@@ -1,0 +1,4 @@
+bin
+*.opensdf
+*.sdf
+*.suo
