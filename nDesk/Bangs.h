@@ -16,7 +16,6 @@ namespace Bangs {
 	void SetWorkArea(HWND, LPCSTR);
 	void On(HWND, LPCSTR);
 	void Off(HWND, LPCSTR);
-	void Test(HWND, LPCSTR);
 
 	typedef struct BangItem {
 		char szName[54];

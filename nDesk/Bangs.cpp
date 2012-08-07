@@ -20,7 +20,6 @@ namespace Bangs {
 		{"SetWorkArea", SetWorkArea},
 		{"On", On},
 		{"Off", Off},
-		{"Test", Test},
 		{NULL, NULL}
 	};
 }
@@ -66,17 +65,4 @@ void Bangs::On(HWND, LPCSTR pszArgs) {
 /// </summary>
 void Bangs::Off(HWND, LPCSTR pszArgs) {
 	g_pClickHandler->RemoveHandlers(pszArgs);
-}
-
-/// <summary>
-///	Removes click handlers.
-/// </summary>
-void Bangs::Test(HWND, LPCSTR) {
-	NOTIFYICONIDENTIFIER n;
-	RECT r;
-	ZeroMemory(&r, sizeof(RECT));
-	n.cbSize = sizeof(NOTIFYICONIDENTIFIER);
-	n.hWnd = (HWND)0x123;
-	n.uID = 0x42;
-	Shell_NotifyIconGetRect(&n, &r);
 }
