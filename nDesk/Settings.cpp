@@ -12,6 +12,9 @@
 
 extern DesktopPainter* g_pDesktopPainter;
 
+/// <summary>
+/// Loads all settings from .RC files and applies them.
+/// </summary>
 void Settings::Load() {
 	using namespace nCore::InputParsing;
 
@@ -31,12 +34,16 @@ void Settings::Load() {
 	g_pDesktopPainter->SetTransitionType(TransitionTypeFromString(buf));
 }
 
-
+/// <summary>
+/// String -> EasingType
+/// </summary>
 DesktopPainter::EasingType Settings::EasingFromString(LPCSTR pszEasing) {
 	return DesktopPainter::EasingType::LINEAR;
 }
 
-
+/// <summary>
+/// String -> TransitionType
+/// </summary>
 DesktopPainter::TransitionType Settings::TransitionTypeFromString(LPCSTR pszTransition) {
 	if (_stricmp(pszTransition, "FadeIn") == 0) return DesktopPainter::TransitionType::FADE_IN;
 	if (_stricmp(pszTransition, "FadeOut") == 0) return DesktopPainter::TransitionType::FADE_OUT;

@@ -58,6 +58,7 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath
 	// Initialize
 	g_pMonitorInfo = new MonitorInfo();
 	g_pClickHandler = new ClickHandler();
+	g_pDesktopPainter = NULL; // Initalized on WM_CREATE
 
 	// Create the main window
 	if (!CreateMainWindow(hDllInstance))
@@ -169,6 +170,8 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	case LM_REFRESH:
 		g_pClickHandler->Refresh();
+		WorkArea::LoadSettings(g_pMonitorInfo, true);
+		Settings::Load();
 		return 0;
 	
 	case WM_MOUSEWHEEL:
