@@ -1,0 +1,87 @@
+nDesk 1.0 by Alucard2
+
+nDesk is LiteStep desktop module.
+
+Settings:
+-------------------------------------------------------------------------------
+nDeskWallpaperChangeEffect (EFFECT)
+- Effect to apply when the wallpaper changes. Valid options are none and fade.
+
+*nDeskWorkArea (MONITOR) (INTEGER) (INTEGER) (INTEGER) (INTEGER)
+- Sets the workarea for the specified monitor. The workarea is the area
+  maximized applications of the specified monitor will occupy.
+
+*nDeskOn (EVENT) (MODKEYS) (ACTION)
+- Will fire ACTION when EVENT occurs and MODKEYS are active.
+
+*nDeskOn (EVENT) (MODKEYS) (COORDINATE) (COORDINATE) (LENGTH) (LENGTH) (ACTION)
+- Will fire ACTION when EVENT occurs in the specified rectangle and MODKEYS are
+  active.
+
+Bangs:
+-------------------------------------------------------------------------------
+!nDeskSetWorkArea (MONITOR) (INTEGER) (INTEGER) (INTEGER) (INTEGER)
+- Sets the workarea for the specified monitor. The workarea is the area
+  maximized applications of the specified monitor will occupy.
+
+!nDeskOn (EVENT) (MODKEYS) (ACTION)
+ - Will fire ACTION when EVENT occurs and MODKEYS are active.
+
+!nDeskOn (EVENT) (MODKEYS) (COORDINATE) (COORDINATE) (LENGTH) (LENGTH) (ACTION)
+- Will fire ACTION when EVENT occurs in the specified rectangle and MODKEYS are
+  active.
+
+!nDeskOff (EVENT) (MODKEYS) [COORDINATE] [COORDINATE] [LENGTH] [LENGTH]
+- Will remove any EVENT/MODKEYS combination which is contained within the
+  specified rectangle.
+
+Event Types:
+-------------------------------------------------------------------------------
+WheelUp
+ - Fires when the mousewheel is scrolled up.
+WheelDown
+ - Fires when the mousewheel is scrolled down.
+WheelRight
+ - Fires when the mousewheel is scrolled right.
+WheelLeft
+ - Fires when the mousewheel is scrolled left.
+LeftClickDown
+ - Fires when the left mouse button is pressed.
+LeftClickUp
+ - Fires when the left mouse button is released.
+LeftDoubleClick
+ - Fires when a double click is made with the left mouse button. Note that the
+   up and down events will also fire.
+MiddleClickDown
+ - Fires when the middle mouse button is pressed.
+MiddleClickUp
+ - Fires when the middle mouse button is released.
+MiddleDoubleClick
+ - Fires when a double click is made with the middle mouse button. Note that the
+   up and down events will also fire.
+RightClickDown
+ - Fires when the right mouse button is pressed.
+RightClickUp
+ - Fires when the right mouse button is released.
+RightDoubleClick
+ - Fires when a double click is made with the right mouse button. Note that the
+   up and down events will also fire.
+X1ClickDown
+ - Fires when the x1 mouse button is pressed.
+X1ClickUp
+ - Fires when the x1 mouse button is released.
+X1DoubleClick
+ - Fires when a double click is made with the x1 mouse button. Note that the
+   up and down events will also fire.
+X2ClickDown
+ - Fires when the x1 mouse button is pressed.
+X2ClickUp
+ - Fires when the x1 mouse button is released.
+X2DoubleClick
+ - Fires when a double click is made with the x1 mouse button. Note that the
+   up and down events will also fire.
+   
+Changelog:
+-------------------------------------------------------------------------------
+v1.0 (2012-07-??)
+ - Initial Release.
