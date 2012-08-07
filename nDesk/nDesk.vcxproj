@@ -188,6 +188,9 @@
     <ClCompile Include="TransitionEffects\SlideEffect.cpp" />
     <ClCompile Include="WorkArea.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nDesk.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

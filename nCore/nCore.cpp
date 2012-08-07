@@ -23,7 +23,7 @@ MonitorInfo* g_pMonitorInfo;
 
 // Constants
 const VERSION g_version		= 0x01000000;
-const char g_rcsRevision[]	= "1.0";
+const char g_rcsRevision[]	= "0.1";
 const char g_szAppName[]	= "nCore";
 const char g_szMsgHandler[] = "LSnCore";
 const char g_szAuthor[]		= "Alurcard2";

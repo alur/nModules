@@ -19,7 +19,7 @@
 
 // Constants
 const int  g_minCoreVersion = 0x01000000;
-LPCSTR g_rcsRevision		= "1.0";
+LPCSTR g_rcsRevision		= "0.1";
 LPCSTR g_szAppName			= "nDesk";
 LPCSTR g_szMainHandler		= "DesktopBackgroundClass";
 LPCSTR g_szAuthor			= "Alurcard2";
