@@ -13,7 +13,7 @@
 #include "../headers/lsapi.h"
 #include "../nShared/Export.h"
 
-void CreateMainWindow(HINSTANCE hInst);
+bool CreateMainWindow(HINSTANCE hInst);
 LRESULT WINAPI MainProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);

@@ -58,7 +58,10 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath
 	// Initialize
 	g_pMonitorInfo = new MonitorInfo();
 	g_pClickHandler = new ClickHandler();
-	CreateMainWindow(hDllInstance);
+
+	// Create the main window
+	if (!CreateMainWindow(hDllInstance))
+		return 1;
 
 	// Load bang commands
 	Bangs::_Register();
@@ -83,17 +86,21 @@ void quitModule(HINSTANCE hDllInstance) {
 	// Unregister bangs
 	Bangs::_Unregister();
 
-	// Deinitalize
+	// Destroy the main window
 	if (g_hwndMain) {
 		SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)g_hwndMain, (LPARAM)g_lsMessages);
 		DestroyWindow(g_hwndMain);
 	}
+
+	// Delete global classes
 	if (g_pDesktopPainter) delete g_pDesktopPainter;
 	if (g_pClickHandler) delete g_pClickHandler;
 	if (g_pMonitorInfo) delete g_pMonitorInfo;
 
+	// Unregister the desktopbackgrounclass
 	UnregisterClass(g_szMainHandler, hDllInstance);
 
+	// Let go of any factories we've allocated
 	Factories::Release();
 }
 
@@ -101,7 +108,7 @@ void quitModule(HINSTANCE hDllInstance) {
 /// Creates the main message handler.
 /// </summary>
 /// <param name="hInst">The instance to attach this message handler to.</param>
-void CreateMainWindow(HINSTANCE hInst) {
+bool CreateMainWindow(HINSTANCE hInst) {
 	WNDCLASSEX wc;
 	ZeroMemory(&wc, sizeof(WNDCLASSEX));
 	wc.cbSize = sizeof(WNDCLASSEX);
@@ -113,19 +120,27 @@ void CreateMainWindow(HINSTANCE hInst) {
 	wc.style = CS_DBLCLKS;
 
 	if (!RegisterClassEx(&wc)) {
-		MessageBox(NULL, TEXT("Error registering Desktop window class"), TEXT("Debug"), MB_OK);
-		return;
+		ErrorMessage(E_LVL_ERROR, TEXT("Error registering the desktop background class, is there already a desktop module loaded?"));
+		return false;
 	}
 
 	g_hwndMain = CreateWindowEx(WS_EX_TOOLWINDOW, g_szMainHandler, "", WS_POPUP|WS_CLIPSIBLINGS|WS_CLIPCHILDREN,
 		g_pMonitorInfo->m_virtualDesktop.rect.left, g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height,
 		NULL, NULL, hInst, NULL);
 
+	if (!g_hwndMain) {
+		ErrorMessage(E_LVL_ERROR, TEXT("Failed to create the desktop background window!"));
+		UnregisterClass(g_szMainHandler, hInst);
+		return false;
+	}
+
 	SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)g_hwndMain, (LPARAM) g_lsMessages);
 
 	SetWindowLongPtr(g_hwndMain, GWLP_USERDATA, MAGIC_DWORD);
 	SetWindowPos(g_hwndMain, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE|SWP_NOACTIVATE|SWP_NOSENDCHANGING);
 	ShowWindow(g_hwndMain, SW_SHOWNOACTIVATE);
+
+	return true;
 }
 
 /// <summary>
