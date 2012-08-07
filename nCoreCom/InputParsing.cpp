@@ -13,6 +13,7 @@
 bool (__cdecl * _pParseCoordinate)(LPCSTR, int *, bool, bool);
 bool (__cdecl * _pParseLength)(LPCSTR, int *, bool, bool);
 bool (__cdecl * _pParseMonitor)(LPCSTR, UINT *);
+bool (__cdecl * _pParseBool)(LPCSTR);
 int (__cdecl * _pGetPrefixedRCInt)(LPCSTR, LPCSTR, int);
 float (__cdecl * _pGetPrefixedRCFloat)(LPCSTR, LPCSTR, float);
 double (__cdecl * _pGetPrefixedRCDouble)(LPCSTR, LPCSTR, double);
@@ -30,6 +31,7 @@ HRESULT nCore::InputParsing::Init(HMODULE hCoreInstance) {
 	INIT_FUNC(_pParseCoordinate,bool (__cdecl *)(LPCSTR, int *, bool, bool),"ParseCoordinateEx")
 	INIT_FUNC(_pParseLength,bool (__cdecl *)(LPCSTR, int *, bool, bool),"ParseLength")
 	INIT_FUNC(_pParseMonitor,bool (__cdecl *)(LPCSTR, UINT *),"ParseMonitor")
+	INIT_FUNC(_pParseBool,bool (__cdecl *)(LPCSTR),"ParseBool")
 
 	INIT_FUNC(_pGetPrefixedRCInt,int (__cdecl *)(LPCSTR, LPCSTR, int),"GetPrefixedRCInt")
 	INIT_FUNC(_pGetPrefixedRCFloat,float (__cdecl *)(LPCSTR, LPCSTR, float),"GetPrefixedRCFloat")
@@ -75,6 +77,10 @@ bool nCore::InputParsing::ParseLength(LPCSTR szLength, int * target, bool canBeR
 /// <returns>True if pszMonitor is a valid length.</return>
 bool nCore::InputParsing::ParseMonitor(LPCSTR pszMonitor, UINT * target) {
 	return _pParseMonitor(pszMonitor, target);
+}
+
+bool nCore::InputParsing::ParseBool(LPCSTR pszBool) {
+	return _pParseBool(pszBool);
 }
 
 int nCore::InputParsing::GetPrefixedRCInt(LPCSTR szPrefix, LPCSTR szOption, int nDefault) {

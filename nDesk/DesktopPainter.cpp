@@ -32,6 +32,7 @@ DesktopPainter::DesktopPainter(HWND hWnd) {
 	m_pOldWallpaperBrush = NULL;
 	m_TransitionEffect = NULL;
 	m_pRenderTarget = NULL;
+	m_bInvalidateAllOnUpdate = false;
 	ZeroMemory(&m_TransitionSettings, sizeof(TransitionEffect::TransitionSettings));
 
 	//
@@ -172,6 +173,13 @@ void DesktopPainter::SetFrameInterval(int iFrameInterval) {
 }
 
 /// <summary>
+///	Changes m_bInvalidateAllOnUpdate
+/// </summary>
+void DesktopPainter::SetInvalidateAllOnUpdate(bool bValue) {
+	m_bInvalidateAllOnUpdate = bValue;
+}
+
+/// <summary>
 ///	Should be called when the desktop has been resized.
 /// </summary>
 void DesktopPainter::Resize() {
@@ -231,7 +239,7 @@ void DesktopPainter::UpdateWallpaper(bool bNoTransition) {
 ///	Causes the whole desktop window to be redrawn
 /// </summary>
 void DesktopPainter::Redraw() {
-	InvalidateRect(m_hWnd, NULL, true);
+	InvalidateRect(m_bInvalidateAllOnUpdate ? NULL : m_hWnd, NULL, true);
 	UpdateWindow(m_hWnd);
 }
 

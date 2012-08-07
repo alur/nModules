@@ -74,6 +74,8 @@ public:
 	void SetTransitionTime(int);
 	void SetFrameInterval(int);
 	void SetSquareSize(int);
+	
+	void SetInvalidateAllOnUpdate(bool);
 
 	void TransitionStep();
 	
@@ -112,6 +114,10 @@ private:
 
 	// Holds all settings for transitions. Passed in to the transitions on init.
 	TransitionEffect::TransitionSettings m_TransitionSettings;
+
+	// If on, every window will be repainted when the wallpaper is changed instead of just the
+	// desktop background. Fixes issues with other modules (xModules).
+	bool m_bInvalidateAllOnUpdate;
 };
 
 #endif /* DESKTOPPAINTER_HPP */

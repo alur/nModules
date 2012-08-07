@@ -148,6 +148,13 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR pszColor, ARGB* target) {
 }
 
 /// <summary>
+/// String -> Bool
+/// </summary>
+EXPORT_CDECL(bool) ParseBool(LPCSTR pszBool) {
+	return lstrcmpi(pszBool, "off") && lstrcmpi(pszBool, "false") && lstrcmpi(pszBool, "no");
+}
+
+/// <summary>
 /// Reads a prefixed color value from an RC file
 /// </summary>
 EXPORT_CDECL(ARGB) GetPrefixedRCColor(LPCSTR szPrefix, LPCSTR szOption, ARGB nDefault) {

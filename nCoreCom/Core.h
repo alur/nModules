@@ -34,6 +34,7 @@ namespace nCore {
 		bool ParseCoordinate(LPCSTR, int *, bool canBeRelative = true, bool canBeNegative = true);
 		bool ParseLength(LPCSTR, int *, bool canBeRelative = true, bool canBeNegative = false);
 		bool ParseMonitor(LPCSTR pszMonitor, UINT * target);
+		bool ParseBool(LPCSTR pszBool);
 
 		int GetPrefixedRCInt(LPCSTR szPrefix, LPCSTR szOption, int nDefault);
 		float GetPrefixedRCFloat(LPCSTR szPrefix, LPCSTR szOption, float fDefault);

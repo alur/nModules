@@ -32,6 +32,9 @@ void Settings::Load() {
 	// 
 	GetRCString("nDeskTransitionEffect",  buf, "FadeOut", sizeof(buf));
 	g_pDesktopPainter->SetTransitionType(TransitionTypeFromString(buf));
+
+	//
+	g_pDesktopPainter->SetInvalidateAllOnUpdate(GetRCBoolDef("nDeskInvalidateAllOnUpdate", FALSE) != FALSE);
 }
 
 /// <summary>

@@ -26,6 +26,8 @@ namespace Bangs {
 	void SetTransitionSquareSize(HWND, LPCSTR);
 	void SetTransitionEffect(HWND, LPCSTR);
 
+	void SetInvalidateAllOnUpdate(HWND, LPCSTR);
+
 	typedef struct BangItem {
 		char szName[54];
 		BANGCOMMANDPROC pCommand;

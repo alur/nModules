@@ -13,6 +13,7 @@
 #include "ClickHandler.hpp"
 #include "DesktopPainter.hpp"
 #include "Settings.h"
+#include "../nCoreCom/Core.h"
 
 extern MonitorInfo* g_pMonitorInfo;
 extern ClickHandler* g_pClickHandler;
@@ -27,6 +28,7 @@ namespace Bangs {
 		{ "SetTransitionFrameInterval", SetTransitionFrameInterval },
 		{ "SetTransitionSquareSize",    SetTransitionSquareSize    },
 		{ "SetTransitionEffect",        SetTransitionEffect        },
+		{ "SetInvalidateAllOnUpdate",   SetInvalidateAllOnUpdate   },
 		{ NULL,                         NULL                       }
 	};
 }
@@ -100,4 +102,11 @@ void Bangs::SetTransitionSquareSize(HWND, LPCSTR pszArgs) {
 /// </summary>
 void Bangs::SetTransitionEffect(HWND, LPCSTR pszArgs) {
 	g_pDesktopPainter->SetTransitionType(Settings::TransitionTypeFromString(pszArgs));
+}
+
+/// <summary>
+///	Sets the transition effect.
+/// </summary>
+void Bangs::SetInvalidateAllOnUpdate(HWND, LPCSTR pszArgs) {
+	g_pDesktopPainter->SetInvalidateAllOnUpdate(nCore::InputParsing::ParseBool(pszArgs));
 }
