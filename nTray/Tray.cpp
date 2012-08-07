@@ -61,12 +61,16 @@ TrayIcon* Tray::AddIcon(LPLSNOTIFYICONDATA pNID) {
 	return tIcon;
 }
 
+/// <summary>
+/// Finds the specified icon.
+/// </summary>
 vector<TrayIcon*>::const_iterator Tray::FindIcon(TrayIcon* pIcon) {
 	for (vector<TrayIcon*>::const_iterator iter = m_icons.begin(); iter != m_icons.end(); iter++) {
 		if ((*iter) == pIcon) {
 			return iter;
 		}
 	}
+	return m_icons.end();
 }
 
 /// <summary>
