@@ -98,17 +98,28 @@ HRESULT DesktopPainter::ReCreateDeviceResources() {
 void DesktopPainter::SetTransitionType(TransitionType transitionType) {
 	m_TransitionType = transitionType;
 
-	// TODO::Handle mid-transition switches
+	// If we are in the middle of a transition, let the current effect cleanup
+	if (m_pOldWallpaperBrush != NULL) {
+		m_TransitionEffect->End();
+	}
 
 	// Delete any existing transition effect
 	if (m_TransitionEffect) {
 		delete m_TransitionEffect;
 	}
 
+	//
 	m_TransitionEffect = TransitionEffectFromType(transitionType);
 
 	if (m_TransitionEffect) {
 		m_TransitionEffect->Initialize(&m_TransitionSettings);
+		if (m_pOldWallpaperBrush != NULL) {
+			m_TransitionEffect->Start(m_pOldWallpaperBrush, m_pWallpaperBrush);
+		}
+	}
+	else if (m_pOldWallpaperBrush != NULL) {
+		m_TransitionSettings.iProgress = m_TransitionSettings.iTime;
+		SAFERELEASE(&m_pOldWallpaperBrush)
 	}
 }
 
