@@ -312,7 +312,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			}
 
 			// If EndDraw fails we need to recreate all device-dependent resources
-			if (FAILED(m_pRenderTarget->EndDraw())) {
+			if (m_pRenderTarget->EndDraw() == D2DERR_RECREATE_TARGET) {
 				DiscardDeviceResources();
 			}
 		}
