@@ -1,13 +1,12 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	nIcon.h															July, 2012
- *	The nModules Project
+ *  nIcon.h                                                         July, 2012
+ *  The nModules Project
  *
- *	Function declarations for nIcon
- *      
- *													             Erik Welander
+ *  Function declarations for nIcon
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef NDESK_H
-#define NDESK_H
+#ifndef NICON_H
+#define NICON_H
 
 #include "../nShared/Export.h"
 
@@ -17,4 +16,4 @@ LRESULT WINAPI LSMsgHandlerProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);
 EXPORT_CDECL(void) quitModule(HINSTANCE);
 
-#endif /* NDESK_H */
+#endif /* NICON_H */

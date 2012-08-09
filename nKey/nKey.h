@@ -1,13 +1,12 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	nLabel.h														July, 2012
- *	The nModules Project
+ *  nKey.h                                                          July, 2012
+ *  The nModules Project
  *
- *	Functions declarations for nLabel.cpp.
- *      
- *													             Erik Welander
+ *  Functions declarations for nKey.cpp.
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef NLABEL_H
-#define NLABEL_H
+#ifndef NKEY_H
+#define NKEY_H
 
 #include "../nShared/Export.h"
 
@@ -23,4 +22,4 @@ UINT ParseKey(LPCSTR szKey);
 EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);
 EXPORT_CDECL(void) quitModule(HINSTANCE);
 
-#endif /* NLABEL_H */
+#endif /* NKEY_H */

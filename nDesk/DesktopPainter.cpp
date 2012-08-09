@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*	DesktopPainter.cpp												July, 2012
-*	The nModules Project
+*   DesktopPainter.cpp                                              July, 2012
+*   The nModules Project
 *
-*	Paints the desktop.
-*      
-*													             Erik Welander
+*   Paints the desktop.
+*   
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include <Windows.h>
 #include <math.h>
@@ -18,13 +17,11 @@
 
 extern MonitorInfo * g_pMonitorInfo;
 
-// Safe way to release objects which required ->Release()
-#define SAFERELEASE(x) if (*x != NULL) { (*x)->Release(); *x = NULL; }
-
 using namespace D2D1;
 
+
 /// <summary>
-///	Creates a new instance of the DesktopPainter class.
+/// Creates a new instance of the DesktopPainter class.
 /// </summary>
 DesktopPainter::DesktopPainter(HWND hWnd) {
     // Initalize
@@ -49,8 +46,9 @@ DesktopPainter::DesktopPainter(HWND hWnd) {
     SetTransitionType(NONE);
 }
 
+
 /// <summary>
-///	Destroys this instance of the DesktopPainter class.
+/// Destroys this instance of the DesktopPainter class.
 /// </summary>
 DesktopPainter::~DesktopPainter() {
     DiscardDeviceResources();
@@ -60,17 +58,19 @@ DesktopPainter::~DesktopPainter() {
     }
 }
 
+
 /// <summary>
-///	Releases all D2D device depenent resources
+/// Releases all D2D device depenent resources
 /// </summary>
 void DesktopPainter::DiscardDeviceResources() {
     SAFERELEASE(&m_pRenderTarget)
-        SAFERELEASE(&m_pWallpaperBrush)
-        SAFERELEASE(&m_pOldWallpaperBrush)
+    SAFERELEASE(&m_pWallpaperBrush)
+    SAFERELEASE(&m_pOldWallpaperBrush)
 }
 
+
 /// <summary>
-///	(Re)Creates all device dependent resources
+/// (Re)Creates all device dependent resources
 /// </summary>
 HRESULT DesktopPainter::ReCreateDeviceResources() {
     HRESULT hr = S_OK;
@@ -93,8 +93,9 @@ HRESULT DesktopPainter::ReCreateDeviceResources() {
     return hr;
 }
 
+
 /// <summary>
-///	Changes the transition type
+/// Changes the transition type
 /// </summary>
 void DesktopPainter::SetTransitionType(TransitionType transitionType) {
     m_TransitionType = transitionType;
@@ -124,8 +125,9 @@ void DesktopPainter::SetTransitionType(TransitionType transitionType) {
     }
 }
 
+
 /// <summary>
-///	Retrives a new transition effect class based on the specified transition type
+/// Retrives a new transition effect class based on the specified transition type
 /// </summary>
 TransitionEffect* DesktopPainter::TransitionEffectFromType(TransitionType transitionType) {
     switch (transitionType) {
@@ -162,39 +164,44 @@ TransitionEffect* DesktopPainter::TransitionEffectFromType(TransitionType transi
     }
 }
 
+
 /// <summary>
-///	Changes the transition time
+/// Changes the transition time
 /// </summary>
 void DesktopPainter::SetTransitionTime(int iTransitionTime) {
     assert(iTransitionTime >= 0);
     m_TransitionSettings.iTime = iTransitionTime;
 }
 
+
 /// <summary>
-///	Changes the square size for square based animations
+/// Changes the square size for square based animations
 /// </summary>
 void DesktopPainter::SetSquareSize(int iSquareSize) {
     m_TransitionSettings.iSquareSize = iSquareSize;
     if (m_TransitionEffect) m_TransitionEffect->Resize();
 }
 
+
 /// <summary>
-///	Changes the frame interval
+/// Changes the frame interval
 /// </summary>
 void DesktopPainter::SetFrameInterval(int iFrameInterval) {
     assert(iFrameInterval > 0);
     m_TransitionSettings.iFrameInterval = iFrameInterval;
 }
 
+
 /// <summary>
-///	Changes m_bInvalidateAllOnUpdate
+/// Changes m_bInvalidateAllOnUpdate
 /// </summary>
 void DesktopPainter::SetInvalidateAllOnUpdate(bool bValue) {
     m_bInvalidateAllOnUpdate = bValue;
 }
 
+
 /// <summary>
-///	Should be called when the desktop has been resized.
+/// Should be called when the desktop has been resized.
 /// </summary>
 void DesktopPainter::Resize() {
     // Resize the window
@@ -213,8 +220,9 @@ void DesktopPainter::Resize() {
     UpdateWallpaper(true);
 }
 
+
 /// <summary>
-///	Should be called when the desktop has been resized, or during init.
+/// Should be called when the desktop has been resized, or during init.
 /// </summary>
 void DesktopPainter::CalculateSizeDepdenentStuff() {
     // Update the virtual desktop rect
@@ -224,8 +232,9 @@ void DesktopPainter::CalculateSizeDepdenentStuff() {
     m_TransitionSettings.WPRect.right = (float)g_pMonitorInfo->m_virtualDesktop.width;
 }
 
+
 /// <summary>
-///	Updates the desktop wallpaper.
+/// Updates the desktop wallpaper.
 /// </summary>
 /// <param name="bNoTransition">If true, there will be no transition.</param>
 void DesktopPainter::UpdateWallpaper(bool bNoTransition) {
@@ -249,16 +258,18 @@ void DesktopPainter::UpdateWallpaper(bool bNoTransition) {
     Redraw();
 }
 
+
 /// <summary>
-///	Causes the whole desktop window to be redrawn
+/// Causes the whole desktop window to be redrawn
 /// </summary>
 void DesktopPainter::Redraw() {
     InvalidateRect(m_bInvalidateAllOnUpdate ? NULL : m_hWnd, NULL, true);
     UpdateWindow(m_hWnd);
 }
 
+
 /// <summary>
-///	Should be called when a new frame in the transition needs to be painted.
+/// Should be called when a new frame in the transition needs to be painted.
 /// </summary>
 void DesktopPainter::TransitionStep() {
     m_TransitionSettings.iProgress += m_TransitionSettings.iFrameInterval;
@@ -268,15 +279,17 @@ void DesktopPainter::TransitionStep() {
     Redraw();
 }
 
+
 /// <summary>
-///	Regular painting
+/// Regular painting
 /// </summary>
 void DesktopPainter::Paint() {
     m_pRenderTarget->FillRectangle(m_TransitionSettings.WPRect, m_pWallpaperBrush);
 }
 
+
 /// <summary>
-///	Called prior to the first painting call, to let the transition effect initialize.
+/// Called prior to the first painting call, to let the transition effect initialize.
 /// </summary>
 void DesktopPainter::TransitionStart() {
     m_TransitionSettings.iProgress = 0;
@@ -284,8 +297,9 @@ void DesktopPainter::TransitionStart() {
     m_TransitionEffect->Start(m_pOldWallpaperBrush, m_pWallpaperBrush);
 }
 
+
 /// <summary>
-///	Called after the transition is done, to let the transition effect do cleanup.
+/// Called after the transition is done, to let the transition effect do cleanup.
 /// </summary>
 void DesktopPainter::TransitionEnd() {
     m_TransitionEffect->End();
@@ -295,8 +309,9 @@ void DesktopPainter::TransitionEnd() {
     Paint();
 }
 
+
 /// <summary>
-///	Paints a composite of the previous wallpaper and the current one
+/// Paints a composite of the previous wallpaper and the current one
 /// </summary>
 void DesktopPainter::PaintComposite() {
     m_TransitionEffect->Paint(m_pRenderTarget, min(1.0f, (float)m_TransitionSettings.iProgress/m_TransitionSettings.iTime));
@@ -307,8 +322,9 @@ void DesktopPainter::PaintComposite() {
     }
 }
 
+
 /// <summary>
-///	Handles certain window messages
+/// Handles certain window messages
 /// </summary>
 LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
@@ -336,8 +352,9 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
+
 /// <summary>
-///	Creates a brush of the current wallpaper.
+/// Creates a brush of the current wallpaper.
 /// </summary>
 HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
     // Information about the wallpaper
@@ -431,7 +448,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
                 }
                 break;
             case 10: // Fill
-                scaleX = (double)g_pMonitorInfo->m_monitors[0].width/cxWallpaper;	
+                scaleX = (double)g_pMonitorInfo->m_monitors[0].width/cxWallpaper;   
                 scaleY = (double)g_pMonitorInfo->m_monitors[0].height/cyWallpaper;
                 if (scaleX < scaleY) {
                     WallpaperResY = g_pMonitorInfo->m_monitors[0].height;
@@ -443,7 +460,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
                 }
                 break;
             case 22: // Span, essentially a fill over the virtual desktop
-                scaleX = (double)g_pMonitorInfo->m_virtualDesktop.width/cxWallpaper;	
+                scaleX = (double)g_pMonitorInfo->m_virtualDesktop.width/cxWallpaper;    
                 scaleY = (double)g_pMonitorInfo->m_virtualDesktop.height/cyWallpaper;
                 if (scaleX < scaleY) {
                     WallpaperResY = g_pMonitorInfo->m_virtualDesktop.height;
