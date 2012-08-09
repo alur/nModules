@@ -75,6 +75,8 @@ DesktopPainter::TransitionType Settings::TransitionTypeFromString(LPCSTR pszTran
 	if (_stricmp(pszTransition, "SquaresLinearVerticalOut") == 0) return DesktopPainter::TransitionType::SQUARES_LINEAR_VERTICAL_OUT;
 	if (_stricmp(pszTransition, "SquaresLinearHorizontalIn") == 0) return DesktopPainter::TransitionType::SQUARES_LINEAR_HORIZONTAL_IN;
 	if (_stricmp(pszTransition, "SquaresLinearHorizontalOut") == 0) return DesktopPainter::TransitionType::SQUARES_LINEAR_HORIZONTAL_OUT;
+    if (_stricmp(pszTransition, "SquaresTriangularBottomRightIn") == 0) return DesktopPainter::TransitionType::SQUARES_TRIANGULAR_BOTTOM_RIGHT_IN;
+	if (_stricmp(pszTransition, "SquaresTriangularBottomRightOut") == 0) return DesktopPainter::TransitionType::SQUARES_TRIANGULAR_BOTTOM_RIGHT_OUT;
 
 	return DesktopPainter::TransitionType::NONE;
 }

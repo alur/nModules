@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	nCore.h									    					July, 2012
- *	The nModules Project
+ *  nCore.h									    					July, 2012
+ *  The nModules Project
  *
- *	Functions declarations for nCore.cpp.
+ *  Functions declarations for nCore.cpp.
  *      
  *													             Erik Welander
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

@@ -26,6 +26,9 @@ public:
 		// The size of the squares used during square transitions
 		int iSquareSize;
 
+		// For animations that fade different parts at different times, how long the fading of an induvidual part should take.
+		float fFadeTime;
+
 		// The rect encompassing the entire screen
 		D2D1_RECT_F WPRect;
 

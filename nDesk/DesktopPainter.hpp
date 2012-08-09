@@ -1,11 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	DesktopPainter.hpp												July, 2012
- *	The nModules Project
- *
- *	Function declarations for the DesktopPainter class.
- *      
- *													             Erik Welander
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+*	DesktopPainter.hpp												July, 2012
+*	The nModules Project
+*
+*	Function declarations for the DesktopPainter class.
+*      
+*													             Erik Welander
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef DESKTOPPAINTER_HPP
 #define DESKTOPPAINTER_HPP
 
@@ -14,110 +14,112 @@
 
 class DesktopPainter {
 public:
-	// Available transition types
-	enum TransitionType {
-		NONE,
+    // Available transition types
+    enum TransitionType {
+        NONE,
 
-		FADE_IN,
-		FADE_OUT,
+        FADE_IN,
+        FADE_OUT,
 
-		SLIDE_BOTH_LEFT,
-		SLIDE_BOTH_RIGHT,
-		SLIDE_BOTH_UP,
-		SLIDE_BOTH_DOWN,
-		SLIDE_IN_LEFT,
-		SLIDE_IN_RIGHT,
-		SLIDE_IN_UP,
-		SLIDE_IN_DOWN,
-		SLIDE_OUT_LEFT,
-		SLIDE_OUT_RIGHT,
-		SLIDE_OUT_UP,
-		SLIDE_OUT_DOWN,
+        SLIDE_BOTH_LEFT,
+        SLIDE_BOTH_RIGHT,
+        SLIDE_BOTH_UP,
+        SLIDE_BOTH_DOWN,
+        SLIDE_IN_LEFT,
+        SLIDE_IN_RIGHT,
+        SLIDE_IN_UP,
+        SLIDE_IN_DOWN,
+        SLIDE_OUT_LEFT,
+        SLIDE_OUT_RIGHT,
+        SLIDE_OUT_UP,
+        SLIDE_OUT_DOWN,
 
-		SCAN_LEFT,
-		SCAN_RIGHT,
-		SCAN_UP,
-		SCAN_DOWN,
+        SCAN_LEFT,
+        SCAN_RIGHT,
+        SCAN_UP,
+        SCAN_DOWN,
 
-		SQUARES_RANDOM_IN,
-		SQUARES_RANDOM_OUT,
-		SQUARES_LINEAR_VERTICAL_IN,
-		SQUARES_LINEAR_VERTICAL_OUT,
-		SQUARES_LINEAR_HORIZONTAL_IN,
-		SQUARES_LINEAR_HORIZONTAL_OUT,
+        SQUARES_RANDOM_IN,
+        SQUARES_RANDOM_OUT,
+        SQUARES_LINEAR_VERTICAL_IN,
+        SQUARES_LINEAR_VERTICAL_OUT,
+        SQUARES_LINEAR_HORIZONTAL_IN,
+        SQUARES_LINEAR_HORIZONTAL_OUT,
+        SQUARES_TRIANGULAR_BOTTOM_RIGHT_IN,
+        SQUARES_TRIANGULAR_BOTTOM_RIGHT_OUT,
 
-		CLOCKWISE_SQUARES,
-		COUNTERCLOCKWISE_SQUARE,
-		LINEAR_SQUARES_TOP_LEFT,
-		LINEAR_SQUARES_TOP_RIGHT,
-		LINEAR_SQUARES_BOTTOM_LEFT,
-		LINEAR_SQUARES_BOTTOM_RIGHT,
-		TRIANGLE_SQUARES_TOP_LEFT,
-		TRIANGLE_SQUARES_TOP_RIGHT
-	};
+        CLOCKWISE_SQUARES,
+        COUNTERCLOCKWISE_SQUARE,
+        LINEAR_SQUARES_TOP_LEFT,
+        LINEAR_SQUARES_TOP_RIGHT,
+        LINEAR_SQUARES_BOTTOM_LEFT,
+        LINEAR_SQUARES_BOTTOM_RIGHT,
+        TRIANGLE_SQUARES_TOP_LEFT,
+        TRIANGLE_SQUARES_TOP_RIGHT
+    };
 
-	// Available easing types
-	enum EasingType {
-		LINEAR,
-		INQUAD,
-		OUTQUAD,
-		INOUTQUAD,
-		INCUBIC,
-		OUTQUBIC,
-		INOUTCUBIC
-	};
+    // Available easing types
+    enum EasingType {
+        LINEAR,
+        INQUAD,
+        OUTQUAD,
+        INOUTQUAD,
+        INCUBIC,
+        OUTQUBIC,
+        INOUTCUBIC
+    };
 
-	explicit DesktopPainter(HWND);
-	virtual ~DesktopPainter();
+    explicit DesktopPainter(HWND);
+    virtual ~DesktopPainter();
 
-	void SetTransitionType(TransitionType);
-	void SetTransitionTime(int);
-	void SetFrameInterval(int);
-	void SetSquareSize(int);
-	
-	void SetInvalidateAllOnUpdate(bool);
+    void SetTransitionType(TransitionType);
+    void SetTransitionTime(int);
+    void SetFrameInterval(int);
+    void SetSquareSize(int);
 
-	void TransitionStep();
-	
-	void UpdateWallpaper(bool bNoTransition = false);
-	void Resize();
-	LRESULT HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    void SetInvalidateAllOnUpdate(bool);
+
+    void TransitionStep();
+
+    void UpdateWallpaper(bool bNoTransition = false);
+    void Resize();
+    LRESULT HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
 private:
-	void CalculateSizeDepdenentStuff();
-	HRESULT ReCreateDeviceResources();
-	void DiscardDeviceResources();
+    void CalculateSizeDepdenentStuff();
+    HRESULT ReCreateDeviceResources();
+    void DiscardDeviceResources();
 
-	void Paint();
-	void PaintComposite();
-	void Redraw();
+    void Paint();
+    void PaintComposite();
+    void Redraw();
 
-	void TransitionStart();
-	void TransitionEnd();
-	TransitionEffect* TransitionEffectFromType(TransitionType transitionType);
+    void TransitionStart();
+    void TransitionEnd();
+    TransitionEffect* TransitionEffectFromType(TransitionType transitionType);
 
-	HRESULT CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush);
-	
-	//
-	HWND m_hWnd;
+    HRESULT CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush);
 
-	// Direct2D targets
-	ID2D1HwndRenderTarget* m_pRenderTarget;
-	ID2D1BitmapBrush* m_pWallpaperBrush;
-	ID2D1BitmapBrush* m_pOldWallpaperBrush;
+    //
+    HWND m_hWnd;
 
-	// The type of transition we should use
-	TransitionType m_TransitionType;
+    // Direct2D targets
+    ID2D1HwndRenderTarget* m_pRenderTarget;
+    ID2D1BitmapBrush* m_pWallpaperBrush;
+    ID2D1BitmapBrush* m_pOldWallpaperBrush;
 
-	// The transition effect currently in use
-	TransitionEffect* m_TransitionEffect;
+    // The type of transition we should use
+    TransitionType m_TransitionType;
 
-	// Holds all settings for transitions. Passed in to the transitions on init.
-	TransitionEffect::TransitionSettings m_TransitionSettings;
+    // The transition effect currently in use
+    TransitionEffect* m_TransitionEffect;
 
-	// If on, every window will be repainted when the wallpaper is changed instead of just the
-	// desktop background. Fixes issues with other modules (xModules).
-	bool m_bInvalidateAllOnUpdate;
+    // Holds all settings for transitions. Passed in to the transitions on init.
+    TransitionEffect::TransitionSettings m_TransitionSettings;
+
+    // If on, every window will be repainted when the wallpaper is changed instead of just the
+    // desktop background. Fixes issues with other modules (xModules).
+    bool m_bInvalidateAllOnUpdate;
 };
 
 #endif /* DESKTOPPAINTER_HPP */
