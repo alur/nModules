@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*	DesktopPainter.hpp												July, 2012
-*	The nModules Project
+*   DesktopPainter.hpp                                              July, 2012
+*   The nModules Project
 *
-*	Function declarations for the DesktopPainter class.
-*      
-*													             Erik Welander
+*   Function declarations for the DesktopPainter class.
+*   
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef DESKTOPPAINTER_HPP
 #define DESKTOPPAINTER_HPP
@@ -47,15 +46,10 @@ public:
         SQUARES_LINEAR_HORIZONTAL_OUT,
         SQUARES_TRIANGULAR_BOTTOM_RIGHT_IN,
         SQUARES_TRIANGULAR_BOTTOM_RIGHT_OUT,
-
-        CLOCKWISE_SQUARES,
-        COUNTERCLOCKWISE_SQUARE,
-        LINEAR_SQUARES_TOP_LEFT,
-        LINEAR_SQUARES_TOP_RIGHT,
-        LINEAR_SQUARES_BOTTOM_LEFT,
-        LINEAR_SQUARES_BOTTOM_RIGHT,
-        TRIANGLE_SQUARES_TOP_LEFT,
-        TRIANGLE_SQUARES_TOP_RIGHT
+        SQUARES_CLOCKWISE_IN,
+        SQUARES_CLOCKWISE_OUT,
+        SQUARES_COUNTERCLOCKWISE_IN,
+        SQUARES_COUNTERCLOCKWISE_OUT
     };
 
     // Available easing types

@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	WorkArea.h														July, 2012
- *	The nModules Project
+ *  WorkArea.h                                                      July, 2012
+ *  The nModules Project
  *
- *	Function declarations for WorkArea.cpp
- *      
- *													             Erik Welander
+ *  Function declarations for WorkArea.cpp
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef WORKAREA_H
 #define WORKAREA_H
@@ -12,9 +11,9 @@
 #include "../nShared/MonitorInfo.hpp"
 
 namespace WorkArea {
-	void LoadSettings(MonitorInfo *, bool = false);
-	void ResetWorkAreas(MonitorInfo *);
-	void ParseLine(MonitorInfo *, LPCSTR);
+    void LoadSettings(MonitorInfo *, bool = false);
+    void ResetWorkAreas(MonitorInfo *);
+    void ParseLine(MonitorInfo *, LPCSTR);
 }
 
 #endif /* WORKAREA_H */

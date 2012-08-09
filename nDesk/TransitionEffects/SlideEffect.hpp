@@ -1,29 +1,25 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*   SlideEffect.hpp												  August, 2012
-*   The nModules Project
+*  SlideEffect.hpp                                                August, 2012
+*  The nModules Project
 *
-*   Function declarations for the SlideEffect class.
-*      
-*													             Erik Welander
+*  Function declarations for the SlideEffect class.
+*  
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef SLIDEEFFECT_HPP
 #define SLIDEEFFECT_HPP
 
 #include "../TransitionEffect.hpp"
 
-class SlideEffect : public TransitionEffect
-{
+class SlideEffect : public TransitionEffect {
 public:
-    enum SlideDirection
-    {
+    enum SlideDirection {
         UP,
         DOWN,
         LEFT,
         RIGHT
     };
 
-    enum SlideType
-    {
+    enum SlideType {
         // Slides both the new and old image as one
         BOTH,
 

@@ -1,22 +1,19 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*   GridEffect.hpp												  August, 2012
-*   The nModules Project
+*  GridEffect.hpp                                                 August, 2012
+*  The nModules Project
 *
-*   Function declarations for the GridEffect class.
-*      
-*													             Erik Welander
+*  Function declarations for the GridEffect class.
+*  
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef GRIDEFFECT_HPP
 #define GRIDEFFECT_HPP
 
 #include "../TransitionEffect.hpp"
 
-class GridEffect : public TransitionEffect
-{
+class GridEffect : public TransitionEffect {
 public:
     //
-    enum GridType
-    {
+    enum GridType {
         RANDOM,
         LINEAR_VERTICAL,
         LINEAR_HORIZONTAL,
@@ -24,8 +21,7 @@ public:
     };
 
     //
-    enum GridStyle
-    {
+    enum GridStyle {
         SHOW_NEW,
         HIDE_OLD
     };

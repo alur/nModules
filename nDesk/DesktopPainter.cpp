@@ -291,8 +291,8 @@ void DesktopPainter::TransitionEnd() {
     m_TransitionEffect->End();
     SAFERELEASE(&m_pOldWallpaperBrush)
 
-        // Repaint, just for good measure
-        Paint();
+    // Repaint, just for good measure
+    Paint();
 }
 
 /// <summary>
@@ -534,10 +534,10 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
         }
 
         SAFERELEASE(&pConverter)
-            SAFERELEASE(&pDecoder)
-            SAFERELEASE(&pBitmap)
-            SAFERELEASE(&pSource)
-            SAFERELEASE(&pScaler)
+        SAFERELEASE(&pDecoder)
+        SAFERELEASE(&pBitmap)
+        SAFERELEASE(&pSource)
+        SAFERELEASE(&pScaler)
     }
 
     // Finish rendering
@@ -547,7 +547,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
     m_pRenderTarget->CreateBitmapBrush(pBitmap, ppBitmapBrush);
 
     SAFERELEASE(&pBitmap)
-        SAFERELEASE(&pBitmapRender)
+    SAFERELEASE(&pBitmapRender)
 
-        return S_OK;
+    return S_OK;
 }

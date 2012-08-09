@@ -1,16 +1,14 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*   Bangs.h															July, 2012
-*   The nModules Project
+*  Bangs.h                                                          July, 2012
+*  The nModules Project
 *
-*   Function declarations for Bangs.cpp
-*      
-*													             Erik Welander
+*  Function declarations for Bangs.cpp
+*   
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef BANGS_H
 #define BANGS_H
 
-namespace Bangs
-{
+namespace Bangs {
     void _Register();
     void _Unregister();
 
@@ -29,8 +27,7 @@ namespace Bangs
 
     void SetInvalidateAllOnUpdate(HWND, LPCSTR);
 
-    typedef struct BangItem
-    {
+    typedef struct {
         char szName[54];
         BANGCOMMANDPROC pCommand;
     } BangItem;

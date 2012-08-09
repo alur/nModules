@@ -1,21 +1,18 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*   FadeEffect.hpp												  August, 2012
-*   The nModules Project
+*  FadeEffect.hpp                                                 August, 2012
+*  The nModules Project
 *
-*   Function declarations for the FadeEffect class.
-*      
-*													             Erik Welander
+*  Function declarations for the FadeEffect class.
+*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef FADEEFFECT_HPP
 #define FADEEFFECT_HPP
 
 #include "../TransitionEffect.hpp"
 
-class FadeEffect : public TransitionEffect
-{
+class FadeEffect : public TransitionEffect {
 public:
-    enum FadeType
-    {
+    enum FadeType {
         FADE_IN,
         FADE_OUT
     };

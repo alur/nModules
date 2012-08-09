@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nCore.h									    					July, 2012
+ *  nCore.h                                                       August, 2012
  *  The nModules Project
  *
- *  Functions declarations for nCore.cpp.
- *      
- *													             Erik Welander
+ *  Functions declarations for nCore.cpp
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef NCORE_H
 #define NCORE_H

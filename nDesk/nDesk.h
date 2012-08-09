@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	nDesk.h															July, 2012
- *	The nModules Project
+ *  nDesk.h                                                         July, 2012
+ *  The nModules Project
  *
- *	Function declarations for nDesk
- *      
- *													             Erik Welander
+ *  Function declarations for nDesk
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef NDESK_H
 #define NDESK_H
