@@ -3,8 +3,7 @@
 *  The nModules Project
 *
 *  Monitors all existing top-level windows.
-*      
-*  Erik Welander
+*  
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef WINDOWMANAGER_H
 #define WINDOWMANAGER_H

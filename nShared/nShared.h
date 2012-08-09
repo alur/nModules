@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	nShared.h														July, 2012
- *	The nModules Project
+ *  nShared.h                                                       July, 2012
+ *  The nModules Project
  *
- *	Contains every declaration in nShared.
- *      
- *													             Erik Welander
+ *  Contains every declaration in nShared.
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef NSHARED_H
 #define NSHARED_H

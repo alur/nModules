@@ -1,11 +1,10 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*	WindowManager.cpp												July, 2012
-*	The nModules Project
+*  WindowManager.cpp                                                July, 2012
+*  The nModules Project
 *
-*	Monitors all existing top-level windows. Forwards notifications to the
-*	taskbars.
-*      
-*													             Erik Welander
+*  Monitors all existing top-level windows. Forwards notifications to the
+*  taskbars.
+*   
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../headers/lsapi.h"
 #include "TaskButton.hpp"

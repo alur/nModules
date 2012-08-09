@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	Export.h														July, 2012
- *	The nModules Project
+ *  Export.h                                                        July, 2012
+ *  The nModules Project
  *
- *	Some defines to simplify DLL export declarations.
- *      
- *													             Erik Welander
+ *  Some defines to simplify DLL export declarations.
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef EXPORT_H
 #define EXPORT_H

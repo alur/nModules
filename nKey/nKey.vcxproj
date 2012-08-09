@@ -147,9 +147,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="nKey.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nKey.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nKey.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	nLabel.h														July, 2012
- *	The nModules Project
+ *  nLabel.h                                                        July, 2012
+ *  The nModules Project
  *
- *	Functions declarations for nLabel.cpp.
- *      
- *													             Erik Welander
+ *  Functions declarations for nLabel.cpp.
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef NLABEL_H
 #define NLABEL_H

@@ -1,13 +1,12 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	nTray.h															July, 2012
- *	The nModules Project
+ *  nTray.h                                                         July, 2012
+ *  The nModules Project
  *
- *	General declarations for nTask
- *      
- *													             Erik Welander
+ *  General declarations for nTask
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef NTASK_H
-#define NTASK_H
+#ifndef NTRAY_H
+#define NTRAY_H
 
 #include "../nShared/Export.h"
 
@@ -20,4 +19,4 @@ void LoadSettings();
 EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);
 EXPORT_CDECL(void) quitModule(HINSTANCE);
 
-#endif /* NTASK_H */
+#endif /* NTRAY_H */

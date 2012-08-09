@@ -30,18 +30,12 @@
     <ClInclude Include="TextFormatting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Painting.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nCore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputParsing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Painting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TextFormatting.cpp">

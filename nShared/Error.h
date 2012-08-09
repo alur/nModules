@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	Error.h															July, 2012
- *	The nModules Project
+ *  Error.h                                                         July, 2012
+ *  The nModules Project
  *
- *	Functions for dealing with errors.
- *      
- *													             Erik Welander
+ *  Functions for dealing with errors.
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef ERROR_H
 #define ERROR_H

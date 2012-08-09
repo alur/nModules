@@ -1,13 +1,12 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	Tray.hpp														July, 2012
- *	The nModules Project
+ *  Tray.hpp                                                        July, 2012
+ *  The nModules Project
  *
- *	Declaration of the Tray class.
- *      
- *													             Erik Welander
+ *  Declaration of the Tray class.
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef TASKBAR_HPP
-#define TASKBAR_HPP
+#ifndef TRAY_HPP
+#define TRAY_HPP
 
 #include <map>
 #include "TrayIcon.hpp"
@@ -17,28 +16,28 @@ using std::map;
 
 class Tray {
 public:
-	explicit Tray(LPCSTR);
-	virtual ~Tray();
+    explicit Tray(LPCSTR);
+    virtual ~Tray();
 
-	void LoadSettings(bool = false);
-	TrayIcon* AddIcon(LPLSNOTIFYICONDATA);
-	void RemoveIcon(TrayIcon*);
-	LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
-	void Relayout();
-	vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* pNID);
+    void LoadSettings(bool = false);
+    TrayIcon* AddIcon(LPLSNOTIFYICONDATA);
+    void RemoveIcon(TrayIcon*);
+    LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
+    void Relayout();
+    vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* pNID);
 
 private:
-	// The name of this tray
-	LPCSTR m_pszName;
+    // The name of this tray
+    LPCSTR m_pszName;
 
-	// The tray's window
-	DrawableWindow* m_pWindow;
+    // The tray's window
+    DrawableWindow* m_pWindow;
 
-	// Settings for painting the tray background
-	PaintSettings* m_pPaintSettings;
+    // Settings for painting the tray background
+    PaintSettings* m_pPaintSettings;
 
-	// The tray icons
-	vector<TrayIcon*> m_icons;
+    // The tray icons
+    vector<TrayIcon*> m_icons;
 };
 
-#endif /* TASKBAR_HPP */
+#endif /* TRAY_HPP */

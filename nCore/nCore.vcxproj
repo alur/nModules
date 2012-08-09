@@ -151,14 +151,12 @@
   <ItemGroup>
     <ClInclude Include="KnownColors.h" />
     <ClInclude Include="nCore.h" />
-    <ClInclude Include="Painting.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TextFormatting.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="InputParsing.cpp" />
     <ClCompile Include="nCore.cpp" />
-    <ClCompile Include="Painting.cpp" />
     <ClCompile Include="TextFormatting.cpp" />
   </ItemGroup>
   <ItemGroup>

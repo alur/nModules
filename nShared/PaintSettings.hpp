@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	PaintSettings.hpp												July, 2012
- *	The nModules Project
+ *  PaintSettings.hpp                                               July, 2012
+ *  The nModules Project
  *
- *	Function declarations for the PaintSettings class.
- *      
- *													             Erik Welander
+ *  Function declarations for the PaintSettings class.
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef PAINTSETTINGS_HPP
 #define PAINTSETTINGS_HPP
@@ -14,32 +13,32 @@
 
 class PaintSettings {
 public:
-	explicit PaintSettings(LPCSTR pszPrefix);
-	virtual ~PaintSettings();
+    explicit PaintSettings(LPCSTR pszPrefix);
+    virtual ~PaintSettings();
 
-	void Load();
-	void OverLoad(LPCSTR pszPrefix);
+    void Load();
+    void OverLoad(LPCSTR pszPrefix);
 
-	RECT position;
-	bool DWMBlur;
-	D2D_COLOR_F backColor;
+    RECT position;
+    bool DWMBlur;
+    D2D_COLOR_F backColor;
 
-	LPCWSTR text;
-	LPCWSTR font;
-	D2D_COLOR_F fontColor;
-	float fontSize;
+    LPCWSTR text;
+    LPCWSTR font;
+    D2D_COLOR_F fontColor;
+    float fontSize;
 
-	D2D_RECT_F textOffset;
+    D2D_RECT_F textOffset;
 
-	DWRITE_TEXT_ALIGNMENT textAlignment;
-	DWRITE_PARAGRAPH_ALIGNMENT textVerticalAlignment;
+    DWRITE_TEXT_ALIGNMENT textAlignment;
+    DWRITE_PARAGRAPH_ALIGNMENT textVerticalAlignment;
 
-	void setText(LPCWSTR);
+    void setText(LPCWSTR);
 
 private:
-	LPCSTR m_pszPrefix;
+    LPCSTR m_pszPrefix;
 
-	D2D_COLOR_F ARGBToD2DColor(DWORD argb);
+    D2D_COLOR_F ARGBToD2DColor(DWORD argb);
 };
 
 #endif /* PAINTSETTINGS_HPP */

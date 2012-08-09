@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	nTask.h															July, 2012
- *	The nModules Project
+ *  nTask.h                                                         July, 2012
+ *  The nModules Project
  *
- *	General declarations for nTask
- *      
- *													             Erik Welander
+ *  General declarations for nTask
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef NTASK_H
 #define NTASK_H

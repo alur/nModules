@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	MonitorInfo.hpp													July, 2012
- *	The nModules Project
+ *  MonitorInfo.hpp                                                 July, 2012
+ *  The nModules Project
  *
- *	Function declarations for the MonitorInfo class.
- *      
- *													             Erik Welander
+ *  Function declarations for the MonitorInfo class.
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef MONITORINFO_HPP
 #define MONITORINFO_HPP
@@ -15,22 +14,22 @@ using std::vector;
 
 class MonitorInfo {
 public:
-	typedef struct Monitor {
-		RECT rect;
-		int width;
-		int height;
-	} Monitor;
+    typedef struct Monitor {
+        RECT rect;
+        int width;
+        int height;
+    } Monitor;
 
-	explicit MonitorInfo();
-	virtual ~MonitorInfo();
-	void Update();
-	UINT MonitorFromHWND(HWND hWnd);
+    explicit MonitorInfo();
+    virtual ~MonitorInfo();
+    void Update();
+    UINT MonitorFromHWND(HWND hWnd);
 
-	// Every monitor
+    // Every monitor
     vector<Monitor> m_monitors;
 
-	// The virtual desktop
-	Monitor m_virtualDesktop;
+    // The virtual desktop
+    Monitor m_virtualDesktop;
 
 private:
 };

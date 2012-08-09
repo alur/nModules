@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	TaskButton.hpp													July, 2012
- *	The nModules Project
+ *  TaskButton.hpp                                                  July, 2012
+ *  The nModules Project
  *
- *	Declaration of the TaskButton class.
- *      
- *													             Erik Welander
+ *  Declaration of the TaskButton class.
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef TASKBUTTON_HPP
 #define TASKBUTTON_HPP
@@ -13,51 +12,51 @@
 
 class TaskButton {
 public:
-	explicit TaskButton(HWND parent, HWND window, LPCSTR prefix);
-	virtual ~TaskButton();
+    explicit TaskButton(HWND parent, HWND window, LPCSTR prefix);
+    virtual ~TaskButton();
 
-	void Reposition(UINT x, UINT y, UINT width, UINT height);
+    void Reposition(UINT x, UINT y, UINT width, UINT height);
 
-	void Activate();
-	void Deactivate();
+    void Activate();
+    void Deactivate();
 
-	void SetIcon(HICON hIcon);
-	void SetText(LPCWSTR pszTitle);
-	void Flash();
+    void SetIcon(HICON hIcon);
+    void SetText(LPCWSTR pszTitle);
+    void Flash();
 
-	void GetMinRect(LPPOINTS lpPoints);
-	void Menu();
-	void Show();
+    void GetMinRect(LPPOINTS lpPoints);
+    void Menu();
+    void Show();
 
-	void LoadSettings(bool = false);
-	LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
+    void LoadSettings(bool = false);
+    LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
 
 private:
-	// The button's window
-	DrawableWindow* m_pWindow;
+    // The button's window
+    DrawableWindow* m_pWindow;
 
-	// Settings for painting the button
-	PaintSettings* m_pPaintSettings;
+    // Settings for painting the button
+    PaintSettings* m_pPaintSettings;
 
-	// The window related to this button
-	HWND m_hWnd;
+    // The window related to this button
+    HWND m_hWnd;
 
-	HWND m_hWndParent;
+    HWND m_hWndParent;
 
-	TRACKMOUSEEVENT m_TrackMouseStruct;
+    TRACKMOUSEEVENT m_TrackMouseStruct;
 
-	LPCSTR m_pszPrefix;
-	LPCSTR m_pszPrefixActive;
-	LPCSTR m_pszPrefixHover;
-	LPCSTR m_pszPrefixFlashing;
+    LPCSTR m_pszPrefix;
+    LPCSTR m_pszPrefixActive;
+    LPCSTR m_pszPrefixHover;
+    LPCSTR m_pszPrefixFlashing;
 
-	bool m_bMouseIsOver;
-	bool m_bIsActive;
-	bool m_bIsFlashing;
+    bool m_bMouseIsOver;
+    bool m_bIsActive;
+    bool m_bIsFlashing;
 
-	HICON m_hIcon;
+    HICON m_hIcon;
 
-	HMENU hMenu;
+    HMENU hMenu;
 };
 
 #endif /* TASKBUTTON_HPP */

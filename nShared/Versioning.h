@@ -1,10 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *	Versioning.h													July, 2012
- *	The nModules Project
+ *  Versioning.h                                                    July, 2012
+ *  The nModules Project
  *
- *	Functions for dealing with versioning.
- *      
- *													             Erik Welander
+ *  Functions for dealing with versioning.
+ *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef VERSIONING_H
 #define VERSIONING_H
