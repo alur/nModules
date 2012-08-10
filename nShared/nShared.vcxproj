@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Debugging.h" />
     <ClInclude Include="DrawableWindow.hpp" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Export.h" />
@@ -30,6 +31,7 @@
     <ClInclude Include="Versioning.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Debugging.cpp" />
     <ClCompile Include="DrawableWindow.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="Factories.cpp" />

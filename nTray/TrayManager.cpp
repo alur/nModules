@@ -7,15 +7,20 @@
 #include "../headers/lsapi.h"
 #include "Tray.hpp"
 #include "TrayManager.h"
+#include "../nShared/Debugging.h"
 
+// The various trays
 extern map<LPCSTR, Tray*> g_Trays;
 
 namespace TrayManager {
+	// All current tray icons
     vector<LPTRAYICONDATA> g_currentIcons;
 }
 
 
-// Need to clear g_currentIcons
+/// <summary>
+/// Stops the tray manager. 
+/// </summary>
 void TrayManager::Stop() {
     for (TRAYICONDATAITER iter = g_currentIcons.begin(); iter != g_currentIcons.end(); iter++) {
         delete (*iter)->icons;
@@ -25,6 +30,9 @@ void TrayManager::Stop() {
 }
 
 
+/// <summary>
+/// Finds a matching icon in g_currentIcons
+/// </summary>
 TrayManager::TRAYICONDATAITER TrayManager::FindIcon(LPLSNOTIFYICONDATA pNID) {
     // There are 2 ways to identify an icon. Same guidItem, or same HWND and same uID.
     // TODO::Look into the guidItem part in the core
@@ -43,6 +51,9 @@ TrayManager::TRAYICONDATAITER TrayManager::FindIcon(LPLSNOTIFYICONDATA pNID) {
 }
 
 
+/// <summary>
+/// Adds the specified icon to the tray, if it exists.
+/// </summary>
 void TrayManager::AddIcon(LPLSNOTIFYICONDATA pNID) {
     if (FindIcon(pNID) == g_currentIcons.end()) {
         TRAYICONDATA* tData = (TRAYICONDATA*)malloc(sizeof(TRAYICONDATA));
@@ -61,6 +72,9 @@ void TrayManager::AddIcon(LPLSNOTIFYICONDATA pNID) {
 }
 
 
+/// <summary>
+/// Deletes the specified icon from all trays, if it exists.
+/// </summary>
 void TrayManager::DeleteIcon(LPLSNOTIFYICONDATA pNID) {
     TRAYICONDATAITER icon = FindIcon(pNID);
     if (icon != g_currentIcons.end()) {
@@ -77,6 +91,9 @@ void TrayManager::DeleteIcon(LPLSNOTIFYICONDATA pNID) {
 }
 
 
+/// <summary>
+/// Modifies an existing icon.
+/// </summary>
 void TrayManager::ModifyIcon(LPLSNOTIFYICONDATA pNID) {
     TRAYICONDATAITER icon = FindIcon(pNID);
     if (icon != g_currentIcons.end()) {
@@ -86,7 +103,7 @@ void TrayManager::ModifyIcon(LPLSNOTIFYICONDATA pNID) {
             (*icon)->NID.uCallbackMessage = pNID->uCallbackMessage;
         }
 
-        //
+        // Check if we should update the icon
         if ((pNID->uFlags & NIF_ICON) == NIF_ICON) {
             if ((*icon)->NID.hIcon != pNID->hIcon) {
                 (*icon)->NID.hIcon = pNID->hIcon;
@@ -99,11 +116,17 @@ void TrayManager::ModifyIcon(LPLSNOTIFYICONDATA pNID) {
 }
 
 
+/// <summary>
+/// ?
+/// </summary>
 void TrayManager::SetFocus(LPLSNOTIFYICONDATA pNID) {
 
 }
 
 
+/// <summary>
+/// Changes the version of an existing tray icon.
+/// </summary>
 void TrayManager::SetVersion(LPLSNOTIFYICONDATA pNID) {
     TRAYICONDATAITER icon = FindIcon(pNID);
     if (icon != g_currentIcons.end()) {
@@ -112,6 +135,9 @@ void TrayManager::SetVersion(LPLSNOTIFYICONDATA pNID) {
 }
 
 
+/// <summary>
+/// Handles LiteStep shell messages.
+/// <summary>
 LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case LM_SYSTRAY:
@@ -139,9 +165,21 @@ LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
         default:
             return FALSE;
         }
-
+        
         return TRUE;
 
+    case LM_SYSTRAYINFOEVENT:
+        switch ((DWORD)wParam) {
+        case 1:
+            return MAKELPARAM(100,100);
+        case 2:
+            return MAKELPARAM(16,16);
+        default:
+            TRACE("TrayManager::Unknown LM_SYSTRAYINFOEVENT message: %u", wParam);
+            return 0;
+        }
+        
+        break;
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
