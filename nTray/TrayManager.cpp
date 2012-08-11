@@ -31,6 +31,20 @@ void TrayManager::Stop() {
 
 
 /// <summary>
+/// Gets the screen rect of an icon.
+/// </summary>
+void TrayManager::GetScreenRect(TRAYICONDATAITER icon, LPRECT rect) {
+    if ((*icon)->icons->size() > 0) {
+        GetWindowRect((*(*icon)->icons)[0]->GetHWND(), rect);
+    }
+    else {
+        // We could define a rectangle for icons that arent included anywhere, instead of just zeroing.
+        ZeroMemory(rect, sizeof(RECT));
+    }
+}
+
+
+/// <summary>
 /// Finds a matching icon in g_currentIcons.
 /// </summary>
 TrayManager::TRAYICONDATAITER TrayManager::FindIcon(GUID guid) {
@@ -149,6 +163,9 @@ void TrayManager::ModifyIcon(LPLSNOTIFYICONDATA pNID) {
             }
         }
     }
+    else {
+        TRACE("Tried to modify non-existing icon");
+    }
 }
 
 
@@ -209,19 +226,35 @@ LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
             LPSYSTRAYINFOEVENT lpSTE = (LPSYSTRAYINFOEVENT)wParam;
             switch (lpSTE->dwEvent) {
             case TRAYEVENT_GETICONPOS:
-                *(LRESULT*)lParam = MAKELPARAM(100, 100);
+                {
+                    TRAYICONDATAITER icon = FindIcon(lpSTE);
+                    if (icon != g_currentIcons.end()) {
+                        RECT r;
+                        GetScreenRect(icon, &r);
+                        *(LRESULT*)lParam = MAKELPARAM(r.left, r.top);
+                        return TRUE;
+                    }
+                }
                 break;
 
             case TRAYEVENT_GETICONSIZE:
-                *(LRESULT*)lParam = MAKELPARAM(20, 20);
+                {
+                    TRAYICONDATAITER icon = FindIcon(lpSTE);
+                    if (icon != g_currentIcons.end()) {
+                        RECT r;
+                        GetScreenRect(icon, &r);
+                        *(LRESULT*)lParam = MAKELPARAM(r.right - r.left, r.bottom - r.top);
+                        return TRUE;
+                    }
+                }
                 break;
 
             default:
                 TRACE("TrayManager::Unknown LM_SYSTRAYINFOEVENT: %u", lpSTE->dwEvent);
-                return FALSE;
+                break;
             }
         }
-        return TRUE;
+        return FALSE;
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

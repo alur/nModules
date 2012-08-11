@@ -128,7 +128,7 @@ bool CreateMainWindow(HINSTANCE hInst) {
         return false;
     }
 
-    g_hwndMain = CreateWindowEx(WS_EX_TOOLWINDOW, g_szMainHandler, "", WS_POPUP|WS_CLIPSIBLINGS|WS_CLIPCHILDREN,
+    g_hwndMain = CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_COMPOSITED, g_szMainHandler, "", WS_POPUP | WS_CLIPCHILDREN,
         g_pMonitorInfo->m_virtualDesktop.rect.left, g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height,
         NULL, NULL, hInst, NULL);
 

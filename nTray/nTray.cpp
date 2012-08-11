@@ -163,7 +163,7 @@ bool CreateLSMsgHandler(HINSTANCE hDllInstance) {
         return false;
     }
 
-    SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)g_hWndMsgHandler, (LPARAM) g_lsMessages);
+    SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)g_hWndMsgHandler, (LPARAM)g_lsMessages);
     return true;
 }
 

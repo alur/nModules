@@ -56,6 +56,11 @@ void TrayIcon::Show() {
 }
 
 
+HWND TrayIcon::GetHWND() {
+    return m_pWindow->getWindow();
+}
+
+
 void TrayIcon::UpdateIcon() {
     m_pWindow->PurgeOverlays();
     if ((m_pNotifyData->uFlags & NIF_ICON) == NIF_ICON) {

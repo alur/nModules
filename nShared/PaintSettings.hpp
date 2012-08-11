@@ -35,10 +35,11 @@ public:
 
     void setText(LPCWSTR);
 
+    D2D_COLOR_F ARGBToD2DColor(DWORD argb);
+
 private:
     LPCSTR m_pszPrefix;
 
-    D2D_COLOR_F ARGBToD2DColor(DWORD argb);
 };
 
 #endif /* PAINTSETTINGS_HPP */

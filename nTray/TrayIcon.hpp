@@ -23,6 +23,7 @@ public:
     LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
     void SendCallback(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void UpdateIcon();
+    HWND GetHWND();
 
 private:
     // The icon's window

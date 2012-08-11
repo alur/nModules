@@ -149,10 +149,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="IconGroup.hpp" />
     <ClInclude Include="nIcon.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="IconGroup.cpp" />
     <ClCompile Include="nIcon.cpp" />
   </ItemGroup>
   <ItemGroup>
