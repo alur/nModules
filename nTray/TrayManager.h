@@ -21,14 +21,18 @@ namespace TrayManager {
     typedef vector<LPTRAYICONDATA>::iterator TRAYICONDATAITER;
     typedef map<LPCSTR, Tray*>::const_iterator TRAYSCITER;
 
+    TRAYICONDATAITER FindIcon(GUID guid);
+    TRAYICONDATAITER FindIcon(HWND hWnd, UINT uID);
     TRAYICONDATAITER FindIcon(LPLSNOTIFYICONDATA pNID);
+    TRAYICONDATAITER FindIcon(LPSYSTRAYINFOEVENT pSTE);
+
     void Stop();
     void AddIcon(LPLSNOTIFYICONDATA pNID);
     void DeleteIcon(LPLSNOTIFYICONDATA pNID);
     void ModifyIcon(LPLSNOTIFYICONDATA pNID);
     void SetFocus(LPLSNOTIFYICONDATA pNID);
     void SetVersion(LPLSNOTIFYICONDATA pNID);
-
+    
     LRESULT ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 }
 

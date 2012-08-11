@@ -14,7 +14,6 @@
 
 #ifdef _DEBUG
 
-
 /// <summary>
 /// Sends a formatted (printf-style) message to the debug output window.
 /// Automatically inserts \n at the end of the string.
@@ -34,10 +33,9 @@ void DbgTraceMessage(LPCSTR pszFormat, ...) {
 }
 
 
-//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//
-// DbgTraceWindowMessage
-//
+/// <summary>
+/// Sends a formatted message to the debug output window.
+/// </summary>
 void DbgTraceWindowMessage(LPCSTR pszPrefix, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (uMsg < WM_USER) {
         TRACE("[%s] WM_%.4X(%.8X, %.8X)", pszPrefix, uMsg, wParam, lParam);

@@ -160,6 +160,9 @@
     <ClCompile Include=".\TrayManager.cpp" />
     <ClCompile Include="TrayIcon.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nTray.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

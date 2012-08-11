@@ -26,7 +26,7 @@ LPCSTR g_szTrayIconHandler          = "LSnTrayIconHandler";
 LPCSTR g_szAuthor                   = "Alurcard2";
 
 // The messages we want from the core
-UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, 0 };
+UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, LM_SYSTRAYINFOEVENT, 0 };
 
 // Handle to the message handler window
 HWND g_hWndMsgHandler;
@@ -192,6 +192,7 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
             return 0;
 
         case LM_SYSTRAY:
+        case LM_SYSTRAYINFOEVENT:
             return TrayManager::ShellMessage(hWnd, uMsg, wParam, lParam);
 
     }

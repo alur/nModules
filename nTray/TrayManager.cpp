@@ -31,23 +31,59 @@ void TrayManager::Stop() {
 
 
 /// <summary>
-/// Finds a matching icon in g_currentIcons
+/// Finds a matching icon in g_currentIcons.
 /// </summary>
-TrayManager::TRAYICONDATAITER TrayManager::FindIcon(LPLSNOTIFYICONDATA pNID) {
-    // There are 2 ways to identify an icon. Same guidItem, or same HWND and same uID.
-    // TODO::Look into the guidItem part in the core
+TrayManager::TRAYICONDATAITER TrayManager::FindIcon(GUID guid) {
     for (TRAYICONDATAITER iter = g_currentIcons.begin(); iter != g_currentIcons.end(); iter++) {
-        if ((pNID->uFlags & NIF_GUID) == NIF_GUID) {
-            if ((*iter)->NID.guidItem == pNID->guidItem) {
-                return iter;
-            }
-        }
-        // uID is ignored if guidItem is set
-        else if ((*iter)->NID.hWnd == pNID->hWnd && (*iter)->NID.uID == pNID->uID) {
+        if ((*iter)->NID.guidItem == guid) {
             return iter;
         }
     }
     return g_currentIcons.end();
+}
+
+
+/// <summary>
+/// Finds a matching icon in g_currentIcons.
+/// </summary>
+TrayManager::TRAYICONDATAITER TrayManager::FindIcon(HWND hWnd, UINT uID) {
+    for (TRAYICONDATAITER iter = g_currentIcons.begin(); iter != g_currentIcons.end(); iter++) {
+        if ((*iter)->NID.hWnd == hWnd && (*iter)->NID.uID == uID) {
+            return iter;
+        }
+    }
+    return g_currentIcons.end();
+}
+
+
+/// <summary>
+/// Finds a matching icon in g_currentIcons.
+/// </summary>
+TrayManager::TRAYICONDATAITER TrayManager::FindIcon(LPLSNOTIFYICONDATA pNID) {
+    // There are 2 ways to identify an icon. Same guidItem, or same HWND and same uID.
+
+    // uID & hWnd is ignored if guidItem is set
+    if ((pNID->uFlags & NIF_GUID) == NIF_GUID) {
+        return FindIcon(pNID->guidItem);
+    }
+
+    return FindIcon(pNID->hWnd, pNID->uID);
+}
+
+
+/// <summary>
+/// Finds a matching icon in g_currentIcons.
+/// </summary>
+TrayManager::TRAYICONDATAITER TrayManager::FindIcon(LPSYSTRAYINFOEVENT pSTE) {
+    // There are 2 ways to identify an icon. Same guidItem, or same HWND and same uID.
+    TRAYICONDATAITER ret;
+
+    ret = FindIcon(pSTE->guidItem);
+    if (ret == g_currentIcons.end()) {
+        ret = FindIcon(pSTE->hWnd, pSTE->uID);
+    }
+
+    return ret;
 }
 
 
@@ -169,17 +205,23 @@ LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
         return TRUE;
 
     case LM_SYSTRAYINFOEVENT:
-        switch ((DWORD)wParam) {
-        case 1:
-            return MAKELPARAM(100,100);
-        case 2:
-            return MAKELPARAM(16,16);
-        default:
-            TRACE("TrayManager::Unknown LM_SYSTRAYINFOEVENT message: %u", wParam);
-            return 0;
+        {
+            LPSYSTRAYINFOEVENT lpSTE = (LPSYSTRAYINFOEVENT)wParam;
+            switch (lpSTE->dwEvent) {
+            case TRAYEVENT_GETICONPOS:
+                *(LRESULT*)lParam = MAKELPARAM(100, 100);
+                break;
+
+            case TRAYEVENT_GETICONSIZE:
+                *(LRESULT*)lParam = MAKELPARAM(20, 20);
+                break;
+
+            default:
+                TRACE("TrayManager::Unknown LM_SYSTRAYINFOEVENT: %u", lpSTE->dwEvent);
+                return FALSE;
+            }
         }
-        
-        break;
+        return TRUE;
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

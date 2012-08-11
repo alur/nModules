@@ -17,11 +17,16 @@
 #define LMM_PATH      0x0000
 #define LMM_HINSTANCE 0x1000
 
+// LM_SYSTRAYINFOEVENT
+#define TRAYEVENT_GETICONPOS  1
+#define TRAYEVENT_GETICONSIZE 2
+
 // EnumLSData
-#define ELD_BANGS    1
-#define ELD_MODULES  2
-#define ELD_REVIDS   3
-#define ELD_BANGS_V2 4
+#define ELD_BANGS       1
+#define ELD_MODULES     2
+#define ELD_REVIDS      3
+#define ELD_BANGS_V2    4
+#define ELD_PERFORMANCE 5
 
 // EnumModulesProc
 #define LS_MODULE_THREADED 0x0001
@@ -76,6 +81,18 @@ typedef struct LSNOTIFYICONDATA {
     DWORD dwInfoFlags;
     GUID guidItem;
 } LSNOTIFYICONDATA, *LPLSNOTIFYICONDATA;
+
+// LM_SYSTRAYINFOEVENT
+#define TRAYEVENT_GETICONPOS  1
+#define TRAYEVENT_GETICONSIZE 2
+
+typedef struct _SYSTRAYINFOEVENT {
+    DWORD cbSize;
+    DWORD dwEvent;
+    HWND hWnd;
+    UINT uID;
+    GUID guidItem;
+} SYSTRAYINFOEVENT, *LPSYSTRAYINFOEVENT;
 
 // Messages
 #define LM_SHUTDOWN              8889  // Module -> Core

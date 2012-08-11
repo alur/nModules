@@ -30,7 +30,7 @@ void DbgTraceMessage(LPCSTR pszFormat, ...);
 #if defined(_DEBUG)
 #  define TRACE  DbgTraceMessage
 #else
-#  define TRACE  1 ? (void)0 : DbgTraceMessage
+#  define TRACE(pszFormat)
 #endif
 
 #if defined(_DEBUG)
