@@ -159,6 +159,10 @@ TransitionEffect* DesktopPainter::TransitionEffectFromType(TransitionType transi
     case SQUARES_LINEAR_VERTICAL_OUT: return new GridEffect(GridEffect::GridType::LINEAR_VERTICAL, GridEffect::GridStyle::HIDE_OLD);
     case SQUARES_TRIANGULAR_BOTTOM_RIGHT_IN: return new GridEffect(GridEffect::GridType::TRIANGULAR, GridEffect::GridStyle::SHOW_NEW);
     case SQUARES_TRIANGULAR_BOTTOM_RIGHT_OUT: return new GridEffect(GridEffect::GridType::TRIANGULAR, GridEffect::GridStyle::HIDE_OLD);
+    case SQUARES_CLOCKWISE_IN: return new GridEffect(GridEffect::GridType::CLOCKWISE, GridEffect::GridStyle::SHOW_NEW);
+    case SQUARES_CLOCKWISE_OUT: return new GridEffect(GridEffect::GridType::CLOCKWISE, GridEffect::GridStyle::HIDE_OLD);
+    case SQUARES_COUNTERCLOCKWISE_IN: return new GridEffect(GridEffect::GridType::COUNTERCLOCKWISE, GridEffect::GridStyle::SHOW_NEW);
+    case SQUARES_COUNTERCLOCKWISE_OUT:return new GridEffect(GridEffect::GridType::COUNTERCLOCKWISE, GridEffect::GridStyle::HIDE_OLD);
 
     default: return NULL;
     }

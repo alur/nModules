@@ -5,6 +5,7 @@
 *   
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "GridEffect.hpp"
+#include "../../nShared/Debugging.h"
 #include <ctime>
 #include <math.h>
 
@@ -68,9 +69,9 @@ void GridEffect::Start(ID2D1BitmapBrush* oldBrush, ID2D1BitmapBrush* newBrush) {
     case LINEAR_HORIZONTAL:
         {
             int i = 0;
-            for (int x = 0; x < m_iSquaresX; x++) {
-                for (int y = 0; y < m_iSquaresY; y++) {
-                    m_StartTimes[y*m_iSquaresX + x] = (i++)*(1.0f - m_pTransitionSettings->fFadeTime)/m_iSquares;
+            for (int y = 0; y < m_iSquaresY; y++) {
+                for (int x = 0; x < m_iSquaresX; x++) {
+                    m_StartTimes[x*m_iSquaresY + y] = (i++)*(1.0f - m_pTransitionSettings->fFadeTime)/m_iSquares;
                 }
             }
         }
@@ -91,7 +92,47 @@ void GridEffect::Start(ID2D1BitmapBrush* oldBrush, ID2D1BitmapBrush* newBrush) {
             float up = sqrt(float(m_iSquaresX*m_iSquaresX+m_iSquaresY*m_iSquaresY))/(1.0f - m_pTransitionSettings->fFadeTime);
             for (int x = 0; x < m_iSquaresX; x++) {
                 for (int y = 0; y < m_iSquaresY; y++) {
-                    m_StartTimes[y*m_iSquaresX + x] = sqrt(float(x*x+y*y))*cos(atan2((float)y, (float)x) - alpha)/up;
+                    m_StartTimes[x*m_iSquaresY + y] = sqrt(float(x*x+y*y))*cos(atan2((float)y, (float)x) - alpha)/up;
+                }
+            }
+        }
+        break;
+    
+    case CLOCKWISE:
+        {
+            int index = 0;
+            for (int depth = 0; depth < min(m_iSquaresX, m_iSquaresY)/2; depth++) {
+                for (int x = depth; x < m_iSquaresX - depth - 1; x++) {
+                    m_StartTimes[x*m_iSquaresY + depth] = index++*(1.0f - m_pTransitionSettings->fFadeTime)/m_iSquares;
+                }
+                for (int y = depth; y < m_iSquaresY - depth - 1; y++) {
+                    m_StartTimes[(m_iSquaresX - depth - 1)*m_iSquaresY + y] = index++*(1.0f - m_pTransitionSettings->fFadeTime)/m_iSquares;
+                }
+                for (int x = m_iSquaresX - depth - 1; x > depth; x--) {
+                    m_StartTimes[(x+1)*m_iSquaresY - depth - 1] = index++*(1.0f - m_pTransitionSettings->fFadeTime)/m_iSquares;
+                }
+                for (int y = m_iSquaresY - depth - 1; y > depth; y--) {
+                    m_StartTimes[depth*m_iSquaresY + y] = index++*(1.0f - m_pTransitionSettings->fFadeTime)/m_iSquares;
+                }
+            }
+        }
+        break;
+
+    case COUNTERCLOCKWISE:
+        {
+            int index = 0;
+            for (int depth = 0; depth < min(m_iSquaresX, m_iSquaresY)/2; depth++) {
+                for (int y = depth; y < m_iSquaresY - depth - 1; y++) {
+                    m_StartTimes[depth*m_iSquaresY + y] = index++*(1.0f - m_pTransitionSettings->fFadeTime)/m_iSquares;
+                }
+                for (int x = depth; x < m_iSquaresX - depth - 1; x++) {
+                    m_StartTimes[(x+1)*m_iSquaresY - depth - 1] = index++*(1.0f - m_pTransitionSettings->fFadeTime)/m_iSquares;
+                }
+                for (int y = m_iSquaresY - depth - 1; y > depth; y--) {
+                    m_StartTimes[(m_iSquaresX - depth - 1)*m_iSquaresY + y] = index++*(1.0f - m_pTransitionSettings->fFadeTime)/m_iSquares;
+                }
+                for (int x = m_iSquaresX - depth - 1; x > depth; x--) {
+                    m_StartTimes[x*m_iSquaresY + depth] = index++*(1.0f - m_pTransitionSettings->fFadeTime)/m_iSquares;
                 }
             }
         }
@@ -131,8 +172,8 @@ void GridEffect::End() {
 /// Called when the rendertarget has been resized
 /// </summary>
 void GridEffect::Resize() {
-    m_iSquaresY = (int)ceil(m_pTransitionSettings->WPRect.right/m_pTransitionSettings->iSquareSize);
-    m_iSquaresX = (int)ceil(m_pTransitionSettings->WPRect.bottom/m_pTransitionSettings->iSquareSize);
+    m_iSquaresX = (int)ceil(m_pTransitionSettings->WPRect.right/m_pTransitionSettings->iSquareSize);
+    m_iSquaresY = (int)ceil(m_pTransitionSettings->WPRect.bottom/m_pTransitionSettings->iSquareSize);
     m_iSquares = m_iSquaresY * m_iSquaresX;
 
     // Reallocate memory for the squares
