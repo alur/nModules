@@ -80,6 +80,10 @@ DesktopPainter::TransitionType Settings::TransitionTypeFromString(LPCSTR pszTran
     if (_stricmp(pszTransition, "SquaresLinearHorizontalOut") == 0) return DesktopPainter::TransitionType::SQUARES_LINEAR_HORIZONTAL_OUT;
     if (_stricmp(pszTransition, "SquaresTriangularBottomRightIn") == 0) return DesktopPainter::TransitionType::SQUARES_TRIANGULAR_BOTTOM_RIGHT_IN;
     if (_stricmp(pszTransition, "SquaresTriangularBottomRightOut") == 0) return DesktopPainter::TransitionType::SQUARES_TRIANGULAR_BOTTOM_RIGHT_OUT;
-
+    if (_stricmp(pszTransition, "SquaresClockwiseIn") == 0) return DesktopPainter::TransitionType::SQUARES_CLOCKWISE_IN;
+    if (_stricmp(pszTransition, "SquaresClockwiseOut") == 0) return DesktopPainter::TransitionType::SQUARES_CLOCKWISE_OUT;
+    if (_stricmp(pszTransition, "SquaresCounterClockwiseIn") == 0) return DesktopPainter::TransitionType::SQUARES_COUNTERCLOCKWISE_IN;
+    if (_stricmp(pszTransition, "SquaresCounterClockwiseOut") == 0) return DesktopPainter::TransitionType::SQUARES_COUNTERCLOCKWISE_OUT;
+    
     return DesktopPainter::TransitionType::NONE;
 }

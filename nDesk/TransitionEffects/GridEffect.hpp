@@ -17,7 +17,9 @@ public:
         RANDOM,
         LINEAR_VERTICAL,
         LINEAR_HORIZONTAL,
-        TRIANGULAR
+        TRIANGULAR,
+		CLOCKWISE,
+        COUNTERCLOCKWISE
     };
 
     //
