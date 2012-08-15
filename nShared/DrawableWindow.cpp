@@ -8,6 +8,7 @@
 #include <strsafe.h>
 #include "../headers/lsapi.h"
 #include "../nCoreCom/Core.h"
+#include "Macros.h"
 #include "DrawableWindow.hpp"
 #include "PaintSettings.hpp"
 #include <d2d1.h>
@@ -15,6 +16,7 @@
 #include <dwrite.h>
 #include <Wincodec.h>
 #include "Factories.h"
+#include "Debugging.h"
 
 using namespace D2D1;
 
@@ -36,13 +38,14 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR pszWndClass, PaintSettings * 
 DrawableWindow::~DrawableWindow() {
     KillTimer(m_hWnd, 1337);
 
-    if (m_hWnd)
+    if (m_hWnd) {
         DestroyWindow(m_hWnd);
-    
-    SAFERELEASE(&m_pRenderTarget)
-    SAFERELEASE(&m_pBackBrush)
-    SAFERELEASE(&m_pTextBrush)
-    SAFERELEASE(&m_pTextFormat)
+    }
+
+    SAFERELEASE(&m_pRenderTarget);
+    SAFERELEASE(&m_pBackBrush);
+    SAFERELEASE(&m_pTextBrush);
+    SAFERELEASE(&m_pTextFormat);
     PurgeOverlays();
 }
 
@@ -86,42 +89,51 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F f, HICON hIcon) {
     IWICImagingFactory *pFactory = NULL;
     ID2D1Bitmap *pBitmap = NULL;
     Overlay overlay;
+    UINT width, height;
+    
+    HRESULT hr = S_OK;
 
     // Create our helper objects.
-    //nCore::Drawing::GetWICFactory(reinterpret_cast<LPVOID*>(&pFactory));
-    Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&pFactory));
-    pFactory->CreateBitmapScaler(&pScaler);
-    pFactory->CreateFormatConverter(&pConverter);
+    CHECKHR(hr, Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&pFactory)));
+    CHECKHR(hr, pFactory->CreateBitmapScaler(&pScaler));
+    CHECKHR(hr, pFactory->CreateFormatConverter(&pConverter));
 
     // Generate a WIC bitmap
-    pFactory->CreateBitmapFromHICON(hIcon, &pSource);
+    CHECKHR(hr, pFactory->CreateBitmapFromHICON(hIcon, &pSource));
 
     // Resize the image
-    UINT width, height;
-    pSource->GetSize(&width, &height);
-    pScaler->Initialize(pSource, (UINT)(f.right - f.left), (UINT)(f.bottom - f.top), WICBitmapInterpolationModeCubic);
+    CHECKHR(hr, pSource->GetSize(&width, &height));
+    CHECKHR(hr, pScaler->Initialize(pSource, (UINT)(f.right - f.left), (UINT)(f.bottom - f.top), WICBitmapInterpolationModeCubic));
     
     // Convert it to an ID2D1Bitmap
-    pConverter->Initialize(pScaler, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut);
-    m_pRenderTarget->CreateBitmapFromWicBitmap(pConverter, 0, &pBitmap);
+    CHECKHR(hr, pConverter->Initialize(pScaler, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut));
+    CHECKHR(hr, m_pRenderTarget->CreateBitmapFromWicBitmap(pConverter, 0, &pBitmap));
 
     // Create a brush based on the bitmap
-    m_pRenderTarget->CreateBitmapBrush(pBitmap, reinterpret_cast<ID2D1BitmapBrush**>(&overlay.brush));
+    CHECKHR(hr, m_pRenderTarget->CreateBitmapBrush(pBitmap, reinterpret_cast<ID2D1BitmapBrush**>(&overlay.brush)));
     
     // Move the origin of the brush to match the overlay position
     overlay.brush->SetTransform(D2D1::Matrix3x2F::Translation(f.left, f.top));
     overlay.position = f;
 
+    // Transfer control here if CHECKHR failed
+    CHECKHR_END();
+
     // Release stuff
-    SAFERELEASE(&pScaler)
-    SAFERELEASE(&pConverter)
-    SAFERELEASE(&pSource)
-    SAFERELEASE(&pBitmap)
+    SAFERELEASE(&pScaler);
+    SAFERELEASE(&pConverter);
+    SAFERELEASE(&pSource);
+    SAFERELEASE(&pBitmap);
 
     // Add the overlays to the overlay list
-    m_overlays.push_back(overlay);
+    if (SUCCEEDED(hr)) {
+        m_overlays.push_back(overlay);
+    }
+    else {
+        TRACE("DrawableWindow::AddOverlay failed");
+    }
 
-    return S_OK;
+    return hr;
 }
 
 

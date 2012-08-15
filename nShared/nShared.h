@@ -13,6 +13,7 @@
 #include "Error.h"
 #include "Export.h"
 #include "Factories.h"
+#include "Macros.h"
 #include "Math.h"
 #include "MonitorInfo.hpp"
 #include "PaintSettings.hpp"

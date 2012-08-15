@@ -40,6 +40,9 @@
     <ClCompile Include="PaintSettings.cpp" />
     <ClCompile Include="Versioning.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".\Macros.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>
   </PropertyGroup>
