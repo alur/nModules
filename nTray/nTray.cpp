@@ -30,6 +30,8 @@ UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, LM_SYSTRAYINFOEVENT
 
 // Handle to the message handler window
 HWND g_hWndMsgHandler;
+
+// Handle to the tray notify window
 HWND g_hWndTrayNotify;
 
 // This instance.
@@ -72,9 +74,6 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath
 
     // Let the core know that we want the system tray icons
     g_hWndTrayNotify = (HWND)SendMessage(GetLitestepWnd(), LM_SYSTRAYREADY, NULL, NULL);
-    if (IsWindow(g_hWndTrayNotify)) {
-        MoveWindow(g_hWndTrayNotify, 1620, 1150, 200, 50, FALSE);
-    }
 
     return 0;
 }

@@ -84,37 +84,25 @@ void TrayIcon::SendCallback(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (m_pNotifyData->uVersion == 0)
         PostMessage(m_pNotifyData->hWnd, m_pNotifyData->uCallbackMessage, (WPARAM)m_pNotifyData->uID, (LPARAM)uMsg);
     else if (m_pNotifyData->uVersion >= 4) {
-        PostMessage(m_pNotifyData->hWnd, m_pNotifyData->uCallbackMessage, (WPARAM)MAKEWPARAM(1720, 1150), (LPARAM)MAKELPARAM(uMsg, m_pNotifyData->uID));
+        RECT r;
+        GetWindowRect(m_pWindow->getWindow(), &r);
+        PostMessage(m_pNotifyData->hWnd, m_pNotifyData->uCallbackMessage, (WPARAM)MAKEWPARAM(r.left, r.right), (LPARAM)MAKELPARAM(uMsg, m_pNotifyData->uID));
     }
 }
 
 
 LRESULT WINAPI TrayIcon::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg) {
-    //case WM_LBUTTONDOWN:
-    case WM_LBUTTONDBLCLK:
-    case WM_RBUTTONDOWN:
-    case WM_RBUTTONDBLCLK:
-    case WM_MBUTTONDOWN:
-    case WM_MBUTTONUP:
-    case WM_MBUTTONDBLCLK:
-    case WM_MOUSEMOVE:
-    case WM_MOUSELEAVE:
-    case WM_XBUTTONDOWN:
-    case WM_XBUTTONUP:
-    case WM_XBUTTONDBLCLK:
+    if (uMsg > WM_MOUSEFIRST && uMsg < WM_MOUSELAST) {
         SendCallback(uMsg, wParam, lParam);
-        return 0;
-    case WM_RBUTTONUP:
-        SendCallback(uMsg, wParam, lParam);
-        SendCallback(WM_CONTEXTMENU, wParam, lParam);
-        return 0;
-    case WM_LBUTTONUP:
-        //SendCallback(WM_LBUTTONDOWN, wParam, lParam);
-        //SendCallback(uMsg, wParam, lParam);
-        SendCallback(NIN_SELECT, wParam, lParam);
-        return 0;
-    default:
+        if (uMsg == WM_RBUTTONUP) {
+            SendCallback(WM_CONTEXTMENU, wParam, lParam);
+        }
+        else if (uMsg == WM_LBUTTONUP) {
+            SendCallback(NIN_SELECT, wParam, lParam);
+        }
+    }
+    else {
         return m_pWindow->HandleMessage(uMsg, wParam, lParam);
     }
+    return 0;
 }

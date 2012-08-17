@@ -13,6 +13,7 @@
 
 extern HINSTANCE g_hInstance;
 extern LPCSTR g_szTrayHandler;
+extern HWND g_hWndTrayNotify;
 
 
 /// <summary>
@@ -114,8 +115,12 @@ void Tray::Relayout() {
 /// </summary>
 LRESULT WINAPI Tray::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
-    case WM_LBUTTONDOWN:
-        return 0;
+    case WM_MOUSEMOVE:
+        if (IsWindow(g_hWndTrayNotify)) {
+            MoveWindow(g_hWndTrayNotify, m_pPaintSettings->position.left, m_pPaintSettings->position.right,
+                m_pPaintSettings->position.left - m_pPaintSettings->position.right,
+                m_pPaintSettings->position.bottom - m_pPaintSettings->position.top, FALSE);
+        }
     default:
         return m_pWindow->HandleMessage(uMsg, wParam, lParam);
     }
