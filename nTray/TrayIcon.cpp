@@ -86,7 +86,7 @@ void TrayIcon::SendCallback(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     else if (m_pNotifyData->uVersion >= 4) {
         RECT r;
         GetWindowRect(m_pWindow->getWindow(), &r);
-        PostMessage(m_pNotifyData->hWnd, m_pNotifyData->uCallbackMessage, (WPARAM)MAKEWPARAM(r.left, r.right), (LPARAM)MAKELPARAM(uMsg, m_pNotifyData->uID));
+        PostMessage(m_pNotifyData->hWnd, m_pNotifyData->uCallbackMessage, (WPARAM)MAKEWPARAM(r.left, r.top), (LPARAM)MAKELPARAM(uMsg, m_pNotifyData->uID));
     }
 }
 
