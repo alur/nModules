@@ -171,7 +171,6 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
     style |= m_hWndParent ? WS_CHILD : WS_POPUP;
 
     DWORD exStyle = WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW;
-    if (!m_pPaintSettings->DWMBlur && !m_hWndParent) exStyle |= WS_EX_COMPOSITED;
 
     m_hWnd = CreateWindowEx(exStyle, pszWndClass, "", style,
         m_pPaintSettings->position.left, m_pPaintSettings->position.top, m_pPaintSettings->position.right - m_pPaintSettings->position.left,
@@ -198,7 +197,6 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
 
     // Create Direct2D objects
     ID2D1Factory *pD2DFactory = NULL;
-    //nCore::Drawing::GetD2DFactory(reinterpret_cast<LPVOID*>(&pD2DFactory));
     Factories::GetD2DFactory(reinterpret_cast<LPVOID*>(&pD2DFactory));
     pD2DFactory->CreateHwndRenderTarget(
         RenderTargetProperties(
@@ -214,7 +212,6 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
 
     // Create DirectWrite objects
     IDWriteFactory *pDWFactory = NULL;
-    //nCore::Drawing::GetDWriteFactory(reinterpret_cast<LPVOID*>(&pDWFactory));
     Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&pDWFactory));
     pDWFactory->CreateTextFormat(
         m_pPaintSettings->font,
@@ -231,11 +228,15 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
 
     SetWindowPos(m_hWnd, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
-    SetBlur(true);
+    //SetBlur(true);
+
+    MARGINS m;
+    ZeroMemory(&m, sizeof(m));
+    m.cyTopHeight = m_pPaintSettings->position.bottom - m_pPaintSettings->position.top;
+    
+    DwmExtendFrameIntoClientArea(m_hWnd, &m);
 
     SetTimer(m_hWnd, 1337, 1000, NULL);
-
-    
 
     return true;
 }
