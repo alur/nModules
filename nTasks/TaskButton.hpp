@@ -38,6 +38,9 @@ private:
     // Settings for painting the button
     PaintSettings* m_pPaintSettings;
 
+    // Settings for painting the icon in the button.
+    PaintSettings* m_pIconPaintSettings;
+
     // The window related to this button
     HWND m_hWnd;
 
@@ -49,6 +52,7 @@ private:
     LPCSTR m_pszPrefixActive;
     LPCSTR m_pszPrefixHover;
     LPCSTR m_pszPrefixFlashing;
+    LPCSTR m_pszPrefixIcon;
 
     bool m_bMouseIsOver;
     bool m_bIsActive;

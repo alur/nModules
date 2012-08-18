@@ -238,7 +238,7 @@ ClickHandler::ClickType ClickHandler::TypeFromString(LPCSTR str) {
 
 
 /// <summary>
-/// Gets the mod value from a string
+/// Gets the mod value from a string.
 /// </summary>
 WORD ClickHandler::ModsFromString(LPSTR str) {
     WORD ret = 0x0000;

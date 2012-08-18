@@ -19,6 +19,9 @@ namespace Factories {
 }
 
 
+/// <summary>
+/// Releases all allocated factories.
+/// </summary>
 void Factories::Release() {
     SAFERELEASE(&pDWFactory);
     SAFERELEASE(&pD2DFactory);
@@ -26,6 +29,9 @@ void Factories::Release() {
 }
 
 
+/// <summary>
+/// Fetches a directwrite factory.
+/// </summary>
 HRESULT Factories::GetDWriteFactory(LPVOID* ppFactory) {
     if (!pDWFactory) {
         HRESULT hr;
@@ -40,6 +46,9 @@ HRESULT Factories::GetDWriteFactory(LPVOID* ppFactory) {
 }
 
 
+/// <summary>
+/// Fetches a direct2d factory.
+/// </summary>
 HRESULT Factories::GetD2DFactory(LPVOID* ppFactory) {
     if (!pD2DFactory) {
         HRESULT hr;
@@ -53,6 +62,9 @@ HRESULT Factories::GetD2DFactory(LPVOID* ppFactory) {
 }
 
 
+/// <summary>
+/// Fetches a WIC factory.
+/// </summary>
 HRESULT Factories::GetWICFactory(LPVOID* ppFactory) {
     if (!pWICFactory) {
         HRESULT hr;

@@ -18,6 +18,8 @@ extern LPCSTR g_szTaskButtonHandler;
 /// Constructor
 /// </summary>
 TaskButton::TaskButton(HWND parent, HWND window, LPCSTR prefix) {
+    m_pIconPaintSettings = NULL;
+
     // Generate our prefixes
     char szPrefix[512];
     sprintf_s(szPrefix, sizeof(szPrefix), "%s%s", prefix, "Button");
@@ -28,6 +30,8 @@ TaskButton::TaskButton(HWND parent, HWND window, LPCSTR prefix) {
     m_pszPrefixHover = _strdup(szPrefix);
     sprintf_s(szPrefix, sizeof(szPrefix), "%s%s", prefix, "ButtonFlashing");
     m_pszPrefixFlashing = _strdup(szPrefix);
+    sprintf_s(szPrefix, sizeof(szPrefix), "%s%s", prefix, "ButtonIcon");
+    m_pszPrefixIcon = _strdup(szPrefix);
 
     // 
     m_hWnd = window;
@@ -40,6 +44,8 @@ TaskButton::TaskButton(HWND parent, HWND window, LPCSTR prefix) {
     m_pPaintSettings = new PaintSettings(m_pszPrefix);
     m_pWindow = new DrawableWindow(parent, g_szTaskButtonHandler, m_pPaintSettings, g_hInstance);
     SetWindowLongPtr(m_pWindow->getWindow(), 0, (LONG_PTR)this);
+
+    m_pIconPaintSettings = new PaintSettings(m_pszPrefixIcon);
 
     // Configure the mouse tracking struct
     ZeroMemory(&m_TrackMouseStruct, sizeof(TRACKMOUSEEVENT));
@@ -65,13 +71,16 @@ TaskButton::~TaskButton() {
     free((LPVOID)m_pszPrefix);
     free((LPVOID)m_pszPrefixActive);
     free((LPVOID)m_pszPrefixHover);
+    free((LPVOID)m_pszPrefixIcon);
 }
 
 
 void TaskButton::SetIcon(HICON hIcon) {
     m_pWindow->PurgeOverlays();
     if (hIcon != NULL) {
-        D2D1_RECT_F f = {5, 5, 35, 35};
+        D2D1_RECT_F f = { m_pIconPaintSettings->position.left, m_pIconPaintSettings->position.top,
+            m_pIconPaintSettings->position.right - m_pIconPaintSettings->position.left,
+            m_pIconPaintSettings->position.bottom - m_pIconPaintSettings->position.top };
         m_pWindow->AddOverlay(f, hIcon);
     }
     m_pWindow->Repaint();

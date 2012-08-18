@@ -89,14 +89,14 @@ void Taskbar::RemoveTask(HWND hWnd) {
 
 
 /// <summary>
-/// Repositions/Resizes all buttons
+/// Repositions/Resizes all buttons.  
 /// </summary>
 void Taskbar::Relayout() {
     UINT taskbarWidth = m_pPaintSettings->position.right - m_pPaintSettings->position.left;
     UINT buttonWidth = m_buttons.empty() ? m_uMaxButtonWidth : min(m_uMaxButtonWidth, (taskbarWidth-5)/(UINT)m_buttons.size());
     UINT startPos = 5;
     for (map<HWND, TaskButton*>::const_iterator iter = m_buttons.begin(); iter != m_buttons.end(); iter++) {
-        iter->second->Reposition(startPos, 5, buttonWidth-5, 40);
+        iter->second->Reposition(startPos, 5, buttonWidth-5, m_pPaintSettings->position.bottom - m_pPaintSettings->position.top - 10);
         startPos += buttonWidth;
         iter->second->Show();
     }
@@ -104,13 +104,8 @@ void Taskbar::Relayout() {
 
 
 /// <summary>
-/// Handles window events for the taskbar
+/// Handles window events for the taskbar.
 /// </summary>
 LRESULT WINAPI Taskbar::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg) {
-    case WM_LBUTTONDOWN:
-        return 0;
-    default:
-        return m_pWindow->HandleMessage(uMsg, wParam, lParam);
-    }
+    return m_pWindow->HandleMessage(uMsg, wParam, lParam);
 }

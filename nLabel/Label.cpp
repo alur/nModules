@@ -19,6 +19,11 @@ Label::Label(LPCSTR pszName) {
     m_pPaintSettings = new PaintSettings(m_pszName);
     m_pWindow = new DrawableWindow(NULL, g_szLabelHandler, m_pPaintSettings, g_hInstance);
     SetWindowLongPtr(m_pWindow->getWindow(), 0, (LONG_PTR)this);
+
+    // Try to put the window right ontop of the desktop
+    SetWindowPos(m_pWindow->getWindow(), FindWindow("DesktopBackgroundClass", ""), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE );
+    SetWindowPos(FindWindow("DesktopBackgroundClass", ""), m_pWindow->getWindow(), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE ); 
+
     m_pWindow->Show();
 }
 

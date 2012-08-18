@@ -3,6 +3,9 @@
  *  The nModules Project
  *
  *  Implementation of the DrawableWindow class. A generic drawable window.
+ *
+ *  Big TODO::Transparent child windows should also have the parent window
+ *  painted beneath them.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include <strsafe.h>
@@ -228,11 +231,10 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
 
     SetWindowPos(m_hWnd, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
-    //SetBlur(true);
-
     MARGINS m;
     ZeroMemory(&m, sizeof(m));
     m.cyTopHeight = m_pPaintSettings->position.bottom - m_pPaintSettings->position.top;
+    m.cyTopHeight = INT_MAX;
     
     DwmExtendFrameIntoClientArea(m_hWnd, &m);
 
@@ -243,13 +245,16 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
 
 
 /// <summary>
-/// Shows the window
+/// Shows the window.
 /// </summary>
 void DrawableWindow::Show() {
     ShowWindow(m_hWnd, SW_SHOWNOACTIVATE);
 }
 
 
+/// <summary>
+/// Causes the window to move to the position specified in its paintsettings.
+/// </summary>
 void DrawableWindow::UpdatePosition() {
     D2D1_SIZE_U size = D2D1::SizeU(
         m_pPaintSettings->position.right - m_pPaintSettings->position.left,
@@ -275,6 +280,9 @@ void DrawableWindow::UpdatePosition() {
 }
 
 
+/// <summary>
+/// Handles window messages for this drawablewindow.
+/// </summary>
 LRESULT WINAPI DrawableWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_ERASEBKGND:
@@ -308,6 +316,17 @@ LRESULT WINAPI DrawableWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lP
         break;
 
     case WM_DISPLAYCHANGE:
+        return 0;
+
+    case WM_LBUTTONDOWN:
+        {
+        }
+        return 0;
+
+    case WM_RBUTTONUP:
+        {
+            LSExecute(NULL, "!About", SW_SHOW);
+        }
         return 0;
 
     }
