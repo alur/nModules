@@ -94,6 +94,12 @@ EXPORT_CDECL(bool) ParseMonitor(LPCSTR pszMonitor, UINT * target) {
 }
 
 
+// Utility function used by ParseColor
+inline bool _IsFunctionOf(LPCSTR pszSource, LPCSTR pszName) {
+    return _strnicmp(pszName, pszSource, strlen(pszName)) == 0 && pszSource[strlen(pszName)] == '(' &&  pszSource[strlen(pszSource)-1] == ')';
+}
+
+
 /// <summary>
 /// Parses a user specified color.
 /// </summary>
@@ -136,9 +142,14 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR pszColor, ARGB* target) {
         }
     }
 
-    // TODO::RGB()
+    // TODO::RGB(), ARGB(), RGBA(), HSL(), AHSL(), HSLA()
 
-    // TODO::ARGB()
+    // TODO::Lighten, darken, saturate, desaturate, fadein, fadeout, spin, mix
+    if (_IsFunctionOf(pszColor, "lighten")) {
+    }
+
+    if (_IsFunctionOf(pszColor, "darken")) {
+    }
 
     // Known colors
     for (int i = 0; knownColors[i].name != NULL; i++) {
@@ -148,7 +159,7 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR pszColor, ARGB* target) {
         }
     }
 
-    // Unkown
+    // Unknown
     return false;
 }
 
