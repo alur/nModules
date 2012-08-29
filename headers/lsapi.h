@@ -123,7 +123,7 @@ typedef struct _SYSTRAYINFOEVENT {
 #define LM_APPCOMMAND            9512  // Core   -> Module
 #define LM_WINDOWREPLACED        9513  // Core   -> Module
 #define LM_WINDOWREPLACING       9514  // Core   -> Module
-#define LM_MONITORCHANGED        9515  // Core   -> Module
+#define LM_MONITORCHANGED        9516  // Core   -> Module
 
 // Callback Function Pointers
 typedef VOID (__cdecl * BANGCOMMANDPROC)(HWND hwndOwner, LPCSTR pszArgs);
