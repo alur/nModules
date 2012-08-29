@@ -177,7 +177,7 @@ EXPORT_CDECL(bool) ParseBool(LPCSTR pszBool) {
 /// </summary>
 EXPORT_CDECL(ARGB) GetPrefixedRCColor(LPCSTR szPrefix, LPCSTR szOption, ARGB nDefault) {
     char szOptionName[MAX_LINE_LENGTH];
-    char szColor[64];
+    char szColor[MAX_LINE_LENGTH];
     ARGB ret = nDefault;
 
     StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", szPrefix, szOption);

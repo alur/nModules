@@ -78,9 +78,9 @@ TaskButton::~TaskButton() {
 void TaskButton::SetIcon(HICON hIcon) {
     m_pWindow->PurgeOverlays();
     if (hIcon != NULL) {
-        D2D1_RECT_F f = { m_pIconPaintSettings->position.left, m_pIconPaintSettings->position.top,
-            m_pIconPaintSettings->position.right - m_pIconPaintSettings->position.left,
-            m_pIconPaintSettings->position.bottom - m_pIconPaintSettings->position.top };
+        D2D1_RECT_F f = { (float)m_pIconPaintSettings->position.left, (float)m_pIconPaintSettings->position.top,
+            (float)(m_pIconPaintSettings->position.right - m_pIconPaintSettings->position.left),
+            (float)(m_pIconPaintSettings->position.bottom - m_pIconPaintSettings->position.top) };
         m_pWindow->AddOverlay(f, hIcon);
     }
     m_pWindow->Repaint();

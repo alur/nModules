@@ -9,41 +9,36 @@
 #include <Windows.h>
 #include "Versioning.h"
 
-/// <summary>
-/// Macro for making a VERSION from 4 bytes.
-/// </summary>
-#define MAKE_VERSION(major,minor,patch,build) ((major << 24) | (minor << 16) | (patch << 8) | build)
-
 
 /// <summary>
 /// Gets the major version
 /// </summary>
-unsigned __int8 GetMajorVersion(VERSION v) {
-    return (unsigned __int8)((v & 0xFF000000) >> 24);
+unsigned short GetMajorVersion(VERSION v) {
+    return (unsigned short)((v & 0xFFFF000000000000) >> 48);
 }
 
 
 /// <summary>
 /// Gets the minor version
 /// </summary>
-unsigned __int8 GetMinorVersion(VERSION v) {
-    return (unsigned __int8)((v & 0xFF0000) >> 16);
+unsigned short GetMinorVersion(VERSION v) {
+    return (unsigned short)((v & 0xFFFF00000000) >> 32);
 }
 
 
 /// <summary>
 /// Gets the patch version
 /// </summary>
-unsigned __int8 GetPatchVersion(VERSION v) {
-    return (unsigned __int8)((v & 0xFF00) >> 8);
+unsigned short GetPatchVersion(VERSION v) {
+    return (unsigned short)((v & 0xFFFF0000) >> 16);
 }
 
 
 /// <summary>
 /// Gets the build version
 /// </summary>
-unsigned __int8 GetBuildVersion(VERSION v) {
-    return (unsigned __int8)(v & 0xFF);
+unsigned short GetBuildVersion(VERSION v) {
+    return (unsigned short)(v & 0xFFFF);
 }
 
 

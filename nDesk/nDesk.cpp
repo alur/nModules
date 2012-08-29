@@ -17,11 +17,11 @@
 #include "Settings.h"
 
 // Constants
-const int  g_minCoreVersion = 0x01000000;
-LPCSTR g_rcsRevision        = "0.1";
-LPCSTR g_szAppName          = "nDesk";
-LPCSTR g_szMainHandler      = "DesktopBackgroundClass";
-LPCSTR g_szAuthor           = "Alurcard2";
+const VERSION g_minCoreVersion    = MAKE_VERSION(0,2,0,0);
+LPCSTR g_rcsRevision              = "0.1";
+LPCSTR g_szAppName                = "nDesk";
+LPCSTR g_szMainHandler            = "DesktopBackgroundClass";
+LPCSTR g_szAuthor                 = "Alurcard2";
 
 // The messages we want from the core
 UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };

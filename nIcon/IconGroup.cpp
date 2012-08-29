@@ -43,8 +43,5 @@ IconGroup::~IconGroup() {
 /// 
 /// </summary>
 LRESULT WINAPI IconGroup::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg) {
-    default:
-        return m_pWindow->HandleMessage(uMsg, wParam, lParam);
-    }
+	return m_pWindow->HandleMessage(uMsg, wParam, lParam);
 }
