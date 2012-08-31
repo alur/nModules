@@ -22,9 +22,10 @@ int (__stdcall * _pGetVersion)();
 /// <returns>True if the core is succefully initalized.</returns>
 HRESULT nCore::Init(VERSION minVersion) {
     HWND coreHWnd = FindWindow("LSnCore", NULL);
-    if (!coreHWnd)
+    if (!coreHWnd) {
         return E_FAIL;
-
+    }
+    
     initialized = false;
 
     HMODULE hCoreInstance = (HMODULE)GetWindowLongPtr(coreHWnd, GWLP_USERDATA);
@@ -33,9 +34,10 @@ HRESULT nCore::Init(VERSION minVersion) {
 
     // Should check the version here
     VERSION coreVersion = GetVersion();
-    if (GetMajorVersion(minVersion) != GetMajorVersion(coreVersion))
+    if (GetMajorVersion(minVersion) != GetMajorVersion(coreVersion)) {
         return E_FAIL;
-
+    }
+    
     HRESULT hr;
     if (!SUCCEEDED(hr = System::Init(hCoreInstance))) return hr;
     if (!SUCCEEDED(hr = InputParsing::Init(hCoreInstance))) return hr;

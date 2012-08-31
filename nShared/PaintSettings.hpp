@@ -10,6 +10,7 @@
 
 #include <d2d1.h>
 #include <dwrite.h>
+#include "Settings.hpp"
 
 class PaintSettings {
 public:
@@ -38,6 +39,7 @@ public:
     D2D_COLOR_F ARGBToD2DColor(DWORD argb);
 
 private:
+	Settings* m_pSettings;
     LPCSTR m_pszPrefix;
 
 };

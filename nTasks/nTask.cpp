@@ -17,13 +17,13 @@
 
 using std::map;
 
-const VERSION g_minCoreVersion  = 0x01000000;
-LPCSTR g_rcsRevision            = "1.0";
-LPCSTR g_szAppName              = "nTask";
-LPCSTR g_szMsgHandler           = "LSnTaskMsgHandler";
-LPCSTR g_szTaskbarHandler       = "LSnTaskbarHandler";
-LPCSTR g_szTaskButtonHandler    = "LSnTaskButtonHandler";
-LPCSTR g_szAuthor               = "Alurcard2";
+const VERSION g_minCoreVersion    = MAKE_VERSION(0,2,0,0);
+const VERSION g_version           = MAKE_VERSION(0,2,0,0);
+LPCSTR g_szAppName                = "nTask";
+LPCSTR g_szMsgHandler             = "LSnTaskMsgHandler";
+LPCSTR g_szTaskbarHandler         = "LSnTaskbarHandler";
+LPCSTR g_szTaskButtonHandler      = "LSnTaskButtonHandler";
+LPCSTR g_szAuthor                 = "Alurcard2";
 
 // The messages we want from the core
 UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, LM_WINDOWCREATED, LM_WINDOWACTIVATED,
@@ -177,9 +177,11 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch(uMsg) {
         case LM_GETREVID: {
             size_t uLength;
-            StringCchPrintf((char*)lParam, 64, "%s: %s", g_szAppName, g_rcsRevision);
+            StringCchPrintf((LPSTR)lParam, 64, "%s: ", g_szAppName);
+			uLength = strlen((LPSTR)lParam);
+			GetVersionString(g_version, (LPSTR)lParam + uLength, 64 - uLength, false);
             
-            if (SUCCEEDED(StringCchLength((char*)lParam, 64, &uLength)))
+            if (SUCCEEDED(StringCchLength((LPSTR)lParam, 64, &uLength)))
                 return uLength;
 
             lParam = NULL;

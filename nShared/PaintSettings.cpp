@@ -8,7 +8,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../headers/lsapi.h"
 #include "PaintSettings.hpp"
-#include "../nCoreCom/Core.h"
 
 
 /// <summary>
@@ -16,6 +15,7 @@
 /// </summary>
 PaintSettings::PaintSettings(LPCSTR pszPrefix) {
     m_pszPrefix = _strdup(pszPrefix);
+    m_pSettings = new Settings(pszPrefix);
     Load();
 }
 
@@ -24,6 +24,7 @@ PaintSettings::PaintSettings(LPCSTR pszPrefix) {
 /// Destructor
 /// </summary>
 PaintSettings::~PaintSettings() {
+	delete m_pSettings;
     free((LPVOID)m_pszPrefix);
     free((LPVOID)text);
     free((LPVOID)font);
@@ -34,40 +35,35 @@ PaintSettings::~PaintSettings() {
 /// Loads/Reloads all settings
 /// </summary>
 void PaintSettings::Load() {
-    using namespace nCore::InputParsing;
-
     char szBuf[MAX_LINE_LENGTH];
     wchar_t wszBuf[MAX_LINE_LENGTH];
     DWORD argb;
 
-    position.left = GetPrefixedRCInt(m_pszPrefix, "X", 0);
-    position.top = GetPrefixedRCInt(m_pszPrefix, "Y", 0);
-    position.right = position.left + GetPrefixedRCInt(m_pszPrefix, "Width", 100);
-    position.bottom = position.top + GetPrefixedRCInt(m_pszPrefix, "Height", 100);
+	m_pSettings->GetRectFromXYWH("X", "Y", "Width", "Height", &position, 0, 0, 100, 100);
 
-    argb = GetPrefixedRCColor(m_pszPrefix, "Color", 0xFF000000);
+	argb = m_pSettings->GetColor("Color", 0xFF000000);
     backColor = ARGBToD2DColor(argb);
-    backColor.a = GetPrefixedRCInt(m_pszPrefix, "Alpha", argb >> 24)/255.0f; // Alpha overrides #argb
+    backColor.a = m_pSettings->GetInt("Alpha", argb >> 24)/255.0f; // Alpha overrides #argb
 
-    argb = GetPrefixedRCColor(m_pszPrefix, "FontColor", 0xFFFFFFFF);
+    argb = m_pSettings->GetColor("FontColor", 0xFFFFFFFF);
     fontColor = ARGBToD2DColor(argb);
-    fontColor.a = GetPrefixedRCInt(m_pszPrefix, "FontAlpha", argb >> 24)/255.0f; // Alpha overrides #argb
+    fontColor.a = m_pSettings->GetInt("FontAlpha", argb >> 24)/255.0f; // Alpha overrides #argb
     
-    DWMBlur = GetPrefixedRCBool(m_pszPrefix, "DWMBlur", false);
+    DWMBlur = m_pSettings->GetBool("DWMBlur", false);
 
-    GetPrefixedRCWString(m_pszPrefix, "Text", wszBuf, " ", sizeof(wszBuf)/sizeof(wchar_t));
+    m_pSettings->GetString("Text", wszBuf, sizeof(wszBuf)/sizeof(wchar_t), "");
     text = _wcsdup(wszBuf);
-    GetPrefixedRCWString(m_pszPrefix, "Font", wszBuf, "Arial", sizeof(wszBuf)/sizeof(wchar_t));
+    m_pSettings->GetString("Font", wszBuf, sizeof(wszBuf)/sizeof(wchar_t), "Arial");
     font = _wcsdup(wszBuf);
 
-    fontSize = GetPrefixedRCFloat(m_pszPrefix, "FontSize", 12.0f);
+    fontSize = m_pSettings->GetFloat("FontSize", 12.0f);
 
-    textOffset.bottom = GetPrefixedRCFloat(m_pszPrefix, "TextOffsetBottom", 0.0f);
-    textOffset.top = GetPrefixedRCFloat(m_pszPrefix, "TextOffsetTop", 0.0f);
-    textOffset.left = GetPrefixedRCFloat(m_pszPrefix, "TextOffsetLeft", 0.0f);
-    textOffset.right = GetPrefixedRCFloat(m_pszPrefix, "TextOffsetRight", 0.0f);
+    textOffset.bottom = m_pSettings->GetFloat("TextOffsetBottom", 0.0f);
+    textOffset.top = m_pSettings->GetFloat("TextOffsetTop", 0.0f);
+    textOffset.left = m_pSettings->GetFloat("TextOffsetLeft", 0.0f);
+    textOffset.right = m_pSettings->GetFloat("TextOffsetRight", 0.0f);
 
-    GetPrefixedRCString(m_pszPrefix, "TextAlign", szBuf, "Left", sizeof(szBuf));
+    m_pSettings->GetString("TextAlign", szBuf, sizeof(szBuf), "Left");
     if (_stricmp(szBuf, "Center") == 0)
         textAlignment = DWRITE_TEXT_ALIGNMENT_CENTER;
     else if (_stricmp(szBuf, "Right") == 0)
@@ -75,7 +71,7 @@ void PaintSettings::Load() {
     else
         textAlignment = DWRITE_TEXT_ALIGNMENT_LEADING;
 
-    GetPrefixedRCString(m_pszPrefix, "TextVerticalAlign", szBuf, "Top", sizeof(szBuf));
+    m_pSettings->GetString("TextVerticalAlign", szBuf, sizeof(szBuf), "Top");
     if (_stricmp(szBuf, "Middle") == 0)
         textVerticalAlignment = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
     else if (_stricmp(szBuf, "Bottom") == 0)
@@ -86,12 +82,14 @@ void PaintSettings::Load() {
 
 
 void PaintSettings::OverLoad(LPCSTR pszPrefix) {
-    using namespace nCore::InputParsing;
     DWORD argb;
+    Settings* settings = new Settings(pszPrefix);
 
-    argb = GetPrefixedRCColor(pszPrefix, "Color", GetPrefixedRCColor(m_pszPrefix, "Color", 0xFF000000));
+    argb = settings->GetColor("Color", m_pSettings->GetColor("Color", 0xFF000000));
     backColor = ARGBToD2DColor(argb);
-    backColor.a = GetPrefixedRCInt(pszPrefix, "Alpha", GetPrefixedRCInt(m_pszPrefix, "Alpha", argb >> 24))/255.0f; // Alpha overrides #argb
+    backColor.a = settings->GetInt("Alpha", m_pSettings->GetInt("Alpha", argb >> 24))/255.0f; // Alpha overrides #argb
+
+    delete settings;
 }
 
 

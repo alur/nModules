@@ -13,32 +13,32 @@
 /// <summary>
 /// Gets the major version
 /// </summary>
-unsigned short GetMajorVersion(VERSION v) {
-    return (unsigned short)((v & 0xFFFF000000000000) >> 48);
+USHORT GetMajorVersion(VERSION v) {
+    return (USHORT)((v & 0xFFFF000000000000) >> 48);
 }
 
 
 /// <summary>
 /// Gets the minor version
 /// </summary>
-unsigned short GetMinorVersion(VERSION v) {
-    return (unsigned short)((v & 0xFFFF00000000) >> 32);
+USHORT GetMinorVersion(VERSION v) {
+    return (USHORT)((v & 0xFFFF00000000) >> 32);
 }
 
 
 /// <summary>
 /// Gets the patch version
 /// </summary>
-unsigned short GetPatchVersion(VERSION v) {
-    return (unsigned short)((v & 0xFFFF0000) >> 16);
+USHORT GetPatchVersion(VERSION v) {
+    return (USHORT)((v & 0xFFFF0000) >> 16);
 }
 
 
 /// <summary>
 /// Gets the build version
 /// </summary>
-unsigned short GetBuildVersion(VERSION v) {
-    return (unsigned short)(v & 0xFFFF);
+USHORT GetBuildVersion(VERSION v) {
+    return (USHORT)(v & 0xFFFF);
 }
 
 
