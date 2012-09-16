@@ -69,7 +69,7 @@ HRESULT Factories::GetWICFactory(LPVOID* ppFactory) {
     if (!pWICFactory) {
         HRESULT hr;
         if (!SUCCEEDED(hr = CoCreateInstance(
-            CLSID_WICImagingFactory,
+            CLSID_WICImagingFactory1,
             NULL,
             CLSCTX_INPROC_SERVER,
             IID_IWICImagingFactory,

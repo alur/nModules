@@ -109,7 +109,7 @@ void Tray::Relayout() {
         x += 20 + m_iColSpacing;
         if (x > wrapwidth) {
             x = m_rMargin.left;
-            y +=  20 + m_iRowSpacing;
+            y += 20 + m_iRowSpacing;
         }
     }
 }
