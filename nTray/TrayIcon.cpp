@@ -22,6 +22,7 @@ TrayIcon::TrayIcon(HWND parent, LPCSTR prefix, LPLSNOTIFYICONDATA pNID) {
     //
     LoadSettings();
 
+    //
     m_pNotifyData = pNID;
 
     // Create the drawable window
@@ -29,11 +30,8 @@ TrayIcon::TrayIcon(HWND parent, LPCSTR prefix, LPLSNOTIFYICONDATA pNID) {
     m_pWindow = new DrawableWindow(parent, g_szTrayIconHandler, m_pPaintSettings, g_hInstance);
     SetWindowLongPtr(m_pWindow->getWindow(), 0, (LONG_PTR)this);
 
-    if ((m_pNotifyData->uFlags & NIF_ICON) == NIF_ICON) {
-        D2D1_RECT_F f;
-        f.bottom = 18; f.top = 2; f.left = 2; f.right = 18;
-        m_pWindow->AddOverlay(f, m_pNotifyData->hIcon);
-    }
+    //
+    UpdateIcon();
 }
 
 

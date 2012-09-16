@@ -38,6 +38,15 @@ private:
 
     // The tray icons
     vector<TrayIcon*> m_icons;
+
+    // 
+    RECT m_rMargin;
+
+    // 
+    int m_iRowSpacing;
+
+    // 
+    int m_iColSpacing;
 };
 
 #endif /* TRAY_HPP */

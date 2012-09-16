@@ -2,7 +2,7 @@
  *  KnownColors.h                                                 August, 2012
  *  The nModules Project
  *
- *  Predefined color constants
+ *  Predefined color constants.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef KNOWNCOLORS_H

@@ -21,12 +21,13 @@ extern HWND g_hWndTrayNotify;
 /// </summary>
 Tray::Tray(LPCSTR pszName) {
     m_pszName = pszName;
-    LoadSettings();
 
     m_pPaintSettings = new PaintSettings(m_pszName);
     m_pWindow = new DrawableWindow(NULL, g_szTrayHandler, m_pPaintSettings, g_hInstance);
     SetWindowLongPtr(m_pWindow->getWindow(), 0, (LONG_PTR)this);
     m_pWindow->Show();
+
+    LoadSettings();
 }
 
 
@@ -50,7 +51,10 @@ Tray::~Tray() {
 /// Loads settings from LiteStep's RC files.
 /// </summary>
 void Tray::LoadSettings(bool /* bIsRefresh */) {
-    using namespace nCore::InputParsing;
+    Settings* pSettings = m_pPaintSettings->GetSettings();
+    pSettings->GetOffsetRect("MarginLeft", "MarginTop", "MarginRight", "MarginBottom", &m_rMargin, 2, 2, 5, 2);
+    m_iColSpacing = pSettings->GetInt("ColumnSpacing", 2);
+    m_iRowSpacing = pSettings->GetInt("RowSpacing", 2);
 }
 
 
@@ -80,7 +84,7 @@ vector<TrayIcon*>::const_iterator Tray::FindIcon(TrayIcon* pIcon) {
 
 
 /// <summary>
-/// Removes the specified task from this taskbar, if it is on it.
+/// Removes the specified icon from this tray, if it is in it.
 /// </summary>
 void Tray::RemoveIcon(TrayIcon* pIcon) {
     vector<TrayIcon*>::const_iterator icon = FindIcon(pIcon);
@@ -93,25 +97,26 @@ void Tray::RemoveIcon(TrayIcon* pIcon) {
 
 
 /// <summary>
-/// Repositions/Resizes all buttons.
+/// Repositions/Resizes all icons.
 /// </summary>
 void Tray::Relayout() {
-    int pos = 4;
-    int y = 4;
+    int x = m_rMargin.left;
+    int y = m_rMargin.top;
+    int wrapwidth = m_pPaintSettings->position.right - m_pPaintSettings->position.left - m_rMargin.right - 20;
 
     for (vector<TrayIcon*>::const_iterator iter = m_icons.begin(); iter != m_icons.end(); iter++) {
-        (*iter)->Reposition(pos, y, 20, 20);
-        pos += 22;
-        if (pos > 150) {
-            pos = 4;
-            y += 22;
+        (*iter)->Reposition(x, y, 20, 20);
+        x += 20 + m_iColSpacing;
+        if (x > wrapwidth) {
+            x = m_rMargin.left;
+            y +=  20 + m_iRowSpacing;
         }
     }
 }
 
 
 /// <summary>
-/// Handles window events for the taskbar.
+/// Handles window events for the tray.
 /// </summary>
 LRESULT WINAPI Tray::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {

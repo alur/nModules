@@ -165,7 +165,6 @@
     <ClInclude Include="ClickHandler.hpp" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="nDesk.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include=".\WorkArea.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="TransitionEffect.hpp" />

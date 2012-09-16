@@ -153,7 +153,6 @@
     <ClInclude Include="Icon.hpp" />
     <ClInclude Include="IconGroup.hpp" />
     <ClInclude Include="nIcon.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Icon.cpp" />

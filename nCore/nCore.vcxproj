@@ -152,7 +152,6 @@
   <ItemGroup>
     <ClInclude Include="KnownColors.h" />
     <ClInclude Include="nCore.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="TextFormatting.h" />
   </ItemGroup>
   <ItemGroup>

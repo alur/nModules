@@ -38,6 +38,8 @@ public:
 
     D2D_COLOR_F ARGBToD2DColor(DWORD argb);
 
+    Settings* GetSettings();
+
 private:
 	Settings* m_pSettings;
     LPCSTR m_pszPrefix;

@@ -21,9 +21,6 @@
     <ClInclude Include="nCore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="KnownColors.h">
       <Filter>Header Files\Painting</Filter>
     </ClInclude>

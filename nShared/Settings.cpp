@@ -323,3 +323,37 @@ void Settings::SetXYWHFromRect(LPCSTR pszX, LPCSTR pszY, LPCSTR pszW, LPCSTR psz
 	SetInt(pszW, pValue->right - pValue->left);
 	SetInt(pszH, pValue->bottom - pValue->top);
 }
+
+
+/// <summary>
+/// Reads a series of values into a RECT structure.
+/// </summary>
+/// <param name="pszLeft">The key for the left value.</param>
+/// <param name="pszTop">The key for the top value.</param>
+/// <param name="pszRight">The key for the right value.</param>
+/// <param name="pszBottom">The key for the bottom value.</param>
+/// <param name="pDest">The destination RECT.</param>
+/// <param name="pDefault">The default values.</param>
+void Settings::GetOffsetRect(LPCSTR pszLeft, LPCSTR pszTop, LPCSTR pszRight, LPCSTR pszBottom, LPRECT pDest, LPRECT pDefault) {
+	GetOffsetRect(pszLeft, pszTop, pszRight, pszBottom, pDest, pDefault->left, pDefault->top, pDefault->right, pDefault->bottom);
+}
+
+
+/// <summary>
+/// Reads a series of values into a RECT structure.
+/// </summary>
+/// <param name="pszLeft">The key for the left value.</param>
+/// <param name="pszTop">The key for the top value.</param>
+/// <param name="pszRight">The key for the right value.</param>
+/// <param name="pszBottom">The key for the bottom value.</param>
+/// <param name="pDest">The destination RECT.</param>
+/// <param name="defLeft">The default left value, if not specified.</param>
+/// <param name="defTop">The default top value, if not specified.</param>
+/// <param name="defRight">The default right, if not specified.</param>
+/// <param name="defBottom">The default bottom, if not specified.</param>
+void Settings::GetOffsetRect(LPCSTR pszLeft, LPCSTR pszTop, LPCSTR pszRight, LPCSTR pszBottom, LPRECT pDest, int defLeft, int defTop, int defRight, int defBottom) {
+	pDest->left = GetInt(pszLeft, defLeft);
+	pDest->top = GetInt(pszTop, defTop);
+	pDest->right = GetInt(pszRight, defRight);
+	pDest->bottom = GetInt(pszBottom, defBottom);
+}

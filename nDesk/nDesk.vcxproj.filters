@@ -30,9 +30,6 @@
     <ClInclude Include="ClickHandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include=".\WorkArea.h">
       <Filter>Header Files</Filter>
     </ClInclude>

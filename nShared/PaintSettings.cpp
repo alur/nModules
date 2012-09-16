@@ -94,7 +94,7 @@ void PaintSettings::OverLoad(LPCSTR pszPrefix) {
 
 
 /// <summary>
-/// Converts GDI+'s ARGB format to a D2D color
+/// Converts GDI+'s ARGB format to a D2D color.
 /// </summary>
 D2D_COLOR_F PaintSettings::ARGBToD2DColor(DWORD argb) {
     D2D_COLOR_F ret;
@@ -106,7 +106,18 @@ D2D_COLOR_F PaintSettings::ARGBToD2DColor(DWORD argb) {
 }
 
 
+/// <summary>
+/// Sets the text value.
+/// </summary>
 void PaintSettings::setText(LPCWSTR pszwText) {
     free((LPVOID)text);
     text = _wcsdup(pszwText);
+}
+
+
+/// <summary>
+/// Returns the settings class used by this paintsettings.
+/// </summary>
+Settings* PaintSettings::GetSettings() {
+    return m_pSettings;
 }
