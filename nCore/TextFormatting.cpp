@@ -19,7 +19,7 @@ map<LPCSTR, FORMATTINGPROC> g_formatters;
 
 
 /// <summary>
-/// Registers a new text formatter
+/// Registers a new text formatter.
 /// </summary>
 EXPORT_CDECL(BOOL) RegisterFormatter(LPCSTR function, FORMATTINGPROC pFormatProc) {
     return FALSE;
@@ -27,7 +27,7 @@ EXPORT_CDECL(BOOL) RegisterFormatter(LPCSTR function, FORMATTINGPROC pFormatProc
 
 
 /// <summary>
-/// Unregisters a text formatter
+/// Unregisters a text formatter.
 /// </summary>
 EXPORT_CDECL(BOOL) UnregisterFormatter(LPCSTR function) {
     return FALSE;
@@ -35,7 +35,7 @@ EXPORT_CDECL(BOOL) UnregisterFormatter(LPCSTR function) {
 
 
 /// <summary>
-/// Formats a piece of text using the registered text formatters
+/// Formats a piece of text using the registered text formatters.
 /// </summary>
 EXPORT_CDECL(BOOL) FormatText(LPCWSTR pszSource, size_t cchDest, LPWSTR pszDest) {
     time_t t = time(0);
@@ -47,4 +47,13 @@ EXPORT_CDECL(BOOL) FormatText(LPCWSTR pszSource, size_t cchDest, LPWSTR pszDest)
     else {
         return SUCCEEDED(StringCchCopyW(pszDest, cchDest, pszSource));
     }
+}
+
+
+/// <summary>
+/// Finds a formatter for the specified function.
+/// </summary>
+FORMATTINGPROC FindFormatter(LPCSTR pszFunc) {
+    map<LPCSTR, FORMATTINGPROC>::const_iterator iter = g_formatters.find(pszFunc);
+    return iter != g_formatters.end() ? iter->second : NULL;
 }

@@ -12,6 +12,8 @@ typedef VOID (__cdecl * FORMATTINGPROC)(HWND hwndOwner, LPCSTR pszArgs);
 EXPORT_CDECL(BOOL) RegisterTextFormatter(LPCSTR, FORMATTINGPROC);
 EXPORT_CDECL(BOOL) UnregisterTextFormatter(LPCSTR, FORMATTINGPROC);
 
+FORMATTINGPROC FindFormatter(LPCSTR pszFunc);
+
 // Valid formats:
 // [Function]
 // [Function(stuff)]

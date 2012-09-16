@@ -2,7 +2,7 @@
  *  IconGroup.hpp                                                 August, 2012
  *  The nModules Project
  *
- *  
+ *  A group of icons. Essentially an *nIcon.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef ICONGROUP_HPP

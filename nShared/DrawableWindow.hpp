@@ -39,6 +39,9 @@ private:
         ID2D1Bitmap *bitmap;
     } Overlay;
 
+    // The screen position of the window
+    RECT m_scPosition;
+
     // 
     vector<Overlay> m_overlays;
 

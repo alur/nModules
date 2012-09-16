@@ -31,6 +31,10 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR pszWndClass, PaintSettings * 
     m_hWndParent = parent;
     m_pszText = "Test";
     m_pPaintSettings = paintSettings;
+    
+    // Copy over the position from the paint settings.
+    memcpy(&m_scPosition, &m_pPaintSettings->position, sizeof(RECT));
+
     CreateWnd(pszWndClass, hInst);
 }
 
@@ -170,22 +174,26 @@ HRESULT DrawableWindow::SetBlur(bool bEnable) {
 /// Creates the window we are drawing.
 /// </summary>
 bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
-    DWORD style = WS_CLIPCHILDREN;
-    style |= m_hWndParent ? WS_CHILD : WS_POPUP;
+    if (m_hWndParent) {
+        RECT parentRect;
+        GetWindowRect(m_hWndParent, &parentRect);
+        m_scPosition.bottom += parentRect.top;
+        m_scPosition.top += parentRect.top;
+        m_scPosition.left += parentRect.left;
+        m_scPosition.right += parentRect.left;
+    }
 
-    DWORD exStyle = WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW;
-
-    m_hWnd = CreateWindowEx(exStyle, pszWndClass, "", style,
-        m_pPaintSettings->position.left, m_pPaintSettings->position.top, m_pPaintSettings->position.right - m_pPaintSettings->position.left,
-        m_pPaintSettings->position.bottom - m_pPaintSettings->position.top, m_hWndParent, NULL, hInst, NULL);
+    m_hWnd = CreateWindowEx(WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW, pszWndClass, "", WS_CLIPCHILDREN | WS_POPUP,
+        m_scPosition.left, m_scPosition.top, m_scPosition.right - m_scPosition.left,
+        m_scPosition.bottom - m_scPosition.top, m_hWndParent, NULL, hInst, NULL);
     
     if (!m_hWnd) {
         return false;
     }
 
     D2D1_SIZE_U size = D2D1::SizeU(
-        m_pPaintSettings->position.right - m_pPaintSettings->position.left,
-        m_pPaintSettings->position.bottom - m_pPaintSettings->position.top
+        m_scPosition.right - m_scPosition.left,
+        m_scPosition.bottom - m_scPosition.top
     );
 
     m_backArea.top = 0;
@@ -233,7 +241,7 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
 
     MARGINS m;
     ZeroMemory(&m, sizeof(m));
-    m.cyTopHeight = m_pPaintSettings->position.bottom - m_pPaintSettings->position.top;
+    m.cyTopHeight = m_scPosition.bottom - m_scPosition.top;
     m.cyTopHeight = INT_MAX;
     
     DwmExtendFrameIntoClientArea(m_hWnd, &m);
@@ -256,9 +264,22 @@ void DrawableWindow::Show() {
 /// Causes the window to move to the position specified in its paintsettings.
 /// </summary>
 void DrawableWindow::UpdatePosition() {
+    // Copy over the position from the paint settings.
+    memcpy(&m_scPosition, &m_pPaintSettings->position, sizeof(RECT));
+
+    // If this is a child window we need to make its position relative to its parent.
+    if (m_hWndParent) {
+        RECT parentRect;
+        GetWindowRect(m_hWndParent, &parentRect);
+        m_scPosition.bottom += parentRect.top;
+        m_scPosition.top += parentRect.top;
+        m_scPosition.left += parentRect.left;
+        m_scPosition.right += parentRect.left;
+    }
+
     D2D1_SIZE_U size = D2D1::SizeU(
-        m_pPaintSettings->position.right - m_pPaintSettings->position.left,
-        m_pPaintSettings->position.bottom - m_pPaintSettings->position.top
+        m_scPosition.right - m_scPosition.left,
+        m_scPosition.bottom - m_scPosition.top
     );
 
     m_backArea.top = 0;
@@ -272,7 +293,7 @@ void DrawableWindow::UpdatePosition() {
     m_textArea.left += m_pPaintSettings->textOffset.left;
     m_textArea.right -= m_pPaintSettings->textOffset.right;
 
-    SetWindowPos(m_hWnd, 0, m_pPaintSettings->position.left, m_pPaintSettings->position.top, size.width, size.height, SWP_NOZORDER | SWP_FRAMECHANGED);
+    SetWindowPos(m_hWnd, 0, m_scPosition.left, m_scPosition.top, size.width, size.height, SWP_NOZORDER | SWP_FRAMECHANGED);
     m_pRenderTarget->Resize(size);
 
     InvalidateRect(m_hWnd, NULL, TRUE);
@@ -325,7 +346,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lP
 
     case WM_RBUTTONUP:
         {
-            LSExecute(NULL, "!About", SW_SHOW);
+            //LSExecute(NULL, "!About", SW_SHOW);
         }
         return 0;
 

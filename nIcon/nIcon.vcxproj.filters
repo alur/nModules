@@ -24,12 +24,18 @@
     <ClInclude Include="IconGroup.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Icon.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nIcon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IconGroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Icon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

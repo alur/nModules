@@ -188,7 +188,7 @@ void DesktopPainter::SetSquareSize(int iSquareSize) {
 
 
 /// <summary>
-/// Changes the frame interval
+/// Changes the frame interval.
 /// </summary>
 void DesktopPainter::SetFrameInterval(int iFrameInterval) {
     assert(iFrameInterval > 0);
@@ -197,7 +197,7 @@ void DesktopPainter::SetFrameInterval(int iFrameInterval) {
 
 
 /// <summary>
-/// Changes m_bInvalidateAllOnUpdate
+/// Changes m_bInvalidateAllOnUpdate.
 /// </summary>
 void DesktopPainter::SetInvalidateAllOnUpdate(bool bValue) {
     m_bInvalidateAllOnUpdate = bValue;
@@ -315,7 +315,7 @@ void DesktopPainter::TransitionEnd() {
 
 
 /// <summary>
-/// Paints a composite of the previous wallpaper and the current one
+/// Paints a composite of the previous wallpaper and the current one.
 /// </summary>
 void DesktopPainter::PaintComposite() {
     m_TransitionEffect->Paint(m_pRenderTarget, min(1.0f, (float)m_TransitionSettings.iProgress/m_TransitionSettings.iTime));
@@ -328,7 +328,7 @@ void DesktopPainter::PaintComposite() {
 
 
 /// <summary>
-/// Handles certain window messages
+/// Handles certain window messages.
 /// </summary>
 LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
@@ -338,6 +338,8 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
     case WM_PAINT:
         if (SUCCEEDED(ReCreateDeviceResources())) {
             m_pRenderTarget->BeginDraw();
+
+            // m_pOldWallpaperBrush being non zero indicates that we are in the middle of a transition
             if (m_pOldWallpaperBrush != NULL) {
                 PaintComposite();
             }

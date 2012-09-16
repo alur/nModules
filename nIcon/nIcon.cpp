@@ -57,7 +57,7 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath
         return 1;
     }
 
-    //pGroup = new IconGroup();
+    pGroup = new IconGroup();
 
     return 0;
 }
