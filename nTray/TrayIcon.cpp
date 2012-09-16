@@ -46,21 +46,33 @@ TrayIcon::~TrayIcon() {
 }
 
 
+/// <summary>
+/// Loads RC settings.
+/// </summary>
 void TrayIcon::LoadSettings(bool /* bIsRefresh */) {
     using namespace nCore::InputParsing;
 }
 
 
+/// <summary>
+/// Shows the trayicon.
+/// </summary>
 void TrayIcon::Show() {
     m_pWindow->Show();
 }
 
 
+/// <summary>
+/// Retrives the icon's HWND.
+/// </summary>
 HWND TrayIcon::GetHWND() {
     return m_pWindow->getWindow();
 }
 
 
+/// <summary>
+/// Updates the icon.
+/// </summary>
 void TrayIcon::UpdateIcon() {
     m_pWindow->PurgeOverlays();
     if ((m_pNotifyData->uFlags & NIF_ICON) == NIF_ICON) {
@@ -71,6 +83,9 @@ void TrayIcon::UpdateIcon() {
 }
 
 
+/// <summary>
+/// Repositions the icon.
+/// </summary>
 void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height) {
     m_pPaintSettings->position.left = x;
     m_pPaintSettings->position.top = y;
@@ -80,17 +95,24 @@ void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height) {
 }
 
 
+/// <summary>
+/// Sends a message to the owner of the icon.
+/// </summary>
 void TrayIcon::SendCallback(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    if (m_pNotifyData->uVersion == 0)
-        PostMessage(m_pNotifyData->hWnd, m_pNotifyData->uCallbackMessage, (WPARAM)m_pNotifyData->uID, (LPARAM)uMsg);
-    else if (m_pNotifyData->uVersion >= 4) {
+    if (m_pNotifyData->uVersion >= 4) {
         RECT r;
         GetWindowRect(m_pWindow->getWindow(), &r);
         PostMessage(m_pNotifyData->hWnd, m_pNotifyData->uCallbackMessage, (WPARAM)MAKEWPARAM(r.left, r.top), (LPARAM)MAKELPARAM(uMsg, m_pNotifyData->uID));
     }
+    else {
+        PostMessage(m_pNotifyData->hWnd, m_pNotifyData->uCallbackMessage, (WPARAM)m_pNotifyData->uID, (LPARAM)uMsg);
+    }
 }
 
 
+/// <summary>
+/// Handles window messages for the icon's window.
+/// </summary>
 LRESULT WINAPI TrayIcon::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (uMsg > WM_MOUSEFIRST && uMsg < WM_MOUSELAST) {
         SendCallback(uMsg, wParam, lParam);

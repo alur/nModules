@@ -216,6 +216,7 @@ LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
             break;
 
         default:
+            TRACE("TrayManager::Unknown LM_SYSTRAY wParam: %u", wParam);
             return FALSE;
         }
         

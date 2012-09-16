@@ -55,7 +55,7 @@ void Tray::LoadSettings(bool /* bIsRefresh */) {
 
 
 /// <summary>
-/// Adds the specified icon to this tray
+/// Adds the specified icon to this tray.
 /// </summary>
 TrayIcon* Tray::AddIcon(LPLSNOTIFYICONDATA pNID) {
     TrayIcon* tIcon = new TrayIcon(m_pWindow->getWindow(), m_pszName, pNID);
@@ -80,7 +80,7 @@ vector<TrayIcon*>::const_iterator Tray::FindIcon(TrayIcon* pIcon) {
 
 
 /// <summary>
-/// Removes the specified task from this taskbar, if it is on it
+/// Removes the specified task from this taskbar, if it is on it.
 /// </summary>
 void Tray::RemoveIcon(TrayIcon* pIcon) {
     vector<TrayIcon*>::const_iterator icon = FindIcon(pIcon);
@@ -93,7 +93,7 @@ void Tray::RemoveIcon(TrayIcon* pIcon) {
 
 
 /// <summary>
-/// Repositions/Resizes all buttons
+/// Repositions/Resizes all buttons.
 /// </summary>
 void Tray::Relayout() {
     int pos = 4;
@@ -111,7 +111,7 @@ void Tray::Relayout() {
 
 
 /// <summary>
-/// Handles window events for the taskbar
+/// Handles window events for the taskbar.
 /// </summary>
 LRESULT WINAPI Tray::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
