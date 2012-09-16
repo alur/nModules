@@ -183,7 +183,12 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
         m_scPosition.right += parentRect.left;
     }
 
-    m_hWnd = CreateWindowEx(WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW, pszWndClass, "", WS_CLIPCHILDREN | WS_POPUP,
+    DWORD exStyle = WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW;
+    DWORD style = WS_POPUP;
+
+    if (m_pPaintSettings->m_bAlwaysOnTop) exStyle |= WS_EX_TOPMOST;
+
+    m_hWnd = CreateWindowEx(exStyle, pszWndClass, "", style,
         m_scPosition.left, m_scPosition.top, m_scPosition.right - m_scPosition.left,
         m_scPosition.bottom - m_scPosition.top, m_hWndParent, NULL, hInst, NULL);
     

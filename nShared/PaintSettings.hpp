@@ -20,6 +20,9 @@ public:
     void Load();
     void OverLoad(LPCSTR pszPrefix);
 
+    // True if the window should be topmost.
+    bool m_bAlwaysOnTop;
+
     RECT position;
     bool DWMBlur;
     D2D_COLOR_F backColor;

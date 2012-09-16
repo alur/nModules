@@ -41,6 +41,8 @@ void PaintSettings::Load() {
 
 	m_pSettings->GetRectFromXYWH("X", "Y", "Width", "Height", &position, 0, 0, 100, 100);
 
+    m_bAlwaysOnTop = m_pSettings->GetBool("AlwaysOnTop", false);
+
 	argb = m_pSettings->GetColor("Color", 0xFF000000);
     backColor = ARGBToD2DColor(argb);
     backColor.a = m_pSettings->GetInt("Alpha", argb >> 24)/255.0f; // Alpha overrides #argb
