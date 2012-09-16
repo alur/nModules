@@ -2,7 +2,7 @@
  *  InputParsing.cpp                                              August, 2012
  *  The nModules Project
  *
- *  Utility functions for parsing input
+ *  Utility functions for parsing input.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include <strsafe.h>
@@ -94,7 +94,9 @@ EXPORT_CDECL(bool) ParseMonitor(LPCSTR pszMonitor, UINT * target) {
 }
 
 
-// Utility function used by ParseColor
+/// <summary>
+/// Utility function used by ParseColor
+/// </summary>
 inline bool _IsFunctionOf(LPCSTR pszSource, LPCSTR pszName) {
     return _strnicmp(pszName, pszSource, strlen(pszName)) == 0 && pszSource[strlen(pszName)] == '(' &&  pszSource[strlen(pszSource)-1] == ')';
 }

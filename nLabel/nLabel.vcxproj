@@ -156,7 +156,6 @@
   <ItemGroup>
     <ClInclude Include="Label.hpp" />
     <ClInclude Include="nLabel.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nLabel.rc" />

@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TaskButton.cpp                                                      July, 2012
+ *  TaskButton.cpp                                                  July, 2012
  *  The nModules Project
  *
  *  Implementation of the TaskButton class. Represents a taskbar button.
@@ -75,6 +75,9 @@ TaskButton::~TaskButton() {
 }
 
 
+/// <summary>
+/// Sets the icon of this button.
+/// </summary>
 void TaskButton::SetIcon(HICON hIcon) {
     m_pWindow->PurgeOverlays();
     if (hIcon != NULL) {
@@ -87,26 +90,39 @@ void TaskButton::SetIcon(HICON hIcon) {
 }
 
 
+/// <summary>
+/// Sets the text of this button.
+/// </summary>
 void TaskButton::SetText(LPCWSTR pszTitle) {
     m_pPaintSettings->setText(pszTitle);
     m_pWindow->Repaint();
 }
 
 
+/// <summary>
+/// Loads RC settings for task buttons.
+/// </summary>
 void TaskButton::LoadSettings(bool /* bIsRefresh */) {
     using namespace nCore::InputParsing;
 }
 
 
+/// <summary>
+/// Moves and resizes the taaskbutton.
+/// </summary>
 void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
     m_pPaintSettings->position.left = x;
     m_pPaintSettings->position.top = y;
     m_pPaintSettings->position.right = x + width;
     m_pPaintSettings->position.bottom = y + height;
+
     m_pWindow->UpdatePosition();
 }
 
 
+/// <summary>
+/// Activates this button.
+/// </summary>
 void TaskButton::Activate() {
     m_bIsActive = true;
     m_pPaintSettings->OverLoad(m_pszPrefixActive);
@@ -114,6 +130,9 @@ void TaskButton::Activate() {
 }
 
 
+/// <summary>
+/// Deactivates this button.
+/// </summary>
 void TaskButton::Deactivate() {
     m_bIsActive = false;
     m_pPaintSettings->OverLoad(m_pszPrefix);
@@ -121,6 +140,9 @@ void TaskButton::Deactivate() {
 }
 
 
+/// <summary>
+/// Tells this button to start flashing.
+/// </summary>
 void TaskButton::Flash() {
     m_bIsFlashing = true;
     m_pPaintSettings->OverLoad(m_pszPrefixFlashing);
@@ -128,11 +150,17 @@ void TaskButton::Flash() {
 }
 
 
+/// <summary>
+/// Shows this button.
+/// </summary>
 void TaskButton::Show() {
     m_pWindow->Show();
 }
 
 
+/// <summary>
+/// Shows the context menu for this task button.
+/// </summary>
 void TaskButton::Menu() {
     WINDOWPLACEMENT wp;
 
@@ -162,7 +190,7 @@ void TaskButton::Menu() {
     PostMessage(m_hWnd, WM_INITMENU, (WPARAM)hMenu, 0);
     
     POINT pt;
-    GetCursorPos( &pt );
+    GetCursorPos(&pt);
     
     int command = TrackPopupMenu(hMenu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, m_pWindow->getWindow(), NULL);
     if (command != 0) {
@@ -171,6 +199,9 @@ void TaskButton::Menu() {
 }
 
 
+/// <summary>
+/// Places the rect of this button into the POINTS structure pointed to by lpPoints.
+/// </summary>
 void TaskButton::GetMinRect(LPPOINTS lpPoints) {
     RECT r;
     GetWindowRect(m_pWindow->getWindow(), &r);
@@ -181,6 +212,9 @@ void TaskButton::GetMinRect(LPPOINTS lpPoints) {
 }
 
 
+/// <summary>
+/// Handles window messages for this button.
+/// </summary>
 LRESULT WINAPI TaskButton::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_LBUTTONUP:
