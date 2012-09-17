@@ -150,11 +150,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DirectoryWatcher.hpp" />
     <ClInclude Include="Icon.hpp" />
     <ClInclude Include="IconGroup.hpp" />
     <ClInclude Include="nIcon.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DirectoryWatcher.cpp" />
     <ClCompile Include="Icon.cpp" />
     <ClCompile Include="IconGroup.cpp" />
     <ClCompile Include="nIcon.cpp" />

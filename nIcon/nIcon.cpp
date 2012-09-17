@@ -11,6 +11,7 @@
 #include "../nCoreCom/Core.h"
 #include "../nShared/Error.h"
 #include "IconGroup.hpp"
+#include "../nShared/Factories.h"
 
 // Constants
 const VERSION g_minCoreVersion    = MAKE_VERSION(0,2,0,0);
@@ -78,6 +79,9 @@ void quitModule(HINSTANCE hDllInstance) {
 
     UnregisterClass(g_szMainHandler, hDllInstance);
     UnregisterClass(g_szGroupHandler, hDllInstance);
+
+    // Let go of any factories we've allocated
+    Factories::Release();
 }
 
 
