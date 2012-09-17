@@ -21,11 +21,15 @@ public:
 
     void LoadSettings(bool = false);
     TaskButton* AddTask(HWND, UINT, bool);
+    bool MonitorChanged(HWND hWnd, UINT monitor, TaskButton** pOut);
     void RemoveTask(HWND);
     LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
     void Relayout();
 
 private:
+
+    void RemoveTask(map<HWND, TaskButton*>::iterator iter);
+
     // The name of this taskbar
     LPCSTR m_pszName;
 

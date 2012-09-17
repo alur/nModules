@@ -79,12 +79,44 @@ TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout) {
 /// Removes the specified task from this taskbar, if it is on it
 /// </summary>
 void Taskbar::RemoveTask(HWND hWnd) {
-    map<HWND, TaskButton*>::iterator iter = m_buttons.find(hWnd);
+    RemoveTask(m_buttons.find(hWnd));
+}
+
+
+/// <summary>
+/// Removes the specified task from this taskbar, if it is on it
+/// </summary>
+void Taskbar::RemoveTask(map<HWND, TaskButton*>::iterator iter) {
     if (iter != m_buttons.end()) {
         delete iter->second;
         m_buttons.erase(iter);
+        Relayout();
     }
-    Relayout();
+}
+
+
+/// <summary>
+/// Called when the specified taskbar has moved to a different monitor.
+/// </summary>
+/// <param name="pOut">If a taskbutton was added or removed, the pointer to that button. Otherwise NULL.</param>
+/// <returns>True if the task should be contained on this taskbar. False otherwise.</returns>
+bool Taskbar::MonitorChanged(HWND hWnd, UINT monitor, TaskButton** pOut) {
+    map<HWND, TaskButton*>::iterator iter = m_buttons.find(hWnd);
+    *pOut = NULL;
+    // If we should contain the task
+    if (monitor == m_uMonitor || m_uMonitor == -1) {
+        if (iter == m_buttons.end()) {
+            *pOut = AddTask(hWnd, monitor, false);
+        }
+        return true;
+    }
+    else {
+        if (iter != m_buttons.end()) {
+            *pOut = iter->second;
+            RemoveTask(iter);
+        }
+        return false;
+    }
 }
 
 

@@ -11,6 +11,7 @@
 #include "Taskbar.hpp"
 #include "WindowManager.h"
 #include "../nShared/MonitorInfo.hpp"
+#include "../nShared/Debugging.h"
 #include <map>
 #include <vector>
 #include <assert.h>
@@ -18,6 +19,8 @@
 using std::map;
 using std::vector;
 using std::pair;
+
+#define TIMER_CHECKMONITOR 1
 
 // All current taskbars
 extern map<LPCSTR, Taskbar*> g_Taskbars;
@@ -54,6 +57,7 @@ void WindowManager::Start() {
     // Grab all existing top level windows.
     EnumDesktopWindows(NULL, AddWindow, 1);
 
+    // Relayout all taskbars.
     for (TASKBARCITER iter = g_Taskbars.begin(); iter != g_Taskbars.end(); iter++) {
         iter->second->Relayout();
     }
@@ -61,7 +65,15 @@ void WindowManager::Start() {
     // Get the currently active window
     SetActive(GetForegroundWindow());
 
-    SetTimer(g_hWndMsgHandler, 1337, 250, NULL);
+    // If we are running something prior to Windows 8 we need to manually keep track of which
+    // monitor a window is on.
+    OSVERSIONINFO osv;
+    ZeroMemory(&osv, sizeof(osv));
+    osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&osv);
+    if (osv.dwMajorVersion < 6 || osv.dwMajorVersion == 6 && osv.dwMinorVersion < 2) {
+        SetTimer(g_hWndMsgHandler, TIMER_CHECKMONITOR, 250, NULL);
+    }
 }
 
 
@@ -74,7 +86,7 @@ void WindowManager::Stop() {
     assert(isStarted);
 
     // Clean up
-    KillTimer(g_hWndMsgHandler, 1337);
+    KillTimer(g_hWndMsgHandler, TIMER_CHECKMONITOR);
     delete g_pMonitorInfo;
     activeWindow = NULL;
     windowMap.clear();
@@ -122,6 +134,47 @@ BOOL CALLBACK WindowManager::AddWindow(HWND hWnd, LPARAM lParam) {
 
 
 /// <summary>
+/// Adds the specified top level window to the list of windows.
+/// </summary>
+void WindowManager::MonitorChanged(HWND hWnd, UINT monitor) {
+    // Check that we are currently running
+    assert(isStarted);
+
+    WNDMAPITER iter = windowMap.find(hWnd);
+    WCHAR szTitle[MAX_LINE_LENGTH];
+
+    if (iter != windowMap.end()) {
+        TaskButton* pOut;
+        iter->second.uMonitor = monitor;
+        GetWindowTextW(hWnd, szTitle, sizeof(szTitle)/sizeof(WCHAR));
+
+        for (TASKBARCITER iter2 = g_Taskbars.begin(); iter2 != g_Taskbars.end(); iter2++) {
+            if (iter2->second->MonitorChanged(hWnd, monitor, &pOut)) {
+                if (pOut != NULL) {
+                    iter->second.buttons.push_back(pOut);
+                    pOut->SetIcon(iter->second.hIcon);
+                    pOut->SetText(szTitle);
+                }
+            }
+            else { 
+                if (pOut != NULL) {
+                    for (vector<TaskButton*>::iterator iter3 = iter->second.buttons.begin(); iter3 != iter->second.buttons.end(); iter3++) {
+                        if (*iter3 == pOut) {
+                            iter->second.buttons.erase(iter3);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else {
+        TRACE("MonitorChanged called with invalid HWND: %u", hWnd);
+    }
+}
+
+
+/// <summary>
 /// Updates the currently active window.
 /// </summary>
 void WindowManager::SetActive(HWND hWnd) {
@@ -146,6 +199,9 @@ void WindowManager::SetActive(HWND hWnd) {
             (*iter2)->Activate();
         }
     }
+    else {
+        TRACE("SetActive called with invalid HWND: %u", hWnd);
+    }
 }
 
 
@@ -164,6 +220,9 @@ void WindowManager::RemoveWindow(HWND hWnd) {
         }
 
         windowMap.erase(iter);
+    }
+    else {
+        TRACE("RemoveWindow called with invalid HWND: %u", hWnd);
     }
 
     if (activeWindow == hWnd)
@@ -197,6 +256,9 @@ void WindowManager::UpdateWindow(HWND hWnd, LPARAM lParam) {
             }
         }
     }
+    else {
+        TRACE("UpdateWindow called with invalid HWND: %u", hWnd);
+    }
 }
 
 
@@ -219,22 +281,8 @@ LRESULT WindowManager::GetMinRect(HWND hWnd, LPPOINTS lpPoints) {
 /// <summary>
 /// Updates the monitor information for each window.
 /// </summary>
-void WindowManager::UpdateMonitor(WNDMAPITER iter) {
-    if (iter != windowMap.end()) {
-        int monitor = g_pMonitorInfo->MonitorFromHWND(iter->first);
-        if ((UINT)monitor != iter->second.uMonitor) {
-            HWND hWnd = iter->first;
-            RemoveWindow(hWnd);
-            AddWindow(hWnd, NULL);
-        }
-    }
-}
-
-
-/// <summary>
-/// Updates the monitor information for each window.
-/// </summary>
 void WindowManager::UpdateWindowMonitors() {
+    // TODO::Don't call MonitorFromHWND twice for windows that have changed
     vector<HWND> mods;
     for (WNDMAPITER iter = windowMap.begin(); iter != windowMap.end(); iter++) {
         int monitor = g_pMonitorInfo->MonitorFromHWND(iter->first);
@@ -243,8 +291,7 @@ void WindowManager::UpdateWindowMonitors() {
         }
     }
     for (vector<HWND>::iterator iter = mods.begin(); iter != mods.end(); iter++) {
-        RemoveWindow(*iter);
-        AddWindow(*iter, NULL);
+        MonitorChanged(*iter, g_pMonitorInfo->MonitorFromHWND(*iter));
     }
 }
 
@@ -299,6 +346,7 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
         // Windows 8+ A window has moved to a different monitor
     case LM_MONITORCHANGED:
+        MonitorChanged((HWND)wParam, g_pMonitorInfo->MonitorFromHWND((HWND)wParam));
         return 0;
 
         // The display layout has changed.
@@ -310,20 +358,13 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         //
     case WM_TIMER:
         switch(wParam) {
-        case 1337:
+        case TIMER_CHECKMONITOR:
             UpdateWindowMonitors();
             return 0;
         }
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
-
-
-/// <summary>
-/// Processes callwndproc hook messages.
-/// </summary>
-//LRESULT WindowManager::ShellMessageHook() {
-//}
 
 
 /// <summary>
