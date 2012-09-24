@@ -200,7 +200,7 @@ void TaskButton::Menu() {
 
 
 /// <summary>
-/// Places the rect of this button into the POINTS structure pointed to by lpPoints.
+/// Places the rect of this button into the 2 POINTS structures pointed to by lpPoints.
 /// </summary>
 void TaskButton::GetMinRect(LPPOINTS lpPoints) {
     RECT r;

@@ -24,7 +24,10 @@
     <ClInclude Include="Icon.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DirectoryWatcher.hpp">
+    <ClInclude Include="DirectoryManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IIconEventHandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,7 +41,7 @@
     <ClCompile Include="Icon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DirectoryWatcher.cpp">
+    <ClCompile Include="DirectoryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -111,6 +111,11 @@ BOOL CALLBACK WindowManager::AddWindow(HWND hWnd, LPARAM lParam) {
         GetWindowTextW(hWnd, szTitle, sizeof(szTitle)/sizeof(WCHAR));
         wndInfo.uMonitor = g_pMonitorInfo->MonitorFromHWND(hWnd);
 
+        if (windowMap.find(hWnd) != windowMap.end()) {
+            TRACE("AddWindow called with existing window!: %u %s", hWnd, szTitle);
+            return FALSE;
+        }
+
         // Add it to any taskbar that wants it
         for (TASKBARCITER iter = g_Taskbars.begin(); iter != g_Taskbars.end(); iter++) {
             TaskButton* taskButton = iter->second->AddTask(hWnd, wndInfo.uMonitor, lParam == 1);
@@ -199,9 +204,6 @@ void WindowManager::SetActive(HWND hWnd) {
             (*iter2)->Activate();
         }
     }
-    else {
-        TRACE("SetActive called with invalid HWND: %u", hWnd);
-    }
 }
 
 
@@ -255,6 +257,9 @@ void WindowManager::UpdateWindow(HWND hWnd, LPARAM lParam) {
                 (*iter2)->Flash();
             }
         }
+    }
+    else if (IsTaskbarWindow(hWnd)) {
+        AddWindow(hWnd, 0);
     }
     else {
         TRACE("UpdateWindow called with invalid HWND: %u", hWnd);

@@ -11,7 +11,11 @@
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/PaintSettings.hpp"
 
-class IconGroup {
+#include "IIconEventHandler.hpp"
+#include "DirectoryManager.hpp"
+#include "Icon.hpp"
+
+class IconGroup : public IIconEventHandler {
 public:
     explicit IconGroup();
     virtual ~IconGroup();
@@ -19,10 +23,17 @@ public:
     LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
     
 private:
-    HWND m_hWnd;
-
+    // Paintsettings for the whole group.
     PaintSettings* m_pPaintSettings;
+
+    // The window which holds the whole group.
     DrawableWindow* m_pWindow;
+
+    // The directory manager used by this group.
+    DirectoryManager* m_pDirectoryManager;
+
+    // All icons currently part of this group.
+    vector<Icon*> m_icons;
 };
 
 #endif /* ICONGROUP_HPP */
