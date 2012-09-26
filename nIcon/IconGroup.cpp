@@ -7,49 +7,47 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../headers/lsapi.h"
 #include "IconGroup.hpp"
-
+#include "../nShared/Macros.h"
+#include "../nShared/Debugging.h"
 // 
 extern HINSTANCE g_hInstance;
 extern LPCSTR g_szGroupHandler;
 
-enum {
-    WM_FILE_ENUM = WM_USER+1,
-    WM_FILE_ADDED,
-    WM_FILE_REMOVED,
-    WM_FILE_RENAMED,
-    WM_FILE_MODIFIED
-};
 
+#define WM_SHCHANGE_NOTIFY WM_USER
 
 /// <summary>
 /// Constructor
 /// </summary>
 IconGroup::IconGroup() {
-    char szPath[MAX_PATH];
+    WCHAR path[MAX_PATH];
 
-    m_pPaintSettings = new PaintSettings("DesktopIcons");
-    m_pPaintSettings->position.bottom = 1100;
-    m_pPaintSettings->position.top = 50;
-    m_pPaintSettings->position.left = 1970;
-    m_pPaintSettings->position.right = 3790;
-    m_pPaintSettings->setText(L"");
-    m_pPaintSettings->backColor = m_pPaintSettings->ARGBToD2DColor(0x6600FF00);
+    // Initalize all variables.
+    this->changeNotifyUID = 0;
 
-    m_pPaintSettings->GetSettings()->GetString("Folder", szPath, sizeof(szPath), "C:\\");
+    this->paintSettings = new PaintSettings("DesktopIcons");
+    this->paintSettings->position.bottom = 1100;
+    this->paintSettings->position.top = 50;
+    this->paintSettings->position.left = 1970;
+    this->paintSettings->position.right = 3790;
+    this->paintSettings->setText(L"");
+    this->paintSettings->backColor = this->paintSettings->ARGBToD2DColor(0x6600FF00);
 
-    m_pWindow = new DrawableWindow(FindWindow("DesktopBackgroundClass", ""), g_szGroupHandler, m_pPaintSettings, g_hInstance);
-    SetWindowLongPtr(m_pWindow->getWindow(), 0, (LONG_PTR)this);
-    m_pWindow->Show();
+    this->paintSettings->GetSettings()->GetString("Folder", path, sizeof(path), "C:\\test");
 
-    DirectoryManager::MessageMap a = {
-        WM_FILE_ENUM,
-        WM_FILE_ADDED,
-        WM_FILE_REMOVED,
-        WM_FILE_RENAMED,
-        WM_FILE_MODIFIED
-    };
+    this->window = new DrawableWindow(FindWindow("DesktopBackgroundClass", ""), g_szGroupHandler, this->paintSettings, g_hInstance);
+    SetWindowLongPtr(this->window->getWindow(), 0, (LONG_PTR)this);
+    this->window->Show();
 
-    m_pDirectoryManager = new DirectoryManager(L"c:\\test", m_pWindow->getWindow(), a);
+    // Get the root ISHellFolder
+    SHGetDesktopFolder(&this->rootFolder);
+
+    SetFolder(path);
+
+    //LPWSTR wszLoc = NULL;
+    //SHGetKnownFolderPath(FOLDERID_Desktop, 0, NULL, &wszLoc);
+    //m_pDirectoryManager = new DirectoryManager(wszLoc, m_pWindow->getWindow(), a);
+    //CoTaskMemFree(wszLoc);
 }
 
 
@@ -57,33 +55,92 @@ IconGroup::IconGroup() {
 /// Destructor
 /// </summary>
 IconGroup::~IconGroup() {
-    if (m_pWindow) delete m_pWindow;
-    if (m_pPaintSettings) delete m_pPaintSettings;
-    if (m_pDirectoryManager) delete m_pDirectoryManager;
+    if (this->changeNotifyUID != 0) {
+        SHChangeNotifyDeregister(this->changeNotifyUID);
+    }
+    SAFERELEASE(this->rootFolder);
+    SAFEDELETE(this->window);
+    SAFEDELETE(this->paintSettings);
+}
+
+
+/// <summary>
+/// Destructor
+/// </summary>
+void IconGroup::SetFolder(LPWSTR folder) {
+    IShellFolder* workingFolder;
+
+    PIDLIST_RELATIVE idList;
+    PIDLIST_RELATIVE idNext;
+    IEnumIDList* enumIDList;
+
+    STRRET ret;
+    
+    // Just in case we are switching folders, deregister for old notifications
+    if (this->changeNotifyUID != 0) {
+        SHChangeNotifyDeregister(this->changeNotifyUID);
+    }
+
+    // Get the folder we are interested in
+    this->rootFolder->ParseDisplayName(NULL, NULL, folder, NULL, &idList, NULL);
+    this->rootFolder->BindToObject(idList, NULL, IID_IShellFolder, reinterpret_cast<LPVOID*>(&workingFolder));
+
+    // Enumerate the contents of this folder
+    workingFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList);
+    while (enumIDList->Next(1, &idNext, NULL) != S_FALSE) {
+        workingFolder->GetDisplayNameOf(idNext, SHGDN_NORMAL, &ret);
+    }
+    enumIDList->Release();
+
+    // Register for change notifications
+    SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
+    this->changeNotifyUID = SHChangeNotifyRegister(
+        this->window->getWindow(),
+        SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
+        SHCNE_CREATE | SHCNE_DELETE,
+        WM_SHCHANGE_NOTIFY,
+        1,
+        watchEntries);
+
+    // Let go fo the PIDLists
+    CoTaskMemFree(idList);
+    CoTaskMemFree(idNext);
+
+	// Let go of the IShellFolder interfaces
+    workingFolder->Release();
 }
 
 
 /// <summary>
 /// 
 /// </summary>
-LRESULT WINAPI IconGroup::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg) {
-    case WM_FILE_ENUM:
-        return 0;
+LRESULT WINAPI IconGroup::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
+    switch (msg) {
+    case WM_SHCHANGE_NOTIFY:
+        {
+            long event;
+            PIDLIST_ABSOLUTE* idList;
+            STRRET ret;
+            HANDLE notifyLock = SHChangeNotification_Lock((HANDLE)wParam, (DWORD)lParam, &idList, &event);
 
-    case WM_FILE_ADDED:
-        return 0;
+            if (notifyLock) {
+                this->rootFolder->GetDisplayNameOf(*idList, SHGDN_NORMAL, &ret);
 
-    case WM_FILE_REMOVED:
-        return 0;
 
-    case WM_FILE_RENAMED:
-        return 0;
-
-    case WM_FILE_MODIFIED:
+                switch (event) {
+                case SHCNE_CREATE:
+                    TRACEW(L"File created: %s", ret.pOleStr);
+                    break;
+                case SHCNE_DELETE:
+                    TRACEW(L"File deleted: %s", ret.pOleStr);
+                    break;
+                }
+                SHChangeNotification_Unlock(notifyLock);
+            }
+        }
         return 0;
 
     default:
-        return m_pWindow->HandleMessage(uMsg, wParam, lParam);
+        return this->window->HandleMessage(msg, wParam, lParam);
     }
 }

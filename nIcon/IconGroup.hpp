@@ -10,30 +10,34 @@
 
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/PaintSettings.hpp"
-
 #include "IIconEventHandler.hpp"
-#include "DirectoryManager.hpp"
 #include "Icon.hpp"
+#include <ShlObj.h>
 
 class IconGroup : public IIconEventHandler {
 public:
     explicit IconGroup();
     virtual ~IconGroup();
 
-    LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam);
+
+    void SetFolder(LPWSTR path);
     
 private:
     // Paintsettings for the whole group.
-    PaintSettings* m_pPaintSettings;
+    PaintSettings* paintSettings;
 
     // The window which holds the whole group.
-    DrawableWindow* m_pWindow;
-
-    // The directory manager used by this group.
-    DirectoryManager* m_pDirectoryManager;
+    DrawableWindow* window;
 
     // All icons currently part of this group.
-    vector<Icon*> m_icons;
+    vector<Icon*> icons;
+
+    // Return value of the latest SHChangeNofityRegister call.
+    ULONG changeNotifyUID;
+
+    // IShellFolder for the desktop; root of the filesystem.
+    IShellFolder* rootFolder;
 };
 
 #endif /* ICONGROUP_HPP */

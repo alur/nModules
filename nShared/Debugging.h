@@ -25,18 +25,23 @@
 /// Sends a formatted (printf-style) message to the debug output window.
 /// Automatically inserts \n at the end of the string.
 /// </summary>
-void DbgTraceMessage(LPCSTR pszFormat, ...);
+void DbgTraceMessageA(LPCSTR format, ...);
+void DbgTraceMessageW(LPCWSTR format, ...);
 
 #if defined(_DEBUG)
-#  define TRACE  DbgTraceMessage
+#  define TRACE  DbgTraceMessageA
+#  define TRACEA  DbgTraceMessageA
+#  define TRACEW  DbgTraceMessageW
 #else
 #  define TRACE
+#  define TRACEA
+#  define TRACEW
 #endif
 
 #if defined(_DEBUG)
-void    DbgTraceWindowMessage(LPCSTR pszPrefix, UINT uMsg, WPARAM wParam, LPARAM lParam);
+void    DbgTraceWindowMessage(LPCSTR prefix, UINT msg, WPARAM wParam, LPARAM lParam);
 #else
-#define DbgTraceWindowMessage(pszPrefix, uMsg, wParam, lParam)
+#define DbgTraceWindowMessage(prefix, msg, wParam, lParam)
 #endif
 
 #endif /* DEBUGGING_H */

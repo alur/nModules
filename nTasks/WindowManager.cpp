@@ -224,7 +224,7 @@ void WindowManager::RemoveWindow(HWND hWnd) {
         windowMap.erase(iter);
     }
     else {
-        TRACE("RemoveWindow called with invalid HWND: %u", hWnd);
+        // TRACE("RemoveWindow called with invalid HWND: %u", hWnd);
     }
 
     if (activeWindow == hWnd)

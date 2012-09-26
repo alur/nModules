@@ -10,6 +10,7 @@
 #include "Settings.hpp"
 #include "Error.h"
 #include "../nCoreCom/Core.h"
+#include "../nShared/Macros.h"
 
 using namespace nCore::InputParsing;
 
@@ -17,21 +18,21 @@ using namespace nCore::InputParsing;
 /// <summary>
 /// Initalizes a new Settings class.
 /// </summary>
-/// <param name="pszPrefix">The RC prefix to use.</param>
-Settings::Settings(LPCSTR pszPrefix) {
-    m_pszPrefix = _strdup(pszPrefix);
-    m_pGroup = GetGroup(NULL);
+/// <param name="prefix">The RC prefix to use.</param>
+Settings::Settings(LPCSTR prefix) {
+    this->prefix = _strdup(prefix);
+    this->group = GetGroup(NULL);
 }
 
 
 /// <summary>
 /// Initalizes a new Settings class, due to the precense of a Group setting in another class.
 /// </summary>
-/// <param name="pszPrefix">The RC prefix to use.</param>
-/// <param name="pszPrev">A list of previous group names.</param>
-Settings::Settings(LPCSTR pszPrefix, LPCSTR pszPrev[]) {
-    m_pszPrefix = _strdup(pszPrefix);
-    m_pGroup = GetGroup(pszPrev);
+/// <param name="prefix">The RC prefix to use.</param>
+/// <param name="prev">A list of previous group names.</param>
+Settings::Settings(LPCSTR prefix, LPCSTR prev[]) {
+    this->prefix = _strdup(prefix);
+    this->group = GetGroup(prev);
 }
 
 
@@ -39,10 +40,8 @@ Settings::Settings(LPCSTR pszPrefix, LPCSTR pszPrev[]) {
 /// Deallocates resources used by the Settings class.
 /// </summary>
 Settings::~Settings() {
-    free((LPVOID)m_pszPrefix);
-    if (m_pGroup) {
-        delete m_pGroup;
-    }
+    free((LPVOID)this->prefix);
+    SAFEDELETE(this->group);
 }
 
 
@@ -53,7 +52,7 @@ Settings::~Settings() {
 /// <returns>The value we should use for m_pGroup.</returns>
 Settings* Settings::GetGroup(LPCSTR pszPrev[]) {
     char szBuf[MAX_LINE_LENGTH];
-    GetPrefixedRCString(m_pszPrefix, "Group", szBuf, "", sizeof(szBuf));
+    GetPrefixedRCString(this->prefix, "Group", szBuf, "", sizeof(szBuf));
     
     // If there is no group
     if (szBuf[0] == '\0') {
@@ -94,7 +93,7 @@ Settings* Settings::GetGroup(LPCSTR pszPrev[]) {
     
     // Allocate space for storing the prefix of this setting
     pszPrev = (LPCSTR*)realloc(pszPrev, (i+2)*sizeof(LPCSTR));
-    pszPrev[i] = m_pszPrefix;
+    pszPrev[i] = this->prefix;
     pszPrev[i+1] = NULL;
 
     return new Settings(szBuf, pszPrev);
@@ -108,7 +107,7 @@ Settings* Settings::GetGroup(LPCSTR pszPrev[]) {
 /// <param name="defColor">The default color to use, if the setting is invalid or unspecified.</param>
 /// <returns>The color.</returns>
 ARGB Settings::GetColor(LPCSTR pszSetting, ARGB defColor) {
-    return GetPrefixedRCColor(m_pszPrefix, pszSetting, m_pGroup != NULL ? m_pGroup->GetColor(pszSetting, defColor) : defColor);
+    return GetPrefixedRCColor(this->prefix, pszSetting, this->group != NULL ? this->group->GetColor(pszSetting, defColor) : defColor);
 }
 
 
@@ -133,7 +132,7 @@ void Settings::SetColor(LPCSTR pszSetting, ARGB colorValue) {
 /// <param name="pszDefault">The default string, used if the RC value is unspecified.</param>
 /// <returns>False if the length of the RC value is > cchDest. True otherwise.</returns>
 bool Settings::GetString(LPCSTR pszSetting, LPSTR pszDest, UINT cchDest, LPCSTR pszDefault) {
-    return GetPrefixedRCString(m_pszPrefix, pszSetting, pszDest, pszDefault, cchDest);
+    return GetPrefixedRCString(this->prefix, pszSetting, pszDest, pszDefault, cchDest);
 }
 
 
@@ -146,7 +145,7 @@ bool Settings::GetString(LPCSTR pszSetting, LPSTR pszDest, UINT cchDest, LPCSTR 
 /// <param name="pszDefault">The default string, used if the RC value is unspecified.</param>
 /// <returns>False if the length of the RC value is > cchDest. True otherwise.</returns>
 bool Settings::GetString(LPCSTR pszSetting, LPWSTR pszwDest, UINT cchDest, LPCSTR pszDefault) {
-    return GetPrefixedRCWString(m_pszPrefix, pszSetting, pszwDest, pszDefault, cchDest);
+    return GetPrefixedRCWString(this->prefix, pszSetting, pszwDest, pszDefault, cchDest);
 }
 
 
@@ -157,7 +156,7 @@ bool Settings::GetString(LPCSTR pszSetting, LPWSTR pszwDest, UINT cchDest, LPCST
 /// <param name="pszValue">The value to set the setting to.</param>
 void Settings::SetString(LPCSTR pszSetting, LPCSTR pszValue) {
     char szOptionName[MAX_LINE_LENGTH];
-    StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", m_pszPrefix, pszSetting);
+    StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", this->prefix, pszSetting);
     LSSetVariable(szOptionName, pszValue);
 }
 
@@ -169,7 +168,7 @@ void Settings::SetString(LPCSTR pszSetting, LPCSTR pszValue) {
 /// <param name="iDefault">The default value to use, if the setting is invalid or unspecified.</param>
 /// <returns>The integer.</returns>
 int Settings::GetInt(LPCSTR pszSetting, int iDefault) {
-    return GetPrefixedRCInt(m_pszPrefix, pszSetting, m_pGroup != NULL ? m_pGroup->GetInt(pszSetting, iDefault) : iDefault);
+    return GetPrefixedRCInt(this->prefix, pszSetting, this->group != NULL ? this->group->GetInt(pszSetting, iDefault) : iDefault);
 }
 
 
@@ -192,7 +191,7 @@ void Settings::SetInt(LPCSTR pszSetting, int iValue) {
 /// <param name="fDefault">The default value to use, if the setting is invalid or unspecified.</param>
 /// <returns>The float.</returns>
 float Settings::GetFloat(LPCSTR pszSetting, float fDefault) {
-    return GetPrefixedRCFloat(m_pszPrefix, pszSetting, m_pGroup != NULL ? m_pGroup->GetFloat(pszSetting, fDefault) : fDefault);
+    return GetPrefixedRCFloat(this->prefix, pszSetting, this->group != NULL ? this->group->GetFloat(pszSetting, fDefault) : fDefault);
 }
 
 
@@ -215,7 +214,7 @@ void Settings::SetFloat(LPCSTR pszSetting, float fValue) {
 /// <param name="dDefault">The default value to use, if the setting is invalid or unspecified.</param>
 /// <returns>The double.</returns>
 double Settings::GetDouble(LPCSTR pszSetting, double dDefault) {
-    return GetPrefixedRCDouble(m_pszPrefix, pszSetting, m_pGroup != NULL ? m_pGroup->GetDouble(pszSetting, dDefault) : dDefault);
+    return GetPrefixedRCDouble(this->prefix, pszSetting, this->group != NULL ? this->group->GetDouble(pszSetting, dDefault) : dDefault);
 }
 
 
@@ -238,7 +237,7 @@ void Settings::SetDouble(LPCSTR pszSetting, double dValue) {
 /// <param name="bDefault">The default value to use, if the setting is invalid or unspecified.</param>
 /// <returns>The boolean.</returns>
 bool Settings::GetBool(LPCSTR pszSetting, bool bDefault) {
-    return GetPrefixedRCBool(m_pszPrefix, pszSetting, m_pGroup != NULL ? m_pGroup->GetBool(pszSetting, bDefault) : bDefault);
+    return GetPrefixedRCBool(this->prefix, pszSetting, this->group != NULL ? this->group->GetBool(pszSetting, bDefault) : bDefault);
 }
 
 
@@ -259,7 +258,7 @@ void Settings::SetBool(LPCSTR pszSetting, bool bValue) {
 /// <param name="uDefault">The default value to use, if the setting is invalid or unspecified.</param>
 /// <returns>The monitor.</returns>
 UINT Settings::GetMonitor(LPCSTR pszSetting, UINT uDefault) {
-    return GetPrefixedRCMonitor(m_pszPrefix, pszSetting, m_pGroup != NULL ? m_pGroup->GetMonitor(pszSetting, uDefault) : uDefault);
+    return GetPrefixedRCMonitor(this->prefix, pszSetting, this->group != NULL ? this->group->GetMonitor(pszSetting, uDefault) : uDefault);
 }
 
 

@@ -214,13 +214,13 @@ EXPORT_CDECL(bool) GetPrefixedRCString(LPCSTR szPrefix, LPCSTR szOption, LPSTR p
 /// Reads a prefixed bool value from an RC file
 /// </summary>
 EXPORT_CDECL(bool) GetPrefixedRCWString(LPCSTR szPrefix, LPCSTR szOption, LPWSTR pszwBuffer, LPCSTR pszDefault, UINT cbBuffer) {
-    char szOptionName[MAX_LINE_LENGTH];
+    char optionName[MAX_LINE_LENGTH];
     bool ret;
-    LPSTR szBuffer = (LPSTR)malloc(cbBuffer);
-    StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", szPrefix, szOption);
-    ret = GetRCString(szOptionName, szBuffer, pszDefault, cbBuffer) != FALSE;
-    MultiByteToWideChar(CP_ACP, 0, szBuffer, cbBuffer, pszwBuffer, cbBuffer);
-    free(szBuffer);
+    LPSTR buffer = (LPSTR)malloc(cbBuffer/2);
+    StringCchPrintf(optionName, MAX_LINE_LENGTH, "%s%s", szPrefix, szOption);
+    ret = GetRCString(optionName, buffer, pszDefault, cbBuffer/2) != FALSE;
+    MultiByteToWideChar(CP_ACP, 0, buffer, cbBuffer/2, pszwBuffer, cbBuffer);
+    free(buffer);
     return ret;
 }
 

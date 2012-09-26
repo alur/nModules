@@ -9,7 +9,7 @@
 #include "TrayTip.hpp"
 
 
-TrayTip::TrayTip(LPCSTR pszPrefix) {
+TrayTip::TrayTip(LPCSTR prefix) {
 
 }
 

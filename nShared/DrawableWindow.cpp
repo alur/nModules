@@ -49,10 +49,10 @@ DrawableWindow::~DrawableWindow() {
         DestroyWindow(m_hWnd);
     }
 
-    SAFERELEASE(&m_pRenderTarget);
-    SAFERELEASE(&m_pBackBrush);
-    SAFERELEASE(&m_pTextBrush);
-    SAFERELEASE(&m_pTextFormat);
+    SAFERELEASE(m_pRenderTarget);
+    SAFERELEASE(m_pBackBrush);
+    SAFERELEASE(m_pTextBrush);
+    SAFERELEASE(m_pTextFormat);
     PurgeOverlays();
 }
 
@@ -127,10 +127,10 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F f, HICON hIcon) {
     CHECKHR_END();
 
     // Release stuff
-    SAFERELEASE(&pScaler);
-    SAFERELEASE(&pConverter);
-    SAFERELEASE(&pSource);
-    SAFERELEASE(&pBitmap);
+    SAFERELEASE(pScaler);
+    SAFERELEASE(pConverter);
+    SAFERELEASE(pSource);
+    SAFERELEASE(pBitmap);
 
     // Add the overlays to the overlay list
     if (SUCCEEDED(hr)) {
@@ -149,7 +149,7 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F f, HICON hIcon) {
 /// </summary>
 void DrawableWindow::PurgeOverlays() {
     for (vector<Overlay>::iterator iter = m_overlays.begin(); iter != m_overlays.end(); iter++) {
-        SAFERELEASE(&iter->brush);
+        SAFERELEASE(iter->brush);
     }
     m_overlays.clear();
 }

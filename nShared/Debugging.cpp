@@ -18,43 +18,62 @@
 /// Sends a formatted (printf-style) message to the debug output window.
 /// Automatically inserts \n at the end of the string.
 /// </summary>
-void DbgTraceMessage(LPCSTR pszFormat, ...) {
-    ASSERT(NULL != pszFormat);
+void DbgTraceMessageA(LPCSTR format, ...) {
+    ASSERT(NULL != format);
     
     va_list args;
-    char szBuffer[512];
+    char buffer[512];
 
-    va_start(args, pszFormat);
-    StringCchVPrintfExA(szBuffer, 512, NULL, NULL, STRSAFE_NULL_ON_FAILURE, pszFormat, args);
+    va_start(args, format);
+    StringCchVPrintfExA(buffer, 512, NULL, NULL, STRSAFE_NULL_ON_FAILURE, format, args);
     va_end(args);
     
-    OutputDebugStringA(szBuffer);
+    OutputDebugStringA(buffer);
     OutputDebugStringA("\n");
+}
+
+
+/// <summary>
+/// Sends a formatted (printf-style) message to the debug output window.
+/// Automatically inserts \n at the end of the string.
+/// </summary>
+void DbgTraceMessageW(LPCWSTR format, ...) {
+    ASSERT(NULL != format);
+    
+    va_list args;
+    WCHAR buffer[512];
+
+    va_start(args, format);
+    StringCchVPrintfExW(buffer, 512, NULL, NULL, STRSAFE_NULL_ON_FAILURE, format, args);
+    va_end(args);
+    
+    OutputDebugStringW(buffer);
+    OutputDebugStringW(L"\n");
 }
 
 
 /// <summary>
 /// Sends a formatted message to the debug output window.
 /// </summary>
-void DbgTraceWindowMessage(LPCSTR pszPrefix, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    if (uMsg < WM_USER) {
-        TRACE("[%s] WM_%.4X(%.8X, %.8X)", pszPrefix, uMsg, wParam, lParam);
+void DbgTraceWindowMessage(LPCSTR prefix, UINT msg, WPARAM wParam, LPARAM lParam) {
+    if (msg < WM_USER) {
+        TRACE("[%s] WM_%.4X(%.8X, %.8X)", prefix, msg, wParam, lParam);
     }
-    else if (uMsg >= WM_USER && uMsg <= (WM_APP-1)) {
-        TRACE("[%s] WM_USER+%u(%.8X, %.8X)", pszPrefix, uMsg-WM_USER, wParam, lParam);
+    else if (msg >= WM_USER && msg <= (WM_APP-1)) {
+        TRACE("[%s] WM_USER+%u(%.8X, %.8X)", prefix, msg-WM_USER, wParam, lParam);
     }
-    else if (uMsg >= WM_APP && uMsg <= (MAXINTATOM-1)) {
-        TRACE("[%s] WM_APP+%u(%.8X, %.8X)", pszPrefix, uMsg-WM_APP, wParam, lParam);
+    else if (msg >= WM_APP && msg <= (MAXINTATOM-1)) {
+        TRACE("[%s] WM_APP+%u(%.8X, %.8X)", prefix, msg-WM_APP, wParam, lParam);
     }
-    else if (uMsg >= MAXINTATOM) {
-        TCHAR szMsgName[MAX_PATH] = { 0 };
+    else if (msg >= MAXINTATOM) {
+        TCHAR msgName[MAX_PATH] = { 0 };
         
         // GetClipboardFormatName retrieves the name of registered window messages too!
-        if (GetClipboardFormatName(uMsg, szMsgName, COUNTOF(szMsgName)) > 0) {
-            TRACE("[%s] WM_'%s'(%.8X, %.8X)", pszPrefix, szMsgName, wParam, lParam);
+        if (GetClipboardFormatName(msg, msgName, COUNTOF(msgName)) > 0) {
+            TRACE("[%s] WM_'%s'(%.8X, %.8X)", prefix, msgName, wParam, lParam);
         }
         else {
-            TRACE("[%s] WM_%.8X(%.8X, %.8X)", pszPrefix, uMsg, wParam, lParam);
+            TRACE("[%s] WM_%.8X(%.8X, %.8X)", prefix, msg, wParam, lParam);
         }
     }
 }

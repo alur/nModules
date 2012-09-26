@@ -11,6 +11,7 @@
 #include <dwrite.h>
 #include <wincodec.h>
 #include "Factories.h"
+#include "Macros.h"
 
 namespace Factories {
     IDWriteFactory *pDWFactory = NULL;
@@ -23,9 +24,9 @@ namespace Factories {
 /// Releases all allocated factories.
 /// </summary>
 void Factories::Release() {
-    SAFERELEASE(&pDWFactory);
-    SAFERELEASE(&pD2DFactory);
-    SAFERELEASE(&pWICFactory);
+    SAFERELEASE(pDWFactory);
+    SAFERELEASE(pD2DFactory);
+    SAFERELEASE(pWICFactory);
 }
 
 

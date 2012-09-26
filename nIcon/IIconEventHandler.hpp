@@ -11,7 +11,7 @@
 class IIconEventHandler {
 public:
 	void IconEvent_Moved(LPVOID self);
-	void IconEvent_Rename(LPVOID self, LPCSTR pszNewName);
+	void IconEvent_Rename(LPVOID self, LPCSTR newName);
 	void IconEvent_Delete(LPVOID self);
 };
 

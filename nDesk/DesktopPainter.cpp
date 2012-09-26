@@ -11,6 +11,7 @@
 #include "DesktopPainter.hpp"
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/Factories.h"
+#include "../nShared/Macros.h"
 #include <d2d1.h>
 #include <wincodec.h>
 #include <assert.h>
@@ -63,9 +64,9 @@ DesktopPainter::~DesktopPainter() {
 /// Releases all D2D device depenent resources
 /// </summary>
 void DesktopPainter::DiscardDeviceResources() {
-    SAFERELEASE(&m_pRenderTarget)
-    SAFERELEASE(&m_pWallpaperBrush)
-    SAFERELEASE(&m_pOldWallpaperBrush)
+    SAFERELEASE(m_pRenderTarget)
+    SAFERELEASE(m_pWallpaperBrush)
+    SAFERELEASE(m_pOldWallpaperBrush)
 }
 
 
@@ -121,7 +122,7 @@ void DesktopPainter::SetTransitionType(TransitionType transitionType) {
     }
     else if (m_pOldWallpaperBrush != NULL) {
         m_TransitionSettings.iProgress = m_TransitionSettings.iTime;
-        SAFERELEASE(&m_pOldWallpaperBrush)
+        SAFERELEASE(m_pOldWallpaperBrush)
     }
 }
 
@@ -256,7 +257,7 @@ void DesktopPainter::UpdateWallpaper(bool bNoTransition) {
         TransitionStart();
     }
     else {
-        SAFERELEASE(&m_pOldWallpaperBrush)
+        SAFERELEASE(m_pOldWallpaperBrush)
     }
 
     Redraw();
@@ -307,7 +308,7 @@ void DesktopPainter::TransitionStart() {
 /// </summary>
 void DesktopPainter::TransitionEnd() {
     m_TransitionEffect->End();
-    SAFERELEASE(&m_pOldWallpaperBrush)
+    SAFERELEASE(m_pOldWallpaperBrush)
 
     // Repaint, just for good measure
     Paint();
@@ -556,11 +557,11 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
             }
         }
 
-        SAFERELEASE(&pConverter)
-        SAFERELEASE(&pDecoder)
-        SAFERELEASE(&pBitmap)
-        SAFERELEASE(&pSource)
-        SAFERELEASE(&pScaler)
+        SAFERELEASE(pConverter)
+        SAFERELEASE(pDecoder)
+        SAFERELEASE(pBitmap)
+        SAFERELEASE(pSource)
+        SAFERELEASE(pScaler)
     }
 
     // Finish rendering
@@ -569,8 +570,8 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
     pBitmapRender->GetBitmap(&pBitmap);
     m_pRenderTarget->CreateBitmapBrush(pBitmap, ppBitmapBrush);
 
-    SAFERELEASE(&pBitmap)
-    SAFERELEASE(&pBitmapRender)
+    SAFERELEASE(pBitmap)
+    SAFERELEASE(pBitmapRender)
 
     return S_OK;
 }

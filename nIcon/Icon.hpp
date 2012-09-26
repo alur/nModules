@@ -16,13 +16,11 @@ public:
     explicit Icon();
     virtual ~Icon();
 
-    LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam);
     
 private:
-    HWND m_hWnd;
-
-    PaintSettings* m_pPaintSettings;
-    DrawableWindow* m_pWindow;
+    PaintSettings* paintSettings;
+    DrawableWindow* window;
 };
 
 #endif /* ICON_HPP */
