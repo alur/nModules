@@ -13,6 +13,9 @@
 #include "IIconEventHandler.hpp"
 #include "Icon.hpp"
 #include <ShlObj.h>
+#include <map>
+
+using std::map;
 
 class IconGroup : public IIconEventHandler {
 public:
@@ -24,6 +27,18 @@ public:
     void SetFolder(LPWSTR path);
     
 private:
+    //
+    HRESULT GetDisplayNameOf(PCUITEMID_CHILD pidl, SHGDNF flags, LPWSTR buf, UINT cchBuf);
+
+    // 
+    void AddIcon(PCUITEMID_CHILD pidl);
+
+    // 
+    void RemoveIcon(PCUITEMID_CHILD pidl);
+
+    // 
+    void PositionIcon(PCUITEMID_CHILD pidl, D2D1_RECT_F* position);
+
     // Paintsettings for the whole group.
     PaintSettings* paintSettings;
 
@@ -31,13 +46,16 @@ private:
     DrawableWindow* window;
 
     // All icons currently part of this group.
-    vector<Icon*> icons;
+    map<PCITEMID_CHILD, Icon*> icons;
 
     // Return value of the latest SHChangeNofityRegister call.
     ULONG changeNotifyUID;
 
-    // IShellFolder for the desktop; root of the filesystem.
-    IShellFolder* rootFolder;
+    // IShellFolder for the folder we are currently in.
+    IShellFolder2* workingFolder;
+
+    // IShellFolder for the root of the file system.
+    IShellFolder2* rootFolder;
 };
 
 #endif /* ICONGROUP_HPP */

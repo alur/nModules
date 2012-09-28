@@ -21,6 +21,16 @@ PaintSettings::PaintSettings(LPCSTR pszPrefix) {
 
 
 /// <summary>
+/// Private constructor
+/// </summary>
+PaintSettings::PaintSettings(LPCSTR prefix, Settings* settings) {
+    m_pszPrefix = _strdup(prefix);
+    m_pSettings = settings;
+    Load();
+}
+
+
+/// <summary>
 /// Destructor
 /// </summary>
 PaintSettings::~PaintSettings() {
@@ -28,6 +38,14 @@ PaintSettings::~PaintSettings() {
     free((LPVOID)m_pszPrefix);
     free((LPVOID)text);
     free((LPVOID)font);
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+PaintSettings* PaintSettings::CreateChild(LPCSTR prefix) {
+    return new PaintSettings(m_pszPrefix, this->m_pSettings->CreateChild(prefix));
 }
 
 
@@ -85,13 +103,14 @@ void PaintSettings::Load() {
 
 void PaintSettings::OverLoad(LPCSTR pszPrefix) {
     DWORD argb;
-    Settings* settings = new Settings(pszPrefix);
+    Settings* settings = pszPrefix[0] == 0 ? m_pSettings : m_pSettings->CreateChild(pszPrefix);
 
     argb = settings->GetColor("Color", m_pSettings->GetColor("Color", 0xFF000000));
     backColor = ARGBToD2DColor(argb);
     backColor.a = settings->GetInt("Alpha", m_pSettings->GetInt("Alpha", argb >> 24))/255.0f; // Alpha overrides #argb
 
-    delete settings;
+    if (settings != m_pSettings)
+        delete settings;
 }
 
 

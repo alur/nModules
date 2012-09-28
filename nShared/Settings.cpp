@@ -21,7 +21,7 @@ using namespace nCore::InputParsing;
 /// <param name="prefix">The RC prefix to use.</param>
 Settings::Settings(LPCSTR prefix) {
     this->prefix = _strdup(prefix);
-    this->group = GetGroup(NULL);
+    this->group = GreateGroup(NULL);
 }
 
 
@@ -29,10 +29,10 @@ Settings::Settings(LPCSTR prefix) {
 /// Initalizes a new Settings class, due to the precense of a Group setting in another class.
 /// </summary>
 /// <param name="prefix">The RC prefix to use.</param>
-/// <param name="prev">A list of previous group names.</param>
-Settings::Settings(LPCSTR prefix, LPCSTR prev[]) {
+/// <param name="previous">A list of previous group names.</param>
+Settings::Settings(LPCSTR prefix, LPCSTR previous[]) {
     this->prefix = _strdup(prefix);
-    this->group = GetGroup(prev);
+    this->group = GreateGroup(previous);
 }
 
 
@@ -46,11 +46,36 @@ Settings::~Settings() {
 
 
 /// <summary>
+/// Creates a child of this Settings*. If you have a Settings with the prefix of Label, and you want
+/// a related setting LabelIcon, you should call ->GetChild("Icon").
+/// </summary>
+Settings* Settings::CreateChild(LPCSTR prefix) {
+    Settings *head, *thisTail, *newTail;
+    CHAR newPrefix[MAX_LINE_LENGTH];
+    
+    StringCchPrintf(newPrefix, sizeof(newPrefix), "%s%s", this->prefix, prefix);
+    head = new Settings(newPrefix);
+    thisTail = this;
+    newTail = head;
+    while (thisTail->group != NULL) {
+        thisTail = thisTail->group;
+        StringCchPrintf(newPrefix, sizeof(newPrefix), "%s%s", thisTail->prefix, prefix);        
+        while (newTail->group != NULL) {
+            newTail = newTail->group;
+        }
+        newTail->group = new Settings(newPrefix);
+    }
+
+    return head;
+}
+
+
+/// <summary>
 /// Gets the value we should use for m_pGroup.
 /// </summary>
 /// <param name="pszPrev">A list of previous group names.</param>
 /// <returns>The value we should use for m_pGroup.</returns>
-Settings* Settings::GetGroup(LPCSTR pszPrev[]) {
+Settings* Settings::GreateGroup(LPCSTR pszPrev[]) {
     char szBuf[MAX_LINE_LENGTH];
     GetPrefixedRCString(this->prefix, "Group", szBuf, "", sizeof(szBuf));
     

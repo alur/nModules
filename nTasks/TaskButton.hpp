@@ -12,7 +12,7 @@
 
 class TaskButton {
 public:
-    explicit TaskButton(HWND parent, HWND window, LPCSTR prefix);
+    explicit TaskButton(HWND parent, HWND window, LPCSTR prefix, PaintSettings* paintSettings);
     virtual ~TaskButton();
 
     void Reposition(UINT x, UINT y, UINT width, UINT height);
@@ -47,12 +47,6 @@ private:
     HWND m_hWndParent;
 
     TRACKMOUSEEVENT m_TrackMouseStruct;
-
-    LPCSTR m_pszPrefix;
-    LPCSTR m_pszPrefixActive;
-    LPCSTR m_pszPrefixHover;
-    LPCSTR m_pszPrefixFlashing;
-    LPCSTR m_pszPrefixIcon;
 
     bool m_bMouseIsOver;
     bool m_bIsActive;

@@ -16,7 +16,7 @@ public:
     explicit Settings(LPCSTR prefix);
     virtual ~Settings();
 
-    Settings* GetChild(LPCSTR prefix);
+    Settings* CreateChild(LPCSTR prefix);
 
     ARGB GetColor(LPCSTR key, ARGB defValue);
     D2D_COLOR_F GetColor(LPCSTR key, D2D_COLOR_F defValue);
@@ -54,13 +54,13 @@ private:
 	explicit Settings(LPCSTR pszPrefix, LPCSTR pszPrev[]);
 
     // Creates the Settings* for this settings group.
-	Settings* GetGroup(LPCSTR pszPrev[]);
+	Settings* GreateGroup(LPCSTR pszPrev[]);
 
     // The fully specified prefix to read settings from the RC files with.
     LPCSTR prefix;
 
+    //
     Settings* group;
-    Settings* parent;
 };
 
 #endif /* SETTINGS_HPP */

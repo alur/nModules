@@ -14,11 +14,13 @@
 
 class PaintSettings {
 public:
-    explicit PaintSettings(LPCSTR pszPrefix);
+    explicit PaintSettings(LPCSTR prefix);
     virtual ~PaintSettings();
 
+    PaintSettings* CreateChild(LPCSTR prefix);
+
     void Load();
-    void OverLoad(LPCSTR pszPrefix);
+    void OverLoad(LPCSTR prefix);
 
     // True if the window should be topmost.
     bool m_bAlwaysOnTop;
@@ -44,6 +46,8 @@ public:
     Settings* GetSettings();
 
 private:
+    explicit PaintSettings(LPCSTR prefix, Settings* settings);
+
 	Settings* m_pSettings;
     LPCSTR m_pszPrefix;
 

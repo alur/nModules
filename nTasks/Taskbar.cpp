@@ -59,7 +59,7 @@ void Taskbar::LoadSettings(bool /* bIsRefresh */) {
 /// </summary>
 TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout) {
     if (monitor == m_uMonitor || m_uMonitor == -1) {
-        TaskButton* pButton = new TaskButton(m_pWindow->getWindow(), hWnd, m_pszName);
+        TaskButton* pButton = new TaskButton(m_pWindow->getWindow(), hWnd, m_pszName, m_pPaintSettings->CreateChild("Button"));
         m_buttons.insert(m_buttons.end(), std::pair<HWND, TaskButton*>(hWnd, pButton));
 
         if (hWnd == GetForegroundWindow()) {

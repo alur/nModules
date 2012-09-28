@@ -17,21 +17,8 @@ extern LPCSTR g_szTaskButtonHandler;
 /// <summary>
 /// Constructor
 /// </summary>
-TaskButton::TaskButton(HWND parent, HWND window, LPCSTR prefix) {
+TaskButton::TaskButton(HWND parent, HWND window, LPCSTR prefix, PaintSettings* paintSettings) {
     m_pIconPaintSettings = NULL;
-
-    // Generate our prefixes
-    char szPrefix[512];
-    sprintf_s(szPrefix, sizeof(szPrefix), "%s%s", prefix, "Button");
-    m_pszPrefix = _strdup(szPrefix);
-    sprintf_s(szPrefix, sizeof(szPrefix), "%s%s", prefix, "ButtonActive");
-    m_pszPrefixActive = _strdup(szPrefix);
-    sprintf_s(szPrefix, sizeof(szPrefix), "%s%s", prefix, "ButtonHover"); // TODO::The drawable window should handle this automatically.
-    m_pszPrefixHover = _strdup(szPrefix);
-    sprintf_s(szPrefix, sizeof(szPrefix), "%s%s", prefix, "ButtonFlashing");
-    m_pszPrefixFlashing = _strdup(szPrefix);
-    sprintf_s(szPrefix, sizeof(szPrefix), "%s%s", prefix, "ButtonIcon");
-    m_pszPrefixIcon = _strdup(szPrefix);
 
     // 
     m_hWnd = window;
@@ -41,11 +28,11 @@ TaskButton::TaskButton(HWND parent, HWND window, LPCSTR prefix) {
     LoadSettings();
 
     // Create the drawable window
-    m_pPaintSettings = new PaintSettings(m_pszPrefix);
+    m_pPaintSettings = paintSettings;
     m_pWindow = new DrawableWindow(parent, g_szTaskButtonHandler, m_pPaintSettings, g_hInstance);
     SetWindowLongPtr(m_pWindow->getWindow(), 0, (LONG_PTR)this);
 
-    m_pIconPaintSettings = new PaintSettings(m_pszPrefixIcon);
+    m_pIconPaintSettings = paintSettings->CreateChild("Icon");
 
     // Configure the mouse tracking struct
     ZeroMemory(&m_TrackMouseStruct, sizeof(TRACKMOUSEEVENT));
@@ -68,10 +55,6 @@ TaskButton::TaskButton(HWND parent, HWND window, LPCSTR prefix) {
 TaskButton::~TaskButton() {
     if (m_pWindow) delete m_pWindow;
     if (m_pPaintSettings) delete m_pPaintSettings;
-    free((LPVOID)m_pszPrefix);
-    free((LPVOID)m_pszPrefixActive);
-    free((LPVOID)m_pszPrefixHover);
-    free((LPVOID)m_pszPrefixIcon);
 }
 
 
@@ -125,7 +108,7 @@ void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
 /// </summary>
 void TaskButton::Activate() {
     m_bIsActive = true;
-    m_pPaintSettings->OverLoad(m_pszPrefixActive);
+    m_pPaintSettings->OverLoad("Active");
     m_pWindow->UpdateBrushes();
 }
 
@@ -135,7 +118,7 @@ void TaskButton::Activate() {
 /// </summary>
 void TaskButton::Deactivate() {
     m_bIsActive = false;
-    m_pPaintSettings->OverLoad(m_pszPrefix);
+    m_pPaintSettings->OverLoad("");
     m_pWindow->UpdateBrushes();
 }
 
@@ -145,7 +128,7 @@ void TaskButton::Deactivate() {
 /// </summary>
 void TaskButton::Flash() {
     m_bIsFlashing = true;
-    m_pPaintSettings->OverLoad(m_pszPrefixFlashing);
+    m_pPaintSettings->OverLoad("Flashing");
     m_pWindow->UpdateBrushes();
 }
 
@@ -239,14 +222,14 @@ LRESULT WINAPI TaskButton::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam
         if (!m_bMouseIsOver) {
             m_bMouseIsOver = true;
             TrackMouseEvent(&m_TrackMouseStruct);
-            m_pPaintSettings->OverLoad(m_pszPrefixHover);
+            m_pPaintSettings->OverLoad("Hover");
             m_pWindow->UpdateBrushes();
         }
         return 0;
 
     case WM_MOUSELEAVE:
         m_bMouseIsOver = false;
-        m_pPaintSettings->OverLoad(m_bIsActive  ? m_pszPrefixActive : m_pszPrefix);
+        m_pPaintSettings->OverLoad(m_bIsActive  ? "Active" : "");
         m_pWindow->UpdateBrushes();
         return 0;
 
