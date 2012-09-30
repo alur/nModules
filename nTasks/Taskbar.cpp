@@ -47,10 +47,9 @@ Taskbar::~Taskbar() {
 /// <summary>
 /// Loads settings from LiteStep's RC files.
 /// </summary>
-void Taskbar::LoadSettings(bool /* bIsRefresh */) {
-    using namespace nCore::InputParsing;
-    m_uMaxButtonWidth = GetPrefixedRCInt(m_pszName, "MaxButtonWidth", 500);
-    m_uMonitor = GetPrefixedRCMonitor(m_pszName, "Monitor", (UINT)-1);
+void Taskbar::LoadSettings(bool /* isRefresh */) {
+    m_uMaxButtonWidth = this->settings->GetInt("MaxButtonWidth", 500);
+    m_uMonitor = this->settings->GetInt("Monitor", (UINT)-1);
 }
 
 
