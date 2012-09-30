@@ -19,16 +19,16 @@ extern HWND g_hWndTrayNotify;
 /// <summary>
 /// Constructor
 /// </summary>
-Tray::Tray(LPCSTR pszName) {
-    m_pszName = pszName;
+Tray::Tray(LPCSTR name) {
+    this->name = name;
 
-    this->settings = new Settings(m_pszName);
+    this->settings = new Settings(this->name);
 
     DrawableSettings* defaults = new DrawableSettings();
-    m_pWindow = new DrawableWindow(NULL, g_szTrayHandler, g_hInstance, this->settings, defaults);
+    this->window = new DrawableWindow(NULL, g_szTrayHandler, g_hInstance, this->settings, defaults);
 
-    SetWindowLongPtr(m_pWindow->GetWindow(), 0, (LONG_PTR)this);
-    m_pWindow->Show();
+    SetWindowLongPtr(this->window->GetWindow(), 0, (LONG_PTR)this);
+    this->window->Show();
 
     LoadSettings();
 }
@@ -39,36 +39,40 @@ Tray::Tray(LPCSTR pszName) {
 /// </summary>
 Tray::~Tray() {
     // Remove all icons
-    for (vector<TrayIcon*>::const_iterator iter = m_icons.begin(); iter != m_icons.end(); iter++) {
+    for (vector<TrayIcon*>::const_iterator iter = this->icons.begin(); iter != this->icons.end(); iter++) {
         delete *iter;
     }
-    m_icons.clear();
+    this->icons.clear();
 
-    if (m_pWindow) delete m_pWindow;
+    if (this->window) delete this->window;
     if (this->settings) delete this->settings;
-    free((void *)m_pszName);
+    free((void *)this->name);
 }
 
 
 /// <summary>
 /// Loads settings from LiteStep's RC files.
 /// </summary>
-void Tray::LoadSettings(bool /* bIsRefresh */) {
-    this->settings->GetOffsetRect("MarginLeft", "MarginTop", "MarginRight", "MarginBottom", &m_rMargin, 2, 2, 5, 2);
-    m_iColSpacing = this->settings->GetInt("ColumnSpacing", 2);
-    m_iRowSpacing = this->settings->GetInt("RowSpacing", 2);
+void Tray::LoadSettings(bool /* IsRefresh */) {
+    this->settings->GetOffsetRect("MarginLeft", "MarginTop", "MarginRight", "MarginBottom", &this->margin, 2, 2, 5, 2);
+    this->colSpacing = this->settings->GetInt("ColumnSpacing", 2);
+    this->rowSpacing = this->settings->GetInt("RowSpacing", 2);
+
+    Settings* iconSettings = this->settings->CreateChild("Icon");
+    this->iconSize = iconSettings->GetInt("Size", 16);
+    delete iconSettings;
 }
 
 
 /// <summary>
 /// Adds the specified icon to this tray.
 /// </summary>
-TrayIcon* Tray::AddIcon(LPLSNOTIFYICONDATA pNID) {
-    TrayIcon* tIcon = new TrayIcon(m_pWindow->GetWindow(), pNID, this->settings);
-    m_icons.push_back(tIcon);
+TrayIcon* Tray::AddIcon(LPLSNOTIFYICONDATA NID) {
+    TrayIcon* icon = new TrayIcon(this->window->GetWindow(), NID, this->settings);
+    this->icons.push_back(icon);
     Relayout();
-    tIcon->Show();
-    return tIcon;
+    icon->Show();
+    return icon;
 }
 
 
@@ -76,12 +80,12 @@ TrayIcon* Tray::AddIcon(LPLSNOTIFYICONDATA pNID) {
 /// Finds the specified icon.
 /// </summary>
 vector<TrayIcon*>::const_iterator Tray::FindIcon(TrayIcon* pIcon) {
-    for (vector<TrayIcon*>::const_iterator iter = m_icons.begin(); iter != m_icons.end(); iter++) {
+    for (vector<TrayIcon*>::const_iterator iter = this->icons.begin(); iter != this->icons.end(); iter++) {
         if ((*iter) == pIcon) {
             return iter;
         }
     }
-    return m_icons.end();
+    return this->icons.end();
 }
 
 
@@ -90,9 +94,9 @@ vector<TrayIcon*>::const_iterator Tray::FindIcon(TrayIcon* pIcon) {
 /// </summary>
 void Tray::RemoveIcon(TrayIcon* pIcon) {
     vector<TrayIcon*>::const_iterator icon = FindIcon(pIcon);
-    if (icon != m_icons.end()) {
+    if (icon != this->icons.end()) {
         delete *icon;
-        m_icons.erase(icon);
+        this->icons.erase(icon);
         Relayout();
     }
 }
@@ -102,16 +106,16 @@ void Tray::RemoveIcon(TrayIcon* pIcon) {
 /// Repositions/Resizes all icons.
 /// </summary>
 void Tray::Relayout() {
-    int x = m_rMargin.left;
-    int y = m_rMargin.top;
-    int wrapwidth = this->m_pWindow->GetSettings()->width - m_rMargin.right - 20;
+    int x = this->margin.left;
+    int y = this->margin.top;
+    int wrapwidth = this->window->GetSettings()->width - this->margin.right - this->iconSize;
 
-    for (vector<TrayIcon*>::const_iterator iter = m_icons.begin(); iter != m_icons.end(); iter++) {
-        (*iter)->Reposition(x, y, 20, 20);
-        x += 20 + m_iColSpacing;
+    for (vector<TrayIcon*>::const_iterator iter = this->icons.begin(); iter != this->icons.end(); iter++) {
+        (*iter)->Reposition(x, y, this->iconSize, this->iconSize);
+        x += this->iconSize + this->colSpacing;
         if (x > wrapwidth) {
-            x = m_rMargin.left;
-            y += 20 + m_iRowSpacing;
+            x = this->margin.left;
+            y += this->iconSize + this->colSpacing;
         }
     }
 }
@@ -124,11 +128,11 @@ LRESULT WINAPI Tray::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_MOUSEMOVE:
         if (IsWindow(g_hWndTrayNotify)) {
-            DrawableSettings* settings = this->m_pWindow->GetSettings();
+            DrawableSettings* settings = this->window->GetSettings();
             MoveWindow(g_hWndTrayNotify, settings->x, settings->y,
                 settings->width, settings->height, FALSE);
         }
     default:
-        return m_pWindow->HandleMessage(uMsg, wParam, lParam);
+        return this->window->HandleMessage(uMsg, wParam, lParam);
     }
 }

@@ -20,15 +20,17 @@ extern LPCSTR g_szTrayIconHandler;
 /// </summary>
 TrayIcon::TrayIcon(HWND parent, LPLSNOTIFYICONDATA pNID, Settings* parentSettings) {
     //
-    LoadSettings();
-
-    //
     m_pNotifyData = pNID;
 
     // Create the drawable window
     this->settings = parentSettings->CreateChild("Icon");
-    m_pWindow = new DrawableWindow(parent, g_szTrayIconHandler, g_hInstance, this->settings, new DrawableSettings());
+    DrawableSettings* defaultSettings = new DrawableSettings();
+    defaultSettings->color = 0x00000000;
+    m_pWindow = new DrawableWindow(parent, g_szTrayIconHandler, g_hInstance, this->settings, defaultSettings);
     SetWindowLongPtr(m_pWindow->GetWindow(), 0, (LONG_PTR)this);
+
+    //
+    LoadSettings();
 
     //
     UpdateIcon();
@@ -48,7 +50,7 @@ TrayIcon::~TrayIcon() {
 /// Loads RC settings.
 /// </summary>
 void TrayIcon::LoadSettings(bool /* bIsRefresh */) {
-    using namespace nCore::InputParsing;
+    this->iconSize = this->settings->GetInt("Size", 16);
 }
 
 
@@ -75,7 +77,7 @@ void TrayIcon::UpdateIcon() {
     m_pWindow->PurgeOverlays();
     if ((m_pNotifyData->uFlags & NIF_ICON) == NIF_ICON) {
         D2D1_RECT_F f;
-        f.bottom = 18; f.top = 2; f.left = 2; f.right = 18;
+        f.bottom = this->iconSize; f.top = 0; f.left = 0; f.right = this->iconSize;
         m_pWindow->AddOverlay(f, m_pNotifyData->hIcon);
     }
 }

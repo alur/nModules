@@ -25,29 +25,31 @@ public:
     void RemoveIcon(TrayIcon*);
     LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
     void Relayout();
-    vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* pNID);
+    vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* NID);
 
 private:
     // The name of this tray
-    LPCSTR m_pszName;
+    LPCSTR name;
 
     // The tray's window
-    DrawableWindow* m_pWindow;
+    DrawableWindow* window;
 
     // Settings for painting the tray background
     Settings* settings;
 
     // The tray icons
-    vector<TrayIcon*> m_icons;
+    vector<TrayIcon*> icons;
 
     // 
-    RECT m_rMargin;
+    RECT margin;
 
     // 
-    int m_iRowSpacing;
+    int rowSpacing;
 
     // 
-    int m_iColSpacing;
+    int colSpacing;
+
+    int iconSize;
 };
 
 #endif /* TRAY_HPP */

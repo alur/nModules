@@ -252,7 +252,7 @@ void WindowManager::UpdateWindow(HWND hWnd, LPARAM lParam) {
         UpdateIcon(hWnd);
 
         // Check if we should be flashing
-        if (lParam != FALSE) {
+        if (lParam == HSHELL_HIGHBIT) {
             for (vector<TaskButton*>::const_iterator iter2 = iter->second.buttons.begin(); iter2 != iter->second.buttons.end(); iter2++) {
                 (*iter2)->Flash();
             }

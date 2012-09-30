@@ -34,6 +34,8 @@ private:
 
     //
     LPLSNOTIFYICONDATA m_pNotifyData;
+
+    int iconSize;
 };
 
 #endif /* TRAYICON_HPP */
