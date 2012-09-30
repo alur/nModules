@@ -5,8 +5,8 @@
  *  Implementation of the Label class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "../nCoreCom/Core.h"
 #include "Label.hpp"
 #include "../nShared/Macros.h"

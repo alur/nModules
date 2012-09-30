@@ -8,8 +8,8 @@
 #ifndef NDESK_H
 #define NDESK_H
 
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "../nShared/Export.h"
 
 bool CreateMainWindow(HINSTANCE hInst);

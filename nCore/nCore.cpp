@@ -5,8 +5,8 @@
  *  Main .cpp file for the nCore module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "nCore.h"
 #include "../nShared/Error.h"
 #include "../nShared/MonitorInfo.hpp"

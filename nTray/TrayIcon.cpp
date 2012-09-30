@@ -5,8 +5,8 @@
  *  Implementation of the TrayIcon class. Represents a taskbar button.
  *   
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "../nCoreCom/Core.h"
 #include "TrayIcon.hpp"
 #include "Windowsx.h"

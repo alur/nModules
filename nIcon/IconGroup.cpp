@@ -5,8 +5,8 @@
  *  
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "IconGroup.hpp"
 #include "../nShared/Macros.h"
 #include "../nShared/Debugging.h"

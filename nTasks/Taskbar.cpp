@@ -5,8 +5,8 @@
  *  Implementation of the Taskbar class. Handles layout of the taskbar buttons.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "../nCoreCom/Core.h"
 #include "Taskbar.hpp"
 

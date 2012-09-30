@@ -5,8 +5,8 @@
  *  Formats text strings.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "../nShared/Export.h"
 #include "TextFormatting.h"
 #include <map>

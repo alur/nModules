@@ -5,8 +5,8 @@
  *  Functions for dealing with errors.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "Error.h"
 
 // The current global error level.

@@ -5,8 +5,8 @@
  *  Main .cpp file for the nIcon module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "nIcon.h"
 #include "../nCoreCom/Core.h"
 #include "../nShared/Error.h"

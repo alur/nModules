@@ -5,8 +5,8 @@
  *  Utility functions for parsing input.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "../nShared/Export.h"
 #include "../nShared/Color.h"
 

@@ -5,8 +5,8 @@
  *  Implementation of the Tray class. Handles layout of the tray buttons.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "../nCoreCom/Core.h"
 #include "Tray.hpp"
 #include "TrayIcon.hpp"

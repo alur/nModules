@@ -5,8 +5,8 @@
  *  Functions for dealing with versioning.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include <Windows.h>
+#include <strsafe.h>
 #include "Versioning.h"
 
 

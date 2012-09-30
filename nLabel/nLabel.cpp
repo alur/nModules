@@ -5,8 +5,8 @@
  *  Main .cpp file for the nLabel module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "nLabel.h"
 #include "../nCoreCom/Core.h"
 #include "../nShared/Error.h"

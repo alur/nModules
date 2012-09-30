@@ -7,8 +7,8 @@
  *  TODO::Possibly implement the default settings as a state. 
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "../nCoreCom/Core.h"
 #include "Macros.h"
 #include "DrawableWindow.hpp"

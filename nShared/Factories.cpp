@@ -5,8 +5,8 @@
  *  Manages Direct2D/DirectWrite/... factories
  *   
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include <d2d1.h>
 #include <dwrite.h>
 #include <wincodec.h>

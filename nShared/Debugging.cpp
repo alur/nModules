@@ -5,8 +5,8 @@
  *  Debugging functions. Taken from the LiteStep core.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include <Windows.h>
+#include <strsafe.h>
 #include "Debugging.h"
 
 // Count array elements

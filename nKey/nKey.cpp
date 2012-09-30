@@ -5,8 +5,8 @@
  *  Main .cpp file for the nKey module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "nKey.h"
 #include "../nShared/Error.h"
 #include <map>

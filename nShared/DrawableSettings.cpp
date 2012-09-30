@@ -5,8 +5,8 @@
  *  Holds all RC settings used by the DrawableWindow class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "DrawableSettings.hpp"
 
 

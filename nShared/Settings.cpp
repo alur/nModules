@@ -5,8 +5,8 @@
  *  Manages RC settings with a certain prefix.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "Settings.hpp"
 #include "Error.h"
 #include "../nCoreCom/Core.h"

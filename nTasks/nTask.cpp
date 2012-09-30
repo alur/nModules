@@ -5,8 +5,8 @@
  *  Main .cpp file for the nTask module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include "../headers/lsapi.h"
+#include <strsafe.h>
 #include "nTask.h"
 #include "Taskbar.hpp"
 #include "../nShared/nShared.h"

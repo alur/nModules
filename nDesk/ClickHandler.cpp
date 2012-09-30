@@ -5,8 +5,8 @@
  *  Handles clicks on the desktop.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <strsafe.h>
 #include <Windows.h>
+#include <strsafe.h>
 #include <Windowsx.h>
 #include "ClickHandler.hpp"
 #include "../nShared/MonitorInfo.hpp"
