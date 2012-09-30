@@ -131,7 +131,7 @@ DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* 
 
     // Insert the state based on its priority.
     list<State>::iterator iter;
-    for (iter = states.begin(); iter != states.end() && iter->priority < state.priority; iter++);
+    for (iter = states.begin(); iter != states.end() && iter->priority > state.priority; iter++);
     return states.insert(iter, state);
 }
 
@@ -140,10 +140,9 @@ DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* 
 /// Actives a certain state.
 /// </summary>
 void DrawableWindow::ActivateState(DrawableWindow::STATE state) {
-    STATE iter = state;
     state->active = true;
-    if (this->activeState == this->states.end() || this->activeState->priority > iter->priority) {
-        this->activeState = iter;
+    if (this->activeState == this->states.end() || this->activeState->priority < state->priority) {
+        this->activeState = state;
         HandleActiveStateChange();
     }
 }
@@ -153,12 +152,11 @@ void DrawableWindow::ActivateState(DrawableWindow::STATE state) {
 /// Clears a certain state.
 /// </summary>
 void DrawableWindow::ClearState(DrawableWindow::STATE state) {
-    STATE iter = state;
-    iter->active = false;
-    if (iter == this->activeState) {
+    state->active = false;
+    if (state == this->activeState) {
         // We just cleared the active state, find the highest priority next active state.
-        for (iter++; iter != this->states.end() && !iter->active; iter++);
-        this->activeState = iter;
+        for (state++; state != this->states.end() && !state->active; state++);
+        this->activeState = state;
         HandleActiveStateChange();
     }
 }
