@@ -50,7 +50,7 @@ Taskbar::~Taskbar() {
 /// </summary>
 void Taskbar::LoadSettings(bool /* isRefresh */) {
     m_uMaxButtonWidth = this->settings->GetInt("MaxButtonWidth", 500);
-    m_uMonitor = this->settings->GetInt("Monitor", (UINT)-1);
+    m_uMonitor = this->settings->GetMonitor("Monitor", (UINT)-1);
 }
 
 
