@@ -141,6 +141,7 @@ DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* 
 /// </summary>
 void DrawableWindow::ActivateState(DrawableWindow::STATE state) {
     STATE iter = state;
+    state->active = true;
     if (this->activeState == this->states.end() || this->activeState->priority > iter->priority) {
         this->activeState = iter;
         HandleActiveStateChange();
