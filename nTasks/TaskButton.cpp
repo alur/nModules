@@ -113,6 +113,7 @@ void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
 void TaskButton::Activate() {
     m_bIsActive = true;
     this->m_pWindow->ActivateState(this->stateActive);
+    this->m_pWindow->ClearState(this->stateFlashing);
 }
 
 
