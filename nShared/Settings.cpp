@@ -175,6 +175,33 @@ bool Settings::GetString(LPCSTR pszSetting, LPWSTR pszwDest, UINT cchDest, LPCST
 
 
 /// <summary>
+/// Get's a string from a prefixed RC value.
+/// </summary>
+/// <param name="pszSetting">The RC setting.</param>
+/// <param name="pszwDest">Where the string should be read to.</param>
+/// <param name="cchDest">The maximum number of characters to write to pszDest.</param>
+/// <param name="pszDefault">The default string, used if the RC value is unspecified.</param>
+/// <returns>False if the length of the RC value is > cchDest. True otherwise.</returns>
+bool Settings::GetString(LPCSTR pszSetting, LPWSTR pszwDest, UINT cchDest, LPCWSTR pszDefault) {
+    size_t size = wcslen(pszDefault);
+    LPSTR multiByte = (LPSTR)malloc(size+1);
+    size_t numConverted;
+    bool ret;
+
+    if (wcstombs_s(&numConverted, multiByte, size+1, pszDefault, size) == 0) {
+        ret = GetPrefixedRCWString(this->prefix, pszSetting, pszwDest, multiByte, cchDest);
+    }
+    else {
+        ret = GetPrefixedRCWString(this->prefix, pszSetting, pszwDest, "", cchDest);
+    }
+
+    free(multiByte);
+
+    return ret;
+}
+
+
+/// <summary>
 /// Set's a prefixed RC value to a particular string.
 /// </summary>
 /// <param name="pszSetting">The RC setting.</param>

@@ -19,7 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Color.h" />
     <ClInclude Include="Debugging.h" />
+    <ClInclude Include="DrawableSettings.hpp" />
     <ClInclude Include="DrawableWindow.hpp" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Export.h" />
@@ -27,18 +29,18 @@
     <ClInclude Include="Math.h" />
     <ClInclude Include="MonitorInfo.hpp" />
     <ClInclude Include="nShared.h" />
-    <ClInclude Include="PaintSettings.hpp" />
     <ClInclude Include="Settings.hpp" />
     <ClInclude Include="Versioning.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Color.cpp" />
     <ClCompile Include="Debugging.cpp" />
+    <ClCompile Include="DrawableSettings.cpp" />
     <ClCompile Include="DrawableWindow.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="Factories.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="MonitorInfo.cpp" />
-    <ClCompile Include="PaintSettings.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Versioning.cpp" />
   </ItemGroup>

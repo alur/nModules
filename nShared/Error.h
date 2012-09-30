@@ -1,21 +1,20 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Error.h                                                         July, 2012
+ *  Error.h
  *  The nModules Project
  *
  *  Functions for dealing with errors.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef ERROR_H
-#define ERROR_H
+#pragma once
 
-#define E_LVL_ERROR 1
-#define E_LVL_WARNING 2
-#define E_LVL_NOTICE 3
-#define E_LVL_DEBUG 4
+enum {
+    E_LVL_ERROR = 1,
+    E_LVL_WARNING,
+    E_LVL_NOTICE,
+    E_LVL_DEBUG
+};
 
 typedef unsigned __int8 ERRORLVL;
 
 void ErrorMessage(ERRORLVL nLevel, LPCSTR pszFormat, ...);
 void SetErrorLevel(ERRORLVL nLevel);
-
-#endif /* ERROR_H */

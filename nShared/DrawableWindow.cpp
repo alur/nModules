@@ -2,10 +2,7 @@
  *  DrawableWindow.cpp                                              July, 2012
  *  The nModules Project
  *
- *  Implementation of the DrawableWindow class. A generic drawable window.
- *
- *  Big TODO::Transparent child windows should also have the parent window
- *  painted beneath them.
+ *  A generic drawable window.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include <strsafe.h>
@@ -13,29 +10,32 @@
 #include "../nCoreCom/Core.h"
 #include "Macros.h"
 #include "DrawableWindow.hpp"
-#include "PaintSettings.hpp"
+#include "DrawableSettings.hpp"
 #include <d2d1.h>
 #include <dwmapi.h>
 #include <dwrite.h>
 #include <Wincodec.h>
 #include "Factories.h"
 #include "Debugging.h"
+#include "Color.h"
 
 using namespace D2D1;
+
+#define TIMER_UPDATE_TEXT 1
 
 
 /// <summary>
 /// Constructor
 /// </summary>
-DrawableWindow::DrawableWindow(HWND parent, LPCSTR pszWndClass, PaintSettings * paintSettings, HINSTANCE hInst) {
-    m_hWndParent = parent;
-    m_pszText = "Test";
-    m_pPaintSettings = paintSettings;
-    
-    // Copy over the position from the paint settings.
-    memcpy(&m_scPosition, &m_pPaintSettings->position, sizeof(RECT));
+DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings *settings, DrawableSettings* defaultSettings) {
+    this->parent = parent;
+    this->settings = settings;
+    this->drawingSettings = new DrawableSettings();
+    this->defaultDrawingSettings = defaultSettings;
 
-    CreateWnd(pszWndClass, hInst);
+    LoadSettings();
+
+    CreateWnd(windowClass, instance);
 }
 
 
@@ -43,16 +43,19 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR pszWndClass, PaintSettings * 
 /// Destructor
 /// </summary>
 DrawableWindow::~DrawableWindow() {
-    KillTimer(m_hWnd, 1337);
+    KillTimer(this->window, TIMER_UPDATE_TEXT);
 
-    if (m_hWnd) {
-        DestroyWindow(m_hWnd);
+    if (this->window) {
+        DestroyWindow(this->window);
     }
 
-    SAFERELEASE(m_pRenderTarget);
-    SAFERELEASE(m_pBackBrush);
-    SAFERELEASE(m_pTextBrush);
-    SAFERELEASE(m_pTextFormat);
+    SAFEDELETE(this->drawingSettings);
+    SAFEDELETE(this->defaultDrawingSettings);
+
+    SAFERELEASE(this->renderTarget);
+    SAFERELEASE(this->backBrush);
+    SAFERELEASE(this->textBrush);
+    SAFERELEASE(this->textFormat);
     PurgeOverlays();
 }
 
@@ -60,20 +63,34 @@ DrawableWindow::~DrawableWindow() {
 /// <summary>
 /// Gets the HWND of this class.
 /// </summary>
-HWND DrawableWindow::getWindow() {
-    return m_hWnd;
+void DrawableWindow::LoadSettings() {
+    this->drawingSettings->Load(this->settings, this->defaultDrawingSettings);
+    this->scPosition.left = this->drawingSettings->x;
+    this->scPosition.top = this->drawingSettings->y;
+    this->scPosition.right = this->scPosition.left + this->drawingSettings->width;
+    this->scPosition.bottom = this->scPosition.top + this->drawingSettings->height;
+
+    if (_stricmp(this->drawingSettings->textAlign, "Center") == 0)
+        this->textAlignment = DWRITE_TEXT_ALIGNMENT_CENTER;
+    else if (_stricmp(this->drawingSettings->textAlign, "Right") == 0)
+        this->textAlignment = DWRITE_TEXT_ALIGNMENT_TRAILING;
+    else
+        this->textAlignment = DWRITE_TEXT_ALIGNMENT_LEADING;
+
+    if (_stricmp(this->drawingSettings->textVerticalAlign, "Middle") == 0)
+        this->textVerticalAlignment = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
+    else if (_stricmp(this->drawingSettings->textVerticalAlign, "Bottom") == 0)
+        this->textVerticalAlignment = DWRITE_PARAGRAPH_ALIGNMENT_FAR;
+    else
+        this->textVerticalAlignment = DWRITE_PARAGRAPH_ALIGNMENT_NEAR;
 }
 
 
 /// <summary>
-/// Reloads graphics resources from the paintsettings object.
+/// Gets the HWND of this class.
 /// </summary>
-void DrawableWindow::UpdateBrushes() {
-    // Update the background brush
-    ID2D1SolidColorBrush *backBrush = reinterpret_cast<ID2D1SolidColorBrush*>(m_pBackBrush);
-    backBrush->SetColor(m_pPaintSettings->backColor);
-
-    Repaint();
+HWND DrawableWindow::GetWindow() {
+    return this->window;
 }
 
 
@@ -81,66 +98,71 @@ void DrawableWindow::UpdateBrushes() {
 /// Repaints the entire window.
 /// </summary>
 void DrawableWindow::Repaint() {
-    InvalidateRect(m_hWnd, NULL, TRUE);
-    UpdateWindow(m_hWnd);
+    InvalidateRect(this->window, NULL, TRUE);
+    UpdateWindow(this->window);
 }
 
 
 /// <summary>
 /// Adds an overlay to this window.
 /// </summary>
-HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F f, HICON hIcon) {
-    IWICBitmap *pSource = NULL;
-    IWICBitmapScaler *pScaler = NULL;
-    IWICFormatConverter *pConverter = NULL;
-    IWICImagingFactory *pFactory = NULL;
-    ID2D1Bitmap *pBitmap = NULL;
+HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
+    IWICBitmap* source = NULL;
+    IWICBitmapScaler* scaler = NULL;
+    IWICFormatConverter* converter = NULL;
+    IWICImagingFactory* factory = NULL;
+    ID2D1Bitmap* bitmap = NULL;
     Overlay overlay;
     UINT width, height;
     
     HRESULT hr = S_OK;
 
     // Create our helper objects.
-    CHECKHR(hr, Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&pFactory)));
-    CHECKHR(hr, pFactory->CreateBitmapScaler(&pScaler));
-    CHECKHR(hr, pFactory->CreateFormatConverter(&pConverter));
+    CHECKHR(hr, Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory)));
+    CHECKHR(hr, factory->CreateBitmapScaler(&scaler));
+    CHECKHR(hr, factory->CreateFormatConverter(&converter));
 
     // Generate a WIC bitmap
-    CHECKHR(hr, pFactory->CreateBitmapFromHICON(hIcon, &pSource));
+    CHECKHR(hr, factory->CreateBitmapFromHICON(icon, &source));
 
     // Resize the image
-    CHECKHR(hr, pSource->GetSize(&width, &height));
-    CHECKHR(hr, pScaler->Initialize(pSource, (UINT)(f.right - f.left), (UINT)(f.bottom - f.top), WICBitmapInterpolationModeCubic));
+    CHECKHR(hr, source->GetSize(&width, &height));
+    CHECKHR(hr, scaler->Initialize(source, (UINT)(position.right - position.left), (UINT)(position.bottom - position.top), WICBitmapInterpolationModeCubic));
     
     // Convert it to an ID2D1Bitmap
-    CHECKHR(hr, pConverter->Initialize(pScaler, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut));
-    CHECKHR(hr, m_pRenderTarget->CreateBitmapFromWicBitmap(pConverter, 0, &pBitmap));
+    CHECKHR(hr, converter->Initialize(scaler, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut));
+    CHECKHR(hr, this->renderTarget->CreateBitmapFromWicBitmap(converter, 0, &bitmap));
 
     // Create a brush based on the bitmap
-    CHECKHR(hr, m_pRenderTarget->CreateBitmapBrush(pBitmap, reinterpret_cast<ID2D1BitmapBrush**>(&overlay.brush)));
+    CHECKHR(hr, this->renderTarget->CreateBitmapBrush(bitmap, reinterpret_cast<ID2D1BitmapBrush**>(&overlay.brush)));
     
     // Move the origin of the brush to match the overlay position
-    overlay.brush->SetTransform(D2D1::Matrix3x2F::Translation(f.left, f.top));
-    overlay.position = f;
+    overlay.brush->SetTransform(D2D1::Matrix3x2F::Translation(position.left, position.top));
+    overlay.position = position;
 
     // Transfer control here if CHECKHR failed
     CHECKHR_END();
 
     // Release stuff
-    SAFERELEASE(pScaler);
-    SAFERELEASE(pConverter);
-    SAFERELEASE(pSource);
-    SAFERELEASE(pBitmap);
+    SAFERELEASE(scaler);
+    SAFERELEASE(converter);
+    SAFERELEASE(source);
+    SAFERELEASE(bitmap);
 
     // Add the overlays to the overlay list
     if (SUCCEEDED(hr)) {
-        m_overlays.push_back(overlay);
+        this->overlays.push_back(overlay);
     }
     else {
-        TRACE("DrawableWindow::AddOverlay failed");
+        TRACE("DrawableWindow::AddOverlay failed!");
     }
 
     return hr;
+}
+
+
+DrawableSettings* DrawableWindow::GetSettings() {
+    return this->drawingSettings;
 }
 
 
@@ -148,25 +170,10 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F f, HICON hIcon) {
 /// Removes all overlays from the window.
 /// </summary>
 void DrawableWindow::PurgeOverlays() {
-    for (vector<Overlay>::iterator iter = m_overlays.begin(); iter != m_overlays.end(); iter++) {
+    for (vector<Overlay>::iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++) {
         SAFERELEASE(iter->brush);
     }
-    m_overlays.clear();
-}
-
-
-/// <summary>
-/// Enables/Disables bluring of the window background.
-/// </summary>
-HRESULT DrawableWindow::SetBlur(bool bEnable) {
-    // Specify blur-behind and blur region.
-    DWM_BLURBEHIND bb = {0};
-    bb.dwFlags = bEnable ? DWM_BB_ENABLE : NULL;
-    bb.hRgnBlur = NULL;
-    bb.fEnable = bEnable;
-
-    // Enable blur-behind.
-    return DwmEnableBlurBehindWindow(m_hWnd, &bb);
+    this->overlays.clear();
 }
 
 
@@ -174,42 +181,42 @@ HRESULT DrawableWindow::SetBlur(bool bEnable) {
 /// Creates the window we are drawing.
 /// </summary>
 bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
-    if (m_hWndParent) {
+    if (this->parent) {
         RECT parentRect;
-        GetWindowRect(m_hWndParent, &parentRect);
-        m_scPosition.bottom += parentRect.top;
-        m_scPosition.top += parentRect.top;
-        m_scPosition.left += parentRect.left;
-        m_scPosition.right += parentRect.left;
+        GetWindowRect(this->parent, &parentRect);
+        this->scPosition.bottom += parentRect.top;
+        this->scPosition.top += parentRect.top;
+        this->scPosition.left += parentRect.left;
+        this->scPosition.right += parentRect.left;
     }
 
     DWORD exStyle = WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW;
     DWORD style = WS_POPUP;
 
-    if (m_pPaintSettings->m_bAlwaysOnTop) exStyle |= WS_EX_TOPMOST;
+    if (this->drawingSettings->alwaysOnTop) exStyle |= WS_EX_TOPMOST;
 
-    m_hWnd = CreateWindowEx(exStyle, pszWndClass, "", style,
-        m_scPosition.left, m_scPosition.top, m_scPosition.right - m_scPosition.left,
-        m_scPosition.bottom - m_scPosition.top, m_hWndParent, NULL, hInst, NULL);
+    this->window = CreateWindowEx(exStyle, pszWndClass, "", style,
+        this->scPosition.left, this->scPosition.top, this->scPosition.right - this->scPosition.left,
+        this->scPosition.bottom - this->scPosition.top, this->parent, NULL, hInst, NULL);
     
-    if (!m_hWnd) {
+    if (!this->window) {
         return false;
     }
 
     D2D1_SIZE_U size = D2D1::SizeU(
-        m_scPosition.right - m_scPosition.left,
-        m_scPosition.bottom - m_scPosition.top
+        this->scPosition.right - this->scPosition.left,
+        this->scPosition.bottom - this->scPosition.top
     );
 
-    m_backArea.top = 0;
-    m_backArea.left = 0;
-    m_backArea.right = (float)size.width;
-    m_backArea.bottom = (float)size.height;
-    m_textArea = m_backArea;
-    m_textArea.bottom -= m_pPaintSettings->textOffset.bottom;
-    m_textArea.top += m_pPaintSettings->textOffset.top;
-    m_textArea.left += m_pPaintSettings->textOffset.left;
-    m_textArea.right -= m_pPaintSettings->textOffset.right;
+    this->backArea.top = 0;
+    this->backArea.left = 0;
+    this->backArea.right = (float)size.width;
+    this->backArea.bottom = (float)size.height;
+    this->textArea = this->backArea;
+    this->textArea.bottom -= this->drawingSettings->textOffsetBottom;
+    this->textArea.top += this->drawingSettings->textOffsetTop;
+    this->textArea.left += this->drawingSettings->textOffsetLeft;
+    this->textArea.right -= this->drawingSettings->textOffsetRight;
 
     // Create Direct2D objects
     ID2D1Factory *pD2DFactory = NULL;
@@ -219,39 +226,39 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
             D2D1_RENDER_TARGET_TYPE_DEFAULT,
             PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)
         ),
-        HwndRenderTargetProperties(m_hWnd, size),
-        &m_pRenderTarget
+        HwndRenderTargetProperties(this->window, size),
+        &this->renderTarget
     );
 
-    m_pRenderTarget->CreateSolidColorBrush(m_pPaintSettings->backColor, (ID2D1SolidColorBrush**)&m_pBackBrush);
-    m_pRenderTarget->CreateSolidColorBrush(m_pPaintSettings->fontColor, (ID2D1SolidColorBrush**)&m_pTextBrush);
+    this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->drawingSettings->color), (ID2D1SolidColorBrush**)&this->backBrush);
+    this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->drawingSettings->fontColor), (ID2D1SolidColorBrush**)&this->textBrush);
 
     // Create DirectWrite objects
     IDWriteFactory *pDWFactory = NULL;
     Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&pDWFactory));
     pDWFactory->CreateTextFormat(
-        m_pPaintSettings->font,
+        this->drawingSettings->font,
         NULL,
         DWRITE_FONT_WEIGHT_REGULAR,
         DWRITE_FONT_STYLE_NORMAL,
         DWRITE_FONT_STRETCH_NORMAL,
-        m_pPaintSettings->fontSize,
+        this->drawingSettings->fontSize,
         L"en-US",
-        &m_pTextFormat);
+        &this->textFormat);
 
-    m_pTextFormat->SetTextAlignment(m_pPaintSettings->textAlignment);
-    m_pTextFormat->SetParagraphAlignment(m_pPaintSettings->textVerticalAlignment);
+    this->textFormat->SetTextAlignment(this->textAlignment);
+    this->textFormat->SetParagraphAlignment(this->textVerticalAlignment);
 
-    SetWindowPos(m_hWnd, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+    SetWindowPos(this->window, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
     MARGINS m;
     ZeroMemory(&m, sizeof(m));
-    m.cyTopHeight = m_scPosition.bottom - m_scPosition.top;
+    m.cyTopHeight = this->scPosition.bottom - this->scPosition.top;
     m.cyTopHeight = INT_MAX;
     
-    DwmExtendFrameIntoClientArea(m_hWnd, &m);
+    DwmExtendFrameIntoClientArea(this->window, &m);
 
-    SetTimer(m_hWnd, 1337, 1000, NULL);
+    SetTimer(this->window, TIMER_UPDATE_TEXT, 1000, NULL);
 
     return true;
 }
@@ -261,7 +268,7 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
 /// Shows the window.
 /// </summary>
 void DrawableWindow::Show() {
-    ShowWindow(m_hWnd, SW_SHOWNOACTIVATE);
+    ShowWindow(this->window, SW_SHOWNOACTIVATE);
 }
 
 
@@ -269,64 +276,66 @@ void DrawableWindow::Show() {
 /// Causes the window to move to the position specified in its paintsettings.
 /// </summary>
 void DrawableWindow::UpdatePosition() {
-    // Copy over the position from the paint settings.
-    memcpy(&m_scPosition, &m_pPaintSettings->position, sizeof(RECT));
+    this->scPosition.left = this->drawingSettings->x;
+    this->scPosition.top = this->drawingSettings->y;
+    this->scPosition.right = this->scPosition.left + this->drawingSettings->width;
+    this->scPosition.bottom = this->scPosition.top + this->drawingSettings->height;
 
     // If this is a child window we need to make its position relative to its parent.
-    if (m_hWndParent) {
+    if (this->parent) {
         RECT parentRect;
-        GetWindowRect(m_hWndParent, &parentRect);
-        m_scPosition.bottom += parentRect.top;
-        m_scPosition.top += parentRect.top;
-        m_scPosition.left += parentRect.left;
-        m_scPosition.right += parentRect.left;
+        GetWindowRect(this->parent, &parentRect);
+        this->scPosition.bottom += parentRect.top;
+        this->scPosition.top += parentRect.top;
+        this->scPosition.left += parentRect.left;
+        this->scPosition.right += parentRect.left;
     }
 
     D2D1_SIZE_U size = D2D1::SizeU(
-        m_scPosition.right - m_scPosition.left,
-        m_scPosition.bottom - m_scPosition.top
+        this->scPosition.right - this->scPosition.left,
+        this->scPosition.bottom - this->scPosition.top
     );
 
-    m_backArea.top = 0;
-    m_backArea.left = 0;
-    m_backArea.right = (float)size.width;
-    m_backArea.bottom = (float)size.height;
+    this->backArea.top = 0;
+    this->backArea.left = 0;
+    this->backArea.right = (float)size.width;
+    this->backArea.bottom = (float)size.height;
 
-    m_textArea = m_backArea;
-    m_textArea.bottom -= m_pPaintSettings->textOffset.bottom;
-    m_textArea.top += m_pPaintSettings->textOffset.top;
-    m_textArea.left += m_pPaintSettings->textOffset.left;
-    m_textArea.right -= m_pPaintSettings->textOffset.right;
+    this->textArea = this->backArea;
+    this->textArea.bottom -= this->drawingSettings->textOffsetBottom;
+    this->textArea.top += this->drawingSettings->textOffsetTop;
+    this->textArea.left += this->drawingSettings->textOffsetLeft;
+    this->textArea.right -= this->drawingSettings->textOffsetRight;
 
-    SetWindowPos(m_hWnd, 0, m_scPosition.left, m_scPosition.top, size.width, size.height, SWP_NOZORDER | SWP_FRAMECHANGED);
-    m_pRenderTarget->Resize(size);
+    SetWindowPos(this->window, 0, this->scPosition.left, this->scPosition.top, size.width, size.height, SWP_NOZORDER | SWP_FRAMECHANGED);
+    this->renderTarget->Resize(size);
 
-    InvalidateRect(m_hWnd, NULL, TRUE);
-    UpdateWindow(m_hWnd);
+    InvalidateRect(this->window, NULL, TRUE);
+    UpdateWindow(this->window);
 }
 
 
 /// <summary>
 /// Handles window messages for this drawablewindow.
 /// </summary>
-LRESULT WINAPI DrawableWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg) {
+LRESULT WINAPI DrawableWindow::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
+    switch (msg) {
     case WM_ERASEBKGND:
         return 1;
 
     case WM_PAINT:
         WCHAR wszText[MAX_LINE_LENGTH];
-        m_pRenderTarget->BeginDraw();
-        m_pRenderTarget->Clear();
-        m_pRenderTarget->FillRectangle(m_backArea, m_pBackBrush);
-        for (vector<Overlay>::iterator iter = m_overlays.begin(); iter != m_overlays.end(); iter++) {
-            m_pRenderTarget->FillRectangle(iter->position, iter->brush);
+        this->renderTarget->BeginDraw();
+        this->renderTarget->Clear();
+        this->renderTarget->FillRectangle(this->backArea, this->backBrush);
+        for (vector<Overlay>::iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++) {
+            this->renderTarget->FillRectangle(iter->position, iter->brush);
         }
-        nCore::System::FormatText(m_pPaintSettings->text, sizeof(wszText)/sizeof(WCHAR), wszText);
-        m_pRenderTarget->DrawText(wszText, lstrlenW(wszText), m_pTextFormat, m_textArea, m_pTextBrush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
-        m_pRenderTarget->EndDraw();
+        nCore::System::FormatText(this->drawingSettings->text, sizeof(wszText)/sizeof(WCHAR), wszText);
+        this->renderTarget->DrawText(wszText, lstrlenW(wszText), this->textFormat, this->textArea, this->textBrush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+        this->renderTarget->EndDraw();
         
-        ValidateRect(m_hWnd, NULL);
+        ValidateRect(this->window, NULL);
 
         return 0;
 
@@ -335,7 +344,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lP
 
     case WM_TIMER:
         switch (wParam) {
-        case 1337:
+        case TIMER_UPDATE_TEXT:
             Repaint();
             return 1;
         }
@@ -356,5 +365,5 @@ LRESULT WINAPI DrawableWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lP
         return 0;
 
     }
-    return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
+    return DefWindowProc(this->window, msg, wParam, lParam);
 }

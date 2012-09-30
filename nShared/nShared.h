@@ -1,14 +1,15 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nShared.h                                                       July, 2012
+ *  nShared.h
  *  The nModules Project
  *
  *  Contains every declaration in nShared.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef NSHARED_H
-#define NSHARED_H
+#pragma once
 
+#include "Color.h"
 #include "Debugging.h"
+#include "DrawableSettings.hpp"
 #include "DrawableWindow.hpp"
 #include "Error.h"
 #include "Export.h"
@@ -16,7 +17,5 @@
 #include "Macros.h"
 #include "Math.h"
 #include "MonitorInfo.hpp"
-#include "PaintSettings.hpp"
+#include "Settings.hpp"
 #include "Versioning.h"
-
-#endif /* NSHARED_H */

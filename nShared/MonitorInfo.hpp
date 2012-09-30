@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  MonitorInfo.hpp                                                 July, 2012
+ *  MonitorInfo.hpp
  *  The nModules Project
  *
  *  Function declarations for the MonitorInfo class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef MONITORINFO_HPP
-#define MONITORINFO_HPP
+#pragma once
 
 #include <vector>
 
@@ -33,5 +32,3 @@ public:
 
 private:
 };
-
-#endif /* MONITORINFO_HPP */

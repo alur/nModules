@@ -12,7 +12,7 @@
 
 class TaskButton {
 public:
-    explicit TaskButton(HWND parent, HWND window, LPCSTR prefix, PaintSettings* paintSettings);
+    explicit TaskButton(HWND parent, HWND window, LPCSTR prefix, Settings* parentSettings);
     virtual ~TaskButton();
 
     void Reposition(UINT x, UINT y, UINT width, UINT height);
@@ -36,10 +36,10 @@ private:
     DrawableWindow* m_pWindow;
 
     // Settings for painting the button
-    PaintSettings* m_pPaintSettings;
+    Settings* settings;
 
     // Settings for painting the icon in the button.
-    PaintSettings* m_pIconPaintSettings;
+    Settings* iconSettings;
 
     // The window related to this button
     HWND m_hWnd;

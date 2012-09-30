@@ -9,7 +9,7 @@
 #define ICONGROUP_HPP
 
 #include "../nShared/DrawableWindow.hpp"
-#include "../nShared/PaintSettings.hpp"
+#include "../nShared/Settings.hpp"
 #include "IIconEventHandler.hpp"
 #include "Icon.hpp"
 #include <ShlObj.h>
@@ -40,7 +40,7 @@ private:
     void PositionIcon(PCUITEMID_CHILD pidl, D2D1_RECT_F* position);
 
     // Paintsettings for the whole group.
-    PaintSettings* paintSettings;
+    Settings* settings;
 
     // The window which holds the whole group.
     DrawableWindow* window;

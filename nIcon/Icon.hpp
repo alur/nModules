@@ -9,7 +9,6 @@
 #define ICON_HPP
 
 #include "../nShared/DrawableWindow.hpp"
-#include "../nShared/PaintSettings.hpp"
 #include <ShlObj.h>
 
 class Icon {
@@ -23,7 +22,7 @@ private:
     IShellFolder2* shellFolder;
     PITEMID_CHILD item;
 
-    PaintSettings* paintSettings;
+    Settings* settings;
     DrawableWindow* window;
 };
 

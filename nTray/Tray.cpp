@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Tray.cpp                                                        July, 2012
+ *  Tray.cpp
  *  The nModules Project
  *
  *  Implementation of the Tray class. Handles layout of the tray buttons.
@@ -22,9 +22,12 @@ extern HWND g_hWndTrayNotify;
 Tray::Tray(LPCSTR pszName) {
     m_pszName = pszName;
 
-    m_pPaintSettings = new PaintSettings(m_pszName);
-    m_pWindow = new DrawableWindow(NULL, g_szTrayHandler, m_pPaintSettings, g_hInstance);
-    SetWindowLongPtr(m_pWindow->getWindow(), 0, (LONG_PTR)this);
+    this->settings = new Settings(m_pszName);
+
+    DrawableSettings* defaults = new DrawableSettings();
+    m_pWindow = new DrawableWindow(NULL, g_szTrayHandler, g_hInstance, this->settings, defaults);
+
+    SetWindowLongPtr(m_pWindow->GetWindow(), 0, (LONG_PTR)this);
     m_pWindow->Show();
 
     LoadSettings();
@@ -42,7 +45,7 @@ Tray::~Tray() {
     m_icons.clear();
 
     if (m_pWindow) delete m_pWindow;
-    if (m_pPaintSettings) delete m_pPaintSettings;
+    if (this->settings) delete this->settings;
     free((void *)m_pszName);
 }
 
@@ -51,10 +54,9 @@ Tray::~Tray() {
 /// Loads settings from LiteStep's RC files.
 /// </summary>
 void Tray::LoadSettings(bool /* bIsRefresh */) {
-    Settings* pSettings = m_pPaintSettings->GetSettings();
-    pSettings->GetOffsetRect("MarginLeft", "MarginTop", "MarginRight", "MarginBottom", &m_rMargin, 2, 2, 5, 2);
-    m_iColSpacing = pSettings->GetInt("ColumnSpacing", 2);
-    m_iRowSpacing = pSettings->GetInt("RowSpacing", 2);
+    this->settings->GetOffsetRect("MarginLeft", "MarginTop", "MarginRight", "MarginBottom", &m_rMargin, 2, 2, 5, 2);
+    m_iColSpacing = this->settings->GetInt("ColumnSpacing", 2);
+    m_iRowSpacing = this->settings->GetInt("RowSpacing", 2);
 }
 
 
@@ -62,7 +64,7 @@ void Tray::LoadSettings(bool /* bIsRefresh */) {
 /// Adds the specified icon to this tray.
 /// </summary>
 TrayIcon* Tray::AddIcon(LPLSNOTIFYICONDATA pNID) {
-    TrayIcon* tIcon = new TrayIcon(m_pWindow->getWindow(), m_pszName, pNID);
+    TrayIcon* tIcon = new TrayIcon(m_pWindow->GetWindow(), pNID, this->settings);
     m_icons.push_back(tIcon);
     Relayout();
     tIcon->Show();
@@ -102,7 +104,7 @@ void Tray::RemoveIcon(TrayIcon* pIcon) {
 void Tray::Relayout() {
     int x = m_rMargin.left;
     int y = m_rMargin.top;
-    int wrapwidth = m_pPaintSettings->position.right - m_pPaintSettings->position.left - m_rMargin.right - 20;
+    int wrapwidth = this->m_pWindow->GetSettings()->width - m_rMargin.right - 20;
 
     for (vector<TrayIcon*>::const_iterator iter = m_icons.begin(); iter != m_icons.end(); iter++) {
         (*iter)->Reposition(x, y, 20, 20);
@@ -122,9 +124,9 @@ LRESULT WINAPI Tray::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_MOUSEMOVE:
         if (IsWindow(g_hWndTrayNotify)) {
-            MoveWindow(g_hWndTrayNotify, m_pPaintSettings->position.left, m_pPaintSettings->position.right,
-                m_pPaintSettings->position.left - m_pPaintSettings->position.right,
-                m_pPaintSettings->position.bottom - m_pPaintSettings->position.top, FALSE);
+            DrawableSettings* settings = this->m_pWindow->GetSettings();
+            MoveWindow(g_hWndTrayNotify, settings->x, settings->y,
+                settings->width, settings->height, FALSE);
         }
     default:
         return m_pWindow->HandleMessage(uMsg, wParam, lParam);

@@ -11,6 +11,7 @@
 #include <map>
 #include "TrayIcon.hpp"
 #include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Settings.hpp"
 
 using std::map;
 
@@ -34,7 +35,7 @@ private:
     DrawableWindow* m_pWindow;
 
     // Settings for painting the tray background
-    PaintSettings* m_pPaintSettings;
+    Settings* settings;
 
     // The tray icons
     vector<TrayIcon*> m_icons;

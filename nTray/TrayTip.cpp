@@ -40,5 +40,5 @@ LRESULT WINAPI TrayTip::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 
 HWND TrayTip::GetHWND() {
-    return m_pWindow->getWindow();
+    return m_pWindow->GetWindow();
 }

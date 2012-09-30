@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Versioning.h                                                    July, 2012
+ *  Versioning.h
  *  The nModules Project
  *
  *  Functions for dealing with versioning.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef VERSIONING_H
-#define VERSIONING_H
+#pragma once
 
 typedef DWORDLONG VERSION;
 
@@ -20,5 +19,3 @@ USHORT GetMinorVersion(VERSION);
 USHORT GetPatchVersion(VERSION);
 USHORT GetBuildVersion(VERSION);
 HRESULT GetVersionString(VERSION, LPSTR, size_t, bool=false);
-
-#endif /* VERSIONING_H */

@@ -21,9 +21,9 @@ Taskbar::Taskbar(LPCSTR pszName) {
     m_pszName = pszName;
     LoadSettings();
 
-    m_pPaintSettings = new PaintSettings(m_pszName);
-    m_pWindow = new DrawableWindow(NULL, g_szTaskbarHandler, m_pPaintSettings, g_hInstance);
-    SetWindowLongPtr(m_pWindow->getWindow(), 0, (LONG_PTR)this);
+    this->settings = new Settings(m_pszName);
+    m_pWindow = new DrawableWindow(NULL, g_szTaskbarHandler, g_hInstance, this->settings, new DrawableSettings());
+    SetWindowLongPtr(m_pWindow->GetWindow(), 0, (LONG_PTR)this);
     m_pWindow->Show();
 }
 
@@ -39,7 +39,7 @@ Taskbar::~Taskbar() {
     m_buttons.clear();
 
     if (m_pWindow) delete m_pWindow;
-    if (m_pPaintSettings) delete m_pPaintSettings;
+    if (this->settings) delete this->settings;
     free((void *)m_pszName);
 }
 
@@ -59,7 +59,7 @@ void Taskbar::LoadSettings(bool /* bIsRefresh */) {
 /// </summary>
 TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout) {
     if (monitor == m_uMonitor || m_uMonitor == -1) {
-        TaskButton* pButton = new TaskButton(m_pWindow->getWindow(), hWnd, m_pszName, m_pPaintSettings->CreateChild("Button"));
+        TaskButton* pButton = new TaskButton(m_pWindow->GetWindow(), hWnd, m_pszName, this->settings);
         m_buttons.insert(m_buttons.end(), std::pair<HWND, TaskButton*>(hWnd, pButton));
 
         if (hWnd == GetForegroundWindow()) {
@@ -124,11 +124,11 @@ bool Taskbar::MonitorChanged(HWND hWnd, UINT monitor, TaskButton** pOut) {
 /// Repositions/Resizes all buttons.  
 /// </summary>
 void Taskbar::Relayout() {
-    UINT taskbarWidth = m_pPaintSettings->position.right - m_pPaintSettings->position.left;
+    UINT taskbarWidth = this->m_pWindow->GetSettings()->width;
     UINT buttonWidth = m_buttons.empty() ? m_uMaxButtonWidth : min(m_uMaxButtonWidth, (taskbarWidth-5)/(UINT)m_buttons.size());
     UINT startPos = 5;
     for (map<HWND, TaskButton*>::const_iterator iter = m_buttons.begin(); iter != m_buttons.end(); iter++) {
-        iter->second->Reposition(startPos, 5, buttonWidth-5, m_pPaintSettings->position.bottom - m_pPaintSettings->position.top - 10);
+        iter->second->Reposition(startPos, 5, buttonWidth-5, this->m_pWindow->GetSettings()->height - 10);
         startPos += buttonWidth;
         iter->second->Show();
     }

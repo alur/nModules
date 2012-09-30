@@ -12,7 +12,7 @@
 
 class TrayIcon {
 public:
-    explicit TrayIcon(HWND parent, LPCSTR prefix, LPLSNOTIFYICONDATA pNID);
+    explicit TrayIcon(HWND parent, LPLSNOTIFYICONDATA pNID, Settings* parentSettings);
     virtual ~TrayIcon();
 
     void Reposition(UINT x, UINT y, UINT width, UINT height);
@@ -30,7 +30,7 @@ private:
     DrawableWindow* m_pWindow;
 
     // Settings for painting the icon
-    PaintSettings* m_pPaintSettings;
+    Settings* settings;
 
     //
     LPLSNOTIFYICONDATA m_pNotifyData;

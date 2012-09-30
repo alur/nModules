@@ -27,18 +27,19 @@ IconGroup::IconGroup() {
     // Initalize all variables.
     this->changeNotifyUID = 0;
 
-    this->paintSettings = new PaintSettings("DesktopIcons");
-    this->paintSettings->position.bottom = 1100;
-    this->paintSettings->position.top = 50;
-    this->paintSettings->position.left = 1970;
-    this->paintSettings->position.right = 3790;
-    this->paintSettings->setText(L"");
-    this->paintSettings->backColor = this->paintSettings->ARGBToD2DColor(0x2200FF00);
+    this->settings = new Settings("DesktopIcons");
 
-    this->paintSettings->GetSettings()->GetString("Folder", path, sizeof(path), "Desktop");
+    DrawableSettings* defaults = new DrawableSettings();
+    defaults->x = 1970;
+    defaults->y = 50;
+    defaults->width = 1820;
+    defaults->height = 1100;
+    defaults->color = 0x2200FF00;
 
-    this->window = new DrawableWindow(FindWindow("DesktopBackgroundClass", ""), g_szGroupHandler, this->paintSettings, g_hInstance);
-    SetWindowLongPtr(this->window->getWindow(), 0, (LONG_PTR)this);
+    this->settings->GetString("Folder", path, sizeof(path), "Desktop");
+
+    this->window = new DrawableWindow(FindWindow("DesktopBackgroundClass", ""), g_szGroupHandler, g_hInstance, this->settings, defaults);
+    SetWindowLongPtr(this->window->GetWindow(), 0, (LONG_PTR)this);
     this->window->Show();
 
     SetFolder(path);
@@ -55,7 +56,7 @@ IconGroup::~IconGroup() {
     SAFERELEASE(this->workingFolder);
     SAFERELEASE(this->rootFolder);
     SAFEDELETE(this->window);
-    SAFEDELETE(this->paintSettings);
+    SAFEDELETE(this->settings);
 }
 
 
@@ -94,7 +95,7 @@ void IconGroup::SetFolder(LPWSTR folder) {
     // Register for change notifications
     SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
     this->changeNotifyUID = SHChangeNotifyRegister(
-        this->window->getWindow(),
+        this->window->GetWindow(),
         SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
         SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM,
         WM_SHCHANGE_NOTIFY,
@@ -138,7 +139,7 @@ void IconGroup::AddIcon(PCUITEMID_CHILD pidl) {
 
 
 void IconGroup::PositionIcon(PCUITEMID_CHILD pidl, D2D1_RECT_F* position) {
-    static int pos = 0;
+    static float pos = 0;
     position->bottom = 64;
     position->left = 0 + pos;
     position->right = 64 + pos;

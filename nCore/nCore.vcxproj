@@ -150,7 +150,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="KnownColors.h" />
     <ClInclude Include="nCore.h" />
     <ClInclude Include="TextFormatting.h" />
   </ItemGroup>

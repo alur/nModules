@@ -5,81 +5,142 @@
  *  Function declarations for the DrawableWindow class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef DRAWABLEWINDOW_HPP
-#define DRAWABLEWINDOW_HPP
+#pragma once
 
-#include "PaintSettings.hpp"
+#include "DrawableSettings.hpp"
 #include <d2d1.h>
 #include <vector>
+#include <list>
 
 using std::vector;
+using std::list;
 
 class DrawableWindow {
 public:
-    explicit DrawableWindow(HWND, LPCSTR, PaintSettings*, HINSTANCE);
+    enum STATES {
+        STATE_HOVER,
+        STATE_ACTIVE,
+        STATE_
+    };
+
+    // Constructor
+    explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings *settings, DrawableSettings* defaultSettings);
+
+    // Destructor
     virtual ~DrawableWindow();
 
-    HWND getWindow();
+    // Returns the window handle.
+    HWND GetWindow();
 
+    // Handles window messages.
     LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
+
+    // Returns the 
+    DrawableSettings* GetSettings();
+
+    // Returns the settings for the specified state.
+    DrawableSettings* GetSettings(DWORD state);
+
+    // 
     void UpdatePosition();
 
+    //
+    DWORD AddState(LPCSTR prefix, DrawableSettings* defaultSettings);
+
+    //
+    void ActiveState(DWORD state);
+
+    //
+    void ClearState(DWORD state);
+
+    //
     HRESULT AddOverlay(D2D1_RECT_F, HICON);
+
+    //
     void PurgeOverlays();
+
+    //
     void UpdateOverlay(LPVOID, HICON);
+
+    //
     void UpdateBrushes();
+
+    //
     void Repaint();
+
+    //
     void Show();
 
 private:
     // All we need in order to paint some type of overlay
-    typedef struct Overlay {
+    typedef struct {
         D2D1_RECT_F position;
-        ID2D1Brush *brush;
-        ID2D1Bitmap *bitmap;
+        ID2D1Brush* brush;
     } Overlay;
 
-    // The screen position of the window
-    RECT m_scPosition;
+    //
+    typedef struct {
+        DWORD state;
+        int priority;
+        Settings* settings;
+        DrawableSettings* drawingSettings;
+        DrawableSettings* defaultSettings;
+    } State;
 
-    // 
-    vector<Overlay> m_overlays;
+    // Creates the window
+    bool CreateWnd(LPCSTR, HINSTANCE);
+
+    // Loads RC settings
+    void LoadSettings();
+
+    // The screen position of the window
+    RECT scPosition;
+
+    // All current overlays
+    vector<Overlay> overlays;
+
+    // All current states
+    list<State> states;
 
     // The HWND we are rendering to
-    HWND m_hWnd;
+    HWND window;
 
     // The parent of this window
-    HWND m_hWndParent;
+    HWND parent;
+
+    // Settings for this window
+    Settings* settings;
+
+    // The current drawing settings we are using
+    DrawableSettings* drawingSettings;
+
+    // The default drawing settings
+    DrawableSettings* defaultDrawingSettings;
 
     // 
-    PaintSettings* m_pPaintSettings;
+    ID2D1HwndRenderTarget* renderTarget;
 
-    //
-    ID2D1HwndRenderTarget *m_pRenderTarget;
+    // The brush we are currently painting the background with.
+    ID2D1Brush* backBrush;
 
-    //
-    ID2D1Brush *m_pBackBrush;
+    // The brush we are currently painting the text with.
+    ID2D1Brush* textBrush;
 
-    //
-    ID2D1Brush *m_pTextBrush;
-
-    //
-    IDWriteTextFormat *m_pTextFormat;
+    // 
+    IDWriteTextFormat* textFormat;
 
     // The text we are currently drawing
-    LPCSTR m_pszText;
+    LPCWSTR text;
 
     // 
-    D2D1_RECT_F m_backArea;
+    D2D1_RECT_F backArea;
 
-    //
-    D2D1_RECT_F m_textArea;
+    // 
+    D2D1_RECT_F textArea;
 
-    //
-    HRESULT SetBlur(bool);
+    // 
+    DWRITE_TEXT_ALIGNMENT textAlignment;
 
-    //
-    bool CreateWnd(LPCSTR, HINSTANCE);
+    // 
+    DWRITE_PARAGRAPH_ALIGNMENT textVerticalAlignment;
 };
-
-#endif /* DRAWABLEWINDOW_HPP */

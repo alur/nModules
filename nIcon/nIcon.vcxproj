@@ -150,14 +150,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="DirectoryManager.hpp" />
     <ClInclude Include="Icon.hpp" />
     <ClInclude Include="IconGroup.hpp" />
     <ClInclude Include="IIconEventHandler.hpp" />
     <ClInclude Include="nIcon.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DirectoryManager.cpp" />
     <ClCompile Include="Icon.cpp" />
     <ClCompile Include="IconGroup.cpp" />
     <ClCompile Include="nIcon.cpp" />

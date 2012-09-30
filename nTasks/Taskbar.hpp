@@ -37,7 +37,7 @@ private:
     DrawableWindow* m_pWindow;
 
     // Settings for painting the taskbar background
-    PaintSettings* m_pPaintSettings;
+    Settings* settings;
 
     // The taskbar buttons
     map<HWND, TaskButton*> m_buttons;

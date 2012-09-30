@@ -18,7 +18,7 @@ extern LPCSTR g_szTrayIconHandler;
 /// <summary>
 /// Constructor
 /// </summary>
-TrayIcon::TrayIcon(HWND parent, LPCSTR prefix, LPLSNOTIFYICONDATA pNID) {
+TrayIcon::TrayIcon(HWND parent, LPLSNOTIFYICONDATA pNID, Settings* parentSettings) {
     //
     LoadSettings();
 
@@ -26,9 +26,9 @@ TrayIcon::TrayIcon(HWND parent, LPCSTR prefix, LPLSNOTIFYICONDATA pNID) {
     m_pNotifyData = pNID;
 
     // Create the drawable window
-    m_pPaintSettings = new PaintSettings("TrayIcon");
-    m_pWindow = new DrawableWindow(parent, g_szTrayIconHandler, m_pPaintSettings, g_hInstance);
-    SetWindowLongPtr(m_pWindow->getWindow(), 0, (LONG_PTR)this);
+    this->settings = parentSettings->CreateChild("Icon");
+    m_pWindow = new DrawableWindow(parent, g_szTrayIconHandler, g_hInstance, this->settings, new DrawableSettings());
+    SetWindowLongPtr(m_pWindow->GetWindow(), 0, (LONG_PTR)this);
 
     //
     UpdateIcon();
@@ -40,7 +40,7 @@ TrayIcon::TrayIcon(HWND parent, LPCSTR prefix, LPLSNOTIFYICONDATA pNID) {
 /// </summary>
 TrayIcon::~TrayIcon() {
     if (m_pWindow) delete m_pWindow;
-    if (m_pPaintSettings) delete m_pPaintSettings;
+    if (this->settings) delete this->settings;
 }
 
 
@@ -64,7 +64,7 @@ void TrayIcon::Show() {
 /// Retrives the icon's HWND.
 /// </summary>
 HWND TrayIcon::GetHWND() {
-    return m_pWindow->getWindow();
+    return m_pWindow->GetWindow();
 }
 
 
@@ -85,10 +85,11 @@ void TrayIcon::UpdateIcon() {
 /// Repositions the icon.
 /// </summary>
 void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height) {
-    m_pPaintSettings->position.left = x;
-    m_pPaintSettings->position.top = y;
-    m_pPaintSettings->position.right = x + width;
-    m_pPaintSettings->position.bottom = y + height;
+    DrawableSettings* drawableSettings = this->m_pWindow->GetSettings();
+    drawableSettings->x = x;
+    drawableSettings->y = y;
+    drawableSettings->width = width;
+    drawableSettings->height = height;
     m_pWindow->UpdatePosition();
 }
 
@@ -99,7 +100,7 @@ void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height) {
 void TrayIcon::SendCallback(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (m_pNotifyData->uVersion >= 4) {
         RECT r;
-        GetWindowRect(m_pWindow->getWindow(), &r);
+        GetWindowRect(m_pWindow->GetWindow(), &r);
         PostMessage(m_pNotifyData->hWnd, m_pNotifyData->uCallbackMessage, (WPARAM)MAKEWPARAM(r.left, r.top), (LPARAM)MAKELPARAM(uMsg, m_pNotifyData->uID));
     }
     else {

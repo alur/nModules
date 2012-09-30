@@ -27,7 +27,7 @@ private:
     DrawableWindow* m_pWindow;
 
     // PaintSettings
-    PaintSettings* m_pPaintSettings;
+    Settings* settings;
 
     // The parent window
     HWND m_hWndParent;

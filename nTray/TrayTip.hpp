@@ -28,7 +28,7 @@ private:
     DrawableWindow* m_pWindow;
 
     // Settings for painting the tip
-    PaintSettings* m_pPaintSettings;
+    Settings* settings;
 };
 
 #endif /* TRAYTIP_HPP */

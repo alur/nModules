@@ -13,16 +13,10 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Painting">
-      <UniqueIdentifier>{d4201038-6f4f-43f4-8986-13953a6eb8e3}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="nCore.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="KnownColors.h">
-      <Filter>Header Files\Painting</Filter>
     </ClInclude>
     <ClInclude Include="TextFormatting.h">
       <Filter>Header Files</Filter>

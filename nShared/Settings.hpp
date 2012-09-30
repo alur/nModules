@@ -25,6 +25,7 @@ public:
     
     bool GetString(LPCSTR key, LPSTR pszDest, UINT cchDest, LPCSTR pszDefault);
     bool GetString(LPCSTR key, LPWSTR pszwDest, UINT cchDest, LPCSTR pszDefault);
+    bool GetString(LPCSTR key, LPWSTR pszwDest, UINT cchDest, LPCWSTR pszDefault);
     void SetString(LPCSTR key, LPCSTR pszValue);
     
     int GetInt(LPCSTR key, int iDefault);

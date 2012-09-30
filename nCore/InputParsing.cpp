@@ -8,7 +8,7 @@
 #include <strsafe.h>
 #include "../headers/lsapi.h"
 #include "../nShared/Export.h"
-#include "KnownColors.h"
+#include "../nShared/Color.h"
 
 
 /// <summary>
@@ -154,6 +154,7 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR pszColor, ARGB* target) {
     }
 
     // Known colors
+    Color::KnownColor* knownColors = Color::GetKnownColors();
     for (int i = 0; knownColors[i].name != NULL; i++) {
         if (_stricmp(pszColor, knownColors[i].name) == 0) {
             *target = knownColors[i].color;
