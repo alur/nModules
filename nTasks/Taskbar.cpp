@@ -19,9 +19,10 @@ extern LPCSTR g_szTaskbarHandler;
 /// </summary>
 Taskbar::Taskbar(LPCSTR pszName) {
     m_pszName = pszName;
-    LoadSettings();
 
     this->settings = new Settings(m_pszName);
+    LoadSettings();
+    
     m_pWindow = new DrawableWindow(NULL, g_szTaskbarHandler, g_hInstance, this->settings, new DrawableSettings());
     SetWindowLongPtr(m_pWindow->GetWindow(), 0, (LONG_PTR)this);
     m_pWindow->Show();
