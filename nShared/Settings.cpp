@@ -126,6 +126,17 @@ Settings* Settings::GreateGroup(LPCSTR pszPrev[]) {
 
 
 /// <summary>
+/// Appends the specified prefix to the end of the group list. Essentially, lets these
+/// settings fall back to that group as a default.
+/// </summary>
+void Settings::AppendGroup(LPCSTR prefix) {
+    Settings* tail;
+    for (tail = this; tail->group != NULL; tail = tail->group);
+    tail->group = new Settings(prefix);
+}
+
+
+/// <summary>
 /// Get's a color from a prefixed RC value.
 /// </summary>
 /// <param name="pszSetting">The RC setting to parse.</param>

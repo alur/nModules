@@ -52,6 +52,8 @@ private:
     bool m_bIsActive;
     bool m_bIsFlashing;
 
+    DrawableWindow::STATE stateHover, stateActive, stateFlashing;
+
     HICON m_hIcon;
 
     HMENU hMenu;

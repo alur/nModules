@@ -4,6 +4,8 @@
  *
  *  A generic drawable window.
  *  
+ *  TODO::Possibly implement the default settings as a state. 
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include <strsafe.h>
 #include "../headers/lsapi.h"
@@ -32,6 +34,8 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instan
     this->settings = settings;
     this->drawingSettings = new DrawableSettings();
     this->defaultDrawingSettings = defaultSettings;
+    this->nextState = 1;
+    this->activeState = this->states.end();
 
     LoadSettings();
 
@@ -48,6 +52,13 @@ DrawableWindow::~DrawableWindow() {
     if (this->window) {
         DestroyWindow(this->window);
     }
+
+    for (STATE iter = this->states.begin(); iter != this->states.end(); iter++) {
+        SAFEDELETE(iter->defaultSettings);
+        SAFEDELETE(iter->drawingSettings);
+        SAFEDELETE(iter->settings);
+    }
+    this->states.clear();
 
     SAFEDELETE(this->drawingSettings);
     SAFEDELETE(this->defaultDrawingSettings);
@@ -100,6 +111,75 @@ HWND DrawableWindow::GetWindow() {
 void DrawableWindow::Repaint() {
     InvalidateRect(this->window, NULL, TRUE);
     UpdateWindow(this->window);
+}
+
+
+/// <summary>
+/// Adds a new state.
+/// </summary>
+DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority) {
+    State state;
+    state.defaultSettings = defaultSettings;
+    state.settings = settings->CreateChild(prefix);
+    state.settings->AppendGroup(settings->prefix);
+    state.priority = state.settings->GetInt("Priority", defaultPriority);
+    state.state = nextState <<= 1;
+    state.active = false;
+    state.drawingSettings = new DrawableSettings();
+
+    state.drawingSettings->Load(state.settings, defaultSettings);
+
+    // Insert the state based on its priority.
+    list<State>::iterator iter;
+    for (iter = states.begin(); iter != states.end() && iter->priority < state.priority; iter++);
+    return states.insert(iter, state);
+}
+
+
+/// <summary>
+/// Actives a certain state.
+/// </summary>
+void DrawableWindow::ActivateState(DrawableWindow::STATE state) {
+    STATE iter = state;
+    if (this->activeState == this->states.end() || this->activeState->priority > iter->priority) {
+        this->activeState = iter;
+        HandleActiveStateChange();
+    }
+}
+
+
+/// <summary>
+/// Clears a certain state.
+/// </summary>
+void DrawableWindow::ClearState(DrawableWindow::STATE state) {
+    STATE iter = state;
+    iter->active = false;
+    if (iter == this->activeState) {
+        // We just cleared the active state, find the highest priority next active state.
+        for (iter++; iter != this->states.end() && !iter->active; iter++);
+        this->activeState = iter;
+        HandleActiveStateChange();
+    }
+}
+
+
+/// <summary>
+/// Clears a certain state.
+/// </summary>
+void DrawableWindow::HandleActiveStateChange() {
+    DrawableSettings* drawSettings;
+    if (this->activeState == this->states.end()) {
+        drawSettings = this->drawingSettings;
+    }
+    else {
+        drawSettings = this->activeState->drawingSettings;
+    }
+
+    // TODO::Really should update all settings.
+    ID2D1SolidColorBrush *backBrush = reinterpret_cast<ID2D1SolidColorBrush*>(this->backBrush);
+    backBrush->SetColor(Color::ARGBToD2D(drawSettings->color));
+
+    Repaint();
 }
 
 

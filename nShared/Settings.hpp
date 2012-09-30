@@ -18,6 +18,8 @@ public:
 
     Settings* CreateChild(LPCSTR prefix);
 
+    void AppendGroup(LPCSTR prefix);
+
     ARGB GetColor(LPCSTR key, ARGB defValue);
     D2D_COLOR_F GetColor(LPCSTR key, D2D_COLOR_F defValue);
     void SetColor(LPCSTR key, ARGB colorValue);
@@ -50,15 +52,15 @@ public:
     void GetOffsetRect(LPCSTR pszLeft, LPCSTR pszTop, LPCSTR pszRight, LPCSTR pszBottom, LPRECT pDest, LPRECT pDefault);
     void GetOffsetRect(LPCSTR pszLeft, LPCSTR pszTop, LPCSTR pszRight, LPCSTR pszBottom, LPRECT pDest, int defLeft, int defTop, int defRight, int defBottom);
     void SetOfsetRect(LPCSTR pszLeft, LPCSTR pszTop, LPCSTR pszRight, LPCSTR pszBottom, LPRECT pValue);
+
+    // The fully specified prefix to read settings from the RC files with.
+    LPCSTR prefix;
     
 private:
 	explicit Settings(LPCSTR pszPrefix, LPCSTR pszPrev[]);
 
     // Creates the Settings* for this settings group.
 	Settings* GreateGroup(LPCSTR pszPrev[]);
-
-    // The fully specified prefix to read settings from the RC files with.
-    LPCSTR prefix;
 
     //
     Settings* group;

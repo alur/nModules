@@ -17,11 +17,17 @@ using std::list;
 
 class DrawableWindow {
 public:
-    enum STATES {
-        STATE_HOVER,
-        STATE_ACTIVE,
-        STATE_
-    };
+        //
+    typedef struct {
+        DWORD state;
+        int priority;
+        bool active;
+        Settings* settings;
+        DrawableSettings* drawingSettings;
+        DrawableSettings* defaultSettings;
+    } State;
+
+    typedef list<State>::iterator STATE;
 
     // Constructor
     explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings *settings, DrawableSettings* defaultSettings);
@@ -45,13 +51,13 @@ public:
     void UpdatePosition();
 
     //
-    DWORD AddState(LPCSTR prefix, DrawableSettings* defaultSettings);
+    STATE AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority);
 
     //
-    void ActiveState(DWORD state);
+    void ActivateState(STATE state);
 
     //
-    void ClearState(DWORD state);
+    void ClearState(STATE state);
 
     //
     HRESULT AddOverlay(D2D1_RECT_F, HICON);
@@ -78,20 +84,14 @@ private:
         ID2D1Brush* brush;
     } Overlay;
 
-    //
-    typedef struct {
-        DWORD state;
-        int priority;
-        Settings* settings;
-        DrawableSettings* drawingSettings;
-        DrawableSettings* defaultSettings;
-    } State;
-
     // Creates the window
     bool CreateWnd(LPCSTR, HINSTANCE);
 
     // Loads RC settings
     void LoadSettings();
+
+    // 
+    void HandleActiveStateChange();
 
     // The screen position of the window
     RECT scPosition;
@@ -101,6 +101,12 @@ private:
 
     // All current states
     list<State> states;
+
+    // The currently active state, or states.end()
+    list<State>::iterator activeState;
+
+    // The next state to be returned from AddState
+    DWORD nextState;
 
     // The HWND we are rendering to
     HWND window;

@@ -32,6 +32,11 @@ TaskButton::TaskButton(HWND parent, HWND window, LPCSTR prefix, Settings* parent
 
     this->iconSettings = this->settings->CreateChild("Icon");
 
+    // Add states to the window
+    this->stateHover = this->m_pWindow->AddState("Hover", new DrawableSettings(), 100);
+    this->stateActive = this->m_pWindow->AddState("Active", new DrawableSettings(), 80);
+    this->stateFlashing = this->m_pWindow->AddState("Flashing", new DrawableSettings(), 50);
+
     // Configure the mouse tracking struct
     ZeroMemory(&m_TrackMouseStruct, sizeof(TRACKMOUSEEVENT));
     m_TrackMouseStruct.cbSize = sizeof(TRACKMOUSEEVENT);
@@ -107,8 +112,7 @@ void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
 /// </summary>
 void TaskButton::Activate() {
     m_bIsActive = true;
-    //m_pPaintSettings->OverLoad("Active");
-    //m_pWindow->UpdateBrushes();
+    this->m_pWindow->ActivateState(this->stateActive);
 }
 
 
@@ -117,8 +121,7 @@ void TaskButton::Activate() {
 /// </summary>
 void TaskButton::Deactivate() {
     m_bIsActive = false;
-    //m_pPaintSettings->OverLoad("");
-    //m_pWindow->UpdateBrushes();
+    this->m_pWindow->ClearState(this->stateActive);
 }
 
 
@@ -127,8 +130,7 @@ void TaskButton::Deactivate() {
 /// </summary>
 void TaskButton::Flash() {
     m_bIsFlashing = true;
-    //m_pPaintSettings->OverLoad("Flashing");
-    //m_pWindow->UpdateBrushes();
+    this->m_pWindow->ActivateState(this->stateFlashing);
 }
 
 
@@ -221,15 +223,13 @@ LRESULT WINAPI TaskButton::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam
         if (!m_bMouseIsOver) {
             m_bMouseIsOver = true;
             TrackMouseEvent(&m_TrackMouseStruct);
-            //m_pPaintSettings->OverLoad("Hover");
-            //m_pWindow->UpdateBrushes();
+            this->m_pWindow->ActivateState(this->stateHover);
         }
         return 0;
 
     case WM_MOUSELEAVE:
         m_bMouseIsOver = false;
-        //m_pPaintSettings->OverLoad(m_bIsActive  ? "Active" : "");
-        //m_pWindow->UpdateBrushes();
+        this->m_pWindow->ClearState(this->stateHover);
         return 0;
 
     default:
