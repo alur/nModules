@@ -204,6 +204,9 @@ void WindowManager::SetActive(HWND hWnd) {
             (*iter2)->Activate();
         }
     }
+    else if (IsTaskbarWindow(hWnd)) {
+        AddWindow(hWnd, 0);
+    }
 }
 
 
