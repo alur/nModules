@@ -14,16 +14,16 @@
 /// <summary>
 /// Parses a user inputed coordinate.
 /// </summary>
-/// <param name="pszCoordinate">The string to parse.</param>
+/// <param name="coordinate">The string to parse.</param>
 /// <param name="target">Pointer to an integer which will be set to the valid coordinate.</param>
 /// <param name="canBeRelative">Ttrue if the coordinate can be relative to a monitor.</param>
 /// <param name="canBeNegative">True if the coordinate can be negative.</param>
 /// <returns>True if szCoordinate is a valid coordinate.</return>
-EXPORT_CDECL(bool) ParseCoordinateEx(LPCSTR pszCoordinate, int * target, bool /* canBeRelative */ = true, bool canBeNegative = true) {
+EXPORT_CDECL(bool) ParseCoordinateEx(LPCSTR coordinate, int * target, bool /* canBeRelative */ = true, bool canBeNegative = true) {
     char * endPtr;
-    int i = strtol(pszCoordinate, &endPtr, 0);
+    int i = strtol(coordinate, &endPtr, 0);
 
-    if (*pszCoordinate == '\0' || *endPtr != '\0' || (!canBeNegative && i < 0)) {
+    if (*coordinate == '\0' || *endPtr != '\0' || (!canBeNegative && i < 0)) {
         return false;
     }
 
@@ -36,16 +36,16 @@ EXPORT_CDECL(bool) ParseCoordinateEx(LPCSTR pszCoordinate, int * target, bool /*
 /// <summary>
 /// Parses a user inputed length.
 /// </summary>
-/// <param name="pszLength">The string to parse.</param>
+/// <param name="length">The string to parse.</param>
 /// <param name="target">Pointer to an integer which will be set to the valid length.</param>
 /// <param name="canBeRelative">Ttrue if the length can be relative to a monitor.</param>
 /// <param name="canBeNegative">True if the length can be negative.</param>
 /// <returns>True if szLength is a valid length.</return>
-EXPORT_CDECL(bool) ParseLength(LPCSTR pszLength, int * target, bool /* canBeRelative */ = true, bool canBeNegative = false) {
+EXPORT_CDECL(bool) ParseLength(LPCSTR length, int * target, bool /* canBeRelative */ = true, bool canBeNegative = false) {
     char * endPtr;
-    int i = strtol(pszLength, &endPtr, 0);
+    int i = strtol(length, &endPtr, 0);
 
-    if (*pszLength == '\0' || *endPtr != '\0' || (!canBeNegative && i < 0)) {
+    if (*length == '\0' || *endPtr != '\0' || (!canBeNegative && i < 0)) {
         return false;
     }
 
@@ -58,33 +58,33 @@ EXPORT_CDECL(bool) ParseLength(LPCSTR pszLength, int * target, bool /* canBeRela
 /// <summary>
 /// Reads a prefixed integer value from an RC file
 /// </summary>
-EXPORT_CDECL(int) GetPrefixedRCInt(LPCSTR szPrefix, LPCSTR szOption, int nDefault) {
+EXPORT_CDECL(int) GetPrefixedRCInt(LPCSTR prefix, LPCSTR option, int default) {
     char szOptionName[MAX_LINE_LENGTH];
-    StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", szPrefix, szOption);
-    return GetRCInt(szOptionName, nDefault);
+    StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", prefix, option);
+    return GetRCInt(szOptionName, default);
 }
 
 
 /// <summary>
 /// Parses a monitor definition
 /// </summary>
-EXPORT_CDECL(bool) ParseMonitor(LPCSTR pszMonitor, UINT * target) {
-    if (_stricmp("primary", pszMonitor) == 0) *target = 0;
-    else if (_stricmp("secondary", pszMonitor) == 0) *target = 1;
-    else if (_stricmp("tertiary", pszMonitor) == 0) *target = 2;
-    else if (_stricmp("quaternary", pszMonitor) == 0) *target = 3;
-    else if (_stricmp("quinary", pszMonitor) == 0) *target = 4;
-    else if (_stricmp("senary", pszMonitor) == 0) *target = 5;
-    else if (_stricmp("septenary", pszMonitor) == 0) *target = 6;
-    else if (_stricmp("octonary", pszMonitor) == 0) *target = 7;
-    else if (_stricmp("nonary", pszMonitor) == 0) *target = 8;
-    else if (_stricmp("denary", pszMonitor) == 0) *target = 9;
-    else if (_stricmp("duodenary", pszMonitor) == 0) *target = 11;
+EXPORT_CDECL(bool) ParseMonitor(LPCSTR monitor, UINT * target) {
+    if (_stricmp("primary", monitor) == 0) *target = 0;
+    else if (_stricmp("secondary", monitor) == 0) *target = 1;
+    else if (_stricmp("tertiary", monitor) == 0) *target = 2;
+    else if (_stricmp("quaternary", monitor) == 0) *target = 3;
+    else if (_stricmp("quinary", monitor) == 0) *target = 4;
+    else if (_stricmp("senary", monitor) == 0) *target = 5;
+    else if (_stricmp("septenary", monitor) == 0) *target = 6;
+    else if (_stricmp("octonary", monitor) == 0) *target = 7;
+    else if (_stricmp("nonary", monitor) == 0) *target = 8;
+    else if (_stricmp("denary", monitor) == 0) *target = 9;
+    else if (_stricmp("duodenary", monitor) == 0) *target = 11;
     else {
         char * endPtr;
-        UINT u = strtoul(pszMonitor, &endPtr, 0);
+        UINT u = strtoul(monitor, &endPtr, 0);
 
-        if (*pszMonitor == '\0' || *endPtr != '\0') {
+        if (*monitor == '\0' || *endPtr != '\0') {
             return false;
         }
 
@@ -97,46 +97,46 @@ EXPORT_CDECL(bool) ParseMonitor(LPCSTR pszMonitor, UINT * target) {
 /// <summary>
 /// Utility function used by ParseColor
 /// </summary>
-inline bool _IsFunctionOf(LPCSTR pszSource, LPCSTR pszName) {
-    return _strnicmp(pszName, pszSource, strlen(pszName)) == 0 && pszSource[strlen(pszName)] == '(' &&  pszSource[strlen(pszSource)-1] == ')';
+inline bool _IsFunctionOf(LPCSTR source, LPCSTR name) {
+    return _strnicmp(name, source, strlen(name)) == 0 && source[strlen(name)] == '(' &&  source[strlen(source)-1] == ')';
 }
 
 
 /// <summary>
 /// Parses a user specified color.
 /// </summary>
-EXPORT_CDECL(bool) ParseColor(LPCSTR pszColor, ARGB* target) {
+EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
     // Useful information
-    size_t uLength;
-    StringCchLength(pszColor, MAX_LINE_LENGTH, &uLength);
+    size_t length;
+    StringCchLength(color, MAX_LINE_LENGTH, &length);
 
     // #RGB, #ARGB, #RRGGBB, #AARRGGBB
-    if (pszColor[0] == '#') {
+    if (color[0] == '#') {
         // Try to parse the input as a hex string
         char * endPtr;
-        ARGB color = strtoul(pszColor+1, &endPtr, 16);
+        ARGB colorValue = strtoul(color+1, &endPtr, 16);
         if (*endPtr != '\0')
             return false;
         
-        switch (uLength) {
+        switch (length) {
         case 4:
         case 5:
             // Alpha
-            *target = uLength == 4 ? 0xFF000000 : ((0xF000 & color) << 16 | (0xF000 & color) << 12);
+            *target = length == 4 ? 0xFF000000 : ((0xF000 & colorValue) << 16 | (0xF000 & colorValue) << 12);
             // Red
-            *target |= (0xF00 & color) << 12 | (0xF00 & color) << 8;
+            *target |= (0xF00 & colorValue) << 12 | (0xF00 & colorValue) << 8;
             // Green
-            *target |= (0xF0 & color) << 8 | (0xF0 & color) << 4;
+            *target |= (0xF0 & colorValue) << 8 | (0xF0 & colorValue) << 4;
             // Blue
-            *target |= (0xF & color) << 4 | (0xF & color);
+            *target |= (0xF & colorValue) << 4 | (0xF & colorValue);
             return true;
 
         case 7:
-            *target = 0xFF000000 | color;
+            *target = 0xFF000000 | colorValue;
             return true;
 
         case 9:
-            *target = color;
+            *target = colorValue;
             return true;
 
         default:
@@ -147,16 +147,16 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR pszColor, ARGB* target) {
     // TODO::RGB(), ARGB(), RGBA(), HSL(), AHSL(), HSLA()
 
     // TODO::Lighten, darken, saturate, desaturate, fadein, fadeout, spin, mix
-    if (_IsFunctionOf(pszColor, "lighten")) {
+    if (_IsFunctionOf(color, "lighten")) {
     }
 
-    if (_IsFunctionOf(pszColor, "darken")) {
+    if (_IsFunctionOf(color, "darken")) {
     }
 
     // Known colors
     Color::KnownColor* knownColors = Color::GetKnownColors();
     for (int i = 0; knownColors[i].name != NULL; i++) {
-        if (_stricmp(pszColor, knownColors[i].name) == 0) {
+        if (_stricmp(color, knownColors[i].name) == 0) {
             *target = knownColors[i].color;
             return true;
         }
@@ -170,23 +170,23 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR pszColor, ARGB* target) {
 /// <summary>
 /// String -> Bool
 /// </summary>
-EXPORT_CDECL(bool) ParseBool(LPCSTR pszBool) {
-    return lstrcmpi(pszBool, "off") && lstrcmpi(pszBool, "false") && lstrcmpi(pszBool, "no");
+EXPORT_CDECL(bool) ParseBool(LPCSTR boolean) {
+    return lstrcmpi(boolean, "off") && lstrcmpi(boolean, "false") && lstrcmpi(boolean, "no");
 }
 
 
 /// <summary>
 /// Reads a prefixed color value from an RC file
 /// </summary>
-EXPORT_CDECL(ARGB) GetPrefixedRCColor(LPCSTR szPrefix, LPCSTR szOption, ARGB nDefault) {
-    char szOptionName[MAX_LINE_LENGTH];
-    char szColor[MAX_LINE_LENGTH];
-    ARGB ret = nDefault;
+EXPORT_CDECL(ARGB) GetPrefixedRCColor(LPCSTR prefix, LPCSTR option, ARGB default) {
+    char optionName[MAX_LINE_LENGTH];
+    char color[MAX_LINE_LENGTH];
+    ARGB ret = default;
 
-    StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", szPrefix, szOption);
-    GetRCLine(szOptionName, szColor, sizeof(szColor), "");
+    StringCchPrintf(optionName, MAX_LINE_LENGTH, "%s%s", prefix, option);
+    GetRCLine(optionName, color, sizeof(color), "");
 
-    ParseColor(szColor, &ret);
+    ParseColor(color, &ret);
     return ret;
 }
 
@@ -194,10 +194,10 @@ EXPORT_CDECL(ARGB) GetPrefixedRCColor(LPCSTR szPrefix, LPCSTR szOption, ARGB nDe
 /// <summary>
 /// Reads a prefixed bool value from an RC file
 /// </summary>
-EXPORT_CDECL(bool) GetPrefixedRCBool(LPCSTR szPrefix, LPCSTR szOption, bool bDefault) {
-    char szOptionName[MAX_LINE_LENGTH];
-    StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", szPrefix, szOption);
-    return GetRCBoolDef(szOptionName, bDefault) != FALSE;
+EXPORT_CDECL(bool) GetPrefixedRCBool(LPCSTR prefix, LPCSTR option, bool default) {
+    char optionName[MAX_LINE_LENGTH];
+    StringCchPrintf(optionName, MAX_LINE_LENGTH, "%s%s", prefix, option);
+    return GetRCBoolDef(optionName, default) != FALSE;
 }
 
 

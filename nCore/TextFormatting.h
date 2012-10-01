@@ -7,11 +7,11 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-typedef VOID (__cdecl * FORMATTINGPROC)(HWND hwndOwner, LPCSTR pszArgs);
+typedef VOID (__cdecl * FORMATTINGPROC)(HWND owner, LPCSTR args);
 EXPORT_CDECL(BOOL) RegisterTextFormatter(LPCSTR, FORMATTINGPROC);
 EXPORT_CDECL(BOOL) UnregisterTextFormatter(LPCSTR, FORMATTINGPROC);
 
-FORMATTINGPROC FindFormatter(LPCSTR pszFunc);
+FORMATTINGPROC FindFormatter(LPCSTR func);
 
 // Valid formats:
 // [Function]
