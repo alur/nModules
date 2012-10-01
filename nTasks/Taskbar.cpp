@@ -50,7 +50,7 @@ Taskbar::~Taskbar() {
 /// </summary>
 void Taskbar::LoadSettings(bool /* isRefresh */) {
     m_uMaxButtonWidth = this->settings->GetInt("MaxButtonWidth", 500);
-    m_uMonitor = this->settings->GetMonitor("Monitor", (UINT)-1);
+    m_uMonitor = this->settings->GetMonitor("Monitor", 0xFFFFFFFF);
 }
 
 
@@ -58,7 +58,7 @@ void Taskbar::LoadSettings(bool /* isRefresh */) {
 /// Adds the specified task to this taskbar
 /// </summary>
 TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout) {
-    if (monitor == m_uMonitor || m_uMonitor == -1) {
+    if (monitor == m_uMonitor || m_uMonitor == 0xFFFFFFFF) {
         TaskButton* pButton = new TaskButton(m_pWindow->GetWindow(), hWnd, m_pszName, this->settings);
         m_buttons.insert(m_buttons.end(), std::pair<HWND, TaskButton*>(hWnd, pButton));
 
@@ -104,7 +104,7 @@ bool Taskbar::MonitorChanged(HWND hWnd, UINT monitor, TaskButton** pOut) {
     map<HWND, TaskButton*>::iterator iter = m_buttons.find(hWnd);
     *pOut = NULL;
     // If we should contain the task
-    if (monitor == m_uMonitor || m_uMonitor == -1) {
+    if (monitor == m_uMonitor || m_uMonitor == 0xFFFFFFFF) {
         if (iter == m_buttons.end()) {
             *pOut = AddTask(hWnd, monitor, false);
         }

@@ -148,7 +148,7 @@ void TaskButton::Show() {
 /// </summary>
 void TaskButton::Menu() {
     WINDOWPLACEMENT wp;
-
+    GetSystemMenu(m_hWnd, TRUE);
     hMenu = GetSystemMenu(m_hWnd, FALSE);
 
     ZeroMemory(&wp, sizeof(WINDOWPLACEMENT));

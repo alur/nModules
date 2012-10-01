@@ -80,6 +80,7 @@ EXPORT_CDECL(bool) ParseMonitor(LPCSTR monitor, UINT * target) {
     else if (_stricmp("nonary", monitor) == 0) *target = 8;
     else if (_stricmp("denary", monitor) == 0) *target = 9;
     else if (_stricmp("duodenary", monitor) == 0) *target = 11;
+    else if (_stricmp("all", monitor) == 0) *target = 0xFFFFFFFF;
     else {
         char * endPtr;
         UINT u = strtoul(monitor, &endPtr, 0);
