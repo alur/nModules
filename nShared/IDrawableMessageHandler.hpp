@@ -9,5 +9,5 @@
 
 class IDrawableMessageHandler {
 public:
-    virtual LRESULT HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
+    virtual LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
 };

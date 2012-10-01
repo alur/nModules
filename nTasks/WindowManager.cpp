@@ -204,7 +204,7 @@ void WindowManager::SetActive(HWND hWnd) {
             (*iter2)->Activate();
         }
     }
-    else if (IsTaskbarWindow(hWnd)) {
+    else if (IsTaskbarWindow(hWnd)) { // Steam...
         AddWindow(hWnd, 0);
     }
 }

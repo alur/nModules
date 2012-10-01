@@ -7,7 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../headers/lsapi.h"
 #include <strsafe.h>
-#include "../nShared/Export.h"
+#include "../nShared/Macros.h"
 #include "../nShared/Color.h"
 
 
