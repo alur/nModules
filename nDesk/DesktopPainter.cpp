@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*   DesktopPainter.cpp                                              July, 2012
+*   DesktopPainter.cpp
 *   The nModules Project
 *
 *   Paints the desktop.

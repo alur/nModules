@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TaskButton.hpp                                                  July, 2012
+ *  TaskButton.hpp
  *  The nModules Project
  *
  *  Declaration of the TaskButton class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef TASKBUTTON_HPP
-#define TASKBUTTON_HPP
+#pragma once
 
 #include "../nShared/DrawableWindow.hpp"
 
@@ -58,5 +57,3 @@ private:
 
     HMENU hMenu;
 };
-
-#endif /* TASKBUTTON_HPP */

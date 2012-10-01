@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TrayManager.h                                                   July, 2012
+ *  TrayManager.h
  *  The nModules Project
  *
  *  

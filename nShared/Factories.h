@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Factories.h                                                     July, 2012
+ *  Factories.h
  *  The nModules Project
  *
  *  Manages Direct2D/DirectWrite/WIC factories.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef FACTORIES_H
-#define FACTORIES_H
+#pragma once
 
 namespace Factories {
     HRESULT GetDWriteFactory(LPVOID* ppFactory);
@@ -14,5 +13,3 @@ namespace Factories {
     HRESULT GetWICFactory(LPVOID* ppFactory);
     void Release();
 }
-
-#endif /* FACTORIES_H */

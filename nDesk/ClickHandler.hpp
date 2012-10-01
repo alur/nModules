@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  ClickHandler.hpp                                                July, 2012
+ *  ClickHandler.hpp
  *  The nModules Project
  *
  *  Function declarations for the ClickHandler class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef CLICKHANDLER_HPP
-#define CLICKHANDLER_HPP
+#pragma once
 
 #include "../headers/lsapi.h"
 #include <vector>
@@ -51,5 +50,3 @@ private:
     WORD ModsFromString(LPSTR str);
     bool Matches(ClickData a, ClickData b);
 };
-
-#endif /* CLICKHANDLER_HPP */

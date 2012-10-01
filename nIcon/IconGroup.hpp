@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  IconGroup.hpp                                                 August, 2012
+ *  IconGroup.hpp
  *  The nModules Project
  *
  *  A group of icons. Essentially an *nIcon.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef ICONGROUP_HPP
-#define ICONGROUP_HPP
+#pragma once
 
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/Settings.hpp"
@@ -57,5 +56,3 @@ private:
     // IShellFolder for the root of the file system.
     IShellFolder2* rootFolder;
 };
-
-#endif /* ICONGROUP_HPP */

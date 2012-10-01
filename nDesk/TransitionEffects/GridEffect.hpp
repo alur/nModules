@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*  GridEffect.hpp                                                 August, 2012
+*  GridEffect.hpp
 *  The nModules Project
 *
 *  Function declarations for the GridEffect class.
 *  
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef GRIDEFFECT_HPP
-#define GRIDEFFECT_HPP
+#pragma once
 
 #include "../TransitionEffect.hpp"
 
@@ -53,5 +52,3 @@ private:
     // The number of squares in a row/column
     int m_iSquaresY, m_iSquaresX, m_iSquares;
 };
-
-#endif /* GRIDEFFECT_HPP */

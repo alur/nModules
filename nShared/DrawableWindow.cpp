@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableWindow.cpp                                              July, 2012
+ *  DrawableWindow.cpp
  *  The nModules Project
  *
  *  A generic drawable window.

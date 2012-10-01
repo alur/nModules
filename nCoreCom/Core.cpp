@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Core.cpp                                                        July, 2012
+ *  Core.cpp
  *  The nModules Project
  *
  *  Handles communication with nCore.

@@ -1,11 +1,10 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Settings.h                                                    August, 2012
+ *  Settings.h
  *  The nModules Project
  *  
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#pragma once
 
 #include "DesktopPainter.hpp"
 
@@ -14,5 +13,3 @@ namespace Settings {
     DesktopPainter::EasingType EasingFromString(LPCSTR pszTransition);
     DesktopPainter::TransitionType TransitionTypeFromString(LPCSTR pszTransition);
 }
-
-#endif /* SETTINGS_H */

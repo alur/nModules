@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TrayIcon.cpp                                                    July, 2012
+ *  TrayIcon.cpp
  *  The nModules Project
  *
  *  Implementation of the TrayIcon class. Represents a taskbar button.

@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nIcon.cpp                                                       July, 2012
+ *  nIcon.cpp
  *  The nModules Project
  *
  *  Main .cpp file for the nIcon module.

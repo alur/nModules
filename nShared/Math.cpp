@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Math.cpp                                                      August, 2012
+ *  Math.cpp
  *  The nModules Project
  *
  *  Math functions

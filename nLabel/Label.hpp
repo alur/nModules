@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Label.hpp                                                       July, 2012
+ *  Label.hpp
  *  The nModules Project
  *
  *  Declaration of the Label class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef LABEL_HPP
-#define LABEL_HPP
+#pragma once
 
 #include "../nShared/DrawableWindow.hpp"
 
@@ -32,5 +31,3 @@ private:
     // The parent window
     HWND m_hWndParent;
 };
-
-#endif /* LABEL_HPP */

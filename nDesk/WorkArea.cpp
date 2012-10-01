@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  WorkArea.cpp                                                    July, 2012
+ *  WorkArea.cpp
  *  The nModules Project
  *
  *  Functions dealing with the workarea

@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nLabel.h                                                        July, 2012
+ *  nLabel.h
  *  The nModules Project
  *
  *  Functions declarations for nLabel.cpp.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef NLABEL_H
-#define NLABEL_H
+#pragma once
 
 #include "../nShared/Export.h"
 
@@ -17,5 +16,3 @@ void LoadSettings();
 
 EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);
 EXPORT_CDECL(void) quitModule(HINSTANCE);
-
-#endif /* NLABEL_H */

@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*  SlideEffect.hpp                                                August, 2012
+*  SlideEffect.hpp
 *  The nModules Project
 *
 *  Function declarations for the SlideEffect class.
 *  
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef SLIDEEFFECT_HPP
-#define SLIDEEFFECT_HPP
+#pragma once
 
 #include "../TransitionEffect.hpp"
 
@@ -61,5 +60,3 @@ private:
     // Rectangle of the old image
     D2D1_RECT_F m_oldRect;
 };
-
-#endif /* SLIDEEFFECT_HPP */

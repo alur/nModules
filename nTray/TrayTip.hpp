@@ -1,13 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TrayTip.hpp                                                   August, 2012
+ *  TrayTip.hpp
  *  The nModules Project
  *
  *  Declaration of the TrayTip class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef TRAYTIP_HPP
-#define TRAYTIP_HPP
-
+#pragma once
 #include "../nShared/DrawableWindow.hpp"
 
 class TrayTip {
@@ -30,5 +28,3 @@ private:
     // Settings for painting the tip
     Settings* settings;
 };
-
-#endif /* TRAYTIP_HPP */

@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Factories.cpp                                                   July, 2012
+ *  Factories.cpp
  *  The nModules Project
  *
  *  Manages Direct2D/DirectWrite/... factories

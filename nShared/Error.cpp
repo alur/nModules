@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Error.cpp                                                       July, 2012
+ *  Error.cpp
  *  The nModules Project
  *
  *  Functions for dealing with errors.

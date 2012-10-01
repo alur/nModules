@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  MonitorInfo.cpp                                                 July, 2012
+ *  MonitorInfo.cpp
  *  The nModules Project
  *
  *  Provides information about the current monitor configuration.

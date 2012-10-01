@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  IIconEventHandler.hpp                                      September, 2012
+ *  IIconEventHandler.hpp
  *  The nModules Project
  *
  *  Interface for a class capable of handling events from Icon.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef IICONEVENTHANDLER_HPP
-#define IICONEVENTHANDLER_HPP
+#pragma once
 
 class IIconEventHandler {
 public:
@@ -14,5 +13,3 @@ public:
 	void IconEvent_Rename(LPVOID self, LPCSTR newName);
 	void IconEvent_Delete(LPVOID self);
 };
-
-#endif /* IICONEVENTHANDLER_HPP */

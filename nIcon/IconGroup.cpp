@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  IconGroup.cpp                                                 August, 2012
+ *  IconGroup.cpp
  *  The nModules Project
  *
  *  

@@ -1,13 +1,10 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Constants.h                                                     July, 2012
+ *  Constants.h
  *  The nModules Project
  *
  *  Constants and #defines
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#pragma once
 
 #define WM_UPDATE_DONE 1
-
-#endif /* CONSTANTS_H */

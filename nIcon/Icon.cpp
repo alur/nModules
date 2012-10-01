@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Icon.hpp                                                   September, 2012
+ *  Icon.cpp
  *  The nModules Project
  *
  *  A single icon in an IconGroup.

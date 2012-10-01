@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  InputParsing.cpp                                                July, 2012
+ *  InputParsing.cpp
  *  The nModules Project
  *
  *  Provides calls to the inputparsing functions of the core.

@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nIcon.h                                                         July, 2012
+ *  nIcon.h
  *  The nModules Project
  *
  *  Function declarations for nIcon
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef NICON_H
-#define NICON_H
+#pragma once
 
 #include "../nShared/Export.h"
 
@@ -16,5 +15,3 @@ LRESULT WINAPI GroupHandlerProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);
 EXPORT_CDECL(void) quitModule(HINSTANCE);
-
-#endif /* NICON_H */

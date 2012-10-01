@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Settings.cpp                                                  August, 2012
+ *  Settings.cpp
  *  The nModules Project
  *
  *  

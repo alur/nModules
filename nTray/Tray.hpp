@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Tray.hpp                                                        July, 2012
+ *  Tray.hpp
  *  The nModules Project
  *
  *  Declaration of the Tray class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef TRAY_HPP
-#define TRAY_HPP
+#pragma once
 
 #include <map>
 #include "TrayIcon.hpp"
@@ -51,5 +50,3 @@ private:
 
     int iconSize;
 };
-
-#endif /* TRAY_HPP */

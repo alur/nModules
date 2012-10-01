@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  ClickHandler.cpp                                                July, 2012
+ *  ClickHandler.cpp
  *  The nModules Project
  *
  *  Handles clicks on the desktop.

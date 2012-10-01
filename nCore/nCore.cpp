@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nCore.cpp                                                       July, 2012
+ *  nCore.cpp
  *  The nModules Project
  *
  *  Main .cpp file for the nCore module.

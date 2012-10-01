@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nDesk.h                                                         July, 2012
+ *  nDesk.h
  *  The nModules Project
  *
  *  Function declarations for nDesk
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef NDESK_H
-#define NDESK_H
+#pragma once
 
 #include "../headers/lsapi.h"
 #include <strsafe.h>
@@ -17,5 +16,3 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);
 EXPORT_CDECL(void) quitModule(HINSTANCE);
-
-#endif /* NDESK_H */

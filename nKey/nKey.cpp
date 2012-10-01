@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nKey.cpp                                                        July, 2012
+ *  nKey.cpp
  *  The nModules Project
  *
  *  Main .cpp file for the nKey module.

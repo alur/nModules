@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Debugging.h                                                     July, 2012
+ *  Debugging.h
  *  The nModules Project
  *
  *  Debugging macros and functions. Taken from the LiteStep core.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef DEBUGGING_H
-#define DEBUGGING_H
+#pragma once
 
 #include <assert.h>
 
@@ -43,5 +42,3 @@ void    DbgTraceWindowMessage(LPCSTR prefix, UINT msg, WPARAM wParam, LPARAM lPa
 #else
 #define DbgTraceWindowMessage(prefix, msg, wParam, lParam)
 #endif
-
-#endif /* DEBUGGING_H */

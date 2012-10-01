@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TrayTip.cpp                                                   August, 2012
+ *  TrayTip.cpp
  *  The nModules Project
  *
  *  

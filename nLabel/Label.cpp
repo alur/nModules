@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Label.cpp                                                       July, 2012
+ *  Label.cpp
  *  The nModules Project
  *
  *  Implementation of the Label class.

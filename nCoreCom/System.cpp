@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  System.cpp                                                      July, 2012
+ *  System.cpp
  *  The nModules Project
  *
  *  Description...

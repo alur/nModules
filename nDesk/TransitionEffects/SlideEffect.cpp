@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  SlideEffect.cpp                                               August, 2012
+ *  SlideEffect.cpp
  *  The nModules Project
  *
  *  Slides in/out

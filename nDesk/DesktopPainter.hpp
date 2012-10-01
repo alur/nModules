@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*   DesktopPainter.hpp                                              July, 2012
+*   DesktopPainter.hpp
 *   The nModules Project
 *
 *   Function declarations for the DesktopPainter class.
 *   
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef DESKTOPPAINTER_HPP
-#define DESKTOPPAINTER_HPP
+#pragma once
 
 #include <d2d1.h>
 #include "TransitionEffects.h"
@@ -115,5 +114,3 @@ private:
     // desktop background. Fixes issues with other modules (xModules).
     bool m_bInvalidateAllOnUpdate;
 };
-
-#endif /* DESKTOPPAINTER_HPP */

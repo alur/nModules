@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*  WindowManager.h                                                  July, 2012
+*  WindowManager.h
 *  The nModules Project
 *
 *  Monitors all existing top-level windows.
 *  
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef WINDOWMANAGER_H
-#define WINDOWMANAGER_H
+#pragma once
 
 namespace WindowManager {
     /// <summary>
@@ -38,5 +37,3 @@ namespace WindowManager {
     void UpdateWindow(HWND hWnd, LPARAM data);
     void UpdateWindowMonitors();
 }
-
-#endif /* WINDOWMANAGER_H */

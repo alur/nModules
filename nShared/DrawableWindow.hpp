@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableWindow.hpp                                              July, 2012
+ *  DrawableWindow.hpp
  *  The nModules Project
  *
  *  Function declarations for the DrawableWindow class.

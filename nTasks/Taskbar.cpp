@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Taskbar.cpp                                                     July, 2012
+ *  Taskbar.cpp
  *  The nModules Project
  *
  *  Implementation of the Taskbar class. Handles layout of the taskbar buttons.

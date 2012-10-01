@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nTask.cpp                                                       July, 2012
+ *  nTask.cpp
  *  The nModules Project
  *
  *  Main .cpp file for the nTask module.

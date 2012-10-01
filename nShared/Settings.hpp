@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Settings.hpp                                                  August, 2012
+ *  Settings.hpp
  *  The nModules Project
  *
  *  Declaration of the Settings class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef SETTINGS_HPP
-#define SETTINGS_HPP
+#pragma once
 
 typedef DWORD ARGB;
 #include <d2d1.h>
@@ -65,5 +64,3 @@ private:
     //
     Settings* group;
 };
-
-#endif /* SETTINGS_HPP */

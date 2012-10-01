@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TrayIcon.hpp                                                    July, 2012
+ *  TrayIcon.hpp
  *  The nModules Project
  *
  *  Declaration of the TrayIcon class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef TRAYICON_HPP
-#define TRAYICON_HPP
+#pragma once
 
 #include "../nShared/DrawableWindow.hpp"
 
@@ -37,5 +36,3 @@ private:
 
     int iconSize;
 };
-
-#endif /* TRAYICON_HPP */

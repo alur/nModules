@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Versioning.cpp                                                  July, 2012
+ *  Versioning.cpp
  *  The nModules Project
  *
  *  Functions for dealing with versioning.

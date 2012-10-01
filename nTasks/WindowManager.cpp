@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*  WindowManager.cpp                                                July, 2012
+*  WindowManager.cpp
 *  The nModules Project
 *
 *  Monitors all existing top-level windows. Forwards notifications to the

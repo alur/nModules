@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*  FadeEffect.hpp                                                 August, 2012
+*  FadeEffect.hpp
 *  The nModules Project
 *
 *  Function declarations for the FadeEffect class.
 *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef FADEEFFECT_HPP
-#define FADEEFFECT_HPP
+#pragma once
 
 #include "../TransitionEffect.hpp"
 
@@ -30,5 +29,3 @@ private:
     // The type of fade we are doing
     FadeType m_fadeType;
 };
-
-#endif /* FADEEFFECT_HPP */

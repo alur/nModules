@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nDesk.cpp                                                       July, 2012
+ *  nDesk.cpp
  *  The nModules Project
  *
  *  Main .cpp file for the nDesk module.

@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*  Bangs.h                                                          July, 2012
+*  Bangs.h
 *  The nModules Project
 *
 *  Function declarations for Bangs.cpp
 *   
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef BANGS_H
-#define BANGS_H
+#pragma once
 
 namespace Bangs {
     void _Register();
@@ -32,5 +31,3 @@ namespace Bangs {
         BANGCOMMANDPROC pCommand;
     } BangItem;
 }
-
-#endif /* BANGS_H */

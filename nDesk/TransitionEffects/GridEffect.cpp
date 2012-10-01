@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*  GridEffect.cpp                                                 August, 2012
+*  GridEffect.cpp
 *  The nModules Project
 *  
 *   

@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Debugging.cpp                                                   July, 2012
+ *  Debugging.cpp
  *  The nModules Project
  *
  *  Debugging functions. Taken from the LiteStep core.

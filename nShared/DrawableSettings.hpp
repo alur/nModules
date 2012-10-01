@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableSettings.hpp                                       September, 2012
+ *  DrawableSettings.hpp
  *  The nModules Project
  *
  *  Settings used by DrawableWindow.

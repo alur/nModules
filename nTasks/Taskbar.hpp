@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Taskbar.hpp                                                     July, 2012
+ *  Taskbar.hpp
  *  The nModules Project
  *
  *  Declaration of the Taskbar class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef TASKBAR_HPP
-#define TASKBAR_HPP
+#pragma once
 
 #include <map>
 #include "TaskButton.hpp"
@@ -48,5 +47,3 @@ private:
     // The monitor to display tasks for
     UINT m_uMonitor;
 };
-
-#endif /* TASKBAR_HPP */

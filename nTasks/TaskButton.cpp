@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TaskButton.cpp                                                  July, 2012
+ *  TaskButton.cpp
  *  The nModules Project
  *
  *  Implementation of the TaskButton class. Represents a taskbar button.

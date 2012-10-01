@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableSettings.cpp                                       September, 2012
+ *  DrawableSettings.cpp
  *  The nModules Project
  *
  *  Holds all RC settings used by the DrawableWindow class.

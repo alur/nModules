@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nCore.h                                                       August, 2012
+ *  nCore.h
  *  The nModules Project
  *
  *  Functions declarations for nCore.cpp
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef NCORE_H
-#define NCORE_H
+#pragma once
 
 #include "../nShared/Export.h"
 #include "../nShared/Versioning.h"
@@ -17,5 +16,3 @@ LRESULT WINAPI MainProc(HWND, UINT, WPARAM, LPARAM);
 EXPORT_CDECL(VERSION) GetCoreVersion();
 EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);
 EXPORT_CDECL(void) quitModule(HINSTANCE);
-
-#endif /* NCORE_H */

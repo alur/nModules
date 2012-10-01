@@ -1,13 +1,12 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Core.h                                                          July, 2012
+ *  Core.h
  *  The nModules Project
  *
  *  Functions declarations for the CoreCom. All functions exported by nCore
  *  and some Init functions.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef CORE_H
-#define CORE_H
+#pragma once
 
 #include "../nShared/Versioning.h"
 
@@ -45,5 +44,3 @@ namespace nCore {
         BOOL FormatText(LPCWSTR pszSource, size_t cchDest, LPWSTR pszDest);
     }
 }
-
-#endif /* CORE_H */

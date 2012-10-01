@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nLabel.cpp                                                      July, 2012
+ *  nLabel.cpp
  *  The nModules Project
  *
  *  Main .cpp file for the nLabel module.

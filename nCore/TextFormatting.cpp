@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TextFormatting.cpp                                              July, 2012
+ *  TextFormatting.cpp
  *  The nModules Project
  *
  *  Formats text strings.

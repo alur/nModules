@@ -1,11 +1,10 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TrayManager.h                                                   July, 2012
+ *  TrayManager.h
  *  The nModules Project
  *
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef TRAYMANAGER_H
-#define TRAYMANAGER_H
+#pragma once
 
 #include "TrayIcon.hpp"
 #include <vector>
@@ -38,5 +37,3 @@ namespace TrayManager {
     
     LRESULT ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 }
-
-#endif /* TRAYMANAGER_H */

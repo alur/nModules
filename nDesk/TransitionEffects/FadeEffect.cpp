@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  FadeEffect.cpp                                                August, 2012
+ *  FadeEffect.cpp
  *  The nModules Project
  *
  *  Fades between two images.

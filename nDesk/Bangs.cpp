@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Bangs.cpp                                                       July, 2012
+ *  Bangs.cpp
  *  The nModules Project
  *
  *  Handles bang commands

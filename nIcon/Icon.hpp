@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Icon.hpp                                                   September, 2012
+ *  Icon.hpp
  *  The nModules Project
  *
  *  A single icon in an IconGroup.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef ICON_HPP
-#define ICON_HPP
+#pragma once
 
 #include "../nShared/DrawableWindow.hpp"
 #include <ShlObj.h>
@@ -25,5 +24,3 @@ private:
     Settings* settings;
     DrawableWindow* window;
 };
-
-#endif /* ICON_HPP */

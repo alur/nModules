@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TextFormatting.h                                              August, 2012
+ *  TextFormatting.h
  *  The nModules Project
  *
  *  Formats text strings.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef TEXTFORMATTING_H
-#define TEXTFORMATTING_H
+#pragma once
 
 typedef VOID (__cdecl * FORMATTINGPROC)(HWND hwndOwner, LPCSTR pszArgs);
 EXPORT_CDECL(BOOL) RegisterTextFormatter(LPCSTR, FORMATTINGPROC);
@@ -19,5 +18,3 @@ FORMATTINGPROC FindFormatter(LPCSTR pszFunc);
 // [Function(stuff)]
 // [Function('some stuff')]
 // [if(function)] stuff [else] other stuff [endif]
-
-#endif /* TEXTFORMATTING_H */

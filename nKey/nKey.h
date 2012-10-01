@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nKey.h                                                          July, 2012
+ *  nKey.h
  *  The nModules Project
  *
  *  Functions declarations for nKey.cpp.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef NKEY_H
-#define NKEY_H
+#pragma once
 
 #include "../nShared/Export.h"
 
@@ -21,5 +20,3 @@ UINT ParseKey(LPCSTR szKey);
 
 EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);
 EXPORT_CDECL(void) quitModule(HINSTANCE);
-
-#endif /* NKEY_H */

@@ -1,12 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  WorkArea.h                                                      July, 2012
+ *  WorkArea.h
  *  The nModules Project
  *
  *  Function declarations for WorkArea.cpp
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifndef WORKAREA_H
-#define WORKAREA_H
+#pragma once
 
 #include "../nShared/MonitorInfo.hpp"
 
@@ -15,5 +14,3 @@ namespace WorkArea {
     void ResetWorkAreas(MonitorInfo *);
     void ParseLine(MonitorInfo *, LPCSTR);
 }
-
-#endif /* WORKAREA_H */

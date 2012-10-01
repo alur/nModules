@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  InputParsing.cpp                                              August, 2012
+ *  InputParsing.cpp
  *  The nModules Project
  *
  *  Utility functions for parsing input.
