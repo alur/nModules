@@ -69,8 +69,15 @@ HRESULT Factories::GetD2DFactory(LPVOID* ppFactory) {
 HRESULT Factories::GetWICFactory(LPVOID* ppFactory) {
     if (!pWICFactory) {
         HRESULT hr;
+
+        // VS2010 does not define CLSID_WICImagingFactory1 
+#ifdef __IWICImagingFactory2_FWD_DEFINED__
+        GUID guid = CLSID_WICImagingFactory1;
+#else
+        GUID guid = CLSID_WICImagingFactory;
+#endif
         if (!SUCCEEDED(hr = CoCreateInstance(
-            CLSID_WICImagingFactory1,
+            guid,
             NULL,
             CLSCTX_INPROC_SERVER,
             IID_IWICImagingFactory,
