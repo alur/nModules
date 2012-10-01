@@ -7,11 +7,4 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "../nShared/Macros.h"
-
-bool CreateLSMsgHandler(HINSTANCE hInst);
-LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 void LoadSettings();
-
-EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);
-EXPORT_CDECL(void) quitModule(HINSTANCE);

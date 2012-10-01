@@ -6,32 +6,21 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../headers/lsapi.h"
-#include <strsafe.h>
 #include "nLabel.h"
-#include "../nCoreCom/Core.h"
-#include "../nShared/Error.h"
+#include "../nShared/LSModule.hpp"
 #include "Label.hpp"
 #include <map>
-#include "../nShared/Factories.h"
 
 using std::map;
 
-// Constants
-const VERSION g_minCoreVersion    = MAKE_VERSION(0,2,0,0);
-const VERSION g_version           = MAKE_VERSION(0,2,0,0);
-LPCSTR g_szAppName                = "nLabel";
-LPCSTR g_szMsgHandler             = "LSnLabelMsgHandler";
-LPCSTR g_szLabelHandler           = "LSnLabelHandler";
-LPCSTR g_szAuthor                 = "Alurcard2";
+// The window classes we want to register
+LPCSTR g_windowClasses[] = {"Label", NULL};
+
+// The LSModule class
+LSModule* g_LSModule;
 
 // The messages we want from the core
 UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
-
-// Handle to the message handler window
-HWND g_hWndMsgHandler;
-
-// This instance.
-HINSTANCE g_hInstance;
 
 // All the labels we currently have loaded
 map<LPCSTR, Label*> g_Labels;
@@ -40,20 +29,18 @@ map<LPCSTR, Label*> g_Labels;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath */) {
-    g_hInstance = hDllInstance;
-
-    // Initalize communication with the core
-    switch (nCore::Init(g_minCoreVersion)) {
-    case S_OK:
-        break;
-    default:
-        ErrorMessage(E_LVL_ERROR, "There was a problem connecting to nCore!");
+int initModuleEx(HWND /* hWndParent */, HINSTANCE instance, LPCSTR /* szPath */) {
+    g_LSModule = new LSModule("nLabel", "Alurcard2", MAKE_VERSION(0,2,0,0), instance, g_lsMessages);
+    
+    if (!g_LSModule->Initialize(g_windowClasses)) {
+        delete g_LSModule;
         return 1;
     }
 
-    // Initialize
-    if (!CreateLSMsgHandler(hDllInstance)) return 1;
+    if (!g_LSModule->ConnectToCore(MAKE_VERSION(0,2,0,0))) {
+        delete g_LSModule;
+        return 1;
+    }
 
     // Load settings
     LoadSettings();
@@ -65,62 +52,16 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath
 /// <summary>
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
-void quitModule(HINSTANCE hDllInstance) {
+void quitModule(HINSTANCE /* instance */) {
     // Remove all labels
     for (map<LPCSTR, Label*>::const_iterator iter = g_Labels.begin(); iter != g_Labels.end(); iter++) {
         delete iter->second;
     }
     g_Labels.clear();
 
-    // Deinitalize
-    if (g_hWndMsgHandler) {
-        SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)g_hWndMsgHandler, (LPARAM)g_lsMessages);
-        DestroyWindow(g_hWndMsgHandler);
+    if (g_LSModule) {
+        delete g_LSModule;
     }
-
-    UnregisterClass(g_szMsgHandler, hDllInstance);
-    UnregisterClass(g_szLabelHandler, hDllInstance);
-
-    Factories::Release();
-}
-
-
-/// <summary>
-/// Creates the main message handler.
-/// </summary>
-/// <param name="hDllInstance">The instance to attach this message handler to.</param>
-bool CreateLSMsgHandler(HINSTANCE hDllInstance) {
-    WNDCLASSEX wc;
-    ZeroMemory(&wc, sizeof(WNDCLASSEX));
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.lpfnWndProc = LSMsgHandlerProc;
-    wc.hInstance = hDllInstance;
-    wc.lpszClassName = g_szMsgHandler;
-    wc.style = CS_NOCLOSE;
-
-    if (!RegisterClassEx(&wc)) {
-        ErrorMessage(E_LVL_ERROR, TEXT("Failed to register nLabel's msg window class!"));
-        return false;
-    }
-
-    if (!DrawableWindow::RegisterWindowClass(::g_szLabelHandler, hDllInstance)) {
-        ErrorMessage(E_LVL_ERROR, TEXT("Failed to register nLabel's label window class!"));
-        UnregisterClass(g_szMsgHandler, hDllInstance);
-        return false;
-    }
-
-    g_hWndMsgHandler = CreateWindowEx(WS_EX_TOOLWINDOW, g_szMsgHandler, "", WS_POPUP|WS_CLIPSIBLINGS|WS_CLIPCHILDREN,
-        0, 0, 0, 0, NULL, NULL, hDllInstance, NULL);
-
-    if (!g_hWndMsgHandler) {
-        ErrorMessage(E_LVL_ERROR, TEXT("Failed to create nLabel's message handler!"));
-        UnregisterClass(g_szMsgHandler, hDllInstance);
-        UnregisterClass(g_szLabelHandler, hDllInstance);
-        return false;
-    }
-
-    SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)g_hWndMsgHandler, (LPARAM) g_lsMessages);
-    return true;
 }
 
 
@@ -131,20 +72,8 @@ bool CreateLSMsgHandler(HINSTANCE hDllInstance) {
 /// <param name="uMsg">The type of message.</param>
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
-LRESULT WINAPI LSMsgHandlerProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI LSMessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch(uMsg) {
-        case LM_GETREVID: {
-            size_t uLength;
-            StringCchPrintf((LPSTR)lParam, 64, "%s: ", g_szAppName);
-			uLength = strlen((LPSTR)lParam);
-			GetVersionString(g_version, (LPSTR)lParam + uLength, 64 - uLength, false);
-            
-            if (SUCCEEDED(StringCchLength((LPSTR)lParam, 64, &uLength)))
-                return uLength;
-
-            lParam = NULL;
-            return 0;
-        }
         case LM_REFRESH: {
             return 0;
         }

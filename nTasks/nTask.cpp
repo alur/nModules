@@ -13,8 +13,10 @@
 
 using std::map;
 
+// The window classes we want to register
 LPCSTR g_windowClasses[] = {"Taskbar", "Button", NULL};
 
+// The LSModule class
 LSModule* g_LSModule;
 
 // The messages we want from the core

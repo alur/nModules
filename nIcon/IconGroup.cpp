@@ -10,13 +10,13 @@
 #include "IconGroup.hpp"
 #include "../nShared/Macros.h"
 #include "../nShared/Debugging.h"
+#include "../nShared/LSModule.hpp"
 
 // 
-extern HINSTANCE g_hInstance;
-extern LPCSTR g_szGroupHandler;
-
+extern LSModule* g_LSModule;
 
 #define WM_SHCHANGE_NOTIFY WM_USER
+
 
 /// <summary>
 /// Constructor
@@ -34,7 +34,7 @@ IconGroup::IconGroup(LPCSTR pszPrefix) {
 
     this->settings->GetString("Folder", path, sizeof(path), "Desktop");
 
-    this->window = new DrawableWindow(FindWindow("DesktopBackgroundClass", ""), g_szGroupHandler, g_hInstance, this->settings, defaults, this);
+    this->window = new DrawableWindow(FindWindow("DesktopBackgroundClass", ""), (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, defaults, this);
     this->window->Show();
 
     SetFolder(path);
@@ -116,7 +116,7 @@ void IconGroup::AddIcon(PCUITEMID_CHILD pidl) {
     D2D1_RECT_F pos;
     PositionIcon(pidl, &pos);
     Icon* icon = new Icon(pidl, this->workingFolder, this->window, this->settings);
-    icon->SetPosition(pos.left, pos.top);
+    icon->SetPosition((int)pos.left, (int)pos.top);
     icons.push_back(icon);
 }
 

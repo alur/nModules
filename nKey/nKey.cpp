@@ -9,21 +9,13 @@
 #include <strsafe.h>
 #include "nKey.h"
 #include "../nShared/Error.h"
+#include "../nShared/LSModule.hpp"
 #include <map>
 
 using std::map;
 
-// Constants
-LPCSTR g_rcsRevision        = "1.0";
-LPCSTR g_szAppName          = "nKey";
-LPCSTR g_szMsgHandler       = "LSnKeyMsgHandler";
-LPCSTR g_szAuthor           = "Alurcard2";
-
 // The messages we want from the core
 UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
-
-// Handle to the message handler window
-HWND g_hWndMsgHandler;
 
 // All hotkey mappings
 map<int, LPCSTR> g_hotKeys;
@@ -34,13 +26,24 @@ map<LPCSTR, UINT> g_vkCodes;
 // Used for assigning hotkeys.
 int g_id = 0;
 
+// The LiteStep module class
+LSModule* g_LSModule;
+
+// The window classes we want to register
+LPCSTR g_windowClasses[] = { NULL };
+
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath */) {
+int initModuleEx(HWND /* hWndParent */, HINSTANCE instance, LPCSTR /* szPath */) {
     // Initialize
-    if (!CreateLSMsgHandler(hDllInstance)) return 1;
+    g_LSModule = new LSModule("nKey", "Alurcard2", MAKE_VERSION(1,0,0,0), instance, g_lsMessages);
+    
+    if (!g_LSModule->Initialize(g_windowClasses)) {
+        delete g_LSModule;
+        return 1;
+    }
 
     // Load settings
     LoadSettings();
@@ -55,7 +58,7 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath
 void quitModule(HINSTANCE hDllInstance) {
     // Remove all hotkeys
     for (map<int, LPCSTR>::const_iterator iter = g_hotKeys.begin(); iter != g_hotKeys.end(); iter++) {
-        UnregisterHotKey(g_hWndMsgHandler, iter->first);
+        UnregisterHotKey(g_LSModule->GetMessageWindow(), iter->first);
         free((LPVOID)iter->second);
     }
     g_hotKeys.clear();
@@ -67,44 +70,9 @@ void quitModule(HINSTANCE hDllInstance) {
     g_vkCodes.clear();
 
     // Deinitalize
-    if (g_hWndMsgHandler) {
-        SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)g_hWndMsgHandler, (LPARAM)g_lsMessages);
-        DestroyWindow(g_hWndMsgHandler);
+    if (g_LSModule) {
+        delete g_LSModule;
     }
-
-    UnregisterClass(g_szMsgHandler, hDllInstance);
-}
-
-
-/// <summary>
-/// Creates the main message handler.
-/// </summary>
-/// <param name="hDllInstance">The instance to attach this message handler to.</param>
-bool CreateLSMsgHandler(HINSTANCE hDllInstance) {
-    WNDCLASSEX wc;
-    ZeroMemory(&wc, sizeof(WNDCLASSEX));
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.lpfnWndProc = LSMsgHandlerProc;
-    wc.hInstance = hDllInstance;
-    wc.lpszClassName = g_szMsgHandler;
-    wc.style = CS_NOCLOSE;
-
-    if (!RegisterClassEx(&wc)) {
-        ErrorMessage(E_LVL_ERROR, TEXT("Failed to register nKey's window class!"));
-        return false;
-    }
-
-    g_hWndMsgHandler = CreateWindowEx(WS_EX_TOOLWINDOW, g_szMsgHandler, "", WS_POPUP|WS_CLIPSIBLINGS|WS_CLIPCHILDREN,
-        0, 0, 0, 0, NULL, NULL, hDllInstance, NULL);
-
-    if (!g_hWndMsgHandler) {
-        ErrorMessage(E_LVL_ERROR, TEXT("Failed to create nKey's message handler!"));
-        UnregisterClass(g_szMsgHandler, hDllInstance);
-        return false;
-    }
-
-    SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)g_hWndMsgHandler, (LPARAM) g_lsMessages);
-    return true;
 }
 
 
@@ -115,18 +83,8 @@ bool CreateLSMsgHandler(HINSTANCE hDllInstance) {
 /// <param name="uMsg">The type of message.</param>
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
-LRESULT WINAPI LSMsgHandlerProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI LSMessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch(uMsg) {
-        case LM_GETREVID: {
-            size_t uLength;
-            StringCchPrintf((char*)lParam, 64, "%s: %s", g_szAppName, g_rcsRevision);
-            
-            if (SUCCEEDED(StringCchLength((char*)lParam, 64, &uLength)))
-                return uLength;
-
-            lParam = NULL;
-            return 0;
-        }
         case LM_REFRESH: {
             return 0;
         }
@@ -256,7 +214,7 @@ bool AddHotkey(UINT mods, UINT key, LPCSTR pszCommand) {
     map<int, LPCSTR>::iterator it = g_hotKeys.insert(g_hotKeys.begin(), std::pair<int, LPCSTR>(g_id, pszCommandHeap));
 
     // Register the hotkey
-    if (RegisterHotKey(g_hWndMsgHandler, g_id, mods, key) == FALSE) {
+    if (RegisterHotKey(g_LSModule->GetMessageWindow(), g_id, mods, key) == FALSE) {
         g_hotKeys.erase(it);
         return false; // Failed to register, probably already taken.
     }

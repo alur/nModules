@@ -7,12 +7,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../headers/lsapi.h"
 #include <strsafe.h>
-#include "../nCoreCom/Core.h"
+#include "../nShared/LSModule.hpp"
 #include "TrayIcon.hpp"
 #include "Windowsx.h"
 
-extern HINSTANCE g_hInstance;
-extern LPCSTR g_szTrayIconHandler;
+
+extern LSModule* g_LSModule;
+extern HWND g_hWndTrayNotify;
 
 
 /// <summary>
@@ -26,7 +27,7 @@ TrayIcon::TrayIcon(HWND parent, LPLSNOTIFYICONDATA pNID, Settings* parentSetting
     this->settings = parentSettings->CreateChild("Icon");
     DrawableSettings* defaultSettings = new DrawableSettings();
     defaultSettings->color = 0x00000000;
-    m_pWindow = new DrawableWindow(parent, g_szTrayIconHandler, g_hInstance, this->settings, defaultSettings, this);
+    m_pWindow = new DrawableWindow(parent, (LPCSTR)g_LSModule->GetWindowClass(2), g_LSModule->GetInstance(), this->settings, defaultSettings, this);
 
     //
     LoadSettings();
@@ -76,7 +77,7 @@ void TrayIcon::UpdateIcon() {
     m_pWindow->PurgeOverlays();
     if ((m_pNotifyData->uFlags & NIF_ICON) == NIF_ICON) {
         D2D1_RECT_F f;
-        f.bottom = this->iconSize; f.top = 0; f.left = 0; f.right = this->iconSize;
+        f.bottom = (float)this->iconSize; f.top = 0; f.left = 0; f.right = (float)this->iconSize;
         m_pWindow->AddOverlay(f, m_pNotifyData->hIcon);
     }
 }
@@ -98,7 +99,7 @@ void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height) {
 /// <summary>
 /// Sends a message to the owner of the icon.
 /// </summary>
-void TrayIcon::SendCallback(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+void TrayIcon::SendCallback(UINT uMsg, WPARAM /* wParam */, LPARAM /* lParam */) {
     if (m_pNotifyData->uVersion >= 4) {
         RECT r;
         GetWindowRect(m_pWindow->GetWindow(), &r);

@@ -6,19 +6,16 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../headers/lsapi.h"
-#include <strsafe.h>
-#include "../nCoreCom/Core.h"
+#include "../nShared/LSModule.hpp"
 #include "Label.hpp"
 #include "../nShared/Macros.h"
 
-extern LPCSTR g_szLabelHandler;
-extern HINSTANCE g_hInstance;
-
+extern LSModule* g_LSModule;
 
 Label::Label(LPCSTR pszName) {
     m_pszName = pszName;
     this->settings = new Settings(m_pszName);
-    m_pWindow = new DrawableWindow(NULL, g_szLabelHandler, g_hInstance, this->settings, new DrawableSettings(), this);
+    m_pWindow = new DrawableWindow(NULL, (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, new DrawableSettings(), this);
     m_pWindow->Show();
 }
 

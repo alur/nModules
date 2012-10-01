@@ -9,10 +9,10 @@
 #include <strsafe.h>
 #include "../nShared/Macros.h"
 #include "Icon.hpp"
+#include "../nShared/LSModule.hpp"
 
-
-extern HINSTANCE g_hInstance;
-extern LPCSTR g_szIconHandler;
+// 
+extern LSModule* g_LSModule;
 
 
 Icon::Icon(PCITEMID_CHILD item, IShellFolder2* shellFolder, DrawableWindow* parentWindow, Settings* parentSettings) {
@@ -30,7 +30,7 @@ Icon::Icon(PCITEMID_CHILD item, IShellFolder2* shellFolder, DrawableWindow* pare
     defaults->textOffsetTop = 64;
     StringCchCopy(defaults->textAlign, sizeof(defaults->textAlign), "Center");
 
-    this->window = new DrawableWindow(parentWindow->GetWindow(), g_szIconHandler, g_hInstance, this->settings, defaults, this);
+    this->window = new DrawableWindow(parentWindow->GetWindow(), (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, defaults, this);
     SetIcon();
     this->window->Show();
 }

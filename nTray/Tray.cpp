@@ -7,12 +7,12 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../headers/lsapi.h"
 #include <strsafe.h>
-#include "../nCoreCom/Core.h"
+#include "../nShared/LSModule.hpp"
 #include "Tray.hpp"
 #include "TrayIcon.hpp"
 
-extern HINSTANCE g_hInstance;
-extern LPCSTR g_szTrayHandler;
+
+extern LSModule* g_LSModule;
 extern HWND g_hWndTrayNotify;
 
 
@@ -25,7 +25,7 @@ Tray::Tray(LPCSTR name) {
     this->settings = new Settings(this->name);
 
     DrawableSettings* defaults = new DrawableSettings();
-    this->window = new DrawableWindow(NULL, g_szTrayHandler, g_hInstance, this->settings, defaults, this);
+    this->window = new DrawableWindow(NULL, (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, defaults, this);
     this->window->Show();
 
     LoadSettings();
