@@ -131,10 +131,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CommandItem.hpp" />
+    <ClInclude Include="FolderItem.hpp" />
     <ClInclude Include="nPopup.h" />
+    <ClInclude Include="Popup.hpp" />
+    <ClInclude Include="PopupItem.hpp" />
+    <ClInclude Include="SeparatorItem.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CommandItem.cpp" />
+    <ClCompile Include="FolderItem.cpp" />
     <ClCompile Include="nPopup.cpp" />
+    <ClCompile Include="Popup.cpp" />
+    <ClCompile Include="PopupItem.cpp" />
+    <ClCompile Include="SeparatorItem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nPopup.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
