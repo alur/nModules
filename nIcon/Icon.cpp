@@ -48,6 +48,9 @@ LRESULT WINAPI Icon::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
     switch(msg) {
     case WM_LBUTTONDBLCLK:
         {
+            WCHAR command[MAX_LINE_LENGTH];
+            this->GetDisplayName(SHGDN_FORPARSING, command, MAX_LINE_LENGTH);
+            ShellExecuteW(NULL, NULL, command, NULL, NULL, SW_SHOW);
         }
         return 0;
 

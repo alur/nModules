@@ -329,6 +329,7 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
     this->textFormat->SetParagraphAlignment(this->textVerticalAlignment);
 
     SetWindowPos(this->window, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+    SetWindowLongPtr(this->window, GWLP_USERDATA, MAGIC_DWORD);
 
     MARGINS m;
     ZeroMemory(&m, sizeof(m));
