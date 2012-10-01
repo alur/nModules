@@ -8,7 +8,7 @@
 #pragma once
 #include "../nShared/DrawableWindow.hpp"
 
-class TrayTip {
+class TrayTip : public IDrawableMessageHandler {
 public:
     explicit TrayTip(LPCSTR pszPrefix);
     virtual ~TrayTip();
@@ -18,7 +18,7 @@ public:
     void Hide();
 
     void LoadSettings(bool = false);
-    LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
     HWND GetHWND();
 
 private:

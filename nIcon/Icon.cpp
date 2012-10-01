@@ -30,8 +30,7 @@ Icon::Icon(PCITEMID_CHILD item, IShellFolder2* shellFolder, DrawableWindow* pare
     defaults->textOffsetTop = 64;
     StringCchCopy(defaults->textAlign, sizeof(defaults->textAlign), "Center");
 
-    this->window = new DrawableWindow(parentWindow->GetWindow(), g_szIconHandler, g_hInstance, this->settings, defaults);
-    SetWindowLongPtr(this->window->GetWindow(), 0, (LONG_PTR)this);
+    this->window = new DrawableWindow(parentWindow->GetWindow(), g_szIconHandler, g_hInstance, this->settings, defaults, this);
     SetIcon();
     this->window->Show();
 }
@@ -44,7 +43,7 @@ Icon::~Icon() {
 }
 
 
-LRESULT WINAPI Icon::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch(msg) {
     case WM_LBUTTONDBLCLK:
         {
@@ -86,7 +85,7 @@ LRESULT WINAPI Icon::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
     default:
         {
         }
-        return this->window->HandleMessage(msg, wParam, lParam);
+        return this->window->HandleMessage(wnd, msg, wParam, lParam);
     }
 
 }

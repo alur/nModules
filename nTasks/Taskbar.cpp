@@ -8,11 +8,10 @@
 #include "../headers/lsapi.h"
 #include <strsafe.h>
 #include "../nCoreCom/Core.h"
+#include "../nShared/LSModule.hpp"
 #include "Taskbar.hpp"
 
-extern HINSTANCE g_hInstance;
-extern LPCSTR g_szTaskbarHandler;
-
+extern LSModule* g_LSModule;
 
 /// <summary>
 /// Constructor
@@ -23,8 +22,7 @@ Taskbar::Taskbar(LPCSTR pszName) {
     this->settings = new Settings(m_pszName);
     LoadSettings();
     
-    m_pWindow = new DrawableWindow(NULL, g_szTaskbarHandler, g_hInstance, this->settings, new DrawableSettings());
-    SetWindowLongPtr(m_pWindow->GetWindow(), 0, (LONG_PTR)this);
+    m_pWindow = new DrawableWindow(NULL, (LPCSTR)g_LSModule->GetWindowClass(2), g_LSModule->GetInstance(), this->settings, new DrawableSettings(), this);
     m_pWindow->Show();
 }
 
@@ -138,6 +136,6 @@ void Taskbar::Relayout() {
 /// <summary>
 /// Handles window events for the taskbar.
 /// </summary>
-LRESULT WINAPI Taskbar::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    return m_pWindow->HandleMessage(uMsg, wParam, lParam);
+LRESULT WINAPI Taskbar::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    return m_pWindow->HandleMessage(wnd, uMsg, wParam, lParam);
 }

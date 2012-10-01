@@ -9,7 +9,7 @@
 
 #include "../nShared/DrawableWindow.hpp"
 
-class TaskButton {
+class TaskButton : public IDrawableMessageHandler {
 public:
     explicit TaskButton(HWND parent, HWND window, LPCSTR prefix, Settings* parentSettings);
     virtual ~TaskButton();
@@ -28,7 +28,7 @@ public:
     void Show();
 
     void LoadSettings(bool = false);
-    LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
 private:
     // The button's window

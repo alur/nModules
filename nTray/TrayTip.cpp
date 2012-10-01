@@ -34,8 +34,8 @@ void TrayTip::LoadSettings(bool /*bIsRefresh*/) {
 }
 
 
-LRESULT WINAPI TrayTip::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    return m_pWindow->HandleMessage(uMsg, wParam, lParam);
+LRESULT WINAPI TrayTip::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    return m_pWindow->HandleMessage(wnd, uMsg, wParam, lParam);
 }
 
 

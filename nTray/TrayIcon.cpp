@@ -26,8 +26,7 @@ TrayIcon::TrayIcon(HWND parent, LPLSNOTIFYICONDATA pNID, Settings* parentSetting
     this->settings = parentSettings->CreateChild("Icon");
     DrawableSettings* defaultSettings = new DrawableSettings();
     defaultSettings->color = 0x00000000;
-    m_pWindow = new DrawableWindow(parent, g_szTrayIconHandler, g_hInstance, this->settings, defaultSettings);
-    SetWindowLongPtr(m_pWindow->GetWindow(), 0, (LONG_PTR)this);
+    m_pWindow = new DrawableWindow(parent, g_szTrayIconHandler, g_hInstance, this->settings, defaultSettings, this);
 
     //
     LoadSettings();
@@ -114,7 +113,7 @@ void TrayIcon::SendCallback(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 /// <summary>
 /// Handles window messages for the icon's window.
 /// </summary>
-LRESULT WINAPI TrayIcon::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI TrayIcon::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (uMsg > WM_MOUSEFIRST && uMsg < WM_MOUSELAST) {
         SendCallback(uMsg, wParam, lParam);
         if (uMsg == WM_RBUTTONUP) {
@@ -125,7 +124,7 @@ LRESULT WINAPI TrayIcon::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) 
         }
     }
     else {
-        return m_pWindow->HandleMessage(uMsg, wParam, lParam);
+        return m_pWindow->HandleMessage(wnd, uMsg, wParam, lParam);
     }
     return 0;
 }

@@ -20,6 +20,7 @@
 #include "Factories.h"
 #include "Debugging.h"
 #include "Color.h"
+#include "IDrawableMessageHandler.hpp"
 
 using namespace D2D1;
 
@@ -29,7 +30,7 @@ using namespace D2D1;
 /// <summary>
 /// Constructor
 /// </summary>
-DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings *settings, DrawableSettings* defaultSettings) {
+DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings *settings, DrawableSettings* defaultSettings, IDrawableMessageHandler* msgHandler) {
     this->parent = parent;
     this->settings = settings;
     this->drawingSettings = new DrawableSettings();
@@ -39,7 +40,7 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instan
 
     LoadSettings();
 
-    CreateWnd(windowClass, instance);
+    CreateWnd(windowClass, instance, msgHandler);
 }
 
 
@@ -68,6 +69,36 @@ DrawableWindow::~DrawableWindow() {
     SAFERELEASE(this->textBrush);
     SAFERELEASE(this->textFormat);
     PurgeOverlays();
+}
+
+
+/// <summary>
+/// Registers a window class for use with a drawable window.
+/// </summary>
+ATOM DrawableWindow::RegisterWindowClass(LPCSTR className, HINSTANCE DLLInstance) {
+    WNDCLASSEX wc = {0};
+    wc.cbWndExtra = sizeof(IDrawableMessageHandler*);
+    wc.cbSize = sizeof(wc);
+    wc.lpfnWndProc = MessageHandler;
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hInstance = DLLInstance;
+    wc.lpszClassName = className;
+    wc.style = CS_NOCLOSE | CS_DBLCLKS;
+
+    return RegisterClassEx(&wc);
+}
+
+
+/// <summary>
+/// Generic DrawableWindow message handler.
+/// </summary>
+LRESULT __stdcall DrawableWindow::MessageHandler(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+    IDrawableMessageHandler * handler = (IDrawableMessageHandler *)GetWindowLongPtr(window, 0);
+    if (handler) {
+        return handler->HandleMessage(window, msg, wParam, lParam);
+    }
+
+    return DefWindowProc(window, msg, wParam, lParam);
 }
 
 
@@ -259,7 +290,7 @@ void DrawableWindow::PurgeOverlays() {
 /// <summary>
 /// Creates the window we are drawing.
 /// </summary>
-bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
+bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst, IDrawableMessageHandler* msgHandler) {
     if (this->parent) {
         RECT parentRect;
         GetWindowRect(this->parent, &parentRect);
@@ -330,6 +361,7 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst) {
 
     SetWindowPos(this->window, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
     SetWindowLongPtr(this->window, GWLP_USERDATA, MAGIC_DWORD);
+    SetWindowLongPtr(this->window, 0, (LONG_PTR)msgHandler);
 
     MARGINS m;
     ZeroMemory(&m, sizeof(m));
@@ -398,7 +430,7 @@ void DrawableWindow::UpdatePosition() {
 /// <summary>
 /// Handles window messages for this drawablewindow.
 /// </summary>
-LRESULT WINAPI DrawableWindow::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
     case WM_ERASEBKGND:
         return 1;
@@ -445,5 +477,5 @@ LRESULT WINAPI DrawableWindow::HandleMessage(UINT msg, WPARAM wParam, LPARAM lPa
         return 0;
 
     }
-    return DefWindowProc(this->window, msg, wParam, lParam);
+    return DefWindowProc(window, msg, wParam, lParam);
 }

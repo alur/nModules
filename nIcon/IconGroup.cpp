@@ -34,8 +34,7 @@ IconGroup::IconGroup(LPCSTR pszPrefix) {
 
     this->settings->GetString("Folder", path, sizeof(path), "Desktop");
 
-    this->window = new DrawableWindow(FindWindow("DesktopBackgroundClass", ""), g_szGroupHandler, g_hInstance, this->settings, defaults);
-    SetWindowLongPtr(this->window->GetWindow(), 0, (LONG_PTR)this);
+    this->window = new DrawableWindow(FindWindow("DesktopBackgroundClass", ""), g_szGroupHandler, g_hInstance, this->settings, defaults, this);
     this->window->Show();
 
     SetFolder(path);
@@ -158,7 +157,7 @@ HRESULT IconGroup::GetDisplayNameOf(PCUITEMID_CHILD pidl, SHGDNF flags, LPWSTR b
 /// <summary>
 /// 
 /// </summary>
-LRESULT WINAPI IconGroup::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
     case WM_SHCHANGE_NOTIFY:
         {
@@ -225,6 +224,6 @@ LRESULT WINAPI IconGroup::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) 
         return 0;
 
     default:
-        return this->window->HandleMessage(msg, wParam, lParam);
+        return this->window->HandleMessage(window, msg, wParam, lParam);
     }
 }

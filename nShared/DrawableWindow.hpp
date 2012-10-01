@@ -8,6 +8,7 @@
 #pragma once
 
 #include "DrawableSettings.hpp"
+#include "IDrawableMessageHandler.hpp"
 #include <d2d1.h>
 #include <vector>
 #include <list>
@@ -17,7 +18,10 @@ using std::list;
 
 class DrawableWindow {
 public:
-        //
+    static ATOM RegisterWindowClass(LPCSTR className, HINSTANCE DLLInstance);
+    static LRESULT __stdcall MessageHandler(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
+
+    // 
     typedef struct {
         DWORD state;
         int priority;
@@ -30,7 +34,13 @@ public:
     typedef list<State>::iterator STATE;
 
     // Constructor
-    explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings *settings, DrawableSettings* defaultSettings);
+    explicit DrawableWindow(
+        HWND parent,
+        LPCSTR windowClass,
+        HINSTANCE instance,
+        Settings *settings,
+        DrawableSettings* defaultSettings,
+        IDrawableMessageHandler* messageHandler);
 
     // Destructor
     virtual ~DrawableWindow();
@@ -39,7 +49,7 @@ public:
     HWND GetWindow();
 
     // Handles window messages.
-    LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
     // Returns the 
     DrawableSettings* GetSettings();
@@ -85,7 +95,7 @@ private:
     } Overlay;
 
     // Creates the window
-    bool CreateWnd(LPCSTR, HINSTANCE);
+    bool CreateWnd(LPCSTR, HINSTANCE, IDrawableMessageHandler*);
 
     // Loads RC settings
     void LoadSettings();

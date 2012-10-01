@@ -10,10 +10,11 @@
 #include <map>
 #include "TaskButton.hpp"
 #include "../nShared/DrawableWindow.hpp"
+#include "../nShared/IDrawableMessageHandler.hpp"
 
 using std::map;
 
-class Taskbar {
+class Taskbar: public IDrawableMessageHandler {
 public:
     explicit Taskbar(LPCSTR);
     virtual ~Taskbar();
@@ -22,7 +23,7 @@ public:
     TaskButton* AddTask(HWND, UINT, bool);
     bool MonitorChanged(HWND hWnd, UINT monitor, TaskButton** pOut);
     void RemoveTask(HWND);
-    LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
     void Relayout();
 
 private:

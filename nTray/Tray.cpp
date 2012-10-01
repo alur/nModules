@@ -25,9 +25,7 @@ Tray::Tray(LPCSTR name) {
     this->settings = new Settings(this->name);
 
     DrawableSettings* defaults = new DrawableSettings();
-    this->window = new DrawableWindow(NULL, g_szTrayHandler, g_hInstance, this->settings, defaults);
-
-    SetWindowLongPtr(this->window->GetWindow(), 0, (LONG_PTR)this);
+    this->window = new DrawableWindow(NULL, g_szTrayHandler, g_hInstance, this->settings, defaults, this);
     this->window->Show();
 
     LoadSettings();
@@ -124,7 +122,7 @@ void Tray::Relayout() {
 /// <summary>
 /// Handles window events for the tray.
 /// </summary>
-LRESULT WINAPI Tray::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_MOUSEMOVE:
         if (IsWindow(g_hWndTrayNotify)) {
@@ -133,6 +131,6 @@ LRESULT WINAPI Tray::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
                 settings->width, settings->height, FALSE);
         }
     default:
-        return this->window->HandleMessage(uMsg, wParam, lParam);
+        return this->window->HandleMessage(wnd, uMsg, wParam, lParam);
     }
 }

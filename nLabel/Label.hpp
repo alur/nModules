@@ -9,14 +9,14 @@
 
 #include "../nShared/DrawableWindow.hpp"
 
-class Label {
+class Label : public IDrawableMessageHandler {
 public:
     explicit Label(LPCSTR);
     virtual ~Label();
 
     void LoadSettings(bool = false);
     void CreateLabelWindow();
-    LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
 private:
     // The name of this label

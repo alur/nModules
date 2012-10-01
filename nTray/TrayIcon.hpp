@@ -9,7 +9,7 @@
 
 #include "../nShared/DrawableWindow.hpp"
 
-class TrayIcon {
+class TrayIcon : public IDrawableMessageHandler {
 public:
     explicit TrayIcon(HWND parent, LPLSNOTIFYICONDATA pNID, Settings* parentSettings);
     virtual ~TrayIcon();
@@ -19,7 +19,7 @@ public:
     void Show();
 
     void LoadSettings(bool = false);
-    LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
     void SendCallback(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void UpdateIcon();
     HWND GetHWND();

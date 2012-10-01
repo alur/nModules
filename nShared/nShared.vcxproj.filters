@@ -14,9 +14,6 @@
     <ClInclude Include="MonitorInfo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Export.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -45,6 +42,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LSModule.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IDrawableMessageHandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -77,6 +80,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Color.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LSModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

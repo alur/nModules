@@ -2,18 +2,9 @@
  *  nTask.h
  *  The nModules Project
  *
- *  General declarations for nTask
+ *  General declarations for nTask.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "../nShared/Export.h"
-
-bool CreateLSMsgHandler(HINSTANCE hInst);
-LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT WINAPI TaskbarHandlerProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT WINAPI TaskButtonHandlerProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 void LoadSettings();
-
-EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);
-EXPORT_CDECL(void) quitModule(HINSTANCE);

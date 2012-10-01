@@ -38,16 +38,6 @@ map<LPCSTR, Label*> g_Labels;
 
 
 /// <summary>
-/// The main entry point for this DLL.
-/// </summary>
-BOOL APIENTRY DllMain( HANDLE hModule, DWORD ul_reason_for_call, LPVOID /* lpReserved */) {
-    if (ul_reason_for_call == DLL_PROCESS_ATTACH)
-        DisableThreadLibraryCalls((HINSTANCE)hModule);
-    return TRUE;
-}
-
-
-/// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
 int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath */) {
@@ -113,17 +103,7 @@ bool CreateLSMsgHandler(HINSTANCE hDllInstance) {
         return false;
     }
 
-    ZeroMemory(&wc, sizeof(WNDCLASSEX));
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.cbWndExtra = sizeof(LONG_PTR); // Planning to hold a Label * here.
-    wc.lpfnWndProc = LabelHandlerProc;
-    wc.hInstance = hDllInstance;
-    wc.lpszClassName = g_szLabelHandler;
-    wc.hIconSm = 0;
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.style = CS_DBLCLKS;
-
-    if (!RegisterClassEx(&wc)) {
+    if (!DrawableWindow::RegisterWindowClass(::g_szLabelHandler, hDllInstance)) {
         ErrorMessage(E_LVL_ERROR, TEXT("Failed to register nLabel's label window class!"));
         UnregisterClass(g_szMsgHandler, hDllInstance);
         return false;
@@ -169,22 +149,6 @@ LRESULT WINAPI LSMsgHandlerProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
             return 0;
         }
     }
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
-}
-
-
-/// <summary>
-/// Handles messages for the induvidual label windows.
-/// </summary>
-/// <param name="hWnd">The window the message is for.</param>
-/// <param name="uMsg">The type of message.</param>
-/// <param name="wParam">wParam</param>
-/// <param name="lParam">lParam</param>
-LRESULT WINAPI LabelHandlerProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    // index 0 of the extra window data holds a pointer to the Label which created it.
-    Label * lbl = (Label *)GetWindowLongPtr(hWnd, 0);
-    if (lbl) return lbl->HandleMessage(uMsg, wParam, lParam);
-
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 

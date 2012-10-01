@@ -16,12 +16,12 @@
 
 using std::map;
 
-class IconGroup : public IIconEventHandler {
+class IconGroup : public IIconEventHandler, IDrawableMessageHandler {
 public:
     explicit IconGroup(LPCSTR pszPrefix);
     virtual ~IconGroup();
 
-    LRESULT WINAPI HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam);
+    LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     void SetFolder(LPWSTR path);
     

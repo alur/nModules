@@ -12,6 +12,7 @@
 #include "WindowManager.h"
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/Debugging.h"
+#include "../nShared/LSModule.hpp"
 #include <map>
 #include <vector>
 #include <assert.h>
@@ -25,8 +26,7 @@ using std::pair;
 // All current taskbars
 extern map<LPCSTR, Taskbar*> g_Taskbars;
 
-// Handle to the message handler window
-extern HWND g_hWndMsgHandler;
+extern LSModule* g_LSModule;
 
 namespace WindowManager {
     // The currently active window
@@ -72,7 +72,7 @@ void WindowManager::Start() {
     osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     GetVersionEx(&osv);
     if (osv.dwMajorVersion < 6 || osv.dwMajorVersion == 6 && osv.dwMinorVersion < 2) {
-        SetTimer(g_hWndMsgHandler, TIMER_CHECKMONITOR, 250, NULL);
+        SetTimer(g_LSModule->GetMessageWindow(), TIMER_CHECKMONITOR, 250, NULL);
     }
 }
 
@@ -86,7 +86,7 @@ void WindowManager::Stop() {
     assert(isStarted);
 
     // Clean up
-    KillTimer(g_hWndMsgHandler, TIMER_CHECKMONITOR);
+    KillTimer(g_LSModule->GetMessageWindow(), TIMER_CHECKMONITOR);
     delete g_pMonitorInfo;
     activeWindow = NULL;
     windowMap.clear();

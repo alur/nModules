@@ -42,16 +42,6 @@ map<LPCSTR, Tray*> g_Trays;
 
 
 /// <summary>
-/// The main entry point for this DLL.
-/// </summary>
-BOOL APIENTRY DllMain( HANDLE hModule, DWORD ul_reason_for_call, LPVOID /* lpReserved */) {
-    if (ul_reason_for_call == DLL_PROCESS_ATTACH)
-        DisableThreadLibraryCalls((HINSTANCE)hModule);
-    return TRUE;
-}
-
-
-/// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
 int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath */) {
@@ -124,26 +114,14 @@ bool CreateLSMsgHandler(HINSTANCE hDllInstance) {
         ErrorMessage(E_LVL_ERROR, TEXT("Failed to register nTray's msg window class!"));
         return false;
     }
-    
-    // Register the taskbar window class
-    wc.cbWndExtra = sizeof(LONG_PTR); // Planning to hold a Taskbar * here.
-    wc.lpfnWndProc = TrayHandlerProc;
-    wc.lpszClassName = g_szTrayHandler;
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.style = CS_DBLCLKS;
 
-    if (!RegisterClassEx(&wc)) {
+    if (!DrawableWindow::RegisterWindowClass(g_szTrayHandler, hDllInstance)) {
         ErrorMessage(E_LVL_ERROR, TEXT("Failed to register nTray's tray window class!"));
         UnregisterClass(g_szMsgHandler, hDllInstance);
         return false;
     }
 
-    // Register the taskbutton window class
-    wc.lpfnWndProc = TrayIconHandlerProc;
-    wc.lpszClassName = g_szTrayIconHandler;
-    wc.style = CS_DBLCLKS;
-
-    if (!RegisterClassEx(&wc)) {
+    if (!DrawableWindow::RegisterWindowClass(g_szTrayIconHandler, hDllInstance)) {
         ErrorMessage(E_LVL_ERROR, TEXT("Failed to register nTray's icon window class!"));
         UnregisterClass(g_szMsgHandler, hDllInstance);
         UnregisterClass(g_szTrayHandler, hDllInstance);
@@ -197,38 +175,6 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
             return TrayManager::ShellMessage(hWnd, uMsg, wParam, lParam);
 
     }
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
-}
-
-
-/// <summary>
-/// Handles messages for the induvidual taskbars.
-/// </summary>
-/// <param name="hWnd">The window the message is for.</param>
-/// <param name="uMsg">The type of message.</param>
-/// <param name="wParam">wParam</param>
-/// <param name="lParam">lParam</param>
-LRESULT WINAPI TrayHandlerProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    // index 0 of the extra window data holds a pointer to the Tray which created it.
-    Tray * pTray = (Tray *)GetWindowLongPtr(hWnd, 0);
-    if (pTray) return pTray->HandleMessage(uMsg, wParam, lParam);
-
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
-}
-
-
-/// <summary>
-/// Handles messages for the induvidual task buttons.
-/// </summary>
-/// <param name="hWnd">The window the message is for.</param>
-/// <param name="uMsg">The type of message.</param>
-/// <param name="wParam">wParam</param>
-/// <param name="lParam">lParam</param>
-LRESULT WINAPI TrayIconHandlerProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    // index 0 of the extra window data holds a pointer to the TaskButton which created it.
-    TrayIcon * pIcon = (TrayIcon *)GetWindowLongPtr(hWnd, 0);
-    if (pIcon) return pIcon->HandleMessage(uMsg, wParam, lParam);
-
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 

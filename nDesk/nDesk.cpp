@@ -34,16 +34,6 @@ ClickHandler* g_pClickHandler;
 
 
 /// <summary>
-/// The main entry point for this DLL.
-/// </summary>
-BOOL APIENTRY DllMain( HANDLE hModule, DWORD ul_reason_for_call, LPVOID /* lpReserved */) {
-    if (ul_reason_for_call == DLL_PROCESS_ATTACH)
-        DisableThreadLibraryCalls((HINSTANCE)hModule);
-    return TRUE;
-}
-
-
-/// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
 int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath */) {

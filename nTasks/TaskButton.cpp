@@ -8,11 +8,10 @@
 #include "../headers/lsapi.h"
 #include <strsafe.h>
 #include "../nCoreCom/Core.h"
+#include "../nShared/LSModule.hpp"
 #include "TaskButton.hpp"
 
-extern HINSTANCE g_hInstance;
-extern LPCSTR g_szTaskButtonHandler;
-
+extern LSModule* g_LSModule;
 
 /// <summary>
 /// Constructor
@@ -27,8 +26,7 @@ TaskButton::TaskButton(HWND parent, HWND window, LPCSTR prefix, Settings* parent
 
     // Create the drawable window
     this->settings = parentSettings->CreateChild("Button");
-    m_pWindow = new DrawableWindow(parent, g_szTaskButtonHandler, g_hInstance, this->settings, new DrawableSettings());
-    SetWindowLongPtr(m_pWindow->GetWindow(), 0, (LONG_PTR)this);
+    m_pWindow = new DrawableWindow(parent, (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, new DrawableSettings(), this);
 
     this->iconSettings = this->settings->CreateChild("Icon");
 
@@ -200,7 +198,7 @@ void TaskButton::GetMinRect(LPPOINTS lpPoints) {
 /// <summary>
 /// Handles window messages for this button.
 /// </summary>
-LRESULT WINAPI TaskButton::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI TaskButton::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_LBUTTONUP:
         if (GetForegroundWindow() == m_hWnd) {
@@ -234,6 +232,6 @@ LRESULT WINAPI TaskButton::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam
         return 0;
 
     default:
-        return m_pWindow->HandleMessage(uMsg, wParam, lParam);
+        return m_pWindow->HandleMessage(wnd, uMsg, wParam, lParam);
     }
 }

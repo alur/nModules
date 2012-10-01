@@ -19,7 +19,7 @@ const VERSION g_version           = MAKE_VERSION(0,2,0,0);
 LPCSTR g_szAppName                = "nIcon";
 LPCSTR g_szMainHandler            = "nIconMsgHandler";
 LPCSTR g_szGroupHandler           = "nIconGroupHandler";
-LPCSTR g_szIconHandler           = "nIconIconHandler";
+LPCSTR g_szIconHandler            = "nIconIconHandler";
 LPCSTR g_szAuthor                 = "Alurcard2";
 
 // The messages we want from the core
@@ -28,15 +28,6 @@ HWND g_hwndMain;
 HINSTANCE g_hInstance;
 
 IconGroup* pGroup;
-
-/// <summary>
-/// The main entry point for this DLL.
-/// </summary>
-BOOL APIENTRY DllMain( HANDLE hModule, DWORD ul_reason_for_call, LPVOID /* lpReserved */) {
-    if (ul_reason_for_call == DLL_PROCESS_ATTACH)
-        DisableThreadLibraryCalls((HINSTANCE)hModule);
-    return TRUE;
-}
 
 
 /// <summary>
@@ -106,23 +97,13 @@ bool CreateMessageHandlers(HINSTANCE hInst) {
         return false;
     }
 
-    wc.cbWndExtra = sizeof(LONG_PTR); // Planning to hold a IconGroup * here.
-    wc.lpfnWndProc = GroupHandlerProc;
-    wc.lpszClassName = g_szGroupHandler;
-    wc.style = CS_NOCLOSE | CS_DBLCLKS;
-
-    if (!RegisterClassEx(&wc)) {
+    if (!DrawableWindow::RegisterWindowClass(g_szGroupHandler, hInst)) {
         ErrorMessage(E_LVL_ERROR, TEXT("Failed to register nIcon's group class!"));
         UnregisterClass(g_szMainHandler, hInst);
         return false;
     }
 
-    wc.cbWndExtra = sizeof(LONG_PTR); // Planning to hold a Icon * here.
-    wc.lpfnWndProc = IconHandlerProc;
-    wc.lpszClassName = g_szIconHandler;
-    wc.style = CS_NOCLOSE | CS_DBLCLKS;
-
-    if (!RegisterClassEx(&wc)) {
+    if (!DrawableWindow::RegisterWindowClass(g_szIconHandler, hInst)) {
         ErrorMessage(E_LVL_ERROR, TEXT("Failed to register nIcon's icon class!"));
         UnregisterClass(g_szMainHandler, hInst);
         UnregisterClass(g_szGroupHandler, hInst);
@@ -174,37 +155,5 @@ LRESULT WINAPI LSMsgHandlerProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
             return 0;
         }
     }
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
-}
-
-
-/// <summary>
-/// Handles messages for the icongroups.
-/// </summary>
-/// <param name="hWnd">The window the message is for.</param>
-/// <param name="uMsg">The type of message.</param>
-/// <param name="wParam">wParam</param>
-/// <param name="lParam">lParam</param>
-LRESULT WINAPI GroupHandlerProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    // index 0 of the extra window data holds a pointer to the TaskButton which created it.
-    IconGroup * pGroup = (IconGroup *)GetWindowLongPtr(hWnd, 0);
-    if (pGroup) return pGroup->HandleMessage(uMsg, wParam, lParam);
-
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
-}
-
-
-/// <summary>
-/// Handles messages for the icongroups.
-/// </summary>
-/// <param name="hWnd">The window the message is for.</param>
-/// <param name="uMsg">The type of message.</param>
-/// <param name="wParam">wParam</param>
-/// <param name="lParam">lParam</param>
-LRESULT WINAPI IconHandlerProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    // index 0 of the extra window data holds a pointer to the TaskButton which created it.
-    Icon * pIcon = (Icon *)GetWindowLongPtr(hWnd, 0);
-    if (pIcon) return pIcon->HandleMessage(uMsg, wParam, lParam);
-
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

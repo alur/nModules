@@ -7,7 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "../nShared/Export.h"
+#include "../nShared/Macros.h"
 
 bool CreateLSMsgHandler(HINSTANCE);
 LRESULT WINAPI LSMsgHandlerProc(HWND, UINT, WPARAM, LPARAM);

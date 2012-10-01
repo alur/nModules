@@ -7,7 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "../nShared/Export.h"
+#include "../nShared/Macros.h"
 #include "../nShared/Versioning.h"
 
 bool CreateMainWindow(HINSTANCE);

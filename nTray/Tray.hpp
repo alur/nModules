@@ -14,7 +14,7 @@
 
 using std::map;
 
-class Tray {
+class Tray : public IDrawableMessageHandler {
 public:
     explicit Tray(LPCSTR);
     virtual ~Tray();
@@ -22,7 +22,7 @@ public:
     void LoadSettings(bool = false);
     TrayIcon* AddIcon(LPLSNOTIFYICONDATA);
     void RemoveIcon(TrayIcon*);
-    LRESULT WINAPI HandleMessage(UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
     void Relayout();
     vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* NID);
 
