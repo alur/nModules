@@ -18,7 +18,7 @@ using std::map;
 
 class IconGroup : public IIconEventHandler {
 public:
-    explicit IconGroup();
+    explicit IconGroup(LPCSTR pszPrefix);
     virtual ~IconGroup();
 
     LRESULT WINAPI HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam);
@@ -45,7 +45,7 @@ private:
     DrawableWindow* window;
 
     // All icons currently part of this group.
-    map<PCITEMID_CHILD, Icon*> icons;
+    vector<Icon*> icons;
 
     // Return value of the latest SHChangeNofityRegister call.
     ULONG changeNotifyUID;

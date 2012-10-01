@@ -23,7 +23,7 @@ Label::Label(LPCSTR pszName) {
 
     // Try to put the window right ontop of the desktop
     //SetWindowPos(m_pWindow->GetWindow(), FindWindow("DesktopBackgroundClass", ""), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE );
-    //SetWindowPos(FindWindow("DesktopBackgroundClass", ""), m_pWindow->GetWindow(), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE ); 
+    //SetWindowPos(FindWindow("DesktopBackgroundClass", ""), m_pWindow->GetWindow(), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE );
 
     m_pWindow->Show();
 }

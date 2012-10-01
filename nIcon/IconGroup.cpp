@@ -21,20 +21,16 @@ extern LPCSTR g_szGroupHandler;
 /// <summary>
 /// Constructor
 /// </summary>
-IconGroup::IconGroup() {
+IconGroup::IconGroup(LPCSTR pszPrefix) {
     WCHAR path[MAX_PATH];
 
     // Initalize all variables.
     this->changeNotifyUID = 0;
 
-    this->settings = new Settings("DesktopIcons");
+    this->settings = new Settings(pszPrefix);
 
     DrawableSettings* defaults = new DrawableSettings();
-    defaults->x = 1970;
-    defaults->y = 50;
-    defaults->width = 1820;
-    defaults->height = 1100;
-    defaults->color = 0x2200FF00;
+    defaults->color = 0x2000FF00;
 
     this->settings->GetString("Folder", path, sizeof(path), "Desktop");
 
@@ -53,6 +49,12 @@ IconGroup::~IconGroup() {
     if (this->changeNotifyUID != 0) {
         SHChangeNotifyDeregister(this->changeNotifyUID);
     }
+
+    for (vector<Icon*>::const_iterator iter = icons.begin(); iter != icons.end(); iter++) {
+        delete *iter;
+    }
+    icons.clear();
+
     SAFERELEASE(this->workingFolder);
     SAFERELEASE(this->rootFolder);
     SAFEDELETE(this->window);
@@ -112,39 +114,21 @@ void IconGroup::SetFolder(LPWSTR folder) {
 /// Add's the icon with the specified ID to the view
 /// </summary>
 void IconGroup::AddIcon(PCUITEMID_CHILD pidl) {
-    IExtractIconW* extractIcon;
-    HICON icon;
-    WCHAR iconFile[MAX_PATH];
-    int iconIndex;
-    UINT flags;
     D2D1_RECT_F pos;
-
     PositionIcon(pidl, &pos);
-
-    // Get the IExtractIcon interface for this item.
-    this->workingFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&pidl, IID_IExtractIconW, NULL, reinterpret_cast<LPVOID*>(&extractIcon));
-
-    // Get the location of the file containing the appropriate icon, and the index of the icon.
-    extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);
-
-    // Extract the icon.
-    extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(64, 0));
-
-    // Add it as an overlay.
-    window->AddOverlay(pos, icon);
-
-    // Let go of the interface.
-    extractIcon->Release();
+    Icon* icon = new Icon(pidl, this->workingFolder, this->window, this->settings);
+    icon->SetPosition(pos.left, pos.top);
+    icons.push_back(icon);
 }
 
 
 void IconGroup::PositionIcon(PCUITEMID_CHILD pidl, D2D1_RECT_F* position) {
-    static float pos = 0;
+    static float pos = 5;
     position->bottom = 64;
     position->left = 0 + pos;
     position->right = 64 + pos;
-    position->top = 0;
-    pos += 72;
+    position->top = 5;
+    pos += 80;
 }
 
 
