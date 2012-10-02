@@ -1,0 +1,15 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *  CommandItem.hpp
+ *  The nModules Project
+ *
+ *  Represents a popup item which executes a command.
+ *  
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#pragma once
+
+#include "PopupItem.hpp"
+
+class CommandItem : public PopupItem {
+public:
+    explicit CommandItem(LPCSTR title, LPCSTR command, LPCSTR customIcon = NULL);
+};

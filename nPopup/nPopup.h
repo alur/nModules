@@ -9,3 +9,5 @@
 
 void LoadSettings();
 void LoadPopups();
+bool LoadPopup(LPVOID f, bool * success, Popup** popup);
+Popup* LoadFolder(LPVOID f, LPCSTR title, LPCSTR prefix);
