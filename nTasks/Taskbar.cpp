@@ -42,8 +42,9 @@ Taskbar::~Taskbar() {
     }
     this->buttons.clear();
 
-    if (this->window) delete this->window;
-    if (this->settings) delete this->settings;
+    SAFEDELETE(this->window);
+    SAFEDELETE(this->settings);
+    SAFEDELETE(this->layoutSettings);
     free((void *)name);
 }
 
@@ -140,10 +141,41 @@ void Taskbar::Relayout() {
 
     switch (this->layoutSettings->startPosition) {
     default:
-    case LayoutSettings::TOPLEFT: x0 = this->layoutSettings->padding.left; y0 = this->layoutSettings->padding.top; xdir = 1; ydir = 1; break;
-    case LayoutSettings::TOPRIGHT: x0 = drawingSettings->width - this->layoutSettings->padding.right; y0 = this->layoutSettings->padding.top; xdir = -1; ydir = 1; break;
-    case LayoutSettings::BOTTOMLEFT: x0 = this->layoutSettings->padding.left; y0 = drawingSettings->height - this->layoutSettings->padding.bottom; xdir = 1; ydir = -1; break;
-    case LayoutSettings::BOTTOMRIGHT: x0 = drawingSettings->width - this->layoutSettings->padding.right; y0 = drawingSettings->height - this->layoutSettings->padding.bottom; xdir = -1; ydir = -1; break;
+    case LayoutSettings::TOPLEFT:
+        {
+            x0 = this->layoutSettings->padding.left;
+            y0 = this->layoutSettings->padding.top;
+            xdir = 1;
+            ydir = 1;
+        }
+        break;
+
+    case LayoutSettings::TOPRIGHT:
+        {
+            x0 = drawingSettings->width - this->layoutSettings->padding.right;
+            y0 = this->layoutSettings->padding.top;
+            xdir = -1;
+            ydir = 1;
+        }
+        break;
+
+    case LayoutSettings::BOTTOMLEFT:
+        {
+            x0 = this->layoutSettings->padding.left;
+            y0 = drawingSettings->height - this->layoutSettings->padding.bottom;
+            xdir = 1;
+            ydir = -1;
+        }
+        break;
+
+    case LayoutSettings::BOTTOMRIGHT:
+        {
+            x0 = drawingSettings->width - this->layoutSettings->padding.right;
+            y0 = drawingSettings->height - this->layoutSettings->padding.bottom;
+            xdir = -1;
+            ydir = -1;
+        }
+        break;
     }
 
     if (this->layoutSettings->primaryDirection == LayoutSettings::HORIZONTAL) {

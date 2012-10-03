@@ -23,6 +23,7 @@ Tray::Tray(LPCSTR name) {
     this->name = name;
 
     this->settings = new Settings(this->name);
+    this->layoutSettings = new LayoutSettings();
 
     DrawableSettings* defaults = new DrawableSettings();
     this->window = new DrawableWindow(NULL, (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, defaults, this);
@@ -42,8 +43,9 @@ Tray::~Tray() {
     }
     this->icons.clear();
 
-    if (this->window) delete this->window;
-    if (this->settings) delete this->settings;
+    SAFEDELETE(this->window);
+    SAFEDELETE(this->settings);
+    SAFEDELETE(this->layoutSettings);
     free((void *)this->name);
 }
 
@@ -52,9 +54,8 @@ Tray::~Tray() {
 /// Loads settings from LiteStep's RC files.
 /// </summary>
 void Tray::LoadSettings(bool /* IsRefresh */) {
-    this->settings->GetOffsetRect("MarginLeft", "MarginTop", "MarginRight", "MarginBottom", &this->margin, 2, 2, 5, 2);
-    this->colSpacing = this->settings->GetInt("ColumnSpacing", 2);
-    this->rowSpacing = this->settings->GetInt("RowSpacing", 2);
+    LayoutSettings* layoutDefaults = new LayoutSettings();
+    this->layoutSettings->Load(this->settings, layoutDefaults);
 
     Settings* iconSettings = this->settings->CreateChild("Icon");
     this->iconSize = iconSettings->GetInt("Size", 16);
@@ -104,16 +105,69 @@ void Tray::RemoveIcon(TrayIcon* pIcon) {
 /// Repositions/Resizes all icons.
 /// </summary>
 void Tray::Relayout() {
-    int x = this->margin.left;
-    int y = this->margin.top;
-    int wrapwidth = this->window->GetSettings()->width - this->margin.right - this->iconSize;
+    int x0, y0, xdir, ydir;
 
-    for (vector<TrayIcon*>::const_iterator iter = this->icons.begin(); iter != this->icons.end(); iter++) {
-        (*iter)->Reposition(x, y, this->iconSize, this->iconSize);
-        x += this->iconSize + this->colSpacing;
-        if (x > wrapwidth) {
-            x = this->margin.left;
-            y += this->iconSize + this->colSpacing;
+    DrawableSettings* drawingSettings = this->window->GetSettings();
+
+    switch (this->layoutSettings->startPosition) {
+    default:
+    case LayoutSettings::TOPLEFT:
+        {
+            x0 = this->layoutSettings->padding.left;
+            y0 = this->layoutSettings->padding.top;
+            xdir = 1;
+            ydir = 1;
+        }
+        break;
+
+    case LayoutSettings::TOPRIGHT:
+        {
+            x0 = drawingSettings->width - this->layoutSettings->padding.right - this->iconSize;
+            y0 = this->layoutSettings->padding.top;
+            xdir = -1;
+            ydir = 1;
+        }
+        break;
+
+    case LayoutSettings::BOTTOMLEFT:
+        {
+            x0 = this->layoutSettings->padding.left;
+            y0 = drawingSettings->height - this->layoutSettings->padding.bottom - this->iconSize;
+            xdir = 1;
+            ydir = -1;
+        }
+        break;
+
+    case LayoutSettings::BOTTOMRIGHT:
+        {
+            x0 = drawingSettings->width - this->layoutSettings->padding.right - this->iconSize;
+            y0 = drawingSettings->height - this->layoutSettings->padding.bottom - this->iconSize;
+            xdir = -1;
+            ydir = -1;
+        }
+        break;
+    }
+
+    if (this->layoutSettings->primaryDirection == LayoutSettings::HORIZONTAL) {
+        int x = x0, y = y0;
+        for (vector<TrayIcon*>::const_iterator iter = this->icons.begin(); iter != this->icons.end(); iter++) {
+            (*iter)->Reposition(x, y, this->iconSize, this->iconSize);
+            x += xdir*(this->iconSize + this->layoutSettings->columnSpacing);
+            if (x < this->layoutSettings->padding.left || x > drawingSettings->width - this->layoutSettings->padding.right - this->iconSize) {
+                x = x0;
+                y += ydir*(this->iconSize + this->layoutSettings->rowSpacing);
+            }
+        }
+    }
+    else {
+        int x = x0, y = y0;
+        for (vector<TrayIcon*>::const_iterator iter = this->icons.begin(); iter != this->icons.end(); iter++) {
+            (*iter)->Reposition(x, y, this->iconSize, this->iconSize);
+            y += ydir*(this->iconSize + this->layoutSettings->rowSpacing);
+            if (y < this->layoutSettings->padding.top || y > drawingSettings->height - this->layoutSettings->padding.bottom - this->iconSize) {
+                y = y0;
+                x += xdir*(this->iconSize + this->layoutSettings->columnSpacing);
+            }
         }
     }
 }
