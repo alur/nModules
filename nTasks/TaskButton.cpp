@@ -16,7 +16,7 @@ extern LSModule* g_LSModule;
 /// <summary>
 /// Constructor
 /// </summary>
-TaskButton::TaskButton(HWND parent, HWND window, LPCSTR prefix, Settings* parentSettings) {
+TaskButton::TaskButton(HWND parent, HWND window, Settings* parentSettings) {
     // 
     m_hWnd = window;
     m_hWndParent = parent;

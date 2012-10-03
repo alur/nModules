@@ -16,14 +16,19 @@ extern LSModule* g_LSModule;
 /// <summary>
 /// Constructor
 /// </summary>
-Taskbar::Taskbar(LPCSTR pszName) {
-    m_pszName = pszName;
+Taskbar::Taskbar(LPCSTR name) {
+    this->name = name;
 
-    this->settings = new Settings(m_pszName);
+    this->settings = new Settings(this->name);
     LoadSettings();
+
+    this->layoutSettings = new LayoutSettings();
+    LayoutSettings* defaults = new LayoutSettings();
+    this->layoutSettings->Load(this->settings, defaults);
+    delete defaults;
     
-    m_pWindow = new DrawableWindow(NULL, (LPCSTR)g_LSModule->GetWindowClass(2), g_LSModule->GetInstance(), this->settings, new DrawableSettings(), this);
-    m_pWindow->Show();
+    this->window = new DrawableWindow(NULL, (LPCSTR)g_LSModule->GetWindowClass(2), g_LSModule->GetInstance(), this->settings, new DrawableSettings(), this);
+    this->window->Show();
 }
 
 
@@ -32,14 +37,14 @@ Taskbar::Taskbar(LPCSTR pszName) {
 /// </summary>
 Taskbar::~Taskbar() {
     // Remove all buttons
-    for (map<HWND, TaskButton*>::const_iterator iter = m_buttons.begin(); iter != m_buttons.end(); iter++) {
+    for (map<HWND, TaskButton*>::const_iterator iter = this->buttons.begin(); iter != this->buttons.end(); iter++) {
         delete iter->second;
     }
-    m_buttons.clear();
+    this->buttons.clear();
 
-    if (m_pWindow) delete m_pWindow;
+    if (this->window) delete this->window;
     if (this->settings) delete this->settings;
-    free((void *)m_pszName);
+    free((void *)name);
 }
 
 
@@ -47,8 +52,13 @@ Taskbar::~Taskbar() {
 /// Loads settings from LiteStep's RC files.
 /// </summary>
 void Taskbar::LoadSettings(bool /* isRefresh */) {
-    m_uMaxButtonWidth = this->settings->GetInt("MaxButtonWidth", 500);
-    m_uMonitor = this->settings->GetMonitor("Monitor", 0xFFFFFFFF);
+    Settings* buttonSettings = settings->CreateChild("Button");
+
+    this->buttonWidth = buttonSettings->GetInt("Width", 100);
+    this->buttonHeight = buttonSettings->GetInt("Height", 20);
+    this->buttonMaxWidth = buttonSettings->GetInt("MaxWidth", this->buttonWidth);
+    this->buttonMaxHeight = buttonSettings->GetInt("MaxHeight", this->buttonHeight);
+    this->monitor = this->settings->GetMonitor("Monitor", 0xFFFFFFFF);
 }
 
 
@@ -56,9 +66,9 @@ void Taskbar::LoadSettings(bool /* isRefresh */) {
 /// Adds the specified task to this taskbar
 /// </summary>
 TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout) {
-    if (monitor == m_uMonitor || m_uMonitor == 0xFFFFFFFF) {
-        TaskButton* pButton = new TaskButton(m_pWindow->GetWindow(), hWnd, m_pszName, this->settings);
-        m_buttons.insert(m_buttons.end(), std::pair<HWND, TaskButton*>(hWnd, pButton));
+    if (monitor == this->monitor || this->monitor == 0xFFFFFFFF) {
+        TaskButton* pButton = new TaskButton(this->window->GetWindow(), hWnd, this->settings);
+        this->buttons.insert(this->buttons.end(), std::pair<HWND, TaskButton*>(hWnd, pButton));
 
         if (hWnd == GetForegroundWindow()) {
             pButton->Activate();
@@ -77,7 +87,7 @@ TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout) {
 /// Removes the specified task from this taskbar, if it is on it
 /// </summary>
 void Taskbar::RemoveTask(HWND hWnd) {
-    RemoveTask(m_buttons.find(hWnd));
+    RemoveTask(this->buttons.find(hWnd));
 }
 
 
@@ -85,9 +95,9 @@ void Taskbar::RemoveTask(HWND hWnd) {
 /// Removes the specified task from this taskbar, if it is on it
 /// </summary>
 void Taskbar::RemoveTask(map<HWND, TaskButton*>::iterator iter) {
-    if (iter != m_buttons.end()) {
+    if (iter != this->buttons.end()) {
         delete iter->second;
-        m_buttons.erase(iter);
+        this->buttons.erase(iter);
         Relayout();
     }
 }
@@ -99,17 +109,17 @@ void Taskbar::RemoveTask(map<HWND, TaskButton*>::iterator iter) {
 /// <param name="pOut">If a taskbutton was added or removed, the pointer to that button. Otherwise NULL.</param>
 /// <returns>True if the task should be contained on this taskbar. False otherwise.</returns>
 bool Taskbar::MonitorChanged(HWND hWnd, UINT monitor, TaskButton** pOut) {
-    map<HWND, TaskButton*>::iterator iter = m_buttons.find(hWnd);
+    map<HWND, TaskButton*>::iterator iter = this->buttons.find(hWnd);
     *pOut = NULL;
     // If we should contain the task
-    if (monitor == m_uMonitor || m_uMonitor == 0xFFFFFFFF) {
-        if (iter == m_buttons.end()) {
+    if (monitor == this->monitor || this->monitor == 0xFFFFFFFF) {
+        if (iter == this->buttons.end()) {
             *pOut = AddTask(hWnd, monitor, false);
         }
         return true;
     }
     else {
-        if (iter != m_buttons.end()) {
+        if (iter != this->buttons.end()) {
             *pOut = iter->second;
             RemoveTask(iter);
         }
@@ -122,13 +132,54 @@ bool Taskbar::MonitorChanged(HWND hWnd, UINT monitor, TaskButton** pOut) {
 /// Repositions/Resizes all buttons.  
 /// </summary>
 void Taskbar::Relayout() {
-    UINT taskbarWidth = this->m_pWindow->GetSettings()->width;
-    UINT buttonWidth = m_buttons.empty() ? m_uMaxButtonWidth : min(m_uMaxButtonWidth, (taskbarWidth-5)/(UINT)m_buttons.size());
-    UINT startPos = 5;
-    for (map<HWND, TaskButton*>::const_iterator iter = m_buttons.begin(); iter != m_buttons.end(); iter++) {
-        iter->second->Reposition(startPos, 5, buttonWidth-5, this->m_pWindow->GetSettings()->height - 10);
-        startPos += buttonWidth;
-        iter->second->Show();
+    DrawableSettings* drawingSettings = this->window->GetSettings();
+
+    // TODO::This code isn't 100% working, in particular i suspect that multiline configurations are broken.
+
+    int spacePerLine, lines, buttonSize, x0, y0, xdir, ydir;
+
+    switch (this->layoutSettings->startPosition) {
+    default:
+    case LayoutSettings::TOPLEFT: x0 = this->layoutSettings->padding.left; y0 = this->layoutSettings->padding.top; xdir = 1; ydir = 1; break;
+    case LayoutSettings::TOPRIGHT: x0 = drawingSettings->width - this->layoutSettings->padding.right; y0 = this->layoutSettings->padding.top; xdir = -1; ydir = 1; break;
+    case LayoutSettings::BOTTOMLEFT: x0 = this->layoutSettings->padding.left; y0 = drawingSettings->height - this->layoutSettings->padding.bottom; xdir = 1; ydir = -1; break;
+    case LayoutSettings::BOTTOMRIGHT: x0 = drawingSettings->width - this->layoutSettings->padding.right; y0 = drawingSettings->height - this->layoutSettings->padding.bottom; xdir = -1; ydir = -1; break;
+    }
+
+    if (this->layoutSettings->primaryDirection == LayoutSettings::HORIZONTAL) {
+        spacePerLine = drawingSettings->width - this->layoutSettings->padding.left - this->layoutSettings->padding.right;
+        lines = (drawingSettings->height + this->layoutSettings->rowSpacing - this->layoutSettings->padding.top - this->layoutSettings->padding.bottom)/(this->layoutSettings->rowSpacing + this->buttonHeight);
+        // We need to consider that buttons can't be split between multiple lines.
+        buttonSize = (int)min(this->buttonMaxWidth, min(spacePerLine * lines / this->buttons.size(), spacePerLine * (int)ceil(this->buttons.size() / (float)lines)));
+        if (ydir == -1) y0 -= this->buttonHeight;
+        if (xdir == -1) x0 -= buttonSize;
+        int x = x0, y = y0;
+        for (map<HWND, TaskButton*>::const_iterator iter = this->buttons.begin(); iter != this->buttons.end(); iter++) {
+            iter->second->Reposition(x, y, buttonSize, this->buttonHeight);
+            x += xdir*(buttonSize + this->layoutSettings->columnSpacing);
+            if (x < this->layoutSettings->padding.left || x > drawingSettings->width - this->layoutSettings->padding.right - buttonSize) {
+                x = x0;
+                y += ydir*(this->buttonHeight + this->layoutSettings->rowSpacing);
+            }
+            iter->second->Show();
+        }
+    }
+    else {
+        spacePerLine = drawingSettings->height - this->layoutSettings->padding.top - this->layoutSettings->padding.bottom;
+        lines = (drawingSettings->width + this->layoutSettings->columnSpacing - this->layoutSettings->padding.left - this->layoutSettings->padding.right)/(this->layoutSettings->columnSpacing + this->buttonWidth);
+        buttonSize = (int)min(this->buttonMaxHeight, min(spacePerLine * lines / this->buttons.size(), spacePerLine * (int)ceil(this->buttons.size() / (float)lines)));
+        if (ydir == -1) y0 -= buttonSize;
+        if (xdir == -1) x0 -= this->buttonWidth;
+        int x = x0, y = y0;
+        for (map<HWND, TaskButton*>::const_iterator iter = this->buttons.begin(); iter != this->buttons.end(); iter++) {
+            iter->second->Reposition(x, y, this->buttonWidth, buttonSize);
+            y += ydir*(buttonSize + this->layoutSettings->rowSpacing);
+            if (y < this->layoutSettings->padding.top || y > drawingSettings->height - this->layoutSettings->padding.bottom - buttonSize) {
+                y = y0;
+                x += xdir*(this->buttonWidth + this->layoutSettings->columnSpacing);
+            }
+            iter->second->Show();
+        }
     }
 }
 
@@ -137,5 +188,5 @@ void Taskbar::Relayout() {
 /// Handles window events for the taskbar.
 /// </summary>
 LRESULT WINAPI Taskbar::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    return m_pWindow->HandleMessage(wnd, uMsg, wParam, lParam);
+    return this->window->HandleMessage(wnd, uMsg, wParam, lParam);
 }

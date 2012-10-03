@@ -11,7 +11,7 @@
 
 class TaskButton : public IDrawableMessageHandler {
 public:
-    explicit TaskButton(HWND parent, HWND window, LPCSTR prefix, Settings* parentSettings);
+    explicit TaskButton(HWND parent, HWND window, Settings* parentSettings);
     virtual ~TaskButton();
 
     void Reposition(UINT x, UINT y, UINT width, UINT height);

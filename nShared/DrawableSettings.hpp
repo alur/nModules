@@ -11,8 +11,6 @@
 #include <dwrite.h>
 #include "Settings.hpp"
 
-typedef DWORD ARGB;
-
 class DrawableSettings {
 public:
     explicit DrawableSettings();

@@ -26,6 +26,7 @@
     <ClInclude Include="Error.h" />
     <ClInclude Include="Factories.h" />
     <ClInclude Include="IDrawableMessageHandler.hpp" />
+    <ClInclude Include="LayoutSettings.hpp" />
     <ClInclude Include="LSModule.hpp" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="MonitorInfo.hpp" />
@@ -40,6 +41,7 @@
     <ClCompile Include="DrawableWindow.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="Factories.cpp" />
+    <ClCompile Include="LayoutSettings.cpp" />
     <ClCompile Include="LSModule.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="MonitorInfo.cpp" />

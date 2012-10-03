@@ -7,8 +7,11 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-typedef DWORD ARGB;
 #include <d2d1.h>
+
+
+typedef DWORD ARGB;
+
 
 class Settings {
 public:
