@@ -182,7 +182,7 @@ void Taskbar::Relayout() {
         spacePerLine = drawingSettings->width - this->layoutSettings->padding.left - this->layoutSettings->padding.right;
         lines = (drawingSettings->height + this->layoutSettings->rowSpacing - this->layoutSettings->padding.top - this->layoutSettings->padding.bottom)/(this->layoutSettings->rowSpacing + this->buttonHeight);
         // We need to consider that buttons can't be split between multiple lines.
-        buttonSize = (int)min(this->buttonMaxWidth, min(spacePerLine * lines / this->buttons.size(), spacePerLine * (int)ceil(this->buttons.size() / (float)lines)));
+        buttonSize = (int)min(this->buttonMaxWidth, min(spacePerLine * lines / this->buttons.size(), spacePerLine / (int)ceil(this->buttons.size() / (float)lines)) - this->layoutSettings->columnSpacing);
         if (ydir == -1) y0 -= this->buttonHeight;
         if (xdir == -1) x0 -= buttonSize;
         int x = x0, y = y0;
@@ -199,7 +199,7 @@ void Taskbar::Relayout() {
     else {
         spacePerLine = drawingSettings->height - this->layoutSettings->padding.top - this->layoutSettings->padding.bottom;
         lines = (drawingSettings->width + this->layoutSettings->columnSpacing - this->layoutSettings->padding.left - this->layoutSettings->padding.right)/(this->layoutSettings->columnSpacing + this->buttonWidth);
-        buttonSize = (int)min(this->buttonMaxHeight, min(spacePerLine * lines / this->buttons.size(), spacePerLine * (int)ceil(this->buttons.size() / (float)lines)));
+        buttonSize = (int)min(this->buttonMaxHeight, min(spacePerLine * lines / this->buttons.size(), spacePerLine / (int)ceil(this->buttons.size() / (float)lines)) - this->layoutSettings->rowSpacing);
         if (ydir == -1) y0 -= buttonSize;
         if (xdir == -1) x0 -= this->buttonWidth;
         int x = x0, y = y0;
