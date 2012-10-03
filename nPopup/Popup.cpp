@@ -15,10 +15,13 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) {
 
 
 Popup::~Popup() {
-
+    for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
+        delete *iter;
+    }
+    this->items.clear();
 }
 
 
 void Popup::AddItem(PopupItem* item) {
-    delete item;
+    this->items.push_back(item);
 }

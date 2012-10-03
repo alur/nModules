@@ -8,11 +8,13 @@
 #include "../headers/lsapi.h"
 #include "../nShared/LSModule.hpp"
 #include "../nShared/Debugging.h"
+#include <strsafe.h>
 #include "Popup.hpp"
 #include "PopupItem.hpp"
 #include "SeparatorItem.hpp"
 #include "CommandItem.hpp"
 #include "FolderItem.hpp"
+#include "InfoItem.hpp"
 #include "nPopup.h"
 
 // The window classes we want to register
@@ -87,12 +89,12 @@ void LoadSettings() {
 /// </summary>
 void LoadPopups() {
     LPVOID f = LCOpen(NULL);
-    bool success;
     Popup* popup;
 
-    while (LoadPopup(f, &success, &popup)) {
-        if (success) {
+    while (LoadPopup(f, NULL, NULL, POPUPLEVEL_ROOT, &popup)) {
+        if (popup != NULL) {
             //rootPopups.push_back(popup);
+            delete popup;
         }
     }
 
@@ -101,96 +103,169 @@ void LoadPopups() {
 
 
 /// <summary>
-/// Loads a popup, !New
+/// Loads a popup
 /// </summary>
-bool LoadPopup(LPVOID f, bool * success, Popup** popup) {
-    char line[MAX_LINE_LENGTH], token1[MAX_LINE_LENGTH], token2[MAX_LINE_LENGTH],
-         token3[MAX_LINE_LENGTH], token4[MAX_LINE_LENGTH], token5[MAX_LINE_LENGTH];
-    LPSTR tokens[] = { token1, token2, token3, token4, token5 };
-    token1[0] = 0; token2[0] = 0; token3[0] = 0; token4[0] = 0; token5[0] = 0;
-
-    // First of, find the first !New line
-    if (!LCReadNextConfig(f, "*Popup", line, sizeof(line))) {
-        *success = false;
-        return false;
+/// <return>Returns false when all lines have been read.</return>
+bool LoadPopup(LPVOID f, LPCSTR folderTitle, LPCSTR folderPrefix, POPUPLEVEL level, Popup** out) {
+    char line[MAX_LINE_LENGTH], title[MAX_LINE_LENGTH], command[MAX_LINE_LENGTH], icon[MAX_LINE_LENGTH], prefix[MAX_LINE_LENGTH];
+    
+    if (level != POPUPLEVEL_ROOT) {
+        *out = new Popup(folderTitle, NULL, folderPrefix);
     }
 
-    // Make sure that we have a !New line
-    LCTokenize(line, tokens, 5, NULL);
-    if (_stricmp(token3, "!New") != 0) {
-        TRACE("Invalid popup line: %s", line);
-        *success = false;
-        return true;
-    }
-
-    // Create the popup
-    *popup = new Popup(token2, token4, token5);
-
-    // Get popup items.
     while (LCReadNextConfig(f, "*Popup", line, sizeof(line))) {
-        // Read through the tokens
-        LPCSTR linePointer = line;
-        GetToken(linePointer, NULL, &linePointer, FALSE); // Drop *Popup
-        GetToken(linePointer, token1, &linePointer, FALSE); //
-        if (_stricmp(token1, "!Separator") == 0) {
-            (*popup)->AddItem(new SeparatorItem());
+        POPUPLINETYPE type = ProcessPopupLine(line, title, sizeof(title), command, sizeof(command), icon, sizeof(icon), prefix, sizeof(prefix));
+        if (level == POPUPLEVEL_ROOT) {
+            if (type == POPUPLINETYPE_NEW) {
+                // hmm..., need to deal with bangs.
+                return LoadPopup(f, title, prefix, POPUPLEVEL_NEW, out);
+            }
+            else {
+                TRACE("Invalid popup line at the root level: %s", line);
+                *out = NULL;
+                return true;
+            }
         }
-        else if (_stricmp(token1, "~New") == 0) {
-            *success = true;
-            return true;
-        }
-        else if (_stricmp(token1, "~Folder") == 0) {
-            TRACE("Unexpected ~Folder, skipping *popup line.");
-        }
-        else if (_strnicmp(token1, ".icon=", strlen(".icon=")) == 0) {
-            GetToken(linePointer, token2, &linePointer, FALSE); //
-            GetToken(linePointer, token3, &linePointer, FALSE);
-            if (_stricmp(token3, "Folder") == 0) {
-                Popup* folderPopup = LoadFolder(f, token2, NULL); // TODO::Prefix
-                if (folderPopup != NULL) {
-                    (*popup)->AddItem(new FolderItem(token2, folderPopup, token1));
+        else switch (type) {
+        case POPUPLINETYPE_FOLDER:
+            {
+                Popup* popup;
+                LoadPopup(f, title, prefix, POPUPLEVEL_FOLDER, &popup);
+                (*out)->AddItem(new FolderItem(title, popup, icon));
+            }
+            break;
+
+        case POPUPLINETYPE_ENDFOLDER:
+            {
+                if (level == POPUPLEVEL_FOLDER) {
+                    return true;
+                }
+                else {
+                    TRACE("Unexpected ~Folder: %s", line);
                 }
             }
-            // TODO:!PopupDynamic, ...
-            else {
-                // Command
-                (*popup)->AddItem(new CommandItem(token2, token3, token1));
-            }
-        }
-        else {
-            // Assume it's a title.
-            GetToken(linePointer, token2, &linePointer, FALSE); //
-            if (_stricmp(token2, "Folder") == 0) {
-                Popup* folderPopup = LoadFolder(f, token1, NULL); // TODO::Prefix
-                if (folderPopup != NULL) {
-                    (*popup)->AddItem(new FolderItem(token1, folderPopup));
+            break;
+
+        case POPUPLINETYPE_ENDNEW:
+            {
+                if (level == POPUPLEVEL_NEW) {
+                    return true;
+                }
+                else {
+                    TRACE("Unexpected ~New: %s", line);
                 }
             }
-            // TODO:!PopupDynamic, ...
-            else {
-                // Command
-                (*popup)->AddItem(new CommandItem(token1, token2));
+            break;
+
+        case POPUPLINETYPE_COMMAND:
+            {
+                (*out)->AddItem(new CommandItem(title, command, icon));
             }
+            break;
+
+        case POPUPLINETYPE_INFO:
+            {
+                (*out)->AddItem(new InfoItem(title, icon));
+            }
+            break;
+
+        case POPUPLINETYPE_SEPARATOR:
+            {
+                (*out)->AddItem(new SeparatorItem());
+            }
+            break;
+
+        case POPUPLINETYPE_NEW:
+            {
+                TRACE("Unexpected New: %s", line);
+            }
+            break;
+
+        default: // Failure
+            {
+                TRACE("Unrecougnized popup line: %s", line);
+            }
+            break;
         }
     }
 
-    TRACE("Invalid popup detected, missing ~New");
-    *success = false;
-    delete *popup;
+    if (level != POPUPLEVEL_ROOT) {
+        TRACE("Unexpected end of *popup lines");
+    }
+    else {
+        *out = NULL;
+    }
+
     return false;
 }
 
 
 /// <summary>
-/// Loads a folder
+/// Extracts information from a *Popup line.
 /// </summary>
-Popup* LoadFolder(LPVOID f, LPCSTR title, LPCSTR prefix) {
-    /*char line[MAX_LINE_LENGTH], token1[MAX_LINE_LENGTH], token2[MAX_LINE_LENGTH],
-         token3[MAX_LINE_LENGTH], token4[MAX_LINE_LENGTH], token5[MAX_LINE_LENGTH];
-    LPSTR tokens[] = { token1, token2, token3, token4, token5 };
-    Popup* ret = new Popup(title, NULL, prefix);
+/// <return>The type of *Popup line this is.</return>
+POPUPLINETYPE ProcessPopupLine(LPCSTR line,
+                               LPSTR title, UINT cchTitle,
+                               LPSTR command, UINT cchCommand,
+                               LPSTR icon, UINT cchIcon,
+                               LPSTR prefix, UINT cchPrefix) {
+    char token[MAX_LINE_LENGTH];
+    LPCSTR linePointer = line;
+    GetToken(linePointer, NULL, &linePointer, FALSE); // Drop *Popup
+    
+    // The first token will be ~Folder, ~New, !Separator, !Info, .icon=, or a title.
+    GetToken(linePointer, token, &linePointer, FALSE);
+    if (_stricmp(token, "~New") == 0) {
+        return POPUPLINETYPE_ENDNEW;
+    }
+    else if (_stricmp(token, "~Folder") == 0) {
+        return POPUPLINETYPE_ENDFOLDER;
+    }
+    else if (_stricmp(token, "!Separator") == 0) {
+        return POPUPLINETYPE_SEPARATOR;
+    }
+    else {
+        // If we have a .icon, copy it over and move forward.
+        if (_strnicmp(token, ".icon=", 6) == 0) {
+            StringCchCopy(icon, cchIcon, token);
+            GetToken(linePointer, token, &linePointer, FALSE);
+        }
+        else {
+            icon[0] = '\0';
+        }
 
-    while (LCReadNextConfig(f, "*Popup", line, sizeof(line))) {
-    }*/
-    return NULL;
+        if (_stricmp(token, "!Info") == 0) {
+            GetToken(linePointer, token, &linePointer, FALSE);
+            StringCchCopy(title, cchTitle, token);
+            return POPUPLINETYPE_INFO;
+        }
+        else {
+            StringCchCopy(title, cchTitle, token);
+            // The token after the title is either !New, Folder, or a command. (TODO::Dynamic stuff).
+
+            // Store a copy to here, if this turns out to be a command
+            LPCSTR commandPointer = linePointer;
+            GetToken(linePointer, token, &linePointer, FALSE);
+
+            if (_stricmp(token, "!New") == 0) {
+                // !New is followed by the bang command
+                GetToken(linePointer, token, &linePointer, FALSE);
+                StringCchCopy(command, cchCommand, token);
+                // Which may be followed by a prefix
+                GetToken(linePointer, token, &linePointer, FALSE);
+                StringCchCopy(prefix, cchPrefix, token);
+                return POPUPLINETYPE_NEW;
+            }
+            else if (_stricmp(token, "Folder") == 0) {
+                // Folder may be followed by a prefix
+                GetToken(linePointer, token, &linePointer, FALSE);
+                StringCchCopy(prefix, cchPrefix, token);
+                return POPUPLINETYPE_FOLDER;
+            }
+            else {
+                StringCchCopy(command, cchCommand, commandPointer);
+                return POPUPLINETYPE_COMMAND;
+            }
+        }
+    }
 }

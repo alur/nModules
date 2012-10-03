@@ -1,20 +1,15 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  FolderItem.hpp
+ *  InfoItem.hpp
  *  The nModules Project
  *
- *  A static folder.
+ *  Represents a line of info.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
 #include "PopupItem.hpp"
-#include "Popup.hpp"
 
-class FolderItem : public PopupItem {
+class InfoItem : public PopupItem {
 public:
-    explicit FolderItem(LPCSTR title, Popup* popup, LPCSTR customIcon = NULL);
-    virtual ~FolderItem();
-
-private:
-    Popup* popup;
+    explicit InfoItem(LPCSTR title, LPCSTR customIcon = NULL);
 };

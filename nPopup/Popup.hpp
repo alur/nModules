@@ -8,6 +8,9 @@
 #pragma once
 
 #include "PopupItem.hpp"
+#include <vector>
+
+using std::vector;
 
 class Popup {
 public:
@@ -15,4 +18,7 @@ public:
     virtual ~Popup();
 
     void AddItem(PopupItem* item);
+
+private:
+    vector<PopupItem*> items;
 };

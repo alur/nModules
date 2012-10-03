@@ -10,5 +10,12 @@
 
 
 FolderItem::FolderItem(LPCSTR title, Popup* popup, LPCSTR customIcon) {
+    this->popup = popup;
+}
 
+
+FolderItem::~FolderItem() {
+    if (this->popup != NULL) {
+        delete this->popup;
+    }
 }

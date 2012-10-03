@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClInclude Include="CommandItem.hpp" />
     <ClInclude Include="FolderItem.hpp" />
+    <ClInclude Include="InfoItem.hpp" />
     <ClInclude Include="nPopup.h" />
     <ClInclude Include="Popup.hpp" />
     <ClInclude Include="PopupItem.hpp" />
@@ -155,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="CommandItem.cpp" />
     <ClCompile Include="FolderItem.cpp" />
+    <ClCompile Include="InfoItem.cpp" />
     <ClCompile Include="nPopup.cpp" />
     <ClCompile Include="Popup.cpp" />
     <ClCompile Include="PopupItem.cpp" />
