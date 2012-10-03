@@ -100,6 +100,9 @@ private:
     // Loads RC settings
     void LoadSettings();
 
+    //
+    HRESULT LoadRCImage();
+
     // 
     void HandleActiveStateChange();
 

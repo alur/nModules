@@ -21,6 +21,7 @@ DrawableSettings::DrawableSettings() {
     this->fontColor = 0xFFFFFFFF;
     this->fontSize = 12.0f;
     this->height = 100;
+    StringCchCopy(this->image, sizeof(this->image), "");
     StringCchCopyW(this->text, sizeof(this->text)/sizeof(WCHAR), L"");
     StringCchCopy(this->textAlign, sizeof(this->textAlign), "Left");
     this->textOffsetBottom = 0.0f;

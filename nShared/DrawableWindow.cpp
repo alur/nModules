@@ -379,6 +379,65 @@ bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst, IDrawableMes
 /// <summary>
 /// Shows the window.
 /// </summary>
+HRESULT DrawableWindow::LoadRCImage() {
+    /*IWICBitmap* source = NULL;
+    IWICBitmapScaler* scaler = NULL;
+    IWICFormatConverter* converter = NULL;
+    IWICImagingFactory* factory = NULL;
+    ID2D1Bitmap* bitmap = NULL;
+    Overlay overlay;
+    UINT width, height;
+    
+    HRESULT hr = S_OK;
+
+    // Create our helper objects.
+    CHECKHR(hr, Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory)));
+    CHECKHR(hr, factory->CreateBitmapScaler(&scaler));
+    CHECKHR(hr, factory->CreateFormatConverter(&converter));
+
+    // Generate a WIC bitmap
+    CHECKHR(hr, factory->CreateBitmapFromMemory);
+
+    // Resize the image
+    CHECKHR(hr, source->GetSize(&width, &height));
+    CHECKHR(hr, scaler->Initialize(source, (UINT)(position.right - position.left), (UINT)(position.bottom - position.top), WICBitmapInterpolationModeCubic));
+    
+    // Convert it to an ID2D1Bitmap
+    CHECKHR(hr, converter->Initialize(scaler, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut));
+    CHECKHR(hr, this->renderTarget->CreateBitmapFromWicBitmap(converter, 0, &bitmap));
+
+    // Create a brush based on the bitmap
+    CHECKHR(hr, this->renderTarget->CreateBitmapBrush(bitmap, reinterpret_cast<ID2D1BitmapBrush**>(&overlay.brush)));
+    
+    // Move the origin of the brush to match the overlay position
+    overlay.brush->SetTransform(D2D1::Matrix3x2F::Translation(position.left, position.top));
+    overlay.position = position;
+
+    // Transfer control here if CHECKHR failed
+    CHECKHR_END();
+
+    // Release stuff
+    SAFERELEASE(scaler);
+    SAFERELEASE(converter);
+    SAFERELEASE(source);
+    SAFERELEASE(bitmap);
+
+    // Add the overlays to the overlay list
+    if (SUCCEEDED(hr)) {
+        this->overlays.push_back(overlay);
+    }
+    else {
+        TRACE("DrawableWindow::AddOverlay failed!");
+    }
+
+    return hr;*/
+    return 0;
+}
+
+
+/// <summary>
+/// Shows the window.
+/// </summary>
 void DrawableWindow::Show() {
     ShowWindow(this->window, SW_SHOWNOACTIVATE);
 }

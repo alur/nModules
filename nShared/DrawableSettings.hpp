@@ -42,6 +42,9 @@ public:
     // The height of the window. Default: 100
     int height;
 
+    // The image to use for this window. Default: "" (blank)
+    char image[MAX_PATH];
+
     // The text to display. Default: "" (blank)
     WCHAR text[MAX_LINE_LENGTH];
 
