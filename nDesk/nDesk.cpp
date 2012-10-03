@@ -60,6 +60,7 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE instance, LPCSTR /* szPath */)
         delete g_pClickHandler;
         return 1;
     }
+
     SetWindowPos(g_pLSModule->GetMessageWindow(), HWND_BOTTOM, g_pMonitorInfo->m_virtualDesktop.rect.left,
         g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.width,
         g_pMonitorInfo->m_virtualDesktop.height, SWP_NOACTIVATE|SWP_NOSENDCHANGING);
