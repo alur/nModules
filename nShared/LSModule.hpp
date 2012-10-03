@@ -23,7 +23,7 @@ public:
     explicit LSModule(LPCSTR moduleName, LPCSTR author, VERSION version, HINSTANCE instance, UINT lsMessages[]);
     virtual ~LSModule();
 
-    bool Initialize(LPCSTR drawableWindowClasses[]);
+    bool Initialize(LPCSTR drawableWindowClasses[], PWNDCLASSEX customClass = NULL);
     bool ConnectToCore(VERSION minimumCoreVersion);
 
     ATOM GetWindowClass(UINT id);
@@ -34,7 +34,7 @@ private:
     // Intercepts LiteStep messages before the module can get to them.
     static LRESULT WINAPI MessageHandler(HWND, UINT, WPARAM, LPARAM);
 
-    bool RegisterLSWindowClass();
+    bool RegisterLSWindowClass(PWNDCLASSEX customClass = NULL);
     bool RegisterDrawableWindowClass(LPCSTR name);
     bool CreateLSWindow();
     void HandleError(DWORD errorCode);

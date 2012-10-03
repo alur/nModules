@@ -80,7 +80,7 @@ LRESULT WINAPI LSMessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 /// 
 /// </summary>
 void LoadSettings() {
-    LoadPopups();
+    //LoadPopups();
 }
 
 

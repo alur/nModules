@@ -55,7 +55,7 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE instance, LPCSTR /* szPath */)
 /// <summary>
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
-void quitModule(HINSTANCE hDllInstance) {
+void quitModule(HINSTANCE /* instance */) {
     // Remove all hotkeys
     for (map<int, LPCSTR>::const_iterator iter = g_hotKeys.begin(); iter != g_hotKeys.end(); iter++) {
         UnregisterHotKey(g_LSModule->GetMessageWindow(), iter->first);

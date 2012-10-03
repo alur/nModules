@@ -5,44 +5,47 @@
  *  Main .cpp file for the nDesk module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#include "../headers/lsapi.h"
 #include "nDesk.h"
 #include "../nCoreCom/Core.h"
 #include "../nShared/MonitorInfo.hpp"
+#include "../nShared/LSModule.hpp"
 #include "DesktopPainter.hpp"
 #include "ClickHandler.hpp"
 #include "WorkArea.h"
 #include "Bangs.h"
-#include "../nShared/Error.h"
-#include "../nShared/Factories.h"
 #include "Settings.h"
 
-// Constants
-const VERSION g_minCoreVersion    = MAKE_VERSION(0,2,0,0);
-const VERSION g_version           = MAKE_VERSION(0,2,0,0);
-LPCSTR g_szAppName                = "nDesk";
-LPCSTR g_szMainHandler            = "DesktopBackgroundClass";
-LPCSTR g_szAuthor                 = "Alurcard2";
 
 // The messages we want from the core
-UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
-HWND g_hwndMain;
+UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
 
 // Class pointers
 DesktopPainter* g_pDesktopPainter;
 MonitorInfo* g_pMonitorInfo;
 ClickHandler* g_pClickHandler;
+LSModule* g_pLSModule;
 
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath */) {
-    // Initalize communication with the core
-    switch (nCore::Init(g_minCoreVersion)) {
-    case S_OK:
-        break;
-    default:
-        ErrorMessage(E_LVL_ERROR, "There was a problem connecting to nCore!");
+int initModuleEx(HWND /* hWndParent */, HINSTANCE instance, LPCSTR /* szPath */) {
+    WNDCLASSEX wc;
+    ZeroMemory(&wc, sizeof(WNDCLASSEX));
+    wc.cbSize = sizeof(WNDCLASSEX);
+    wc.cbWndExtra = sizeof(LSModule*);
+    wc.lpfnWndProc = LSMessageHandler;
+    wc.hInstance = instance;
+    wc.lpszClassName = "DesktopBackgroundClass";
+    wc.hIconSm = 0;
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.style = CS_DBLCLKS;
+
+    g_pLSModule = new LSModule("nDesk", "Alurcard2", MAKE_VERSION(0,2,0,0), instance, g_lsMessages);
+
+    if (!g_pLSModule->ConnectToCore(MAKE_VERSION(0,2,0,0))) {
+        delete g_pLSModule;
         return 1;
     }
 
@@ -50,10 +53,17 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath
     g_pMonitorInfo = new MonitorInfo();
     g_pClickHandler = new ClickHandler();
     g_pDesktopPainter = NULL; // Initalized on WM_CREATE
-
-    // Create the main window
-    if (!CreateMainWindow(hDllInstance))
+    
+    if (!g_pLSModule->Initialize(NULL, &wc)) {
+        delete g_pLSModule;
+        delete g_pMonitorInfo;
+        delete g_pClickHandler;
         return 1;
+    }
+    SetWindowPos(g_pLSModule->GetMessageWindow(), HWND_BOTTOM, g_pMonitorInfo->m_virtualDesktop.rect.left,
+        g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.width,
+        g_pMonitorInfo->m_virtualDesktop.height, SWP_NOACTIVATE|SWP_NOSENDCHANGING);
+    ShowWindow(g_pLSModule->GetMessageWindow(), SW_SHOWNOACTIVATE);
 
     // Load bang commands
     Bangs::_Register();
@@ -72,69 +82,18 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath
 /// <summary>
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
-void quitModule(HINSTANCE hDllInstance) {
+void quitModule(HINSTANCE /* instance */) {
     // Reset the work area for all monitors
     WorkArea::ResetWorkAreas(g_pMonitorInfo);
 
     // Unregister bangs
     Bangs::_Unregister();
 
-    // Destroy the main window
-    if (g_hwndMain) {
-        SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)g_hwndMain, (LPARAM)g_lsMessages);
-        DestroyWindow(g_hwndMain);
-    }
-
     // Delete global classes
     if (g_pDesktopPainter) delete g_pDesktopPainter;
     if (g_pClickHandler) delete g_pClickHandler;
     if (g_pMonitorInfo) delete g_pMonitorInfo;
-
-    // Unregister the desktopbackgrounclass
-    UnregisterClass(g_szMainHandler, hDllInstance);
-
-    // Let go of any factories we've allocated
-    Factories::Release();
-}
-
-
-/// <summary>
-/// Creates the main message handler.
-/// </summary>
-/// <param name="hInst">The instance to attach this message handler to.</param>
-bool CreateMainWindow(HINSTANCE hInst) {
-    WNDCLASSEX wc;
-    ZeroMemory(&wc, sizeof(WNDCLASSEX));
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.lpfnWndProc = MainProc;
-    wc.hInstance = hInst;
-    wc.lpszClassName = g_szMainHandler;
-    wc.hIconSm = 0;
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.style = CS_DBLCLKS;
-
-    if (!RegisterClassEx(&wc)) {
-        ErrorMessage(E_LVL_ERROR, TEXT("Error registering the desktop background class, is there already a desktop module loaded?"));
-        return false;
-    }
-
-    g_hwndMain = CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_COMPOSITED, g_szMainHandler, "", WS_POPUP | WS_CLIPCHILDREN,
-        g_pMonitorInfo->m_virtualDesktop.rect.left, g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height,
-        NULL, NULL, hInst, NULL);
-
-    if (!g_hwndMain) {
-        ErrorMessage(E_LVL_ERROR, TEXT("Failed to create the desktop background window!"));
-        UnregisterClass(g_szMainHandler, hInst);
-        return false;
-    }
-
-    SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)g_hwndMain, (LPARAM) g_lsMessages);
-
-    SetWindowLongPtr(g_hwndMain, GWLP_USERDATA, MAGIC_DWORD);
-    SetWindowPos(g_hwndMain, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE|SWP_NOACTIVATE|SWP_NOSENDCHANGING);
-    ShowWindow(g_hwndMain, SW_SHOWNOACTIVATE);
-
-    return true;
+    if (g_pLSModule) delete g_pLSModule;
 }
 
 
@@ -145,24 +104,11 @@ bool CreateMainWindow(HINSTANCE hInst) {
 /// <param name="uMsg">The type of message.</param>
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
-LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI LSMessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch(uMsg) {
     case WM_CREATE:
         g_pDesktopPainter = new DesktopPainter(hWnd);
         return 0;
-
-    case LM_GETREVID: {
-        size_t uLength;
-        StringCchPrintf((LPSTR)lParam, 64, "%s: ", g_szAppName);
-		uLength = strlen((LPSTR)lParam);
-		GetVersionString(g_version, (LPSTR)lParam + uLength, 64 - uLength, false);
-            
-        if (SUCCEEDED(StringCchLength((LPSTR)lParam, 64, &uLength)))
-            return uLength;
-
-        lParam = NULL;
-        return 0;
-    }
 
     case LM_REFRESH:
         g_pClickHandler->Refresh();
@@ -194,7 +140,7 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     case WM_WINDOWPOSCHANGING: {
         // Keep the hWnd at the bottom of the window stack
         WINDOWPOS *c = (WINDOWPOS*)lParam;
-        c->hwnd = g_hwndMain;
+        c->hwnd = g_pLSModule->GetMessageWindow();
         c->hwndInsertAfter = HWND_BOTTOM;
         c->flags |= SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOMOVE;
         return 0;
@@ -242,7 +188,7 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     case WM_ACTIVATEAPP:
     case WM_ACTIVATE:
     case WM_PARENTNOTIFY:
-        SetWindowPos(g_hwndMain,HWND_BOTTOM,0,0,0,0,SWP_NOACTIVATE);
+        SetWindowPos(g_pLSModule->GetMessageWindow(),HWND_BOTTOM,0,0,0,0,SWP_NOACTIVATE);
         break;
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);

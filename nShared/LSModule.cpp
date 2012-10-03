@@ -63,14 +63,16 @@ LSModule::~LSModule() {
 /// <summary>
 /// Initalizes the module. Registers window classes and connects with the core.
 /// </summary>
-bool LSModule::Initialize(LPCSTR drawableWindowClasses[]) {
+bool LSModule::Initialize(LPCSTR drawableWindowClasses[], PWNDCLASSEX customClass) {
     // Register window classes.
-    if (!RegisterLSWindowClass()) {
+    if (!RegisterLSWindowClass(customClass)) {
         return false;
     }
-    while (*drawableWindowClasses != NULL) {
-        if (!RegisterDrawableWindowClass(*drawableWindowClasses++)) {
-            return false;
+    if (drawableWindowClasses != NULL) {
+        while (*drawableWindowClasses != NULL) {
+            if (!RegisterDrawableWindowClass(*drawableWindowClasses++)) {
+                return false;
+            }
         }
     }
 
@@ -106,7 +108,7 @@ bool LSModule::ConnectToCore(VERSION minimumCoreVersion) {
 /// <summary>
 /// Registers the LiteStep message handling class.
 /// </summary>
-bool LSModule::RegisterLSWindowClass() {
+bool LSModule::RegisterLSWindowClass(PWNDCLASSEX customClass) {
     WNDCLASSEX wc;
     char className[MAX_PATH];
 
@@ -120,7 +122,7 @@ bool LSModule::RegisterLSWindowClass() {
     wc.lpszClassName = className;
     wc.style = CS_NOCLOSE;
 
-    ATOM value = RegisterClassEx(&wc);
+    ATOM value = RegisterClassEx(customClass == NULL ? &wc : customClass);
 
     if (value == 0) {
         HandleError(GetLastError());
@@ -159,7 +161,7 @@ bool LSModule::RegisterDrawableWindowClass(LPCSTR name) {
 /// </summary>
 bool LSModule::CreateLSWindow() {
     this->LSWindow = CreateWindowEx(
-        WS_EX_TOOLWINDOW,
+        WS_EX_TOOLWINDOW | WS_EX_COMPOSITED,
         (LPCSTR)this->registeredWindowClasses[0],
         "", WS_POPUP|WS_CLIPSIBLINGS|WS_CLIPCHILDREN,
         0, 0, 0, 0, NULL, NULL, this->instance, NULL);
