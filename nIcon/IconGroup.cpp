@@ -112,7 +112,7 @@ void IconGroup::SetFolder(LPWSTR folder) {
 /// <summary>
 /// Add's the icon with the specified ID to the view
 /// </summary>
-void IconGroup::AddIcon(PCUITEMID_CHILD pidl) {
+void IconGroup::AddIcon(PCITEMID_CHILD pidl) {
     D2D1_RECT_F pos;
     PositionIcon(pidl, &pos);
     Icon* icon = new Icon(pidl, this->workingFolder, this->window, this->settings);
@@ -120,8 +120,18 @@ void IconGroup::AddIcon(PCUITEMID_CHILD pidl) {
     icons.push_back(icon);
 }
 
+PCITEMID_CHILD IconGroup::GetLastPIDLItem(LPITEMIDLIST pidl) {
+    LPITEMIDLIST ret = pidl;
+    USHORT lastCB;
+    while (ret->mkid.cb != 0) {
+        lastCB = ret->mkid.cb;
+        ret = LPITEMIDLIST(((LPBYTE)ret)+lastCB);
+    }
+    return LPITEMIDLIST(((LPBYTE)ret)-lastCB);
+}
 
-void IconGroup::PositionIcon(PCUITEMID_CHILD pidl, D2D1_RECT_F* position) {
+
+void IconGroup::PositionIcon(PCITEMID_CHILD pidl, D2D1_RECT_F* position) {
     static float pos = 5;
     position->bottom = 64;
     position->left = 0 + pos;
@@ -134,7 +144,7 @@ void IconGroup::PositionIcon(PCUITEMID_CHILD pidl, D2D1_RECT_F* position) {
 /// <summary>
 /// Get's the display name of a particular PIDL
 /// </summary>
-HRESULT IconGroup::GetDisplayNameOf(PCUITEMID_CHILD pidl, SHGDNF flags, LPWSTR buf, UINT cchBuf) {
+HRESULT IconGroup::GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR buf, UINT cchBuf) {
     STRRET ret;
     HRESULT hr = S_OK;
 
@@ -186,6 +196,7 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LP
                 case SHCNE_CREATE:
                     {
                         TRACEW(L"File created: %s", file1);
+                        AddIcon(GetLastPIDLItem(idList[0]));
                     }
                     break;
 
@@ -200,6 +211,7 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LP
                 case SHCNE_MKDIR:
                     {
                         TRACEW(L"The folder %s was created", file1);
+                        AddIcon(GetLastPIDLItem(idList[0]));
                     }
                     break;
 

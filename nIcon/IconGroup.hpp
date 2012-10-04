@@ -27,16 +27,22 @@ public:
     
 private:
     //
-    HRESULT GetDisplayNameOf(PCUITEMID_CHILD pidl, SHGDNF flags, LPWSTR buf, UINT cchBuf);
+    HRESULT GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR buf, UINT cchBuf);
 
     // 
-    void AddIcon(PCUITEMID_CHILD pidl);
+    void AddIcon(PCITEMID_CHILD pidl);
 
     // 
-    void RemoveIcon(PCUITEMID_CHILD pidl);
+    void RemoveIcon(PCITEMID_CHILD pidl);
 
     // 
-    void PositionIcon(PCUITEMID_CHILD pidl, D2D1_RECT_F* position);
+    void PositionIcon(PCITEMID_CHILD pidl, D2D1_RECT_F* position);
+
+    //
+    PCITEMID_CHILD GetLastPIDLItem(LPITEMIDLIST pidl);
+
+    //
+    vector<Icon*>::iterator FindIcon(PCITEMID_CHILD pidl);
 
     // Paintsettings for the whole group.
     Settings* settings;
