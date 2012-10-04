@@ -163,7 +163,7 @@ bool LSModule::CreateLSWindow() {
     this->LSWindow = CreateWindowEx(
         WS_EX_TOOLWINDOW | WS_EX_COMPOSITED,
         (LPCSTR)this->registeredWindowClasses[0],
-        "", WS_POPUP|WS_CLIPSIBLINGS|WS_CLIPCHILDREN,
+        "", WS_POPUP,
         0, 0, 0, 0, NULL, NULL, this->instance, NULL);
 
     return (this->LSWindow != NULL);

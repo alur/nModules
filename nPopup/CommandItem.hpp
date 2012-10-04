@@ -15,4 +15,9 @@ public:
     virtual ~CommandItem();
     
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    void Init(Settings* parentSettings, DrawableWindow* parentWindow);
+
+private:
+    LPCSTR title;
+    LPCSTR command;
 };

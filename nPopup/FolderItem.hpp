@@ -16,7 +16,9 @@ public:
     virtual ~FolderItem();
 
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    void Init(Settings* parentSettings, DrawableWindow* parentWindow);
 
 private:
     Popup* popup;
+    LPCSTR title;
 };

@@ -291,17 +291,19 @@ void DrawableWindow::PurgeOverlays() {
 /// Creates the window we are drawing.
 /// </summary>
 bool DrawableWindow::CreateWnd(LPCSTR pszWndClass, HINSTANCE hInst, IDrawableMessageHandler* msgHandler) {
-    if (this->parent) {
+    /*if (this->parent) {
         RECT parentRect;
         GetWindowRect(this->parent, &parentRect);
         this->scPosition.bottom += parentRect.top;
         this->scPosition.top += parentRect.top;
         this->scPosition.left += parentRect.left;
         this->scPosition.right += parentRect.left;
-    }
+    }*/
 
-    DWORD exStyle = WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW;
-    DWORD style = WS_POPUP;
+    DWORD exStyle = WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_COMPOSITED;
+    DWORD style = (this->parent) ? WS_CHILD : WS_POPUP;
+
+    if (!this->parent) exStyle |= WS_EX_COMPOSITED;
 
     if (this->drawingSettings->alwaysOnTop) exStyle |= WS_EX_TOPMOST;
 
@@ -461,14 +463,14 @@ void DrawableWindow::UpdatePosition() {
     this->scPosition.bottom = this->scPosition.top + this->drawingSettings->height;
 
     // If this is a child window we need to make its position relative to its parent.
-    if (this->parent) {
+    /*if (this->parent) {
         RECT parentRect;
         GetWindowRect(this->parent, &parentRect);
         this->scPosition.bottom += parentRect.top;
         this->scPosition.top += parentRect.top;
         this->scPosition.left += parentRect.left;
         this->scPosition.right += parentRect.left;
-    }
+    }*/
 
     D2D1_SIZE_U size = D2D1::SizeU(
         this->scPosition.right - this->scPosition.left,
@@ -520,7 +522,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         
         this->renderTarget->EndDraw();
         
-        ValidateRect(this->window, NULL);
+        //ValidateRect(this->window, NULL);
 
         return 0;
 

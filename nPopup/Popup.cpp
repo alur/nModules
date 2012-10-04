@@ -27,7 +27,7 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) {
     defaultSettings->color = 0x440000FF;
     defaultSettings->textRotation = -45.0f;
     defaultSettings->fontSize = 32.0f;
-    StringCchCopyW(defaultSettings->text, MAX_LINE_LENGTH, L"Demo");
+    StringCchCopyW(defaultSettings->text, MAX_LINE_LENGTH, L"nDemo");
     StringCchCopy(defaultSettings->textAlign, sizeof(defaultSettings->textAlign), "Center");
     StringCchCopy(defaultSettings->textVerticalAlign, sizeof(defaultSettings->textVerticalAlign), "Middle");
     this->window = new DrawableWindow(NULL, (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, defaultSettings, this);
@@ -51,6 +51,7 @@ Popup::~Popup() {
 void Popup::AddItem(PopupItem* item) {
     this->items.push_back(item);
     this->sized = false;
+    item->Init(this->settings, this->window);
 }
 
 
@@ -67,18 +68,22 @@ void Popup::Show() {
 
 
 void Popup::Show(int x, int y) {
-     DrawableSettings* drawingSettings = this->window->GetSettings();
-     drawingSettings->x = x;
-     drawingSettings->y = y;
+    DrawableSettings* drawingSettings = this->window->GetSettings();
+    drawingSettings->x = x;
+    drawingSettings->y = y;
 
-     if (!this->sized) {
-         drawingSettings->width = 200;
-         drawingSettings->height = 400;
-         this->sized = true;
-     }
+    if (!this->sized) {
+        drawingSettings->width = 200;
+        drawingSettings->height = 5;
+        for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
+            (*iter)->Position(5, drawingSettings->height);
+            drawingSettings->height += (*iter)->GetHeight() + 5;
+        }
+        this->sized = true;
+    }
 
-     this->window->UpdatePosition();
-     this->window->Show();
+    this->window->UpdatePosition();
+    this->window->Show();
 }
 
 

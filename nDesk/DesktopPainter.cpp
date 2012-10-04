@@ -353,7 +353,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                 DiscardDeviceResources();
             }
         }
-        ValidateRect(hWnd, NULL);
+        //ValidateRect(hWnd, NULL);
         return 0;
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);

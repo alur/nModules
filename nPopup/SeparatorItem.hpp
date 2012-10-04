@@ -15,4 +15,5 @@ public:
     virtual ~SeparatorItem();
 
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    void Init(Settings* parentSettings, DrawableWindow* parentWindow);
 };
