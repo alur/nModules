@@ -61,6 +61,9 @@ public:
     // Text offset from the top. Default: 0
     float textOffsetTop;
 
+    // Text rotation. Default: 0
+    float textRotation;
+
     // The vertical alignment of the text. Bottom, Middle, Top. Default: 0
     char textVerticalAlign[8];
 

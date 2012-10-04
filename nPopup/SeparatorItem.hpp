@@ -12,4 +12,7 @@
 class SeparatorItem : public PopupItem {
 public:
     explicit SeparatorItem();
+    virtual ~SeparatorItem();
+
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 };

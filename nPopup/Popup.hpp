@@ -30,6 +30,9 @@ private:
     vector<PopupItem*> items;
     LPCSTR bang;
 
+    // True if the popup is already sized properly.
+    bool sized;
+
     Settings* settings;
     DrawableWindow* window;
 };

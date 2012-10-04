@@ -59,6 +59,11 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE instance, LPCSTR /* szPath */)
 /// Called by the core when this module is about to be unloaded.
 /// </summary>
 void quitModule(HINSTANCE /* hDllInstance */) {
+    for (vector<Popup*>::const_iterator iter = rootPopups.begin(); iter != rootPopups.end(); iter++) {
+        RemoveBangCommand((*iter)->GetBang());
+        delete *iter;
+    }
+
     if (g_LSModule) {
         delete g_LSModule;
     }

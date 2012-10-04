@@ -12,3 +12,13 @@
 InfoItem::InfoItem(LPCSTR title, LPCSTR customIcon) {
 
 }
+
+
+InfoItem::~InfoItem() {
+
+}
+
+
+LRESULT InfoItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+    return this->window->HandleMessage(window, msg, wParam, lParam);
+}

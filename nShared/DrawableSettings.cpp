@@ -28,6 +28,7 @@ DrawableSettings::DrawableSettings() {
     this->textOffsetLeft = 0.0f;
     this->textOffsetRight = 0.0f;
     this->textOffsetTop = 0.0f;
+    this->textRotation = 0.0f;
     StringCchCopy(this->textVerticalAlign, sizeof(this->textVerticalAlign), "Top");
     this->width = 100;
     this->x = 0;
@@ -61,6 +62,7 @@ void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
     this->textOffsetLeft = settings->GetFloat("TextOffsetLeft", defaults->textOffsetLeft);
     this->textOffsetRight = settings->GetFloat("TextOffsetRight", defaults->textOffsetRight);
     this->textOffsetTop = settings->GetFloat("TextOffsetTop", defaults->textOffsetTop);
+    this->textRotation = settings->GetFloat("TextRotation", defaults->textRotation);
     settings->GetString("TextVerticalAlign", this->textVerticalAlign, sizeof(this->textVerticalAlign), defaults->textVerticalAlign);
     this->width = settings->GetInt("Width", defaults->width);
     this->x = settings->GetInt("X", defaults->x);

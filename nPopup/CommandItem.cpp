@@ -12,3 +12,13 @@
 CommandItem::CommandItem(LPCSTR title, LPCSTR command, LPCSTR customIcon) {
 
 }
+
+
+CommandItem::~CommandItem() {
+
+}
+
+
+LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+    return this->window->HandleMessage(window, msg, wParam, lParam);
+}

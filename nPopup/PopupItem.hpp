@@ -7,7 +7,17 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-class PopupItem {
+#include "../headers/lsapi.h"
+#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/IDrawableMessageHandler.hpp"
+
+class PopupItem : public IDrawableMessageHandler {
 public:
     virtual ~PopupItem();
+    void Position(int x, int y);
+    virtual LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM) = 0;
+
+protected:
+    DrawableWindow* window;
+    Settings* settings;
 };

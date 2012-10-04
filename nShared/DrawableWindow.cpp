@@ -505,13 +505,19 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
     case WM_PAINT:
         WCHAR wszText[MAX_LINE_LENGTH];
         this->renderTarget->BeginDraw();
+        
         this->renderTarget->Clear();
+        this->renderTarget->SetTransform(IdentityMatrix());
+
         this->renderTarget->FillRectangle(this->backArea, this->backBrush);
         for (vector<Overlay>::iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++) {
             this->renderTarget->FillRectangle(iter->position, iter->brush);
         }
+        
         nCore::System::FormatText(this->drawingSettings->text, sizeof(wszText)/sizeof(WCHAR), wszText);
+        this->renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, Point2F(this->drawingSettings->width/2,this->drawingSettings->height/2)));
         this->renderTarget->DrawText(wszText, lstrlenW(wszText), this->textFormat, this->textArea, this->textBrush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+        
         this->renderTarget->EndDraw();
         
         ValidateRect(this->window, NULL);

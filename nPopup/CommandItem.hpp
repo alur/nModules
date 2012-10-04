@@ -12,4 +12,7 @@
 class CommandItem : public PopupItem {
 public:
     explicit CommandItem(LPCSTR title, LPCSTR command, LPCSTR customIcon = NULL);
+    virtual ~CommandItem();
+    
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 };
