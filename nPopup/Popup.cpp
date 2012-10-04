@@ -6,11 +6,20 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../headers/lsapi.h"
+#include "../nShared/Debugging.h"
 #include "Popup.hpp"
+#include "../nShared/LSModule.hpp"
+
+
+extern LSModule* g_LSModule;
 
 
 Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) {
-
+    if (bang != NULL) {
+        this->bang = _strdup(bang);
+    }
+    this->settings = new Settings("nPopup");
+    this->window = new DrawableWindow(NULL, (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, new DrawableSettings(), this);
 }
 
 
@@ -19,9 +28,49 @@ Popup::~Popup() {
         delete *iter;
     }
     this->items.clear();
+    if (this->bang != NULL) {
+        free((LPVOID)this->bang);
+    }
+    SAFEDELETE(this->window);
+    SAFEDELETE(this->settings);
 }
 
 
 void Popup::AddItem(PopupItem* item) {
     this->items.push_back(item);
+}
+
+
+LPCSTR Popup::GetBang() {
+    return this->bang;
+}
+
+
+void Popup::Show() {
+    POINT pt;
+    GetCursorPos(&pt);
+    Show(pt.x, pt.y);
+}
+
+
+void Popup::Show(int x, int y) {
+     DrawableSettings* drawingSettings = this->window->GetSettings();
+     drawingSettings->x = x;
+     drawingSettings->y = y;
+     this->window->UpdatePosition();
+     this->window->Show();
+}
+
+
+LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+    switch (msg) {
+    case WM_ACTIVATE:
+        if (LOWORD(wParam) == WA_INACTIVE) {
+            this->window->Hide();
+        }
+        return 0;
+
+    default:
+        return this->window->HandleMessage(window, msg, wParam, lParam);
+    }
 }

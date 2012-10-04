@@ -9,16 +9,27 @@
 
 #include "PopupItem.hpp"
 #include <vector>
+#include "../nShared/IDrawableMessageHandler.hpp"
+#include "../nShared/Settings.hpp"
+#include "../nShared/DrawableWindow.hpp"
 
 using std::vector;
 
-class Popup {
+class Popup : public IDrawableMessageHandler {
 public:
     explicit Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix);
     virtual ~Popup();
 
     void AddItem(PopupItem* item);
+    void Show();
+    void Show(int x, int y);
+    LPCSTR GetBang();
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
 private:
     vector<PopupItem*> items;
+    LPCSTR bang;
+
+    Settings* settings;
+    DrawableWindow* window;
 };

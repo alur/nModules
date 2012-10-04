@@ -87,6 +87,9 @@ public:
     //
     void Show();
 
+    //
+    void Hide();
+
 private:
     // All we need in order to paint some type of overlay
     typedef struct {

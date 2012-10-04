@@ -444,6 +444,14 @@ void DrawableWindow::Show() {
 
 
 /// <summary>
+/// Hides the window.
+/// </summary>
+void DrawableWindow::Hide() {
+    ShowWindow(this->window, SW_HIDE);
+}
+
+
+/// <summary>
 /// Causes the window to move to the position specified in its paintsettings.
 /// </summary>
 void DrawableWindow::UpdatePosition() {

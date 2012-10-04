@@ -28,5 +28,6 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, LPSTR title, UINT cchTitle,
 
 void LoadSettings();
 void LoadPopups();
-bool LoadPopup(LPVOID f, LPCSTR folderTitle, LPCSTR folderPrefix, POPUPLEVEL level, Popup** out);
+bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out);
 Popup* LoadFolder(LPVOID f, LPCSTR title, LPCSTR prefix);
+void __cdecl HandlePopupBang(HWND owner, LPCSTR bang, LPCSTR args);

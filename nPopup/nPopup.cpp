@@ -9,6 +9,7 @@
 #include "../nShared/LSModule.hpp"
 #include "../nShared/Debugging.h"
 #include <strsafe.h>
+#include <map>
 #include "Popup.hpp"
 #include "PopupItem.hpp"
 #include "SeparatorItem.hpp"
@@ -16,6 +17,7 @@
 #include "FolderItem.hpp"
 #include "InfoItem.hpp"
 #include "nPopup.h"
+
 
 // The window classes we want to register
 LPCSTR g_windowClasses[] = {"Popup", "Item", NULL};
@@ -25,6 +27,9 @@ LSModule* g_LSModule;
 
 // The messages we want from the core
 UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
+
+// All root level popups
+vector<Popup*> rootPopups;
 
 
 /// <summary>
@@ -79,6 +84,21 @@ LRESULT WINAPI LSMessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 /// <summary>
 /// 
 /// </summary>
+void __cdecl HandlePopupBang(HWND owner, LPCSTR bang, LPCSTR args) {
+    for (vector<Popup*>::const_iterator iter = rootPopups.begin(); iter != rootPopups.end(); iter++) {
+        if (_stricmp(bang, (*iter)->GetBang()) == 0) {
+            Popup* popup = *iter;
+            popup->Show();
+
+            break;
+        }
+    }
+}
+
+
+/// <summary>
+/// 
+/// </summary>
 void LoadSettings() {
     LoadPopups();
 }
@@ -91,10 +111,10 @@ void LoadPopups() {
     LPVOID f = LCOpen(NULL);
     Popup* popup;
 
-    while (LoadPopup(f, NULL, NULL, POPUPLEVEL_ROOT, &popup)) {
+    while (LoadPopup(f, POPUPLEVEL_ROOT, &popup)) {
         if (popup != NULL) {
-            //rootPopups.push_back(popup);
-            delete popup;
+            rootPopups.push_back(popup);
+            AddBangCommandEx(popup->GetBang(), HandlePopupBang);
         }
     }
 
@@ -106,19 +126,16 @@ void LoadPopups() {
 /// Loads a popup
 /// </summary>
 /// <return>Returns false when all lines have been read.</return>
-bool LoadPopup(LPVOID f, LPCSTR folderTitle, LPCSTR folderPrefix, POPUPLEVEL level, Popup** out) {
+bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
     char line[MAX_LINE_LENGTH], title[MAX_LINE_LENGTH], command[MAX_LINE_LENGTH], icon[MAX_LINE_LENGTH], prefix[MAX_LINE_LENGTH];
     
-    if (level != POPUPLEVEL_ROOT) {
-        *out = new Popup(folderTitle, NULL, folderPrefix);
-    }
-
     while (LCReadNextConfig(f, "*Popup", line, sizeof(line))) {
         POPUPLINETYPE type = ProcessPopupLine(line, title, sizeof(title), command, sizeof(command), icon, sizeof(icon), prefix, sizeof(prefix));
         if (level == POPUPLEVEL_ROOT) {
             if (type == POPUPLINETYPE_NEW) {
                 // hmm..., need to deal with bangs.
-                return LoadPopup(f, title, prefix, POPUPLEVEL_NEW, out);
+                *out = new Popup(title, command, prefix);
+                return LoadPopup(f, POPUPLEVEL_NEW, out);
             }
             else {
                 TRACE("Invalid popup line at the root level: %s", line);
@@ -129,8 +146,8 @@ bool LoadPopup(LPVOID f, LPCSTR folderTitle, LPCSTR folderPrefix, POPUPLEVEL lev
         else switch (type) {
         case POPUPLINETYPE_FOLDER:
             {
-                Popup* popup;
-                LoadPopup(f, title, prefix, POPUPLEVEL_FOLDER, &popup);
+                Popup* popup = new Popup(title, NULL, prefix);
+                LoadPopup(f, POPUPLEVEL_FOLDER, &popup);
                 (*out)->AddItem(new FolderItem(title, popup, icon));
             }
             break;
