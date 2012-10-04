@@ -135,8 +135,6 @@ bool Taskbar::MonitorChanged(HWND hWnd, UINT monitor, TaskButton** pOut) {
 void Taskbar::Relayout() {
     DrawableSettings* drawingSettings = this->window->GetSettings();
 
-    // TODO::This code isn't 100% working, in particular i suspect that multiline configurations are broken.
-
     int spacePerLine, lines, buttonSize, x0, y0, xdir, ydir;
 
     switch (this->layoutSettings->startPosition) {

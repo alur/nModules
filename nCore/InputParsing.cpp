@@ -207,8 +207,13 @@ EXPORT_CDECL(bool) GetPrefixedRCBool(LPCSTR prefix, LPCSTR option, bool default)
 /// </summary>
 EXPORT_CDECL(bool) GetPrefixedRCString(LPCSTR szPrefix, LPCSTR szOption, LPSTR pszBuffer, LPCSTR pszDefault, UINT cbBuffer) {
     char szOptionName[MAX_LINE_LENGTH];
+    LPCSTR def = pszDefault == pszBuffer ? _strdup(pszDefault) : pszDefault; // LiteStep will null the first character of the buffer.
     StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", szPrefix, szOption);
-    return GetRCString(szOptionName, pszBuffer, pszDefault, cbBuffer) != FALSE;
+    bool ret = GetRCString(szOptionName, pszBuffer, def, cbBuffer) != FALSE;
+    if (def != pszDefault) {
+        free((LPVOID)def);
+    }
+    return ret;
 }
 
 

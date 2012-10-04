@@ -40,8 +40,8 @@ void LayoutSettings::Load(Settings* settings, LayoutSettings* defaults) {
 
     this->columnSpacing = settings->GetInt("ColumnSpacing", defaults->columnSpacing);
     settings->GetOffsetRect("PaddingLeft", "PaddingTop", "PaddingRight", "PaddingBottom", &this->padding, &defaults->padding);
-    settings->GetString("Start", buffer, sizeof(buffer), "TopLeft");
 
+    settings->GetString("Start", buffer, sizeof(buffer), "TopLeft");
     if (_stricmp(buffer, "TopRight") == 0) {
         this->startPosition = STARTPOSITION::TOPRIGHT;
     }

@@ -168,6 +168,11 @@ void Settings::SetColor(LPCSTR pszSetting, ARGB colorValue) {
 /// <param name="pszDefault">The default string, used if the RC value is unspecified.</param>
 /// <returns>False if the length of the RC value is > cchDest. True otherwise.</returns>
 bool Settings::GetString(LPCSTR pszSetting, LPSTR pszDest, UINT cchDest, LPCSTR pszDefault) {
+    bool ret = true;
+    if (this->group != NULL) {
+        ret &= this->group->GetString(pszSetting, pszDest, cchDest, pszDefault);
+        return ret && GetPrefixedRCString(this->prefix, pszSetting, pszDest, pszDest, cchDest);
+    }
     return GetPrefixedRCString(this->prefix, pszSetting, pszDest, pszDefault, cchDest);
 }
 
@@ -181,6 +186,14 @@ bool Settings::GetString(LPCSTR pszSetting, LPSTR pszDest, UINT cchDest, LPCSTR 
 /// <param name="pszDefault">The default string, used if the RC value is unspecified.</param>
 /// <returns>False if the length of the RC value is > cchDest. True otherwise.</returns>
 bool Settings::GetString(LPCSTR pszSetting, LPWSTR pszwDest, UINT cchDest, LPCSTR pszDefault) {
+    bool ret = true;
+    if (this->group != NULL) {
+        LPSTR def = (LPSTR)malloc(cchDest);
+        ret &= this->group->GetString(pszSetting, def, cchDest, pszDefault);
+        ret &= GetPrefixedRCWString(this->prefix, pszSetting, pszwDest, def, cchDest);
+        free((LPVOID)def);
+        return ret;
+    }
     return GetPrefixedRCWString(this->prefix, pszSetting, pszwDest, pszDefault, cchDest);
 }
 
@@ -200,10 +213,10 @@ bool Settings::GetString(LPCSTR pszSetting, LPWSTR pszwDest, UINT cchDest, LPCWS
     bool ret;
 
     if (wcstombs_s(&numConverted, multiByte, size+1, pszDefault, size) == 0) {
-        ret = GetPrefixedRCWString(this->prefix, pszSetting, pszwDest, multiByte, cchDest);
+        ret = GetString(pszSetting, pszwDest, cchDest, multiByte);
     }
     else {
-        ret = GetPrefixedRCWString(this->prefix, pszSetting, pszwDest, "", cchDest);
+        ret = GetString(pszSetting, pszwDest, cchDest, "");
     }
 
     free(multiByte);
