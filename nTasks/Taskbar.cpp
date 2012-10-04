@@ -137,6 +137,8 @@ void Taskbar::Relayout() {
 
     int spacePerLine, lines, buttonSize, x0, y0, xdir, ydir;
 
+    if (this->buttons.size() == 0) return;
+
     switch (this->layoutSettings->startPosition) {
     default:
     case LayoutSettings::TOPLEFT:
