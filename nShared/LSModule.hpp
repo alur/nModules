@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  LSModule.cpp
+ *  LSModule.hpp
  *  The nModules Project
  *
  *  Deals with all basic LiteStep module functionality.
@@ -9,42 +9,68 @@
 
 #include "Macros.h"
 #include "Versioning.h"
-#include <vector>
+#include <map>
+#include <string>
+#include "Drawable.hpp"
 
-using std::vector;
 
+using namespace std;
+
+
+// Functions which all modules must implement.
 LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+EXPORT_CDECL(int) initModuleEx(HWND parent, HINSTANCE instance, LPCSTR path);
+EXPORT_CDECL(void) quitModule(HINSTANCE instance);
 
-EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);
-EXPORT_CDECL(void) quitModule(HINSTANCE);
 
-class LSModule {
+class LSModule : public MessageHandler {
 public:
-    explicit LSModule(LPCSTR moduleName, LPCSTR author, VERSION version, HINSTANCE instance, UINT lsMessages[]);
+    explicit LSModule(HWND parent, LPCSTR moduleName, LPCSTR author, VERSION version, HINSTANCE instance);
     virtual ~LSModule();
 
-    bool Initialize(LPCSTR drawableWindowClasses[], PWNDCLASSEX customClass = NULL);
+    // Registers window classes and creates the message handler window.
+    bool Initialize(PWNDCLASSEX customMessageClass = NULL, PWNDCLASSEX customDrawableClass = NULL);
+    
+    // Connects to nCore.
     bool ConnectToCore(VERSION minimumCoreVersion);
 
-    ATOM GetWindowClass(UINT id);
-    HINSTANCE GetInstance();
-    HWND GetMessageWindow();
+    // Adds a top-level drawable.
+    void AddDrawable(LPCSTR name, Drawable* drawable);
+
+    // Creates a top-level drawable window.
+    DrawableWindow* CreateDrawableWindow(Settings* settings);
+
+    // Registers the message handler to recieve these messages from the core.
+    void RegisterForMessages(UINT messages[]);
+
+    //
+    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 
 private:
-    // Intercepts LiteStep messages before the module can get to them.
-    static LRESULT WINAPI MessageHandler(HWND, UINT, WPARAM, LPARAM);
+    // The window class used by the message handler.
+    ATOM messageHandlerClass;
 
-    bool RegisterLSWindowClass(PWNDCLASSEX customClass = NULL);
-    bool RegisterDrawableWindowClass(LPCSTR name);
-    bool CreateLSWindow();
-    void HandleError(DWORD errorCode);
+    // The window class used for drawable windows.
+    ATOM drawableClass;
 
+    // The name of this module.
     LPCSTR moduleName;
-    LPCSTR author;
-    VERSION version;
-    HWND LSWindow;
-    HINSTANCE instance;
-    UINT* lsMessages;
 
-    vector<ATOM> registeredWindowClasses;
+    // The author of this module.
+    LPCSTR author;
+
+    // The version of this module.
+    VERSION version;
+
+    // The LiteStep message handler window.
+    HWND messageHandler;
+
+    // The parent window given to initModuleEx. Should be used as the parent for all top-level windows.
+    HWND parent;
+
+    // The instance of this module.
+    HINSTANCE instance;
+
+    // All top-level drawables.
+    map<string, Drawable*> drawables;
 };

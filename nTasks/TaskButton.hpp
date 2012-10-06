@@ -8,10 +8,11 @@
 #pragma once
 
 #include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Drawable.hpp"
 
-class TaskButton : public IDrawableMessageHandler {
+class TaskButton : public MessageHandler, Drawable {
 public:
-    explicit TaskButton(HWND parent, HWND window, Settings* parentSettings);
+    explicit TaskButton(Drawable* parent);
     virtual ~TaskButton();
 
     void Reposition(UINT x, UINT y, UINT width, UINT height);
@@ -31,12 +32,6 @@ public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
 private:
-    // The button's window
-    DrawableWindow* m_pWindow;
-
-    // Settings for painting the button
-    Settings* settings;
-
     // Settings for painting the icon in the button.
     Settings* iconSettings;
 

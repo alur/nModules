@@ -11,9 +11,8 @@
 
 class SeparatorItem : public PopupItem {
 public:
-    explicit SeparatorItem();
+    explicit SeparatorItem(Drawable* parent);
     virtual ~SeparatorItem();
 
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
-    void Init(Settings* parentSettings, DrawableWindow* parentWindow);
 };

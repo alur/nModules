@@ -15,12 +15,10 @@
 extern LSModule* g_LSModule;
 
 
-Icon::Icon(PCITEMID_CHILD item, IShellFolder2* shellFolder, DrawableWindow* parentWindow, Settings* parentSettings) {
+Icon::Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder) : Drawable(parent, "Icon") {
     this->shellFolder = shellFolder;
     this->item = (PITEMID_CHILD)malloc(item->mkid.cb + 2);
     memcpy(this->item, item, item->mkid.cb + 2);
-
-    this->settings = parentSettings->CreateChild("Icon");
 
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 64;
@@ -30,7 +28,7 @@ Icon::Icon(PCITEMID_CHILD item, IShellFolder2* shellFolder, DrawableWindow* pare
     defaults->textOffsetTop = 64;
     StringCchCopy(defaults->textAlign, sizeof(defaults->textAlign), "Center");
 
-    this->window = new DrawableWindow(parentWindow->GetWindow(), (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, defaults, this);
+    this->window->Initialize(defaults);
     SetIcon();
     this->window->Show();
 }
@@ -38,8 +36,6 @@ Icon::Icon(PCITEMID_CHILD item, IShellFolder2* shellFolder, DrawableWindow* pare
 
 Icon::~Icon() {
     free(this->item);
-    SAFEDELETE(this->window);
-    SAFEDELETE(this->settings);
 }
 
 
@@ -66,7 +62,7 @@ LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lPa
             POINT pt;
             GetCursorPos(&pt);
 
-            int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, this->window->GetWindow(), NULL);
+            int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, NULL, NULL);
             if (command != 0) {
                 CMINVOKECOMMANDINFO info = { 0 };
                 char verb[MAX_LINE_LENGTH];
@@ -92,9 +88,7 @@ LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 
 void Icon::SetPosition(int x, int y) {
-    this->window->GetSettings()->x = x;
-    this->window->GetSettings()->y = y;
-    this->window->UpdatePosition();
+    this->window->Move(x, y);
 }
 
 
@@ -122,7 +116,7 @@ void Icon::SetIcon() {
     }
 
     // Add it as an overlay.
-    window->AddOverlay(pos, icon);
+    //window->AddOverlay(pos, icon);
 
     // Let go of the interface.
     extractIcon->Release();

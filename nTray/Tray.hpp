@@ -15,7 +15,7 @@
 
 using std::map;
 
-class Tray : public IDrawableMessageHandler {
+class Tray : public Drawable, public MessageHandler {
 public:
     explicit Tray(LPCSTR);
     virtual ~Tray();
@@ -30,12 +30,6 @@ public:
 private:
     // The name of this tray
     LPCSTR name;
-
-    // The tray's window
-    DrawableWindow* window;
-
-    // Settings for painting the tray background
-    Settings* settings;
 
     //
     LayoutSettings* layoutSettings;

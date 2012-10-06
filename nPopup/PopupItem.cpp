@@ -9,24 +9,19 @@
 #include "../nShared/Macros.h"
 
 
-PopupItem::PopupItem() {
-    this->settings = NULL;
-    this->window = NULL;
-}
-
-
-void PopupItem::Position(int x, int y) {
-    DrawableSettings* drawingSettings = this->window->GetSettings();
-    drawingSettings->x = x;
-    drawingSettings->y = y;
-
-    this->window->UpdatePosition();
+PopupItem::PopupItem(Drawable* parent) : Drawable(parent, "Item") {
 }
 
 
 PopupItem::~PopupItem() {
 }
 
+
+void PopupItem::Position(int x, int y) {
+    this->window->Move(x, y);
+}
+
+
 int PopupItem::GetHeight() {
-    return this->window->GetSettings()->height;
+    return this->window->GetDrawingSettings()->height;
 }

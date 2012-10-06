@@ -19,14 +19,14 @@ extern HWND g_hWndTrayNotify;
 /// <summary>
 /// Constructor
 /// </summary>
-Tray::Tray(LPCSTR name) {
+Tray::Tray(LPCSTR name) : Drawable(name) {
     this->name = name;
 
     this->settings = new Settings(this->name);
     this->layoutSettings = new LayoutSettings();
 
     DrawableSettings* defaults = new DrawableSettings();
-    this->window = new DrawableWindow(NULL, (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, defaults, this);
+    this->window->Initialize(defaults);
     this->window->Show();
 
     LoadSettings();
@@ -43,8 +43,6 @@ Tray::~Tray() {
     }
     this->icons.clear();
 
-    SAFEDELETE(this->window);
-    SAFEDELETE(this->settings);
     SAFEDELETE(this->layoutSettings);
     free((void *)this->name);
 }
@@ -67,7 +65,7 @@ void Tray::LoadSettings(bool /* IsRefresh */) {
 /// Adds the specified icon to this tray.
 /// </summary>
 TrayIcon* Tray::AddIcon(LPLSNOTIFYICONDATA NID) {
-    TrayIcon* icon = new TrayIcon(this->window->GetWindow(), NID, this->settings);
+    TrayIcon* icon = new TrayIcon(this, NID, this->settings);
     this->icons.push_back(icon);
     Relayout();
     icon->Show();
@@ -107,7 +105,7 @@ void Tray::RemoveIcon(TrayIcon* pIcon) {
 void Tray::Relayout() {
     int x0, y0, xdir, ydir;
 
-    DrawableSettings* drawingSettings = this->window->GetSettings();
+    DrawableSettings* drawingSettings = this->window->GetDrawingSettings();
 
     switch (this->layoutSettings->startPosition) {
     default:
@@ -180,9 +178,9 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lP
     switch (uMsg) {
     case WM_MOUSEMOVE:
         if (IsWindow(g_hWndTrayNotify)) {
-            DrawableSettings* settings = this->window->GetSettings();
-            MoveWindow(g_hWndTrayNotify, settings->x, settings->y,
-                settings->width, settings->height, FALSE);
+            RECT r;
+            this->window->GetScreenRect(&r);
+            MoveWindow(g_hWndTrayNotify, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
         }
     default:
         return this->window->HandleMessage(wnd, uMsg, wParam, lParam);

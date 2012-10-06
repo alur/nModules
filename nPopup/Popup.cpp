@@ -15,14 +15,14 @@
 extern LSModule* g_LSModule;
 
 
-Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) {
+Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
     if (bang != NULL) {
         this->bang = _strdup(bang);
     }
     else {
         this->bang = NULL;
     }
-    this->settings = new Settings("nPopup");
+
     DrawableSettings* defaultSettings = new DrawableSettings();
     defaultSettings->color = 0x440000FF;
     defaultSettings->textRotation = -45.0f;
@@ -30,7 +30,7 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) {
     StringCchCopyW(defaultSettings->text, MAX_LINE_LENGTH, L"nDemo");
     StringCchCopy(defaultSettings->textAlign, sizeof(defaultSettings->textAlign), "Center");
     StringCchCopy(defaultSettings->textVerticalAlign, sizeof(defaultSettings->textVerticalAlign), "Middle");
-    this->window = new DrawableWindow(NULL, (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, defaultSettings, this);
+    this->window->Initialize(defaultSettings);
     this->sized = false;
 }
 
@@ -43,15 +43,12 @@ Popup::~Popup() {
     if (this->bang != NULL) {
         free((LPVOID)this->bang);
     }
-    SAFEDELETE(this->window);
-    SAFEDELETE(this->settings);
 }
 
 
 void Popup::AddItem(PopupItem* item) {
     this->items.push_back(item);
     this->sized = false;
-    item->Init(this->settings, this->window);
 }
 
 
@@ -68,21 +65,18 @@ void Popup::Show() {
 
 
 void Popup::Show(int x, int y) {
-    DrawableSettings* drawingSettings = this->window->GetSettings();
-    drawingSettings->x = x;
-    drawingSettings->y = y;
+    this->window->Move(x, y);
 
     if (!this->sized) {
-        drawingSettings->width = 200;
-        drawingSettings->height = 5;
+        int width = 200, height = 5;
         for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
-            (*iter)->Position(5, drawingSettings->height);
-            drawingSettings->height += (*iter)->GetHeight() + 5;
+            (*iter)->Position(5, height);
+            height += (*iter)->GetHeight() + 5;
         }
+        this->window->SetPosition(x, y, width, height);
         this->sized = true;
     }
 
-    this->window->UpdatePosition();
     this->window->Show();
 }
 

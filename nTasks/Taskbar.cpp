@@ -16,10 +16,9 @@ extern LSModule* g_LSModule;
 /// <summary>
 /// Constructor
 /// </summary>
-Taskbar::Taskbar(LPCSTR name) {
+Taskbar::Taskbar(LPCSTR name) : Drawable(name) {
     this->name = name;
 
-    this->settings = new Settings(this->name);
     LoadSettings();
 
     this->layoutSettings = new LayoutSettings();
@@ -27,7 +26,7 @@ Taskbar::Taskbar(LPCSTR name) {
     this->layoutSettings->Load(this->settings, defaults);
     delete defaults;
     
-    this->window = new DrawableWindow(NULL, (LPCSTR)g_LSModule->GetWindowClass(2), g_LSModule->GetInstance(), this->settings, new DrawableSettings(), this);
+    this->window->Initialize(new DrawableSettings());
     this->window->Show();
 }
 
@@ -42,8 +41,6 @@ Taskbar::~Taskbar() {
     }
     this->buttons.clear();
 
-    SAFEDELETE(this->window);
-    SAFEDELETE(this->settings);
     SAFEDELETE(this->layoutSettings);
     free((void *)name);
 }
@@ -68,7 +65,7 @@ void Taskbar::LoadSettings(bool /* isRefresh */) {
 /// </summary>
 TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout) {
     if (monitor == this->monitor || this->monitor == 0xFFFFFFFF) {
-        TaskButton* pButton = new TaskButton(this->window->GetWindow(), hWnd, this->settings);
+        TaskButton* pButton = new TaskButton(this);
         this->buttons.insert(this->buttons.end(), std::pair<HWND, TaskButton*>(hWnd, pButton));
 
         if (hWnd == GetForegroundWindow()) {
@@ -133,8 +130,7 @@ bool Taskbar::MonitorChanged(HWND hWnd, UINT monitor, TaskButton** pOut) {
 /// Repositions/Resizes all buttons.  
 /// </summary>
 void Taskbar::Relayout() {
-    DrawableSettings* drawingSettings = this->window->GetSettings();
-
+    DrawableSettings* drawingSettings = this->window->GetDrawingSettings();
     int spacePerLine, lines, buttonSize, x0, y0, xdir, ydir;
 
     if (this->buttons.size() == 0) return;
@@ -213,12 +209,4 @@ void Taskbar::Relayout() {
             iter->second->Show();
         }
     }
-}
-
-
-/// <summary>
-/// Handles window events for the taskbar.
-/// </summary>
-LRESULT WINAPI Taskbar::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    return this->window->HandleMessage(wnd, uMsg, wParam, lParam);
 }

@@ -8,7 +8,7 @@
 #pragma once
 #include "../nShared/DrawableWindow.hpp"
 
-class TrayTip : public IDrawableMessageHandler {
+class TrayTip : public MessageHandler {
 public:
     explicit TrayTip(LPCSTR pszPrefix);
     virtual ~TrayTip();

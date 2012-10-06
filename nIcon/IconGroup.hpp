@@ -7,6 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "../nShared/Drawable.hpp"
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/Settings.hpp"
 #include "IIconEventHandler.hpp"
@@ -14,11 +15,13 @@
 #include <ShlObj.h>
 #include <map>
 
+
 using std::map;
 
-class IconGroup : public IIconEventHandler, IDrawableMessageHandler {
+
+class IconGroup : public IIconEventHandler, public Drawable, public MessageHandler {
 public:
-    explicit IconGroup(LPCSTR pszPrefix);
+    explicit IconGroup(LPCSTR prefix);
     virtual ~IconGroup();
 
     LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -43,12 +46,6 @@ private:
 
     //
     vector<Icon*>::iterator FindIcon(PCITEMID_CHILD pidl);
-
-    // Paintsettings for the whole group.
-    Settings* settings;
-
-    // The window which holds the whole group.
-    DrawableWindow* window;
 
     // All icons currently part of this group.
     vector<Icon*> icons;

@@ -7,11 +7,12 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "../nShared/Drawable.hpp"
 #include "../nShared/DrawableWindow.hpp"
 
-class Label : public IDrawableMessageHandler {
+class Label : public Drawable, public MessageHandler {
 public:
-    explicit Label(LPCSTR);
+    explicit Label(LPCSTR name);
     virtual ~Label();
 
     void LoadSettings(bool = false);
@@ -20,14 +21,5 @@ public:
 
 private:
     // The name of this label
-    LPCSTR m_pszName;
-
-    // The label's window
-    DrawableWindow* m_pWindow;
-
-    // PaintSettings
-    Settings* settings;
-
-    // The parent window
-    HWND m_hWndParent;
+    LPCSTR name;
 };

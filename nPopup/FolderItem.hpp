@@ -12,11 +12,10 @@
 
 class FolderItem : public PopupItem {
 public:
-    explicit FolderItem(LPCSTR title, Popup* popup, LPCSTR customIcon = NULL);
+    explicit FolderItem(Drawable* parent, LPCSTR title, Popup* popup, LPCSTR customIcon = NULL);
     virtual ~FolderItem();
 
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
-    void Init(Settings* parentSettings, DrawableWindow* parentWindow);
 
 private:
     Popup* popup;

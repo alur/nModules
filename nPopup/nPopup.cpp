@@ -19,9 +19,6 @@
 #include "nPopup.h"
 
 
-// The window classes we want to register
-LPCSTR g_windowClasses[] = {"Popup", "Item", NULL};
-
 // The LSModule class
 LSModule* g_LSModule;
 
@@ -35,10 +32,10 @@ vector<Popup*> rootPopups;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND /* hWndParent */, HINSTANCE instance, LPCSTR /* szPath */) {
-    g_LSModule = new LSModule("nPopup", "Alurcard2", MAKE_VERSION(0,2,0,0), instance, g_lsMessages);
+int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
+    g_LSModule = new LSModule(parent, "nPopup", "Alurcard2", MAKE_VERSION(0,2,0,0), instance);
     
-    if (!g_LSModule->Initialize(g_windowClasses)) {
+    if (!g_LSModule->Initialize()) {
         delete g_LSModule;
         return 1;
     }
@@ -73,16 +70,30 @@ void quitModule(HINSTANCE /* hDllInstance */) {
 /// <summary>
 /// Handles the main window's messages.
 /// </summary>
-/// <param name="hWnd">The window the message is for.</param>
-/// <param name="uMsg">The type of message.</param>
+/// <param name="window">The window the message is for.</param>
+/// <param name="message">The type of message.</param>
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
-LRESULT WINAPI LSMessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch(uMsg) {
-        case LM_REFRESH:
-            return 0;
+LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch(message) {
+    case WM_CREATE:
+        {
+            SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+        }
+        return 0;
+
+    case WM_DESTROY:
+        {
+            SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+        }
+        return 0;
+
+    case LM_REFRESH:
+        {
+        }
+        return 0;
     }
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+    return DefWindowProc(window, message, wParam, lParam);
 }
 
 
@@ -153,7 +164,7 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
             {
                 Popup* popup = new Popup(title, NULL, prefix);
                 LoadPopup(f, POPUPLEVEL_FOLDER, &popup);
-                (*out)->AddItem(new FolderItem(title, popup, icon));
+                (*out)->AddItem(new FolderItem(*out, title, popup, icon));
             }
             break;
 
@@ -181,19 +192,19 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
 
         case POPUPLINETYPE_COMMAND:
             {
-                (*out)->AddItem(new CommandItem(title, command, icon));
+                (*out)->AddItem(new CommandItem(*out, title, command, icon));
             }
             break;
 
         case POPUPLINETYPE_INFO:
             {
-                (*out)->AddItem(new InfoItem(title, icon));
+                (*out)->AddItem(new InfoItem(*out, title, icon));
             }
             break;
 
         case POPUPLINETYPE_SEPARATOR:
             {
-                (*out)->AddItem(new SeparatorItem());
+                (*out)->AddItem(new SeparatorItem(*out));
             }
             break;
 

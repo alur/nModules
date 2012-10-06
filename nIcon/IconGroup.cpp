@@ -21,20 +21,18 @@ extern LSModule* g_LSModule;
 /// <summary>
 /// Constructor
 /// </summary>
-IconGroup::IconGroup(LPCSTR pszPrefix) {
+IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     WCHAR path[MAX_PATH];
 
     // Initalize all variables.
     this->changeNotifyUID = 0;
-
-    this->settings = new Settings(pszPrefix);
 
     DrawableSettings* defaults = new DrawableSettings();
     defaults->color = 0x2000FF00;
 
     this->settings->GetString("Folder", path, sizeof(path), "Desktop");
 
-    this->window = new DrawableWindow(FindWindow("DesktopBackgroundClass", ""), (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, defaults, this);
+    this->window->Initialize(defaults);
     this->window->Show();
 
     SetFolder(path);
@@ -56,8 +54,6 @@ IconGroup::~IconGroup() {
 
     SAFERELEASE(this->workingFolder);
     SAFERELEASE(this->rootFolder);
-    SAFEDELETE(this->window);
-    SAFEDELETE(this->settings);
 }
 
 
@@ -94,14 +90,14 @@ void IconGroup::SetFolder(LPWSTR folder) {
     enumIDList->Release();
 
     // Register for change notifications
-    SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
+    /* SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
     this->changeNotifyUID = SHChangeNotifyRegister(
         this->window->GetWindow(),
         SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
         SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM,
         WM_SHCHANGE_NOTIFY,
         1,
-        watchEntries);
+        watchEntries); */
 
     // Let go fo the PIDLists
     CoTaskMemFree(idList);
@@ -115,14 +111,14 @@ void IconGroup::SetFolder(LPWSTR folder) {
 void IconGroup::AddIcon(PCITEMID_CHILD pidl) {
     D2D1_RECT_F pos;
     PositionIcon(pidl, &pos);
-    Icon* icon = new Icon(pidl, this->workingFolder, this->window, this->settings);
+    Icon* icon = new Icon(this, pidl, this->workingFolder);
     icon->SetPosition((int)pos.left, (int)pos.top);
     icons.push_back(icon);
 }
 
 PCITEMID_CHILD IconGroup::GetLastPIDLItem(LPITEMIDLIST pidl) {
     LPITEMIDLIST ret = pidl;
-    USHORT lastCB;
+    USHORT lastCB = 0;
     while (ret->mkid.cb != 0) {
         lastCB = ret->mkid.cb;
         ret = LPITEMIDLIST(((LPBYTE)ret)+lastCB);

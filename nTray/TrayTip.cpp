@@ -9,7 +9,7 @@
 #include "TrayTip.hpp"
 
 
-TrayTip::TrayTip(LPCSTR prefix) {
+TrayTip::TrayTip(LPCSTR /* prefix */) {
 
 }
 
@@ -36,9 +36,4 @@ void TrayTip::LoadSettings(bool /*bIsRefresh*/) {
 
 LRESULT WINAPI TrayTip::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     return m_pWindow->HandleMessage(wnd, uMsg, wParam, lParam);
-}
-
-
-HWND TrayTip::GetHWND() {
-    return m_pWindow->GetWindow();
 }

@@ -30,19 +30,17 @@ LSModule* g_pLSModule;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND /* hWndParent */, HINSTANCE instance, LPCSTR /* szPath */) {
+int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     WNDCLASSEX wc;
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
     wc.cbSize = sizeof(WNDCLASSEX);
-    wc.cbWndExtra = sizeof(LSModule*);
-    wc.lpfnWndProc = LSMessageHandler;
     wc.hInstance = instance;
     wc.lpszClassName = "DesktopBackgroundClass";
     wc.hIconSm = 0;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.style = CS_DBLCLKS;
 
-    g_pLSModule = new LSModule("nDesk", "Alurcard2", MAKE_VERSION(0,2,0,0), instance, g_lsMessages);
+    g_pLSModule = new LSModule(parent, "nDesk", "Alurcard2", MAKE_VERSION(0,2,0,0), instance);
 
     if (!g_pLSModule->ConnectToCore(MAKE_VERSION(0,2,0,0))) {
         delete g_pLSModule;
@@ -61,16 +59,16 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE instance, LPCSTR /* szPath */)
         return 1;
     }
 
-    SetWindowPos(g_pLSModule->GetMessageWindow(), HWND_BOTTOM, g_pMonitorInfo->m_virtualDesktop.rect.left,
+    SetWindowPos(g_pDesktopPainter->GetWindow(), HWND_BOTTOM, g_pMonitorInfo->m_virtualDesktop.rect.left,
         g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.width,
         g_pMonitorInfo->m_virtualDesktop.height, SWP_NOACTIVATE|SWP_NOSENDCHANGING);
-    ShowWindow(g_pLSModule->GetMessageWindow(), SW_SHOWNOACTIVATE);
+    ShowWindow(g_pDesktopPainter->GetWindow(), SW_SHOWNOACTIVATE);
 
     // Load bang commands
     Bangs::_Register();
 
     // Load settings
-    Settings::Load();
+    nDesk::Settings::Load();
 
     // Reset the work area for all monitors
     WorkArea::ResetWorkAreas(g_pMonitorInfo);
@@ -105,16 +103,27 @@ void quitModule(HINSTANCE /* instance */) {
 /// <param name="uMsg">The type of message.</param>
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
-LRESULT WINAPI LSMessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch(uMsg) {
+LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch(message) {
     case WM_CREATE:
-        g_pDesktopPainter = new DesktopPainter(hWnd);
+        {
+            SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            g_pDesktopPainter = new DesktopPainter(window);
+        }
+        return 0;
+
+    case WM_DESTROY:
+        {
+            SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+        }
         return 0;
 
     case LM_REFRESH:
-        g_pClickHandler->Refresh();
-        WorkArea::LoadSettings(g_pMonitorInfo, true);
-        Settings::Load();
+        {
+            g_pClickHandler->Refresh();
+            WorkArea::LoadSettings(g_pMonitorInfo, true);
+            nDesk::Settings::Load();
+        }
         return 0;
     
     case WM_MOUSEWHEEL:
@@ -131,31 +140,38 @@ LRESULT WINAPI LSMessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     case WM_XBUTTONDOWN:
     case WM_XBUTTONUP:
     case WM_XBUTTONDBLCLK:
-        g_pClickHandler->HandleClick(uMsg, wParam, lParam);
+        {
+            g_pClickHandler->HandleClick(message, wParam, lParam);
+        }
         return 0;
     
     case WM_PAINT:
     case WM_ERASEBKGND:
-        return g_pDesktopPainter->HandleMessage(hWnd, uMsg, wParam, lParam);
+        return g_pDesktopPainter->HandleMessage(window, message, wParam, lParam);
     
-    case WM_WINDOWPOSCHANGING: {
-        // Keep the hWnd at the bottom of the window stack
-        WINDOWPOS *c = (WINDOWPOS*)lParam;
-        c->hwnd = g_pLSModule->GetMessageWindow();
-        c->hwndInsertAfter = HWND_BOTTOM;
-        c->flags |= SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOMOVE;
+    case WM_WINDOWPOSCHANGING:
+        {
+            // Keep the hWnd at the bottom of the window stack
+            WINDOWPOS *c = (WINDOWPOS*)lParam;
+            c->hwnd = g_pDesktopPainter->GetWindow();
+            c->hwndInsertAfter = HWND_BOTTOM;
+            c->flags |= SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOMOVE;
+        }
         return 0;
-    }
 
     case WM_DISPLAYCHANGE:
-        g_pMonitorInfo->Update();
-        g_pDesktopPainter->Resize();
+        {
+            g_pMonitorInfo->Update();
+            g_pDesktopPainter->Resize();
+        }
         break;
     
     case WM_SETTINGCHANGE:
-        if (wParam == SPI_SETDESKWALLPAPER) {
-            g_pDesktopPainter->UpdateWallpaper();
-            return 0;
+        {
+            if (wParam == SPI_SETDESKWALLPAPER) {
+                g_pDesktopPainter->UpdateWallpaper();
+                return 0;
+            }
         }
         break;
 
@@ -189,8 +205,8 @@ LRESULT WINAPI LSMessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     case WM_ACTIVATEAPP:
     case WM_ACTIVATE:
     case WM_PARENTNOTIFY:
-        SetWindowPos(g_pLSModule->GetMessageWindow(),HWND_BOTTOM,0,0,0,0,SWP_NOACTIVATE);
+        SetWindowPos(g_pDesktopPainter->GetWindow(), HWND_BOTTOM, 0, 0, 0, 0, SWP_NOACTIVATE);
         break;
     }
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+    return DefWindowProc(window, message, wParam, lParam);
 }

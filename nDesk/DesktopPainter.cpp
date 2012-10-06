@@ -71,6 +71,14 @@ void DesktopPainter::DiscardDeviceResources() {
 
 
 /// <summary>
+/// Returns the window we are drawing to.
+/// </summary>
+HWND DesktopPainter::GetWindow() {
+    return m_hWnd;
+}
+
+
+/// <summary>
 /// (Re)Creates all device dependent resources
 /// </summary>
 HRESULT DesktopPainter::ReCreateDeviceResources() {
@@ -353,7 +361,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                 DiscardDeviceResources();
             }
         }
-        //ValidateRect(hWnd, NULL);
+        ValidateRect(hWnd, NULL);
         return 0;
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);

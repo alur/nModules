@@ -47,10 +47,13 @@
     <ClInclude Include="LSModule.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IDrawableMessageHandler.hpp">
+    <ClInclude Include="LayoutSettings.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LayoutSettings.hpp">
+    <ClInclude Include="Drawable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageHandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -89,6 +92,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LayoutSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Drawable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

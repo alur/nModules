@@ -19,7 +19,7 @@ extern HWND g_hWndTrayNotify;
 /// <summary>
 /// Constructor
 /// </summary>
-TrayIcon::TrayIcon(HWND parent, LPLSNOTIFYICONDATA pNID, Settings* parentSettings) {
+TrayIcon::TrayIcon(Drawable* parent, LPLSNOTIFYICONDATA pNID, Settings* parentSettings) : Drawable(parent, "Icon") {
     //
     m_pNotifyData = pNID;
 
@@ -27,7 +27,7 @@ TrayIcon::TrayIcon(HWND parent, LPLSNOTIFYICONDATA pNID, Settings* parentSetting
     this->settings = parentSettings->CreateChild("Icon");
     DrawableSettings* defaultSettings = new DrawableSettings();
     defaultSettings->color = 0x00000000;
-    m_pWindow = new DrawableWindow(parent, (LPCSTR)g_LSModule->GetWindowClass(2), g_LSModule->GetInstance(), this->settings, defaultSettings, this);
+    this->window->Initialize(defaultSettings);
 
     //
     LoadSettings();
@@ -41,8 +41,6 @@ TrayIcon::TrayIcon(HWND parent, LPLSNOTIFYICONDATA pNID, Settings* parentSetting
 /// Destructor
 /// </summary>
 TrayIcon::~TrayIcon() {
-    if (m_pWindow) delete m_pWindow;
-    if (this->settings) delete this->settings;
 }
 
 
@@ -58,15 +56,7 @@ void TrayIcon::LoadSettings(bool /* bIsRefresh */) {
 /// Shows the trayicon.
 /// </summary>
 void TrayIcon::Show() {
-    m_pWindow->Show();
-}
-
-
-/// <summary>
-/// Retrives the icon's HWND.
-/// </summary>
-HWND TrayIcon::GetHWND() {
-    return m_pWindow->GetWindow();
+    this->window->Show();
 }
 
 
@@ -74,11 +64,10 @@ HWND TrayIcon::GetHWND() {
 /// Updates the icon.
 /// </summary>
 void TrayIcon::UpdateIcon() {
-    m_pWindow->PurgeOverlays();
     if ((m_pNotifyData->uFlags & NIF_ICON) == NIF_ICON) {
         D2D1_RECT_F f;
         f.bottom = (float)this->iconSize; f.top = 0; f.left = 0; f.right = (float)this->iconSize;
-        m_pWindow->AddOverlay(f, m_pNotifyData->hIcon);
+        //m_pWindow->AddOverlay(f, m_pNotifyData->hIcon);
     }
 }
 
@@ -87,12 +76,15 @@ void TrayIcon::UpdateIcon() {
 /// Repositions the icon.
 /// </summary>
 void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height) {
-    DrawableSettings* drawableSettings = this->m_pWindow->GetSettings();
-    drawableSettings->x = x;
-    drawableSettings->y = y;
-    drawableSettings->width = width;
-    drawableSettings->height = height;
-    m_pWindow->UpdatePosition();
+    this->window->SetPosition(x, y, width, height);
+}
+
+
+/// <summary>
+/// Gets the screen coordinate rect of this tray icon.
+/// </summary>
+void TrayIcon::GetScreenRect(LPRECT rect) {
+    this->window->GetScreenRect(rect);
 }
 
 
@@ -102,7 +94,7 @@ void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height) {
 void TrayIcon::SendCallback(UINT uMsg, WPARAM /* wParam */, LPARAM /* lParam */) {
     if (m_pNotifyData->uVersion >= 4) {
         RECT r;
-        GetWindowRect(m_pWindow->GetWindow(), &r);
+        this->window->GetScreenRect(&r);
         PostMessage(m_pNotifyData->hWnd, m_pNotifyData->uCallbackMessage, (WPARAM)MAKEWPARAM(r.left, r.top), (LPARAM)MAKELPARAM(uMsg, m_pNotifyData->uID));
     }
     else {
@@ -125,7 +117,7 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARA
         }
     }
     else {
-        return m_pWindow->HandleMessage(wnd, uMsg, wParam, lParam);
+        return this->window->HandleMessage(wnd, uMsg, wParam, lParam);
     }
     return 0;
 }

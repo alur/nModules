@@ -10,12 +10,13 @@
 #include <map>
 #include "TaskButton.hpp"
 #include "../nShared/DrawableWindow.hpp"
-#include "../nShared/IDrawableMessageHandler.hpp"
+#include "../nShared/MessageHandler.hpp"
 #include "../nShared/LayoutSettings.hpp"
+#include "../nShared/Drawable.hpp"
 
 using std::map;
 
-class Taskbar: public IDrawableMessageHandler {
+class Taskbar: public Drawable {
 public:
     // Ways to sort the tasks.
     enum ORDERING {
@@ -31,7 +32,6 @@ public:
     TaskButton* AddTask(HWND, UINT, bool);
     bool MonitorChanged(HWND hWnd, UINT monitor, TaskButton** out);
     void RemoveTask(HWND);
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
     void Relayout();
 
 private:
@@ -40,12 +40,6 @@ private:
 
     // The name of this taskbar
     LPCSTR name;
-
-    // The taskbar's window
-    DrawableWindow* window;
-
-    // Settings for painting the taskbar background
-    Settings* settings;
 
     // Settings which define how to organize the buttons
     LayoutSettings* layoutSettings;

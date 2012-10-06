@@ -12,18 +12,16 @@
 
 extern LSModule* g_LSModule;
 
-Label::Label(LPCSTR pszName) {
-    m_pszName = pszName;
-    this->settings = new Settings(m_pszName);
-    m_pWindow = new DrawableWindow(NULL, (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, new DrawableSettings(), this);
-    m_pWindow->Show();
+Label::Label(LPCSTR name) : Drawable(name) {
+    this->name = name;
+    this->settings = new Settings(name);
+    this->window->Initialize(new DrawableSettings());
+    this->window->Show();
 }
 
 
 Label::~Label() {
-    SAFEDELETE(this->m_pWindow);
-    SAFEDELETE(this->settings);
-    free((LPVOID)m_pszName);
+    free((LPVOID)this->name);
 }
 
 
@@ -32,5 +30,5 @@ void Label::LoadSettings(bool /* bIsRefresh */) {
 
 
 LRESULT WINAPI Label::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    return m_pWindow->HandleMessage(hWnd, uMsg, wParam, lParam);
+    return this->window->HandleMessage(hWnd, uMsg, wParam, lParam);
 }

@@ -16,31 +16,18 @@ extern LSModule* g_LSModule;
 /// <summary>
 /// Constructor
 /// </summary>
-TaskButton::TaskButton(HWND parent, HWND window, Settings* parentSettings) {
-    // 
-    m_hWnd = window;
-    m_hWndParent = parent;
-
+TaskButton::TaskButton(Drawable* parent) : Drawable(parent, "Button") {
     //
     LoadSettings();
 
-    // Create the drawable window
-    this->settings = parentSettings->CreateChild("Button");
-    m_pWindow = new DrawableWindow(parent, (LPCSTR)g_LSModule->GetWindowClass(1), g_LSModule->GetInstance(), this->settings, new DrawableSettings(), this);
-
     this->iconSettings = this->settings->CreateChild("Icon");
 
-    // Add states to the window
-    this->stateHover = this->m_pWindow->AddState("Hover", new DrawableSettings(), 100);
-    this->stateActive = this->m_pWindow->AddState("Active", new DrawableSettings(), 80);
-    this->stateFlashing = this->m_pWindow->AddState("Flashing", new DrawableSettings(), 50);
+    this->window->Initialize(new DrawableSettings());
 
-    // Configure the mouse tracking struct
-    ZeroMemory(&m_TrackMouseStruct, sizeof(TRACKMOUSEEVENT));
-    m_TrackMouseStruct.cbSize = sizeof(TRACKMOUSEEVENT);
-    m_TrackMouseStruct.hwndTrack = m_pWindow->GetWindow();
-    m_TrackMouseStruct.dwFlags = TME_LEAVE;
-    m_TrackMouseStruct.dwHoverTime = 200;
+    // Add states to the window
+    this->stateHover = this->window->AddState("Hover", new DrawableSettings(), 100);
+    this->stateActive = this->window->AddState("Active", new DrawableSettings(), 80);
+    this->stateFlashing = this->window->AddState("Flashing", new DrawableSettings(), 50);
 
     // Initalize variables
     m_bMouseIsOver = false;
@@ -54,8 +41,6 @@ TaskButton::TaskButton(HWND parent, HWND window, Settings* parentSettings) {
 /// Destructor
 /// </summary>
 TaskButton::~TaskButton() {
-    if (m_pWindow) delete m_pWindow;
-    if (this->settings) delete this->settings;
 }
 
 
@@ -63,23 +48,21 @@ TaskButton::~TaskButton() {
 /// Sets the icon of this button.
 /// </summary>
 void TaskButton::SetIcon(HICON hIcon) {
-    m_pWindow->PurgeOverlays();
     if (hIcon != NULL) {
         D2D1_RECT_F f = { (float)this->iconSettings->GetInt("X", 0), (float)this->iconSettings->GetInt("Y", 0),
             (float)this->iconSettings->GetInt("Width", 32) + (float)this->iconSettings->GetInt("X", 0),
             (float)this->iconSettings->GetInt("Height", 32)+ (float)this->iconSettings->GetInt("Y", 0) };
-        m_pWindow->AddOverlay(f, hIcon);
+        //m_pWindow->AddOverlay(f, hIcon);
     }
-    m_pWindow->Repaint();
+    this->window->Repaint();
 }
 
 
 /// <summary>
 /// Sets the text of this button.
 /// </summary>
-void TaskButton::SetText(LPCWSTR pszTitle) {
-    StringCchCopyW(this->m_pWindow->GetSettings()->text, MAX_LINE_LENGTH, pszTitle);
-    m_pWindow->Repaint();
+void TaskButton::SetText(LPCWSTR title) {
+    this->window->SetText(title);
 }
 
 
@@ -95,13 +78,7 @@ void TaskButton::LoadSettings(bool /* bIsRefresh */) {
 /// Moves and resizes the taaskbutton.
 /// </summary>
 void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
-    DrawableSettings* drawableSettings = this->m_pWindow->GetSettings();
-    drawableSettings->x = x;
-    drawableSettings->y = y;
-    drawableSettings->width = width;
-    drawableSettings->height = height;
-
-    m_pWindow->UpdatePosition();
+    this->window->SetPosition(x, y, width, height);
 }
 
 
@@ -110,8 +87,8 @@ void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
 /// </summary>
 void TaskButton::Activate() {
     m_bIsActive = true;
-    this->m_pWindow->ActivateState(this->stateActive);
-    this->m_pWindow->ClearState(this->stateFlashing);
+    //this->window->ActivateState(this->stateActive);
+    //this->window->ClearState(this->stateFlashing);
 }
 
 
@@ -120,7 +97,7 @@ void TaskButton::Activate() {
 /// </summary>
 void TaskButton::Deactivate() {
     m_bIsActive = false;
-    this->m_pWindow->ClearState(this->stateActive);
+    //this->window->ClearState(this->stateActive);
 }
 
 
@@ -129,7 +106,7 @@ void TaskButton::Deactivate() {
 /// </summary>
 void TaskButton::Flash() {
     m_bIsFlashing = true;
-    this->m_pWindow->ActivateState(this->stateFlashing);
+    //this->window->ActivateState(this->stateFlashing);
 }
 
 
@@ -137,7 +114,7 @@ void TaskButton::Flash() {
 /// Shows this button.
 /// </summary>
 void TaskButton::Show() {
-    m_pWindow->Show();
+    this->window->Show();
 }
 
 
@@ -175,7 +152,7 @@ void TaskButton::Menu() {
     POINT pt;
     GetCursorPos(&pt);
     
-    int command = TrackPopupMenu(hMenu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, m_pWindow->GetWindow(), NULL);
+    int command = TrackPopupMenu(hMenu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, NULL, NULL);
     if (command != 0) {
         PostMessage(m_hWnd, WM_SYSCOMMAND, (WPARAM)command, MAKELPARAM(pt.x, pt.y));
     }
@@ -187,7 +164,7 @@ void TaskButton::Menu() {
 /// </summary>
 void TaskButton::GetMinRect(LPPOINTS lpPoints) {
     RECT r;
-    GetWindowRect(m_pWindow->GetWindow(), &r);
+    this->window->GetScreenRect(&r);
     lpPoints[0].x = (short)r.left;
     lpPoints[0].y = (short)r.top;
     lpPoints[1].x = (short)r.right;
@@ -222,16 +199,16 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPA
         if (!m_bMouseIsOver) {
             m_bMouseIsOver = true;
             TrackMouseEvent(&m_TrackMouseStruct);
-            this->m_pWindow->ActivateState(this->stateHover);
+            this->window->ActivateState(this->stateHover);
         }
         return 0;
 
     case WM_MOUSELEAVE:
         m_bMouseIsOver = false;
-        this->m_pWindow->ClearState(this->stateHover);
+        this->window->ClearState(this->stateHover);
         return 0;
 
     default:
-        return m_pWindow->HandleMessage(wnd, uMsg, wParam, lParam);
+        return window->HandleMessage(wnd, uMsg, wParam, lParam);
     }
 }

@@ -35,7 +35,7 @@ void TrayManager::Stop() {
 /// </summary>
 void TrayManager::GetScreenRect(TRAYICONDATAITER icon, LPRECT rect) {
     if ((*icon)->icons->size() > 0) {
-        GetWindowRect((*(*icon)->icons)[0]->GetHWND(), rect);
+        (*(*icon)->icons)[0]->GetScreenRect(rect);
     }
     else {
         // We could define a rectangle for icons that arent included anywhere, instead of just zeroing.

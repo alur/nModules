@@ -26,10 +26,10 @@ IconGroup* pGroup;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND /* hWndParent */, HINSTANCE instance, LPCSTR /* szPath */) {
-    g_LSModule = new LSModule("nIcon", "Alurcard2", MAKE_VERSION(0,2,0,0), instance, g_lsMessages);
+int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
+    g_LSModule = new LSModule(parent, "nIcon", "Alurcard2", MAKE_VERSION(0,2,0,0), instance);
     
-    if (!g_LSModule->Initialize(g_windowClasses)) {
+    if (!g_LSModule->Initialize()) {
         delete g_LSModule;
         return 1;
     }

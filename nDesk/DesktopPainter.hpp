@@ -77,6 +77,7 @@ public:
     void UpdateWallpaper(bool bNoTransition = false);
     void Resize();
     LRESULT HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    HWND GetWindow();
 
 private:
     void CalculateSizeDepdenentStuff();

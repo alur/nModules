@@ -13,9 +13,6 @@
 
 using std::map;
 
-// The window classes we want to register
-LPCSTR g_windowClasses[] = {"Label", NULL};
-
 // The LSModule class
 LSModule* g_LSModule;
 
@@ -29,10 +26,10 @@ map<LPCSTR, Label*> g_Labels;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND /* hWndParent */, HINSTANCE instance, LPCSTR /* szPath */) {
-    g_LSModule = new LSModule("nLabel", "Alurcard2", MAKE_VERSION(0,2,0,0), instance, g_lsMessages);
+int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
+    g_LSModule = new LSModule(parent, "nLabel", "Alurcard2", MAKE_VERSION(0,2,0,0), instance);
     
-    if (!g_LSModule->Initialize(g_windowClasses)) {
+    if (!g_LSModule->Initialize()) {
         delete g_LSModule;
         return 1;
     }
@@ -68,17 +65,30 @@ void quitModule(HINSTANCE /* instance */) {
 /// <summary>
 /// Handles the main window's messages.
 /// </summary>
-/// <param name="hWnd">The window the message is for.</param>
-/// <param name="uMsg">The type of message.</param>
+/// <param name="window">The window the message is for.</param>
+/// <param name="message">The type of message.</param>
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
-LRESULT WINAPI LSMessageHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch(uMsg) {
-        case LM_REFRESH: {
-            return 0;
+LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch(message) {
+    case WM_CREATE:
+        {
+            SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
+        return 0;
+
+    case WM_DESTROY:
+        {
+            SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+        }
+        return 0;
+
+    case LM_REFRESH:
+        {
+        }
+        return 0;
     }
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+    return DefWindowProc(window, message, wParam, lParam);
 }
 
 

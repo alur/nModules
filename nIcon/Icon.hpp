@@ -7,12 +7,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "../nShared/Drawable.hpp"
 #include "../nShared/DrawableWindow.hpp"
 #include <ShlObj.h>
 
-class Icon : public IDrawableMessageHandler {
+class Icon : public Drawable, public MessageHandler {
 public:
-    explicit Icon(PCITEMID_CHILD item, IShellFolder2* shellFolder, DrawableWindow* parentWindow, Settings* parentSettings);
+    explicit Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder);
     virtual ~Icon();
 
     void SetPosition(int x, int y);
@@ -24,7 +25,4 @@ private:
     PITEMID_CHILD item;
 
     void SetIcon();
-
-    Settings* settings;
-    DrawableWindow* window;
 };

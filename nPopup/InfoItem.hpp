@@ -11,11 +11,10 @@
 
 class InfoItem : public PopupItem {
 public:
-    explicit InfoItem(LPCSTR title, LPCSTR customIcon = NULL);
+    explicit InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon = NULL);
     virtual ~InfoItem();
 
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
-    void Init(Settings* parentSettings, DrawableWindow* parentWindow);
 
 private:
     LPCSTR title;

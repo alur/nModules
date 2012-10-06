@@ -14,7 +14,7 @@ extern DesktopPainter* g_pDesktopPainter;
 /// <summary>
 /// Loads all settings from .RC files and applies them.
 /// </summary>
-void Settings::Load() {
+void nDesk::Settings::Load() {
     using namespace nCore::InputParsing;
 
     char buf[MAX_LINE_LENGTH];
@@ -40,7 +40,7 @@ void Settings::Load() {
 /// <summary>
 /// String -> EasingType
 /// </summary>
-DesktopPainter::EasingType Settings::EasingFromString(LPCSTR pszEasing) {
+DesktopPainter::EasingType nDesk::Settings::EasingFromString(LPCSTR pszEasing) {
     if (_stricmp(pszEasing, "InQuad") == 0) return DesktopPainter::EasingType::INQUAD;
 
     return DesktopPainter::EasingType::LINEAR;
@@ -50,7 +50,7 @@ DesktopPainter::EasingType Settings::EasingFromString(LPCSTR pszEasing) {
 /// <summary>
 /// String -> TransitionType
 /// </summary>
-DesktopPainter::TransitionType Settings::TransitionTypeFromString(LPCSTR pszTransition) {
+DesktopPainter::TransitionType nDesk::Settings::TransitionTypeFromString(LPCSTR pszTransition) {
     if (_stricmp(pszTransition, "FadeIn") == 0) return DesktopPainter::TransitionType::FADE_IN;
     if (_stricmp(pszTransition, "FadeOut") == 0) return DesktopPainter::TransitionType::FADE_OUT;
 

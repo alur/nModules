@@ -109,7 +109,7 @@ void Bangs::SetTransitionSquareSize(HWND, LPCSTR pszArgs) {
 /// Sets the transition effect.
 /// </summary>
 void Bangs::SetTransitionEffect(HWND, LPCSTR pszArgs) {
-    g_pDesktopPainter->SetTransitionType(Settings::TransitionTypeFromString(pszArgs));
+    g_pDesktopPainter->SetTransitionType(nDesk::Settings::TransitionTypeFromString(pszArgs));
 }
 
 

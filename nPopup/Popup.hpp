@@ -9,13 +9,13 @@
 
 #include "PopupItem.hpp"
 #include <vector>
-#include "../nShared/IDrawableMessageHandler.hpp"
+#include "../nShared/MessageHandler.hpp"
 #include "../nShared/Settings.hpp"
 #include "../nShared/DrawableWindow.hpp"
 
 using std::vector;
 
-class Popup : public IDrawableMessageHandler {
+class Popup : public MessageHandler, public Drawable {
 public:
     explicit Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix);
     virtual ~Popup();
@@ -32,7 +32,4 @@ private:
 
     // True if the popup is already sized properly.
     bool sized;
-
-    Settings* settings;
-    DrawableWindow* window;
 };

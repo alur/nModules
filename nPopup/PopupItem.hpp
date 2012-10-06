@@ -8,19 +8,15 @@
 #pragma once
 
 #include "../headers/lsapi.h"
+#include "../nShared/Drawable.hpp"
 #include "../nShared/DrawableWindow.hpp"
-#include "../nShared/IDrawableMessageHandler.hpp"
+#include "../nShared/MessageHandler.hpp"
 
-class PopupItem : public IDrawableMessageHandler {
+class PopupItem : public Drawable, MessageHandler {
 public:
-    explicit PopupItem();
+    explicit PopupItem(Drawable* parent);
     virtual ~PopupItem();
     void Position(int x, int y);
     virtual LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM) = 0;
-    virtual void Init(Settings* parentSettings, DrawableWindow* parentWindow) = 0;
     int GetHeight();
-
-protected:
-    DrawableWindow* window;
-    Settings* settings;
 };

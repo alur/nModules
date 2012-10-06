@@ -14,9 +14,20 @@
 extern LSModule* g_LSModule;
 
 
-CommandItem::CommandItem(LPCSTR title, LPCSTR command, LPCSTR customIcon) : PopupItem() {
+CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, LPCSTR customIcon) : PopupItem(parent) {
     this->title = _strdup(title);
     this->command = _strdup(command);
+
+    DrawableSettings* defaults = new DrawableSettings();
+    defaults->width = 190;
+    defaults->height = 20;
+    defaults->color = 0xAAFFFF00;
+    defaults->fontColor = 0xFF000000;
+    MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
+    StringCchCopy(defaults->textVerticalAlign, sizeof(defaults->textVerticalAlign), "Middle");
+    defaults->textOffsetLeft = 20;
+    this->window->Initialize(defaults);
+    this->window->Show();
 }
 
 
@@ -35,19 +46,4 @@ LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM 
         return 0;
     }
     return this->window->HandleMessage(window, msg, wParam, lParam);
-}
-
-
-void CommandItem::Init(Settings* parentSettings, DrawableWindow* parentWindow) {
-    this->settings = parentSettings->CreateChild("Item");
-
-    DrawableSettings* defaults = new DrawableSettings();
-    defaults->width = 190;
-    defaults->height = 20;
-    defaults->color = 0x55FFFF00;
-    MultiByteToWideChar(CP_ACP, 0, this->title, strlen(this->title)+1, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
-    StringCchCopy(defaults->textVerticalAlign, sizeof(defaults->textVerticalAlign), "Middle");
-    defaults->textOffsetLeft = 20;
-    this->window = new DrawableWindow(parentWindow->GetWindow(), (LPCSTR)g_LSModule->GetWindowClass(2), g_LSModule->GetInstance(), this->settings, defaults, this);
-    this->window->Show();
 }

@@ -21,11 +21,12 @@
   <ItemGroup>
     <ClInclude Include="Color.h" />
     <ClInclude Include="Debugging.h" />
+    <ClInclude Include="Drawable.hpp" />
     <ClInclude Include="DrawableSettings.hpp" />
     <ClInclude Include="DrawableWindow.hpp" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Factories.h" />
-    <ClInclude Include="IDrawableMessageHandler.hpp" />
+    <ClInclude Include="MessageHandler.hpp" />
     <ClInclude Include="LayoutSettings.hpp" />
     <ClInclude Include="LSModule.hpp" />
     <ClInclude Include="Math.h" />
@@ -37,6 +38,7 @@
   <ItemGroup>
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Debugging.cpp" />
+    <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="DrawableSettings.cpp" />
     <ClCompile Include="DrawableWindow.cpp" />
     <ClCompile Include="Error.cpp" />
@@ -44,6 +46,7 @@
     <ClCompile Include="LayoutSettings.cpp" />
     <ClCompile Include="LSModule.cpp" />
     <ClCompile Include="Math.cpp" />
+    <ClCompile Include="MessageHandler.cpp" />
     <ClCompile Include="MonitorInfo.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Versioning.cpp" />
