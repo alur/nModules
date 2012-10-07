@@ -28,6 +28,18 @@ CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, LPCSTR 
     defaults->textOffsetLeft = 20;
     this->window->Initialize(defaults);
     this->window->Show();
+
+    if (customIcon[0] != '\0') {
+        D2D1_RECT_F f;
+        LPSTR index = (LPSTR)strrchr(customIcon, ',');
+        index++[0] = NULL;
+        f.bottom = 18; f.top = 2; f.left = 2; f.right = 18;
+        HICON icon = ExtractIcon(g_LSModule->GetInstance(), customIcon, atoi(index));
+        if (icon != NULL) {
+            this->window->AddOverlay(f, icon);
+            DestroyIcon(icon);
+        }
+    }
 }
 
 

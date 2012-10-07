@@ -163,6 +163,10 @@ HWND LSModule::GetMessageWindow() {
     return this->messageHandler;
 }
 
+HINSTANCE LSModule::GetInstance() {
+    return this->instance;
+}
+
 
 /// <summary>
 /// Intercepts LiteStep messages before the module can get to them.

@@ -260,7 +260,7 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line,
     else {
         // If we have a .icon, copy it over and move forward.
         if (_strnicmp(token, ".icon=", 6) == 0) {
-            StringCchCopy(icon, cchIcon, token);
+            StringCchCopy(icon, cchIcon, token+6);
             GetToken(linePointer, token, &linePointer, FALSE);
         }
         else {

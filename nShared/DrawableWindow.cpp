@@ -616,6 +616,9 @@ void DrawableWindow::Paint() {
 /// </summary>
 void DrawableWindow::RemoveChild(DrawableWindow* child) {
     this->children.remove(child);
+    if (child == this->activeChild) {
+        this->activeChild = NULL;
+    }
     this->Repaint();
 }
 

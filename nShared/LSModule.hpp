@@ -47,6 +47,9 @@ public:
     HWND GetMessageWindow();
 
     //
+    HINSTANCE GetInstance();
+
+    //
     LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 
 private:
