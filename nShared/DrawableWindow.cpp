@@ -39,6 +39,7 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instan
     this->defaultDrawingSettings = NULL;
     ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
     this->drawingSettings = new DrawableSettings();
+    this->initialized = false;
     this->isTrackingMouse = false;
     this->msgHandler = msgHandler;
     this->parent = NULL;
@@ -74,6 +75,7 @@ DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, Messa
     this->defaultDrawingSettings = NULL;
     ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
     this->drawingSettings = new DrawableSettings();
+    this->initialized = false;
     this->isTrackingMouse = false;
     this->msgHandler = msgHandler;
     this->parent = parent;
@@ -92,6 +94,8 @@ DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, Messa
 /// Destroys all children and frees allocated resources.
 /// </summary>
 DrawableWindow::~DrawableWindow() {
+    this->initialized = false;
+
     if (this->parent) {
         this->parent->RemoveChild(this);
     }
@@ -258,6 +262,8 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
         this->textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
     SetText(this->drawingSettings->text);
+
+    this->Repaint();
 }
 
 
@@ -288,11 +294,11 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     }
     else {
         this->drawingArea = D2D1::RectF(
-                this->parent->drawingArea.left + this->drawingSettings->x,
-                this->parent->drawingArea.top + this->drawingSettings->y,
-                this->parent->drawingArea.left + this->drawingSettings->x + this->drawingSettings->width,
-                this->parent->drawingArea.top + this->drawingSettings->y + this->drawingSettings->height
-            );
+            this->parent->drawingArea.left + this->drawingSettings->x,
+            this->parent->drawingArea.top + this->drawingSettings->y,
+            this->parent->drawingArea.left + this->drawingSettings->x + this->drawingSettings->width,
+            this->parent->drawingArea.top + this->drawingSettings->y + this->drawingSettings->height
+        );
     }
 
     // The text area is offset from the drawing area.
@@ -314,6 +320,8 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
         iter->brush->SetTransform(Matrix3x2F::Identity());
         iter->brush->SetTransform(Matrix3x2F::Translation(iter->drawingPosition.left, iter->drawingPosition.top));
     }
+
+    this->Repaint();
 }
 
 /// <summary>
@@ -384,12 +392,14 @@ HWND DrawableWindow::GetWindow() {
 /// Repaints the entire window.
 /// </summary>
 void DrawableWindow::Repaint() {
-    if (this->parent) {
-        this->parent->Repaint();
-    }
-    else {
-        InvalidateRect(this->window, NULL, TRUE);
-        UpdateWindow(this->window);
+    if (!this->initialized && this->visible) {
+        if (this->parent) {
+            this->parent->Repaint();
+        }
+        else {
+            InvalidateRect(this->window, NULL, TRUE);
+            UpdateWindow(this->window);
+        }
     }
 }
 
@@ -606,6 +616,7 @@ void DrawableWindow::Paint() {
 /// </summary>
 void DrawableWindow::RemoveChild(DrawableWindow* child) {
     this->children.remove(child);
+    this->Repaint();
 }
 
 

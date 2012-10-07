@@ -144,6 +144,9 @@ private:
     DrawableSettings* drawingSettings;
 
     //
+    bool initialized;
+
+    //
     bool isTrackingMouse;
 
     // The object which should handle mouse event messages.
