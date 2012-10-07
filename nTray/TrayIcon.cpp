@@ -108,7 +108,7 @@ void TrayIcon::SendCallback(UINT uMsg, WPARAM /* wParam */, LPARAM /* lParam */)
 /// Handles window messages for the icon's window.
 /// </summary>
 LRESULT WINAPI TrayIcon::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    if (uMsg > WM_MOUSEFIRST && uMsg < WM_MOUSELAST) {
+    if (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) {
         SendCallback(uMsg, wParam, lParam);
         if (uMsg == WM_RBUTTONUP) {
             SendCallback(WM_CONTEXTMENU, wParam, lParam);

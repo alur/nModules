@@ -40,8 +40,6 @@ private:
 
     HWND m_hWndParent;
 
-    TRACKMOUSEEVENT m_TrackMouseStruct;
-
     bool m_bMouseIsOver;
     bool m_bIsActive;
     bool m_bIsFlashing;

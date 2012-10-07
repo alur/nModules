@@ -122,6 +122,9 @@ private:
     // Removes the specified child.
     void RemoveChild(DrawableWindow* child);
 
+    //
+    DrawableWindow* activeChild;
+
     // The currently active state, or states.end().
     list<State>::iterator activeState;
 
@@ -139,6 +142,9 @@ private:
 
     // The current drawing settings we are using.
     DrawableSettings* drawingSettings;
+
+    //
+    bool isTrackingMouse;
 
     // The object which should handle mouse event messages.
     MessageHandler* msgHandler;
@@ -160,6 +166,9 @@ private:
 
     // The brush we are currently painting the text with.
     ID2D1Brush* textBrush;
+
+    //
+    TRACKMOUSEEVENT trackMouseStruct;
 
     // Whether or not we are visible.
     bool visible;

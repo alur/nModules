@@ -200,7 +200,6 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
     case WM_MOUSEMOVE:
         if (!m_bMouseIsOver) {
             m_bMouseIsOver = true;
-            TrackMouseEvent(&m_TrackMouseStruct);
             this->window->ActivateState(this->stateHover);
         }
         return 0;

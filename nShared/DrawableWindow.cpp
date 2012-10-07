@@ -33,11 +33,13 @@ using namespace D2D1;
 /// Constructor used by LSModule to create a top-level window.
 /// </summary>
 DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) {
+    this->activeChild = NULL;
     this->activeState = this->states.end();
     this->backBrush = NULL;
     this->defaultDrawingSettings = NULL;
     ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
     this->drawingSettings = new DrawableSettings();
+    this->isTrackingMouse = false;
     this->msgHandler = msgHandler;
     this->parent = NULL;
     this->renderTarget = NULL;
@@ -66,11 +68,13 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instan
 /// Constructor used by CreateChild to create a child window.
 /// </summary>
 DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler) {
+    this->activeChild = NULL;
     this->activeState = this->states.end();
     this->backBrush = NULL;
     this->defaultDrawingSettings = NULL;
     ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
     this->drawingSettings = new DrawableSettings();
+    this->isTrackingMouse = false;
     this->msgHandler = msgHandler;
     this->parent = parent;
     this->renderTarget = NULL;
@@ -97,12 +101,16 @@ DrawableWindow::~DrawableWindow() {
         DestroyWindow(this->window);
     }
 
+    // Delete all states
     for (STATE iter = this->states.begin(); iter != this->states.end(); iter++) {
         SAFEDELETE(iter->defaultSettings);
         SAFEDELETE(iter->drawingSettings);
         SAFEDELETE(iter->settings);
     }
     this->states.clear();
+
+    // Delete all overlays
+    ClearOverlays();
 
     SAFEDELETE(this->drawingSettings);
     SAFEDELETE(this->defaultDrawingSettings);
@@ -200,6 +208,13 @@ void DrawableWindow::ClearOverlays() {
 void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     this->defaultDrawingSettings = defaultSettings;
     this->drawingSettings->Load(this->settings, this->defaultDrawingSettings);
+
+    // Configure the mouse tracking struct
+    ZeroMemory(&this->trackMouseStruct, sizeof(TRACKMOUSEEVENT));
+    this->trackMouseStruct.cbSize = sizeof(TRACKMOUSEEVENT);
+    this->trackMouseStruct.hwndTrack = this->window;
+    this->trackMouseStruct.dwFlags = TME_LEAVE;
+    this->trackMouseStruct.dwHoverTime = 200;
 
     // Create D2D resources
     ReCreateDeviceResources();
@@ -478,24 +493,51 @@ void DrawableWindow::SetText(LPCWSTR text) {
 /// Handles window messages for this drawablewindow.
 /// </summary>
 LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (msg > WM_MOUSEFIRST && msg < WM_MOUSELAST) {
+    if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) {
         // Check if we should send it to a child window
         int xPos = GET_X_LPARAM(lParam); 
         int yPos = GET_Y_LPARAM(lParam);
+        MessageHandler* handler = NULL;
+
         for (list<DrawableWindow*>::const_iterator iter = this->children.begin(); iter != this->children.end(); ++iter) {
             D2D1_RECT_F* pos = &(*iter)->drawingArea;
             if (xPos >= pos->left && xPos <= pos->right && yPos >= pos->top && yPos <= pos->bottom) {
-                return (*iter)->HandleMessage(window, msg, wParam, lParam);
+                handler = *iter;
+                break;
             }
         }
 
+        if (msg == WM_MOUSEMOVE) {
+            if (!this->parent && !isTrackingMouse) {
+                isTrackingMouse = true;
+                TrackMouseEvent(&this->trackMouseStruct);
+            }
+            if (handler != activeChild) {
+                if (activeChild != NULL) {
+                    activeChild->HandleMessage(window, WM_MOUSELEAVE, NULL, NULL);
+                }
+                activeChild = (DrawableWindow*)handler;
+            }
+        }
+
+        if (handler == NULL) {
+            handler = this->msgHandler;
+        }
+
         // Let our messagehandler deal with it.
-        return this->msgHandler->HandleMessage(window, msg, wParam, lParam);
+        return handler->HandleMessage(window, msg, wParam, lParam);
     }
 
     switch (msg) {
-    case WM_CTLCOLORSTATIC:
-        return 1;
+    case WM_MOUSELEAVE:
+        {
+            isTrackingMouse = false;
+            if (activeChild != NULL) {
+                activeChild->HandleMessage(window, WM_MOUSELEAVE, NULL, NULL);
+                activeChild = NULL;
+            }
+        }
+        break;
 
     case WM_ERASEBKGND:
         return 1;
