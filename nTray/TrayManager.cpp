@@ -9,8 +9,10 @@
 #include "TrayManager.h"
 #include "../nShared/Debugging.h"
 
+
 // The various trays
-extern map<LPCSTR, Tray*> g_Trays;
+extern map<string, Tray*> g_Trays;
+
 
 namespace TrayManager {
 	// All current tray icons

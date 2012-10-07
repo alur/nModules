@@ -43,6 +43,9 @@ TaskButton::TaskButton(Drawable* parent, HWND hWnd) : Drawable(parent, "Button")
 /// Destructor
 /// </summary>
 TaskButton::~TaskButton() {
+    if (this->m_bIsFlashing) {
+        this->window->ClearCallbackTimer(this->flash_timer);
+    }
 }
 
 
@@ -72,7 +75,8 @@ void TaskButton::SetText(LPCWSTR title) {
 /// Loads RC settings for task buttons.
 /// </summary>
 void TaskButton::LoadSettings(bool /* bIsRefresh */) {
-    using namespace nCore::InputParsing;
+    this->useFlashing = this->settings->GetBool("UseFlashing", true);
+    this->flashInterval = this->settings->GetInt("FlashInterval", 500);
 }
 
 
@@ -90,7 +94,13 @@ void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
 void TaskButton::Activate() {
     m_bIsActive = true;
     this->window->ActivateState(this->stateActive);
-    this->window->ClearState(this->stateFlashing);
+
+    if (this->m_bIsFlashing) {
+        this->window->ClearState(this->stateFlashing);
+        this->flashOn = false;
+        this->window->ClearCallbackTimer(this->flash_timer);
+        this->m_bIsFlashing = false;
+    }
 }
 
 
@@ -107,8 +117,12 @@ void TaskButton::Deactivate() {
 /// Tells this button to start flashing.
 /// </summary>
 void TaskButton::Flash() {
-    m_bIsFlashing = true;
-    this->window->ActivateState(this->stateFlashing);
+    if (!this->m_bIsFlashing) {
+        this->m_bIsFlashing = true;
+        this->flashOn = true;
+        this->window->ActivateState(this->stateFlashing);
+        this->flash_timer = this->window->SetCallbackTimer(this->flashInterval, this);
+    }
 }
 
 
@@ -207,6 +221,25 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
     case WM_MOUSELEAVE:
         m_bMouseIsOver = false;
         this->window->ClearState(this->stateHover);
+        return 0;
+
+    case WM_TIMER:
+        {
+            if (wParam == this->flash_timer) {
+                if (this->m_bIsFlashing) {
+                    this->flashOn = !this->flashOn;
+                    if (this->flashOn) {
+                        this->window->ActivateState(this->stateFlashing);
+                    }
+                    else {
+                        this->window->ClearState(this->stateFlashing);
+                    }
+                }
+                else {
+                    this->window->ClearCallbackTimer(this->flash_timer);
+                }
+            }
+        }
         return 0;
 
     default:

@@ -12,9 +12,14 @@
 #include <d2d1.h>
 #include <vector>
 #include <list>
+#include <map>
+#include "UIDGenerator.hpp"
+
 
 using std::vector;
 using std::list;
+using std::map;
+
 
 class DrawableWindow : MessageHandler {
 public:
@@ -51,6 +56,9 @@ public:
     // Marks a particular state as active.
     void ActivateState(STATE state);
 
+    // Stops a timer.
+    void ClearCallbackTimer(UINT_PTR);
+
     // Removes all overlays.
     void ClearOverlays();
 
@@ -80,6 +88,9 @@ public:
 
     // Sets the message handler for this window.
     void SetMessageHandler(MessageHandler* msgHandler);
+
+    // Registers a timer
+    UINT_PTR SetCallbackTimer(UINT elapse, MessageHandler* msgHandler);
 
     // Moves this window.
     void Move(int x, int y);
@@ -171,7 +182,16 @@ private:
     ID2D1Brush* textBrush;
 
     //
+    UIDGenerator<UINT_PTR>* timerIDs;
+
+    //
+    map<UINT_PTR, MessageHandler*> timers;
+
+    //
     TRACKMOUSEEVENT trackMouseStruct;
+
+    //
+    UINT_PTR updateTextTimer;
 
     // Whether or not we are visible.
     bool visible;

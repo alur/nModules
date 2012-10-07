@@ -79,6 +79,7 @@ void Popup::Show(int x, int y) {
     }
 
     this->window->Show();
+    SetWindowPos(this->window->GetWindow(), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 }
 
 

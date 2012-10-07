@@ -25,6 +25,7 @@
     <ClInclude Include="DrawableSettings.hpp" />
     <ClInclude Include="DrawableWindow.hpp" />
     <ClInclude Include="Error.h" />
+    <ClInclude Include="EventHandler.hpp" />
     <ClInclude Include="Factories.h" />
     <ClInclude Include="MessageHandler.hpp" />
     <ClInclude Include="LayoutSettings.hpp" />
@@ -33,6 +34,7 @@
     <ClInclude Include="MonitorInfo.hpp" />
     <ClInclude Include="nShared.h" />
     <ClInclude Include="Settings.hpp" />
+    <ClInclude Include="UIDGenerator.hpp" />
     <ClInclude Include="Versioning.h" />
   </ItemGroup>
   <ItemGroup>
@@ -42,6 +44,7 @@
     <ClCompile Include="DrawableSettings.cpp" />
     <ClCompile Include="DrawableWindow.cpp" />
     <ClCompile Include="Error.cpp" />
+    <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="Factories.cpp" />
     <ClCompile Include="LayoutSettings.cpp" />
     <ClCompile Include="LSModule.cpp" />
@@ -49,6 +52,7 @@
     <ClCompile Include="MessageHandler.cpp" />
     <ClCompile Include="MonitorInfo.cpp" />
     <ClCompile Include="Settings.cpp" />
+    <ClCompile Include="UIDGenerator.cpp" />
     <ClCompile Include="Versioning.cpp" />
   </ItemGroup>
   <ItemGroup>

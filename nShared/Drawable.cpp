@@ -21,6 +21,7 @@ Drawable::Drawable(LPCSTR prefix) {
     this->settings = new Settings(prefix);
     this->window = g_LSModule->CreateDrawableWindow(this->settings, this);
     this->initialized = true;
+    this->parent = NULL;
 }
 
 
@@ -32,6 +33,7 @@ Drawable::Drawable(Drawable* parent, LPCSTR prefix) {
     this->settings = parent->settings->CreateChild(prefix);
     this->window = parent->window->CreateChild(this->settings, this);
     this->initialized = true;
+    this->parent = parent;
 }
 
 

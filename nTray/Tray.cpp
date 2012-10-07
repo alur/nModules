@@ -21,9 +21,6 @@ extern bool g_InitPhase;
 /// Constructor
 /// </summary>
 Tray::Tray(LPCSTR name) : Drawable(name) {
-    this->name = name;
-
-    this->settings = new Settings(this->name);
     this->layoutSettings = new LayoutSettings();
 
     DrawableSettings* defaults = new DrawableSettings();
@@ -45,7 +42,6 @@ Tray::~Tray() {
     this->icons.clear();
 
     SAFEDELETE(this->layoutSettings);
-    free((void *)this->name);
 }
 
 

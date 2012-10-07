@@ -43,6 +43,11 @@ private:
     bool m_bMouseIsOver;
     bool m_bIsActive;
     bool m_bIsFlashing;
+    bool useFlashing;
+
+    bool flashOn;
+    int flashInterval;
+    UINT_PTR flash_timer;
 
     DrawableWindow::STATE stateHover, stateActive, stateFlashing;
 

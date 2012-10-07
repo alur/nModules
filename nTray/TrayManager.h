@@ -10,6 +10,7 @@
 #include <vector>
 
 using std::vector;
+using std::string;
 
 namespace TrayManager {
     typedef struct {
@@ -18,7 +19,7 @@ namespace TrayManager {
     } TRAYICONDATA, *LPTRAYICONDATA;
 
     typedef vector<LPTRAYICONDATA>::iterator TRAYICONDATAITER;
-    typedef map<LPCSTR, Tray*>::const_iterator TRAYSCITER;
+    typedef map<string, Tray*>::const_iterator TRAYSCITER;
 
     void Stop();
     void GetScreenRect(TRAYICONDATAITER icon, LPRECT rect);

@@ -29,9 +29,6 @@ public:
     void InitCompleted();
 
 private:
-    // The name of this tray
-    LPCSTR name;
-
     //
     LayoutSettings* layoutSettings;
 

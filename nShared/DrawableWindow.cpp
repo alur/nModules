@@ -22,11 +22,10 @@
 #include "Debugging.h"
 #include "Color.h"
 #include "MessageHandler.hpp"
+#include "UIDGenerator.cpp"
+
 
 using namespace D2D1;
-
-
-#define TIMER_UPDATE_TEXT 1
 
 
 /// <summary>
@@ -49,6 +48,7 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instan
     ZeroMemory(&this->textArea, sizeof(this->textArea));
     this->textBrush = NULL;
     this->textFormat = NULL;
+    this->timerIDs = new UIDGenerator<UINT_PTR>(1);
     this->visible = false;
     this->window = MessageHandler::CreateMessageWindowEx(WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_COMPOSITED,
         windowClass, "", WS_POPUP, 0, 0, 0, 0, parent, NULL, instance, this);
@@ -61,7 +61,7 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instan
     m.cyTopHeight = INT_MAX;
     DwmExtendFrameIntoClientArea(this->window, &m);
 
-    SetTimer(this->window, TIMER_UPDATE_TEXT, 1000, NULL);
+    this->updateTextTimer = SetCallbackTimer(1000, this);
 }
 
 
@@ -85,6 +85,8 @@ DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, Messa
     ZeroMemory(&this->textArea, sizeof(this->textArea));
     this->textBrush = NULL;
     this->textFormat = NULL;
+    this->timerIDs = NULL;
+    this->updateTextTimer = NULL;
     this->visible = false;
     this->window = parent->window;
 }
@@ -101,7 +103,7 @@ DrawableWindow::~DrawableWindow() {
     }
 
     if (!this->parent && this->window) {
-        KillTimer(this->window, TIMER_UPDATE_TEXT);
+        ClearCallbackTimer(this->updateTextTimer);
         DestroyWindow(this->window);
     }
 
@@ -385,6 +387,30 @@ HWND DrawableWindow::GetWindow() {
 }
 
 
+void DrawableWindow::ClearCallbackTimer(UINT_PTR timer) {
+    if (!this->parent) {
+        KillTimer(this->window, timer);
+        this->timers.erase(timer);
+        this->timerIDs->ReleaseID(timer);
+    }
+    else {
+        this->parent->ClearCallbackTimer(timer);
+    }
+}
+
+
+UINT_PTR DrawableWindow::SetCallbackTimer(UINT elapse, MessageHandler* msgHandler) {
+    if (!this->parent) {
+        UINT_PTR ret = SetTimer(this->window, this->timerIDs->GetNewID(), elapse, NULL);
+        this->timers.insert(std::pair<UINT_PTR, MessageHandler*>(ret, msgHandler));
+        return ret;
+    }
+    else {
+        return this->parent->SetCallbackTimer(elapse, msgHandler);
+    }
+}
+
+
 /// <summary>
 /// Repaints the entire window.
 /// </summary>
@@ -564,11 +590,18 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         return 0;
 
     case WM_TIMER:
-        switch (wParam) {
-        case TIMER_UPDATE_TEXT:
-            UpdateText();
+        {
+            if (wParam == this->updateTextTimer) {
+                this->UpdateText();
+            }
+            else {
+                map<UINT_PTR, MessageHandler*>::const_iterator iter = timers.find(wParam);
+                if (iter != timers.end()) {
+                    return iter->second->HandleMessage(window, msg, wParam, lParam);
+                }
+            }
         }
-        break;
+        return 0;
 
     case WM_DISPLAYCHANGE:
         return 0;

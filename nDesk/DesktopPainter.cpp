@@ -26,8 +26,6 @@ using namespace D2D1;
 /// Creates a new instance of the DesktopPainter class.
 /// </summary>
 DesktopPainter::DesktopPainter(HWND hWnd) {
-    DWORD start = GetTickCount();
-
     // Initalize
     m_pWallpaperBrush = NULL;
     m_pOldWallpaperBrush = NULL;
@@ -48,8 +46,6 @@ DesktopPainter::DesktopPainter(HWND hWnd) {
     m_TransitionSettings.iSquareSize = 100;
     m_TransitionSettings.fFadeTime = 0.2f;
     SetTransitionType(NONE);
-
-    TRACE("It took %d ms to init", GetTickCount() - start);
 }
 
 

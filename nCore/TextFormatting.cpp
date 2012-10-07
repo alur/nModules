@@ -13,9 +13,10 @@
 #include <ctime>
 
 using std::map;
+using std::string;
 
 // All registered formatters.
-map<LPCSTR, FORMATTINGPROC> g_formatters;
+map<string, FORMATTINGPROC> g_formatters;
 
 
 /// <summary>
@@ -54,6 +55,7 @@ EXPORT_CDECL(BOOL) FormatText(LPCWSTR pszSource, size_t cchDest, LPWSTR pszDest)
 /// Finds a formatter for the specified function.
 /// </summary>
 FORMATTINGPROC FindFormatter(LPCSTR pszFunc) {
-    map<LPCSTR, FORMATTINGPROC>::const_iterator iter = g_formatters.find(pszFunc);
-    return iter != g_formatters.end() ? iter->second : NULL;
+    //map<string, FORMATTINGPROC>::const_iterator iter = g_formatters.find(string(pszFunc));
+    //return iter != g_formatters.end() ? iter->second : NULL;
+    return NULL;
 }

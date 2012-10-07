@@ -14,6 +14,7 @@
 
 
 using std::map;
+using std::string;
 
 
 #define TIMER_INIT_COMPLETED 1
@@ -25,13 +26,14 @@ UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, LM_SYSTRAYINFOEVENT
 HWND g_hWndTrayNotify;
 
 // All the trays we currently have loaded
-map<LPCSTR, Tray*> g_Trays;
+map<string, Tray*> g_Trays;
 
 // The LiteStep module class
 LSModule* g_LSModule;
 
 // True for the first 100ms of nTrays life. Speeds up loading.
 bool g_InitPhase;
+
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
@@ -66,7 +68,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
     // Remove all trays
-    for (map<LPCSTR, Tray*>::const_iterator iter = g_Trays.begin(); iter != g_Trays.end(); iter++) {
+    for (map<string, Tray*>::const_iterator iter = g_Trays.begin(); iter != g_Trays.end(); iter++) {
         delete iter->second;
     }
     g_Trays.clear();
@@ -133,15 +135,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// Reads through the .rc files and creates trays.
 /// </summary>
 void LoadSettings() {
-    char szLine[MAX_LINE_LENGTH], szName[256];
-    LPSTR szTokens[] = { szName };
+    char szLine[MAX_LINE_LENGTH], name[256];
+    LPSTR szTokens[] = { name };
     LPVOID f = LCOpen(NULL);
-    LPSTR name;
 
     while (LCReadNextConfig(f, "*nTray", szLine, sizeof(szLine))) {
         LCTokenize(szLine+strlen("*nTray")+1, szTokens, 1, NULL);
-        name = _strdup(szName);
-        g_Trays.insert(g_Trays.begin(), std::pair<LPCSTR, Tray*>(name, new Tray(name)));
+        g_Trays.insert(g_Trays.begin(), std::pair<string, Tray*>(string(name), new Tray(name)));
     }
     LCClose(f);
 }

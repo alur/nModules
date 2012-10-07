@@ -24,4 +24,7 @@ protected:
 
     // The object which does actual drawing.
     DrawableWindow* window;
+
+    // The parent drawable, if there is one.
+    Drawable* parent;
 };
