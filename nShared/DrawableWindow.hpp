@@ -31,17 +31,31 @@ public:
     } State;
     typedef list<State>::iterator STATE;
 
+    // Defines an overlay. A bitmap, or icon, or something. To pounder::All these could be their own full-blown DrawableWindow.
+    typedef struct {
+        D2D1_RECT_F position;
+        D2D1_RECT_F drawingPosition;
+        ID2D1Brush* brush;
+    } Overlay;
+    typedef list<Overlay>::pointer OVERLAY;
+
     // Constructor used for top-level windows.
     explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings);
 
     // Destructor
     virtual ~DrawableWindow();
 
+    // Adds an icon as an overlay.
+    HRESULT AddOverlay(D2D1_RECT_F position, HICON icon);
+
     // Adds a new state.
     STATE AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority);
 
     // Marks a particular state as active.
     void ActivateState(STATE state);
+
+    // Removes all overlays.
+    void ClearOverlays();
 
     // Clears the active flag of a particular state.
     void ClearState(STATE state);
@@ -120,8 +134,11 @@ private:
     // The area we draw in.
     D2D1_RECT_F drawingArea;
 
-    // The current drawing settings we are using
+    // The current drawing settings we are using.
     DrawableSettings* drawingSettings;
+
+    // All current overlays.
+    list<Overlay> overlays;
 
     // The DrawableWindow which is this windows parent.
     DrawableWindow* parent;

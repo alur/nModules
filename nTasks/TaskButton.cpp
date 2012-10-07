@@ -48,13 +48,13 @@ TaskButton::~TaskButton() {
 /// Sets the icon of this button.
 /// </summary>
 void TaskButton::SetIcon(HICON hIcon) {
+    this->window->ClearOverlays();
     if (hIcon != NULL) {
         D2D1_RECT_F f = { (float)this->iconSettings->GetInt("X", 0), (float)this->iconSettings->GetInt("Y", 0),
             (float)this->iconSettings->GetInt("Width", 32) + (float)this->iconSettings->GetInt("X", 0),
             (float)this->iconSettings->GetInt("Height", 32)+ (float)this->iconSettings->GetInt("Y", 0) };
-        //m_pWindow->AddOverlay(f, hIcon);
+        this->window->AddOverlay(f, hIcon);
     }
-    this->window->Repaint();
 }
 
 

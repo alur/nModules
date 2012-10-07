@@ -115,6 +115,83 @@ DrawableWindow::~DrawableWindow() {
 
 
 /// <summary>
+/// Adds an overlay icon.
+/// </summary>
+HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
+    IWICBitmap* source = NULL;
+    IWICBitmapScaler* scaler = NULL;
+    IWICFormatConverter* converter = NULL;
+    IWICImagingFactory* factory = NULL;
+    ID2D1Bitmap* bitmap = NULL;
+    Overlay overlay;
+    UINT width, height;
+    
+    HRESULT hr = S_OK;
+
+    // Create our helper objects.
+    CHECKHR(hr, Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory)));
+    CHECKHR(hr, factory->CreateBitmapScaler(&scaler));
+    CHECKHR(hr, factory->CreateFormatConverter(&converter));
+
+    // Generate a WIC bitmap
+    CHECKHR(hr, factory->CreateBitmapFromHICON(icon, &source));
+
+    // Resize the image
+    CHECKHR(hr, source->GetSize(&width, &height));
+    CHECKHR(hr, scaler->Initialize(source, (UINT)(position.right - position.left), (UINT)(position.bottom - position.top), WICBitmapInterpolationModeCubic));
+    
+    // Convert it to an ID2D1Bitmap
+    CHECKHR(hr, converter->Initialize(scaler, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut));
+    CHECKHR(hr, this->renderTarget->CreateBitmapFromWicBitmap(converter, 0, &bitmap));
+
+    // Create a brush based on the bitmap
+    CHECKHR(hr, this->renderTarget->CreateBitmapBrush(bitmap, reinterpret_cast<ID2D1BitmapBrush**>(&overlay.brush)));
+    
+    // Make the position relative to the drawing area.
+    overlay.position = position;
+    overlay.drawingPosition = overlay.position;
+    overlay.drawingPosition.left += this->drawingArea.left;
+    overlay.drawingPosition.right += this->drawingArea.left;
+    overlay.drawingPosition.top += this->drawingArea.top;
+    overlay.drawingPosition.bottom += this->drawingArea.top;
+
+    // Move the origin of the brush to match the overlay position
+    overlay.brush->SetTransform(Matrix3x2F::Translation(overlay.drawingPosition.left, overlay.drawingPosition.top));
+
+    // Transfer control here if CHECKHR failed
+    CHECKHR_END();
+
+    // Release stuff
+    SAFERELEASE(scaler);
+    SAFERELEASE(converter);
+    SAFERELEASE(source);
+    SAFERELEASE(bitmap);
+
+    // Add the overlays to the overlay list
+    if (SUCCEEDED(hr)) {
+        this->overlays.push_back(overlay);
+        Repaint();
+    }
+    else {
+        TRACE("DrawableWindow::AddOverlay failed!");
+    }
+
+    return hr;
+}
+
+
+/// <summary>
+/// Removes all overlays from the window.
+/// </summary>
+void DrawableWindow::ClearOverlays() {
+    for (list<Overlay>::iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++) {
+        SAFERELEASE(iter->brush);
+    }
+    this->overlays.clear();
+}
+
+
+/// <summary>
 /// Initalizes this window.
 /// </summary>
 void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
@@ -200,6 +277,19 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     this->textArea.top += this->drawingSettings->textOffsetTop;
     this->textArea.left += this->drawingSettings->textOffsetLeft;
     this->textArea.right -= this->drawingSettings->textOffsetRight;
+
+    // Update all overlays
+    for (list<Overlay>::iterator iter = overlays.begin(); iter != overlays.end(); ++iter) {
+        iter->drawingPosition = iter->position;
+        iter->drawingPosition.left += this->drawingArea.left;
+        iter->drawingPosition.right += this->drawingArea.left;
+        iter->drawingPosition.top += this->drawingArea.top;
+        iter->drawingPosition.bottom += this->drawingArea.top;
+
+        // Move the origin of the brush to match the overlay position
+        iter->brush->SetTransform(Matrix3x2F::Identity());
+        iter->brush->SetTransform(Matrix3x2F::Translation(iter->drawingPosition.left, iter->drawingPosition.top));
+    }
 }
 
 /// <summary>
@@ -429,6 +519,11 @@ void DrawableWindow::Paint() {
         this->renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, Point2F(this->drawingSettings->width/2.0f,this->drawingSettings->height/2.0f)));
         this->renderTarget->DrawText(this->text, lstrlenW(this->text), this->textFormat, this->textArea, this->textBrush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         
+        // Paint all overlays
+        for (list<Overlay>::iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++) {
+            this->renderTarget->FillRectangle(iter->drawingPosition, iter->brush);
+        }
+
         // Paint all children
         for (list<DrawableWindow*>::const_iterator iter = this->children.begin(); iter != this->children.end(); ++iter) {
             (*iter)->Paint();

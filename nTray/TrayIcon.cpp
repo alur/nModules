@@ -64,10 +64,11 @@ void TrayIcon::Show() {
 /// Updates the icon.
 /// </summary>
 void TrayIcon::UpdateIcon() {
+    this->window->ClearOverlays();
     if ((m_pNotifyData->uFlags & NIF_ICON) == NIF_ICON) {
         D2D1_RECT_F f;
         f.bottom = (float)this->iconSize; f.top = 0; f.left = 0; f.right = (float)this->iconSize;
-        //m_pWindow->AddOverlay(f, m_pNotifyData->hIcon);
+        this->window->AddOverlay(f, this->m_pNotifyData->hIcon);
     }
 }
 

@@ -116,6 +116,7 @@ void IconGroup::AddIcon(PCITEMID_CHILD pidl) {
     icons.push_back(icon);
 }
 
+
 PCITEMID_CHILD IconGroup::GetLastPIDLItem(LPITEMIDLIST pidl) {
     LPITEMIDLIST ret = pidl;
     USHORT lastCB = 0;

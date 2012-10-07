@@ -116,7 +116,7 @@ void Icon::SetIcon() {
     }
 
     // Add it as an overlay.
-    //window->AddOverlay(pos, icon);
+    this->window->AddOverlay(pos, icon);
 
     // Let go of the interface.
     extractIcon->Release();
