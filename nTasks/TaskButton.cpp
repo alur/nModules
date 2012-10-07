@@ -87,8 +87,8 @@ void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
 /// </summary>
 void TaskButton::Activate() {
     m_bIsActive = true;
-    //this->window->ActivateState(this->stateActive);
-    //this->window->ClearState(this->stateFlashing);
+    this->window->ActivateState(this->stateActive);
+    this->window->ClearState(this->stateFlashing);
 }
 
 
@@ -97,7 +97,7 @@ void TaskButton::Activate() {
 /// </summary>
 void TaskButton::Deactivate() {
     m_bIsActive = false;
-    //this->window->ClearState(this->stateActive);
+    this->window->ClearState(this->stateActive);
 }
 
 
@@ -106,7 +106,7 @@ void TaskButton::Deactivate() {
 /// </summary>
 void TaskButton::Flash() {
     m_bIsFlashing = true;
-    //this->window->ActivateState(this->stateFlashing);
+    this->window->ActivateState(this->stateFlashing);
 }
 
 
