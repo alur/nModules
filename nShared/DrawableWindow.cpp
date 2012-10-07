@@ -8,6 +8,7 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../headers/lsapi.h"
+#include <windowsx.h>
 #include <strsafe.h>
 #include "../nCoreCom/Core.h"
 #include "Macros.h"
@@ -31,12 +32,13 @@ using namespace D2D1;
 /// <summary>
 /// Constructor used by LSModule to create a top-level window.
 /// </summary>
-DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings) {
+DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) {
     this->activeState = this->states.end();
     this->backBrush = NULL;
     this->defaultDrawingSettings = NULL;
     ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
     this->drawingSettings = new DrawableSettings();
+    this->msgHandler = msgHandler;
     this->parent = NULL;
     this->renderTarget = NULL;
     this->settings = settings;
@@ -63,12 +65,13 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instan
 /// <summary>
 /// Constructor used by CreateChild to create a child window.
 /// </summary>
-DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings) {
+DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler) {
     this->activeState = this->states.end();
     this->backBrush = NULL;
     this->defaultDrawingSettings = NULL;
     ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
     this->drawingSettings = new DrawableSettings();
+    this->msgHandler = msgHandler;
     this->parent = parent;
     this->renderTarget = NULL;
     this->settings = settings;
@@ -77,7 +80,7 @@ DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings) {
     this->textBrush = NULL;
     this->textFormat = NULL;
     this->visible = false;
-    this->window = NULL;
+    this->window = parent->window;
 }
 
 
@@ -204,6 +207,12 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     //
     SetPosition(this->drawingSettings->x, this->drawingSettings->y, this->drawingSettings->width, this->drawingSettings->height);
 
+    BOOL b;
+    if (!this->parent && this->drawingSettings->alwaysOnTop) {
+        SetParent(this->window, NULL);
+        b = SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+    }
+
     // Create the text format
     IDWriteFactory *pDWFactory = NULL;
     Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&pDWFactory));
@@ -257,7 +266,7 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     // Position the window and/or set the backarea. TODO::Should call resize instead.
     if (!this->parent) {
         SetWindowPos(this->window, 0, this->drawingSettings->x, this->drawingSettings->y,
-            this->drawingSettings->width, this->drawingSettings->height, SWP_NOZORDER | SWP_FRAMECHANGED);
+            this->drawingSettings->width, this->drawingSettings->height, SWP_NOZORDER);
         this->drawingArea = D2D1::RectF(0, 0, (float)this->drawingSettings->width, (float)this->drawingSettings->height);
         D2D1_SIZE_U size = D2D1::SizeU(width, height);
         this->renderTarget->Resize(size);
@@ -332,8 +341,8 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
 /// <summary>
 /// Creates a child window.
 /// </summary>
-DrawableWindow* DrawableWindow::CreateChild(Settings* childSettings) {
-    DrawableWindow* child = new DrawableWindow(this, childSettings);
+DrawableWindow* DrawableWindow::CreateChild(Settings* childSettings, MessageHandler* msgHandler) {
+    DrawableWindow* child = new DrawableWindow(this, childSettings, msgHandler);
     children.push_back(child);
     return child;
 }
@@ -349,6 +358,10 @@ void DrawableWindow::GetScreenRect(LPRECT rect) {
     rect->top = r.top + (LONG)this->drawingArea.top;
     rect->right = rect->left + this->drawingSettings->width;
     rect->bottom = rect->top + this->drawingSettings->height;
+}
+
+HWND DrawableWindow::GetWindow() {
+    return this->window;
 }
 
 
@@ -465,6 +478,21 @@ void DrawableWindow::SetText(LPCWSTR text) {
 /// Handles window messages for this drawablewindow.
 /// </summary>
 LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+    if (msg > WM_MOUSEFIRST && msg < WM_MOUSELAST) {
+        // Check if we should send it to a child window
+        int xPos = GET_X_LPARAM(lParam); 
+        int yPos = GET_Y_LPARAM(lParam);
+        for (list<DrawableWindow*>::const_iterator iter = this->children.begin(); iter != this->children.end(); ++iter) {
+            D2D1_RECT_F* pos = &(*iter)->drawingArea;
+            if (xPos >= pos->left && xPos <= pos->right && yPos >= pos->top && yPos <= pos->bottom) {
+                return (*iter)->HandleMessage(window, msg, wParam, lParam);
+            }
+        }
+
+        // Let our messagehandler deal with it.
+        return this->msgHandler->HandleMessage(window, msg, wParam, lParam);
+    }
+
     switch (msg) {
     case WM_CTLCOLORSTATIC:
         return 1;
@@ -494,12 +522,6 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         break;
 
     case WM_DISPLAYCHANGE:
-        return 0;
-
-    case WM_LBUTTONDOWN:
-        return 0;
-
-    case WM_RBUTTONUP:
         return 0;
 
     }

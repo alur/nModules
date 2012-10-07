@@ -15,7 +15,7 @@
 
 using std::map;
 
-class Tray : public Drawable, public MessageHandler {
+class Tray : public Drawable {
 public:
     explicit Tray(LPCSTR);
     virtual ~Tray();

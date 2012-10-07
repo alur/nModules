@@ -45,5 +45,5 @@ LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM 
         LSExecute(NULL, this->command, SW_SHOW);
         return 0;
     }
-    return this->window->HandleMessage(window, msg, wParam, lParam);
+    return DefWindowProc(window, msg, wParam, lParam);
 }

@@ -38,10 +38,13 @@ public:
     void AddDrawable(LPCSTR name, Drawable* drawable);
 
     // Creates a top-level drawable window.
-    DrawableWindow* CreateDrawableWindow(Settings* settings);
+    DrawableWindow* CreateDrawableWindow(Settings* settings, MessageHandler* msgHandler);
 
     // Registers the message handler to recieve these messages from the core.
     void RegisterForMessages(UINT messages[]);
+
+    //
+    HWND GetMessageWindow();
 
     //
     LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);

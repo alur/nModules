@@ -233,6 +233,6 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LP
         return 0;
 
     default:
-        return this->window->HandleMessage(window, msg, wParam, lParam);
+        return DefWindowProc(window, msg, wParam, lParam);
     }
 }

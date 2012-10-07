@@ -10,9 +10,9 @@
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/Drawable.hpp"
 
-class TaskButton : public MessageHandler, Drawable {
+class TaskButton : public Drawable {
 public:
-    explicit TaskButton(Drawable* parent);
+    explicit TaskButton(Drawable* parent, HWND hWnd);
     virtual ~TaskButton();
 
     void Reposition(UINT x, UINT y, UINT width, UINT height);

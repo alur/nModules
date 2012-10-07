@@ -10,7 +10,7 @@
 #include "../nShared/Drawable.hpp"
 #include "../nShared/DrawableWindow.hpp"
 
-class Label : public Drawable, public MessageHandler {
+class Label : public Drawable {
 public:
     explicit Label(LPCSTR name);
     virtual ~Label();

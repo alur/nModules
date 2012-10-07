@@ -62,7 +62,7 @@ LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lPa
             POINT pt;
             GetCursorPos(&pt);
 
-            int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, NULL, NULL);
+            int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, this->window->GetWindow(), NULL);
             if (command != 0) {
                 CMINVOKECOMMANDINFO info = { 0 };
                 char verb[MAX_LINE_LENGTH];
@@ -79,9 +79,7 @@ LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lPa
         return 0;
 
     default:
-        {
-        }
-        return this->window->HandleMessage(wnd, msg, wParam, lParam);
+        return DefWindowProc(wnd, msg, wParam, lParam);
     }
 
 }

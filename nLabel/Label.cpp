@@ -30,5 +30,5 @@ void Label::LoadSettings(bool /* bIsRefresh */) {
 
 
 LRESULT WINAPI Label::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    return this->window->HandleMessage(hWnd, uMsg, wParam, lParam);
+    return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

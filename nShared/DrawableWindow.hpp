@@ -18,9 +18,6 @@ using std::list;
 
 class DrawableWindow : MessageHandler {
 public:
-    // MessageHandler for drawable top-level windows.
-    static LRESULT __stdcall MessageHandler(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
-
     // Defines a "State" which the window can be in.
     typedef struct {
         int priority;
@@ -40,7 +37,7 @@ public:
     typedef list<Overlay>::pointer OVERLAY;
 
     // Constructor used for top-level windows.
-    explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings);
+    explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler);
 
     // Destructor
     virtual ~DrawableWindow();
@@ -61,13 +58,16 @@ public:
     void ClearState(STATE state);
 
     // Creates a new child window.
-    DrawableWindow* CreateChild(Settings* childSettings);
+    DrawableWindow* CreateChild(Settings* childSettings, MessageHandler* msgHandler);
 
     // Returns the current drawing settings.
     DrawableSettings* GetDrawingSettings();
 
     // Returns the screen-coordinate position of this window.
     void GetScreenRect(LPRECT rect);
+
+    // Returns the handle to the top-level window in this window stack.
+    HWND GetWindow();
 
     // Handles window messages.
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
@@ -77,6 +77,9 @@ public:
 
     // Initializes the DrawableWindow.
     void Initialize(DrawableSettings* defaultSettings);
+
+    // Sets the message handler for this window.
+    void SetMessageHandler(MessageHandler* msgHandler);
 
     // Moves this window.
     void Move(int x, int y);
@@ -108,7 +111,7 @@ protected:
 
 private:
     // Constructor used by CreateChild to create a child window.
-    explicit DrawableWindow(DrawableWindow* parent, Settings* settings);
+    explicit DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler);
 
     // Should be called when the active state has changed.
     void HandleActiveStateChange();
@@ -136,6 +139,9 @@ private:
 
     // The current drawing settings we are using.
     DrawableSettings* drawingSettings;
+
+    // The object which should handle mouse event messages.
+    MessageHandler* msgHandler;
 
     // All current overlays.
     list<Overlay> overlays;

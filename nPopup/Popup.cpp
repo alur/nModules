@@ -27,6 +27,7 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
     defaultSettings->color = 0x440000FF;
     defaultSettings->textRotation = -45.0f;
     defaultSettings->fontSize = 32.0f;
+    defaultSettings->alwaysOnTop = true;
     StringCchCopyW(defaultSettings->text, MAX_LINE_LENGTH, L"nDemo");
     StringCchCopy(defaultSettings->textAlign, sizeof(defaultSettings->textAlign), "Center");
     StringCchCopy(defaultSettings->textVerticalAlign, sizeof(defaultSettings->textVerticalAlign), "Middle");
@@ -90,6 +91,6 @@ LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam
         return 0;
 
     default:
-        return this->window->HandleMessage(window, msg, wParam, lParam);
+        return DefWindowProc(window, msg, wParam, lParam);
     }
 }

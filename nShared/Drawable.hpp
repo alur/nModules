@@ -10,8 +10,9 @@
 #include <list>
 #include "Settings.hpp"
 #include "DrawableWindow.hpp"
+#include "MessageHandler.hpp"
 
-class Drawable {
+class Drawable : public MessageHandler {
 public:
     explicit Drawable(LPCSTR prefix);
     explicit Drawable(Drawable* parent, LPCSTR prefix);

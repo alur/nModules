@@ -154,8 +154,13 @@ bool LSModule::ConnectToCore(VERSION minimumCoreVersion) {
 /// Creates a top-level drawable window.
 /// </summary>
 /// <param name="settings">The settings structure to use.</param>
-DrawableWindow* LSModule::CreateDrawableWindow(Settings* settings) {
-    return new DrawableWindow(this->parent, (LPCSTR)this->drawableClass, this->instance, settings);
+DrawableWindow* LSModule::CreateDrawableWindow(Settings* settings, MessageHandler* msgHandler) {
+    return new DrawableWindow(this->parent, (LPCSTR)this->drawableClass, this->instance, settings, msgHandler);
+}
+
+
+HWND LSModule::GetMessageWindow() {
+    return this->messageHandler;
 }
 
 

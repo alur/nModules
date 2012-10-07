@@ -11,7 +11,7 @@
 #include "../nShared/DrawableWindow.hpp"
 #include <ShlObj.h>
 
-class Icon : public Drawable, public MessageHandler {
+class Icon : public Drawable {
 public:
     explicit Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder);
     virtual ~Icon();

@@ -12,7 +12,7 @@
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/MessageHandler.hpp"
 
-class PopupItem : public Drawable, MessageHandler {
+class PopupItem : public Drawable {
 public:
     explicit PopupItem(Drawable* parent);
     virtual ~PopupItem();

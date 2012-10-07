@@ -10,7 +10,7 @@
 #include "../nShared/Drawable.hpp"
 #include "../nShared/DrawableWindow.hpp"
 
-class TrayIcon : public Drawable, public MessageHandler {
+class TrayIcon : public Drawable {
 public:
     explicit TrayIcon(Drawable* parent, LPLSNOTIFYICONDATA pNID, Settings* parentSettings);
     virtual ~TrayIcon();

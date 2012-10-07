@@ -65,7 +65,7 @@ void Taskbar::LoadSettings(bool /* isRefresh */) {
 /// </summary>
 TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout) {
     if (monitor == this->monitor || this->monitor == 0xFFFFFFFF) {
-        TaskButton* pButton = new TaskButton(this);
+        TaskButton* pButton = new TaskButton(this, hWnd);
         this->buttons.insert(this->buttons.end(), std::pair<HWND, TaskButton*>(hWnd, pButton));
 
         if (hWnd == GetForegroundWindow()) {
@@ -209,4 +209,12 @@ void Taskbar::Relayout() {
             iter->second->Show();
         }
     }
+}
+
+
+/// <summary>
+/// Handles window messages for this taskbar.
+/// </summary>
+LRESULT WINAPI Taskbar::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    return DefWindowProc(window, message, wParam, lParam);
 }

@@ -18,7 +18,7 @@ extern LSModule* g_LSModule;
 /// </summary>
 Drawable::Drawable(LPCSTR prefix) {
     this->settings = new Settings(prefix);
-    this->window = g_LSModule->CreateDrawableWindow(this->settings);
+    this->window = g_LSModule->CreateDrawableWindow(this->settings, this);
 }
 
 
@@ -27,7 +27,7 @@ Drawable::Drawable(LPCSTR prefix) {
 /// </summary>
 Drawable::Drawable(Drawable* parent, LPCSTR prefix) {
     this->settings = parent->settings->CreateChild(prefix);
-    this->window = parent->window->CreateChild(this->settings);
+    this->window = parent->window->CreateChild(this->settings, this);
 }
 
 

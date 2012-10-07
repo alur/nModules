@@ -118,7 +118,7 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARA
         }
     }
     else {
-        return this->window->HandleMessage(wnd, uMsg, wParam, lParam);
+        return DefWindowProc(wnd, uMsg, wParam, lParam);
     }
     return 0;
 }

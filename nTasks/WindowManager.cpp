@@ -72,7 +72,7 @@ void WindowManager::Start() {
     osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     GetVersionEx(&osv);
     if (osv.dwMajorVersion < 6 || osv.dwMajorVersion == 6 && osv.dwMinorVersion < 2) {
-        //SetTimer(g_LSModule->GetMessageWindow(), TIMER_CHECKMONITOR, 250, NULL);
+        SetTimer(g_LSModule->GetMessageWindow(), TIMER_CHECKMONITOR, 250, NULL);
     }
 }
 
@@ -86,7 +86,7 @@ void WindowManager::Stop() {
     assert(isStarted);
 
     // Clean up
-    //KillTimer(g_LSModule->GetMessageWindow(), TIMER_CHECKMONITOR);
+    KillTimer(g_LSModule->GetMessageWindow(), TIMER_CHECKMONITOR);
     delete g_pMonitorInfo;
     activeWindow = NULL;
     windowMap.clear();

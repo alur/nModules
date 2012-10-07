@@ -19,7 +19,7 @@
 using std::map;
 
 
-class IconGroup : public IIconEventHandler, public Drawable, public MessageHandler {
+class IconGroup : public IIconEventHandler, public Drawable {
 public:
     explicit IconGroup(LPCSTR prefix);
     virtual ~IconGroup();

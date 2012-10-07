@@ -15,7 +15,7 @@
 
 using std::vector;
 
-class Popup : public MessageHandler, public Drawable {
+class Popup : public Drawable {
 public:
     explicit Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix);
     virtual ~Popup();

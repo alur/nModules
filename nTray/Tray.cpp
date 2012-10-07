@@ -183,6 +183,6 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lP
             MoveWindow(g_hWndTrayNotify, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
         }
     default:
-        return this->window->HandleMessage(wnd, uMsg, wParam, lParam);
+        return DefWindowProc(wnd, uMsg, wParam, lParam);
     }
 }

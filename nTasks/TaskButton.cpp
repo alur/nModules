@@ -16,9 +16,11 @@ extern LSModule* g_LSModule;
 /// <summary>
 /// Constructor
 /// </summary>
-TaskButton::TaskButton(Drawable* parent) : Drawable(parent, "Button") {
+TaskButton::TaskButton(Drawable* parent, HWND hWnd) : Drawable(parent, "Button") {
     //
     LoadSettings();
+
+    m_hWnd = hWnd;
 
     this->iconSettings = this->settings->CreateChild("Icon");
 
@@ -152,7 +154,7 @@ void TaskButton::Menu() {
     POINT pt;
     GetCursorPos(&pt);
     
-    int command = TrackPopupMenu(hMenu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, NULL, NULL);
+    int command = TrackPopupMenu(hMenu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, this->window->GetWindow(), NULL);
     if (command != 0) {
         PostMessage(m_hWnd, WM_SYSCOMMAND, (WPARAM)command, MAKELPARAM(pt.x, pt.y));
     }
@@ -175,8 +177,8 @@ void TaskButton::GetMinRect(LPPOINTS lpPoints) {
 /// <summary>
 /// Handles window messages for this button.
 /// </summary>
-LRESULT WINAPI TaskButton::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg) {
+LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch (message) {
     case WM_LBUTTONUP:
         if (GetForegroundWindow() == m_hWnd) {
             ShowWindow(m_hWnd, SW_MINIMIZE);
@@ -209,6 +211,6 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPA
         return 0;
 
     default:
-        return window->HandleMessage(wnd, uMsg, wParam, lParam);
+        return DefWindowProc(window, message, wParam, lParam);
     }
 }
