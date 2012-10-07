@@ -7,6 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "UIDGenerator.hpp"
+#include "../headers/lsapi.h"
 
 /// <summary>
 /// Constructor.
@@ -49,4 +50,13 @@ TYPE UIDGenerator<TYPE>::GetNewID() {
 template<class TYPE>
 void UIDGenerator<TYPE>::ReleaseID(TYPE id) {
     this->releasedIDs.push_back(id);
+}
+
+
+/// <summary>
+/// Forces the compiler to generate functions for the types we want.
+/// </summary>
+void Generator() {
+    UIDGenerator<UINT_PTR> u;
+    u.ReleaseID(u.GetNewID());
 }
