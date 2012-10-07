@@ -21,6 +21,9 @@ public:
     // Implemented by the derived class, handles the window messages.
     virtual LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
 
+    //
+    bool initialized;
+
 private:
     // Forwards messages to the appropriate msghandler. 
     static LRESULT WINAPI WindowProcedure(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
