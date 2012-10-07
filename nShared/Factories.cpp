@@ -54,7 +54,7 @@ HRESULT Factories::GetD2DFactory(LPVOID* ppFactory) {
     if (!pD2DFactory) {
         HRESULT hr;
         if (!SUCCEEDED(hr = D2D1CreateFactory(
-            D2D1_FACTORY_TYPE_SINGLE_THREADED,
+            D2D1_FACTORY_TYPE_MULTI_THREADED,
             &pD2DFactory
         ))) return hr;
     }

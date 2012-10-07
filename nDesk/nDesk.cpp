@@ -10,6 +10,7 @@
 #include "../nCoreCom/Core.h"
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/LSModule.hpp"
+#include "../nShared/Debugging.h"
 #include "DesktopPainter.hpp"
 #include "ClickHandler.hpp"
 #include "WorkArea.h"

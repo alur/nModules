@@ -30,7 +30,7 @@ void WorkArea::ParseLine(MonitorInfo * mInfo, LPCSTR pszLine) {
             if (_stricmp("all", szMonitor) == 0) {
                 for (std::vector<MonitorInfo::Monitor>::iterator iter = mInfo->m_monitors.begin(); iter != mInfo->m_monitors.end(); iter++) {
                     RECT r = { iter->rect.left + left, iter->rect.top + top, iter->rect.right - right, iter->rect.bottom - bottom };
-                    SystemParametersInfo(SPI_SETWORKAREA, 0, &r, SPIF_SENDCHANGE);
+                    SystemParametersInfo(SPI_SETWORKAREA, 0, &r, NULL);
                 }
                 return;
             }
@@ -38,7 +38,7 @@ void WorkArea::ParseLine(MonitorInfo * mInfo, LPCSTR pszLine) {
                 if (monitor < mInfo->m_monitors.size()) {
                     RECT mRect = mInfo->m_monitors[monitor].rect;
                     RECT r = { mRect.left + left, mRect.top + top, mRect.right - right, mRect.bottom - bottom };
-                    SystemParametersInfo(SPI_SETWORKAREA, 0, &r, SPIF_SENDCHANGE);
+                    SystemParametersInfo(SPI_SETWORKAREA, 0, &r, NULL);
                 }
                 return;
             }
@@ -60,6 +60,7 @@ void WorkArea::LoadSettings(MonitorInfo * mInfo, bool /* bIsRefresh */) {
         ParseLine(mInfo, szLine+strlen("*nDeskWorkArea")+1);
     }
     LCClose(f);
+    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, NULL);
 }
 
 
@@ -69,6 +70,7 @@ void WorkArea::LoadSettings(MonitorInfo * mInfo, bool /* bIsRefresh */) {
 /// <param name="mInfo">A current MonitorInfo.</param>
 void WorkArea::ResetWorkAreas(MonitorInfo * mInfo) {
     for (std::vector<MonitorInfo::Monitor>::iterator iter = mInfo->m_monitors.begin(); iter != mInfo->m_monitors.end(); iter++) {
-        SystemParametersInfo(SPI_SETWORKAREA, 0, &iter->rect, SPIF_SENDCHANGE);
+        SystemParametersInfo(SPI_SETWORKAREA, 0, &iter->rect, NULL);
     }
+    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, NULL);
 }
