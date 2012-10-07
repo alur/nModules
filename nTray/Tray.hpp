@@ -26,6 +26,7 @@ public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
     void Relayout();
     vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* NID);
+    void InitCompleted();
 
 private:
     // The name of this tray

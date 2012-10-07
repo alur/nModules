@@ -33,6 +33,8 @@ namespace TrayManager {
     void ModifyIcon(LPLSNOTIFYICONDATA pNID);
     void SetFocus(LPLSNOTIFYICONDATA pNID);
     void SetVersion(LPLSNOTIFYICONDATA pNID);
+
+    void InitCompleted();
     
     
     LRESULT ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

@@ -97,7 +97,7 @@ public:
     void SetTextAlignment(DWRITE_TEXT_ALIGNMENT alignment);
 
     // Forces this window to redraw.
-    void Repaint();
+    void Repaint(LPRECT region = NULL);
 
     // Shows this window.
     void Show();

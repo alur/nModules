@@ -259,3 +259,13 @@ LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
+
+
+/// <summary>
+/// Called when the init phase has ended.
+/// <summary>
+void TrayManager::InitCompleted() {
+    for (TRAYSCITER iter = g_Trays.begin(); iter != g_Trays.end(); iter++) {
+        iter->second->InitCompleted();
+    }
+}

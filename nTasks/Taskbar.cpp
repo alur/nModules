@@ -72,8 +72,10 @@ TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout) {
             pButton->Activate();
         }
 
-        if (!noLayout)
+        if (!noLayout) {
             Relayout();
+            Repaint();
+        }
 
         return pButton;
     }
@@ -97,6 +99,7 @@ void Taskbar::RemoveTask(map<HWND, TaskButton*>::iterator iter) {
         delete iter->second;
         this->buttons.erase(iter);
         Relayout();
+        Repaint();
     }
 }
 
@@ -123,6 +126,11 @@ bool Taskbar::MonitorChanged(HWND hWnd, UINT monitor, TaskButton** pOut) {
         }
         return false;
     }
+}
+
+
+void Taskbar::Repaint() {
+    this->window->Repaint();
 }
 
 

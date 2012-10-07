@@ -34,6 +34,7 @@ public:
     void RemoveTask(HWND);
     void Relayout();
     LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
+    void Repaint();
 
 private:
     // Removes a task from this taskbar

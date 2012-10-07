@@ -185,7 +185,6 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
     // Add the overlays to the overlay list
     if (SUCCEEDED(hr)) {
         this->overlays.push_back(overlay);
-        Repaint();
     }
     else {
         TRACE("DrawableWindow::AddOverlay failed!");
@@ -263,7 +262,7 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
 
     SetText(this->drawingSettings->text);
 
-    this->Repaint();
+    this->initialized = true;
 }
 
 
@@ -320,8 +319,6 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
         iter->brush->SetTransform(Matrix3x2F::Identity());
         iter->brush->SetTransform(Matrix3x2F::Translation(iter->drawingPosition.left, iter->drawingPosition.top));
     }
-
-    this->Repaint();
 }
 
 /// <summary>
@@ -391,13 +388,13 @@ HWND DrawableWindow::GetWindow() {
 /// <summary>
 /// Repaints the entire window.
 /// </summary>
-void DrawableWindow::Repaint() {
-    if (!this->initialized && this->visible) {
+void DrawableWindow::Repaint(LPRECT region) {
+    if (this->initialized && this->visible) {
         if (this->parent) {
-            this->parent->Repaint();
+            this->parent->Repaint(region);
         }
         else {
-            InvalidateRect(this->window, NULL, TRUE);
+            InvalidateRect(this->window, region, TRUE);
             UpdateWindow(this->window);
         }
     }
@@ -619,7 +616,6 @@ void DrawableWindow::RemoveChild(DrawableWindow* child) {
     if (child == this->activeChild) {
         this->activeChild = NULL;
     }
-    this->Repaint();
 }
 
 

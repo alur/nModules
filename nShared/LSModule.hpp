@@ -52,6 +52,9 @@ public:
     //
     LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 
+    // All top-level drawables.
+    map<string, Drawable*> drawables;
+
 private:
     // The window class used by the message handler.
     ATOM messageHandlerClass;
@@ -76,7 +79,4 @@ private:
 
     // The instance of this module.
     HINSTANCE instance;
-
-    // All top-level drawables.
-    map<string, Drawable*> drawables;
 };

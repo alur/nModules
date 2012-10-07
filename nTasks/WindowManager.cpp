@@ -134,6 +134,7 @@ BOOL CALLBACK WindowManager::AddWindow(HWND hWnd, LPARAM lParam) {
         UpdateIcon(hWnd);
     }
 
+
     return TRUE;
 }
 

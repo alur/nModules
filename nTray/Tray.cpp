@@ -14,6 +14,7 @@
 
 extern LSModule* g_LSModule;
 extern HWND g_hWndTrayNotify;
+extern bool g_InitPhase;
 
 
 /// <summary>
@@ -69,6 +70,9 @@ TrayIcon* Tray::AddIcon(LPLSNOTIFYICONDATA NID) {
     this->icons.push_back(icon);
     Relayout();
     icon->Show();
+    if (!g_InitPhase) {
+        this->window->Repaint();
+    }
     return icon;
 }
 
@@ -185,4 +189,12 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lP
     default:
         return DefWindowProc(wnd, uMsg, wParam, lParam);
     }
+}
+
+
+/// <summary>
+/// Called when the init phase has ended.
+/// <summary>
+void Tray::InitCompleted() {
+    this->window->Repaint();
 }
