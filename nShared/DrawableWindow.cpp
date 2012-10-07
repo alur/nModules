@@ -523,9 +523,13 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
 
     case WM_DISPLAYCHANGE:
         return 0;
-
     }
-    return DefWindowProc(window, msg, wParam, lParam);
+    if (this->defaultDrawingSettings != NULL) {
+        return this->msgHandler->HandleMessage(window, msg, wParam, lParam);
+    }
+    else {
+        return DefWindowProc(window, msg, wParam, lParam);
+    }
 }
 
 
