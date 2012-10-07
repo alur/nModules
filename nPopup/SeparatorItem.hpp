@@ -15,4 +15,7 @@ public:
     virtual ~SeparatorItem();
 
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+
+private:
+    DrawableWindow::STATE hoverState;
 };

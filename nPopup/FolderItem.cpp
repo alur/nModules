@@ -27,13 +27,14 @@ FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, LPCSTR cust
     StringCchCopy(defaults->textVerticalAlign, sizeof(defaults->textVerticalAlign), "Middle");
     defaults->textOffsetLeft = 20;
     this->window->Initialize(defaults);
+
+    this->hoverState = this->window->AddState("Hover", new DrawableSettings(), 100);
+
     this->window->Show();
 }
 
 
 FolderItem::~FolderItem() {
-    SAFEDELETE(this->window);
-    SAFEDELETE(this->settings);
     if (this->popup != NULL) {
         delete this->popup;
     }
@@ -42,5 +43,18 @@ FolderItem::~FolderItem() {
 
 
 LRESULT FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+    switch (msg) {
+    case WM_MOUSEMOVE:
+        {
+            this->window->ActivateState(this->hoverState);
+        }
+        return 0;
+
+    case WM_MOUSELEAVE:
+        {
+            this->window->ClearState(this->hoverState);
+        }
+        return 0;
+    }
     return DefWindowProc(window, msg, wParam, lParam);
 }

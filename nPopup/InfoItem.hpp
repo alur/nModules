@@ -18,4 +18,6 @@ public:
 
 private:
     LPCSTR title;
+
+    DrawableWindow::STATE hoverState;
 };

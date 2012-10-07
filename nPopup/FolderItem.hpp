@@ -20,4 +20,6 @@ public:
 private:
     Popup* popup;
     LPCSTR title;
+
+    DrawableWindow::STATE hoverState;
 };

@@ -26,17 +26,31 @@ InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupIte
     StringCchCopy(defaults->textVerticalAlign, sizeof(defaults->textVerticalAlign), "Middle");
     defaults->textOffsetLeft = 20;
     this->window->Initialize(defaults);
+
+    this->hoverState = this->window->AddState("Hover", new DrawableSettings(), 100);
+
     this->window->Show();
 }
 
 
 InfoItem::~InfoItem() {
-    SAFEDELETE(this->window);
-    SAFEDELETE(this->settings);
     free((LPVOID)this->title);
 }
 
 
 LRESULT InfoItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+    switch (msg) {
+    case WM_MOUSEMOVE:
+        {
+            this->window->ActivateState(this->hoverState);
+        }
+        return 0;
+
+    case WM_MOUSELEAVE:
+        {
+            this->window->ClearState(this->hoverState);
+        }
+        return 0;
+    }
     return DefWindowProc(window, msg, wParam, lParam);
 }

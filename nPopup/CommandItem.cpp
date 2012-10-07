@@ -27,7 +27,6 @@ CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, LPCSTR 
     StringCchCopy(defaults->textVerticalAlign, sizeof(defaults->textVerticalAlign), "Middle");
     defaults->textOffsetLeft = 20;
     this->window->Initialize(defaults);
-    this->window->Show();
 
     if (customIcon[0] != '\0') {
         D2D1_RECT_F f;
@@ -40,12 +39,14 @@ CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, LPCSTR 
             DestroyIcon(icon);
         }
     }
+
+    this->hoverState = this->window->AddState("Hover", new DrawableSettings(), 100);
+
+    this->window->Show();
 }
 
 
 CommandItem::~CommandItem() {
-    SAFEDELETE(this->window);
-    SAFEDELETE(this->settings);
     free((LPVOID)this->title);
     free((LPVOID)this->command);
 }
@@ -54,7 +55,21 @@ CommandItem::~CommandItem() {
 LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
     case WM_LBUTTONDOWN:
-        LSExecute(NULL, this->command, SW_SHOW);
+        {
+            LSExecute(NULL, this->command, SW_SHOW);
+        }
+        return 0;
+
+    case WM_MOUSEMOVE:
+        {
+            this->window->ActivateState(this->hoverState);
+        }
+        return 0;
+
+    case WM_MOUSELEAVE:
+        {
+            this->window->ClearState(this->hoverState);
+        }
         return 0;
     }
     return DefWindowProc(window, msg, wParam, lParam);
