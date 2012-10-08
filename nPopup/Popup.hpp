@@ -22,7 +22,18 @@ public:
 
     void AddItem(PopupItem* item);
     void Show();
-    void Show(int x, int y);
+    void Show(int x, int y, Popup* owner = NULL);
+    
+    // Called by PopupItems
+    void OpenChild(Popup*, int y);
+    void CloseChild();
+
+    // Called by child popups
+    void ChildClosing(bool closeParent);
+
+    // Called by items or children
+    void Close(bool closeAll = true);
+
     LPCSTR GetBang();
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
@@ -32,4 +43,10 @@ private:
 
     // True if the popup is already sized properly.
     bool sized;
+
+    // The currently open child, or NULL
+    Popup* openChild;
+
+    //
+    Popup* owner;
 };

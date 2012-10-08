@@ -9,6 +9,7 @@
 #include <strsafe.h>
 #include "CommandItem.hpp"
 #include "../nShared/LSModule.hpp"
+#include "Popup.hpp"
 
 
 extern LSModule* g_LSModule;
@@ -56,6 +57,7 @@ LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM 
     switch (msg) {
     case WM_LBUTTONDOWN:
         {
+            ((Popup*)this->parent)->Close();
             LSExecute(NULL, this->command, SW_SHOW);
         }
         return 0;
@@ -63,6 +65,7 @@ LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM 
     case WM_MOUSEMOVE:
         {
             this->window->ActivateState(this->hoverState);
+            ((Popup*)this->parent)->CloseChild();
         }
         return 0;
 

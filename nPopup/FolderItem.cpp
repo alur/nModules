@@ -50,7 +50,7 @@ LRESULT FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM l
             if (this->popup != NULL) {
                 RECT r;
                 this->window->GetScreenRect(&r);
-                this->popup->Show(r.right, r.top);
+                ((Popup*)this->parent)->OpenChild(this->popup, r.top);
             }
         }
         return 0;

@@ -5,9 +5,9 @@
  *  Manages a set of unique ID's, letting you generate and release them.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 #include "UIDGenerator.hpp"
 #include "../headers/lsapi.h"
+
 
 /// <summary>
 /// Constructor.

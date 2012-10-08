@@ -22,6 +22,8 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
     else {
         this->bang = NULL;
     }
+    this->openChild = NULL;
+    this->owner = NULL;
 
     DrawableSettings* defaultSettings = new DrawableSettings();
     defaultSettings->color = 0x440000FF;
@@ -53,8 +55,49 @@ void Popup::AddItem(PopupItem* item) {
 }
 
 
+void Popup::CloseChild() {
+    if (this->openChild != NULL) {
+        this->openChild->Close(false);
+        this->openChild = NULL;
+    }
+}
+
+
+void Popup::OpenChild(Popup* child, int y) {
+    if (child != this->openChild) {
+        if (this->openChild != NULL) {
+            this->openChild->Close(false);
+        }
+        RECT r;
+        this->window->GetScreenRect(&r);
+        this->openChild = child;
+        this->openChild->Show(r.right, y, this);
+    }
+}
+
+
 LPCSTR Popup::GetBang() {
     return this->bang;
+}
+
+
+void Popup::Close(bool closeAll) {
+    this->window->Hide();
+    if (this->openChild != NULL) {
+        this->openChild->Close(false);
+    }
+    if (this->owner != NULL) {
+        this->owner->ChildClosing(closeAll);
+        this->owner = NULL;
+    }
+}
+
+
+void Popup::ChildClosing(bool close) {
+    this->openChild = NULL;
+    if (close) {
+        Close();
+    }
 }
 
 
@@ -65,8 +108,9 @@ void Popup::Show() {
 }
 
 
-void Popup::Show(int x, int y) {
+void Popup::Show(int x, int y, Popup* owner) {
     this->window->Move(x, y);
+    this->owner = owner;
 
     if (!this->sized) {
         int width = 200, height = 5;
@@ -87,7 +131,9 @@ LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam
     switch (msg) {
     case WM_ACTIVATE:
         if (LOWORD(wParam) == WA_INACTIVE) {
-            this->window->Hide();
+            if (this->openChild == NULL) {
+                Close(false);
+            }
         }
         return 0;
 
