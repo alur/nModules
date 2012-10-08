@@ -10,9 +10,11 @@
 #include "../nShared/Debugging.h"
 #include "Popup.hpp"
 #include "../nShared/LSModule.hpp"
+#include "../nShared/MonitorInfo.hpp"
 
 
 extern LSModule* g_LSModule;
+static MonitorInfo g_MonitorInfo;
 
 
 Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
@@ -123,7 +125,6 @@ void Popup::Show() {
 
 
 void Popup::Show(int x, int y, Popup* owner) {
-    this->window->Move(x, y);
     this->owner = owner;
 
     if (!this->sized) {
@@ -136,6 +137,11 @@ void Popup::Show(int x, int y, Popup* owner) {
         this->window->SetPosition(x, y, width, height);
         this->sized = true;
     }
+
+    x = max(g_MonitorInfo.m_virtualDesktop.rect.left, min(g_MonitorInfo.m_virtualDesktop.rect.right - this->window->GetDrawingSettings()->width, x));
+    y = max(g_MonitorInfo.m_virtualDesktop.rect.top, min(g_MonitorInfo.m_virtualDesktop.rect.bottom - this->window->GetDrawingSettings()->height, y));
+
+    this->window->Move(x, y);
 
     this->window->Show();
     SetWindowPos(this->window->GetWindow(), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
