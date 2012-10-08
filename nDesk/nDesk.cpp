@@ -53,7 +53,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     g_pClickHandler = new ClickHandler();
     g_pDesktopPainter = NULL; // Initalized on WM_CREATE
     
-    if (!g_pLSModule->Initialize(NULL, &wc)) {
+    if (!g_pLSModule->Initialize(&wc, NULL)) {
         delete g_pLSModule;
         delete g_pMonitorInfo;
         delete g_pClickHandler;
@@ -206,7 +206,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case WM_ACTIVATEAPP:
     case WM_ACTIVATE:
     case WM_PARENTNOTIFY:
-        SetWindowPos(g_pDesktopPainter->GetWindow(), HWND_BOTTOM, 0, 0, 0, 0, SWP_NOACTIVATE);
+        SetWindowPos(g_pDesktopPainter->GetWindow(), HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
         break;
     }
     return DefWindowProc(window, message, wParam, lParam);
