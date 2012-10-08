@@ -10,10 +10,9 @@
 #include "nTask.h"
 #include "Taskbar.hpp"
 #include "WindowManager.h"
-
+#include "Constants.h"
 
 using std::map;
-
 
 // The LSModule class
 LSModule* g_LSModule;
@@ -83,6 +82,9 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     switch(message) {
     case WM_CREATE:
         {
+            // Add the existing windows in a little bit so we dont hinder startup.
+            SetTimer(window, TIMER_ADD_EXISTING, 50, NULL);
+
             SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
         return 0;
@@ -92,6 +94,24 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
             SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
         return 0;
+
+    case WM_TIMER:
+        {
+            switch(wParam) {
+            case TIMER_ADD_EXISTING:
+                {
+                    KillTimer(window, TIMER_ADD_EXISTING);
+                    WindowManager::AddExisting();
+                }
+                return 0;
+
+            default:
+                {
+                }
+                return WindowManager::ShellMessage(window, message, wParam, lParam);
+            }
+        }
+        break;
 
     case LM_REFRESH:
         return 0;
@@ -106,7 +126,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case LM_WINDOWREPLACING:
     case LM_MONITORCHANGED:
     case WM_DISPLAYCHANGE:
-    case WM_TIMER:
+    case WM_ADDED_EXISTING:
         return WindowManager::ShellMessage(window, message, wParam, lParam);
     }
     return DefWindowProc(window, message, wParam, lParam);

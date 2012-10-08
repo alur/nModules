@@ -161,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\nTask.h" />
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="Taskbar.hpp" />
     <ClInclude Include="TaskButton.hpp" />
     <ClInclude Include=".\WindowManager.h" />

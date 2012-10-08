@@ -27,7 +27,7 @@ namespace WindowManager {
     bool IsTaskbarWindow(HWND hWnd);
     void SetActive(HWND hWnd);
     LRESULT ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    BOOL CALLBACK AddWindow(HWND hWnd, LPARAM lParam);
+    void AddWindow(HWND hWnd);
     void RemoveWindow(HWND hWnd);
     void MonitorChanged(HWND hWnd, UINT monitor);
     LRESULT GetMinRect(HWND, LPPOINTS);
@@ -36,4 +36,5 @@ namespace WindowManager {
     void SetIcon(HWND, HICON);
     void UpdateWindow(HWND hWnd, LPARAM data);
     void UpdateWindowMonitors();
+    void AddExisting();
 }

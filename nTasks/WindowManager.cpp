@@ -16,12 +16,14 @@
 #include <map>
 #include <vector>
 #include <assert.h>
+#include <process.h>
+#include "Constants.h"
+
 
 using std::map;
 using std::vector;
 using std::pair;
 
-#define TIMER_CHECKMONITOR 1
 
 // All current taskbars
 extern map<LPCSTR, Taskbar*> g_Taskbars;
@@ -29,6 +31,9 @@ extern map<LPCSTR, Taskbar*> g_Taskbars;
 extern LSModule* g_LSModule;
 
 namespace WindowManager {
+    UINT __stdcall ThreadAddExisting(LPVOID);
+    BOOL CALLBACK ThreadAddExistingCallback(HWND, LPARAM);
+
     // The currently active window
     HWND activeWindow = NULL;
 
@@ -40,6 +45,9 @@ namespace WindowManager {
 
     // True if the windowmanager is running.
     bool isStarted = false;
+
+    // True if we havent added existing windows yet.
+    bool initalizing = true;
 }
 
 
@@ -53,14 +61,6 @@ void WindowManager::Start() {
 
     // Initalize our monitorinfo class
     g_pMonitorInfo = new MonitorInfo();
-
-    // Grab all existing top level windows.
-    EnumDesktopWindows(NULL, AddWindow, 1);
-
-    // Relayout all taskbars.
-    for (TASKBARCITER iter = g_Taskbars.begin(); iter != g_Taskbars.end(); iter++) {
-        iter->second->Relayout();
-    }
 
     // Get the currently active window
     SetActive(GetForegroundWindow());
@@ -97,7 +97,7 @@ void WindowManager::Stop() {
 /// <summary>
 /// Adds the specified top level window to the list of windows.
 /// </summary>
-BOOL CALLBACK WindowManager::AddWindow(HWND hWnd, LPARAM lParam) {
+void WindowManager::AddWindow(HWND hWnd) {
     WindowInformation wndInfo;
     WCHAR szTitle[MAX_LINE_LENGTH];
 
@@ -113,12 +113,12 @@ BOOL CALLBACK WindowManager::AddWindow(HWND hWnd, LPARAM lParam) {
 
         if (windowMap.find(hWnd) != windowMap.end()) {
             TRACE("AddWindow called with existing window!: %u %s", hWnd, szTitle);
-            return FALSE;
+            return;
         }
 
         // Add it to any taskbar that wants it
         for (TASKBARCITER iter = g_Taskbars.begin(); iter != g_Taskbars.end(); iter++) {
-            TaskButton* taskButton = iter->second->AddTask(hWnd, wndInfo.uMonitor, lParam == 1);
+            TaskButton* taskButton = iter->second->AddTask(hWnd, wndInfo.uMonitor, initalizing);
 
             // If the taskbar created a button for this window
             if (taskButton != NULL) {
@@ -133,9 +133,6 @@ BOOL CALLBACK WindowManager::AddWindow(HWND hWnd, LPARAM lParam) {
         windowMap.insert(pair<HWND, WindowInformation>(hWnd, wndInfo));
         UpdateIcon(hWnd);
     }
-
-
-    return TRUE;
 }
 
 
@@ -206,7 +203,7 @@ void WindowManager::SetActive(HWND hWnd) {
         }
     }
     else if (IsTaskbarWindow(hWnd)) { // Steam...
-        AddWindow(hWnd, 0);
+        AddWindow(hWnd);
     }
 }
 
@@ -263,7 +260,7 @@ void WindowManager::UpdateWindow(HWND hWnd, LPARAM lParam) {
         }
     }
     else if (IsTaskbarWindow(hWnd)) {
-        AddWindow(hWnd, 0);
+        AddWindow(hWnd);
     }
     else {
         TRACE("UpdateWindow called with invalid HWND: %u", hWnd);
@@ -309,9 +306,6 @@ void WindowManager::UpdateWindowMonitors() {
 /// Processes shell hook messages.
 /// </summary>
 LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    // Check that we are currently running
-    assert(isStarted);
-
     switch (uMsg) {
 
         // A window is being minimized or restored, the system needs the coordinates of
@@ -335,7 +329,7 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
         // A new top level window has been created
     case LM_WINDOWCREATED:
-        AddWindow((HWND)wParam, NULL);
+        AddWindow((HWND)wParam);
         return 0;
 
         // A top level window has been destroyed
@@ -345,7 +339,7 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
         // A top level window has been replaced
     case LM_WINDOWREPLACED:
-        AddWindow((HWND)lParam, NULL);
+        AddWindow((HWND)lParam);
         return 0;
 
         // A window is about to be replaced
@@ -371,7 +365,19 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             UpdateWindowMonitors();
             return 0;
         }
+        
+    case WM_ADDED_EXISTING:
+        {
+            // Relayout all taskbars.
+            initalizing = false;
+            for (TASKBARCITER iter = g_Taskbars.begin(); iter != g_Taskbars.end(); iter++) {
+                iter->second->Relayout();
+            }
+        }
+        return 0;
     }
+
+
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
@@ -462,4 +468,34 @@ void CALLBACK WindowManager::UpdateIconCallback(HWND hWnd, UINT uMsg, ULONG_PTR 
 /// </summary>
 void WindowManager::UpdateIcon(HWND hWnd) {
     SendMessageCallback(hWnd, WM_GETICON, ICON_BIG, NULL, UpdateIconCallback, ICON_BIG);
+}
+
+
+/// <summary>
+/// Sends LM_WINDOWCREATED for all existing top-level windows.
+/// </summary>
+void WindowManager::AddExisting() {
+    UINT workerID;
+    _beginthreadex(NULL, 0, ThreadAddExisting, 0, 0, &workerID);
+}
+
+
+/// <summary>
+/// Worker used by AddExisting
+/// </summary>
+UINT __stdcall WindowManager::ThreadAddExisting(LPVOID) {
+    EnumDesktopWindows(NULL, ThreadAddExistingCallback, NULL);
+    PostMessage(g_LSModule->GetMessageWindow(), WM_ADDED_EXISTING, NULL, NULL);
+    return 0;
+}
+
+
+/// <summary>
+/// Worker used by AddExisting
+/// </summary>
+BOOL CALLBACK WindowManager::ThreadAddExistingCallback(HWND window, LPARAM) {
+    if (IsTaskbarWindow(window)) {
+        PostMessage(g_LSModule->GetMessageWindow(), LM_WINDOWCREATED, (WPARAM)window, NULL);
+    }
+    return TRUE;
 }
