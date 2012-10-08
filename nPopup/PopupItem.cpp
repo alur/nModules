@@ -12,11 +12,13 @@
 extern LSModule* g_LSModule;
 
 
-PopupItem::PopupItem(Drawable* parent) : Drawable(parent, "Item") {
+PopupItem::PopupItem(Drawable* parent, LPCSTR prefix) : Drawable(parent, prefix) {
+    this->iconSettings = this->settings->CreateChild("Icon");
 }
 
 
 PopupItem::~PopupItem() {
+    SAFEDELETE(this->iconSettings);
 }
 
 
@@ -49,7 +51,10 @@ bool PopupItem::ParseDotIcon(LPCSTR dotIcon) {
     }
 
     D2D1_RECT_F f;
-    f.bottom = 18; f.top = 2; f.left = 2; f.right = 18;
+    f.top = this->iconSettings->GetFloat("X", 2.0f);
+    f.bottom = f.top + this->iconSettings->GetFloat("Size", 16.0f);
+    f.left = this->iconSettings->GetFloat("Y", 2.0f);
+    f.right = f.left + this->iconSettings->GetFloat("Size", 16.0f);
     this->window->AddOverlay(f, icon);
     DestroyIcon(icon);
     return true;

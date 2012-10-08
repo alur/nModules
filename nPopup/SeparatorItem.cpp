@@ -14,7 +14,7 @@
 extern LSModule* g_LSModule;
 
 
-SeparatorItem::SeparatorItem(Drawable* parent) : PopupItem(parent) {
+SeparatorItem::SeparatorItem(Drawable* parent) : PopupItem(parent, "SeparatorItem") {
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 190;
     defaults->height = 5;

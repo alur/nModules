@@ -22,7 +22,8 @@ public:
     enum ORDERING {
         BYAPPLICATION,
         BYTITLE,
-        BYTIMEADDED
+        BYTIMEADDED,
+        BYPOSITION
     };
 
     explicit Taskbar(LPCSTR);

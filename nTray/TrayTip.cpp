@@ -9,7 +9,7 @@
 #include "TrayTip.hpp"
 
 
-TrayTip::TrayTip(LPCSTR /* prefix */) {
+TrayTip::TrayTip(LPCSTR prefix) : Drawable(prefix) {
 
 }
 
@@ -19,8 +19,9 @@ TrayTip::~TrayTip() {
 }
 
 
-void TrayTip::Show() {
-
+void TrayTip::Show(LPCWSTR text) {
+    this->window->SetText(text);
+    this->window->Show();
 }
 
 
@@ -34,6 +35,6 @@ void TrayTip::LoadSettings(bool /*bIsRefresh*/) {
 }
 
 
-LRESULT WINAPI TrayTip::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    return m_pWindow->HandleMessage(wnd, uMsg, wParam, lParam);
+LRESULT WINAPI TrayTip::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    return DefWindowProc(window, message, wParam, lParam);
 }

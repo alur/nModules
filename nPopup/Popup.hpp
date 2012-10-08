@@ -35,11 +35,21 @@ public:
     // Called by items or children
     void Close(bool closeAll = true);
 
+    //
     LPCSTR GetBang();
+
+    //
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
 private:
+    int itemSpacing;
+
+    RECT padding;
+
+    //
     vector<PopupItem*> items;
+
+    //
     LPCSTR bang;
 
     // True if the popup is already sized properly.

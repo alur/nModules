@@ -164,6 +164,9 @@ void TrayManager::ModifyIcon(LPLSNOTIFYICONDATA pNID) {
                 }
             }
         }
+
+        // Check if we should update the tip
+
     }
     else {
         TRACE("Tried to modify non-existing icon");

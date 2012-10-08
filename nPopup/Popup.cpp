@@ -25,6 +25,9 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
     this->openChild = NULL;
     this->owner = NULL;
 
+    this->itemSpacing = settings->GetInt("ItemSpacing", 2);
+    settings->GetOffsetRect("PaddingLeft", "PaddingTop", "PaddingRight", "PaddingBottom", &this->padding, 5, 5, 5, 5);
+
     DrawableSettings* defaultSettings = new DrawableSettings();
     defaultSettings->color = 0x440000FF;
     defaultSettings->textRotation = -45.0f;
@@ -124,11 +127,12 @@ void Popup::Show(int x, int y, Popup* owner) {
     this->owner = owner;
 
     if (!this->sized) {
-        int width = 200, height = 5;
+        int width = 200, height = this->padding.top;
         for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
-            (*iter)->Position(5, height);
-            height += (*iter)->GetHeight() + 5;
+            (*iter)->Position(this->padding.left, height);
+            height += (*iter)->GetHeight() + this->itemSpacing;
         }
+        height += this->padding.bottom - this->itemSpacing;
         this->window->SetPosition(x, y, width, height);
         this->sized = true;
     }

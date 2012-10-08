@@ -14,7 +14,7 @@
 extern LSModule* g_LSModule;
 
 
-InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupItem(parent) {
+InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupItem(parent, "InfoItem") {
     this->title = _strdup(title);
 
     DrawableSettings* defaults = new DrawableSettings();

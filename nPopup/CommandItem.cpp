@@ -12,7 +12,7 @@
 #include "Popup.hpp"
 
 
-CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, LPCSTR customIcon) : PopupItem(parent) {
+CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, LPCSTR customIcon) : PopupItem(parent, "Item") {
     this->title = _strdup(title);
     this->command = _strdup(command);
 

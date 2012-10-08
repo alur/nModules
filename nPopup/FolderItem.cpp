@@ -14,7 +14,7 @@
 extern LSModule* g_LSModule;
 
 
-FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, LPCSTR customIcon) : PopupItem(parent) {
+FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, LPCSTR customIcon) : PopupItem(parent, "FolderItem") {
     this->popup = popup;
     this->title = _strdup(title);
 
