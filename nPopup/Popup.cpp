@@ -81,6 +81,17 @@ LPCSTR Popup::GetBang() {
 }
 
 
+void Popup::HandleInactivate(HWND window) {
+    if (this->window->GetWindow() != window) {
+        Close(false);
+    
+        if (this->owner) {
+            this->owner->HandleInactivate(window);
+        }
+    }
+}
+
+
 void Popup::Close(bool closeAll) {
     this->window->Hide();
     if (this->openChild != NULL) {
@@ -88,7 +99,6 @@ void Popup::Close(bool closeAll) {
     }
     if (this->owner != NULL) {
         this->owner->ChildClosing(closeAll);
-        this->owner = NULL;
     }
 }
 
@@ -133,6 +143,9 @@ LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam
         if (LOWORD(wParam) == WA_INACTIVE) {
             if (this->openChild == NULL) {
                 Close(false);
+                if (this->owner) {
+                    this->owner->HandleInactivate((HWND)lParam);
+                }
             }
         }
         return 0;

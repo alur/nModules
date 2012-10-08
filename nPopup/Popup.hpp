@@ -30,6 +30,7 @@ public:
 
     // Called by child popups
     void ChildClosing(bool closeParent);
+    void HandleInactivate(HWND newActive);
 
     // Called by items or children
     void Close(bool closeAll = true);
