@@ -31,6 +31,7 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
     defaultSettings->fontSize = 32.0f;
     defaultSettings->alwaysOnTop = true;
     StringCchCopyW(defaultSettings->text, MAX_LINE_LENGTH, L"nDemo");
+    MultiByteToWideChar(CP_ACP, 0, title, (int)strlen(title)+1, defaultSettings->text, sizeof(defaultSettings->text)/sizeof(defaultSettings->text[0]));
     StringCchCopy(defaultSettings->textAlign, sizeof(defaultSettings->textAlign), "Center");
     StringCchCopy(defaultSettings->textVerticalAlign, sizeof(defaultSettings->textVerticalAlign), "Middle");
     this->window->Initialize(defaultSettings);

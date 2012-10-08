@@ -28,6 +28,8 @@ FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, LPCSTR cust
     defaults->textOffsetLeft = 20;
     this->window->Initialize(defaults);
 
+    ParseDotIcon(customIcon);
+
     this->hoverState = this->window->AddState("Hover", new DrawableSettings(), 100);
 
     this->window->Show();

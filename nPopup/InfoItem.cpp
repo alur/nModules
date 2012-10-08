@@ -27,6 +27,8 @@ InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupIte
     defaults->textOffsetLeft = 20;
     this->window->Initialize(defaults);
 
+    ParseDotIcon(customIcon);
+
     this->hoverState = this->window->AddState("Hover", new DrawableSettings(), 100);
 
     this->window->Show();

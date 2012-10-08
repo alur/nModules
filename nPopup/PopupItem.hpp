@@ -19,4 +19,7 @@ public:
     void Position(int x, int y);
     virtual LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM) = 0;
     int GetHeight();
+
+protected:
+    bool ParseDotIcon(LPCSTR dotIcon);
 };
