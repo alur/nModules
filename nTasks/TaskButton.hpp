@@ -25,7 +25,7 @@ public:
     void Flash();
 
     void GetMinRect(LPPOINTS lpPoints);
-    void Menu();
+    void ShowMenu();
     void Show();
 
     void LoadSettings(bool = false);
@@ -35,23 +35,18 @@ private:
     // Settings for painting the icon in the button.
     Settings* iconSettings;
 
-    // The window related to this button
-    HWND m_hWnd;
+    // The window related to this button.
+    HWND watchedWindow;
 
-    HWND m_hWndParent;
+    // The system context menu for this window.
+    HMENU menu;
 
-    bool m_bMouseIsOver;
-    bool m_bIsActive;
-    bool m_bIsFlashing;
+    bool mouseIsOver;
+    bool isFlashing;
     bool useFlashing;
-
     bool flashOn;
     int flashInterval;
-    UINT_PTR flash_timer;
+    UINT_PTR flashTimer;
 
-    DrawableWindow::STATE stateHover, stateActive, stateFlashing;
-
-    HICON m_hIcon;
-
-    HMENU hMenu;
+    DrawableWindow::STATE stateHover, stateActive, stateFlashing, stateHoverActive;
 };
