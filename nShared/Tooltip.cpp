@@ -1,40 +1,39 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TrayTip.cpp
+ *  Tooltip.cpp
  *  The nModules Project
  *
  *  
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../headers/lsapi.h"
-#include "TrayTip.hpp"
+#include "Tooltip.hpp"
 
 
-TrayTip::TrayTip(LPCSTR prefix) : Drawable(prefix) {
-
-}
-
-
-TrayTip::~TrayTip() {
+Tooltip::Tooltip(LPCSTR prefix) : Drawable(prefix) {
 
 }
 
 
-void TrayTip::Show(LPCWSTR text) {
+Tooltip::~Tooltip() {
+}
+
+
+void Tooltip::Show(LPCWSTR text, int x, int y, int duration) {
     this->window->SetText(text);
     this->window->Show();
 }
 
 
-void TrayTip::Hide() {
+void Tooltip::Hide() {
 
 }
 
 
-void TrayTip::LoadSettings(bool /*bIsRefresh*/) {
+void Tooltip::LoadSettings(bool /*bIsRefresh*/) {
 
 }
 
 
-LRESULT WINAPI TrayTip::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI Tooltip::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
     return DefWindowProc(window, message, wParam, lParam);
 }

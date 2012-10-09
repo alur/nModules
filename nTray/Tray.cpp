@@ -95,6 +95,7 @@ void Tray::RemoveIcon(TrayIcon* pIcon) {
         delete *icon;
         this->icons.erase(icon);
         Relayout();
+        this->window->Repaint();
     }
 }
 

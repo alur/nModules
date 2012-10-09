@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Balloon.hpp" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Debugging.h" />
     <ClInclude Include="Drawable.hpp" />
@@ -34,10 +35,12 @@
     <ClInclude Include="MonitorInfo.hpp" />
     <ClInclude Include="nShared.h" />
     <ClInclude Include="Settings.hpp" />
+    <ClInclude Include="Tooltip.hpp" />
     <ClInclude Include="UIDGenerator.hpp" />
     <ClInclude Include="Versioning.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Balloon.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Debugging.cpp" />
     <ClCompile Include="Drawable.cpp" />
@@ -52,6 +55,7 @@
     <ClCompile Include="MessageHandler.cpp" />
     <ClCompile Include="MonitorInfo.cpp" />
     <ClCompile Include="Settings.cpp" />
+    <ClCompile Include="Tooltip.cpp" />
     <ClCompile Include="UIDGenerator.cpp" />
     <ClCompile Include="Versioning.cpp" />
   </ItemGroup>

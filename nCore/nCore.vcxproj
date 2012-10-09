@@ -152,12 +152,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="IParsedText.hpp" />
     <ClInclude Include="nCore.h" />
+    <ClInclude Include="ParsedText.hpp" />
     <ClInclude Include="TextFormatting.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Formatters.cpp" />
     <ClCompile Include="InputParsing.cpp" />
     <ClCompile Include="nCore.cpp" />
+    <ClCompile Include="ParsedText.cpp" />
     <ClCompile Include="TextFormatting.cpp" />
   </ItemGroup>
   <ItemGroup>

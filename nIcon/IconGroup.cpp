@@ -90,14 +90,14 @@ void IconGroup::SetFolder(LPWSTR folder) {
     enumIDList->Release();
 
     // Register for change notifications
-    /* SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
+    SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
     this->changeNotifyUID = SHChangeNotifyRegister(
         this->window->GetWindow(),
         SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
         SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM,
         WM_SHCHANGE_NOTIFY,
         1,
-        watchEntries); */
+        watchEntries);
 
     // Let go fo the PIDLists
     CoTaskMemFree(idList);

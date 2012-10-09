@@ -21,6 +21,12 @@
     <ClInclude Include="TextFormatting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IParsedText.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParsedText.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nCore.cpp">
@@ -30,6 +36,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TextFormatting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Formatters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParsedText.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

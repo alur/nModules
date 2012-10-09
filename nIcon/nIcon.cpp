@@ -16,9 +16,6 @@ UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 // The LiteStep module class
 LSModule* g_LSModule;
 
-// The window classes we want to register
-LPCSTR g_windowClasses[] = {"Tray", "Icon", NULL};
-
 //
 IconGroup* pGroup;
 

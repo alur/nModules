@@ -37,9 +37,9 @@ namespace Bangs {
 /// Registers bangs.
 /// </summary>
 void Bangs::_Register() {
-    char szBangName[MAX_BANGCOMMAND];
+    char szBangName[64];
     for (int i = 0; BangMap[i].pCommand != NULL; i++) {
-        StringCchPrintf(szBangName, MAX_BANGCOMMAND, "!nDesk%s", BangMap[i].szName);
+        StringCchPrintf(szBangName, sizeof(szBangName), "!nDesk%s", BangMap[i].szName);
         AddBangCommand(szBangName, BangMap[i].pCommand);
     }
 }
@@ -49,9 +49,9 @@ void Bangs::_Register() {
 /// Unregisters bangs.
 /// </summary>
 void Bangs::_Unregister() {
-    char szBangName[MAX_BANGCOMMAND];
+    char szBangName[64];
     for (int i = 0; BangMap[i].pCommand != NULL; i++) {
-        StringCchPrintf(szBangName, MAX_BANGCOMMAND, "!nDesk%s", BangMap[i].szName);
+        StringCchPrintf(szBangName, sizeof(szBangName), "!nDesk%s", BangMap[i].szName);
         RemoveBangCommand(szBangName);
     }
 }

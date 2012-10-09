@@ -7,12 +7,6 @@
 #define MAX_LINE_LENGTH 4096
 #define MAGIC_DWORD     0x49474541
 
-// LM_RECYCLE
-#define LR_RECYCLE    0
-#define LR_LOGOFF     1
-#define LR_QUIT       2
-#define LR_MSSHUTDOWN 3
-
 // LM_RELOADMODULE/LM_UNLOADMODULE
 #define LMM_PATH      0x0000
 #define LMM_HINSTANCE 0x1000
@@ -31,6 +25,12 @@
 // EnumModulesProc
 #define LS_MODULE_THREADED 0x0001
 
+// LSLog, LSLogPrintf
+#define LOG_ERROR   1
+#define LOG_WARNING 2
+#define LOG_NOTICE  3
+#define LOG_DEBUG   4
+
 // is_valid_pattern
 #define PATTERN_VALID  0
 #define PATTERN_ESC   -1
@@ -45,17 +45,6 @@
 #define MATCH_RANGE   4
 #define MATCH_LITERAL 5
 #define MATCH_PATTERN 6
-
-// LM_BANGCOMMAND
-#define MAX_BANGCOMMAND 64
-#define MAX_BANGARGS    256
-
-typedef struct LMBANGCOMMAND {
-    UINT cbSize;
-    HWND hWnd;
-    CHAR szCommand[MAX_BANGCOMMAND];
-    CHAR szArgs[MAX_BANGARGS];
-} LMBANGCOMMAND, *LPLMBANGCOMMAND;
 
 // LM_SYSTRAY
 #define TRAY_MAX_TIP_LENGTH       128
@@ -80,6 +69,7 @@ typedef struct LSNOTIFYICONDATA {
     CHAR szInfoTitle[TRAY_MAX_INFOTITLE_LENGTH];
     DWORD dwInfoFlags;
     GUID guidItem;
+    HICON hBalloonIcon;
 } LSNOTIFYICONDATA, *LPLSNOTIFYICONDATA;
 
 // LM_SYSTRAYINFOEVENT
@@ -95,13 +85,11 @@ typedef struct _SYSTRAYINFOEVENT {
 } SYSTRAYINFOEVENT, *LPSYSTRAYINFOEVENT;
 
 // Messages
-#define LM_SHUTDOWN              8889  // Module -> Core
 #define LM_SAVEDATA              8892  // Module -> Core
 #define LM_RESTOREDATA           8893  // Module -> Core
 #define LM_SYSTRAY               9214  // Core   -> Module
 #define LM_SYSTRAYREADY          9215  // Module -> Core
 #define LM_SYSTRAYINFOEVENT      9216  // Core   -> Module
-#define LM_RECYCLE               9260  // Module -> Core
 #define LM_REGISTERMESSAGE       9263  // Module -> Core
 #define LM_UNREGISTERMESSAGE     9264  // Module -> Core
 #define LM_GETREVID              9265  // Core   -> Module
@@ -110,7 +98,6 @@ typedef struct _SYSTRAYINFOEVENT {
 #define LM_REGISTERHOOKMESSAGE   9268  // Module -> Core
 #define LM_UNREGISTERHOOKMESSAGE 9269  // Module -> Core
 #define LM_REFRESH               9305  // Core   -> Module
-#define LM_BANGCOMMAND           9420  // Module -> Core
 #define LM_WINDOWCREATED         9501  // Core   -> Module
 #define LM_WINDOWDESTROYED       9502  // Core   -> Module
 #define LM_ACTIVATESHELLWINDOW   9503  // Core   -> Module

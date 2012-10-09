@@ -1,24 +1,24 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TrayTip.hpp
+ *  Balloon.hpp
  *  The nModules Project
  *
- *  Declaration of the TrayTip class.
+ *  A general balloon popup window.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
-#include "../nShared/Drawable.hpp"
-#include "../nShared/DrawableWindow.hpp"
 
-class TrayTip : public Drawable {
+#include "Drawable.hpp"
+#include "DrawableWindow.hpp"
+#include "Tooltip.hpp"
+
+class Balloon : protected Tooltip {
 public:
-    explicit TrayTip(LPCSTR pszPrefix);
-    virtual ~TrayTip();
+    explicit Balloon(LPCSTR prefix);
+    virtual ~Balloon();
 
-    void Reposition(UINT x, UINT y, UINT width, UINT height);
-    void Show(LPCWSTR text);
+    void Show(LPCWSTR text, int x, int y, int duration);
     void Hide();
 
     void LoadSettings(bool = false);
     LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
-    HWND GetHWND();
 };

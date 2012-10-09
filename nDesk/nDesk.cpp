@@ -27,6 +27,11 @@ MonitorInfo* g_pMonitorInfo;
 ClickHandler* g_pClickHandler;
 LSModule* g_pLSModule;
 
+namespace ExplorerTest {
+void Init();
+DWORD WINAPI Thread(LPVOID param);
+}
+
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
@@ -62,7 +67,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
 
     SetWindowPos(g_pDesktopPainter->GetWindow(), HWND_BOTTOM, g_pMonitorInfo->m_virtualDesktop.rect.left,
         g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.width,
-        g_pMonitorInfo->m_virtualDesktop.height, SWP_NOACTIVATE|SWP_NOSENDCHANGING);
+        g_pMonitorInfo->m_virtualDesktop.height, SWP_NOACTIVATE | SWP_NOSENDCHANGING);
     ShowWindow(g_pDesktopPainter->GetWindow(), SW_SHOWNOACTIVATE);
 
     // Load bang commands
@@ -74,6 +79,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     // Reset the work area for all monitors
     WorkArea::ResetWorkAreas(g_pMonitorInfo);
     WorkArea::LoadSettings(g_pMonitorInfo);
+
+    //ExplorerTest::Init();
 
     return 0;
 }
@@ -185,14 +192,14 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     
     case WM_CLOSE:
         // If someone tries to exit the desktop window, lets make it a windows shutdown.
-        PostMessage(GetLitestepWnd(), LM_RECYCLE, 3, 0);
+        // PostMessage(GetLitestepWnd(), LM_RECYCLE, 3, 0);
         return 0;
 
     case WM_SYSCOMMAND:
         switch (wParam) {
             // For using the standard alt+F4 to shutdown windows
             case SC_CLOSE:
-                PostMessage(GetLitestepWnd(), LM_RECYCLE, 3, 0);
+                // PostMessage(GetLitestepWnd(), LM_RECYCLE, 3, 0);
                 return 0;
             default:
                 break;

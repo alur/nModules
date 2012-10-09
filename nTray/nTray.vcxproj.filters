@@ -27,9 +27,6 @@
     <ClInclude Include="TrayIcon.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TrayTip.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nTray.cpp">
@@ -42,9 +39,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TrayIcon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TrayTip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

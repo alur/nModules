@@ -156,14 +156,12 @@
     <ClInclude Include="Tray.hpp" />
     <ClInclude Include=".\TrayManager.h" />
     <ClInclude Include="TrayIcon.hpp" />
-    <ClInclude Include="TrayTip.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nTray.cpp" />
     <ClCompile Include="Tray.cpp" />
     <ClCompile Include=".\TrayManager.cpp" />
     <ClCompile Include="TrayIcon.cpp" />
-    <ClCompile Include="TrayTip.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nTray.rc" />

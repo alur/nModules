@@ -63,6 +63,9 @@
     <ClInclude Include="Settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ShellDesktopTray.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nDesk.cpp">
@@ -96,6 +99,12 @@
       <Filter>Source Files\TransitionEffects</Filter>
     </ClCompile>
     <ClCompile Include="Settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ExplorerTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellDesktopTray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
