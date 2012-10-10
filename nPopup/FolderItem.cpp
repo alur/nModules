@@ -15,8 +15,22 @@ extern LSModule* g_LSModule;
 
 
 FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, LPCSTR customIcon) : PopupItem(parent, "FolderItem") {
-    this->popup = popup;
+    Init(title, popup);
+    ParseDotIcon(customIcon);
+    this->window->Show();
+}
+
+
+FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, HICON icon) : PopupItem(parent, "FolderItem") {
+    Init(title, popup);
+    AddIcon(icon);
+    this->window->Show();
+}
+
+
+void FolderItem::Init(LPCSTR title, Popup* popup) {
     this->title = _strdup(title);
+    this->popup = popup;
 
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 190;
@@ -27,12 +41,7 @@ FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, LPCSTR cust
     StringCchCopy(defaults->textVerticalAlign, sizeof(defaults->textVerticalAlign), "Middle");
     defaults->textOffsetLeft = 20;
     this->window->Initialize(defaults);
-
-    ParseDotIcon(customIcon);
-
     this->hoverState = this->window->AddState("Hover", new DrawableSettings(), 100);
-
-    this->window->Show();
 }
 
 

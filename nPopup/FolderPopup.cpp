@@ -21,10 +21,8 @@ FolderPopup::~FolderPopup() {
 
 
 void FolderPopup::PreShow() {
-    TRACE("FolderPopup::PreShow");
 }
 
 
 void FolderPopup::PostClose() {
-    TRACE("FolderPopup::PostClose");
 }

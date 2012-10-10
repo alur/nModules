@@ -65,4 +65,7 @@ private:
 
     //
     Popup* owner;
+
+    //
+    bool mouseOver;
 };

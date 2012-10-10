@@ -41,6 +41,7 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
     StringCchCopy(defaultSettings->textVerticalAlign, sizeof(defaultSettings->textVerticalAlign), "Middle");
     this->window->Initialize(defaultSettings);
     this->sized = false;
+    this->mouseOver = false;
 }
 
 
@@ -89,7 +90,7 @@ LPCSTR Popup::GetBang() {
 
 
 void Popup::HandleInactivate(HWND window) {
-    if (this->window->GetWindow() != window) {
+    if (this->window->GetWindow() != window && !this->mouseOver) {
         Close(false);
     
         if (this->owner) {
@@ -102,11 +103,13 @@ void Popup::HandleInactivate(HWND window) {
 void Popup::Close(bool closeAll) {
     this->window->Hide();
     if (this->openChild != NULL) {
-        this->openChild->Close(false);
+        this->openChild->owner = NULL;
+        this->openChild->Close(true);
     }
     if (this->owner != NULL) {
         this->owner->ChildClosing(closeAll);
     }
+    this->mouseOver = false;
     PostClose();
 }
 
@@ -181,6 +184,14 @@ LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam
                 }
             }
         }
+        return 0;
+
+    case WM_MOUSEMOVE:
+        this->mouseOver = true;
+        return 0;
+
+    case WM_MOUSELEAVE:
+        this->mouseOver = false;
         return 0;
 
     default:

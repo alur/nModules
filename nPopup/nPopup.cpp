@@ -123,16 +123,36 @@ void LoadSettings() {
 
 
 /// <summary>
+/// Adds a new root-level popup
+/// </summary>
+void AddPopup(Popup* popup) {
+    rootPopups.push_back(popup);
+    AddBangCommandEx(popup->GetBang(), HandlePopupBang);
+}
+
+
+/// <summary>
 /// Reads through the .rc files and creates Taskbars.
 /// </summary>
 void LoadPopups() {
     LPVOID f = LCOpen(NULL);
     Popup* popup;
 
+    // Add pre-defined popups
+    AddPopup(new ContentPopup(ContentPopup::ContentSource::ADMIN_TOOLS, "Admin Tools", "!PopupAdminTools", "nPopup"));
+    AddPopup(new ContentPopup(ContentPopup::ContentSource::CONTROL_PANEL, "Control Panel", "!PopupControlPanel", "nPopup"));
+    AddPopup(new ContentPopup(ContentPopup::ContentSource::MY_COMPUTER, "My Computer", "!PopupMyComputer", "nPopup"));
+    AddPopup(new ContentPopup(ContentPopup::ContentSource::NETWORK, "Network", "!PopupNetwork", "nPopup"));
+    AddPopup(new ContentPopup(ContentPopup::ContentSource::PRINTERS, "Printers", "!PopupPrinters", "nPopup"));
+    AddPopup(new ContentPopup(ContentPopup::ContentSource::PROGRAMS, "Programs", "!PopupPrograms", "nPopup"));
+    AddPopup(new ContentPopup(ContentPopup::ContentSource::RECENT_DOCUMENTS, "Recent Documents", "!PopupRecentDocuments", "nPopup"));
+    AddPopup(new ContentPopup(ContentPopup::ContentSource::RECYCLE_BIN, "Recycle Bin", "!PopupRecycleBin", "nPopup"));
+    AddPopup(new ContentPopup(ContentPopup::ContentSource::START_MENU, "Start Menu", "!PopupStartMenu", "nPopup"));
+
+    // Load .rc popups
     while (LoadPopup(f, POPUPLEVEL_ROOT, &popup)) {
         if (popup != NULL) {
-            rootPopups.push_back(popup);
-            AddBangCommandEx(popup->GetBang(), HandlePopupBang);
+            AddPopup(popup);
         }
     }
 
@@ -303,8 +323,40 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
                 StringCchCopy(prefix, cchPrefix, token);
                 return POPUPLINETYPE_FOLDER;
             }
+            else if (_stricmp(token, "!PopupAdminTools") == 0) {
+                *source = ContentPopup::ContentSource::ADMIN_TOOLS;
+                return POPUPLINETYPE_CONTENT;
+            }
             else if (_stricmp(token, "!PopupControlPanel") == 0) {
-                *source = ContentPopup::ContentSource::CONTENT_SOURCE_CONTROLPANEL;
+                *source = ContentPopup::ContentSource::CONTROL_PANEL;
+                return POPUPLINETYPE_CONTENT;
+            }
+            else if (_stricmp(token, "!PopupMyComputer") == 0) {
+                *source = ContentPopup::ContentSource::MY_COMPUTER;
+                return POPUPLINETYPE_CONTENT;
+            }
+            else if (_stricmp(token, "!PopupNetwork") == 0) {
+                *source = ContentPopup::ContentSource::NETWORK;
+                return POPUPLINETYPE_CONTENT;
+            }
+            else if (_stricmp(token, "!PopupPrinters") == 0) {
+                *source = ContentPopup::ContentSource::PRINTERS;
+                return POPUPLINETYPE_CONTENT;
+            }
+            else if (_stricmp(token, "!PopupPrograms") == 0) {
+                *source = ContentPopup::ContentSource::PROGRAMS;
+                return POPUPLINETYPE_CONTENT;
+            }
+            else if (_stricmp(token, "!PopupRecentDocuments") == 0) {
+                *source = ContentPopup::ContentSource::RECENT_DOCUMENTS;
+                return POPUPLINETYPE_CONTENT;
+            }
+            else if (_stricmp(token, "!PopupRecycleBin") == 0) {
+                *source = ContentPopup::ContentSource::RECYCLE_BIN;
+                return POPUPLINETYPE_CONTENT;
+            }
+            else if (_stricmp(token, "!PopupStartMenu") == 0) {
+                *source = ContentPopup::ContentSource::START_MENU;
                 return POPUPLINETYPE_CONTENT;
             }
             else {
