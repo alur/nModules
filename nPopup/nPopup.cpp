@@ -16,6 +16,8 @@
 #include "CommandItem.hpp"
 #include "FolderItem.hpp"
 #include "InfoItem.hpp"
+#include "ContentPopup.hpp"
+#include "FolderPopup.hpp"
 #include "nPopup.h"
 
 
@@ -144,13 +146,13 @@ void LoadPopups() {
 /// <return>Returns false when all lines have been read.</return>
 bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
     char line[MAX_LINE_LENGTH], title[MAX_LINE_LENGTH], command[MAX_LINE_LENGTH], icon[MAX_LINE_LENGTH], prefix[MAX_LINE_LENGTH];
+    ContentPopup::ContentSource source;
     
     while (LCReadNextConfig(f, "*Popup", line, sizeof(line))) {
-        POPUPLINETYPE type = ProcessPopupLine(line, title, sizeof(title), command, sizeof(command), icon, sizeof(icon), prefix, sizeof(prefix));
+        POPUPLINETYPE type = ProcessPopupLine(line, &source, title, sizeof(title), command, sizeof(command), icon, sizeof(icon), prefix, sizeof(prefix));
         if (level == POPUPLEVEL_ROOT) {
             if (type == POPUPLINETYPE_NEW) {
-                // hmm..., need to deal with bangs.
-                *out = new Popup(title, command, prefix);
+                *out = new FolderPopup(title, command, prefix);
                 return LoadPopup(f, POPUPLEVEL_NEW, out);
             }
             else {
@@ -162,7 +164,7 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
         else switch (type) {
         case POPUPLINETYPE_FOLDER:
             {
-                Popup* popup = new Popup(title, NULL, prefix);
+                Popup* popup = new FolderPopup(title, NULL, prefix);
                 LoadPopup(f, POPUPLEVEL_FOLDER, &popup);
                 (*out)->AddItem(new FolderItem(*out, title, popup, icon));
             }
@@ -193,6 +195,12 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
         case POPUPLINETYPE_COMMAND:
             {
                 (*out)->AddItem(new CommandItem(*out, title, command, icon));
+            }
+            break;
+
+        case POPUPLINETYPE_CONTENT:
+            {
+                (*out)->AddItem(new FolderItem(*out, title, new ContentPopup(source, title, command, prefix), icon));
             }
             break;
 
@@ -237,7 +245,7 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
 /// Extracts information from a *Popup line.
 /// </summary>
 /// <return>The type of *Popup line this is.</return>
-POPUPLINETYPE ProcessPopupLine(LPCSTR line,
+POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
                                LPSTR title, UINT cchTitle,
                                LPSTR command, UINT cchCommand,
                                LPSTR icon, UINT cchIcon,
@@ -294,6 +302,10 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line,
                 GetToken(linePointer, token, &linePointer, FALSE);
                 StringCchCopy(prefix, cchPrefix, token);
                 return POPUPLINETYPE_FOLDER;
+            }
+            else if (_stricmp(token, "!PopupControlPanel") == 0) {
+                *source = ContentPopup::ContentSource::CONTENT_SOURCE_CONTROLPANEL;
+                return POPUPLINETYPE_CONTENT;
             }
             else {
                 StringCchCopy(command, cchCommand, commandPointer);

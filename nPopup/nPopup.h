@@ -14,7 +14,8 @@ enum POPUPLINETYPE {
     POPUPLINETYPE_FOLDER,
     POPUPLINETYPE_SEPARATOR,
     POPUPLINETYPE_INFO,
-    POPUPLINETYPE_COMMAND
+    POPUPLINETYPE_COMMAND,
+    POPUPLINETYPE_CONTENT
 };
 
 enum POPUPLEVEL {
@@ -23,7 +24,7 @@ enum POPUPLEVEL {
     POPUPLEVEL_FOLDER
 };
 
-POPUPLINETYPE ProcessPopupLine(LPCSTR line, LPSTR title, UINT cchTitle,
+POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source, LPSTR title, UINT cchTitle,
     LPSTR command, UINT cchCommand, LPSTR icon, UINT cchIcon, LPSTR prefix, UINT cchPrefix);
 
 void LoadSettings();

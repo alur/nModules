@@ -63,6 +63,7 @@ void Popup::AddItem(PopupItem* item) {
 
 void Popup::CloseChild() {
     if (this->openChild != NULL) {
+        this->openChild->owner = NULL;
         this->openChild->Close(false);
         this->openChild = NULL;
     }
@@ -106,6 +107,7 @@ void Popup::Close(bool closeAll) {
     if (this->owner != NULL) {
         this->owner->ChildClosing(closeAll);
     }
+    PostClose();
 }
 
 
@@ -125,6 +127,7 @@ void Popup::Show() {
 
 
 void Popup::Show(int x, int y, Popup* owner) {
+    PreShow();
     this->owner = owner;
 
     if (!this->sized) {
@@ -134,6 +137,25 @@ void Popup::Show(int x, int y, Popup* owner) {
             height += (*iter)->GetHeight() + this->itemSpacing;
         }
         height += this->padding.bottom - this->itemSpacing;
+
+        if (height > g_MonitorInfo.m_virtualDesktop.height) {
+            int columns = (height - this->padding.top - this->padding.bottom)/(g_MonitorInfo.m_virtualDesktop.height - this->padding.top - this->padding.bottom) + 1;
+            width = 200 * columns + this->itemSpacing*(columns - 1);
+            height = this->padding.top;
+            int column = 0;
+            int rowHeight = 0;
+            for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
+                (*iter)->Position(this->padding.left + (200 + this->itemSpacing) * column, height);
+                rowHeight = max((*iter)->GetHeight() + this->itemSpacing, rowHeight);
+                column++;
+                if (column == columns) {
+                    height += rowHeight;
+                    rowHeight = 0;
+                    column = 0;
+                }
+            }
+            height += this->padding.bottom;
+        }
         this->window->SetPosition(x, y, width, height);
         this->sized = true;
     }

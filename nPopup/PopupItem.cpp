@@ -33,6 +33,10 @@ int PopupItem::GetHeight() {
 
 
 bool PopupItem::ParseDotIcon(LPCSTR dotIcon) {
+    if (dotIcon == NULL) {
+        return false;
+    }
+
     // TODO::May cause problems with paths which include a comma.
     LPSTR index = (LPSTR)strrchr(dotIcon, ',');
     int nIndex;
@@ -50,12 +54,22 @@ bool PopupItem::ParseDotIcon(LPCSTR dotIcon) {
         return false;
     }
 
+    AddIcon(icon);
+    DestroyIcon(icon);
+    return true;
+}
+
+
+void PopupItem::AddIcon(HICON icon) {
     D2D1_RECT_F f;
     f.top = this->iconSettings->GetFloat("X", 2.0f);
     f.bottom = f.top + this->iconSettings->GetFloat("Size", 16.0f);
     f.left = this->iconSettings->GetFloat("Y", 2.0f);
     f.right = f.left + this->iconSettings->GetFloat("Size", 16.0f);
     this->window->AddOverlay(f, icon);
-    DestroyIcon(icon);
-    return true;
+}
+
+
+bool PopupItem::CompareTo(PopupItem* b) {
+    return _wcsicmp(this->window->GetDrawingSettings()->text, b->window->GetDrawingSettings()->text) < 0;
 }

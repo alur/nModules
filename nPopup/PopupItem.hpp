@@ -19,9 +19,11 @@ public:
     void Position(int x, int y);
     virtual LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM) = 0;
     int GetHeight();
+    bool CompareTo(PopupItem* b);
 
 protected:
     bool ParseDotIcon(LPCSTR dotIcon);
+    void AddIcon(HICON icon);
 
     Settings* iconSettings;
 

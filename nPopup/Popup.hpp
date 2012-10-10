@@ -41,13 +41,18 @@ public:
     //
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
+protected:
+    //
+    virtual void PreShow() = 0;
+    virtual void PostClose() = 0;
+
+    //
+    vector<PopupItem*> items;
+
 private:
     int itemSpacing;
 
     RECT padding;
-
-    //
-    vector<PopupItem*> items;
 
     //
     LPCSTR bang;

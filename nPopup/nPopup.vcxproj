@@ -95,7 +95,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>nShared.lib;nCoreCom.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>nShared.lib;nCoreCom.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -107,7 +107,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>nShared.lib;nCoreCom.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>nShared.lib;nCoreCom.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -126,7 +126,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>nShared.lib;nCoreCom.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>nShared.lib;nCoreCom.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -142,13 +142,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>nShared.lib;nCoreCom.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>nShared.lib;nCoreCom.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CommandItem.hpp" />
+    <ClInclude Include="ContentPopup.hpp" />
     <ClInclude Include="FolderItem.hpp" />
+    <ClInclude Include="FolderPopup.hpp" />
     <ClInclude Include="InfoItem.hpp" />
     <ClInclude Include="nPopup.h" />
     <ClInclude Include="Popup.hpp" />
@@ -157,7 +159,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandItem.cpp" />
+    <ClCompile Include="ContentPopup.cpp" />
     <ClCompile Include="FolderItem.cpp" />
+    <ClCompile Include="FolderPopup.cpp" />
     <ClCompile Include="InfoItem.cpp" />
     <ClCompile Include="nPopup.cpp" />
     <ClCompile Include="Popup.cpp" />

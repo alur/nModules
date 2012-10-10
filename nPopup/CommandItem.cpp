@@ -13,6 +13,22 @@
 
 
 CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, LPCSTR customIcon) : PopupItem(parent, "Item") {
+    Init(title, command);
+    ParseDotIcon(customIcon);
+    this->window->Show();
+}
+
+
+CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, HICON icon) : PopupItem(parent, "Item") {
+    Init(title, command);
+    if (icon != NULL) {
+        AddIcon(icon);
+    }
+    this->window->Show();
+}
+
+
+void CommandItem::Init(LPCSTR title, LPCSTR command) {
     this->title = _strdup(title);
     this->command = _strdup(command);
 
@@ -25,12 +41,7 @@ CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, LPCSTR 
     StringCchCopy(defaults->textVerticalAlign, sizeof(defaults->textVerticalAlign), "Middle");
     defaults->textOffsetLeft = 20;
     this->window->Initialize(defaults);
-
-    ParseDotIcon(customIcon);
-
     this->hoverState = this->window->AddState("Hover", new DrawableSettings(), 100);
-
-    this->window->Show();
 }
 
 

@@ -36,6 +36,12 @@
     <ClInclude Include="InfoItem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ContentPopup.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FolderPopup.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nPopup.cpp">
@@ -57,6 +63,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InfoItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContentPopup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FolderPopup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
