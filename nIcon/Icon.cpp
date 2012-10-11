@@ -91,33 +91,40 @@ void Icon::SetPosition(int x, int y) {
 
 
 void Icon::SetIcon() {
-    IExtractIconW* extractIcon;
+    IExtractIconW* extractIcon = NULL;
     HICON icon;
     WCHAR iconFile[MAX_PATH];
-    int iconIndex;
+    int iconIndex = 0;
     UINT flags;
     D2D1_RECT_F pos;
+    HRESULT hr;
 
     pos.top = 0; pos.left = 0; pos.right = 64; pos.bottom = 64;
 
     // Get the IExtractIcon interface for this item.
-    this->shellFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&this->item, IID_IExtractIconW, NULL, reinterpret_cast<LPVOID*>(&extractIcon));
+    hr = this->shellFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&this->item, IID_IExtractIconW, NULL, reinterpret_cast<LPVOID*>(&extractIcon));
 
     // Get the location of the file containing the appropriate icon, and the index of the icon.
-    extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);
+    if (SUCCEEDED(hr)) {
+        hr = extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);
+    }
 
     // Extract the icon.
-    HRESULT hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(64, 0));
+    if (SUCCEEDED(hr)) {
+        hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(64, 0));
+    }
     if (hr == S_FALSE) {
         // If the extraction failed, fall back to a 32x32 icon.
-        extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(32, 0));
+        hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(32, 0));
     }
 
     // Add it as an overlay.
-    this->window->AddOverlay(pos, icon);
+    if (SUCCEEDED(hr)) {
+        this->window->AddOverlay(pos, icon);
+    }
 
     // Let go of the interface.
-    extractIcon->Release();
+    SAFERELEASE(extractIcon);
 }
 
 /// <summary>
