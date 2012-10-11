@@ -12,6 +12,7 @@
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/Settings.hpp"
 #include "../nShared/LayoutSettings.hpp"
+#include "../nShared/Tooltip.hpp"
 
 using std::map;
 
@@ -20,21 +21,25 @@ public:
     explicit Tray(LPCSTR);
     virtual ~Tray();
 
-    void LoadSettings(bool = false);
     TrayIcon* AddIcon(LPLSNOTIFYICONDATA);
-    void RemoveIcon(TrayIcon*);
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
-    void Relayout();
     vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* NID);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
     void InitCompleted();
+    void LoadSettings(bool = false);
+    void ShowTip(int x, int y, LPCWSTR text);
+    void Relayout();
+    void RemoveIcon(TrayIcon*);
 
 private:
-    //
-    LayoutSettings* layoutSettings;
-
-    // The tray icons
+    // The tray icons.
     vector<TrayIcon*> icons;
 
-    // The size of the icons
+    // The size of the icons.
     int iconSize;
+
+    // Defines how the tray icons should be layed out.
+    LayoutSettings* layoutSettings;
+
+    // The tooltip to show.
+    Tooltip* tooltip;
 };

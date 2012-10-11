@@ -6,6 +6,7 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../headers/lsapi.h"
+#include <windowsx.h>
 #include <strsafe.h>
 #include "IconGroup.hpp"
 #include "../nShared/Macros.h"
@@ -164,8 +165,23 @@ HRESULT IconGroup::GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR bu
 /// <summary>
 /// 
 /// </summary>
-LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
-    switch (msg) {
+LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    static HWND desktopWindow = NULL;
+
+    if (!desktopWindow)
+    {
+        desktopWindow = FindWindow("DesktopBackgroundClass", NULL);
+    }
+
+    // Forward mouse messages to the desktop window.
+    if (message >= WM_MOUSEFIRST || message <= WM_MOUSELAST)
+    {
+        POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+        MapWindowPoints(this->window->GetWindow(), desktopWindow, &pt, 1);
+        PostMessage(desktopWindow, message, wParam, MAKELPARAM((short) pt.x, (short) pt.y));
+    }
+
+    switch (message) {
     case WM_SHCHANGE_NOTIFY:
         {
             long event;
@@ -233,6 +249,6 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LP
         return 0;
 
     default:
-        return DefWindowProc(window, msg, wParam, lParam);
+        return DefWindowProc(window, message, wParam, lParam);
     }
 }

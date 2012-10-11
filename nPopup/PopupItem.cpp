@@ -8,6 +8,8 @@
 #include "PopupItem.hpp"
 #include "../nShared/Macros.h"
 #include "../nShared/LSModule.hpp"
+#include "../nShared/Debugging.h"
+
 
 extern LSModule* g_LSModule;
 
@@ -78,28 +80,35 @@ bool PopupItem::CompareTo(PopupItem* b) {
 void PopupItem::SetIcon(IExtractIconW* extractIcon) {
     HICON icon;
     WCHAR iconFile[MAX_PATH];
-    int iconIndex;
+    int iconIndex = 0;
     UINT flags;
     HRESULT hr;
 
     // Get the location of the file containing the appropriate icon, and the index of the icon.
-    extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);
+    hr = extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);
 
     // Extract the icon.
-    hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(64, 0));
+    if (SUCCEEDED(hr)) {
+        hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(64, 0));
+    }
+    
+    // If the extraction failed, fall back to a 32x32 icon.
     if (hr == S_FALSE) {
-        // If the extraction failed, fall back to a 32x32 icon.
         hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(32, 0));
-
-        if (hr == S_FALSE) {
-            hr = extractIcon->Extract(iconFile, iconIndex, NULL, &icon, MAKELONG(0, 16));
-        }
     }
 
-    if (SUCCEEDED(hr)) {
+    // And then to a 16x16
+    if (hr == S_FALSE) {
+        hr = extractIcon->Extract(iconFile, iconIndex, NULL, &icon, MAKELONG(0, 16));
+    }
+
+    if (hr == S_OK) {
         AddIcon(icon);
+    }
+    else {
+        TRACEW(L"Failed to extract icon %s,%i", iconFile, iconIndex);
     }
 
     // Let go of the interface.
-    extractIcon->Release();
+    SAFERELEASE(extractIcon);
 }

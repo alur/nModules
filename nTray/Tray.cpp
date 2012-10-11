@@ -21,8 +21,10 @@ extern bool g_InitPhase;
 /// Constructor
 /// </summary>
 Tray::Tray(LPCSTR name) : Drawable(name) {
+    char tooltipPrefix[256];
+    StringCchPrintf(tooltipPrefix, sizeof(tooltipPrefix), "%sTooltip", name);
+    this->tooltip = new Tooltip(tooltipPrefix);
     this->layoutSettings = new LayoutSettings();
-
     DrawableSettings* defaults = new DrawableSettings();
     this->window->Initialize(defaults);
     this->window->Show();

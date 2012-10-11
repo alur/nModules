@@ -113,13 +113,14 @@ void Icon::SetIcon() {
     if (SUCCEEDED(hr)) {
         hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(64, 0));
     }
+
+    // If the extraction failed, fall back to a 32x32 icon.
     if (hr == S_FALSE) {
-        // If the extraction failed, fall back to a 32x32 icon.
         hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(32, 0));
     }
 
     // Add it as an overlay.
-    if (SUCCEEDED(hr)) {
+    if (hr == S_OK) {
         this->window->AddOverlay(pos, icon);
     }
 
