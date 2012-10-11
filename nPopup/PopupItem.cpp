@@ -102,11 +102,19 @@ void PopupItem::SetIcon(IExtractIconW* extractIcon) {
         hr = extractIcon->Extract(iconFile, iconIndex, NULL, &icon, MAKELONG(0, 16));
     }
 
-    if (hr == S_OK) {
+    if (hr == S_FALSE) {
+        icon = ExtractIconW(g_LSModule->GetInstance(), iconFile, iconIndex);
+    }
+
+    if (SUCCEEDED(hr) && icon != NULL) {
         AddIcon(icon);
     }
     else {
         TRACEW(L"Failed to extract icon %s,%i", iconFile, iconIndex);
+    }
+
+    if (hr == S_FALSE && icon != NULL) {
+        DestroyIcon(icon);
     }
 
     // Let go of the interface.
