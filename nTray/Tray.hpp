@@ -29,6 +29,7 @@ public:
     void ShowTip(int x, int y, LPCWSTR text);
     void Relayout();
     void RemoveIcon(TrayIcon*);
+    void HideTip();
 
 private:
     // The tray icons.

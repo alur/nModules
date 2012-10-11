@@ -15,7 +15,9 @@ using std::string;
 namespace TrayManager {
     typedef struct {
         vector<TrayIcon*>* icons;
-        LSNOTIFYICONDATA NID;
+        GUID guidItem;
+        UINT uID;
+        HWND hwnd;
     } TRAYICONDATA, *LPTRAYICONDATA;
 
     typedef vector<LPTRAYICONDATA>::iterator TRAYICONDATAITER;

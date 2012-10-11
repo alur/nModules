@@ -14,6 +14,7 @@
 #include <list>
 #include <map>
 #include "UIDGenerator.hpp"
+#include "MonitorInfo.hpp"
 
 
 using std::vector;
@@ -70,6 +71,9 @@ public:
 
     // Returns the current drawing settings.
     DrawableSettings* GetDrawingSettings();
+
+    //
+    MonitorInfo* GetMonitorInformation();
 
     // Returns the screen-coordinate position of this window.
     void GetScreenRect(LPRECT rect);
@@ -162,6 +166,9 @@ private:
 
     // The object which should handle mouse event messages.
     MessageHandler* msgHandler;
+
+    // MonitorInfo...
+    MonitorInfo* monitorInfo;
 
     // All current overlays.
     list<Overlay> overlays;

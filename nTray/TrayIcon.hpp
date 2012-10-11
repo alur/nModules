@@ -16,18 +16,36 @@ public:
     virtual ~TrayIcon();
 
     void Reposition(UINT x, UINT y, UINT width, UINT height);
-    void Update();
     void Show();
 
-    void LoadSettings(bool = false);
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
-    void SendCallback(UINT uMsg, WPARAM wParam, LPARAM lParam);
-    void UpdateIcon();
+    void LoadSettings(bool isRefresh = false);
+    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+    void SendCallback(UINT message, WPARAM wParam, LPARAM lParam);
     void GetScreenRect(LPRECT rect);
+
+    void SetIcon(HICON icon);
+
+    void HandleAdd(LPLSNOTIFYICONDATA pNID);
+    void HandleModify(LPLSNOTIFYICONDATA pNID);
+    void HandleSetVersion(LPLSNOTIFYICONDATA pNID);
 
 private:
     //
-    LPLSNOTIFYICONDATA m_pNotifyData;
-
     int iconSize;
+    bool showingTip;
+    bool showingBalloon;
+
+    bool showTip; // True if we should show the tooltip
+
+    // Tray data
+    WCHAR tip[TRAY_MAX_TIP_LENGTH];
+    WCHAR info[TRAY_MAX_INFO_LENGTH];
+    WCHAR infoTitle[TRAY_MAX_INFOTITLE_LENGTH];
+    DWORD infoFlags;
+    UINT version;
+    HICON icon;
+    HWND callbackWindow;
+    UINT callbackID;
+    UINT callbackMessage;
+    HICON balloonIcon;
 };

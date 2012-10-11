@@ -43,6 +43,7 @@ Tray::~Tray() {
     }
     this->icons.clear();
 
+    SAFEDELETE(this->tooltip);
     SAFEDELETE(this->layoutSettings);
 }
 
@@ -196,4 +197,20 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lP
 /// <summary>
 void Tray::InitCompleted() {
     this->window->Repaint();
+}
+
+
+/// <summary>
+/// Shows the specified tooltip for this tray.
+/// <summary>
+void Tray::ShowTip(int x, int y, LPCWSTR text) {
+    this->tooltip->Show(text, x, y, 10);
+}
+
+
+/// <summary>
+/// Hides the tooltip for this tray.
+/// <summary>
+void Tray::HideTip() {
+    this->tooltip->Hide();
 }

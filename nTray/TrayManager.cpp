@@ -51,7 +51,7 @@ void TrayManager::GetScreenRect(TRAYICONDATAITER icon, LPRECT rect) {
 /// </summary>
 TrayManager::TRAYICONDATAITER TrayManager::FindIcon(GUID guid) {
     for (TRAYICONDATAITER iter = g_currentIcons.begin(); iter != g_currentIcons.end(); iter++) {
-        if ((*iter)->NID.guidItem == guid) {
+        if ((*iter)->guidItem == guid) {
             return iter;
         }
     }
@@ -64,7 +64,7 @@ TrayManager::TRAYICONDATAITER TrayManager::FindIcon(GUID guid) {
 /// </summary>
 TrayManager::TRAYICONDATAITER TrayManager::FindIcon(HWND hWnd, UINT uID) {
     for (TRAYICONDATAITER iter = g_currentIcons.begin(); iter != g_currentIcons.end(); iter++) {
-        if ((*iter)->NID.hWnd == hWnd && (*iter)->NID.uID == uID) {
+        if ((*iter)->hwnd == hWnd && (*iter)->uID == uID) {
             return iter;
         }
     }
@@ -109,11 +109,18 @@ TrayManager::TRAYICONDATAITER TrayManager::FindIcon(LPSYSTRAYINFOEVENT pSTE) {
 void TrayManager::AddIcon(LPLSNOTIFYICONDATA pNID) {
     if (FindIcon(pNID) == g_currentIcons.end()) {
         TRAYICONDATA* tData = (TRAYICONDATA*)malloc(sizeof(TRAYICONDATA));
-        memcpy(&tData->NID, pNID, sizeof(tData->NID));
         tData->icons = new vector<TrayIcon*>;
+        if ((NIF_GUID & pNID->uFlags) == NIF_GUID) {
+            tData->guidItem = pNID->guidItem;
+        }
+        else {
+            tData->guidItem = GUID_NULL;
+        }
+        tData->hwnd = pNID->hWnd;
+        tData->uID = pNID->uID;
         
         for (TRAYSCITER iter = g_Trays.begin(); iter != g_Trays.end(); iter++) {
-            TrayIcon* pIcon = iter->second->AddIcon(&tData->NID);
+            TrayIcon* pIcon = iter->second->AddIcon(pNID);
             if (pIcon != NULL) {
                 tData->icons->push_back(pIcon);
             }
@@ -149,24 +156,9 @@ void TrayManager::DeleteIcon(LPLSNOTIFYICONDATA pNID) {
 void TrayManager::ModifyIcon(LPLSNOTIFYICONDATA pNID) {
     TRAYICONDATAITER icon = FindIcon(pNID);
     if (icon != g_currentIcons.end()) {
-
-        // Check if we should update the message ID
-        if ((pNID->uFlags & NIF_MESSAGE) == NIF_MESSAGE) {
-            (*icon)->NID.uCallbackMessage = pNID->uCallbackMessage;
+        for (vector<TrayIcon*>::const_iterator iter = (*icon)->icons->begin(); iter != (*icon)->icons->end(); iter++) {
+            (*iter)->HandleModify(pNID);
         }
-
-        // Check if we should update the icon
-        if ((pNID->uFlags & NIF_ICON) == NIF_ICON) {
-            if ((*icon)->NID.hIcon != pNID->hIcon) {
-                (*icon)->NID.hIcon = pNID->hIcon;
-                for (vector<TrayIcon*>::const_iterator iter = (*icon)->icons->begin(); iter != (*icon)->icons->end(); iter++) {
-                    (*iter)->UpdateIcon();
-                }
-            }
-        }
-
-        // Check if we should update the tip
-
     }
     else {
         TRACE("Tried to modify non-existing icon");
@@ -175,10 +167,9 @@ void TrayManager::ModifyIcon(LPLSNOTIFYICONDATA pNID) {
 
 
 /// <summary>
-/// ?
+/// Returns the focus to one of the trays.
 /// </summary>
-void TrayManager::SetFocus(LPLSNOTIFYICONDATA pNID) {
-
+void TrayManager::SetFocus(LPLSNOTIFYICONDATA /* pNID */) {
 }
 
 
@@ -188,7 +179,9 @@ void TrayManager::SetFocus(LPLSNOTIFYICONDATA pNID) {
 void TrayManager::SetVersion(LPLSNOTIFYICONDATA pNID) {
     TRAYICONDATAITER icon = FindIcon(pNID);
     if (icon != g_currentIcons.end()) {
-        (*icon)->NID.uVersion = pNID->uVersion;
+        for (vector<TrayIcon*>::const_iterator iter = (*icon)->icons->begin(); iter != (*icon)->icons->end(); iter++) {
+            (*iter)->HandleSetVersion(pNID);
+        }
     }
 }
 

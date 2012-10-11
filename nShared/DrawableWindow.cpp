@@ -40,6 +40,7 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instan
     this->initialized = false;
     this->isTrackingMouse = false;
     this->msgHandler = msgHandler;
+    this->monitorInfo = new MonitorInfo();
     this->parent = NULL;
     this->renderTarget = NULL;
     this->settings = settings;
@@ -77,6 +78,7 @@ DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, Messa
     this->initialized = false;
     this->isTrackingMouse = false;
     this->msgHandler = msgHandler;
+    this->monitorInfo = parent->monitorInfo;
     this->parent = parent;
     this->renderTarget = NULL;
     this->settings = settings;
@@ -122,6 +124,10 @@ DrawableWindow::~DrawableWindow() {
 
     if (!this->parent) {
         SAFERELEASE(this->renderTarget);
+    }
+
+    if (!this->parent) {
+        SAFEDELETE(this->monitorInfo);
     }
 
     SAFERELEASE(this->backBrush);
@@ -369,6 +375,11 @@ DrawableWindow* DrawableWindow::CreateChild(Settings* childSettings, MessageHand
 }
 
 
+MonitorInfo* DrawableWindow::GetMonitorInformation() {
+    return this->monitorInfo;
+}
+
+
 /// <summary>
 /// Gets the screen position of the window.
 /// </summary>
@@ -603,6 +614,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         return 0;
 
     case WM_DISPLAYCHANGE:
+        this->monitorInfo->Update();
         return 0;
     }
 
