@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="IconExtractor.h" />
     <ClInclude Include="IParsedText.hpp" />
     <ClInclude Include="nCore.h" />
     <ClInclude Include="ParsedText.hpp" />
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Formatters.cpp" />
+    <ClCompile Include="IconExtractorService.cpp" />
     <ClCompile Include="InputParsing.cpp" />
     <ClCompile Include="nCore.cpp" />
     <ClCompile Include="ParsedText.cpp" />

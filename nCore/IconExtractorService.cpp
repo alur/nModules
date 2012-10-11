@@ -1,0 +1,7 @@
+
+
+namespace IconExtractorService {
+    bool closing;
+}
+
+

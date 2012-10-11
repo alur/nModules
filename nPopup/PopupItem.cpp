@@ -73,3 +73,33 @@ void PopupItem::AddIcon(HICON icon) {
 bool PopupItem::CompareTo(PopupItem* b) {
     return _wcsicmp(this->window->GetDrawingSettings()->text, b->window->GetDrawingSettings()->text) < 0;
 }
+
+
+void PopupItem::SetIcon(IExtractIconW* extractIcon) {
+    HICON icon;
+    WCHAR iconFile[MAX_PATH];
+    int iconIndex;
+    UINT flags;
+    HRESULT hr;
+
+    // Get the location of the file containing the appropriate icon, and the index of the icon.
+    extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);
+
+    // Extract the icon.
+    hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(64, 0));
+    if (hr == S_FALSE) {
+        // If the extraction failed, fall back to a 32x32 icon.
+        hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(32, 0));
+
+        if (hr == S_FALSE) {
+            hr = extractIcon->Extract(iconFile, iconIndex, NULL, &icon, MAKELONG(0, 16));
+        }
+    }
+
+    if (SUCCEEDED(hr)) {
+        AddIcon(icon);
+    }
+
+    // Let go of the interface.
+    extractIcon->Release();
+}

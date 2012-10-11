@@ -78,7 +78,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     WorkArea::LoadSettings(g_pMonitorInfo);
 
     g_pExplorerService = new ExplorerService();
-    g_pExplorerService->Start();
+    //g_pExplorerService->Start();
 
     return 0;
 }

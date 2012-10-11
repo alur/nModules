@@ -186,7 +186,7 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
             {
                 Popup* popup = new FolderPopup(title, NULL, prefix);
                 LoadPopup(f, POPUPLEVEL_FOLDER, &popup);
-                (*out)->AddItem(new FolderItem(*out, title, popup, icon));
+                (*out)->AddItem(new nPopup::FolderItem(*out, title, popup, icon));
             }
             break;
 
@@ -220,7 +220,7 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
 
         case POPUPLINETYPE_CONTENT:
             {
-                (*out)->AddItem(new FolderItem(*out, title, new ContentPopup(source, title, command, prefix), icon));
+                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(source, title, command, prefix), icon));
             }
             break;
 

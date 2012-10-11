@@ -11,6 +11,7 @@
 #include "../nShared/Drawable.hpp"
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/MessageHandler.hpp"
+#include <Shlobj.h>
 
 class PopupItem : public Drawable {
 public:
@@ -20,6 +21,7 @@ public:
     virtual LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM) = 0;
     int GetHeight();
     bool CompareTo(PopupItem* b);
+    void SetIcon(IExtractIconW* extractIcon);
 
 protected:
     bool ParseDotIcon(LPCSTR dotIcon);

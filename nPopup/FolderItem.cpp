@@ -14,21 +14,21 @@
 extern LSModule* g_LSModule;
 
 
-FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, LPCSTR customIcon) : PopupItem(parent, "FolderItem") {
+nPopup::FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, LPCSTR customIcon) : PopupItem(parent, "FolderItem") {
     Init(title, popup);
     ParseDotIcon(customIcon);
     this->window->Show();
 }
 
 
-FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, HICON icon) : PopupItem(parent, "FolderItem") {
+nPopup::FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, HICON icon) : PopupItem(parent, "FolderItem") {
     Init(title, popup);
     AddIcon(icon);
     this->window->Show();
 }
 
 
-void FolderItem::Init(LPCSTR title, Popup* popup) {
+void nPopup::FolderItem::Init(LPCSTR title, Popup* popup) {
     this->title = _strdup(title);
     this->popup = popup;
 
@@ -45,7 +45,7 @@ void FolderItem::Init(LPCSTR title, Popup* popup) {
 }
 
 
-FolderItem::~FolderItem() {
+nPopup::FolderItem::~FolderItem() {
     if (this->popup != NULL) {
         delete this->popup;
     }
@@ -53,7 +53,7 @@ FolderItem::~FolderItem() {
 }
 
 
-LRESULT FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
     case WM_MOUSEMOVE:
         {

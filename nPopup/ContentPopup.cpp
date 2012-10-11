@@ -121,7 +121,13 @@ void ContentPopup::LoadShellFolder(GUID folder) {
     SHGetKnownFolderIDList(folder, NULL, NULL, &idList);
     rootFolder->BindToObject(idList, NULL, IID_IShellFolder, reinterpret_cast<LPVOID*>(&targetFolder));
 
+    //
+    __int64 start, end, frequency;
+    QueryPerformanceCounter((LARGE_INTEGER*)&start);
     LoadFromIDList(targetFolder, idList);
+    QueryPerformanceCounter((LARGE_INTEGER*)&end);
+    QueryPerformanceFrequency((LARGE_INTEGER*)&frequency);
+    TRACE("LoadFromIDList took %d ms", (DWORD)((start-end)*1000)/frequency);
 
     CoTaskMemFree(idList);
     rootFolder->Release();
@@ -153,12 +159,11 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
     STRRET ret;
     LPSTR name, command;
     IExtractIconW* extractIcon;
-    HICON icon;
-    WCHAR iconFile[MAX_PATH];
-    int iconIndex;
-    UINT flags;
     SFGAOF attributes;
     char quotedCommand[MAX_LINE_LENGTH];
+    bool openable;
+    HRESULT hr;
+    PopupItem* item;
 
     // Enumerate the contents of this folder
     targetFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList);
@@ -170,52 +175,26 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
             if (SUCCEEDED(targetFolder->GetDisplayNameOf(idNext, SHGDN_FORPARSING, &ret))) {
                 StrRetToStr(&ret, NULL, &command);
 
-                //
-                targetFolder->GetAttributesOf(1, (LPCITEMIDLIST *)&idNext, &attributes);
+                // 
+                hr = targetFolder->GetAttributesOf(1, (LPCITEMIDLIST *)&idNext, &attributes);
+                openable = SUCCEEDED(hr) && ((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE);
 
-                // Get the IExtractIcon interface for this item.
-                HRESULT hr = targetFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&idNext, IID_IExtractIconW, NULL, reinterpret_cast<LPVOID*>(&extractIcon));
-
-                if (SUCCEEDED(hr)) {
-                    // Get the location of the file containing the appropriate icon, and the index of the icon.
-                    extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);
-
-                    // Extract the icon.
-                    hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(64, 0));
-                    if (hr == S_FALSE) {
-                        // If the extraction failed, fall back to a 32x32 icon.
-                        hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(32, 0));
-
-                        if (FAILED(hr)) {
-                            hr = extractIcon->Extract(iconFile, iconIndex, NULL, &icon, MAKELONG(0, 16));
-                        }
-                    }
-
-                    // Let go of the interface.
-                    extractIcon->Release();
-                }
-
-
-                bool openable = ((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE);
-
-                if (hr == S_OK) {
-                    if (openable) {
-                        AddItem(new FolderItem(this, name, new ContentPopup(command, false, name, NULL, this->settings->prefix), icon));
-                    }
-                    else {
-                        StringCchPrintf(quotedCommand, sizeof(quotedCommand), "\"%s\"", command);
-                        AddItem(new CommandItem(this, name, quotedCommand, icon));
-                    }
+                if (openable) {
+                    item = new nPopup::FolderItem(this, name, new ContentPopup(command, false, name, NULL, this->settings->prefix));
                 }
                 else {
-                    if (openable) {
-                        AddItem(new FolderItem(this, name, new ContentPopup(command, false, name, NULL, this->settings->prefix)));
-                    }
-                    else {
-                        StringCchPrintf(quotedCommand, sizeof(quotedCommand), "\"%s\"", command);
-                        AddItem(new CommandItem(this, name, quotedCommand));
-                    }
+                    StringCchPrintf(quotedCommand, sizeof(quotedCommand), "\"%s\"", command);
+                    item = new CommandItem(this, name, quotedCommand);
                 }
+
+                // Get the IExtractIcon interface for this item.
+                hr = targetFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&idNext, IID_IExtractIconW, NULL, reinterpret_cast<LPVOID*>(&extractIcon));
+
+                if (SUCCEEDED(hr)) {
+                    item->SetIcon(extractIcon);
+                }
+
+                AddItem(item);
 
                 CoTaskMemFree(command);
             }
