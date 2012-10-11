@@ -24,7 +24,7 @@ TrayIcon::TrayIcon(Drawable* parent, LPLSNOTIFYICONDATA pNID, Settings* parentSe
     // Init
     this->balloonIcon = NULL;
     this->callbackID = 0;
-    this->callbackMessage = -1;
+    this->callbackMessage = 0xFFFFFFFF;
     this->callbackWindow = NULL;
     this->icon = NULL;
     this->iconSize = 0;
@@ -35,6 +35,8 @@ TrayIcon::TrayIcon(Drawable* parent, LPLSNOTIFYICONDATA pNID, Settings* parentSe
     this->showingTip =  false;
     this->showTip = false;
     this->version = 0;
+    this->guid = GUID_NULL;
+    this->flags = 0;
 
     // Create the drawable window
     this->settings = parentSettings->CreateChild("Icon");
@@ -95,6 +97,11 @@ void TrayIcon::HandleModify(LPLSNOTIFYICONDATA pNID) {
     }
     if ((pNID->uFlags & NIF_TIP) == NIF_TIP) {
         mbstowcs(this->tip, pNID->szTip, TRAY_MAX_TIP_LENGTH);
+    }
+
+    if ((this->flags & NIF_GUID) != NIF_GUID && (pNID->uFlags & NIF_GUID) == NIF_GUID) {
+        this->flags &= NIF_GUID;
+        this->guid = pNID->guidItem;
     }
 
     // TODO::NIF_STATE
@@ -169,6 +176,17 @@ void TrayIcon::SendCallback(UINT message, WPARAM /* wParam */, LPARAM /* lParam 
 LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
     if (message >= WM_MOUSEFIRST && message <= WM_MOUSELAST && this->showTip) {
         if (message == WM_MOUSEMOVE && !this->showingTip) {
+            if (!IsWindow(this->callbackWindow)) {
+                // The icon went away...
+                LSNOTIFYICONDATA lsNID;
+                lsNID.cbSize = sizeof(lsNID);
+                lsNID.hWnd = this->callbackWindow;
+                lsNID.uID = this->callbackID;
+                lsNID.guidItem = this->guid;
+                lsNID.uFlags = this->flags & NIF_GUID;
+                PostMessage(g_LSModule->GetMessageWindow(), LM_SYSTRAY, NIM_DELETE, (LPARAM)&lsNID);
+                return 0;
+            }
             RECT r;
             this->showingTip = true;
             this->window->GetScreenRect(&r);
@@ -177,9 +195,11 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam,
 
         SendCallback(message, wParam, lParam);
         if (message == WM_RBUTTONUP) {
+            ((Tray*)this->parent)->HideTip();
             SendCallback(WM_CONTEXTMENU, wParam, lParam);
         }
         else if (message == WM_LBUTTONUP) {
+            ((Tray*)this->parent)->HideTip();
             SendCallback(NIN_SELECT, wParam, lParam);
         }
     }

@@ -48,4 +48,6 @@ private:
     UINT callbackID;
     UINT callbackMessage;
     HICON balloonIcon;
+    GUID guid;
+    DWORD flags;
 };

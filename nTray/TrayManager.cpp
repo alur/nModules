@@ -223,37 +223,35 @@ LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
     case LM_SYSTRAYINFOEVENT:
         {
             LPSYSTRAYINFOEVENT lpSTE = (LPSYSTRAYINFOEVENT)wParam;
+            TRAYICONDATAITER icon = FindIcon(lpSTE);
+            RECT r;
+
+            if (icon == g_currentIcons.end()) {
+                return FALSE;
+            }
+            GetScreenRect(icon, &r);
+
             switch (lpSTE->dwEvent) {
             case TRAYEVENT_GETICONPOS:
                 {
-                    TRAYICONDATAITER icon = FindIcon(lpSTE);
-                    if (icon != g_currentIcons.end()) {
-                        RECT r;
-                        GetScreenRect(icon, &r);
-                        *(LRESULT*)lParam = MAKELPARAM(r.left, r.top);
-                        return TRUE;
-                    }
+                    *(LRESULT*)lParam = MAKELPARAM(r.left, r.top);
                 }
                 break;
 
             case TRAYEVENT_GETICONSIZE:
                 {
-                    TRAYICONDATAITER icon = FindIcon(lpSTE);
-                    if (icon != g_currentIcons.end()) {
-                        RECT r;
-                        GetScreenRect(icon, &r);
-                        *(LRESULT*)lParam = MAKELPARAM(r.right - r.left, r.bottom - r.top);
-                        return TRUE;
-                    }
+                    *(LRESULT*)lParam = MAKELPARAM(r.right - r.left, r.bottom - r.top);
                 }
                 break;
 
             default:
-                TRACE("TrayManager::Unknown LM_SYSTRAYINFOEVENT: %u", lpSTE->dwEvent);
-                break;
+                {
+                    TRACE("TrayManager::Unknown LM_SYSTRAYINFOEVENT: %u", lpSTE->dwEvent);
+                }
+                return FALSE;
             }
         }
-        return FALSE;
+        return TRUE;
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
