@@ -68,6 +68,9 @@
     <ClInclude Include="Balloon.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PIDL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MonitorInfo.cpp">
@@ -122,6 +125,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Tooltip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PIDL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

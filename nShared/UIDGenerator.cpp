@@ -59,4 +59,6 @@ void UIDGenerator<TYPE>::ReleaseID(TYPE id) {
 void Generator() {
     UIDGenerator<UINT_PTR> u;
     u.ReleaseID(u.GetNewID());
+    UIDGenerator<UINT> u2;
+    u2.ReleaseID(u2.GetNewID());
 }

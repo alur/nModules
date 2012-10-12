@@ -49,6 +49,7 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instan
     this->textBrush = NULL;
     this->textFormat = NULL;
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
+    this->userMsgIDs = new UIDGenerator<UINT>(WM_USER);
     this->visible = false;
     this->window = MessageHandler::CreateMessageWindowEx(WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_COMPOSITED,
         windowClass, "", WS_POPUP, 0, 0, 0, 0, parent, NULL, instance, this);
@@ -87,6 +88,7 @@ DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, Messa
     this->textBrush = NULL;
     this->textFormat = NULL;
     this->timerIDs = NULL;
+    this->userMsgIDs = NULL;
     this->updateTextTimer = NULL;
     this->visible = false;
     this->window = parent->window;
@@ -408,6 +410,29 @@ void DrawableWindow::ClearCallbackTimer(UINT_PTR timer) {
 }
 
 
+UINT DrawableWindow::RegisterUserMessage(MessageHandler* msgHandler) {
+    if (!this->parent) {
+        UINT ret = this->userMsgIDs->GetNewID();
+        this->userMessages.insert(std::pair<UINT, MessageHandler*>(ret, msgHandler));
+        return ret;
+    }
+    else {
+        return this->parent->RegisterUserMessage(msgHandler);
+    }
+}
+
+
+void DrawableWindow::ReleaseUserMessage(UINT message) {
+    if (!this->parent) {
+        this->userMessages.erase(message);
+        this->userMsgIDs->ReleaseID(message);
+    }
+    else {
+        this->parent->ReleaseUserMessage(message);
+    }
+}
+
+
 UINT_PTR DrawableWindow::SetCallbackTimer(UINT elapse, MessageHandler* msgHandler) {
     if (!this->parent) {
         UINT_PTR ret = SetTimer(this->window, this->timerIDs->GetNewID(), elapse, NULL);
@@ -535,8 +560,8 @@ void DrawableWindow::SetText(LPCWSTR text) {
 /// Handles window messages for this drawablewindow.
 /// </summary>
 LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+    // Forward mouse messages to the lowest level child window which the mouse is over.
     if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) {
-        // Check if we should send it to a child window
         int xPos = GET_X_LPARAM(lParam); 
         int yPos = GET_Y_LPARAM(lParam);
         MessageHandler* handler = NULL;
@@ -570,6 +595,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         return handler->HandleMessage(window, msg, wParam, lParam);
     }
 
+    // Handle DrawableWindow messages.
     switch (msg) {
     case WM_MOUSELEAVE:
         {
@@ -617,6 +643,15 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         return 0;
     }
 
+    // Forward registered user messages.
+    if (msg >= WM_USER) {
+        map<UINT,MessageHandler*>::const_iterator handler = this->userMessages.find(msg);
+        if (handler != this->userMessages.end()) {
+            return handler->second->HandleMessage(window, msg, wParam, lParam);
+        }
+    }
+
+    // Let the default messagehandler deal with anything else, if it is initialized.
     if (this->msgHandler->initialized) {
         return this->msgHandler->HandleMessage(window, msg, wParam, lParam);
     }

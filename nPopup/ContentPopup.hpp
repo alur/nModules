@@ -30,6 +30,9 @@ public:
     explicit ContentPopup(LPCSTR path, bool dynamic, LPCSTR title, LPCSTR bang, LPCSTR prefix);
     virtual ~ContentPopup();
 
+    //
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+
 protected:
     void PreShow();
     void PostClose();
@@ -47,6 +50,9 @@ private:
     //
     void LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE idList);
 
+    //
+    void LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE itemID);
+
     // True if the content needs to be reloaded every time the popup is shown.
     bool dynamic;
 
@@ -58,4 +64,10 @@ private:
 
     // What to retrive the popup contents from.
     ContentSource source;
+
+    // Message, SHChangeNofityRegister return value, IShellFolder
+    typedef map<UINT, std::pair<ULONG, IShellFolder*> > WATCHFOLDERMAP;
+
+    // Folders which this popup is watching for changes.
+    WATCHFOLDERMAP watchedFolders;
 };

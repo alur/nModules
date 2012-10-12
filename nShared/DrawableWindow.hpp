@@ -90,14 +90,23 @@ public:
     // Initializes the DrawableWindow.
     void Initialize(DrawableSettings* defaultSettings);
 
-    // Sets the message handler for this window.
-    void SetMessageHandler(MessageHandler* msgHandler);
+    // Moves this window.
+    void Move(int x, int y);
+
+    // Registers a user message
+    UINT RegisterUserMessage(MessageHandler* msgHandler);
+
+    // Unregisters a user message
+    void ReleaseUserMessage(UINT message);
+
+    // Forces this window to redraw.
+    void Repaint(LPRECT region = NULL);
 
     // Registers a timer
     UINT_PTR SetCallbackTimer(UINT elapse, MessageHandler* msgHandler);
 
-    // Moves this window.
-    void Move(int x, int y);
+    // Sets the message handler for this window.
+    void SetMessageHandler(MessageHandler* msgHandler);
 
     // Sets the paragraph alignment of this drawablewindow.
     void SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT alignment);
@@ -110,9 +119,6 @@ public:
 
     // Sets the text alignment of this drawablewindow.
     void SetTextAlignment(DWRITE_TEXT_ALIGNMENT alignment);
-
-    // Forces this window to redraw.
-    void Repaint(LPRECT region = NULL);
 
     // Shows this window.
     void Show();
@@ -199,6 +205,12 @@ private:
 
     //
     UINT_PTR updateTextTimer;
+
+    //
+    UIDGenerator<UINT>* userMsgIDs;
+
+    //
+    map<UINT, MessageHandler*> userMessages;
 
     // Whether or not we are visible.
     bool visible;

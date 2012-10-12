@@ -13,6 +13,7 @@
 #include "FolderItem.hpp"
 #include <Shlwapi.h>
 #include <algorithm>
+#include "../nShared/PIDL.h"
 
 
 ContentPopup::ContentPopup(ContentSource source, LPCSTR title, LPCSTR bang, LPCSTR prefix) : Popup(title, bang, prefix) {
@@ -31,6 +32,12 @@ ContentPopup::ContentPopup(LPCSTR path, bool dynamic, LPCSTR title, LPCSTR bang,
 
 
 ContentPopup::~ContentPopup() {
+    for (WATCHFOLDERMAP::const_iterator iter = this->watchedFolders.begin(); iter != this->watchedFolders.end(); ++iter) {
+        iter->second.second->Release();
+        this->window->ReleaseUserMessage(iter->first);
+        SHChangeNotifyDeregister(iter->second.first);
+    }
+
     for (list<LPCSTR>::const_iterator iter = paths.begin(); iter != paths.end(); ++iter) {
         free((LPVOID)*iter);
     }
@@ -156,6 +163,32 @@ void ContentPopup::LoadPath(LPCSTR path) {
 void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE idList) {
     PIDLIST_RELATIVE idNext;
     IEnumIDList* enumIDList;
+
+    // Enumerate the contents of this folder
+    targetFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList);
+    while (enumIDList->Next(1, &idNext, NULL) != S_FALSE) {
+        LoadSingleItem(targetFolder, idNext);
+    }
+    enumIDList->Release();
+
+    // Register for change notifications
+    SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
+    UINT message = this->window->RegisterUserMessage(this);
+    ULONG shnrUID = SHChangeNotifyRegister(
+        this->window->GetWindow(),
+        SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
+        SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM,
+        message,
+        1,
+        watchEntries);
+
+    this->watchedFolders.insert(WATCHFOLDERMAP::value_type(message, std::pair<UINT, IShellFolder*>(shnrUID, targetFolder)));
+
+    CoTaskMemFree(idNext);
+}
+
+
+void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE itemID) {
     STRRET ret;
     LPSTR name, command;
     IExtractIconW* extractIcon;
@@ -165,45 +198,78 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
     HRESULT hr;
     PopupItem* item;
 
-    // Enumerate the contents of this folder
-    targetFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList);
-    while (enumIDList->Next(1, &idNext, NULL) != S_FALSE) {
+    if (SUCCEEDED(targetFolder->GetDisplayNameOf(itemID, SHGDN_NORMAL, &ret))) {
+        StrRetToStr(&ret, NULL, &name);
+        if (SUCCEEDED(targetFolder->GetDisplayNameOf(itemID, SHGDN_FORPARSING, &ret))) {
+            StrRetToStr(&ret, NULL, &command);
 
+            // 
+            attributes = SFGAO_BROWSABLE | SFGAO_FOLDER;
+            hr = targetFolder->GetAttributesOf(1, (LPCITEMIDLIST *)&itemID, &attributes);
+            openable = SUCCEEDED(hr) && ((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE);
 
-        if (SUCCEEDED(targetFolder->GetDisplayNameOf(idNext, SHGDN_NORMAL, &ret))) {
-            StrRetToStr(&ret, NULL, &name);
-            if (SUCCEEDED(targetFolder->GetDisplayNameOf(idNext, SHGDN_FORPARSING, &ret))) {
-                StrRetToStr(&ret, NULL, &command);
-
-                // 
-                attributes = SFGAO_BROWSABLE | SFGAO_FOLDER;
-                hr = targetFolder->GetAttributesOf(1, (LPCITEMIDLIST *)&idNext, &attributes);
-                openable = SUCCEEDED(hr) && ((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE);
-
-                if (openable) {
-                    item = new nPopup::FolderItem(this, name, new ContentPopup(command, false, name, NULL, this->settings->prefix));
-                }
-                else {
-                    StringCchPrintf(quotedCommand, sizeof(quotedCommand), "\"%s\"", command);
-                    item = new CommandItem(this, name, quotedCommand);
-                }
-
-                // Get the IExtractIcon interface for this item.
-                hr = targetFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&idNext, IID_IExtractIconW, NULL, reinterpret_cast<LPVOID*>(&extractIcon));
-
-                if (SUCCEEDED(hr)) {
-                    item->SetIcon(extractIcon);
-                }
-
-                AddItem(item);
-
-                CoTaskMemFree(command);
+            if (openable) {
+                item = new nPopup::FolderItem(this, name, new ContentPopup(command, false, name, NULL, this->settings->prefix));
             }
-            CoTaskMemFree(name);
+            else {
+                StringCchPrintf(quotedCommand, sizeof(quotedCommand), "\"%s\"", command);
+                item = new CommandItem(this, name, quotedCommand);
+            }
+
+            // Get the IExtractIcon interface for this item.
+            hr = targetFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&itemID, IID_IExtractIconW, NULL, reinterpret_cast<LPVOID*>(&extractIcon));
+
+            if (SUCCEEDED(hr)) {
+                item->SetIcon(extractIcon);
+            }
+
+            AddItem(item);
+
+            CoTaskMemFree(command);
+        }
+        CoTaskMemFree(name);
+    }
+}
+
+
+LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    if (message >= WM_USER) {
+        WATCHFOLDERMAP::const_iterator folder = this->watchedFolders.find(message);
+        if (folder != this->watchedFolders.end()) {
+            long event;
+            PIDLIST_ABSOLUTE* idList;
+            HANDLE notifyLock = SHChangeNotification_Lock((HANDLE)wParam, (DWORD)lParam, &idList, &event);
+
+            if (notifyLock) {
+                // TODO::Have to handle deletes and renames as well
+                switch (event) {
+                case SHCNE_CREATE:
+                case SHCNE_MKDIR:
+                    {
+                        LoadSingleItem(folder->second.second, (PIDLIST_RELATIVE)PIDL::GetLastPIDLItem(idList[0]));
+                        std::sort(this->items.begin(), this->items.end(), sorter);
+                    }
+                    break;
+
+                // A non-folder item has been renamed.
+                case SHCNE_RENAMEITEM:
+                    {
+                        //TRACEW(L"Non-Folder renamed: %s -> %s", file1, file2);
+                    }
+                    break;
+
+                // A folder has been renamed.
+                case SHCNE_RENAMEFOLDER:
+                    {
+                        //TRACEW(L"Folder renamed: %s -> %s", file1, file2);
+                    }
+                    break;
+                }
+
+                SHChangeNotification_Unlock(notifyLock);
+            }
+            return 0;
         }
     }
-    enumIDList->Release();
-
-    CoTaskMemFree(idNext);
-    targetFolder->Release();
+    return Popup::HandleMessage(window, message, wParam, lParam); 
 }

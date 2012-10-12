@@ -42,9 +42,6 @@ private:
     void PositionIcon(PCITEMID_CHILD pidl, D2D1_RECT_F* position);
 
     //
-    PCITEMID_CHILD GetLastPIDLItem(LPITEMIDLIST pidl);
-
-    //
     vector<Icon*>::iterator FindIcon(PCITEMID_CHILD pidl);
 
     // All icons currently part of this group.

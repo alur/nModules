@@ -34,6 +34,7 @@
     <ClInclude Include="Math.h" />
     <ClInclude Include="MonitorInfo.hpp" />
     <ClInclude Include="nShared.h" />
+    <ClInclude Include="PIDL.h" />
     <ClInclude Include="Settings.hpp" />
     <ClInclude Include="Tooltip.hpp" />
     <ClInclude Include="UIDGenerator.hpp" />
@@ -54,6 +55,7 @@
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="MessageHandler.cpp" />
     <ClCompile Include="MonitorInfo.cpp" />
+    <ClCompile Include="PIDL.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Tooltip.cpp" />
     <ClCompile Include="UIDGenerator.cpp" />

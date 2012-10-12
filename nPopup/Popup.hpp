@@ -21,6 +21,7 @@ public:
     virtual ~Popup();
 
     void AddItem(PopupItem* item);
+    void RemoveItem(PopupItem* item);
     void Show();
     void Show(int x, int y, Popup* owner = NULL);
     

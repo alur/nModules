@@ -12,6 +12,7 @@
 #include "../nShared/Macros.h"
 #include "../nShared/Debugging.h"
 #include "../nShared/LSModule.hpp"
+#include "../nShared/PIDL.h"
 
 // 
 extern LSModule* g_LSModule;
@@ -118,17 +119,6 @@ void IconGroup::AddIcon(PCITEMID_CHILD pidl) {
 }
 
 
-PCITEMID_CHILD IconGroup::GetLastPIDLItem(LPITEMIDLIST pidl) {
-    LPITEMIDLIST ret = pidl;
-    USHORT lastCB = 0;
-    while (ret->mkid.cb != 0) {
-        lastCB = ret->mkid.cb;
-        ret = LPITEMIDLIST(((LPBYTE)ret)+lastCB);
-    }
-    return LPITEMIDLIST(((LPBYTE)ret)-lastCB);
-}
-
-
 void IconGroup::PositionIcon(PCITEMID_CHILD pidl, D2D1_RECT_F* position) {
     static float pos = 5;
     position->bottom = 64;
@@ -209,7 +199,7 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
                 case SHCNE_CREATE:
                     {
                         TRACEW(L"File created: %s", file1);
-                        AddIcon(GetLastPIDLItem(idList[0]));
+                        AddIcon(PIDL::GetLastPIDLItem(idList[0]));
                     }
                     break;
 
@@ -224,7 +214,7 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
                 case SHCNE_MKDIR:
                     {
                         TRACEW(L"The folder %s was created", file1);
-                        AddIcon(GetLastPIDLItem(idList[0]));
+                        AddIcon(PIDL::GetLastPIDLItem(idList[0]));
                     }
                     break;
 
