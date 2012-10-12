@@ -176,6 +176,7 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
                 StrRetToStr(&ret, NULL, &command);
 
                 // 
+                attributes = SFGAO_BROWSABLE | SFGAO_FOLDER;
                 hr = targetFolder->GetAttributesOf(1, (LPCITEMIDLIST *)&idNext, &attributes);
                 openable = SUCCEEDED(hr) && ((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE);
 

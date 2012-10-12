@@ -78,7 +78,7 @@ bool PopupItem::CompareTo(PopupItem* b) {
 
 
 void PopupItem::SetIcon(IExtractIconW* extractIcon) {
-    HICON icon;
+    HICON icon = NULL;
     WCHAR iconFile[MAX_PATH];
     int iconIndex = 0;
     UINT flags;
