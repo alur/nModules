@@ -31,6 +31,7 @@ CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, HICON i
 void CommandItem::Init(LPCSTR title, LPCSTR command) {
     this->title = _strdup(title);
     this->command = _strdup(command);
+    this->itemType = PopupItemType::COMMAND;
 
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 190;

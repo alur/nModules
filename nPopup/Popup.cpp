@@ -14,7 +14,6 @@
 
 
 extern LSModule* g_LSModule;
-static MonitorInfo g_MonitorInfo;
 
 
 Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
@@ -136,6 +135,8 @@ void Popup::Show(int x, int y, Popup* owner) {
     PreShow();
     this->owner = owner;
 
+    MonitorInfo* monInfo = this->window->GetMonitorInformation();
+
     if (!this->sized) {
         int width = 200, height = this->padding.top;
         for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
@@ -144,8 +145,8 @@ void Popup::Show(int x, int y, Popup* owner) {
         }
         height += this->padding.bottom - this->itemSpacing;
 
-        if (height > g_MonitorInfo.m_virtualDesktop.height) {
-            int columns = (height - this->padding.top - this->padding.bottom)/(g_MonitorInfo.m_virtualDesktop.height - this->padding.top - this->padding.bottom) + 1;
+        if (height > monInfo->m_virtualDesktop.height) {
+            int columns = (height - this->padding.top - this->padding.bottom)/(monInfo->m_virtualDesktop.height - this->padding.top - this->padding.bottom) + 1;
             width = 200 * columns + this->itemSpacing*(columns - 1);
             height = this->padding.top;
             int column = 0;
@@ -160,14 +161,17 @@ void Popup::Show(int x, int y, Popup* owner) {
                     column = 0;
                 }
             }
-            height += this->padding.bottom;
+            if (column != 0) {
+                height += rowHeight;
+            }
+            height += this->padding.bottom - this->itemSpacing;
         }
         this->window->SetPosition(x, y, width, height);
         this->sized = true;
     }
 
-    x = max(g_MonitorInfo.m_virtualDesktop.rect.left, min(g_MonitorInfo.m_virtualDesktop.rect.right - this->window->GetDrawingSettings()->width, x));
-    y = max(g_MonitorInfo.m_virtualDesktop.rect.top, min(g_MonitorInfo.m_virtualDesktop.rect.bottom - this->window->GetDrawingSettings()->height, y));
+    x = max(monInfo->m_virtualDesktop.rect.left, min(monInfo->m_virtualDesktop.rect.right - this->window->GetDrawingSettings()->width, x));
+    y = max(monInfo->m_virtualDesktop.rect.top, min(monInfo->m_virtualDesktop.rect.bottom - this->window->GetDrawingSettings()->height, y));
 
     this->window->Move(x, y);
 

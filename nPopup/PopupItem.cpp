@@ -16,6 +16,7 @@ extern LSModule* g_LSModule;
 
 PopupItem::PopupItem(Drawable* parent, LPCSTR prefix) : Drawable(parent, prefix) {
     this->iconSettings = this->settings->CreateChild("Icon");
+    this->itemType = PopupItemType::SEPARATOR;
 }
 
 
@@ -73,7 +74,7 @@ void PopupItem::AddIcon(HICON icon) {
 
 
 bool PopupItem::CompareTo(PopupItem* b) {
-    return _wcsicmp(this->window->GetDrawingSettings()->text, b->window->GetDrawingSettings()->text) < 0;
+    return this->itemType > b->itemType || this->itemType == b->itemType && _wcsicmp(this->window->GetDrawingSettings()->text, b->window->GetDrawingSettings()->text) < 0;
 }
 
 

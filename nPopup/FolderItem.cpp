@@ -31,6 +31,7 @@ nPopup::FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, HIC
 void nPopup::FolderItem::Init(LPCSTR title, Popup* popup) {
     this->title = _strdup(title);
     this->popup = popup;
+    this->itemType = PopupItemType::FOLDER;
 
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 190;

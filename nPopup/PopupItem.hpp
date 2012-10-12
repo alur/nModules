@@ -24,9 +24,18 @@ public:
     void SetIcon(IExtractIconW* extractIcon);
 
 protected:
+    enum PopupItemType {
+        COMMAND = 0,
+        INFO,
+        FOLDER,
+        SEPARATOR
+    };
+    
     bool ParseDotIcon(LPCSTR dotIcon);
     void AddIcon(HICON icon);
 
     Settings* iconSettings;
+
+    UINT itemType;
 
 };
