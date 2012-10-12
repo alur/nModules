@@ -232,10 +232,9 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     //
     SetPosition(this->drawingSettings->x, this->drawingSettings->y, this->drawingSettings->width, this->drawingSettings->height);
 
-    BOOL b;
     if (!this->parent && this->drawingSettings->alwaysOnTop) {
         SetParent(this->window, NULL);
-        b = SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+        SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
     }
 
     // Create the text format

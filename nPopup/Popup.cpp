@@ -73,15 +73,16 @@ void Popup::CloseChild() {
 }
 
 
-void Popup::OpenChild(Popup* child, int y) {
+void Popup::OpenChild(Popup* child, int y, int x) {
     if (child != this->openChild) {
         if (this->openChild != NULL) {
             this->openChild->Close(false);
         }
-        RECT r;
-        this->window->GetScreenRect(&r);
+        //RECT r;
+        //this->window->GetScreenRect(&r);
         this->openChild = child;
-        this->openChild->Show(r.right, y, this);
+        //this->openChild->Show(r.right, y, this);
+        this->openChild->Show(x+this->padding.right, y, this);
     }
 }
 

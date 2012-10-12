@@ -69,13 +69,13 @@ HRESULT TShellDesktopTray::GetTrayWindow(HWND *hTrayWnd)
 }
 
 
-HRESULT TShellDesktopTray::RegisterDesktopWindow(HWND d)
+HRESULT TShellDesktopTray::RegisterDesktopWindow(HWND)
 {
     return S_OK;
 }
 
 
-HRESULT TShellDesktopTray::SetVar(int p1, ULONG p2)
+HRESULT TShellDesktopTray::SetVar(int, ULONG)
 {
     return S_OK;
 }

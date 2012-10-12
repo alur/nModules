@@ -25,7 +25,7 @@ public:
     void Show(int x, int y, Popup* owner = NULL);
     
     // Called by PopupItems
-    void OpenChild(Popup*, int y);
+    void OpenChild(Popup*, int y, int x);
     void CloseChild();
 
     // Called by child popups
