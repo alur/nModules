@@ -12,7 +12,7 @@
 bool initialized = false;
 
 // Pointers to the functions in the core.
-int (__stdcall * _pGetVersion)();
+VERSION (__stdcall * _pGetVersion)();
 
 
 /// <summary>
@@ -30,13 +30,16 @@ HRESULT nCore::Init(VERSION minVersion) {
 
     HMODULE hCoreInstance = (HMODULE)GetWindowLongPtr(coreHWnd, GWLP_USERDATA);
     
-    INIT_FUNC(_pGetVersion,int (__stdcall *)(),"GetCoreVersion")
+    INIT_FUNC(_pGetVersion,VERSION (__stdcall *)(),"GetCoreVersion")
 
     // Should check the version here
     VERSION coreVersion = GetVersion();
+    // The major version must be the same
     if (GetMajorVersion(minVersion) != GetMajorVersion(coreVersion)) {
         return E_FAIL;
     }
+    // The minor version must be >=
+    // If the minor version ==, the patch version must be >=
     
     HRESULT hr;
     if (!SUCCEEDED(hr = System::Init(hCoreInstance))) return hr;
