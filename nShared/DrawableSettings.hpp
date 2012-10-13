@@ -70,6 +70,9 @@ public:
     // The width of the window. Default: 100
     int width;
 
+    // Wordwrap. Default: False
+    bool wordWrap;
+
     // The x position of the window, relative to the parent. Default: 0
     int x;
 

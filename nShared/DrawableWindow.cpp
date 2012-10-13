@@ -268,6 +268,8 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     else
         this->textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
+    this->textFormat->SetWordWrapping(this->drawingSettings->wordWrap ? DWRITE_WORD_WRAPPING_WRAP : DWRITE_WORD_WRAPPING_NO_WRAP);
+
     SetText(this->drawingSettings->text);
 
     this->initialized = true;

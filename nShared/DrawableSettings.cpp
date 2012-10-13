@@ -31,6 +31,7 @@ DrawableSettings::DrawableSettings() {
     this->textRotation = 0.0f;
     StringCchCopy(this->textVerticalAlign, sizeof(this->textVerticalAlign), "Top");
     this->width = 100;
+    this->wordWrap = false;
     this->x = 0;
     this->y = 0;
 }
@@ -65,6 +66,7 @@ void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
     this->textRotation = settings->GetFloat("TextRotation", defaults->textRotation);
     settings->GetString("TextVerticalAlign", this->textVerticalAlign, sizeof(this->textVerticalAlign), defaults->textVerticalAlign);
     this->width = settings->GetInt("Width", defaults->width);
+    this->wordWrap = settings->GetBool("WordWrap", defaults->wordWrap);
     this->x = settings->GetInt("X", defaults->x);
     this->y = settings->GetInt("Y", defaults->y);
 }
