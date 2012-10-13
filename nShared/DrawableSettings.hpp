@@ -64,6 +64,9 @@ public:
     // Text rotation. Default: 0
     float textRotation;
 
+    // The trimming setting. None, Character, Word. Default: Character
+    char textTrimmingGranularity[16];
+
     // The vertical alignment of the text. Bottom, Middle, Top. Default: 0
     char textVerticalAlign[8];
 

@@ -268,8 +268,23 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     else
         this->textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
+    // Set the trimming method
+    DWRITE_TRIMMING trimmingOptions;
+    trimmingOptions.delimiter = 0;
+    trimmingOptions.delimiterCount = 0;
+    if (_stricmp(this->drawingSettings->textTrimmingGranularity, "None") == 0)
+        trimmingOptions.granularity = DWRITE_TRIMMING_GRANULARITY_NONE;
+    else if (_stricmp(this->drawingSettings->textVerticalAlign, "Word") == 0)
+        trimmingOptions.granularity = DWRITE_TRIMMING_GRANULARITY_WORD;
+    else
+        trimmingOptions.granularity = DWRITE_TRIMMING_GRANULARITY_CHARACTER;
+
+    this->textFormat->SetTrimming(&trimmingOptions, NULL);
+
+    // Set word wrapping
     this->textFormat->SetWordWrapping(this->drawingSettings->wordWrap ? DWRITE_WORD_WRAPPING_WRAP : DWRITE_WORD_WRAPPING_NO_WRAP);
 
+    // Set the text
     SetText(this->drawingSettings->text);
 
     this->initialized = true;
