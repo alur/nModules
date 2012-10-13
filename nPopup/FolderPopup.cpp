@@ -21,8 +21,10 @@ FolderPopup::~FolderPopup() {
 
 
 void FolderPopup::PreShow() {
+
 }
 
 
 void FolderPopup::PostClose() {
+
 }

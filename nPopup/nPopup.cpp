@@ -224,6 +224,18 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
             }
             break;
 
+        case POPUPLINETYPE_CONTENTPATH:
+            {
+                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(command, false, title, "", prefix), icon));
+            }
+            break;
+
+        case POPUPLINETYPE_CONTENTPATHDYNAMIC:
+            {
+                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(command, true, title, "", prefix), icon));
+            }
+            break;
+
         case POPUPLINETYPE_INFO:
             {
                 (*out)->AddItem(new InfoItem(*out, title, icon));
@@ -358,6 +370,18 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
             else if (_stricmp(token, "!PopupStartMenu") == 0) {
                 *source = ContentPopup::ContentSource::START_MENU;
                 return POPUPLINETYPE_CONTENT;
+            }
+            else if (_strnicmp(token, "!PopupFolder:", strlen("!PopupFolder:")) == 0) {
+                *source = ContentPopup::ContentSource::PATH;
+                StringCchCopy(command, cchCommand, commandPointer + strlen("!PopupFolder:") + 1);
+                command[strlen(command)-1] = 0;
+                return POPUPLINETYPE_CONTENTPATH;
+            }
+            else if (_strnicmp(token, "!PopupDynamicFolder:", strlen("!PopupDynamicFolder:")) == 0) {
+                *source = ContentPopup::ContentSource::PATH;
+                StringCchCopy(command, cchCommand, commandPointer + strlen("!PopupDynamicFolder:") + 1);
+                command[strlen(command)-1] = 0;
+                return POPUPLINETYPE_CONTENTPATHDYNAMIC;
             }
             else {
                 StringCchCopy(command, cchCommand, commandPointer);

@@ -17,10 +17,16 @@ EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
 // Dynamic text -- Syntax
 //----------------------------------------------------------------------------
 // Sample: "Text and stuff [function2(12) add function3('4', true)] some more text ..."
-// 
+//         "Some [if function(1)]A[elseif function2(2)]B[else]C[endif] character"
 // Text:
 //  .*
 //  Text[Expression]Text
+//  Text[If Expression]IfInternal[Endif]Text
+//
+// IfInternal:
+//  Text[ElseIf Expression]IfInternal
+//  Text[Else]Text
+//  Text
 //
 // Expression:
 //  Constant
@@ -51,8 +57,8 @@ EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
 //  [+-]?[0-9]+
 //
 // Boolean:
-//  true
-//  false
+//  True
+//  False
 //
 
 
@@ -89,7 +95,6 @@ EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
 // Next # of args characters -> argument types, in order.
 // Remainder, function name followed by terminating null.
 // e.g. Boolean IAmAFunction(Integer, String) -> 2123IAmAFunction.
-//
 // 
 
 
