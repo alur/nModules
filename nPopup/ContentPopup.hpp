@@ -42,16 +42,16 @@ private:
     void LoadContent();
 
     //
-    void LoadShellFolder(GUID folder);
+    void LoadShellFolder(GUID folder, bool dontExpandFolders = false);
 
     //
     void LoadPath(LPCSTR path);
 
     //
-    void LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE idList);
+    void LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE idList, bool dontExpandFolders);
 
     //
-    void LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE itemID);
+    void LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE itemID, bool dontExpandFolders);
 
     // True if the content needs to be reloaded every time the popup is shown.
     bool dynamic;

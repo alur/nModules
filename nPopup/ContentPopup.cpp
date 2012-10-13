@@ -77,7 +77,7 @@ void ContentPopup::LoadContent() {
         break;
 
     case CONTROL_PANEL:
-        LoadShellFolder(FOLDERID_ControlPanelFolder);
+        LoadShellFolder(FOLDERID_ControlPanelFolder, true);
         break;
 
     case MY_COMPUTER:
@@ -119,7 +119,7 @@ void ContentPopup::LoadContent() {
 }
 
 
-void ContentPopup::LoadShellFolder(GUID folder) {
+void ContentPopup::LoadShellFolder(GUID folder, bool dontExpandFolders) {
     PIDLIST_ABSOLUTE idList;
     IShellFolder *targetFolder, *rootFolder;
 
@@ -127,17 +127,14 @@ void ContentPopup::LoadShellFolder(GUID folder) {
     SHGetDesktopFolder(reinterpret_cast<IShellFolder**>(&rootFolder));
     SHGetKnownFolderIDList(folder, NULL, NULL, &idList);
     rootFolder->BindToObject(idList, NULL, IID_IShellFolder, reinterpret_cast<LPVOID*>(&targetFolder));
+    rootFolder->Release();
 
     //
-    __int64 start, end, frequency;
-    QueryPerformanceCounter((LARGE_INTEGER*)&start);
-    LoadFromIDList(targetFolder, idList);
-    QueryPerformanceCounter((LARGE_INTEGER*)&end);
-    QueryPerformanceFrequency((LARGE_INTEGER*)&frequency);
-    TRACE("LoadFromIDList took %d ms", (DWORD)((start-end)*1000)/frequency);
+    LoadFromIDList(targetFolder, idList, dontExpandFolders);
 
-    CoTaskMemFree(idList);
-    rootFolder->Release();
+    if (idList != NULL) {
+        CoTaskMemFree(idList);
+    }
 }
 
 
@@ -154,22 +151,26 @@ void ContentPopup::LoadPath(LPCSTR path) {
     rootFolder->BindToObject(idList, NULL, IID_IShellFolder, reinterpret_cast<LPVOID*>(&targetFolder));
     rootFolder->Release();
     
-    if (targetFolder != NULL && idList != NULL) {
-        LoadFromIDList(targetFolder, idList);
+    LoadFromIDList(targetFolder, idList, false);
 
+    if (idList != NULL) {
         CoTaskMemFree(idList);
     }
 }
 
 
-void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE idList) {
+void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE idList, bool dontExpandFolders) {
     PIDLIST_RELATIVE idNext = NULL;
     IEnumIDList* enumIDList;
+
+    if (targetFolder == NULL || idList == NULL) {
+        return;
+    }
 
     // Enumerate the contents of this folder
     targetFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList);
     while (enumIDList->Next(1, &idNext, NULL) != S_FALSE) {
-        LoadSingleItem(targetFolder, idNext);
+        LoadSingleItem(targetFolder, idNext, dontExpandFolders);
     }
     enumIDList->Release();
 
@@ -192,7 +193,7 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
 }
 
 
-void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE itemID) {
+void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE itemID, bool dontExpandFolders) {
     STRRET ret;
     LPSTR name, command;
     IExtractIconW* extractIcon;
@@ -210,7 +211,7 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
             // 
             attributes = SFGAO_BROWSABLE | SFGAO_FOLDER;
             hr = targetFolder->GetAttributesOf(1, (LPCITEMIDLIST *)&itemID, &attributes);
-            openable = SUCCEEDED(hr) && ((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE);
+            openable = SUCCEEDED(hr) && !dontExpandFolders && (((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE));
 
             if (openable) {
                 item = new nPopup::FolderItem(this, name, new ContentPopup(command, false, name, NULL, this->settings->prefix));
@@ -250,7 +251,7 @@ LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wPa
                 case SHCNE_CREATE:
                 case SHCNE_MKDIR:
                     {
-                        LoadSingleItem(folder->second.second, (PIDLIST_RELATIVE)PIDL::GetLastPIDLItem(idList[0]));
+                        LoadSingleItem(folder->second.second, (PIDLIST_RELATIVE)PIDL::GetLastPIDLItem(idList[0]), false);
                         std::sort(this->items.begin(), this->items.end(), sorter);
                     }
                     break;
