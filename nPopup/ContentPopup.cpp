@@ -142,7 +142,7 @@ void ContentPopup::LoadShellFolder(GUID folder) {
 
 
 void ContentPopup::LoadPath(LPCSTR path) {
-    PIDLIST_ABSOLUTE idList;
+    PIDLIST_ABSOLUTE idList = NULL;
     IShellFolder *targetFolder, *rootFolder;
     WCHAR widePath[MAX_PATH];
 
@@ -152,11 +152,13 @@ void ContentPopup::LoadPath(LPCSTR path) {
     SHGetDesktopFolder(reinterpret_cast<IShellFolder**>(&rootFolder));
     rootFolder->ParseDisplayName(NULL, NULL, widePath, NULL, &idList, NULL);
     rootFolder->BindToObject(idList, NULL, IID_IShellFolder, reinterpret_cast<LPVOID*>(&targetFolder));
-
-    LoadFromIDList(targetFolder, idList);
-
-    CoTaskMemFree(idList);
     rootFolder->Release();
+    
+    if (targetFolder != NULL && idList != NULL) {
+        LoadFromIDList(targetFolder, idList);
+
+        CoTaskMemFree(idList);
+    }
 }
 
 
