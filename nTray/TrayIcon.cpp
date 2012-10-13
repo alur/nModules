@@ -81,6 +81,7 @@ void TrayIcon::Show() {
 /// </summary>
 void TrayIcon::HandleAdd(LiteStep::LPLSNOTIFYICONDATA pNID) {
     this->callbackWindow = pNID->hWnd;
+    this->callbackID = pNID->uID;
     HandleModify(pNID);
 }
 
@@ -100,7 +101,7 @@ void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
         if (this->showingTip) {
             RECT r;
             this->window->GetScreenRect(&r);
-            ((Tray*)this->parent)->ShowTip(r.left + this->iconSize/2, r.top, this->tip);
+            ((Tray*)this->parent)->ShowTip(this->tip, &r);
         }
     }
 
@@ -195,7 +196,7 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam,
             RECT r;
             this->showingTip = true;
             this->window->GetScreenRect(&r);
-            ((Tray*)this->parent)->ShowTip(r.left + this->iconSize/2, r.top, this->tip);
+            ((Tray*)this->parent)->ShowTip(this->tip, &r);
         }
 
         SendCallback(message, wParam, lParam);

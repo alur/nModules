@@ -62,6 +62,7 @@ void TaskButton::SetIcon(HICON icon) {
             (float)this->iconSettings->GetInt("Width", 32) + (float)this->iconSettings->GetInt("X", 0),
             (float)this->iconSettings->GetInt("Height", 32)+ (float)this->iconSettings->GetInt("Y", 0) };
         this->window->AddOverlay(f, icon);
+        this->window->Repaint();
     }
 }
 

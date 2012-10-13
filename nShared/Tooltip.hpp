@@ -14,7 +14,7 @@ public:
     explicit Tooltip(LPCSTR prefix);
     virtual ~Tooltip();
 
-    void Show(LPCWSTR text, int x, int y, int duration);
+    void Show(LPCWSTR text, LPRECT position, int duration);
     void Hide();
 
     void LoadSettings(bool = false);

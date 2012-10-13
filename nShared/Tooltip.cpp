@@ -35,9 +35,12 @@ Tooltip::~Tooltip() {
 }
 
 
-void Tooltip::Show(LPCWSTR text, int x, int y, int duration) {
+void Tooltip::Show(LPCWSTR text, LPRECT position, int duration) {
     this->window->SetText(text);
     this->window->SizeToText(this->maxWidth, this->maxHeight);
+
+    int x = position->left + (position->right - position->left)/2;
+    int y = position->top;
 
     // Show it centerd on x, 5 px above, while forcing it to stay on the virtual desktop
     MonitorInfo* monInfo = this->window->GetMonitorInformation();

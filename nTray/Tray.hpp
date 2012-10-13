@@ -2,7 +2,7 @@
  *  Tray.hpp
  *  The nModules Project
  *
- *  Declaration of the Tray class.
+ *  A systen tray, contains the tray icons.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
@@ -21,17 +21,34 @@ public:
     explicit Tray(LPCSTR);
     virtual ~Tray();
 
+    // Adds an icon to the tray.
     TrayIcon* AddIcon(LiteStep::LPLSNOTIFYICONDATA);
-    vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* NID);
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
-    void InitCompleted();
-    void LoadSettings(bool = false);
-    void ShowTip(int x, int y, LPCWSTR text);
-    void Relayout();
+
+    // Removes the specified icon from this tray, if it exists.
     void RemoveIcon(TrayIcon*);
+
+    // Handles window messages for the tray.
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+
+    // Should be called when the initalization phase is done -- repaint the tray.
+    void InitCompleted();
+
+    // Shows the trays tooltip.
+    void ShowTip(LPCWSTR text, LPRECT position);
+
+    // 
     void HideTip();
 
 private:
+    // Loads .rc settings for this tray.
+    void LoadSettings(bool isRefresh = false);
+
+    // Positions all tray icons properly.
+    void Relayout();
+
+    // Finds the specified icon in the tray.
+    vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* NID);
+
     // The tray icons.
     vector<TrayIcon*> icons;
 
