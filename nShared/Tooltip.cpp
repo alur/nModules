@@ -15,8 +15,17 @@ Tooltip::Tooltip(LPCSTR prefix) : Drawable(prefix) {
     defaults->height = 40;
     defaults->color = 0xCCFAFAD2;
     defaults->fontColor = 0xFF000000;
+    defaults->textOffsetTop = 2;
+    defaults->textOffsetBottom = 2;
+    defaults->textOffsetRight = 2;
+    defaults->textOffsetLeft = 2;
     defaults->alwaysOnTop = true;
     this->window->Initialize(defaults);
+
+    this->maxHeight = settings->GetInt("MaxHeight", 100);
+    this->maxWidth = settings->GetInt("MaxWidth", 300);
+
+    // Not working...
     SetParent(this->window->GetWindow(), NULL);
     SetWindowPos(this->window->GetWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 }
@@ -28,7 +37,7 @@ Tooltip::~Tooltip() {
 
 void Tooltip::Show(LPCWSTR text, int x, int y, int duration) {
     this->window->SetText(text);
-    // TODO::Should resize to fit text
+    this->window->SizeToText(this->maxWidth, this->maxHeight);
 
     // Show it centerd on x, 5 px above, while forcing it to stay on the virtual desktop
     MonitorInfo* monInfo = this->window->GetMonitorInformation();

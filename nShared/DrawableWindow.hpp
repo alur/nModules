@@ -123,6 +123,9 @@ public:
     // Shows this window.
     void Show();
 
+    // Sizes the window to fit the text.
+    void SizeToText(int maxWidth, int maxHeight);
+
     // Forcibly updates the text.
     void UpdateText();
 

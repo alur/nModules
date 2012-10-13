@@ -152,7 +152,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="IconExtractor.h" />
     <ClInclude Include="IParsedText.hpp" />
     <ClInclude Include="nCore.h" />
     <ClInclude Include="ParsedText.hpp" />

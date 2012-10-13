@@ -97,6 +97,11 @@ void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
     }
     if ((pNID->uFlags & NIF_TIP) == NIF_TIP) {
         mbstowcs(this->tip, pNID->szTip, TRAY_MAX_TIP_LENGTH);
+        if (this->showingTip) {
+            RECT r;
+            this->window->GetScreenRect(&r);
+            ((Tray*)this->parent)->ShowTip(r.left + this->iconSize/2, r.top, this->tip);
+        }
     }
 
     if ((this->flags & NIF_GUID) != NIF_GUID && (pNID->uFlags & NIF_GUID) == NIF_GUID) {

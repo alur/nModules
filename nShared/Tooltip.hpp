@@ -19,4 +19,9 @@ public:
 
     void LoadSettings(bool = false);
     LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+
+private:
+    int maxWidth;
+
+    int maxHeight;
 };

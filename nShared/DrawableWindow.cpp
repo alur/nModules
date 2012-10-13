@@ -462,6 +462,26 @@ void DrawableWindow::Repaint(LPRECT region) {
 
 
 /// <summary>
+/// Sizes the window to fit its current text.
+/// </summary>
+void DrawableWindow::SizeToText(int maxWidth, int maxHeight) {
+    IDWriteFactory* factory;
+    IDWriteTextLayout* textLayout;
+    DWRITE_TEXT_METRICS metrics;
+
+    Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&factory));
+    factory->CreateTextLayout(this->text, lstrlenW(this->text), this->textFormat, (float)maxWidth, (float)maxHeight, &textLayout);
+    textLayout->GetMetrics(&metrics);
+    textLayout->Release();
+
+    metrics.width += this->drawingSettings->textOffsetLeft + this->drawingSettings->textOffsetRight + 1;
+    metrics.height += this->drawingSettings->textOffsetTop + this->drawingSettings->textOffsetBottom + 1;
+
+    this->SetPosition(this->drawingSettings->x, this->drawingSettings->y, (int)metrics.width, (int)metrics.height);
+}
+
+
+/// <summary>
 /// Adds a new state.
 /// </summary>
 DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority) {
