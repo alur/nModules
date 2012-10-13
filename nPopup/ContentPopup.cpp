@@ -28,32 +28,17 @@ ContentPopup::ContentPopup(LPCSTR path, bool dynamic, LPCSTR title, LPCSTR bang,
     this->dynamic = dynamic;
     this->source = ContentSource::PATH;
 
-
     char processedPath[MAX_PATH], originalPath[MAX_PATH];
-
-    LPCSTR splitter;
-    size_t pathSize;
-    while ((splitter = strchr(path, '|')) != NULL) {
-        pathSize = splitter - path;
-
-        StringCchCopyN(originalPath, MAX_PATH, path, pathSize);
+    LPCSTR splitter, end = strchr(path, '\0');
+    do {
+        splitter = strchr(path, '|');
+        StringCchCopyN(originalPath, MAX_PATH, path, (splitter != NULL ? splitter : end) - path);
         PathCanonicalize(processedPath, originalPath);
-        if (processedPath[pathSize-1] == '\\') {
-            processedPath[pathSize-1] = '\0';
-        }
+        PathRemoveBackslash(processedPath);
 
         this->paths.push_back(_strdup(processedPath));
         path = ++splitter;
-    }
-
-    pathSize = strlen(path);
-    StringCchCopy(originalPath, MAX_PATH, path);
-    PathCanonicalize(processedPath, originalPath);
-    if (processedPath[pathSize-1] == '\\') {
-        processedPath[pathSize-1] = '\0';
-    }
-
-    this->paths.push_back(_strdup(processedPath));
+    } while (splitter != (LPCSTR)0x1);
 }
 
 
