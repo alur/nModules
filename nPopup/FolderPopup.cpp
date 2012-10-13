@@ -5,7 +5,7 @@
  *  A popup which contains the contents a *Popup Folder, or *Popup !New
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "FolderPopup.hpp"
 #include "../nShared/Debugging.h"
 

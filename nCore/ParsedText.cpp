@@ -1,4 +1,5 @@
-#include "../headers/lsapi.h"
+
+#include "../nShared/LiteStep.h"
 #include "ParsedText.hpp"
 
 

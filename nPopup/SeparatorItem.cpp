@@ -5,7 +5,7 @@
  *  Represents a separator.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "SeparatorItem.hpp"
 #include "../nShared/LSModule.hpp"

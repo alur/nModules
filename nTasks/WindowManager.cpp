@@ -6,7 +6,7 @@
 *  taskbars.
 *   
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "TaskButton.hpp"
 #include "Taskbar.hpp"
 #include "WindowManager.h"

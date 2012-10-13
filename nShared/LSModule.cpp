@@ -5,7 +5,7 @@
  *  Deals with all basic LiteStep module functionality.
  *   
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "LSModule.hpp"
 #include "Factories.h"

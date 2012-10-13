@@ -5,7 +5,7 @@
  *  Utility functions for parsing input.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "../nShared/Macros.h"
 #include "../nShared/Color.h"
@@ -61,7 +61,7 @@ EXPORT_CDECL(bool) ParseLength(LPCSTR length, int * target, bool /* canBeRelativ
 EXPORT_CDECL(int) GetPrefixedRCInt(LPCSTR prefix, LPCSTR option, int default) {
     char szOptionName[MAX_LINE_LENGTH];
     StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", prefix, option);
-    return GetRCInt(szOptionName, default);
+    return LiteStep::GetRCInt(szOptionName, default);
 }
 
 
@@ -185,7 +185,7 @@ EXPORT_CDECL(ARGB) GetPrefixedRCColor(LPCSTR prefix, LPCSTR option, ARGB default
     ARGB ret = default;
 
     StringCchPrintf(optionName, MAX_LINE_LENGTH, "%s%s", prefix, option);
-    GetRCLine(optionName, color, sizeof(color), "");
+    LiteStep::GetRCLine(optionName, color, sizeof(color), "");
 
     ParseColor(color, &ret);
     return ret;
@@ -198,7 +198,7 @@ EXPORT_CDECL(ARGB) GetPrefixedRCColor(LPCSTR prefix, LPCSTR option, ARGB default
 EXPORT_CDECL(bool) GetPrefixedRCBool(LPCSTR prefix, LPCSTR option, bool default) {
     char optionName[MAX_LINE_LENGTH];
     StringCchPrintf(optionName, MAX_LINE_LENGTH, "%s%s", prefix, option);
-    return GetRCBoolDef(optionName, default) != FALSE;
+    return LiteStep::GetRCBoolDef(optionName, default) != FALSE;
 }
 
 
@@ -209,7 +209,7 @@ EXPORT_CDECL(bool) GetPrefixedRCString(LPCSTR szPrefix, LPCSTR szOption, LPSTR p
     char szOptionName[MAX_LINE_LENGTH];
     LPCSTR def = pszDefault == pszBuffer ? _strdup(pszDefault) : pszDefault; // LiteStep will null the first character of the buffer.
     StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", szPrefix, szOption);
-    bool ret = GetRCString(szOptionName, pszBuffer, def, cbBuffer) != FALSE;
+    bool ret = LiteStep::GetRCString(szOptionName, pszBuffer, def, cbBuffer) != FALSE;
     if (def != pszDefault) {
         free((LPVOID)def);
     }
@@ -225,7 +225,7 @@ EXPORT_CDECL(bool) GetPrefixedRCWString(LPCSTR szPrefix, LPCSTR szOption, LPWSTR
     bool ret;
     LPSTR buffer = (LPSTR)malloc(cbBuffer/2);
     StringCchPrintf(optionName, MAX_LINE_LENGTH, "%s%s", szPrefix, szOption);
-    ret = GetRCString(optionName, buffer, pszDefault, cbBuffer/2) != FALSE;
+    ret = LiteStep::GetRCString(optionName, buffer, pszDefault, cbBuffer/2) != FALSE;
     MultiByteToWideChar(CP_ACP, 0, buffer, cbBuffer/2, pszwBuffer, cbBuffer);
     free(buffer);
     return ret;
@@ -240,7 +240,7 @@ EXPORT_CDECL(float) GetPrefixedRCFloat(LPCSTR szPrefix, LPCSTR szOption, float f
     char *endPtr;
 
     StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", szPrefix, szOption);
-    GetRCString(szOptionName, szFloat, "", sizeof(szFloat));
+    LiteStep::GetRCString(szOptionName, szFloat, "", sizeof(szFloat));
     float f = (float)strtod(szFloat, &endPtr);
 
     return (*endPtr != '\0' || szFloat[0] == '\0') ? fDefault : f;
@@ -255,7 +255,7 @@ EXPORT_CDECL(double) GetPrefixedRCDouble(LPCSTR szPrefix, LPCSTR szOption, doubl
     char *endPtr;
 
     StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", szPrefix, szOption);
-    GetRCString(szOptionName, szDouble, "", sizeof(szDouble));
+    LiteStep::GetRCString(szOptionName, szDouble, "", sizeof(szDouble));
     double d = strtod(szDouble, &endPtr);
 
     return (*endPtr != '\0' || szDouble[0] == '\0') ? dDefault : d;
@@ -270,7 +270,7 @@ EXPORT_CDECL(UINT) GetPrefixedRCMonitor(LPCSTR szPrefix, LPCSTR szOption, UINT u
     UINT monitor;
 
     StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", szPrefix, szOption);
-    GetRCString(szOptionName, szMonitor, "", sizeof(szMonitor));
+    LiteStep::GetRCString(szOptionName, szMonitor, "", sizeof(szMonitor));
 
     return ParseMonitor(szMonitor, &monitor) ? monitor : uDefault;
 }

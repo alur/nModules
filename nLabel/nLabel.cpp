@@ -5,7 +5,7 @@
  *  Main .cpp file for the nLabel module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "nLabel.h"
 #include "../nShared/LSModule.hpp"
 #include "Label.hpp"
@@ -73,13 +73,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     switch(message) {
     case WM_CREATE:
         {
-            SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
         return 0;
 
     case WM_DESTROY:
         {
-            SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
         return 0;
 
@@ -98,13 +98,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 void LoadSettings() {
     char szLine[MAX_LINE_LENGTH], szLabel[256];
     LPSTR szTokens[] = { szLabel };
-    LPVOID f = LCOpen(NULL);
+    LPVOID f = LiteStep::LCOpen(NULL);
     LPSTR name;
 
-    while (LCReadNextConfig(f, "*nLabel", szLine, sizeof(szLine))) {
-        LCTokenize(szLine+strlen("*nLabel")+1, szTokens, 1, NULL);
+    while (LiteStep::LCReadNextConfig(f, "*nLabel", szLine, sizeof(szLine))) {
+        LiteStep::LCTokenize(szLine+strlen("*nLabel")+1, szTokens, 1, NULL);
         name = _strdup(szLabel);
         g_Labels.insert(g_Labels.begin(), std::pair<LPCSTR, Label*>(name, new Label(name)));
     }
-    LCClose(f);
+    LiteStep::LCClose(f);
 }

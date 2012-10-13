@@ -28,6 +28,7 @@
     <ClInclude Include="Error.h" />
     <ClInclude Include="EventHandler.hpp" />
     <ClInclude Include="Factories.h" />
+    <ClInclude Include="LiteStep.h" />
     <ClInclude Include="MessageHandler.hpp" />
     <ClInclude Include="LayoutSettings.hpp" />
     <ClInclude Include="LSModule.hpp" />
@@ -51,6 +52,7 @@
     <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="Factories.cpp" />
     <ClCompile Include="LayoutSettings.cpp" />
+    <ClCompile Include="LiteStep.cpp" />
     <ClCompile Include="LSModule.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="MessageHandler.cpp" />

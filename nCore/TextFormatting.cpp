@@ -5,7 +5,7 @@
  *  Formats text strings.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "../nShared/Macros.h"
 #include "TextFormatting.h"
@@ -14,19 +14,19 @@
 #include "ParsedText.hpp"
 
 using std::map;
-using std::string;
+using std::wstring;
 
 // All registered formatters.
-map<string, FORMATTINGPROC> g_formatters;
+map<wstring, FORMATTINGPROC> g_formatters;
 
 
 /// <summary>
 /// Registers a new text formatter.
 /// </summary>
-EXPORT_CDECL(BOOL) RegisterFormatter(LPCSTR function, FORMATTINGPROC formatProc) {
+EXPORT_CDECL(BOOL) RegisterFormatter(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter) {
     //if (g_formatters.find(string(function)) == g_formatters.end()) {
     //    return FALSE;
-   // }
+    //}
     //g_formatters.insert(std::pair<string, FORMATTINGPROC>(string(function), formatProc));
     return TRUE;
 }
@@ -35,7 +35,7 @@ EXPORT_CDECL(BOOL) RegisterFormatter(LPCSTR function, FORMATTINGPROC formatProc)
 /// <summary>
 /// Unregisters a text formatter.
 /// </summary>
-EXPORT_CDECL(BOOL) UnregisterFormatter(LPCSTR function) {
+EXPORT_CDECL(BOOL) UnregisterFormatter(LPCWSTR name, UCHAR numArgs) {
     //g_formatters.erase(string(function));
     return FALSE;
 }

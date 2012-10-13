@@ -4,7 +4,7 @@
  *
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "../nCoreCom/Core.h"
 #include "Settings.h"
 
@@ -20,20 +20,20 @@ void nDesk::Settings::Load() {
     char buf[MAX_LINE_LENGTH];
 
     // Defaults to 625ms
-    g_pDesktopPainter->SetTransitionTime(GetRCInt("nDeskTransitionDuration", 625));
+    g_pDesktopPainter->SetTransitionTime(LiteStep::GetRCInt("nDeskTransitionDuration", 625));
 
     // Defaults to 16ms per frame -> 62.5fps
-    g_pDesktopPainter->SetFrameInterval(GetRCInt("nDeskTransitionFrameInterval", 16));
+    g_pDesktopPainter->SetFrameInterval(LiteStep::GetRCInt("nDeskTransitionFrameInterval", 16));
 
     //
-    g_pDesktopPainter->SetSquareSize(GetRCInt("nDeskTransitionSquareSize", 150));
+    g_pDesktopPainter->SetSquareSize(LiteStep::GetRCInt("nDeskTransitionSquareSize", 150));
 
     // 
-    GetRCString("nDeskTransitionEffect",  buf, "FadeOut", sizeof(buf));
+    LiteStep::GetRCString("nDeskTransitionEffect",  buf, "FadeOut", sizeof(buf));
     g_pDesktopPainter->SetTransitionType(TransitionTypeFromString(buf));
 
     //
-    g_pDesktopPainter->SetInvalidateAllOnUpdate(GetRCBoolDef("nDeskInvalidateAllOnUpdate", FALSE) != FALSE);
+    g_pDesktopPainter->SetInvalidateAllOnUpdate(LiteStep::GetRCBoolDef("nDeskInvalidateAllOnUpdate", FALSE) != FALSE);
 }
 
 

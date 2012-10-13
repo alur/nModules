@@ -8,12 +8,10 @@
 #pragma once
 #include "../nShared/Macros.h"
 
-typedef BOOL (__cdecl * FORMATTINGPROC)(HWND owner, LPWSTR text, bool* isDynamic);
+typedef BOOL (__cdecl * FORMATTINGPROC)(LPCWSTR name, UCHAR numArgs, LPCWSTR arguments[], bool* isDynamic);
 
-EXPORT_CDECL(BOOL) RegisterTextFormatter(LPCSTR, FORMATTINGPROC);
-EXPORT_CDECL(BOOL) UnregisterTextFormatter(LPCSTR, FORMATTINGPROC);
-
-FORMATTINGPROC FindFormatter(LPCSTR func);
+EXPORT_CDECL(BOOL) RegisterTextFormatter(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter);
+EXPORT_CDECL(BOOL) UnregisterTextFormatter(LPCWSTR name, UCHAR numArgs);
 
 
 // Valid formats:

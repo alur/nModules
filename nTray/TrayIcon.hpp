@@ -12,7 +12,7 @@
 
 class TrayIcon : public Drawable {
 public:
-    explicit TrayIcon(Drawable* parent, LPLSNOTIFYICONDATA pNID, Settings* parentSettings);
+    explicit TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings* parentSettings);
     virtual ~TrayIcon();
 
     void Reposition(UINT x, UINT y, UINT width, UINT height);
@@ -25,9 +25,9 @@ public:
 
     void SetIcon(HICON icon);
 
-    void HandleAdd(LPLSNOTIFYICONDATA pNID);
-    void HandleModify(LPLSNOTIFYICONDATA pNID);
-    void HandleSetVersion(LPLSNOTIFYICONDATA pNID);
+    void HandleAdd(LiteStep::LPLSNOTIFYICONDATA pNID);
+    void HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID);
+    void HandleSetVersion(LiteStep::LPLSNOTIFYICONDATA pNID);
 
 private:
     //

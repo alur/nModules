@@ -5,7 +5,7 @@
  *  Implementation of the TrayIcon class. Represents a taskbar button.
  *   
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "../nShared/LSModule.hpp"
 #include "Tray.hpp"
@@ -20,7 +20,7 @@ extern HWND g_hWndTrayNotify;
 /// <summary>
 /// Constructor
 /// </summary>
-TrayIcon::TrayIcon(Drawable* parent, LPLSNOTIFYICONDATA pNID, Settings* parentSettings) : Drawable(parent, "Icon") {
+TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings* parentSettings) : Drawable(parent, "Icon") {
     // Init
     this->balloonIcon = NULL;
     this->callbackID = 0;
@@ -79,7 +79,7 @@ void TrayIcon::Show() {
 /// <summary>
 /// Handles NIM_ADD.
 /// </summary>
-void TrayIcon::HandleAdd(LPLSNOTIFYICONDATA pNID) {
+void TrayIcon::HandleAdd(LiteStep::LPLSNOTIFYICONDATA pNID) {
     this->callbackWindow = pNID->hWnd;
     HandleModify(pNID);
 }
@@ -88,7 +88,7 @@ void TrayIcon::HandleAdd(LPLSNOTIFYICONDATA pNID) {
 /// <summary>
 /// Handles NIM_MODIFY.
 /// </summary>
-void TrayIcon::HandleModify(LPLSNOTIFYICONDATA pNID) {
+void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
     if ((pNID->uFlags & NIF_MESSAGE) == NIF_MESSAGE) {
         this->callbackMessage = pNID->uCallbackMessage;
     }
@@ -119,7 +119,7 @@ void TrayIcon::HandleModify(LPLSNOTIFYICONDATA pNID) {
 /// <summary>
 /// Handles NIM_SETVERSION.
 /// </summary>
-void TrayIcon::HandleSetVersion(LPLSNOTIFYICONDATA pNID) {
+void TrayIcon::HandleSetVersion(LiteStep::LPLSNOTIFYICONDATA pNID) {
     this->version = pNID->uVersion;
 }
 
@@ -178,7 +178,7 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam,
         if (message == WM_MOUSEMOVE && !this->showingTip) {
             if (!IsWindow(this->callbackWindow)) {
                 // The icon went away...
-                LSNOTIFYICONDATA lsNID;
+                LiteStep::LSNOTIFYICONDATA lsNID;
                 lsNID.cbSize = sizeof(lsNID);
                 lsNID.hWnd = this->callbackWindow;
                 lsNID.uID = this->callbackID;

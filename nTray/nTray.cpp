@@ -5,7 +5,7 @@
  *  Main .cpp file for the nTask module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "nTray.h"
 #include <map>
 #include "Tray.hpp"
@@ -57,7 +57,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
     LoadSettings();
 
     // Let the core know that we want the system tray icons
-    g_hWndTrayNotify = (HWND)SendMessage(GetLitestepWnd(), LM_SYSTRAYREADY, NULL, NULL);
+    g_hWndTrayNotify = (HWND)SendMessage(LiteStep::GetLitestepWnd(), LM_SYSTRAYREADY, NULL, NULL);
 
     return 0;
 }
@@ -93,13 +93,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case WM_CREATE:
         {
             SetTimer(window, TIMER_INIT_COMPLETED, 100, NULL);
-            SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
         return 0;
 
     case WM_DESTROY:
         {
-            SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
         return 0;
 
@@ -137,11 +137,11 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 void LoadSettings() {
     char szLine[MAX_LINE_LENGTH], name[256];
     LPSTR szTokens[] = { name };
-    LPVOID f = LCOpen(NULL);
+    LPVOID f = LiteStep::LCOpen(NULL);
 
-    while (LCReadNextConfig(f, "*nTray", szLine, sizeof(szLine))) {
-        LCTokenize(szLine+strlen("*nTray")+1, szTokens, 1, NULL);
+    while (LiteStep::LCReadNextConfig(f, "*nTray", szLine, sizeof(szLine))) {
+        LiteStep::LCTokenize(szLine+strlen("*nTray")+1, szTokens, 1, NULL);
         g_Trays.insert(g_Trays.begin(), std::pair<string, Tray*>(string(name), new Tray(name)));
     }
-    LCClose(f);
+    LiteStep::LCClose(f);
 }

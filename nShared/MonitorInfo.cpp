@@ -5,7 +5,7 @@
  *  Provides information about the current monitor configuration.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "MonitorInfo.hpp"
 #include "Math.h"
 

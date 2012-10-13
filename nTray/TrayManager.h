@@ -28,17 +28,16 @@ namespace TrayManager {
 
     TRAYICONDATAITER FindIcon(GUID guid);
     TRAYICONDATAITER FindIcon(HWND hWnd, UINT uID);
-    TRAYICONDATAITER FindIcon(LPLSNOTIFYICONDATA pNID);
-    TRAYICONDATAITER FindIcon(LPSYSTRAYINFOEVENT pSTE);
+    TRAYICONDATAITER FindIcon(LiteStep::LPLSNOTIFYICONDATA pNID);
+    TRAYICONDATAITER FindIcon(LiteStep::LPSYSTRAYINFOEVENT pSTE);
     
-    void AddIcon(LPLSNOTIFYICONDATA pNID);
-    void DeleteIcon(LPLSNOTIFYICONDATA pNID);
-    void ModifyIcon(LPLSNOTIFYICONDATA pNID);
-    void SetFocus(LPLSNOTIFYICONDATA pNID);
-    void SetVersion(LPLSNOTIFYICONDATA pNID);
+    void AddIcon(LiteStep::LPLSNOTIFYICONDATA pNID);
+    void DeleteIcon(LiteStep::LPLSNOTIFYICONDATA pNID);
+    void ModifyIcon(LiteStep::LPLSNOTIFYICONDATA pNID);
+    void SetFocus(LiteStep::LPLSNOTIFYICONDATA pNID);
+    void SetVersion(LiteStep::LPLSNOTIFYICONDATA pNID);
 
     void InitCompleted();
-    
     
     LRESULT ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 }

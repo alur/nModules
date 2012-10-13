@@ -7,7 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <vector>
 
 using std::vector;

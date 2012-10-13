@@ -5,7 +5,7 @@
  *  An object which has a drawable window.
  *   
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "Drawable.hpp"
 #include "LSModule.hpp"
 

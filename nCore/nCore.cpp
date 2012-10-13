@@ -5,7 +5,7 @@
  *  Main .cpp file for the nCore module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "nCore.h"
 #include "../nShared/Error.h"
@@ -54,7 +54,7 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath
 void quitModule(HINSTANCE hDllInstance) {
     // Deinitalize
     if (g_hwndMsgHandler) {
-        SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)g_hwndMsgHandler, (LPARAM)g_lsMessages);
+        SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)g_hwndMsgHandler, (LPARAM)g_lsMessages);
         DestroyWindow(g_hwndMsgHandler);
     }
 
@@ -92,7 +92,7 @@ bool CreateMainWindow(HINSTANCE hDllInstance) {
 
     // Let other modules get the instance using FindWindow + GetWindowLongPtr()
     SetWindowLongPtr(g_hwndMsgHandler, GWLP_USERDATA, (LONG_PTR)hDllInstance);
-    SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)g_hwndMsgHandler, (LPARAM) g_lsMessages);
+    SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)g_hwndMsgHandler, (LPARAM) g_lsMessages);
 
     return true;
 }

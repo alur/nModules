@@ -7,7 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "../nShared/Drawable.hpp"
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/MessageHandler.hpp"

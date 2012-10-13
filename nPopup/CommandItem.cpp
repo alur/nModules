@@ -5,7 +5,7 @@
  *  Represents a popup item which executes a command.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "CommandItem.hpp"
 #include "../nShared/LSModule.hpp"
@@ -57,7 +57,7 @@ LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM 
     case WM_LBUTTONDOWN:
         {
             ((Popup*)this->parent)->Close();
-            LSExecute(NULL, this->command, SW_SHOW);
+            LiteStep::LSExecute(NULL, this->command, SW_SHOW);
         }
         return 0;
 

@@ -5,7 +5,7 @@
  *  Represents a line of info.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "InfoItem.hpp"
 #include "../nShared/LSModule.hpp"

@@ -5,7 +5,7 @@
  *  Main .cpp file for the nKey module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "nKey.h"
 #include "../nShared/Error.h"
@@ -88,13 +88,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case WM_CREATE:
         {
             g_window = window;
-            SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
         return 0;
 
     case WM_DESTROY:
         {
-            SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
         return 0;
 
@@ -107,7 +107,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         {
             map<int, LPCSTR>::iterator iter = g_hotKeys.find((int)wParam);
             if (iter != g_hotKeys.end()) {
-                LSExecute(window, iter->second, 0);
+                LiteStep::LSExecute(window, iter->second, 0);
             }
         }
         return 0;
@@ -135,10 +135,10 @@ void LoadVKeyTable() {
     char * endPtr;
     UINT u;
 
-    GetRCLine("nKeyVKTable", path, sizeof(path), "");
+    LiteStep::GetRCLine("nKeyVKTable", path, sizeof(path), "");
     if (fopen_s(&file, path, "r") == 0) {
         while (fgets(line, sizeof(line), file) != NULL) {
-            if (LCTokenize(line, tokens, 2, NULL) == 2) {
+            if (LiteStep::LCTokenize(line, tokens, 2, NULL) == 2) {
                 u = strtoul(szCode, &endPtr, 0);
 
                 if (szCode[0] != '\0' && *endPtr == '\0') {
@@ -167,16 +167,16 @@ void LoadVKeyTable() {
 void LoadHotKeys() {
     char szLine[MAX_LINE_LENGTH], szMods[128], szKey[128], szCommand[MAX_LINE_LENGTH];
     LPSTR szTokens[] = {szMods, szKey};
-    LPVOID f = LCOpen(NULL);
+    LPVOID f = LiteStep::LCOpen(NULL);
 
-    while (LCReadNextConfig(f, "*HotKey", szLine, sizeof(szLine))) {
-        LCTokenize(szLine+strlen("*HotKey")+1, szTokens, 2, szCommand);
+    while (LiteStep::LCReadNextConfig(f, "*HotKey", szLine, sizeof(szLine))) {
+        LiteStep::LCTokenize(szLine+strlen("*HotKey")+1, szTokens, 2, szCommand);
         // ParseMods expects szMods to be all lowercase.
         _strlwr_s(szMods, sizeof(szMods));
         AddHotkey(ParseMods(szMods), ParseKey(szKey), szCommand);
     }
 
-    LCClose(f);
+    LiteStep::LCClose(f);
 }
 
 

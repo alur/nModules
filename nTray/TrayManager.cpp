@@ -4,7 +4,7 @@
  *
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "Tray.hpp"
 #include "TrayManager.h"
 #include "../nShared/Debugging.h"
@@ -75,7 +75,7 @@ TrayManager::TRAYICONDATAITER TrayManager::FindIcon(HWND hWnd, UINT uID) {
 /// <summary>
 /// Finds a matching icon in g_currentIcons.
 /// </summary>
-TrayManager::TRAYICONDATAITER TrayManager::FindIcon(LPLSNOTIFYICONDATA pNID) {
+TrayManager::TRAYICONDATAITER TrayManager::FindIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
     // There are 2 ways to identify an icon. Same guidItem, or same HWND and same uID.
 
     // uID & hWnd is ignored if guidItem is set
@@ -90,7 +90,7 @@ TrayManager::TRAYICONDATAITER TrayManager::FindIcon(LPLSNOTIFYICONDATA pNID) {
 /// <summary>
 /// Finds a matching icon in g_currentIcons.
 /// </summary>
-TrayManager::TRAYICONDATAITER TrayManager::FindIcon(LPSYSTRAYINFOEVENT pSTE) {
+TrayManager::TRAYICONDATAITER TrayManager::FindIcon(LiteStep::LPSYSTRAYINFOEVENT pSTE) {
     // There are 2 ways to identify an icon. Same guidItem, or same HWND and same uID.
     TRAYICONDATAITER ret;
 
@@ -106,7 +106,7 @@ TrayManager::TRAYICONDATAITER TrayManager::FindIcon(LPSYSTRAYINFOEVENT pSTE) {
 /// <summary>
 /// Adds the specified icon to the tray, if it exists.
 /// </summary>
-void TrayManager::AddIcon(LPLSNOTIFYICONDATA pNID) {
+void TrayManager::AddIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
     if (FindIcon(pNID) == g_currentIcons.end()) {
         TRAYICONDATA* tData = (TRAYICONDATA*)malloc(sizeof(TRAYICONDATA));
         tData->icons = new vector<TrayIcon*>;
@@ -134,7 +134,7 @@ void TrayManager::AddIcon(LPLSNOTIFYICONDATA pNID) {
 /// <summary>
 /// Deletes the specified icon from all trays, if it exists.
 /// </summary>
-void TrayManager::DeleteIcon(LPLSNOTIFYICONDATA pNID) {
+void TrayManager::DeleteIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
     TRAYICONDATAITER icon = FindIcon(pNID);
     if (icon != g_currentIcons.end()) {
         for (TRAYSCITER iter = g_Trays.begin(); iter != g_Trays.end(); iter++) {
@@ -153,7 +153,7 @@ void TrayManager::DeleteIcon(LPLSNOTIFYICONDATA pNID) {
 /// <summary>
 /// Modifies an existing icon.
 /// </summary>
-void TrayManager::ModifyIcon(LPLSNOTIFYICONDATA pNID) {
+void TrayManager::ModifyIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
     TRAYICONDATAITER icon = FindIcon(pNID);
     if (icon != g_currentIcons.end()) {
         for (vector<TrayIcon*>::const_iterator iter = (*icon)->icons->begin(); iter != (*icon)->icons->end(); iter++) {
@@ -169,14 +169,14 @@ void TrayManager::ModifyIcon(LPLSNOTIFYICONDATA pNID) {
 /// <summary>
 /// Returns the focus to one of the trays.
 /// </summary>
-void TrayManager::SetFocus(LPLSNOTIFYICONDATA /* pNID */) {
+void TrayManager::SetFocus(LiteStep::LPLSNOTIFYICONDATA /* pNID */) {
 }
 
 
 /// <summary>
 /// Changes the version of an existing tray icon.
 /// </summary>
-void TrayManager::SetVersion(LPLSNOTIFYICONDATA pNID) {
+void TrayManager::SetVersion(LiteStep::LPLSNOTIFYICONDATA pNID) {
     TRAYICONDATAITER icon = FindIcon(pNID);
     if (icon != g_currentIcons.end()) {
         for (vector<TrayIcon*>::const_iterator iter = (*icon)->icons->begin(); iter != (*icon)->icons->end(); iter++) {
@@ -194,23 +194,23 @@ LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
     case LM_SYSTRAY:
         switch ((DWORD)wParam) {
         case NIM_ADD:
-            AddIcon((LPLSNOTIFYICONDATA)lParam);
+            AddIcon((LiteStep::LPLSNOTIFYICONDATA)lParam);
             break;
             
         case NIM_DELETE:
-            DeleteIcon((LPLSNOTIFYICONDATA)lParam);
+            DeleteIcon((LiteStep::LPLSNOTIFYICONDATA)lParam);
             break;
             
         case NIM_MODIFY:
-            ModifyIcon((LPLSNOTIFYICONDATA)lParam);
+            ModifyIcon((LiteStep::LPLSNOTIFYICONDATA)lParam);
             break;
             
         case NIM_SETFOCUS:
-            SetFocus((LPLSNOTIFYICONDATA)lParam);
+            SetFocus((LiteStep::LPLSNOTIFYICONDATA)lParam);
             break;
             
         case NIM_SETVERSION:
-            SetVersion((LPLSNOTIFYICONDATA)lParam);
+            SetVersion((LiteStep::LPLSNOTIFYICONDATA)lParam);
             break;
 
         default:
@@ -222,7 +222,7 @@ LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
     case LM_SYSTRAYINFOEVENT:
         {
-            LPSYSTRAYINFOEVENT lpSTE = (LPSYSTRAYINFOEVENT)wParam;
+            LiteStep::LPSYSTRAYINFOEVENT lpSTE = (LiteStep::LPSYSTRAYINFOEVENT)wParam;
             TRAYICONDATAITER icon = FindIcon(lpSTE);
             RECT r;
 

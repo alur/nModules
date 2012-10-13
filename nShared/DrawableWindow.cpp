@@ -7,7 +7,7 @@
  *  TODO::Possibly implement the default settings as a state. 
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <windowsx.h>
 #include <strsafe.h>
 #include "../nCoreCom/Core.h"

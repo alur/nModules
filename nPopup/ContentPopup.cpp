@@ -5,7 +5,7 @@
  *  A popup which retrives its content from outside LiteStep's .rc files.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "ContentPopup.hpp"
 #include "../nShared/Debugging.h"
@@ -161,7 +161,7 @@ void ContentPopup::LoadPath(LPCSTR path) {
 
 
 void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE idList) {
-    PIDLIST_RELATIVE idNext;
+    PIDLIST_RELATIVE idNext = NULL;
     IEnumIDList* enumIDList;
 
     // Enumerate the contents of this folder
@@ -184,7 +184,9 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
 
     this->watchedFolders.insert(WATCHFOLDERMAP::value_type(message, std::pair<UINT, IShellFolder*>(shnrUID, targetFolder)));
 
-    CoTaskMemFree(idNext);
+    if (idNext) {
+        CoTaskMemFree(idNext);
+    }
 }
 
 

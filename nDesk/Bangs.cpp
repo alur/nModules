@@ -5,7 +5,7 @@
  *  Handles bang commands
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "Bangs.h"
 #include "WorkArea.h"
@@ -40,7 +40,7 @@ void Bangs::_Register() {
     char szBangName[64];
     for (int i = 0; BangMap[i].pCommand != NULL; i++) {
         StringCchPrintf(szBangName, sizeof(szBangName), "!nDesk%s", BangMap[i].szName);
-        AddBangCommand(szBangName, BangMap[i].pCommand);
+        LiteStep::AddBangCommand(szBangName, BangMap[i].pCommand);
     }
 }
 
@@ -52,7 +52,7 @@ void Bangs::_Unregister() {
     char szBangName[64];
     for (int i = 0; BangMap[i].pCommand != NULL; i++) {
         StringCchPrintf(szBangName, sizeof(szBangName), "!nDesk%s", BangMap[i].szName);
-        RemoveBangCommand(szBangName);
+        LiteStep::RemoveBangCommand(szBangName);
     }
 }
 

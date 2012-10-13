@@ -5,7 +5,7 @@
  *  
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <windowsx.h>
 #include <strsafe.h>
 #include "IconGroup.hpp"

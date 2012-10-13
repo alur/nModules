@@ -5,7 +5,7 @@
  *  Manages Direct2D/DirectWrite/... factories
  *   
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include <d2d1.h>
 #include <dwrite.h>

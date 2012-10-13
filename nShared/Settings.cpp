@@ -5,7 +5,7 @@
  *  Manages RC settings with a certain prefix.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "Settings.hpp"
 #include "Error.h"
@@ -232,7 +232,7 @@ bool Settings::GetString(LPCSTR pszSetting, LPWSTR pszwDest, UINT cchDest, LPCWS
 void Settings::SetString(LPCSTR pszSetting, LPCSTR pszValue) {
     char szOptionName[MAX_LINE_LENGTH];
     StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", this->prefix, pszSetting);
-    LSSetVariable(szOptionName, pszValue);
+    LiteStep::LSSetVariable(szOptionName, pszValue);
 }
 
 

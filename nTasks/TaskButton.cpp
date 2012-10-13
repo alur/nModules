@@ -5,7 +5,7 @@
  *  Implementation of the TaskButton class. Represents a taskbar button.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "../nCoreCom/Core.h"
 #include "../nShared/LSModule.hpp"

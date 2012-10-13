@@ -5,7 +5,7 @@
  *  A single icon in an IconGroup.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "../nShared/Macros.h"
 #include "Icon.hpp"

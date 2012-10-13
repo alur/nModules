@@ -21,7 +21,7 @@ public:
     explicit Tray(LPCSTR);
     virtual ~Tray();
 
-    TrayIcon* AddIcon(LPLSNOTIFYICONDATA);
+    TrayIcon* AddIcon(LiteStep::LPLSNOTIFYICONDATA);
     vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* NID);
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
     void InitCompleted();

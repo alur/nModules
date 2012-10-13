@@ -5,7 +5,7 @@
  *  Represents a popup box.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "../nShared/Debugging.h"
 #include "Popup.hpp"

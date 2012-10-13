@@ -5,7 +5,7 @@
  *  Functions dealing with the workarea
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "WorkArea.h"
 #include "../nCoreCom/Core.h"
 #include "../nShared/Error.h"
@@ -25,7 +25,7 @@ void WorkArea::ParseLine(MonitorInfo * mInfo, LPCSTR pszLine) {
     using namespace nCore::InputParsing;
 
     // Parse the input string
-    if (LCTokenize(pszLine, szTokens, 5, NULL) == 5) {
+    if (LiteStep::LCTokenize(pszLine, szTokens, 5, NULL) == 5) {
         if (ParseCoordinate(szLeft, &left) && ParseCoordinate(szTop, &top) && ParseCoordinate(szRight, &right) && ParseCoordinate(szBottom, &bottom)) {
             if (_stricmp("all", szMonitor) == 0) {
                 for (std::vector<MonitorInfo::Monitor>::iterator iter = mInfo->m_monitors.begin(); iter != mInfo->m_monitors.end(); iter++) {
@@ -55,11 +55,11 @@ void WorkArea::ParseLine(MonitorInfo * mInfo, LPCSTR pszLine) {
 /// <param name="mInfo">A current MonitorInfo.</param>
 void WorkArea::LoadSettings(MonitorInfo * mInfo, bool /* bIsRefresh */) {
     char szLine[MAX_LINE_LENGTH];
-    LPVOID f = LCOpen(NULL);
-    while (LCReadNextConfig(f, "*nDeskWorkArea", szLine, sizeof(szLine))) {
+    LPVOID f = LiteStep::LCOpen(NULL);
+    while (LiteStep::LCReadNextConfig(f, "*nDeskWorkArea", szLine, sizeof(szLine))) {
         ParseLine(mInfo, szLine+strlen("*nDeskWorkArea")+1);
     }
-    LCClose(f);
+    LiteStep::LCClose(f);
     SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, NULL);
 }
 

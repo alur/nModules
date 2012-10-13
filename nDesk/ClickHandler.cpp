@@ -5,7 +5,7 @@
  *  Handles clicks on the desktop.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <Windows.h>
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include <Windowsx.h>
 #include "ClickHandler.hpp"
@@ -82,7 +82,7 @@ void ClickHandler::HandleClick(UINT msg, WPARAM wParam, LPARAM lParam) {
 
     for (vector<ClickData>::const_iterator iter = m_clickHandlers.begin(); iter != m_clickHandlers.end(); iter++) {
         if (ClickHandler::Matches(cData, *iter)) {
-            LSExecute(NULL, iter->action, SW_SHOW);
+            LiteStep::LSExecute(NULL, iter->action, SW_SHOW);
         }
     }
 }
@@ -101,11 +101,11 @@ void ClickHandler::Refresh() {
 /// </summary>
 void ClickHandler::LoadSettings(bool /* bIsRefresh */) {
     char szLine[MAX_LINE_LENGTH];
-    LPVOID f = LCOpen(NULL);
-    while (LCReadNextConfig(f, "*nDeskOn", szLine, sizeof(szLine))) {
+    LPVOID f = LiteStep::LCOpen(NULL);
+    while (LiteStep::LCReadNextConfig(f, "*nDeskOn", szLine, sizeof(szLine))) {
         AddHandler(szLine+strlen("*nDeskOn")+1);
     }
-    LCClose(f);
+    LiteStep::LCClose(f);
 }
 
 
@@ -122,11 +122,11 @@ ClickHandler::ClickData ClickHandler::ParseLine(LPCSTR szLine) {
     using nCore::InputParsing::ParseCoordinate;
 
     // Type
-    GetToken(pszNext, szToken, &pszNext, false);
+    LiteStep::GetToken(pszNext, szToken, &pszNext, false);
     cData.type = TypeFromString(szToken);
 
     // ModKeys
-    GetToken(pszNext, szToken, &pszNext, false);
+    LiteStep::GetToken(pszNext, szToken, &pszNext, false);
     cData.mods = ModsFromString(szToken);
 
     // Guess that the rest is an action for now
@@ -135,19 +135,19 @@ ClickHandler::ClickData ClickHandler::ParseLine(LPCSTR szLine) {
 
     // Check if we have 4 valid coordinates followed by some action
     int left, top, width, height;
-    if (GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
+    if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
     if (!ParseCoordinate(szToken, &left)) return cData;
 
-    if (GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
+    if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
     if (!ParseCoordinate(szToken, &top)) return cData;
 
-    if (GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
+    if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
     if (!ParseCoordinate(szToken, &width)) return cData;
 
-    if (GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
+    if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
     if (!ParseCoordinate(szToken, &height)) return cData;
 

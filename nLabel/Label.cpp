@@ -5,7 +5,7 @@
  *  Implementation of the Label class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "../nShared/LSModule.hpp"
 #include "Label.hpp"
 #include "../nShared/Macros.h"

@@ -5,7 +5,7 @@
  *  Represents a popup item which executes a command.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "FolderItem.hpp"
 #include "../nShared/LSModule.hpp"

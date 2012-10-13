@@ -5,7 +5,7 @@
  *  A class which can accept window messages.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "MessageHandler.hpp"
 #include "Debugging.h"
 

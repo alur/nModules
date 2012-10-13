@@ -5,7 +5,7 @@
  *  Implementation of the Tray class. Handles layout of the tray buttons.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "../nShared/LSModule.hpp"
 #include "Tray.hpp"
@@ -64,7 +64,7 @@ void Tray::LoadSettings(bool /* IsRefresh */) {
 /// <summary>
 /// Adds the specified icon to this tray.
 /// </summary>
-TrayIcon* Tray::AddIcon(LPLSNOTIFYICONDATA NID) {
+TrayIcon* Tray::AddIcon(LiteStep::LPLSNOTIFYICONDATA NID) {
     TrayIcon* icon = new TrayIcon(this, NID, this->settings);
     this->icons.push_back(icon);
     Relayout();

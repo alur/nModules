@@ -5,7 +5,7 @@
  *  Main .cpp file for the nPopup module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "../nShared/LSModule.hpp"
 #include "../nShared/Debugging.h"
 #include <strsafe.h>
@@ -59,7 +59,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 /// </summary>
 void quitModule(HINSTANCE /* hDllInstance */) {
     for (vector<Popup*>::const_iterator iter = rootPopups.begin(); iter != rootPopups.end(); iter++) {
-        RemoveBangCommand((*iter)->GetBang());
+        LiteStep::RemoveBangCommand((*iter)->GetBang());
         delete *iter;
     }
 
@@ -80,13 +80,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     switch(message) {
     case WM_CREATE:
         {
-            SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
         return 0;
 
     case WM_DESTROY:
         {
-            SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
         return 0;
 
@@ -127,7 +127,7 @@ void LoadSettings() {
 /// </summary>
 void AddPopup(Popup* popup) {
     rootPopups.push_back(popup);
-    AddBangCommandEx(popup->GetBang(), HandlePopupBang);
+    LiteStep::AddBangCommandEx(popup->GetBang(), HandlePopupBang);
 }
 
 
@@ -135,7 +135,7 @@ void AddPopup(Popup* popup) {
 /// Reads through the .rc files and creates Taskbars.
 /// </summary>
 void LoadPopups() {
-    LPVOID f = LCOpen(NULL);
+    LPVOID f = LiteStep::LCOpen(NULL);
     Popup* popup;
 
     // Add pre-defined popups
@@ -156,7 +156,7 @@ void LoadPopups() {
         }
     }
 
-    LCClose(f);
+    LiteStep::LCClose(f);
 }
 
 
@@ -168,7 +168,7 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
     char line[MAX_LINE_LENGTH], title[MAX_LINE_LENGTH], command[MAX_LINE_LENGTH], icon[MAX_LINE_LENGTH], prefix[MAX_LINE_LENGTH];
     ContentPopup::ContentSource source;
     
-    while (LCReadNextConfig(f, "*Popup", line, sizeof(line))) {
+    while (LiteStep::LCReadNextConfig(f, "*Popup", line, sizeof(line))) {
         POPUPLINETYPE type = ProcessPopupLine(line, &source, title, sizeof(title), command, sizeof(command), icon, sizeof(icon), prefix, sizeof(prefix));
         if (level == POPUPLEVEL_ROOT) {
             if (type == POPUPLINETYPE_NEW) {
@@ -272,10 +272,10 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
                                LPSTR prefix, UINT cchPrefix) {
     char token[MAX_LINE_LENGTH];
     LPCSTR linePointer = line;
-    GetToken(linePointer, NULL, &linePointer, FALSE); // Drop *Popup
+    LiteStep::GetToken(linePointer, NULL, &linePointer, FALSE); // Drop *Popup
     
     // The first token will be ~Folder, ~New, !Separator, !Info, .icon=, or a title.
-    GetToken(linePointer, token, &linePointer, FALSE);
+    LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
     if (_stricmp(token, "~New") == 0) {
         return POPUPLINETYPE_ENDNEW;
     }
@@ -289,14 +289,14 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
         // If we have a .icon, copy it over and move forward.
         if (_strnicmp(token, ".icon=", 6) == 0) {
             StringCchCopy(icon, cchIcon, token+6);
-            GetToken(linePointer, token, &linePointer, FALSE);
+            LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
         }
         else {
             icon[0] = '\0';
         }
 
         if (_stricmp(token, "!Info") == 0) {
-            GetToken(linePointer, token, &linePointer, FALSE);
+            LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
             StringCchCopy(title, cchTitle, token);
             return POPUPLINETYPE_INFO;
         }
@@ -306,20 +306,20 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
 
             // Store a copy to here, if this turns out to be a command
             LPCSTR commandPointer = linePointer;
-            GetToken(linePointer, token, &linePointer, FALSE);
+            LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
 
             if (_stricmp(token, "!New") == 0) {
                 // !New is followed by the bang command
-                GetToken(linePointer, token, &linePointer, FALSE);
+                LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
                 StringCchCopy(command, cchCommand, token);
                 // Which may be followed by a prefix
-                GetToken(linePointer, token, &linePointer, FALSE);
+                LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
                 StringCchCopy(prefix, cchPrefix, token);
                 return POPUPLINETYPE_NEW;
             }
             else if (_stricmp(token, "Folder") == 0) {
                 // Folder may be followed by a prefix
-                GetToken(linePointer, token, &linePointer, FALSE);
+                LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
                 StringCchCopy(prefix, cchPrefix, token);
                 return POPUPLINETYPE_FOLDER;
             }

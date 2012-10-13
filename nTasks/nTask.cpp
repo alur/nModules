@@ -5,7 +5,7 @@
  *  Main .cpp file for the nTask module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 #include "../nShared/LSModule.hpp"
 #include "nTask.h"
 #include "Taskbar.hpp"
@@ -85,13 +85,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
             // Add the existing windows in a little bit so we dont hinder startup.
             SetTimer(window, TIMER_ADD_EXISTING, 50, NULL);
 
-            SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
         return 0;
 
     case WM_DESTROY:
         {
-            SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
         }
         return 0;
 
@@ -139,13 +139,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 void LoadSettings() {
     char szLine[MAX_LINE_LENGTH], szLabel[256];
     LPSTR szTokens[] = { szLabel };
-    LPVOID f = LCOpen(NULL);
+    LPVOID f = LiteStep::LCOpen(NULL);
     LPSTR name;
 
-    while (LCReadNextConfig(f, "*nTaskbar", szLine, sizeof(szLine))) {
-        LCTokenize(szLine+strlen("*nTaskbar")+1, szTokens, 1, NULL);
+    while (LiteStep::LCReadNextConfig(f, "*nTaskbar", szLine, sizeof(szLine))) {
+        LiteStep::LCTokenize(szLine+strlen("*nTaskbar")+1, szTokens, 1, NULL);
         name = _strdup(szLabel);
         g_Taskbars.insert(g_Taskbars.begin(), std::pair<LPCSTR, Taskbar*>(name, new Taskbar(name)));
     }
-    LCClose(f);
+    LiteStep::LCClose(f);
 }

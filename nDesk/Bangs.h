@@ -28,6 +28,6 @@ namespace Bangs {
 
     typedef struct {
         char szName[54];
-        BANGCOMMANDPROC pCommand;
+        LiteStep::BANGCOMMANDPROC pCommand;
     } BangItem;
 }

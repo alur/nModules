@@ -6,7 +6,7 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "UIDGenerator.hpp"
-#include "../headers/lsapi.h"
+#include "../nShared/LiteStep.h"
 
 
 /// <summary>
