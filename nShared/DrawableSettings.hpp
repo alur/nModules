@@ -37,6 +37,19 @@ public:
     // The default font size. Default: 12
     float fontSize;
 
+    // The default font stretch. Ultra Condensed, Extra Condensed, Condensed, 
+    // Semi Condensed, Normal, Medium, Semi Expanded, Expanded, Extra Expanded,
+    // Ultra Expanded. Default: Normal
+    char fontStretch[16];
+
+    // The default font style. Normal, Oblique, Italic. Default: Normal
+    char fontStyle[8];
+
+    // The default font weight. Thin, Extra Light, Ultra Light, Light,
+    // Semi Light, Normal, Regular, Medium, Semi Bold, Bold, Extra Bold, 
+    // Ultra Bold, Black, Heavy, Extra Black, Ultra Black. Default: Normal
+    char fontWeight[16];
+
     // The height of the window. Default: 100
     int height;
 

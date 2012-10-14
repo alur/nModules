@@ -239,15 +239,82 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
         SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
     }
 
+    // Font weight
+    DWRITE_FONT_WEIGHT fontWeight;
+    if (_stricmp(this->drawingSettings->fontWeight, "Thin") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_THIN;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Extra Light") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_EXTRA_LIGHT;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Ultra Light") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_ULTRA_LIGHT;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Light") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_LIGHT;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Semi Light") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_SEMI_LIGHT;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Regular") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_REGULAR;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Medium") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_MEDIUM;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Semi Bold") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_SEMI_BOLD;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Bold") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_BOLD;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Extra Bold") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_EXTRA_BOLD;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Ultra Bold") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_ULTRA_BOLD;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Black") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_BLACK;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Heavy") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_HEAVY;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Extra Black") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_EXTRA_BLACK;
+    else if (_stricmp(this->drawingSettings->fontWeight, "Ultra Black") == 0)
+        fontWeight = DWRITE_FONT_WEIGHT_ULTRA_BLACK;
+    else
+        fontWeight = DWRITE_FONT_WEIGHT_NORMAL;
+
+    // Font style
+    DWRITE_FONT_STYLE fontStyle;
+    if (_stricmp(this->drawingSettings->fontStyle, "Oblique") == 0)
+        fontStyle = DWRITE_FONT_STYLE_OBLIQUE;
+    else if (_stricmp(this->drawingSettings->fontStyle, "Italic") == 0)
+        fontStyle = DWRITE_FONT_STYLE_ITALIC;
+    else
+        fontStyle = DWRITE_FONT_STYLE_NORMAL;
+
+    // Font stretch
+    DWRITE_FONT_STRETCH fontStretch;
+    if (_stricmp(this->drawingSettings->fontStretch, "Ultra Condensed") == 0)
+        fontStretch = DWRITE_FONT_STRETCH_ULTRA_CONDENSED;
+    else if (_stricmp(this->drawingSettings->fontStretch, "Extra Condensed") == 0)
+        fontStretch = DWRITE_FONT_STRETCH_EXTRA_CONDENSED;
+    else if (_stricmp(this->drawingSettings->fontStretch, "Condensed") == 0)
+        fontStretch = DWRITE_FONT_STRETCH_CONDENSED;
+    else if (_stricmp(this->drawingSettings->fontStretch, "Semi Condensed") == 0)
+        fontStretch = DWRITE_FONT_STRETCH_SEMI_CONDENSED;
+    else if (_stricmp(this->drawingSettings->fontStretch, "Medium") == 0)
+        fontStretch = DWRITE_FONT_STRETCH_MEDIUM;
+    else if (_stricmp(this->drawingSettings->fontStretch, "Semi Expanded") == 0)
+        fontStretch = DWRITE_FONT_STRETCH_SEMI_EXPANDED;
+    else if (_stricmp(this->drawingSettings->fontStretch, "Expanded") == 0)
+        fontStretch = DWRITE_FONT_STRETCH_EXPANDED;
+    else if (_stricmp(this->drawingSettings->fontStretch, "Extra Expanded") == 0)
+        fontStretch = DWRITE_FONT_STRETCH_EXTRA_EXPANDED;
+    else if (_stricmp(this->drawingSettings->fontStretch, "Ultra Expanded") == 0)
+        fontStretch = DWRITE_FONT_STRETCH_ULTRA_EXPANDED;
+    else
+        fontStretch = DWRITE_FONT_STRETCH_NORMAL;
+
     // Create the text format
     IDWriteFactory *pDWFactory = NULL;
     Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&pDWFactory));
     pDWFactory->CreateTextFormat(
         this->drawingSettings->font,
         NULL,
-        DWRITE_FONT_WEIGHT_REGULAR,
-        DWRITE_FONT_STYLE_NORMAL,
-        DWRITE_FONT_STRETCH_NORMAL,
+        fontWeight,
+        fontStyle,
+        fontStretch,
         this->drawingSettings->fontSize,
         L"en-US",
         &this->textFormat);

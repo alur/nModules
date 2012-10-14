@@ -20,6 +20,9 @@ DrawableSettings::DrawableSettings() {
     StringCchCopyW(this->font, sizeof(this->font)/sizeof(WCHAR), L"Arial");
     this->fontColor = 0xFFFFFFFF;
     this->fontSize = 12.0f;
+    StringCchCopy(this->fontStretch, sizeof(this->fontStretch), "Normal");
+    StringCchCopy(this->fontStyle, sizeof(this->fontStyle), "Normal");
+    StringCchCopy(this->fontWeight, sizeof(this->fontWeight), "Normal");
     this->height = 100;
     StringCchCopy(this->image, sizeof(this->image), "");
     StringCchCopyW(this->text, sizeof(this->text)/sizeof(WCHAR), L"");
@@ -57,6 +60,9 @@ void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
     this->fontColor = settings->GetColor("FontColor", defaults->fontColor);
     this->fontColor = this->fontColor & 0xFFFFFF | ((ARGB)settings->GetInt("FontAlpha", (this->fontColor & 0xFF000000) >> 24) & 0xFF) << 24;
     this->fontSize = settings->GetFloat("FontSize", defaults->fontSize);
+    settings->GetString("FontStretch", this->fontStretch, sizeof(this->fontStretch), defaults->fontStretch);
+    settings->GetString("FontStyle", this->fontStyle, sizeof(this->fontStyle), defaults->fontStyle);
+    settings->GetString("FontWeight", this->fontWeight, sizeof(this->fontWeight), defaults->fontWeight);
     this->height = settings->GetInt("Height", defaults->height);
     settings->GetString("Text", this->text, sizeof(this->text)/sizeof(WCHAR), defaults->text);
     settings->GetString("TextAlign", this->textAlign, sizeof(this->textAlign), defaults->textAlign);
