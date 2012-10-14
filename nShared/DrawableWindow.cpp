@@ -596,8 +596,8 @@ void DrawableWindow::SizeToText(int maxWidth, int maxHeight) {
 DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority) {
     State state;
     state.defaultSettings = defaultSettings;
-    state.settings = settings->CreateChild(prefix);
-    state.settings->AppendGroup(settings->prefix);
+    state.settings = this->settings->CreateChild(prefix);
+    state.settings->AppendGroup(this->settings);
     state.priority = state.settings->GetInt("Priority", defaultPriority);
     state.active = false;
     state.drawingSettings = new DrawableSettings();
@@ -606,8 +606,8 @@ DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* 
 
     // Insert the state based on its priority.
     list<State>::iterator iter;
-    for (iter = states.begin(); iter != states.end() && iter->priority > state.priority; iter++);
-    return states.insert(iter, state);
+    for (iter = this->states.begin(); iter != this->states.end() && iter->priority > state.priority; iter++);
+    return this->states.insert(iter, state);
 }
 
 

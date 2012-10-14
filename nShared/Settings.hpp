@@ -20,7 +20,7 @@ public:
 
     Settings* CreateChild(LPCSTR prefix);
 
-    void AppendGroup(LPCSTR prefix);
+    void AppendGroup(Settings* group);
 
     ARGB GetColor(LPCSTR key, ARGB defValue);
     D2D_COLOR_F GetColor(LPCSTR key, D2D_COLOR_F defValue);
@@ -60,6 +60,9 @@ public:
     
 private:
 	explicit Settings(LPCSTR pszPrefix, LPCSTR pszPrev[]);
+
+    // Makes a deep copy of the specified settings.
+    explicit Settings(Settings* settings);
 
     // Creates the Settings* for this settings group.
 	Settings* GreateGroup(LPCSTR pszPrev[]);

@@ -37,6 +37,20 @@ Settings::Settings(LPCSTR prefix, LPCSTR previous[]) {
 
 
 /// <summary>
+/// Creates a deep copy of the specified group.
+/// </summary>
+Settings::Settings(Settings* settings) {
+    this->prefix = _strdup(settings->prefix);
+    if (settings->group != NULL) {
+        this->group = new Settings(settings->group);
+    }
+    else {
+        this->group = NULL;
+    }
+}
+
+
+/// <summary>
 /// Deallocates resources used by the Settings class.
 /// </summary>
 Settings::~Settings() {
@@ -129,10 +143,10 @@ Settings* Settings::GreateGroup(LPCSTR pszPrev[]) {
 /// Appends the specified prefix to the end of the group list. Essentially, lets these
 /// settings fall back to that group as a default.
 /// </summary>
-void Settings::AppendGroup(LPCSTR prefix) {
+void Settings::AppendGroup(Settings* group) {
     Settings* tail;
     for (tail = this; tail->group != NULL; tail = tail->group);
-    tail->group = new Settings(prefix);
+    tail->group = new Settings(group);
 }
 
 
