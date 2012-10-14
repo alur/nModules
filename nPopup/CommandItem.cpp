@@ -42,7 +42,7 @@ void CommandItem::Init(LPCSTR title, LPCSTR command) {
     StringCchCopy(defaults->textVerticalAlign, sizeof(defaults->textVerticalAlign), "Middle");
     defaults->textOffsetLeft = 20;
     this->window->Initialize(defaults);
-    this->hoverState = this->window->AddState("Hover", new DrawableSettings(), 100);
+    this->hoverState = this->window->AddState("Hover", new DrawableSettings(*defaults), 100);
 }
 
 

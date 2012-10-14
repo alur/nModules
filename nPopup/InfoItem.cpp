@@ -30,7 +30,7 @@ InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupIte
 
     ParseDotIcon(customIcon);
 
-    this->hoverState = this->window->AddState("Hover", new DrawableSettings(), 100);
+    this->hoverState = this->window->AddState("Hover", new DrawableSettings(*defaults), 100);
 
     this->window->Show();
 }

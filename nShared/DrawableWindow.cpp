@@ -239,69 +239,86 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
         SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
     }
 
+    // Create the text format
+    ReCreateTextFormat(this->drawingSettings);
+    
+    // Set the text
+    SetText(this->drawingSettings->text);
+
+    this->initialized = true;
+}
+
+
+/// <summary>
+/// (Re)Creates the textFormat based on the specified drawingSettings.
+/// </summary>
+void DrawableWindow::ReCreateTextFormat(DrawableSettings* drawingSettings) {
+    // Drop the old textformat
+    SAFERELEASE(this->textFormat);
+
     // Font weight
     DWRITE_FONT_WEIGHT fontWeight;
-    if (_stricmp(this->drawingSettings->fontWeight, "Thin") == 0)
+    if (_stricmp(drawingSettings->fontWeight, "Thin") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_THIN;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Extra Light") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Extra Light") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_EXTRA_LIGHT;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Ultra Light") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Ultra Light") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_ULTRA_LIGHT;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Light") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Light") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_LIGHT;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Semi Light") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Semi Light") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_SEMI_LIGHT;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Regular") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Regular") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_REGULAR;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Medium") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Medium") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_MEDIUM;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Semi Bold") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Semi Bold") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_SEMI_BOLD;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Bold") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Bold") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_BOLD;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Extra Bold") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Extra Bold") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_EXTRA_BOLD;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Ultra Bold") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Ultra Bold") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_ULTRA_BOLD;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Black") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Black") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_BLACK;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Heavy") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Heavy") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_HEAVY;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Extra Black") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Extra Black") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_EXTRA_BLACK;
-    else if (_stricmp(this->drawingSettings->fontWeight, "Ultra Black") == 0)
+    else if (_stricmp(drawingSettings->fontWeight, "Ultra Black") == 0)
         fontWeight = DWRITE_FONT_WEIGHT_ULTRA_BLACK;
     else
         fontWeight = DWRITE_FONT_WEIGHT_NORMAL;
 
     // Font style
     DWRITE_FONT_STYLE fontStyle;
-    if (_stricmp(this->drawingSettings->fontStyle, "Oblique") == 0)
+    if (_stricmp(drawingSettings->fontStyle, "Oblique") == 0)
         fontStyle = DWRITE_FONT_STYLE_OBLIQUE;
-    else if (_stricmp(this->drawingSettings->fontStyle, "Italic") == 0)
+    else if (_stricmp(drawingSettings->fontStyle, "Italic") == 0)
         fontStyle = DWRITE_FONT_STYLE_ITALIC;
     else
         fontStyle = DWRITE_FONT_STYLE_NORMAL;
 
     // Font stretch
     DWRITE_FONT_STRETCH fontStretch;
-    if (_stricmp(this->drawingSettings->fontStretch, "Ultra Condensed") == 0)
+    if (_stricmp(drawingSettings->fontStretch, "Ultra Condensed") == 0)
         fontStretch = DWRITE_FONT_STRETCH_ULTRA_CONDENSED;
-    else if (_stricmp(this->drawingSettings->fontStretch, "Extra Condensed") == 0)
+    else if (_stricmp(drawingSettings->fontStretch, "Extra Condensed") == 0)
         fontStretch = DWRITE_FONT_STRETCH_EXTRA_CONDENSED;
-    else if (_stricmp(this->drawingSettings->fontStretch, "Condensed") == 0)
+    else if (_stricmp(drawingSettings->fontStretch, "Condensed") == 0)
         fontStretch = DWRITE_FONT_STRETCH_CONDENSED;
-    else if (_stricmp(this->drawingSettings->fontStretch, "Semi Condensed") == 0)
+    else if (_stricmp(drawingSettings->fontStretch, "Semi Condensed") == 0)
         fontStretch = DWRITE_FONT_STRETCH_SEMI_CONDENSED;
-    else if (_stricmp(this->drawingSettings->fontStretch, "Medium") == 0)
+    else if (_stricmp(drawingSettings->fontStretch, "Medium") == 0)
         fontStretch = DWRITE_FONT_STRETCH_MEDIUM;
-    else if (_stricmp(this->drawingSettings->fontStretch, "Semi Expanded") == 0)
+    else if (_stricmp(drawingSettings->fontStretch, "Semi Expanded") == 0)
         fontStretch = DWRITE_FONT_STRETCH_SEMI_EXPANDED;
-    else if (_stricmp(this->drawingSettings->fontStretch, "Expanded") == 0)
+    else if (_stricmp(drawingSettings->fontStretch, "Expanded") == 0)
         fontStretch = DWRITE_FONT_STRETCH_EXPANDED;
-    else if (_stricmp(this->drawingSettings->fontStretch, "Extra Expanded") == 0)
+    else if (_stricmp(drawingSettings->fontStretch, "Extra Expanded") == 0)
         fontStretch = DWRITE_FONT_STRETCH_EXTRA_EXPANDED;
-    else if (_stricmp(this->drawingSettings->fontStretch, "Ultra Expanded") == 0)
+    else if (_stricmp(drawingSettings->fontStretch, "Ultra Expanded") == 0)
         fontStretch = DWRITE_FONT_STRETCH_ULTRA_EXPANDED;
     else
         fontStretch = DWRITE_FONT_STRETCH_NORMAL;
@@ -310,27 +327,27 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     IDWriteFactory *pDWFactory = NULL;
     Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&pDWFactory));
     pDWFactory->CreateTextFormat(
-        this->drawingSettings->font,
+        drawingSettings->font,
         NULL,
         fontWeight,
         fontStyle,
         fontStretch,
-        this->drawingSettings->fontSize,
+        drawingSettings->fontSize,
         L"en-US",
         &this->textFormat);
 
     // Set the horizontal text alignment
-    if (_stricmp(this->drawingSettings->textAlign, "Center") == 0)
+    if (_stricmp(drawingSettings->textAlign, "Center") == 0)
         this->textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-    else if (_stricmp(this->drawingSettings->textAlign, "Right") == 0)
+    else if (_stricmp(drawingSettings->textAlign, "Right") == 0)
         this->textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
     else
         this->textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 
     // Set the vertical text alignment
-    if (_stricmp(this->drawingSettings->textVerticalAlign, "Middle") == 0)
+    if (_stricmp(drawingSettings->textVerticalAlign, "Middle") == 0)
         this->textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-    else if (_stricmp(this->drawingSettings->textVerticalAlign, "Bottom") == 0)
+    else if (_stricmp(drawingSettings->textVerticalAlign, "Bottom") == 0)
         this->textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
     else
         this->textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
@@ -339,9 +356,9 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     DWRITE_TRIMMING trimmingOptions;
     trimmingOptions.delimiter = 0;
     trimmingOptions.delimiterCount = 0;
-    if (_stricmp(this->drawingSettings->textTrimmingGranularity, "None") == 0)
+    if (_stricmp(drawingSettings->textTrimmingGranularity, "None") == 0)
         trimmingOptions.granularity = DWRITE_TRIMMING_GRANULARITY_NONE;
-    else if (_stricmp(this->drawingSettings->textVerticalAlign, "Word") == 0)
+    else if (_stricmp(drawingSettings->textVerticalAlign, "Word") == 0)
         trimmingOptions.granularity = DWRITE_TRIMMING_GRANULARITY_WORD;
     else
         trimmingOptions.granularity = DWRITE_TRIMMING_GRANULARITY_CHARACTER;
@@ -349,15 +366,10 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     this->textFormat->SetTrimming(&trimmingOptions, NULL);
 
     // Set word wrapping
-    this->textFormat->SetWordWrapping(this->drawingSettings->wordWrap ? DWRITE_WORD_WRAPPING_WRAP : DWRITE_WORD_WRAPPING_NO_WRAP);
+    this->textFormat->SetWordWrapping(drawingSettings->wordWrap ? DWRITE_WORD_WRAPPING_WRAP : DWRITE_WORD_WRAPPING_NO_WRAP);
 
     // Set reading direction
-    this->textFormat->SetReadingDirection(this->drawingSettings->rightToLeft ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
-
-    // Set the text
-    SetText(this->drawingSettings->text);
-
-    this->initialized = true;
+    this->textFormat->SetReadingDirection(drawingSettings->rightToLeft ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
 }
 
 
@@ -640,6 +652,9 @@ void DrawableWindow::HandleActiveStateChange() {
     // TODO::Really should update all settings.
     ID2D1SolidColorBrush *backBrush = reinterpret_cast<ID2D1SolidColorBrush*>(this->backBrush);
     backBrush->SetColor(Color::ARGBToD2D(drawSettings->color));
+
+    //
+    ReCreateTextFormat(drawSettings);
 
     Repaint();
 }

@@ -149,6 +149,9 @@ private:
     // (Re)Creates D2D device-dependent stuff.
     HRESULT ReCreateDeviceResources();
 
+    // Recreates textFormat.
+    void ReCreateTextFormat(DrawableSettings* drawingSettings);
+
     // Removes the specified child.
     void RemoveChild(DrawableWindow* child);
 
