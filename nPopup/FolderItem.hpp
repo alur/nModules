@@ -19,6 +19,8 @@ namespace nPopup {
 
         LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
+        void ClosingPopup();
+
     private:
         void Init(LPCSTR title, Popup* popup);
 
@@ -26,5 +28,6 @@ namespace nPopup {
         LPCSTR title;
 
         DrawableWindow::STATE hoverState;
+        DrawableWindow::STATE openState;
     };
 }

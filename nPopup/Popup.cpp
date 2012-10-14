@@ -11,6 +11,7 @@
 #include "Popup.hpp"
 #include "../nShared/LSModule.hpp"
 #include "../nShared/MonitorInfo.hpp"
+#include "FolderItem.hpp"
 
 
 extern LSModule* g_LSModule;
@@ -43,6 +44,7 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
     SetWindowLongPtr(this->window->GetWindow(), GWL_EXSTYLE, GetWindowLongPtr(this->window->GetWindow(), GWL_EXSTYLE) & ~WS_EX_NOACTIVATE);
     this->sized = false;
     this->mouseOver = false;
+    this->childItem = NULL;
 }
 
 
@@ -74,18 +76,21 @@ void Popup::RemoveItem(PopupItem* item) {
 void Popup::CloseChild() {
     if (this->openChild != NULL) {
         this->openChild->owner = NULL;
+        ((nPopup::FolderItem*)this->childItem)->ClosingPopup();
         this->openChild->Close();
+        this->childItem = NULL;
         this->openChild = NULL;
     }
 }
 
 
-void Popup::OpenChild(Popup* child, int y, int x) {
+void Popup::OpenChild(Popup* child, int y, int x, PopupItem* childItem) {
     if (child != this->openChild) {
         CloseChild();
         //RECT r;
         //this->window->GetScreenRect(&r);
         this->openChild = child;
+        this->childItem = childItem;
         //this->openChild->Show(r.right, y, this);
         this->openChild->Show(x+this->padding.right, y, this);
     }

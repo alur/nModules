@@ -43,6 +43,7 @@ void nPopup::FolderItem::Init(LPCSTR title, Popup* popup) {
     defaults->textOffsetLeft = 20;
     this->window->Initialize(defaults);
     this->hoverState = this->window->AddState("Hover", new DrawableSettings(), 100);
+    this->openState = this->window->AddState("Open", new DrawableSettings(), 80);
 }
 
 
@@ -62,7 +63,8 @@ LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, 
             if (this->popup != NULL) {
                 RECT r;
                 this->window->GetScreenRect(&r);
-                ((Popup*)this->parent)->OpenChild(this->popup, r.top, r.right);
+                ((Popup*)this->parent)->OpenChild(this->popup, r.top, r.right, this);
+                this->window->ActivateState(this->openState);
             }
         }
         return 0;
@@ -74,4 +76,12 @@ LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, 
         return 0;
     }
     return DefWindowProc(window, msg, wParam, lParam);
+}
+
+
+/// <summary>
+/// Called by the parent when it is closing the popup for whatever reason.
+/// </summary>
+void nPopup::FolderItem::ClosingPopup() {
+    this->window->ClearState(this->openState);
 }

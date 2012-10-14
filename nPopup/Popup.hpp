@@ -26,13 +26,10 @@ public:
     void Show(int x, int y, Popup* owner = NULL);
     
     // Called by PopupItems
-    void OpenChild(Popup*, int y, int x);
+    void OpenChild(Popup*, int y, int x, PopupItem* childItem);
     void CloseChild();
 
-    // Called by the parent
-
-
-    // Called by items or children
+    // Called by items, children, or the owner.
     void Close();
 
     //
@@ -53,6 +50,9 @@ protected:
     vector<PopupItem*> items;
 
 private:
+    //
+    PopupItem* childItem;
+
     //
     bool CheckFocus(HWND newActive, __int8 direction);
 
