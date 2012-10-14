@@ -73,8 +73,13 @@ void Popup::RemoveItem(PopupItem* item) {
 }
 
 
-void Popup::CloseChild() {
+void Popup::CloseChild(bool closing) {
     if (this->openChild != NULL) {
+        if (!closing) {
+            SetFocus(this->window->GetWindow());
+            SetActiveWindow(this->window->GetWindow());
+        }
+
         this->openChild->owner = NULL;
         ((nPopup::FolderItem*)this->childItem)->ClosingPopup();
         this->openChild->Close();
@@ -112,7 +117,7 @@ bool Popup::CheckFocus(HWND newActive, __int8 direction) {
 
 void Popup::Close() {
     this->window->Hide();
-    CloseChild();
+    CloseChild(true);
     if (this->owner != NULL) {
         this->owner->Close();
         this->owner = NULL;
@@ -166,6 +171,7 @@ void Popup::Size() {
 
 void Popup::Show(int x, int y, Popup* owner) {
     this->owner = owner;
+    SetParent(this->window->GetWindow(), NULL);
     PreShow();
 
     MonitorInfo* monInfo = this->window->GetMonitorInformation();
@@ -181,6 +187,7 @@ void Popup::Show(int x, int y, Popup* owner) {
 
     this->window->Show();
     SetWindowPos(this->window->GetWindow(), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    SetFocus(this->window->GetWindow());
     SetActiveWindow(this->window->GetWindow());
 }
 

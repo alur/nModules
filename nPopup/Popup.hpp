@@ -27,7 +27,7 @@ public:
     
     // Called by PopupItems
     void OpenChild(Popup*, int y, int x, PopupItem* childItem);
-    void CloseChild();
+    void CloseChild(bool closing = false);
 
     // Called by items, children, or the owner.
     void Close();
