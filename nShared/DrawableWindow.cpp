@@ -650,8 +650,8 @@ void DrawableWindow::HandleActiveStateChange() {
     }
 
     // TODO::Really should update all settings.
-    ID2D1SolidColorBrush *backBrush = reinterpret_cast<ID2D1SolidColorBrush*>(this->backBrush);
-    backBrush->SetColor(Color::ARGBToD2D(drawSettings->color));
+    reinterpret_cast<ID2D1SolidColorBrush*>(this->backBrush)->SetColor(Color::ARGBToD2D(drawSettings->color));
+    reinterpret_cast<ID2D1SolidColorBrush*>(this->textBrush)->SetColor(Color::ARGBToD2D(drawSettings->fontColor));
 
     //
     ReCreateTextFormat(drawSettings);
