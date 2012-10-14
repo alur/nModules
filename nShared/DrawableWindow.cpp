@@ -351,6 +351,9 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     // Set word wrapping
     this->textFormat->SetWordWrapping(this->drawingSettings->wordWrap ? DWRITE_WORD_WRAPPING_WRAP : DWRITE_WORD_WRAPPING_NO_WRAP);
 
+    // Set reading direction
+    this->textFormat->SetReadingDirection(this->drawingSettings->rightToLeft ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
+
     // Set the text
     SetText(this->drawingSettings->text);
 

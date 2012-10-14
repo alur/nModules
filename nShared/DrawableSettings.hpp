@@ -56,6 +56,9 @@ public:
     // The image to use for this window. Default: "" (blank)
     char image[MAX_PATH];
 
+    // Right-to-Left. Default: False
+    bool rightToLeft;
+
     // The text to display. Default: "" (blank)
     WCHAR text[MAX_LINE_LENGTH];
 
