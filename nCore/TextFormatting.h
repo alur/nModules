@@ -32,7 +32,7 @@ EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
 //  Constant
 //  Function
 //  Function(List)
-//  Expression Function Expression
+//  Expression Operator Expression
 //
 // List:
 //  Expression, List
@@ -40,6 +40,22 @@ EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
 //     
 // Function:
 //  ['A'-'Z' 'a'-'z']+['0'-'9' 'A'-'Z' 'a'-'z']*
+//
+// Operator:
+//  +
+//  -
+//  /
+//  *
+//  ^
+//  %
+//  <=
+//  >=
+//  <
+//  >
+//  !=
+//  ==
+//  &&
+//  ||
 // 
 // Constant:
 //  String

@@ -16,8 +16,11 @@
 using std::map;
 using std::wstring;
 
-// All registered formatters.
-map<wstring, FORMATTINGPROC> g_formatters;
+// All existing functions.
+map<wstring, FORMATTINGPROC> functionMap;
+
+//
+map<wstring, FORMATTINGPROC> operatorMap;
 
 
 /// <summary>
