@@ -662,10 +662,10 @@ void DrawableWindow::Show() {
 /// Hides the window.
 /// </summary>
 void DrawableWindow::Hide() {
+    this->visible = false;
     if (!this->parent) {
         ShowWindow(this->window, SW_HIDE);
     }
-    this->visible = false;
 }
 
 

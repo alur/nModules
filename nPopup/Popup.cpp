@@ -116,14 +116,19 @@ bool Popup::CheckFocus(HWND newActive, __int8 direction) {
 
 
 void Popup::Close() {
+    TRACEW(L"Closing %s", this->window->GetDrawingSettings()->text);
     this->window->Hide();
     CloseChild(true);
+    TRACEW(L"PostClose %s", this->window->GetDrawingSettings()->text);
+    PostClose();
     if (this->owner != NULL) {
+        this->owner->openChild = NULL;
+        ((nPopup::FolderItem*)this->owner->childItem)->ClosingPopup();
+        this->owner->childItem = NULL;
         this->owner->Close();
         this->owner = NULL;
     }
     this->mouseOver = false;
-    PostClose();
 }
 
 
@@ -195,7 +200,7 @@ void Popup::Show(int x, int y, Popup* owner) {
 LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
     case WM_ACTIVATE:
-        if (LOWORD(wParam) == WA_INACTIVE) {
+        if (LOWORD(wParam) == WA_INACTIVE && this->window->IsVisible()) {
             if (!CheckFocus((HWND)lParam, 3)) {
                 Close();
             }

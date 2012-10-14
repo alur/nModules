@@ -43,11 +43,13 @@ ContentPopup::ContentPopup(LPCSTR path, bool dynamic, LPCSTR title, LPCSTR bang,
 
 
 ContentPopup::~ContentPopup() {
+    TRACEW(L"~ContentPopup %s", this->window->GetDrawingSettings()->text);
     for (WATCHFOLDERMAP::const_iterator iter = this->watchedFolders.begin(); iter != this->watchedFolders.end(); ++iter) {
         iter->second.second->Release();
         this->window->ReleaseUserMessage(iter->first);
         SHChangeNotifyDeregister(iter->second.first);
     }
+    this->watchedFolders.clear();
 
     for (list<LPCSTR>::const_iterator iter = paths.begin(); iter != paths.end(); ++iter) {
         free((LPVOID)*iter);
@@ -72,10 +74,19 @@ void ContentPopup::PreShow() {
 
 void ContentPopup::PostClose() {
     if (this->dynamic) {
+        TRACEW(L"~ContentPopup::PostClose() %s", this->window->GetDrawingSettings()->text);
+        for (WATCHFOLDERMAP::const_iterator iter = this->watchedFolders.begin(); iter != this->watchedFolders.end(); ++iter) {
+            iter->second.second->Release();
+            this->window->ReleaseUserMessage(iter->first);
+            SHChangeNotifyDeregister(iter->second.first);
+        }
+        this->watchedFolders.clear();
+
         for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); ++iter) {
             delete *iter;
         }
         this->items.clear();
+
         this->loaded = false;
     }
 }
@@ -227,7 +238,7 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
             openable = SUCCEEDED(hr) && !dontExpandFolders && (((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE));
 
             if (openable) {
-                item = new nPopup::FolderItem(this, name, new ContentPopup(command, false, name, NULL, this->settings->prefix));
+                item = new nPopup::FolderItem(this, name, new ContentPopup(command, this->dynamic, name, NULL, this->settings->prefix));
             }
             else {
                 StringCchPrintf(quotedCommand, sizeof(quotedCommand), "\"%s\"", command);
