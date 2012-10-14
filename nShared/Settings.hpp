@@ -16,6 +16,10 @@ typedef DWORD ARGB;
 class Settings {
 public:
     explicit Settings(LPCSTR prefix);
+
+    // Makes a deep copy of the specified settings.
+    explicit Settings(Settings* settings);
+
     virtual ~Settings();
 
     Settings* CreateChild(LPCSTR prefix);
@@ -60,9 +64,6 @@ public:
     
 private:
 	explicit Settings(LPCSTR pszPrefix, LPCSTR pszPrev[]);
-
-    // Makes a deep copy of the specified settings.
-    explicit Settings(Settings* settings);
 
     // Creates the Settings* for this settings group.
 	Settings* GreateGroup(LPCSTR pszPrev[]);

@@ -3,8 +3,6 @@
  *  The nModules Project
  *
  *  A generic drawable window.
- *  
- *  TODO::Possibly implement the default settings as a state. 
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
@@ -31,30 +29,24 @@ using namespace D2D1;
 /// Constructor used by LSModule to create a top-level window.
 /// </summary>
 DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) {
-    this->activeChild = NULL;
-    this->activeState = this->states.end();
-    this->backBrush = NULL;
-    this->defaultDrawingSettings = NULL;
-    ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
-    this->drawingSettings = new DrawableSettings();
-    this->initialized = false;
-    this->isTrackingMouse = false;
-    this->msgHandler = msgHandler;
     this->monitorInfo = new MonitorInfo();
     this->parent = NULL;
-    this->renderTarget = NULL;
-    this->settings = settings;
-    this->text[0] = '\0';
-    ZeroMemory(&this->textArea, sizeof(this->textArea));
-    this->textBrush = NULL;
-    this->textFormat = NULL;
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
     this->userMsgIDs = new UIDGenerator<UINT>(WM_USER);
-    this->visible = false;
+
+    ConstructorCommon(settings, msgHandler);
+
     this->window = MessageHandler::CreateMessageWindowEx(WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_COMPOSITED,
         windowClass, "", WS_POPUP, 0, 0, 0, 0, parent, NULL, instance, this);
     SetWindowPos(this->window, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
     SetWindowLongPtr(this->window, GWLP_USERDATA, MAGIC_DWORD);
+
+    // Configure the mouse tracking struct
+    ZeroMemory(&this->trackMouseStruct, sizeof(TRACKMOUSEEVENT));
+    this->trackMouseStruct.cbSize = sizeof(TRACKMOUSEEVENT);
+    this->trackMouseStruct.hwndTrack = this->window;
+    this->trackMouseStruct.dwFlags = TME_LEAVE;
+    this->trackMouseStruct.dwHoverTime = 200;
 
     // All frame :p
     MARGINS m;
@@ -70,28 +62,36 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instan
 /// Constructor used by CreateChild to create a child window.
 /// </summary>
 DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler) {
-    this->activeChild = NULL;
-    this->activeState = this->states.end();
-    this->backBrush = NULL;
-    this->defaultDrawingSettings = NULL;
-    ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
-    this->drawingSettings = new DrawableSettings();
-    this->initialized = false;
-    this->isTrackingMouse = false;
-    this->msgHandler = msgHandler;
     this->monitorInfo = parent->monitorInfo;
     this->parent = parent;
-    this->renderTarget = NULL;
-    this->settings = settings;
-    this->text[0] = '\0';
-    ZeroMemory(&this->textArea, sizeof(this->textArea));
-    this->textBrush = NULL;
-    this->textFormat = NULL;
     this->timerIDs = NULL;
     this->userMsgIDs = NULL;
     this->updateTextTimer = NULL;
-    this->visible = false;
     this->window = parent->window;
+
+    ConstructorCommon(settings, msgHandler);
+}
+
+
+/// <summary>
+/// Called by the constructors, intializes variables.
+/// </summary>
+void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHandler) {
+    this->activeChild = NULL;
+    ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
+    this->initialized = false;
+    this->isTrackingMouse = false;
+    this->msgHandler = msgHandler;
+    this->renderTarget = NULL;
+    this->text[0] = '\0';
+    this->visible = false;
+
+    // Create the base state
+    State state = {0};
+    state.active = true;
+    state.settings = new Settings(settings);
+    state.drawingSettings = new DrawableSettings();
+    this->activeState = this->baseState = this->states.insert(this->states.begin(), state);
 }
 
 
@@ -115,14 +115,15 @@ DrawableWindow::~DrawableWindow() {
         SAFEDELETE(iter->defaultSettings);
         SAFEDELETE(iter->drawingSettings);
         SAFEDELETE(iter->settings);
+
+        SAFERELEASE(iter->backBrush);
+        SAFERELEASE(iter->textBrush);
+        SAFERELEASE(iter->textFormat);
     }
     this->states.clear();
 
     // Delete all overlays
     ClearOverlays();
-
-    SAFEDELETE(this->drawingSettings);
-    SAFEDELETE(this->defaultDrawingSettings);
 
     if (!this->parent) {
         SAFERELEASE(this->renderTarget);
@@ -131,10 +132,6 @@ DrawableWindow::~DrawableWindow() {
     if (!this->parent) {
         SAFEDELETE(this->monitorInfo);
     }
-
-    SAFERELEASE(this->backBrush);
-    SAFERELEASE(this->textBrush);
-    SAFERELEASE(this->textFormat);
 }
 
 
@@ -218,44 +215,49 @@ void DrawableWindow::ClearOverlays() {
 /// Initalizes this window.
 /// </summary>
 void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
-    this->defaultDrawingSettings = defaultSettings;
-    this->drawingSettings->Load(this->settings, this->defaultDrawingSettings);
-
-    // Configure the mouse tracking struct
-    ZeroMemory(&this->trackMouseStruct, sizeof(TRACKMOUSEEVENT));
-    this->trackMouseStruct.cbSize = sizeof(TRACKMOUSEEVENT);
-    this->trackMouseStruct.hwndTrack = this->window;
-    this->trackMouseStruct.dwFlags = TME_LEAVE;
-    this->trackMouseStruct.dwHoverTime = 200;
+    // Load the base state's settings.
+    this->baseState->defaultSettings = defaultSettings;
+    this->baseState->drawingSettings->Load(this->baseState->settings, this->baseState->defaultSettings);
 
     // Create D2D resources
     ReCreateDeviceResources();
 
-    //
-    SetPosition(this->drawingSettings->x, this->drawingSettings->y, this->drawingSettings->width, this->drawingSettings->height);
+    // Put the window in its correct position.
+    SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y,
+        this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
 
-    if (!this->parent && this->drawingSettings->alwaysOnTop) {
+    // AlwaysOnTop... TODO::Fix this!
+    if (!this->parent && this->baseState->drawingSettings->alwaysOnTop) {
         SetParent(this->window, NULL);
         SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
     }
 
     // Create the text format
-    ReCreateTextFormat(this->drawingSettings);
+    CreateTextFormat(this->baseState->drawingSettings, &this->baseState->textFormat);
+    CreateBrushes(&(*this->baseState));
     
     // Set the text
-    SetText(this->drawingSettings->text);
+    SetText(this->baseState->drawingSettings->text);
 
     this->initialized = true;
 }
 
 
 /// <summary>
-/// (Re)Creates the textFormat based on the specified drawingSettings.
+/// Creates the brushes for the specified state.
 /// </summary>
-void DrawableWindow::ReCreateTextFormat(DrawableSettings* drawingSettings) {
-    // Drop the old textformat
-    SAFERELEASE(this->textFormat);
+HRESULT DrawableWindow::CreateBrushes(State* state) {
+    this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(state->drawingSettings->color), (ID2D1SolidColorBrush**)&state->backBrush);
+    this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(state->drawingSettings->fontColor), (ID2D1SolidColorBrush**)&state->textBrush);
 
+    return S_OK;
+}
+
+
+/// <summary>
+/// Creates a textFormat based on the specified drawingSettings.
+/// </summary>
+HRESULT DrawableWindow::CreateTextFormat(DrawableSettings* drawingSettings, IDWriteTextFormat** textFormat) {
     // Font weight
     DWRITE_FONT_WEIGHT fontWeight;
     if (_stricmp(drawingSettings->fontWeight, "Thin") == 0)
@@ -334,23 +336,23 @@ void DrawableWindow::ReCreateTextFormat(DrawableSettings* drawingSettings) {
         fontStretch,
         drawingSettings->fontSize,
         L"en-US",
-        &this->textFormat);
+        textFormat);
 
     // Set the horizontal text alignment
     if (_stricmp(drawingSettings->textAlign, "Center") == 0)
-        this->textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+        (*textFormat)->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     else if (_stricmp(drawingSettings->textAlign, "Right") == 0)
-        this->textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
+        (*textFormat)->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
     else
-        this->textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+        (*textFormat)->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 
     // Set the vertical text alignment
     if (_stricmp(drawingSettings->textVerticalAlign, "Middle") == 0)
-        this->textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+        (*textFormat)->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
     else if (_stricmp(drawingSettings->textVerticalAlign, "Bottom") == 0)
-        this->textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+        (*textFormat)->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
     else
-        this->textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+        (*textFormat)->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
     // Set the trimming method
     DWRITE_TRIMMING trimmingOptions;
@@ -363,28 +365,30 @@ void DrawableWindow::ReCreateTextFormat(DrawableSettings* drawingSettings) {
     else
         trimmingOptions.granularity = DWRITE_TRIMMING_GRANULARITY_CHARACTER;
 
-    this->textFormat->SetTrimming(&trimmingOptions, NULL);
+    (*textFormat)->SetTrimming(&trimmingOptions, NULL);
 
     // Set word wrapping
-    this->textFormat->SetWordWrapping(drawingSettings->wordWrap ? DWRITE_WORD_WRAPPING_WRAP : DWRITE_WORD_WRAPPING_NO_WRAP);
+    (*textFormat)->SetWordWrapping(drawingSettings->wordWrap ? DWRITE_WORD_WRAPPING_WRAP : DWRITE_WORD_WRAPPING_NO_WRAP);
 
     // Set reading direction
-    this->textFormat->SetReadingDirection(drawingSettings->rightToLeft ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
+    (*textFormat)->SetReadingDirection(drawingSettings->rightToLeft ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
+
+    return S_OK;
 }
 
 
 DrawableSettings* DrawableWindow::GetDrawingSettings() {
-    return this->drawingSettings;
+    return this->baseState->drawingSettings;
 }
 
 
 void DrawableWindow::Move(int x, int y) {
-    SetPosition(x, y, this->drawingSettings->width, this->drawingSettings->height);
+    SetPosition(x, y, this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
 }
 
 
 void DrawableWindow::Resize(int width, int height) {
-    SetPosition(this->drawingSettings->x, this->drawingSettings->y, width, height);
+    SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y, width, height);
 }
 
 
@@ -395,46 +399,47 @@ bool DrawableWindow::IsVisible() {
 
 void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     //
-    this->drawingSettings->x = x;
-    this->drawingSettings->y = y;
-    this->drawingSettings->width = width;
-    this->drawingSettings->height = height;
+    this->baseState->drawingSettings->x = x;
+    this->baseState->drawingSettings->y = y;
+    this->baseState->drawingSettings->width = width;
+    this->baseState->drawingSettings->height = height;
 
     // Position the window and/or set the backarea.
     if (!this->parent) {
-        SetWindowPos(this->window, 0, this->drawingSettings->x, this->drawingSettings->y,
-            this->drawingSettings->width, this->drawingSettings->height, SWP_NOZORDER);
-        this->drawingArea = D2D1::RectF(0, 0, (float)this->drawingSettings->width, (float)this->drawingSettings->height);
+        SetWindowPos(this->window, 0, x, y, width, height, SWP_NOZORDER);
+        this->drawingArea = D2D1::RectF(0, 0, (float)width, (float)height);
         D2D1_SIZE_U size = D2D1::SizeU(width, height);
         this->renderTarget->Resize(size);
     }
     else {
         this->drawingArea = D2D1::RectF(
-            this->parent->drawingArea.left + this->drawingSettings->x,
-            this->parent->drawingArea.top + this->drawingSettings->y,
-            this->parent->drawingArea.left + this->drawingSettings->x + this->drawingSettings->width,
-            this->parent->drawingArea.top + this->drawingSettings->y + this->drawingSettings->height
+            this->parent->drawingArea.left + x,
+            this->parent->drawingArea.top + y,
+            this->parent->drawingArea.left + x + width,
+            this->parent->drawingArea.top + y + height
         );
     }
 
     // The text area is offset from the drawing area.
-    this->textArea = this->drawingArea;
-    this->textArea.bottom -= this->drawingSettings->textOffsetBottom;
-    this->textArea.top += this->drawingSettings->textOffsetTop;
-    this->textArea.left += this->drawingSettings->textOffsetLeft;
-    this->textArea.right -= this->drawingSettings->textOffsetRight;
+    for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
+        state->textArea = this->drawingArea;
+        state->textArea.bottom -= state->drawingSettings->textOffsetBottom;
+        state->textArea.top += state->drawingSettings->textOffsetTop;
+        state->textArea.left += state->drawingSettings->textOffsetLeft;
+        state->textArea.right -= state->drawingSettings->textOffsetRight;
+    }
 
     // Update all overlays
-    for (list<Overlay>::iterator iter = overlays.begin(); iter != overlays.end(); ++iter) {
-        iter->drawingPosition = iter->position;
-        iter->drawingPosition.left += this->drawingArea.left;
-        iter->drawingPosition.right += this->drawingArea.left;
-        iter->drawingPosition.top += this->drawingArea.top;
-        iter->drawingPosition.bottom += this->drawingArea.top;
+    for (OVERLAY overlay = overlays.begin(); overlay != overlays.end(); ++overlay) {
+        overlay->drawingPosition = overlay->position;
+        overlay->drawingPosition.left += this->drawingArea.left;
+        overlay->drawingPosition.right += this->drawingArea.left;
+        overlay->drawingPosition.top += this->drawingArea.top;
+        overlay->drawingPosition.bottom += this->drawingArea.top;
 
         // Move the origin of the brush to match the overlay position
-        iter->brush->SetTransform(Matrix3x2F::Identity());
-        iter->brush->SetTransform(Matrix3x2F::Translation(iter->drawingPosition.left, iter->drawingPosition.top));
+        overlay->brush->SetTransform(Matrix3x2F::Identity());
+        overlay->brush->SetTransform(Matrix3x2F::Translation(overlay->drawingPosition.left, overlay->drawingPosition.top));
     }
 }
 
@@ -450,7 +455,7 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
             Factories::GetD2DFactory(reinterpret_cast<LPVOID*>(&pD2DFactory));
 
             // Create the render target
-            D2D1_SIZE_U size = D2D1::SizeU(this->drawingSettings->width, this->drawingSettings->height);
+            D2D1_SIZE_U size = D2D1::SizeU(this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
             pD2DFactory->CreateHwndRenderTarget(
                 RenderTargetProperties(
                     D2D1_RENDER_TARGET_TYPE_DEFAULT,
@@ -459,15 +464,9 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
                 HwndRenderTargetProperties(this->window, size),
                 &this->renderTarget
             );
-        
-            // And the brushes
-            this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->drawingSettings->color), (ID2D1SolidColorBrush**)&this->backBrush);
-            this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->drawingSettings->fontColor), (ID2D1SolidColorBrush**)&this->textBrush);
         }
         else {
             this->renderTarget = this->parent->renderTarget;
-            this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->drawingSettings->color), (ID2D1SolidColorBrush**)&this->backBrush);
-            this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->drawingSettings->fontColor), (ID2D1SolidColorBrush**)&this->textBrush);
         }
     }
 
@@ -498,9 +497,10 @@ void DrawableWindow::GetScreenRect(LPRECT rect) {
     GetWindowRect(this->window, &r);
     rect->left = r.left + (LONG)this->drawingArea.left;
     rect->top = r.top + (LONG)this->drawingArea.top;
-    rect->right = rect->left + this->drawingSettings->width;
-    rect->bottom = rect->top + this->drawingSettings->height;
+    rect->right = r.left + (LONG)this->drawingArea.right;
+    rect->bottom = r.top + (LONG)this->drawingArea.bottom;
 }
+
 
 HWND DrawableWindow::GetWindow() {
     return this->window;
@@ -574,19 +574,19 @@ void DrawableWindow::Repaint(LPRECT region) {
 /// Sizes the window to fit its current text.
 /// </summary>
 void DrawableWindow::SizeToText(int maxWidth, int maxHeight) {
-    IDWriteFactory* factory;
-    IDWriteTextLayout* textLayout;
+    IDWriteFactory* factory = NULL;
+    IDWriteTextLayout* textLayout = NULL;
     DWRITE_TEXT_METRICS metrics;
 
     Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&factory));
-    factory->CreateTextLayout(this->text, lstrlenW(this->text), this->textFormat, (float)maxWidth, (float)maxHeight, &textLayout);
+    factory->CreateTextLayout(this->text, lstrlenW(this->text), this->baseState->textFormat, (float)maxWidth, (float)maxHeight, &textLayout);
     textLayout->GetMetrics(&metrics);
-    textLayout->Release();
+    SAFERELEASE(textLayout);
 
-    metrics.width += this->drawingSettings->textOffsetLeft + this->drawingSettings->textOffsetRight + 1;
-    metrics.height += this->drawingSettings->textOffsetTop + this->drawingSettings->textOffsetBottom + 1;
+    metrics.width += this->baseState->drawingSettings->textOffsetLeft + this->baseState->drawingSettings->textOffsetRight + 1;
+    metrics.height += this->baseState->drawingSettings->textOffsetTop + this->baseState->drawingSettings->textOffsetBottom + 1;
 
-    this->SetPosition(this->drawingSettings->x, this->drawingSettings->y, (int)metrics.width, (int)metrics.height);
+    this->SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y, (int)metrics.width, (int)metrics.height);
 }
 
 
@@ -596,13 +596,15 @@ void DrawableWindow::SizeToText(int maxWidth, int maxHeight) {
 DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority) {
     State state;
     state.defaultSettings = defaultSettings;
-    state.settings = this->settings->CreateChild(prefix);
-    state.settings->AppendGroup(this->settings);
+    state.settings = this->baseState->settings->CreateChild(prefix);
+    state.settings->AppendGroup(this->baseState->settings);
     state.priority = state.settings->GetInt("Priority", defaultPriority);
     state.active = false;
     state.drawingSettings = new DrawableSettings();
 
     state.drawingSettings->Load(state.settings, defaultSettings);
+    CreateTextFormat(state.drawingSettings, &state.textFormat);
+    CreateBrushes(&state);
 
     // Insert the state based on its priority.
     list<State>::iterator iter;
@@ -638,24 +640,9 @@ void DrawableWindow::ClearState(DrawableWindow::STATE state) {
 
 
 /// <summary>
-/// Clears a certain state.
+/// 
 /// </summary>
 void DrawableWindow::HandleActiveStateChange() {
-    DrawableSettings* drawSettings;
-    if (this->activeState == this->states.end()) {
-        drawSettings = this->drawingSettings;
-    }
-    else {
-        drawSettings = this->activeState->drawingSettings;
-    }
-
-    // TODO::Really should update all settings.
-    reinterpret_cast<ID2D1SolidColorBrush*>(this->backBrush)->SetColor(Color::ARGBToD2D(drawSettings->color));
-    reinterpret_cast<ID2D1SolidColorBrush*>(this->textBrush)->SetColor(Color::ARGBToD2D(drawSettings->fontColor));
-
-    //
-    ReCreateTextFormat(drawSettings);
-
     Repaint();
 }
 
@@ -683,7 +670,7 @@ void DrawableWindow::Hide() {
 
 
 void DrawableWindow::SetText(LPCWSTR text) {
-    StringCchCopyW(this->drawingSettings->text, sizeof(this->drawingSettings->text)/sizeof(this->defaultDrawingSettings->text[0]), text);
+    StringCchCopyW(this->baseState->drawingSettings->text, sizeof(this->baseState->drawingSettings->text)/sizeof(this->baseState->drawingSettings->text[0]), text);
     UpdateText();
 }
 
@@ -800,10 +787,14 @@ void DrawableWindow::Paint() {
     if (this->visible) {
         this->renderTarget->SetTransform(Matrix3x2F::Identity());
 
-        this->renderTarget->FillRectangle(this->drawingArea, this->backBrush);
+        this->renderTarget->FillRectangle(this->drawingArea, this->activeState->backBrush);
     
-        this->renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, Point2F(this->drawingSettings->width/2.0f,this->drawingSettings->height/2.0f)));
-        this->renderTarget->DrawText(this->text, lstrlenW(this->text), this->textFormat, this->textArea, this->textBrush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+        this->renderTarget->SetTransform(
+            Matrix3x2F::Rotation(this->activeState->drawingSettings->textRotation,
+            Point2F(this->activeState->drawingSettings->width/2.0f,this->activeState->drawingSettings->height/2.0f)));
+
+        this->renderTarget->DrawText(this->text, lstrlenW(this->text), this->activeState->textFormat, 
+            this->activeState->textArea, this->activeState->textBrush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         
         // Paint all overlays
         for (list<Overlay>::iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++) {
@@ -833,6 +824,6 @@ void DrawableWindow::RemoveChild(DrawableWindow* child) {
 /// Forcibly updates the text.
 /// </summary>
 void DrawableWindow::UpdateText() {
-    nCore::System::FormatText(this->drawingSettings->text, sizeof(this->text)/sizeof(WCHAR), this->text);
+    nCore::System::FormatText(this->baseState->drawingSettings->text, sizeof(this->text)/sizeof(WCHAR), this->text);
     Repaint();
 }

@@ -31,6 +31,18 @@ public:
         Settings* settings;
         DrawableSettings* drawingSettings;
         DrawableSettings* defaultSettings;
+
+        // The brush we are currently painting the background with.
+        ID2D1Brush* backBrush;
+
+        // The brush we are currently painting the text with.
+        ID2D1Brush* textBrush;
+
+        // The area we draw text in
+        D2D1_RECT_F textArea;
+
+        // Defines how the text is formatted.
+        IDWriteTextFormat* textFormat;
     } State;
     typedef list<State>::iterator STATE;
 
@@ -40,7 +52,7 @@ public:
         D2D1_RECT_F drawingPosition;
         ID2D1Brush* brush;
     } Overlay;
-    typedef list<Overlay>::pointer OVERLAY;
+    typedef list<Overlay>::iterator OVERLAY;
 
     // Constructor used for top-level windows.
     explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler);
@@ -72,7 +84,7 @@ public:
     // Returns the current drawing settings.
     DrawableSettings* GetDrawingSettings();
 
-    //
+    // Returns a MonitorInfo class which will be kept up-to-date for the duration of this windows lifetime.
     MonitorInfo* GetMonitorInformation();
 
     // Returns the screen-coordinate position of this window.
@@ -140,6 +152,15 @@ protected:
     void Paint();
 
 private:
+    // Called by the constructors, intializes variables.
+    void ConstructorCommon(Settings* settings, MessageHandler* msgHandler);
+
+    // Creates an IDWriteTextFormat based on a DrawableSettings.
+    HRESULT CreateTextFormat(DrawableSettings* drawingSettings, IDWriteTextFormat** textFormat);
+
+    // Creates the brushes for a particular state.
+    HRESULT CreateBrushes(State* state);
+
     // Constructor used by CreateChild to create a child window.
     explicit DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler);
 
@@ -149,37 +170,28 @@ private:
     // (Re)Creates D2D device-dependent stuff.
     HRESULT ReCreateDeviceResources();
 
-    // Recreates textFormat.
-    void ReCreateTextFormat(DrawableSettings* drawingSettings);
-
     // Removes the specified child.
     void RemoveChild(DrawableWindow* child);
 
-    //
+    // The child window the mouse is currently over.
     DrawableWindow* activeChild;
 
     // The currently active state, or states.end().
     list<State>::iterator activeState;
 
-    // The brush we are currently painting the background with.
-    ID2D1Brush* backBrush;
+    // The base state -- the one to use when no others are active.
+    list<State>::iterator baseState;
 
     // The children of this drawablewindow.
     list<DrawableWindow*> children;
 
-    // The default drawing settings
-    DrawableSettings* defaultDrawingSettings;
-
     // The area we draw in.
     D2D1_RECT_F drawingArea;
 
-    // The current drawing settings we are using.
-    DrawableSettings* drawingSettings;
-
-    //
+    // If Initalize has been called.
     bool initialized;
 
-    //
+    // If the mouse is above the top-level window.
     bool isTrackingMouse;
 
     // The object which should handle mouse event messages.
@@ -197,31 +209,25 @@ private:
     // The render target to draw to
     ID2D1HwndRenderTarget* renderTarget;
 
-    // Settings for this window
-    Settings* settings;
-
     // All current states.
     list<State> states;
 
-    // The brush we are currently painting the text with.
-    ID2D1Brush* textBrush;
-
-    //
+    // Timer ID generator.
     UIDGenerator<UINT_PTR>* timerIDs;
 
-    //
+    // Registered timer ID's.
     map<UINT_PTR, MessageHandler*> timers;
 
-    //
+    // Used by the top-level window to track the mouse.
     TRACKMOUSEEVENT trackMouseStruct;
 
-    //
+    // Timer for re-evaulating the text.
     UINT_PTR updateTextTimer;
 
-    //
+    // User msg ID generator.
     UIDGenerator<UINT>* userMsgIDs;
 
-    //
+    // Registered user messages.
     map<UINT, MessageHandler*> userMessages;
 
     // Whether or not we are visible.
@@ -232,10 +238,4 @@ private:
 
     // The text we are currently drawing
     WCHAR text[MAX_LINE_LENGTH];
-
-    // The area we draw text in
-    D2D1_RECT_F textArea;
-
-    // Defines how the text is formatted.
-    IDWriteTextFormat* textFormat;
 };

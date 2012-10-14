@@ -92,7 +92,7 @@ void Icon::SetPosition(int x, int y) {
 
 void Icon::SetIcon() {
     IExtractIconW* extractIcon = NULL;
-    HICON icon;
+    HICON icon = NULL;
     WCHAR iconFile[MAX_PATH];
     int iconIndex = 0;
     UINT flags;
