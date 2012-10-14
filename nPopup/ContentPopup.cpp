@@ -25,7 +25,7 @@ ContentPopup::ContentPopup(ContentSource source, LPCSTR title, LPCSTR bang, LPCS
 
 ContentPopup::ContentPopup(LPCSTR path, bool dynamic, LPCSTR title, LPCSTR bang, LPCSTR prefix) : Popup(title, bang, prefix) {
     this->loaded = false;
-    this->dynamic = dynamic;
+    this->dynamic = false;
     this->source = ContentSource::PATH;
 
     char processedPath[MAX_PATH], originalPath[MAX_PATH];
@@ -72,7 +72,7 @@ void ContentPopup::PreShow() {
 
 void ContentPopup::PostClose() {
     if (this->dynamic) {
-        for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
+        for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); ++iter) {
             delete *iter;
         }
         this->items.clear();
@@ -179,24 +179,26 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
     }
 
     // Enumerate the contents of this folder
-    targetFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList);
-    while (enumIDList->Next(1, &idNext, NULL) != S_FALSE) {
-        LoadSingleItem(targetFolder, idNext, dontExpandFolders);
+    if (SUCCEEDED(targetFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList))) {
+        while (enumIDList->Next(1, &idNext, NULL) != S_FALSE) {
+            LoadSingleItem(targetFolder, idNext, dontExpandFolders);
+        }
+        enumIDList->Release();
+    
+
+        // Register for change notifications
+        SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
+        UINT message = this->window->RegisterUserMessage(this);
+        ULONG shnrUID = SHChangeNotifyRegister(
+            this->window->GetWindow(),
+            SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
+            SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM,
+            message,
+            1,
+            watchEntries);
+
+        this->watchedFolders.insert(WATCHFOLDERMAP::value_type(message, std::pair<UINT, IShellFolder*>(shnrUID, targetFolder)));
     }
-    enumIDList->Release();
-
-    // Register for change notifications
-    SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
-    UINT message = this->window->RegisterUserMessage(this);
-    ULONG shnrUID = SHChangeNotifyRegister(
-        this->window->GetWindow(),
-        SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
-        SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM,
-        message,
-        1,
-        watchEntries);
-
-    this->watchedFolders.insert(WATCHFOLDERMAP::value_type(message, std::pair<UINT, IShellFolder*>(shnrUID, targetFolder)));
 
     if (idNext) {
         CoTaskMemFree(idNext);

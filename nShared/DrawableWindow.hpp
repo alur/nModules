@@ -90,6 +90,9 @@ public:
     // Initializes the DrawableWindow.
     void Initialize(DrawableSettings* defaultSettings);
 
+    // Returns whether or not this window is visible.
+    bool IsVisible();
+
     // Moves this window.
     void Move(int x, int y);
 
@@ -101,6 +104,9 @@ public:
 
     // Forces this window to redraw.
     void Repaint(LPRECT region = NULL);
+
+    // Resizes the window.
+    void Resize(int width, int height);
 
     // Registers a timer
     UINT_PTR SetCallbackTimer(UINT elapse, MessageHandler* msgHandler);

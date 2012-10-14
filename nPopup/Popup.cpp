@@ -60,6 +60,10 @@ Popup::~Popup() {
 void Popup::AddItem(PopupItem* item) {
     this->items.push_back(item);
     this->sized = false;
+    if (this->window->IsVisible()) {
+        Size();
+        this->window->Repaint();
+    }
 }
 
 
@@ -70,7 +74,7 @@ void Popup::RemoveItem(PopupItem* item) {
 void Popup::CloseChild() {
     if (this->openChild != NULL) {
         this->openChild->owner = NULL;
-        this->openChild->Close(false);
+        this->openChild->Close();
         this->openChild = NULL;
     }
 }
@@ -78,9 +82,7 @@ void Popup::CloseChild() {
 
 void Popup::OpenChild(Popup* child, int y, int x) {
     if (child != this->openChild) {
-        if (this->openChild != NULL) {
-            this->openChild->Close(false);
-        }
+        CloseChild();
         //RECT r;
         //this->window->GetScreenRect(&r);
         this->openChild = child;
@@ -95,36 +97,23 @@ LPCSTR Popup::GetBang() {
 }
 
 
-void Popup::HandleInactivate(HWND window) {
-    if (this->window->GetWindow() != window && !this->mouseOver) {
-        Close(false);
-    
-        if (this->owner) {
-            this->owner->HandleInactivate(window);
-        }
-    }
+bool Popup::CheckFocus(HWND newActive, __int8 direction) {
+    if (this->window->GetWindow() == newActive || this->mouseOver)
+        return true;
+    return direction & 1 && this->owner && this->owner->CheckFocus(newActive, 1)
+        || direction & 2 && this->openChild && this->openChild->CheckFocus(newActive, 2);
 }
 
 
-void Popup::Close(bool closeAll) {
+void Popup::Close() {
     this->window->Hide();
-    if (this->openChild != NULL) {
-        this->openChild->owner = NULL;
-        this->openChild->Close(true);
-    }
+    CloseChild();
     if (this->owner != NULL) {
-        this->owner->ChildClosing(closeAll);
+        this->owner->Close();
+        this->owner = NULL;
     }
     this->mouseOver = false;
     PostClose();
-}
-
-
-void Popup::ChildClosing(bool close) {
-    this->openChild = NULL;
-    if (close) {
-        Close();
-    }
 }
 
 
@@ -135,43 +124,49 @@ void Popup::Show() {
 }
 
 
+void Popup::Size() {
+    int width = 200, height = this->padding.top;
+    for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
+        (*iter)->Position(this->padding.left, height);
+        height += (*iter)->GetHeight() + this->itemSpacing;
+    }
+    height += this->padding.bottom - this->itemSpacing;
+    MonitorInfo* monInfo = this->window->GetMonitorInformation();
+
+    if (height > monInfo->m_virtualDesktop.height) {
+        int columns = (height - this->padding.top - this->padding.bottom)/(monInfo->m_virtualDesktop.height - this->padding.top - this->padding.bottom) + 1;
+        width = 200 * columns + this->itemSpacing*(columns - 1);
+        height = this->padding.top;
+        int column = 0;
+        int rowHeight = 0;
+        for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
+            (*iter)->Position(this->padding.left + (200 + this->itemSpacing) * column, height);
+            rowHeight = max((*iter)->GetHeight() + this->itemSpacing, rowHeight);
+            column++;
+            if (column == columns) {
+                height += rowHeight;
+                rowHeight = 0;
+                column = 0;
+            }
+        }
+        if (column != 0) {
+            height += rowHeight;
+        }
+        height += this->padding.bottom - this->itemSpacing;
+    }
+    this->window->Resize(width, height);
+    this->sized = true;
+}
+
+
 void Popup::Show(int x, int y, Popup* owner) {
-    PreShow();
     this->owner = owner;
+    PreShow();
 
     MonitorInfo* monInfo = this->window->GetMonitorInformation();
 
     if (!this->sized) {
-        int width = 200, height = this->padding.top;
-        for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
-            (*iter)->Position(this->padding.left, height);
-            height += (*iter)->GetHeight() + this->itemSpacing;
-        }
-        height += this->padding.bottom - this->itemSpacing;
-
-        if (height > monInfo->m_virtualDesktop.height) {
-            int columns = (height - this->padding.top - this->padding.bottom)/(monInfo->m_virtualDesktop.height - this->padding.top - this->padding.bottom) + 1;
-            width = 200 * columns + this->itemSpacing*(columns - 1);
-            height = this->padding.top;
-            int column = 0;
-            int rowHeight = 0;
-            for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
-                (*iter)->Position(this->padding.left + (200 + this->itemSpacing) * column, height);
-                rowHeight = max((*iter)->GetHeight() + this->itemSpacing, rowHeight);
-                column++;
-                if (column == columns) {
-                    height += rowHeight;
-                    rowHeight = 0;
-                    column = 0;
-                }
-            }
-            if (column != 0) {
-                height += rowHeight;
-            }
-            height += this->padding.bottom - this->itemSpacing;
-        }
-        this->window->SetPosition(x, y, width, height);
-        this->sized = true;
+        Size();
     }
 
     x = max(monInfo->m_virtualDesktop.rect.left, min(monInfo->m_virtualDesktop.rect.right - this->window->GetDrawingSettings()->width, x));
@@ -189,11 +184,8 @@ LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam
     switch (msg) {
     case WM_ACTIVATE:
         if (LOWORD(wParam) == WA_INACTIVE) {
-            if (this->openChild == NULL) {
-                Close(false);
-                if (this->owner) {
-                    this->owner->HandleInactivate((HWND)lParam);
-                }
+            if (!CheckFocus((HWND)lParam, 3)) {
+                Close();
             }
         }
         return 0;

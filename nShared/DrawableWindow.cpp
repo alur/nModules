@@ -301,6 +301,16 @@ void DrawableWindow::Move(int x, int y) {
 }
 
 
+void DrawableWindow::Resize(int width, int height) {
+    SetPosition(this->drawingSettings->x, this->drawingSettings->y, width, height);
+}
+
+
+bool DrawableWindow::IsVisible() {
+    return this->visible;
+}
+
+
 void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     //
     this->drawingSettings->x = x;
@@ -308,7 +318,7 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     this->drawingSettings->width = width;
     this->drawingSettings->height = height;
 
-    // Position the window and/or set the backarea. TODO::Should call resize instead.
+    // Position the window and/or set the backarea.
     if (!this->parent) {
         SetWindowPos(this->window, 0, this->drawingSettings->x, this->drawingSettings->y,
             this->drawingSettings->width, this->drawingSettings->height, SWP_NOZORDER);

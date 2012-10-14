@@ -29,12 +29,11 @@ public:
     void OpenChild(Popup*, int y, int x);
     void CloseChild();
 
-    // Called by child popups
-    void ChildClosing(bool closeParent);
-    void HandleInactivate(HWND newActive);
+    // Called by the parent
+
 
     // Called by items or children
-    void Close(bool closeAll = true);
+    void Close();
 
     //
     LPCSTR GetBang();
@@ -48,11 +47,19 @@ protected:
     virtual void PostClose() = 0;
 
     //
+    void Size();
+
+    //
     vector<PopupItem*> items;
 
 private:
+    //
+    bool CheckFocus(HWND newActive, __int8 direction);
+
+    //
     int itemSpacing;
 
+    //
     RECT padding;
 
     //
@@ -64,9 +71,9 @@ private:
     // The currently open child, or NULL
     Popup* openChild;
 
-    //
+    // The popup which opened this popup, or NULL
     Popup* owner;
 
-    //
+    // True if the mouse is currently above the popup.
     bool mouseOver;
 };

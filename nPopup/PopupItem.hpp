@@ -36,6 +36,6 @@ protected:
 
     Settings* iconSettings;
 
-    UINT itemType;
+    PopupItemType itemType;
 
 };
