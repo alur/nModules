@@ -26,6 +26,18 @@ Drawable::Drawable(LPCSTR prefix) {
 
 
 /// <summary>
+/// Creates a new top-level drawable, derived from the specified settings.
+/// </summary>
+Drawable::Drawable(LPCSTR prefix, Settings* parentSettings) {
+    this->initialized = false;
+    this->settings = parentSettings->CreateChild(prefix);
+    this->window = g_LSModule->CreateDrawableWindow(this->settings, this);
+    this->initialized = true;
+    this->parent = NULL;
+}
+
+
+/// <summary>
 /// Creates a new child drawable.
 /// </summary>
 Drawable::Drawable(Drawable* parent, LPCSTR prefix) {

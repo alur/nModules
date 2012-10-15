@@ -9,7 +9,7 @@
 #include "Tooltip.hpp"
 
 
-Tooltip::Tooltip(LPCSTR prefix) : Drawable(prefix) {
+Tooltip::Tooltip(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings) {
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 150;
     defaults->height = 40;

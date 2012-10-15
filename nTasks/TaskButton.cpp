@@ -9,6 +9,7 @@
 #include <strsafe.h>
 #include "../nCoreCom/Core.h"
 #include "../nShared/LSModule.hpp"
+#include "Taskbar.hpp"
 #include "TaskButton.hpp"
 
 extern LSModule* g_LSModule;
@@ -223,6 +224,10 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                 this->mouseIsOver = true;
                 this->window->ActivateState(this->stateHover);
 
+                RECT r;
+                this->window->GetScreenRect(&r);
+                ((Taskbar*)this->parent)->ShowThumbnail(this->watchedWindow, &r);
+
                 if (this->stateActive->active) {
                     this->window->ActivateState(this->stateActiveHover);
                 }
@@ -240,6 +245,7 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
             this->window->ClearState(this->stateHover);
             this->window->ClearState(this->stateActiveHover);
             this->window->ClearState(this->stateFlashingHover);
+            ((Taskbar*)this->parent)->HideThumbnail();
         }
         return 0;
 

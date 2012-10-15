@@ -13,6 +13,7 @@
 #include "../nShared/MessageHandler.hpp"
 #include "../nShared/LayoutSettings.hpp"
 #include "../nShared/Drawable.hpp"
+#include "../nShared/WindowThumbnail.hpp"
 
 using std::map;
 
@@ -28,6 +29,9 @@ public:
 
     explicit Taskbar(LPCSTR);
     virtual ~Taskbar();
+
+    void ShowThumbnail(HWND hwnd, LPRECT position);
+    void HideThumbnail();
 
     void LoadSettings(bool = false);
     TaskButton* AddTask(HWND, UINT, bool);
@@ -58,4 +62,10 @@ private:
 
     //
     ORDERING ordering;
+
+    //
+    WindowThumbnail* thumbnail;
+
+    //
+    bool noThumbnails;
 };

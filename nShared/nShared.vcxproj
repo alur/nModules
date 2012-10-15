@@ -40,6 +40,7 @@
     <ClInclude Include="Tooltip.hpp" />
     <ClInclude Include="UIDGenerator.hpp" />
     <ClInclude Include="Versioning.h" />
+    <ClInclude Include="WindowThumbnail.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Balloon.cpp" />
@@ -62,6 +63,7 @@
     <ClCompile Include="Tooltip.cpp" />
     <ClCompile Include="UIDGenerator.cpp" />
     <ClCompile Include="Versioning.cpp" />
+    <ClCompile Include="WindowThumbnail.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".\Macros.h" />

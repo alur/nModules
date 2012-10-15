@@ -11,7 +11,7 @@
 
 class Tooltip : public Drawable {
 public:
-    explicit Tooltip(LPCSTR prefix);
+    explicit Tooltip(LPCSTR prefix, Settings* parentSettings);
     virtual ~Tooltip();
 
     void Show(LPCWSTR text, LPRECT position, int duration);

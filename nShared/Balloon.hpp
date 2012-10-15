@@ -13,7 +13,7 @@
 
 class Balloon : protected Tooltip {
 public:
-    explicit Balloon(LPCSTR prefix);
+    explicit Balloon(LPCSTR prefix, Settings* parentSettings);
     virtual ~Balloon();
 
     void Show(LPCWSTR text, int x, int y, int duration);

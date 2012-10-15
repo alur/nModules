@@ -19,6 +19,8 @@ extern LSModule* g_LSModule;
 Taskbar::Taskbar(LPCSTR name) : Drawable(name) {
     this->name = name;
 
+    this->thumbnail = new WindowThumbnail("Thumbnail", this->settings);
+
     LoadSettings();
 
     this->layoutSettings = new LayoutSettings();
@@ -42,6 +44,7 @@ Taskbar::~Taskbar() {
     this->buttons.clear();
 
     SAFEDELETE(this->layoutSettings);
+    SAFEDELETE(this->thumbnail);
     free((void *)name);
 }
 
@@ -57,6 +60,7 @@ void Taskbar::LoadSettings(bool /* isRefresh */) {
     this->buttonMaxWidth = buttonSettings->GetInt("MaxWidth", this->buttonWidth);
     this->buttonMaxHeight = buttonSettings->GetInt("MaxHeight", this->buttonHeight);
     this->monitor = this->settings->GetMonitor("Monitor", 0xFFFFFFFF);
+    this->noThumbnails = this->settings->GetBool("NoThumbnails", false);
 }
 
 
@@ -225,4 +229,22 @@ void Taskbar::Relayout() {
 /// </summary>
 LRESULT WINAPI Taskbar::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
     return DefWindowProc(window, message, wParam, lParam);
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+void Taskbar::ShowThumbnail(HWND hwnd, LPRECT position) {
+    if (!this->noThumbnails) {
+        this->thumbnail->Show(hwnd, position);
+    }
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+void Taskbar::HideThumbnail() {
+    this->thumbnail->Hide();
 }

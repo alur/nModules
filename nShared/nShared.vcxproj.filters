@@ -74,6 +74,9 @@
     <ClInclude Include="LiteStep.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WindowThumbnail.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MonitorInfo.cpp">
@@ -134,6 +137,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LiteStep.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowThumbnail.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
