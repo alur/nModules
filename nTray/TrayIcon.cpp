@@ -199,13 +199,15 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam,
             ((Tray*)this->parent)->ShowTip(this->tip, &r);
         }
 
+        if (message == WM_RBUTTONDOWN || message == WM_LBUTTONDOWN) {
+            ((Tray*)this->parent)->HideTip();
+        }
+
         SendCallback(message, wParam, lParam);
         if (message == WM_RBUTTONUP) {
-            ((Tray*)this->parent)->HideTip();
             SendCallback(WM_CONTEXTMENU, wParam, lParam);
         }
         else if (message == WM_LBUTTONUP) {
-            ((Tray*)this->parent)->HideTip();
             SendCallback(NIN_SELECT, wParam, lParam);
         }
     }

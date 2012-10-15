@@ -208,6 +208,7 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
             else {
                 SetForegroundWindow(this->watchedWindow);
             }
+            ((Taskbar*)this->parent)->HideThumbnail();
         }
         return 0;
 

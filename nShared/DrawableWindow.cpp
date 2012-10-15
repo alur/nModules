@@ -37,7 +37,7 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instan
     ConstructorCommon(settings, msgHandler);
 
     this->window = MessageHandler::CreateMessageWindowEx(WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_COMPOSITED,
-        windowClass, "", WS_POPUP, 0, 0, 0, 0, parent, NULL, instance, this);
+        windowClass, settings->prefix, WS_POPUP, 0, 0, 0, 0, NULL, NULL, instance, this);
     SetWindowPos(this->window, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
     SetWindowLongPtr(this->window, GWLP_USERDATA, MAGIC_DWORD);
 
