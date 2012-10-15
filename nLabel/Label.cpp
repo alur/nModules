@@ -16,6 +16,7 @@ Label::Label(LPCSTR name) : Drawable(name) {
     this->name = name;
     this->settings = new Settings(name);
     this->window->Initialize(new DrawableSettings());
+    this->stateHover = this->window->AddState("Hover", new DrawableSettings(), 100);
     this->window->Show();
 }
 
@@ -30,5 +31,11 @@ void Label::LoadSettings(bool /* bIsRefresh */) {
 
 
 LRESULT WINAPI Label::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    if (uMsg == WM_MOUSEMOVE) {
+        this->window->ActivateState(this->stateHover);
+    }
+    else if (uMsg == WM_MOUSELEAVE) {
+        this->window->ClearState(this->stateHover);
+    }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

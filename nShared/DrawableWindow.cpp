@@ -603,6 +603,13 @@ DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* 
     state.drawingSettings = new DrawableSettings();
 
     state.drawingSettings->Load(state.settings, defaultSettings);
+
+    state.textArea = this->drawingArea;
+    state.textArea.bottom -= state.drawingSettings->textOffsetBottom;
+    state.textArea.top += state.drawingSettings->textOffsetTop;
+    state.textArea.left += state.drawingSettings->textOffsetLeft;
+    state.textArea.right -= state.drawingSettings->textOffsetRight;
+
     CreateTextFormat(state.drawingSettings, &state.textFormat);
     CreateBrushes(&state);
 

@@ -22,4 +22,6 @@ public:
 private:
     // The name of this label
     LPCSTR name;
+
+    DrawableWindow::STATE stateHover;
 };
