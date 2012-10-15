@@ -314,7 +314,7 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
         }
         else {
             StringCchCopy(title, cchTitle, token);
-            // The token after the title is either !New, Folder, or a command. (TODO::Dynamic stuff).
+            // The token after the title is either !New, Folder, or a command.
 
             // Store a copy to here, if this turns out to be a command
             LPCSTR commandPointer = linePointer;

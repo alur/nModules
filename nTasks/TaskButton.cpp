@@ -27,9 +27,10 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
     this->window->Initialize(new DrawableSettings());
 
     // Add states to the window
-    this->stateHoverActive = this->window->AddState("HoverActive", new DrawableSettings(), 120);
+    this->stateFlashingHover = this->window->AddState("FlashingHover", new DrawableSettings(), 150); 
+    this->stateActiveHover = this->window->AddState("ActiveHover", new DrawableSettings(), 125);
     this->stateHover = this->window->AddState("Hover", new DrawableSettings(), 100);
-    this->stateActive = this->window->AddState("Active", new DrawableSettings(), 80);
+    this->stateActive = this->window->AddState("Active", new DrawableSettings(), 75);
     this->stateFlashing = this->window->AddState("Flashing", new DrawableSettings(), 50);
 
     // Initalize variables
@@ -99,11 +100,12 @@ void TaskButton::Activate() {
     this->window->ActivateState(this->stateActive);
 
     if (this->stateHover->active) {
-        this->window->ActivateState(this->stateHoverActive);
+        this->window->ActivateState(this->stateActiveHover);
     }
 
     if (this->isFlashing) {
         this->window->ClearState(this->stateFlashing);
+        this->window->ClearState(this->stateFlashingHover);
         this->flashOn = false;
         this->window->ClearCallbackTimer(this->flashTimer);
         this->isFlashing = false;
@@ -116,7 +118,7 @@ void TaskButton::Activate() {
 /// </summary>
 void TaskButton::Deactivate() {
     this->window->ClearState(this->stateActive);
-    this->window->ClearState(this->stateHoverActive);
+    this->window->ClearState(this->stateActiveHover);
 }
 
 
@@ -128,6 +130,9 @@ void TaskButton::Flash() {
         this->isFlashing = true;
         this->flashOn = true;
         this->window->ActivateState(this->stateFlashing);
+        if (this->stateHover->active) {
+            this->window->ActivateState(this->stateFlashingHover);
+        }
         this->flashTimer = this->window->SetCallbackTimer(this->flashInterval, this);
     }
 }
@@ -219,7 +224,11 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                 this->window->ActivateState(this->stateHover);
 
                 if (this->stateActive->active) {
-                    this->window->ActivateState(this->stateHoverActive);
+                    this->window->ActivateState(this->stateActiveHover);
+                }
+
+                if (this->stateFlashing->active) {
+                    this->window->ActivateState(this->stateFlashingHover);
                 }
             }
         }
@@ -229,7 +238,8 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
         {
             this->mouseIsOver = false;
             this->window->ClearState(this->stateHover);
-            this->window->ClearState(this->stateHoverActive);
+            this->window->ClearState(this->stateActiveHover);
+            this->window->ClearState(this->stateFlashingHover);
         }
         return 0;
 
@@ -240,9 +250,13 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                     this->flashOn = !this->flashOn;
                     if (this->flashOn) {
                         this->window->ActivateState(this->stateFlashing);
+                        if (this->stateHover->active) {
+                            this->window->ActivateState(this->stateFlashingHover);
+                        }
                     }
                     else {
                         this->window->ClearState(this->stateFlashing);
+                        this->window->ClearState(this->stateFlashingHover);
                     }
                 }
                 else {

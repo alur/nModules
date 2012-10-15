@@ -51,10 +51,10 @@ ContentPopup::~ContentPopup() {
     }
     this->watchedFolders.clear();
 
-    for (list<LPCSTR>::const_iterator iter = paths.begin(); iter != paths.end(); ++iter) {
+    for (list<LPCSTR>::const_iterator iter = this->paths.begin(); iter != this->paths.end(); ++iter) {
         free((LPVOID)*iter);
     }
-    paths.clear();
+    this->paths.clear();
 }
 
 
@@ -64,6 +64,7 @@ bool sorter(PopupItem* a, PopupItem* b) {
 
 
 void ContentPopup::PreShow() {
+    TRACEW(L"ContentPopup::PreShow() %s", this->window->GetDrawingSettings()->text);
     if (!this->loaded) {
         LoadContent();
         std::sort(this->items.begin(), this->items.end(), sorter);
@@ -73,8 +74,8 @@ void ContentPopup::PreShow() {
 
 
 void ContentPopup::PostClose() {
+    TRACEW(L"ContentPopup::PostClose() %s", this->window->GetDrawingSettings()->text);
     if (this->dynamic) {
-        TRACEW(L"~ContentPopup::PostClose() %s", this->window->GetDrawingSettings()->text);
         for (WATCHFOLDERMAP::const_iterator iter = this->watchedFolders.begin(); iter != this->watchedFolders.end(); ++iter) {
             iter->second.second->Release();
             this->window->ReleaseUserMessage(iter->first);
@@ -93,6 +94,7 @@ void ContentPopup::PostClose() {
 
 
 void ContentPopup::LoadContent() {
+    TRACEW(L"ContentPopup::LoadContent() %s", this->window->GetDrawingSettings()->text);
     switch (this->source) {
     case ADMIN_TOOLS:
         LoadShellFolder(FOLDERID_AdminTools);

@@ -48,5 +48,5 @@ private:
     int flashInterval;
     UINT_PTR flashTimer;
 
-    DrawableWindow::STATE stateHover, stateActive, stateFlashing, stateHoverActive;
+    DrawableWindow::STATE stateHover, stateActive, stateFlashing, stateActiveHover, stateFlashingHover;
 };
