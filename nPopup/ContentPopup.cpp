@@ -167,7 +167,7 @@ void ContentPopup::LoadPath(LPCSTR path) {
     IShellFolder *targetFolder, *rootFolder;
     WCHAR widePath[MAX_PATH];
 
-    mbstowcs(widePath, path, MAX_PATH);
+    MultiByteToWideChar(CP_ACP, NULL, path, -1, widePath, MAX_PATH);
 
     // Get the root ISHellFolder
     SHGetDesktopFolder(reinterpret_cast<IShellFolder**>(&rootFolder));

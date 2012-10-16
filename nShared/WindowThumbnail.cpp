@@ -27,7 +27,6 @@ WindowThumbnail::~WindowThumbnail() {
 void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
     HRESULT hr = S_OK;
     SIZE sourceSize = {0};
-    RECT destRect = {0};
 
     this->hwnd = hwnd;
 
@@ -45,16 +44,17 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
         int x, y, width, height, maxWidth, maxHeight;
         double scale;
         switch (this->position) {
+        default:
         case TOP:
         case BOTTOM:
             {
                 maxWidth = (this->sizeToButton ? position->right - position->left : this->maxWidth) - this->offset.left - this->offset.right;
-                maxHeight = this->maxHeight - this->offset.top - this->offset.bottom;
+                maxHeight = (this->maxHeight - this->offset.top - this->offset.bottom);
                 scale = min(maxWidth/(double)sourceSize.cx, maxHeight/(double)sourceSize.cy);
-                width = scale*sourceSize.cx + this->offset.left + this->offset.right;
-                height = scale*sourceSize.cy + this->offset.top + this->offset.bottom;
+                width = int(scale*sourceSize.cx) + this->offset.left + this->offset.right;
+                height = int(scale*sourceSize.cy) + this->offset.top + this->offset.bottom;
                 x = position->left + (position->right - position->left - width)/2;
-                y = this->position == TOP ? position->top - height - this->distanceFromButton : position->bottom + this->distanceFromButton;
+                y = this->position == BOTTOM ? position->bottom + this->distanceFromButton : position->top - height - this->distanceFromButton;
             }
             break;
 
@@ -64,8 +64,8 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
                 maxWidth = this->maxWidth - this->offset.left - this->offset.right;
                 maxHeight = (this->sizeToButton ? position->bottom - position->top : this->maxHeight) - this->offset.top - this->offset.bottom;
                 scale = min(maxWidth/(double)sourceSize.cx, maxHeight/(double)sourceSize.cy);
-                width = scale*sourceSize.cx + this->offset.left + this->offset.right;
-                height = scale*sourceSize.cy + this->offset.top + this->offset.bottom;
+                width = int(scale*sourceSize.cx) + this->offset.left + this->offset.right;
+                height = int(scale*sourceSize.cy) + this->offset.top + this->offset.bottom;
                 y = position->top;
                 x = this->position == LEFT ? position->left - width - this->distanceFromButton : position->right + this->distanceFromButton;
             }
@@ -79,7 +79,7 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
         properties.dwFlags = DWM_TNP_RECTDESTINATION | DWM_TNP_VISIBLE | DWM_TNP_SOURCECLIENTAREAONLY | DWM_TNP_OPACITY;
         properties.fSourceClientAreaOnly = FALSE;
         properties.fVisible = TRUE;
-        properties.opacity = this->thumbnailOpacity;
+        properties.opacity = (BYTE)this->thumbnailOpacity;
         properties.rcDestination = dest;
 
         hr = DwmUpdateThumbnailProperties(this->thumbnailHandle, &properties);

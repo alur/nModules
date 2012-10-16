@@ -11,6 +11,7 @@
 #include "../nShared/LSModule.hpp"
 #include "Taskbar.hpp"
 #include "TaskButton.hpp"
+#include "../nShared/Debugging.h"
 
 extern LSModule* g_LSModule;
 
@@ -188,6 +189,8 @@ void TaskButton::GetMinRect(LPPOINTS lpPoints) {
     lpPoints[0].y = (short)r.top;
     lpPoints[1].x = (short)r.right;
     lpPoints[1].y = (short)r.bottom;
+
+    TRACEW(L"GetMinRect() %d %d %d %d -- %s", r.left, r.top, r.right, r.bottom, this->window->GetDrawingSettings()->text);
 }
 
 
@@ -202,7 +205,6 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                 ShowWindow(this->watchedWindow, SW_MINIMIZE);
             }
             else if (IsIconic(this->watchedWindow)) {
-                SetForegroundWindow(this->watchedWindow);
                 ShowWindow(this->watchedWindow, SW_RESTORE);
             }
             else {

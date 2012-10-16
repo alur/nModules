@@ -97,7 +97,7 @@ void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
         SetIcon(pNID->hIcon);
     }
     if ((pNID->uFlags & NIF_TIP) == NIF_TIP) {
-        mbstowcs(this->tip, pNID->szTip, TRAY_MAX_TIP_LENGTH);
+        MultiByteToWideChar(CP_ACP, NULL, pNID->szTip, -1, this->tip, TRAY_MAX_TIP_LENGTH);
         if (this->showingTip) {
             RECT r;
             this->window->GetScreenRect(&r);
@@ -114,8 +114,8 @@ void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
 
     if ((pNID->uFlags & NIF_INFO ) == NIF_INFO) {
         // uTimeout is only valid on 2000 and XP, so we can safely ignore it.
-        mbstowcs(this->info, pNID->szInfo, TRAY_MAX_INFO_LENGTH);
-        mbstowcs(this->infoTitle, pNID->szInfoTitle, TRAY_MAX_INFOTITLE_LENGTH);
+        MultiByteToWideChar(CP_ACP, NULL, pNID->szInfo, -1, this->info, TRAY_MAX_INFO_LENGTH);
+        MultiByteToWideChar(CP_ACP, NULL, pNID->szInfoTitle, -1, this->infoTitle, TRAY_MAX_INFOTITLE_LENGTH);
     }
 
     this->showTip = true;

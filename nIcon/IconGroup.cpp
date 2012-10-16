@@ -35,6 +35,7 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     this->settings->GetString("Folder", path, sizeof(path), "Desktop");
 
     this->window->Initialize(defaults);
+    //SetParent(this->window->GetWindow(), FindWindow("DesktopBackgroundClass", NULL));
     this->window->Show();
 
     SetFolder(path);

@@ -60,8 +60,10 @@ public:
     // Destructor
     virtual ~DrawableWindow();
 
-    // Adds an icon as an overlay.
+    // Adds an overlay.
+    HRESULT AddOverlay(D2D1_RECT_F position, HBITMAP image);
     HRESULT AddOverlay(D2D1_RECT_F position, HICON icon);
+    HRESULT AddOverlay(D2D1_RECT_F position, IWICBitmap* source);
 
     // Adds a new state.
     STATE AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority);

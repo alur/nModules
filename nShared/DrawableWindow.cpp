@@ -140,6 +140,57 @@ DrawableWindow::~DrawableWindow() {
 /// </summary>
 HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
     IWICBitmap* source = NULL;
+    IWICImagingFactory* factory = NULL;
+
+    HRESULT hr = S_OK;
+    
+    //
+    CHECKHR(hr, Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory)));
+
+    // Generate a WIC bitmap and call the overloaded AddOverlay function
+    CHECKHR(hr, factory->CreateBitmapFromHICON(icon, &source));
+    CHECKHR(hr, AddOverlay(position, source));
+
+    // Transfer control here if CHECKHR failed
+    CHECKHR_END();
+
+    //
+    SAFERELEASE(source);
+
+    return hr;
+}
+
+
+/// <summary>
+/// Adds an overlay image.
+/// </summary>
+HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap) {
+    IWICBitmap* source = NULL;
+    IWICImagingFactory* factory = NULL;
+
+    HRESULT hr = S_OK;
+    
+    //
+    CHECKHR(hr, Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory)));
+
+    // Generate a WIC bitmap and call the overloaded AddOverlay function
+    CHECKHR(hr, factory->CreateBitmapFromHBITMAP(bitmap, NULL, WICBitmapUseAlpha, &source));
+    CHECKHR(hr, AddOverlay(position, source));
+
+    // Transfer control here if CHECKHR failed
+    CHECKHR_END();
+
+    //
+    SAFERELEASE(source);
+
+    return hr;
+}
+
+
+/// <summary>
+/// Adds an overlay icon.
+/// </summary>
+HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmap* source) {
     IWICBitmapScaler* scaler = NULL;
     IWICFormatConverter* converter = NULL;
     IWICImagingFactory* factory = NULL;
@@ -153,9 +204,6 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
     CHECKHR(hr, Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory)));
     CHECKHR(hr, factory->CreateBitmapScaler(&scaler));
     CHECKHR(hr, factory->CreateFormatConverter(&converter));
-
-    // Generate a WIC bitmap
-    CHECKHR(hr, factory->CreateBitmapFromHICON(icon, &source));
 
     // Resize the image
     CHECKHR(hr, source->GetSize(&width, &height));
@@ -185,7 +233,6 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
     // Release stuff
     SAFERELEASE(scaler);
     SAFERELEASE(converter);
-    SAFERELEASE(source);
     SAFERELEASE(bitmap);
 
     // Add the overlays to the overlay list
@@ -247,7 +294,18 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
 /// Creates the brushes for the specified state.
 /// </summary>
 HRESULT DrawableWindow::CreateBrushes(State* state) {
+    IWICImagingFactory* factory = NULL;
+    Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
+
+    // Create the background brush
+    if (state->drawingSettings->image[0] != 0) {
+        
+        //factory->
+    }
+
     this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(state->drawingSettings->color), (ID2D1SolidColorBrush**)&state->backBrush);
+
+
     this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(state->drawingSettings->fontColor), (ID2D1SolidColorBrush**)&state->textBrush);
 
     return S_OK;
