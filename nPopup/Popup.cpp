@@ -31,6 +31,8 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     this->maxWidth = settings->GetInt("MaxWidth", 300);
     this->noIcons = settings->GetBool("NoIcons", false);
     this->expandLeft = settings->GetBool("ExpandLeft", false);
+    this->confineToMonitor = settings->GetBool("ConfineToMonitor", false);
+    this->confineToWorkArea = settings->GetBool("ConfineToWorkArea", false);
     settings->GetOffsetRect("PaddingLeft", "PaddingTop", "PaddingRight", "PaddingBottom", &this->padding, 5, 5, 5, 5);
 
     DrawableSettings* defaultSettings = new DrawableSettings();
@@ -122,6 +124,7 @@ bool Popup::CheckFocus(HWND newActive, __int8 direction) {
 void Popup::Close() {
     TRACEW(L"Closing %s", this->window->GetDrawingSettings()->text);
     this->window->Hide();
+    this->expandLeft = settings->GetBool("ExpandLeft", false);
     CloseChild(true);
     TRACEW(L"PostClose %s", this->window->GetDrawingSettings()->text);
     PostClose();
@@ -145,8 +148,8 @@ void Popup::Show() {
 
 void Popup::Show(int x, int y) {
     RECT r;
-    r.left = r.right = x;
-    r.top = r.bottom = y;
+    r.left = x - 1; r.right = x + 1;
+    r.top = y - 1; r.bottom = y + 1;
     Show(&r);
 }
 
@@ -213,23 +216,36 @@ void Popup::Show(LPRECT position, Popup* owner) {
     }
 
     int x, y;
+    RECT limits = monInfo->m_virtualDesktop.rect;
+
+    if (this->confineToMonitor && this->confineToWorkArea) {
+        limits = monInfo->m_monitors.at(monInfo->MonitorFromRECT(position)).workArea;
+    }
+    else if (this->confineToMonitor) {
+        limits = monInfo->m_monitors.at(monInfo->MonitorFromRECT(position)).rect;
+    }
+    else if (this->confineToWorkArea) {
+        // TODO::Shouldn't confine to the monitor here.
+        limits = monInfo->m_monitors.at(monInfo->MonitorFromRECT(position)).workArea;
+    }
+
 
     if (this->expandLeft) {
         x = position->left - this->window->GetDrawingSettings()->width;
-        if (x < monInfo->m_virtualDesktop.rect.left) {
+        if (x < limits.left) {
             this->expandLeft = false;
             x = position->right;
         }
     }
     else {
         x = position->right;
-        if (x > monInfo->m_virtualDesktop.rect.right - this->window->GetDrawingSettings()->width) {
+        if (x > limits.right - this->window->GetDrawingSettings()->width) {
             this->expandLeft = true;
             x = position->left - this->window->GetDrawingSettings()->width;
         }
     }
 
-    y = max(monInfo->m_virtualDesktop.rect.top, min(monInfo->m_virtualDesktop.rect.bottom - this->window->GetDrawingSettings()->height, position->top));
+    y = max(limits.top, min(limits.bottom - this->window->GetDrawingSettings()->height, position->top));
 
     this->window->Move(x, y);
 

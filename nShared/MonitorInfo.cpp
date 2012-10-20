@@ -50,12 +50,21 @@ UINT MonitorInfo::MonitorFromHWND(HWND hWnd) {
         wndRect = wndInfo.rcWindow;
     }
 
-    // Figure out which monitor contains the bigest part of the window.
+    return MonitorFromRECT(&wndRect);
+}
+
+
+/// <summary>
+/// Returns the monitor which contains the biggest area of the specified window.
+/// </summary>
+UINT MonitorInfo::MonitorFromRECT(LPRECT rect) {
     int maxArea = 0;
     int area = 0;
     UINT monitor = 0;
+
+    // Figure out which monitor contains the bigest part of the RECT.
     for (int i = 0; i < m_monitors.size(); i++) {
-        area = Math::RectIntersectArea(&wndRect, &m_monitors[i].rect);
+        area = Math::RectIntersectArea(rect, &m_monitors[i].rect);
         if (area >= maxArea) {
             maxArea = area;
             monitor = i;
@@ -78,6 +87,9 @@ void MonitorInfo::Update() {
     this->m_virtualDesktop.height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
     this->m_virtualDesktop.rect.right = this->m_virtualDesktop.width + this->m_virtualDesktop.rect.left;
     this->m_virtualDesktop.rect.bottom = this->m_virtualDesktop.height + this->m_virtualDesktop.rect.top;
+    ZeroMemory(&this->m_virtualDesktop.workArea, sizeof(RECT));
+    this->m_virtualDesktop.workAreaHeight = 0;
+    this->m_virtualDesktop.workAreaWidth = 0;
 
     EnumDisplayMonitors(NULL, NULL, EnumMonitorsCallback, (LPARAM)this);
 }
@@ -101,6 +113,10 @@ BOOL CALLBACK EnumMonitorsCallback(HMONITOR hMonitor, HDC, LPRECT, LPARAM lParam
     mInfo.rect = mi.rcMonitor;
     mInfo.height = mi.rcMonitor.bottom - mi.rcMonitor.top;
     mInfo.width = mi.rcMonitor.right - mi.rcMonitor.left;
+
+    mInfo.workArea = mi.rcWork;
+    mInfo.workAreaHeight = mi.rcWork.bottom - mi.rcWork.top;
+    mInfo.workAreaWidth = mi.rcWork.right - mi.rcWork.left;
 
     // The primary monitor goes in position 0
     if ((mi.dwFlags & MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY) {

@@ -830,8 +830,22 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         }
         return 0;
 
+    case WM_SETTINGCHANGE:
+        {
+            switch (wParam) {
+            case SPI_SETWORKAREA:
+                {
+                    this->monitorInfo->Update();    
+                }
+                break;
+            }
+        }
+        return 0;
+
     case WM_DISPLAYCHANGE:
-        this->monitorInfo->Update();
+        {
+            this->monitorInfo->Update();
+        }
         return 0;
     }
 

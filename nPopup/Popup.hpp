@@ -86,4 +86,10 @@ private:
 
     // True to have children appear to the left rather than the right.
     bool expandLeft;
+
+    //
+    bool confineToWorkArea;
+
+    //
+    bool confineToMonitor;
 };
