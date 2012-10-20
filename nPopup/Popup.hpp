@@ -60,6 +60,9 @@ private:
     int itemSpacing;
 
     //
+    int maxWidth;
+
+    //
     RECT padding;
 
     //

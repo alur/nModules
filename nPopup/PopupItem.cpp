@@ -35,6 +35,18 @@ int PopupItem::GetHeight() {
 }
 
 
+int PopupItem::GetDesiredWidth(int maxWidth) {
+    SIZE s;
+    this->window->GetDesiredSize(maxWidth, this->window->GetDrawingSettings()->height, &s);
+    return s.cx;
+}
+
+
+void PopupItem::SetWidth(int width) {
+    this->window->Resize(width, this->window->GetDrawingSettings()->height);
+}
+
+
 bool PopupItem::ParseDotIcon(LPCSTR dotIcon) {
     if (dotIcon == NULL) {
         return false;

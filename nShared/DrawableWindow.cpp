@@ -629,9 +629,9 @@ void DrawableWindow::Repaint(LPRECT region) {
 
 
 /// <summary>
-/// Sizes the window to fit its current text.
+/// Gets the "Desired" size of the window, given the specified constraints.
 /// </summary>
-void DrawableWindow::SizeToText(int maxWidth, int maxHeight) {
+void DrawableWindow::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
     IDWriteFactory* factory = NULL;
     IDWriteTextLayout* textLayout = NULL;
     DWRITE_TEXT_METRICS metrics;
@@ -641,10 +641,18 @@ void DrawableWindow::SizeToText(int maxWidth, int maxHeight) {
     textLayout->GetMetrics(&metrics);
     SAFERELEASE(textLayout);
 
-    metrics.width += this->baseState->drawingSettings->textOffsetLeft + this->baseState->drawingSettings->textOffsetRight + 1;
-    metrics.height += this->baseState->drawingSettings->textOffsetTop + this->baseState->drawingSettings->textOffsetBottom + 1;
+    size->cx = metrics.width + this->baseState->drawingSettings->textOffsetLeft + this->baseState->drawingSettings->textOffsetRight + 1;
+    size->cy = metrics.height + this->baseState->drawingSettings->textOffsetTop + this->baseState->drawingSettings->textOffsetBottom + 1;
+}
 
-    this->SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y, (int)metrics.width, (int)metrics.height);
+
+/// <summary>
+/// Sizes the window to fit its current text.
+/// </summary>
+void DrawableWindow::SizeToText(int maxWidth, int maxHeight) {
+    SIZE s;
+    GetDesiredSize(maxWidth, maxHeight, &s);
+    this->SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y, s.cx, s.cy);
 }
 
 

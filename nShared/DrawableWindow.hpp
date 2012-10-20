@@ -89,6 +89,9 @@ public:
     // Returns a MonitorInfo class which will be kept up-to-date for the duration of this windows lifetime.
     MonitorInfo* GetMonitorInformation();
 
+    // Gets the "desired" size for a given width and height.
+    void GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size);
+
     // Returns the screen-coordinate position of this window.
     void GetScreenRect(LPRECT rect);
 

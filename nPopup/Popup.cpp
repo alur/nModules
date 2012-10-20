@@ -28,6 +28,7 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
     this->owner = NULL;
 
     this->itemSpacing = settings->GetInt("ItemSpacing", 2);
+    this->maxWidth = settings->GetInt("MaxWidth", 300);
     settings->GetOffsetRect("PaddingLeft", "PaddingTop", "PaddingRight", "PaddingBottom", &this->padding, 5, 5, 5, 5);
 
     DrawableSettings* defaultSettings = new DrawableSettings();
@@ -35,6 +36,7 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
     defaultSettings->textRotation = -45.0f;
     defaultSettings->fontSize = 32.0f;
     defaultSettings->alwaysOnTop = true;
+    defaultSettings->width = 200;
     StringCchCopyW(defaultSettings->text, MAX_LINE_LENGTH, L"nDemo");
     MultiByteToWideChar(CP_ACP, 0, title, (int)strlen(title)+1, defaultSettings->text, sizeof(defaultSettings->text)/sizeof(defaultSettings->text[0]));
     StringCchCopy(defaultSettings->textAlign, sizeof(defaultSettings->textAlign), "Center");
@@ -97,7 +99,7 @@ void Popup::OpenChild(Popup* child, int y, int x, PopupItem* childItem) {
         this->openChild = child;
         this->childItem = childItem;
         //this->openChild->Show(r.right, y, this);
-        this->openChild->Show(x+this->padding.right, y, this);
+        this->openChild->Show(x + this->padding.right, y, this);
     }
 }
 
@@ -140,22 +142,30 @@ void Popup::Show() {
 
 
 void Popup::Size() {
-    int width = 200, height = this->padding.top;
+    // Work out the desired item 
+    int itemWidth = settings->GetInt("Width", 200) - this->padding.left - this->padding.right;
+    int maxItemWidth = this->maxWidth - this->padding.left - this->padding.right;
+    int height = this->padding.top;
+    int width;
     for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
         (*iter)->Position(this->padding.left, height);
         height += (*iter)->GetHeight() + this->itemSpacing;
+        itemWidth = max(itemWidth, (*iter)->GetDesiredWidth(maxItemWidth));
     }
+    width = itemWidth + this->padding.left + this->padding.right;
     height += this->padding.bottom - this->itemSpacing;
     MonitorInfo* monInfo = this->window->GetMonitorInformation();
 
+    // We've excceeded the max height, split the popup into columns.
     if (height > monInfo->m_virtualDesktop.height) {
         int columns = (height - this->padding.top - this->padding.bottom)/(monInfo->m_virtualDesktop.height - this->padding.top - this->padding.bottom) + 1;
-        width = 200 * columns + this->itemSpacing*(columns - 1);
+        int columnWidth = width;
+        width = columnWidth * columns + this->itemSpacing*(columns - 1);
         height = this->padding.top;
         int column = 0;
         int rowHeight = 0;
         for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
-            (*iter)->Position(this->padding.left + (200 + this->itemSpacing) * column, height);
+            (*iter)->Position(this->padding.left + (columnWidth + this->itemSpacing) * column, height);
             rowHeight = max((*iter)->GetHeight() + this->itemSpacing, rowHeight);
             column++;
             if (column == columns) {
@@ -169,6 +179,13 @@ void Popup::Size() {
         }
         height += this->padding.bottom - this->itemSpacing;
     }
+
+    // Size all items properly
+    for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
+        (*iter)->SetWidth(itemWidth);
+    }
+
+    // Size the main window
     this->window->Resize(width, height);
     this->sized = true;
 }
