@@ -234,14 +234,14 @@ void Popup::Show(LPRECT position, Popup* owner) {
         x = position->left - this->window->GetDrawingSettings()->width;
         if (x < limits.left) {
             this->expandLeft = false;
-            x = position->right;
+            x = this->owner ? position->right : limits.left;
         }
     }
     else {
         x = position->right;
         if (x > limits.right - this->window->GetDrawingSettings()->width) {
             this->expandLeft = true;
-            x = position->left - this->window->GetDrawingSettings()->width;
+            x = (this->owner ? position->left : limits.right) - this->window->GetDrawingSettings()->width;
         }
     }
 
