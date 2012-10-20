@@ -168,11 +168,9 @@
     <ClInclude Include=".\DesktopPainter.hpp" />
     <ClInclude Include="ClickHandler.hpp" />
     <ClInclude Include="Constants.h" />
-    <ClInclude Include="ExplorerService.h" />
     <ClInclude Include="nDesk.h" />
     <ClInclude Include=".\WorkArea.h" />
     <ClInclude Include="Settings.h" />
-    <ClInclude Include="ShellDesktopTray.h" />
     <ClInclude Include="TransitionEffect.hpp" />
     <ClInclude Include=".\TransitionEffects\FadeEffect.hpp" />
     <ClInclude Include="TransitionEffects.h" />
@@ -185,11 +183,9 @@
     <ClCompile Include="Bangs.cpp" />
     <ClCompile Include="ClickHandler.cpp" />
     <ClCompile Include="DesktopPainter.cpp" />
-    <ClCompile Include="ExplorerService.cpp" />
     <ClCompile Include="nDesk.cpp" />
     <ClCompile Include=".\TransitionEffects\FadeEffect.cpp" />
     <ClCompile Include="Settings.cpp" />
-    <ClCompile Include="ShellDesktopTray.cpp" />
     <ClCompile Include="TransitionEffects\BlindsEffect.cpp" />
     <ClCompile Include="TransitionEffects\CircularEffect.cpp" />
     <ClCompile Include="TransitionEffects\GridEffect.cpp" />

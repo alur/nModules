@@ -16,7 +16,6 @@
 #include "WorkArea.h"
 #include "Bangs.h"
 #include "Settings.h"
-#include "ExplorerService.h"
 
 
 // The messages we want from the core
@@ -27,7 +26,6 @@ DesktopPainter* g_pDesktopPainter;
 MonitorInfo* g_pMonitorInfo;
 ClickHandler* g_pClickHandler;
 LSModule* g_pLSModule;
-ExplorerService* g_pExplorerService;
 
 
 /// <summary>
@@ -79,9 +77,6 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     WorkArea::ResetWorkAreas(g_pMonitorInfo);
     WorkArea::LoadSettings(g_pMonitorInfo);
 
-    g_pExplorerService = new ExplorerService();
-    //g_pExplorerService->Start();
-
     return 0;
 }
 
@@ -96,14 +91,11 @@ void quitModule(HINSTANCE /* instance */) {
     // Unregister bangs
     Bangs::_Unregister();
 
-    g_pExplorerService->Stop();
-
     // Delete global classes
     if (g_pDesktopPainter) delete g_pDesktopPainter;
     if (g_pClickHandler) delete g_pClickHandler;
     if (g_pMonitorInfo) delete g_pMonitorInfo;
     if (g_pLSModule) delete g_pLSModule;
-    SAFEDELETE(g_pExplorerService);
 }
 
 
