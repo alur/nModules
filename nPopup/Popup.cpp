@@ -17,7 +17,7 @@
 extern LSModule* g_LSModule;
 
 
-Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
+Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     if (bang != NULL) {
         this->bang = _strdup(bang);
     }

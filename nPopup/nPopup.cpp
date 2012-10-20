@@ -150,7 +150,7 @@ void LoadPopups() {
     AddPopup(new ContentPopup(ContentPopup::ContentSource::START_MENU, "Start Menu", "!PopupStartMenu", "nPopup"));
 
     // Load .rc popups
-    while (LoadPopup(f, POPUPLEVEL_ROOT, &popup)) {
+    while (LoadPopup(f, POPUPLEVEL_ROOT, &popup, "nPopup")) {
         if (popup != NULL) {
             AddPopup(popup);
         }
@@ -164,7 +164,7 @@ void LoadPopups() {
 /// Loads a popup
 /// </summary>
 /// <return>Returns false when all lines have been read.</return>
-bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
+bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out, LPCSTR parentPrefix) {
     char line[MAX_LINE_LENGTH], title[MAX_LINE_LENGTH], command[MAX_LINE_LENGTH], icon[MAX_LINE_LENGTH], prefix[MAX_LINE_LENGTH];
     ContentPopup::ContentSource source;
     
@@ -172,8 +172,8 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
         POPUPLINETYPE type = ProcessPopupLine(line, &source, title, sizeof(title), command, sizeof(command), icon, sizeof(icon), prefix, sizeof(prefix));
         if (level == POPUPLEVEL_ROOT) {
             if (type == POPUPLINETYPE_NEW) {
-                *out = new FolderPopup(title, command, prefix);
-                return LoadPopup(f, POPUPLEVEL_NEW, out);
+                *out = new FolderPopup(title, command, prefix[0] == '\0' ? parentPrefix : prefix);
+                return LoadPopup(f, POPUPLEVEL_NEW, out, prefix[0] == '\0' ? parentPrefix : prefix);
             }
             else {
                 TRACE("Invalid popup line at the root level: %s", line);
@@ -184,8 +184,8 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
         else switch (type) {
         case POPUPLINETYPE_FOLDER:
             {
-                Popup* popup = new FolderPopup(title, NULL, prefix);
-                LoadPopup(f, POPUPLEVEL_FOLDER, &popup);
+                Popup* popup = new FolderPopup(title, NULL, prefix[0] == '\0' ? parentPrefix : prefix);
+                LoadPopup(f, POPUPLEVEL_FOLDER, &popup, prefix[0] == '\0' ? parentPrefix : prefix);
                 (*out)->AddItem(new nPopup::FolderItem(*out, title, popup, icon));
             }
             break;
@@ -220,19 +220,19 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
 
         case POPUPLINETYPE_CONTENT:
             {
-                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(source, title, command, prefix), icon));
+                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(source, title, command, parentPrefix), icon));
             }
             break;
 
         case POPUPLINETYPE_CONTENTPATH:
             {
-                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(command, false, title, "", prefix), icon));
+                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(command, false, title, "", parentPrefix), icon));
             }
             break;
 
         case POPUPLINETYPE_CONTENTPATHDYNAMIC:
             {
-                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(command, true, title, "", prefix), icon));
+                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(command, true, title, "", parentPrefix), icon));
             }
             break;
 
@@ -251,6 +251,12 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out) {
         case POPUPLINETYPE_NEW:
             {
                 TRACE("Unexpected New: %s", line);
+            }
+            break;
+
+        case POPUPLINETYPE_INVALID:
+            {
+                TRACE("Invalid popup line: %s", line);
             }
             break;
 
@@ -284,6 +290,7 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
                                LPSTR prefix, UINT cchPrefix) {
     char token[MAX_LINE_LENGTH];
     LPCSTR linePointer = line;
+
     LiteStep::GetToken(linePointer, NULL, &linePointer, FALSE); // Drop *Popup
     
     // The first token will be ~Folder, ~New, !Separator, !Info, .icon=, or a title.
@@ -301,15 +308,21 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
         // If we have a .icon, copy it over and move forward.
         if (_strnicmp(token, ".icon=", 6) == 0) {
             StringCchCopy(icon, cchIcon, token+6);
-            LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
+            if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) == FALSE) {
+                return POPUPLINETYPE_INVALID; // Ending after .icon=
+            }
         }
         else {
             icon[0] = '\0';
         }
 
         if (_stricmp(token, "!Info") == 0) {
-            LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
+            if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) != FALSE) {
             StringCchCopy(title, cchTitle, token);
+            }
+            else {
+                title[0] = '\0';
+            }
             return POPUPLINETYPE_INFO;
         }
         else {
@@ -318,21 +331,36 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
 
             // Store a copy to here, if this turns out to be a command
             LPCSTR commandPointer = linePointer;
-            LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
+
+            // This would be an empty command, or something, might as well mark it invalid.
+            if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) == FALSE) {
+                return POPUPLINETYPE_INVALID;
+            }
 
             if (_stricmp(token, "!New") == 0) {
                 // !New is followed by the bang command
-                LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
+                if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) == FALSE) {
+                    return POPUPLINETYPE_INVALID;
+                }
                 StringCchCopy(command, cchCommand, token);
+
                 // Which may be followed by a prefix
-                LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
-                StringCchCopy(prefix, cchPrefix, token);
+                if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) != FALSE) {
+                    StringCchCopy(prefix, cchPrefix, token);
+                }
+                else {
+                    prefix[0] = '\0';
+                }
                 return POPUPLINETYPE_NEW;
             }
             else if (_stricmp(token, "Folder") == 0) {
                 // Folder may be followed by a prefix
-                LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
-                StringCchCopy(prefix, cchPrefix, token);
+                if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) != FALSE) {
+                    StringCchCopy(prefix, cchPrefix, token);
+                }
+                else {
+                    prefix[0] = '\0';
+                }
                 return POPUPLINETYPE_FOLDER;
             }
             else if (_stricmp(token, "!PopupAdminTools") == 0) {
@@ -374,13 +402,13 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
             else if (_strnicmp(token, "!PopupFolder:", strlen("!PopupFolder:")) == 0) {
                 *source = ContentPopup::ContentSource::PATH;
                 StringCchCopy(command, cchCommand, commandPointer + strlen("!PopupFolder:") + 1);
-                command[strlen(command)-1] = 0;
+                command[strlen(command)-1] = '\0';
                 return POPUPLINETYPE_CONTENTPATH;
             }
             else if (_strnicmp(token, "!PopupDynamicFolder:", strlen("!PopupDynamicFolder:")) == 0) {
                 *source = ContentPopup::ContentSource::PATH;
                 StringCchCopy(command, cchCommand, commandPointer + strlen("!PopupDynamicFolder:") + 1);
-                command[strlen(command)-1] = 0;
+                command[strlen(command)-1] = '\0';
                 return POPUPLINETYPE_CONTENTPATHDYNAMIC;
             }
             else {

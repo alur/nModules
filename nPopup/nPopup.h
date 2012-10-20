@@ -17,7 +17,8 @@ enum POPUPLINETYPE {
     POPUPLINETYPE_COMMAND,
     POPUPLINETYPE_CONTENT,
     POPUPLINETYPE_CONTENTPATH,
-    POPUPLINETYPE_CONTENTPATHDYNAMIC
+    POPUPLINETYPE_CONTENTPATHDYNAMIC,
+    POPUPLINETYPE_INVALID
 };
 
 enum POPUPLEVEL {
@@ -31,6 +32,5 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
 
 void LoadSettings();
 void LoadPopups();
-bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out);
-Popup* LoadFolder(LPVOID f, LPCSTR title, LPCSTR prefix);
+bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out, LPCSTR parentPrefix);
 void __cdecl HandlePopupBang(HWND owner, LPCSTR bang, LPCSTR args);
