@@ -41,6 +41,7 @@ void nPopup::FolderItem::Init(LPCSTR title, Popup* popup) {
     MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
     StringCchCopy(defaults->textVerticalAlign, sizeof(defaults->textVerticalAlign), "Middle");
     defaults->textOffsetLeft = 20;
+    defaults->textOffsetRight = 5;
     this->window->Initialize(defaults);
     this->hoverState = this->window->AddState("Hover", new DrawableSettings(*defaults), 100);
     this->openState = this->window->AddState("Open", new DrawableSettings(*defaults), 80);
