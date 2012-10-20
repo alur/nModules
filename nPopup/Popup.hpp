@@ -38,6 +38,9 @@ public:
     //
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
+    //
+    bool noIcons;
+
 protected:
     //
     virtual void PreShow() = 0;

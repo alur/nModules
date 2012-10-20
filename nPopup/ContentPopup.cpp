@@ -247,11 +247,13 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
                 item = new CommandItem(this, name, quotedCommand);
             }
 
-            // Get the IExtractIcon interface for this item.
-            hr = targetFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&itemID, IID_IExtractIconW, NULL, reinterpret_cast<LPVOID*>(&extractIcon));
+            if (!this->noIcons) {
+                // Get the IExtractIcon interface for this item.
+                hr = targetFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&itemID, IID_IExtractIconW, NULL, reinterpret_cast<LPVOID*>(&extractIcon));
 
-            if (SUCCEEDED(hr)) {
-                item->SetIcon(extractIcon);
+                if (SUCCEEDED(hr)) {
+                    item->SetIcon(extractIcon);
+                }
             }
 
             AddItem(item);

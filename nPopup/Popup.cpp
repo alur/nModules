@@ -29,6 +29,7 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable("nPopup") {
 
     this->itemSpacing = settings->GetInt("ItemSpacing", 2);
     this->maxWidth = settings->GetInt("MaxWidth", 300);
+    this->noIcons = settings->GetBool("NoIcons", false);
     settings->GetOffsetRect("PaddingLeft", "PaddingTop", "PaddingRight", "PaddingBottom", &this->padding, 5, 5, 5, 5);
 
     DrawableSettings* defaultSettings = new DrawableSettings();

@@ -5,7 +5,7 @@
  *  Represents an item in a popup.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "PopupItem.hpp"
+#include "Popup.hpp"
 #include "../nShared/Macros.h"
 #include "../nShared/LSModule.hpp"
 #include "../nShared/Debugging.h"
@@ -48,7 +48,7 @@ void PopupItem::SetWidth(int width) {
 
 
 bool PopupItem::ParseDotIcon(LPCSTR dotIcon) {
-    if (dotIcon == NULL) {
+    if (dotIcon == NULL || ((Popup*)this->parent)->noIcons) {
         return false;
     }
 
@@ -97,37 +97,48 @@ void PopupItem::SetIcon(IExtractIconW* extractIcon) {
     UINT flags;
     HRESULT hr;
 
-    // Get the location of the file containing the appropriate icon, and the index of the icon.
-    hr = extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);
+    if (!((Popup*)this->parent)->noIcons) {
 
-    // Extract the icon.
-    if (SUCCEEDED(hr)) {
-        hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(64, 0));
-    }
+        // Get the location of the file containing the appropriate icon, and the index of the icon.
+        hr = extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);
+
+        // Extract the icon.
+        if (SUCCEEDED(hr)) {
+            hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(64, 0));
+        }
     
-    // If the extraction failed, fall back to a 32x32 icon.
-    if (hr == S_FALSE) {
-        hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(32, 0));
-    }
+        // If the extraction failed, fall back to a 32x32 icon.
+        if (hr == S_FALSE) {
+            hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(32, 0));
+        }
 
-    // And then to a 16x16
-    if (hr == S_FALSE) {
-        hr = extractIcon->Extract(iconFile, iconIndex, NULL, &icon, MAKELONG(0, 16));
-    }
+        // And then to a 16x16
+        if (hr == S_FALSE) {
+            hr = extractIcon->Extract(iconFile, iconIndex, NULL, &icon, MAKELONG(0, 16));
+        }
 
-    if (hr == S_FALSE) {
-        icon = ExtractIconW(g_LSModule->GetInstance(), iconFile, iconIndex);
-    }
+        if (hr == S_FALSE) {
+            icon = ExtractIconW(g_LSModule->GetInstance(), iconFile, iconIndex);
+        }
 
-    if (SUCCEEDED(hr) && icon != NULL) {
-        AddIcon(icon);
-    }
-    else {
-        TRACEW(L"Failed to extract icon %s,%i", iconFile, iconIndex);
-    }
+        if (SUCCEEDED(hr) && icon != NULL) {
+            AddIcon(icon);
+        }
+        else {
+            TRACEW(L"Failed to extract icon %s,%i", iconFile, iconIndex);
 
-    if (hr == S_FALSE && icon != NULL) {
-        DestroyIcon(icon);
+            // Try to fall back to the default icon.
+            icon = ExtractIconW(g_LSModule->GetInstance(), L"shell32.dll", 1);
+
+            if (icon != NULL) {
+                AddIcon(icon);
+                hr = S_FALSE;
+            }
+        }
+
+        if (hr == S_FALSE && icon != NULL) {
+            DestroyIcon(icon);
+        }
     }
 
     // Let go of the interface.
