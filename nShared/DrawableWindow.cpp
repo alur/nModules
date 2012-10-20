@@ -641,8 +641,8 @@ void DrawableWindow::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
     textLayout->GetMetrics(&metrics);
     SAFERELEASE(textLayout);
 
-    size->cx = metrics.width + this->baseState->drawingSettings->textOffsetLeft + this->baseState->drawingSettings->textOffsetRight + 1;
-    size->cy = metrics.height + this->baseState->drawingSettings->textOffsetTop + this->baseState->drawingSettings->textOffsetBottom + 1;
+    size->cx = long(metrics.width + this->baseState->drawingSettings->textOffsetLeft + this->baseState->drawingSettings->textOffsetRight) + 1;
+    size->cy = long(metrics.height + this->baseState->drawingSettings->textOffsetTop + this->baseState->drawingSettings->textOffsetBottom) + 1;
 }
 
 
