@@ -23,10 +23,11 @@ public:
     void AddItem(PopupItem* item);
     void RemoveItem(PopupItem* item);
     void Show();
-    void Show(int x, int y, Popup* owner = NULL);
+    void Show(int x, int y);
+    void Show(LPRECT position, Popup* owner = NULL);
     
     // Called by PopupItems
-    void OpenChild(Popup*, int y, int x, PopupItem* childItem);
+    void OpenChild(Popup*, LPRECT position, PopupItem* childItem);
     void CloseChild(bool closing = false);
 
     // Called by items, children, or the owner.
@@ -82,4 +83,7 @@ private:
 
     // True if the mouse is currently above the popup.
     bool mouseOver;
+
+    // True to have children appear to the left rather than the right.
+    bool expandLeft;
 };

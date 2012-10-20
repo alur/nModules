@@ -64,7 +64,7 @@ LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, 
             if (this->popup != NULL) {
                 RECT r;
                 this->window->GetScreenRect(&r);
-                ((Popup*)this->parent)->OpenChild(this->popup, r.top, r.right, this);
+                ((Popup*)this->parent)->OpenChild(this->popup, &r, this);
                 this->window->ActivateState(this->openState);
             }
         }
