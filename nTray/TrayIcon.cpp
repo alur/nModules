@@ -2,7 +2,7 @@
  *  TrayIcon.cpp
  *  The nModules Project
  *
- *  Implementation of the TrayIcon class. Represents a taskbar button.
+ *  Implementation of the TrayIcon class. A single icon in the tray.
  *   
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"

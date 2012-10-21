@@ -1,8 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TrayManager.h
+ *  TrayManager.cpp
  *  The nModules Project
  *
- *  
+ *  Keeps track of the system tray icons and notifies the trays of changes.
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "Tray.hpp"

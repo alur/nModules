@@ -6,6 +6,7 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "Easing.h"
+#include <cmath>
 
 
 /// <summary>
@@ -17,8 +18,15 @@ float Easing::Transform(float progress, EasingType easingType) {
     switch (easingType) {
     case LINEAR:
         return progress;
-    case EasingType::INOUTCUBIC:
+    case CUBIC:
         return progress*progress*progress;
+    case SINE:
+        return (float)sin(1.57079632679*progress);
+    case BOUNCE:
+        {
+            //if (progress < 0.6) return progress*progress/0.36f;
+            //if (progress < 0.8) return pow(progress-0.6, 2)
+        }
     default:
         return progress;
     }

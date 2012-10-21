@@ -34,9 +34,6 @@ public:
     // Connects to nCore.
     bool ConnectToCore(VERSION minimumCoreVersion);
 
-    // Adds a top-level drawable.
-    void AddDrawable(LPCSTR name, Drawable* drawable);
-
     // Creates a top-level drawable window.
     DrawableWindow* CreateDrawableWindow(Settings* settings, MessageHandler* msgHandler);
 
@@ -51,9 +48,6 @@ public:
 
     //
     LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
-
-    // All top-level drawables.
-    map<string, Drawable*> drawables;
 
 private:
     // The window class used by the message handler.

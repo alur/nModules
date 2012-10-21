@@ -52,12 +52,6 @@ LSModule::LSModule(HWND parent, LPCSTR moduleName, LPCSTR author, VERSION versio
 /// Destructor. Frees allocated resources.
 /// </summary>
 LSModule::~LSModule() {
-    // Destroy all drawables.
-    for (map<string, Drawable*>::iterator iter = this->drawables.begin(); iter != this->drawables.end(); ++iter) {
-        delete iter->second;
-    }
-    this->drawables.clear();
-
     // Destroy the message handler.
     if (this->messageHandler != NULL) {
         DestroyWindow(this->messageHandler);

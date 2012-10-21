@@ -89,7 +89,7 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
                 this->window->SetPosition(position->right, position->bottom, 1, position->bottom - position->top);
                 break;
         }
-        this->window->SetAnimation(x, y, width, height, 200, Easing::INOUTCUBIC);
+        this->window->SetAnimation(x, y, width, height, 200, Easing::SINE);
 
         DWM_THUMBNAIL_PROPERTIES properties;
         properties.dwFlags = DWM_TNP_VISIBLE | DWM_TNP_SOURCECLIENTAREAONLY | DWM_TNP_OPACITY;

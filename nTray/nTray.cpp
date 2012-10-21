@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nTask.cpp
+ *  nTray.cpp
  *  The nModules Project
  *
- *  Main .cpp file for the nTask module.
+ *  Main .cpp file for the nTray module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"

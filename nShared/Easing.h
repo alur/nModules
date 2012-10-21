@@ -10,13 +10,12 @@
 namespace Easing {
     enum EasingType {
         LINEAR,
-        INQUAD,
-        OUTQUAD,
-        INOUTQUAD,
-        INCUBIC,
-        OUTQUBIC,
-        INOUTCUBIC,
-        BOUNCE
+        SQUARED,
+        CUBIC,
+        QUADRATIC,
+        BOUNCE,
+        ELASTIC,
+        SINE
     };
 
 
