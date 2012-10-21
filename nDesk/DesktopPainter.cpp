@@ -32,6 +32,8 @@ DesktopPainter::DesktopPainter(HWND hWnd) {
     m_TransitionEffect = NULL;
     m_pRenderTarget = NULL;
     m_bInvalidateAllOnUpdate = false;
+    this->transitionStartTime = 0;
+    this->transitionEndTime = 0;
     ZeroMemory(&m_TransitionSettings, sizeof(TransitionEffect::TransitionSettings));
 
     //
@@ -41,7 +43,6 @@ DesktopPainter::DesktopPainter(HWND hWnd) {
     CalculateSizeDepdenentStuff();
 
     //
-    m_TransitionSettings.iFrameInterval = 16; // 62.5 frames per second
     m_TransitionSettings.iTime = 625; // milliseconds
     m_TransitionSettings.iSquareSize = 100;
     m_TransitionSettings.fFadeTime = 0.2f;
@@ -65,9 +66,9 @@ DesktopPainter::~DesktopPainter() {
 /// Releases all D2D device depenent resources
 /// </summary>
 void DesktopPainter::DiscardDeviceResources() {
-    SAFERELEASE(m_pRenderTarget)
-    SAFERELEASE(m_pWallpaperBrush)
-    SAFERELEASE(m_pOldWallpaperBrush)
+    SAFERELEASE(m_pRenderTarget);
+    SAFERELEASE(m_pWallpaperBrush);
+    SAFERELEASE(m_pOldWallpaperBrush);
 }
 
 
@@ -130,8 +131,8 @@ void DesktopPainter::SetTransitionType(TransitionType transitionType) {
         }
     }
     else if (m_pOldWallpaperBrush != NULL) {
-        m_TransitionSettings.iProgress = m_TransitionSettings.iTime;
-        SAFERELEASE(m_pOldWallpaperBrush)
+        SAFERELEASE(m_pOldWallpaperBrush);
+        Redraw();
     }
 }
 
@@ -194,15 +195,6 @@ void DesktopPainter::SetTransitionTime(int iTransitionTime) {
 void DesktopPainter::SetSquareSize(int iSquareSize) {
     m_TransitionSettings.iSquareSize = iSquareSize;
     if (m_TransitionEffect) m_TransitionEffect->Resize();
-}
-
-
-/// <summary>
-/// Changes the frame interval.
-/// </summary>
-void DesktopPainter::SetFrameInterval(int iFrameInterval) {
-    assert(iFrameInterval > 0);
-    m_TransitionSettings.iFrameInterval = iFrameInterval;
 }
 
 
@@ -283,18 +275,6 @@ void DesktopPainter::Redraw() {
 
 
 /// <summary>
-/// Should be called when a new frame in the transition needs to be painted.
-/// </summary>
-void DesktopPainter::TransitionStep() {
-    m_TransitionSettings.iProgress += m_TransitionSettings.iFrameInterval;
-    if (m_TransitionSettings.iProgress >= m_TransitionSettings.iTime) {
-        KillTimer(m_hWnd, 1337);
-    }
-    Redraw();
-}
-
-
-/// <summary>
 /// Regular painting
 /// </summary>
 void DesktopPainter::Paint() {
@@ -306,9 +286,11 @@ void DesktopPainter::Paint() {
 /// Called prior to the first painting call, to let the transition effect initialize.
 /// </summary>
 void DesktopPainter::TransitionStart() {
-    m_TransitionSettings.iProgress = 0;
-    SetTimer(m_hWnd, 1337, 16, NULL);
+    this->transitionStartTime = GetTickCount();
+    this->transitionEndTime = this->transitionStartTime + this->m_TransitionSettings.iTime;
     m_TransitionEffect->Start(m_pOldWallpaperBrush, m_pWallpaperBrush);
+
+    Redraw();
 }
 
 
@@ -328,10 +310,12 @@ void DesktopPainter::TransitionEnd() {
 /// Paints a composite of the previous wallpaper and the current one.
 /// </summary>
 void DesktopPainter::PaintComposite() {
-    m_TransitionEffect->Paint(m_pRenderTarget, min(1.0f, (float)m_TransitionSettings.iProgress/m_TransitionSettings.iTime));
+    float progress = min(1.0f, float(GetTickCount() - this->transitionStartTime)/(this->m_TransitionSettings.iTime));
+
+    m_TransitionEffect->Paint(m_pRenderTarget, progress);
 
     // We are done with the transition, let go of the old wallpaper
-    if (m_TransitionSettings.iProgress >= m_TransitionSettings.iTime) {
+    if (progress >= 1.0f) {
         TransitionEnd();
     }
 }
@@ -362,7 +346,13 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                 DiscardDeviceResources();
             }
         }
+
         ValidateRect(hWnd, NULL);
+
+        if (m_pOldWallpaperBrush != NULL) {
+            Redraw();
+        }
+
         return 0;
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);

@@ -22,9 +22,6 @@ void nDesk::Settings::Load() {
     // Defaults to 625ms
     g_pDesktopPainter->SetTransitionTime(LiteStep::GetRCInt("nDeskTransitionDuration", 625));
 
-    // Defaults to 16ms per frame -> 62.5fps
-    g_pDesktopPainter->SetFrameInterval(LiteStep::GetRCInt("nDeskTransitionFrameInterval", 16));
-
     //
     g_pDesktopPainter->SetSquareSize(LiteStep::GetRCInt("nDeskTransitionSquareSize", 150));
 

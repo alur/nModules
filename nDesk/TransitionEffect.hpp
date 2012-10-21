@@ -17,12 +17,6 @@ public:
 		// The number of milliseconds the transition should take
 		int iTime;
 
-		// How many milliseconds into the transition we are
-		int iProgress;
-
-		// How often to repaint during a transition
-		int iFrameInterval;
-
 		// The size of the squares used during square transitions
 		int iSquareSize;
 

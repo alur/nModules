@@ -20,7 +20,6 @@ namespace Bangs {
 
     // Transition Related
     void SetTransitionDuration(HWND, LPCSTR);
-    void SetTransitionFrameInterval(HWND, LPCSTR);
     void SetTransitionSquareSize(HWND, LPCSTR);
     void SetTransitionEffect(HWND, LPCSTR);
 

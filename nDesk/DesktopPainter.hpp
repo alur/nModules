@@ -67,12 +67,9 @@ public:
 
     void SetTransitionType(TransitionType);
     void SetTransitionTime(int);
-    void SetFrameInterval(int);
     void SetSquareSize(int);
 
     void SetInvalidateAllOnUpdate(bool);
-
-    void TransitionStep();
 
     void UpdateWallpaper(bool bNoTransition = false);
     void Resize();
@@ -96,6 +93,10 @@ private:
 
     //
     HWND m_hWnd;
+
+    //
+    DWORD transitionEndTime;
+    DWORD transitionStartTime;
 
     // Direct2D targets
     ID2D1HwndRenderTarget* m_pRenderTarget;

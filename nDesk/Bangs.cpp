@@ -24,7 +24,6 @@ namespace Bangs {
         { "On",                         On                         },
         { "Off",                        Off                        },
         { "SetTransitionDuration",      SetTransitionDuration      },
-        { "SetTransitionFrameInterval", SetTransitionFrameInterval },
         { "SetTransitionSquareSize",    SetTransitionSquareSize    },
         { "SetTransitionEffect",        SetTransitionEffect        },
         { "SetInvalidateAllOnUpdate",   SetInvalidateAllOnUpdate   },
@@ -86,14 +85,6 @@ void Bangs::Off(HWND, LPCSTR pszArgs) {
 /// </summary>
 void Bangs::SetTransitionDuration(HWND, LPCSTR pszArgs) {
     g_pDesktopPainter->SetTransitionTime(atoi(pszArgs));
-}
-
-
-/// <summary>
-/// Sets the transition frame interval. Force it to be in the range of 10 to 50.
-/// </summary>
-void Bangs::SetTransitionFrameInterval(HWND, LPCSTR pszArgs) {
-    g_pDesktopPainter->SetFrameInterval(min(50, max(10, atoi(pszArgs))));
 }
 
 

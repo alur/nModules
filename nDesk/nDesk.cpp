@@ -178,13 +178,6 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         }
         break;
 
-    case WM_TIMER:
-        switch (wParam) {
-        case 1337:
-            g_pDesktopPainter->TransitionStep();
-        }
-        break;
-    
     case WM_CLOSE:
         // If someone tries to exit the desktop window, lets make it a windows shutdown.
         // PostMessage(GetLitestepWnd(), LM_RECYCLE, 3, 0);
