@@ -372,6 +372,7 @@ HRESULT DrawableWindow::CreateBrushes(State* state) {
             }
 
             if (SUCCEEDED(hr)) {
+                brush->SetTransform(Matrix3x2F::Translation(this->drawingArea.left, this->drawingArea.top));
                 state->imageBrush = brush;
             }
 
