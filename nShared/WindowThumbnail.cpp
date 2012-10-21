@@ -72,7 +72,24 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
             break;
         }
 
-        this->window->SetPosition(x, y, width, height);
+        switch (this->position) {
+            case TOP:
+                this->window->SetPosition(position->left, position->top - 1, position->right - position->left, 1);
+                break;
+
+            case BOTTOM:
+                this->window->SetPosition(position->left, position->bottom, position->right - position->left, 1);
+                break;
+
+            case LEFT:
+                this->window->SetPosition(position->left, position->bottom, 1, position->bottom - position->top);
+                break;
+
+            case RIGHT:
+                this->window->SetPosition(position->right, position->bottom, 1, position->bottom - position->top);
+                break;
+        }
+        this->window->SetAnimation(x, y, width, height, 100, Easing::INOUTCUBIC);
 
         RECT dest = { this->offset.left, this->offset.top, width - this->offset.right, height - this->offset.bottom };
         DWM_THUMBNAIL_PROPERTIES properties;

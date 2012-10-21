@@ -15,6 +15,7 @@
 #include <map>
 #include "UIDGenerator.hpp"
 #include "MonitorInfo.hpp"
+#include "Easing.h"
 
 
 using std::vector;
@@ -125,6 +126,9 @@ public:
     // Resizes the window.
     void Resize(int width, int height);
 
+    // Performs an animation.
+    void SetAnimation(int x, int y, int width, int height, int duration, Easing::EasingType easing);
+
     // Registers a timer
     UINT_PTR SetCallbackTimer(UINT elapse, MessageHandler* msgHandler);
 
@@ -157,6 +161,9 @@ protected:
     void Paint();
 
 private:
+    //
+    void Animate();
+
     // Called by the constructors, intializes variables.
     void ConstructorCommon(Settings* settings, MessageHandler* msgHandler);
 
@@ -183,6 +190,24 @@ private:
 
     // The currently active state, or states.end().
     list<State>::iterator activeState;
+
+    // The easing we are using for the current animation.
+    Easing::EasingType animationEasing;
+
+    //
+    DWORD animationEndTime;
+
+    // If we are currently doing an animation, the position at the start of the animation.
+    RECT animationStart;
+
+    // If we are currently doing an animation, how far along we are.
+    DWORD animationStartTime;
+
+    // If we are currently doing an animation, the position target of the animation.
+    RECT animationTarget;
+
+    // 
+    UINT_PTR animationTimer;
 
     // The base state -- the one to use when no others are active.
     list<State>::iterator baseState;

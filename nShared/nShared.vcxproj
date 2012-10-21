@@ -25,6 +25,7 @@
     <ClInclude Include="Drawable.hpp" />
     <ClInclude Include="DrawableSettings.hpp" />
     <ClInclude Include="DrawableWindow.hpp" />
+    <ClInclude Include="Easing.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="EventHandler.hpp" />
     <ClInclude Include="Factories.h" />
@@ -49,6 +50,7 @@
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="DrawableSettings.cpp" />
     <ClCompile Include="DrawableWindow.cpp" />
+    <ClCompile Include="Easing.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="Factories.cpp" />

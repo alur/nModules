@@ -36,7 +36,7 @@ private:
     };
 
     typedef struct ClickData {
-        ClickType type;
+        EventType type;
         WORD mods; // Modifier keys
         RECT area; // Region of the virtual screen where this event is valid
         char action[MAX_LINE_LENGTH]; // Action to fire when this event occurs
@@ -46,7 +46,7 @@ private:
 
     void LoadSettings(bool = false);
     ClickData ParseLine(LPCSTR);
-    ClickType TypeFromString(LPCSTR str);
+    EventType TypeFromString(LPCSTR str);
     WORD ModsFromString(LPSTR str);
     bool Matches(ClickData a, ClickData b);
 };

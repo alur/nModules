@@ -78,6 +78,7 @@ DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, Messa
 /// </summary>
 void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHandler) {
     this->activeChild = NULL;
+    this->animationTimer = 0;
     ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
     this->initialized = false;
     this->isTrackingMouse = false;
@@ -244,6 +245,51 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmap* source) {
     }
 
     return hr;
+}
+
+
+/// <summary>
+/// Performs an animation step.
+/// </summary>
+void DrawableWindow::Animate() {
+    float progress = Easing::Transform(min(1.0f,
+        float(GetTickCount() - this->animationStartTime)/(this->animationEndTime - this->animationStartTime)),
+        this->animationEasing);
+
+    if (progress >= 1.0f) {
+        ClearCallbackTimer(this->animationTimer);
+        this->animationTimer = 0;
+    }
+
+    RECT step;
+    step.left = this->animationStart.left + long(progress*(this->animationTarget.left - this->animationStart.left));
+    step.top = this->animationStart.top + long(progress*(this->animationTarget.top - this->animationStart.top));
+    step.right = this->animationStart.right + long(progress*(this->animationTarget.right - this->animationStart.right));
+    step.bottom = this->animationStart.bottom + long(progress*(this->animationTarget.bottom - this->animationStart.bottom));
+
+    SetPosition(step.left, step.top, step.right - step.left, step.bottom - step.top);
+}
+
+
+/// <summary>
+/// Starts a new animation, or updates the parameters of the current one.
+/// </summary>
+void DrawableWindow::SetAnimation(int x, int y, int width, int height, int duration, Easing::EasingType easing) {
+    RECT target = { x, y, x + width, y + height };
+    this->animationTarget = target;
+    this->animationStart.top = this->baseState->drawingSettings->y;
+    this->animationStart.left = this->baseState->drawingSettings->x;
+    this->animationStart.bottom = this->baseState->drawingSettings->y + this->baseState->drawingSettings->height;
+    this->animationStart.right = this->baseState->drawingSettings->x + this->baseState->drawingSettings->width;
+    this->animationEasing = easing;
+
+    // TODO::Not too fond of using GetTickCount or WM_TIMER.
+    this->animationStartTime = GetTickCount();
+    this->animationEndTime = this->animationStartTime + duration;
+
+    if (!this->animationTimer) {
+        this->animationTimer = SetCallbackTimer(16, this);
+    }
 }
 
 
@@ -820,6 +866,9 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         {
             if (wParam == this->updateTextTimer) {
                 this->UpdateText();
+            }
+            else if (wParam == this->animationTimer) {
+                this->Animate();
             }
             else {
                 map<UINT_PTR, MessageHandler*>::const_iterator iter = timers.find(wParam);

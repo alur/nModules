@@ -11,6 +11,7 @@
 #include "Settings.hpp"
 #include "DrawableWindow.hpp"
 #include "MessageHandler.hpp"
+#include "EventHandler.hpp"
 
 class Drawable : public MessageHandler {
 public:
@@ -28,4 +29,7 @@ protected:
 
     // The parent drawable, if there is one.
     Drawable* parent;
+
+    // Handles events.
+    EventHandler* eventHandler;
 };

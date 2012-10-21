@@ -20,8 +20,9 @@ Drawable::Drawable(LPCSTR prefix) {
     this->initialized = false;
     this->settings = new Settings(prefix);
     this->window = g_LSModule->CreateDrawableWindow(this->settings, this);
-    this->initialized = true;
+    //this->eventHandler = new EventHandler(this->settings);
     this->parent = NULL;
+    this->initialized = true;
 }
 
 
@@ -32,8 +33,9 @@ Drawable::Drawable(LPCSTR prefix, Settings* parentSettings) {
     this->initialized = false;
     this->settings = parentSettings->CreateChild(prefix);
     this->window = g_LSModule->CreateDrawableWindow(this->settings, this);
-    this->initialized = true;
+    //this->eventHandler = new EventHandler(this->settings);
     this->parent = NULL;
+    this->initialized = true;
 }
 
 
@@ -44,8 +46,9 @@ Drawable::Drawable(Drawable* parent, LPCSTR prefix) {
     this->initialized = false;
     this->settings = parent->settings->CreateChild(prefix);
     this->window = parent->window->CreateChild(this->settings, this);
-    this->initialized = true;
+    //this->eventHandler = new EventHandler(this->settings);
     this->parent = parent;
+    this->initialized = true;
 }
 
 
@@ -56,4 +59,5 @@ Drawable::~Drawable() {
     this->initialized = false;
     SAFEDELETE(this->window);
     SAFEDELETE(this->settings);
+    //SAFEDELETE(this->eventHandler);
 }
