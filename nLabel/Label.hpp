@@ -13,15 +13,15 @@
 class Label : public Drawable {
 public:
     explicit Label(LPCSTR name);
+    explicit Label(LPCSTR name, Drawable* parent);
     virtual ~Label();
-
-    void LoadSettings(bool = false);
-    void CreateLabelWindow();
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
 private:
-    // The name of this label
-    LPCSTR name;
+    void Initalize();
+    void LoadSettings(bool isRefresh = false);
 
     DrawableWindow::STATE stateHover;
+    list<Drawable*> overlays;
+    map<string, Label*>::iterator allLabelsIter;
 };

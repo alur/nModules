@@ -16,7 +16,7 @@
 class Drawable : public MessageHandler {
 public:
     explicit Drawable(LPCSTR prefix);
-    explicit Drawable(Drawable* parent, LPCSTR prefix);
+    explicit Drawable(Drawable* parent, LPCSTR prefix, bool independent = false);
     explicit Drawable(LPCSTR prefix, Settings* parentSettings);
     virtual ~Drawable();
 

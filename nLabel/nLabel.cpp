@@ -10,6 +10,7 @@
 #include "../nShared/LSModule.hpp"
 #include "Label.hpp"
 #include <map>
+#include <strsafe.h>
 
 using std::map;
 
@@ -19,8 +20,11 @@ LSModule* g_LSModule;
 // The messages we want from the core
 UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
 
-// All the labels we currently have loaded
-map<LPCSTR, Label*> g_Labels;
+// All the top-level labels we currently have loaded
+map<string, Label*> g_TopLevelLabels;
+
+// All the labels we currently have loaded. Labels add and remove themselfs from this list.
+map<string, Label*> g_AllLabels;
 
 
 /// <summary>
@@ -51,10 +55,10 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
     // Remove all labels
-    for (map<LPCSTR, Label*>::const_iterator iter = g_Labels.begin(); iter != g_Labels.end(); iter++) {
+    for (map<string, Label*>::const_iterator iter = g_TopLevelLabels.begin(); iter != g_TopLevelLabels.end(); iter++) {
         delete iter->second;
     }
-    g_Labels.clear();
+    g_TopLevelLabels.clear();
 
     if (g_LSModule) {
         delete g_LSModule;
@@ -99,12 +103,10 @@ void LoadSettings() {
     char szLine[MAX_LINE_LENGTH], szLabel[256];
     LPSTR szTokens[] = { szLabel };
     LPVOID f = LiteStep::LCOpen(NULL);
-    LPSTR name;
 
     while (LiteStep::LCReadNextConfig(f, "*nLabel", szLine, sizeof(szLine))) {
         LiteStep::LCTokenize(szLine+strlen("*nLabel")+1, szTokens, 1, NULL);
-        name = _strdup(szLabel);
-        g_Labels.insert(g_Labels.begin(), std::pair<LPCSTR, Label*>(name, new Label(name)));
+        g_TopLevelLabels.insert(g_TopLevelLabels.begin(), std::pair<string, Label*>(string(szLabel), new Label(szLabel)));
     }
     LiteStep::LCClose(f);
 }

@@ -9,24 +9,58 @@
 #include "../nShared/LSModule.hpp"
 #include "Label.hpp"
 #include "../nShared/Macros.h"
+#include <strsafe.h>
 
 extern LSModule* g_LSModule;
+extern map<string, Label*> g_AllLabels;
+
 
 Label::Label(LPCSTR name) : Drawable(name) {
-    this->name = name;
-    this->settings = new Settings(name);
+    Initalize();
+}
+
+
+Label::Label(LPCSTR name, Drawable* parent) : Drawable(parent, name, true) {
+    Initalize();
+}
+
+
+Label::~Label() {
+    // Remove all overlays
+    for (list<Drawable*>::const_iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++) {
+        delete *iter;
+    }
+    this->overlays.clear();
+
+    g_AllLabels.erase(this->allLabelsIter);
+}
+
+
+void Label::Initalize() {
+    this->allLabelsIter = g_AllLabels.insert(g_AllLabels.begin(), pair<string, Label*>(string(this->settings->prefix), this));
+    
     this->window->Initialize(new DrawableSettings());
+
+    LoadSettings();
+
     this->stateHover = this->window->AddState("Hover", new DrawableSettings(), 100);
     this->window->Show();
 }
 
 
-Label::~Label() {
-    free((LPVOID)this->name);
-}
+void Label::LoadSettings(bool /* isRefresh */) {
+    // Load overlays.
+    char line[MAX_LINE_LENGTH], prefix[256], label[256];
+    LPSTR tokens[] = { label };
+    LPVOID f = LiteStep::LCOpen(NULL);
 
+    StringCchPrintf(prefix, sizeof(prefix), "*%sOverlayLabel", this->settings->prefix);
 
-void Label::LoadSettings(bool /* bIsRefresh */) {
+    while (LiteStep::LCReadNextConfig(f, prefix, line, sizeof(line))) {
+        LiteStep::LCTokenize(line+strlen(prefix)+1, tokens, 1, NULL);
+        this->overlays.push_back(new Label(label, this));
+    }
+    LiteStep::LCClose(f);
 }
 
 

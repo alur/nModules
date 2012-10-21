@@ -42,9 +42,9 @@ Drawable::Drawable(LPCSTR prefix, Settings* parentSettings) {
 /// <summary>
 /// Creates a new child drawable.
 /// </summary>
-Drawable::Drawable(Drawable* parent, LPCSTR prefix) {
+Drawable::Drawable(Drawable* parent, LPCSTR prefix, bool independent) {
     this->initialized = false;
-    this->settings = parent->settings->CreateChild(prefix);
+    this->settings = independent ? new Settings(prefix) : parent->settings->CreateChild(prefix);
     this->window = parent->window->CreateChild(this->settings, this);
     //this->eventHandler = new EventHandler(this->settings);
     this->parent = parent;
