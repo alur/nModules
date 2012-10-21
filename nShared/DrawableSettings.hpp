@@ -56,6 +56,15 @@ public:
     // The image to use for this window. Default: "" (blank)
     char image[MAX_PATH];
 
+    // The maximum opacity of the image. 0 to 1. Default: 1
+    float imageOpacity;
+
+    // The rotation of the image, in degrees. Default: 0
+    float imageRotation;
+
+    // How to position the image. Fit, Fill, Center, Stretch, or Tile. Default: Tile
+    char imageScalingMode[32];
+
     // Right-to-Left. Default: False
     bool rightToLeft;
 

@@ -120,6 +120,7 @@ DrawableWindow::~DrawableWindow() {
         SAFERELEASE(iter->backBrush);
         SAFERELEASE(iter->textBrush);
         SAFERELEASE(iter->textFormat);
+        SAFERELEASE(iter->imageBrush);
     }
     this->states.clear();
 
@@ -341,18 +342,47 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
 /// Creates the brushes for the specified state.
 /// </summary>
 HRESULT DrawableWindow::CreateBrushes(State* state) {
-    IWICImagingFactory* factory = NULL;
-    Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
+    state->imageBrush = NULL;
 
     // Create the background brush
     if (state->drawingSettings->image[0] != 0) {
+        IWICImagingFactory* factory = NULL;
+        IWICBitmap* wicBitmap = NULL;
+        IWICFormatConverter* converter = NULL;
+        ID2D1BitmapBrush* brush = NULL;
+        ID2D1Bitmap* bitmap = NULL;
+        Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
         
-        //factory->
+        HBITMAP hBitmap = LiteStep::LoadLSImage(state->drawingSettings->image, NULL);
+        if (hBitmap) {
+            HRESULT hr;
+
+            hr = factory->CreateFormatConverter(&converter);
+            if (SUCCEEDED(hr)) {
+                hr = factory->CreateBitmapFromHBITMAP(hBitmap, NULL, WICBitmapUseAlpha, &wicBitmap);
+            }
+            if (SUCCEEDED(hr)) {
+                hr = converter->Initialize(wicBitmap, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut);
+            }
+            if (SUCCEEDED(hr)) {
+                hr = this->renderTarget->CreateBitmapFromWicBitmap(converter, NULL, &bitmap);
+            }
+            if (SUCCEEDED(hr)) {
+                hr = this->renderTarget->CreateBitmapBrush(bitmap, &brush);
+            }
+
+            if (SUCCEEDED(hr)) {
+                state->imageBrush = brush;
+            }
+
+            DeleteObject(hBitmap);
+            SAFERELEASE(wicBitmap);
+            SAFERELEASE(bitmap);
+            SAFERELEASE(converter);
+        }
     }
 
     this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(state->drawingSettings->color), (ID2D1SolidColorBrush**)&state->backBrush);
-
-
     this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(state->drawingSettings->fontColor), (ID2D1SolidColorBrush**)&state->textBrush);
 
     return S_OK;
@@ -923,6 +953,10 @@ void DrawableWindow::Paint() {
         this->renderTarget->SetTransform(Matrix3x2F::Identity());
 
         this->renderTarget->FillRectangle(this->drawingArea, this->activeState->backBrush);
+
+        if (this->activeState->imageBrush != NULL) {
+            this->renderTarget->FillRectangle(this->drawingArea, this->activeState->imageBrush);
+        }
     
         this->renderTarget->SetTransform(
             Matrix3x2F::Rotation(this->activeState->drawingSettings->textRotation,

@@ -39,6 +39,9 @@ public:
         // The brush we are currently painting the text with.
         ID2D1Brush* textBrush;
 
+        // If we are painting an image, the brush for that image.
+        ID2D1Brush* imageBrush;
+
         // The area we draw text in
         D2D1_RECT_F textArea;
 
