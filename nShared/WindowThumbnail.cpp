@@ -89,15 +89,13 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
                 this->window->SetPosition(position->right, position->bottom, 1, position->bottom - position->top);
                 break;
         }
-        this->window->SetAnimation(x, y, width, height, 100, Easing::INOUTCUBIC);
+        this->window->SetAnimation(x, y, width, height, 200, Easing::INOUTCUBIC);
 
-        RECT dest = { this->offset.left, this->offset.top, width - this->offset.right, height - this->offset.bottom };
         DWM_THUMBNAIL_PROPERTIES properties;
-        properties.dwFlags = DWM_TNP_RECTDESTINATION | DWM_TNP_VISIBLE | DWM_TNP_SOURCECLIENTAREAONLY | DWM_TNP_OPACITY;
+        properties.dwFlags = DWM_TNP_VISIBLE | DWM_TNP_SOURCECLIENTAREAONLY | DWM_TNP_OPACITY;
         properties.fSourceClientAreaOnly = FALSE;
         properties.fVisible = TRUE;
         properties.opacity = (BYTE)this->thumbnailOpacity;
-        properties.rcDestination = dest;
 
         hr = DwmUpdateThumbnailProperties(this->thumbnailHandle, &properties);
     }
@@ -155,5 +153,18 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
 
 
 LRESULT WINAPI WindowThumbnail::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch (message) {
+    case WM_SIZE:
+        {
+            DWM_THUMBNAIL_PROPERTIES properties;
+            properties.dwFlags = DWM_TNP_RECTDESTINATION;
+            properties.rcDestination.left = this->offset.left;
+            properties.rcDestination.right = LOWORD(lParam) - this->offset.right;
+            properties.rcDestination.top = this->offset.top;
+            properties.rcDestination.bottom = HIWORD(lParam) - this->offset.bottom;
+            DwmUpdateThumbnailProperties(this->thumbnailHandle, &properties);
+        }
+        return 0;
+    }
     return DefWindowProc(window, message, wParam, lParam);
 }

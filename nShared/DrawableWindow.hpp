@@ -191,6 +191,9 @@ private:
     // The currently active state, or states.end().
     list<State>::iterator activeState;
 
+    //
+    bool animating;
+
     // The easing we are using for the current animation.
     Easing::EasingType animationEasing;
 
@@ -205,9 +208,6 @@ private:
 
     // If we are currently doing an animation, the position target of the animation.
     RECT animationTarget;
-
-    // 
-    UINT_PTR animationTimer;
 
     // The base state -- the one to use when no others are active.
     list<State>::iterator baseState;

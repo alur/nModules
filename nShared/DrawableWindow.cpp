@@ -78,7 +78,7 @@ DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, Messa
 /// </summary>
 void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHandler) {
     this->activeChild = NULL;
-    this->animationTimer = 0;
+    this->animating = false;
     ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
     this->initialized = false;
     this->isTrackingMouse = false;
@@ -257,8 +257,7 @@ void DrawableWindow::Animate() {
         this->animationEasing);
 
     if (progress >= 1.0f) {
-        ClearCallbackTimer(this->animationTimer);
-        this->animationTimer = 0;
+        this->animating = false;
     }
 
     RECT step;
@@ -268,6 +267,8 @@ void DrawableWindow::Animate() {
     step.bottom = this->animationStart.bottom + long(progress*(this->animationTarget.bottom - this->animationStart.bottom));
 
     SetPosition(step.left, step.top, step.right - step.left, step.bottom - step.top);
+
+    Repaint();
 }
 
 
@@ -283,13 +284,13 @@ void DrawableWindow::SetAnimation(int x, int y, int width, int height, int durat
     this->animationStart.right = this->baseState->drawingSettings->x + this->baseState->drawingSettings->width;
     this->animationEasing = easing;
 
-    // TODO::Not too fond of using GetTickCount or WM_TIMER.
+    // TODO::Not too fond of using GetTickCount.
     this->animationStartTime = GetTickCount();
     this->animationEndTime = this->animationStartTime + duration;
 
-    if (!this->animationTimer) {
-        this->animationTimer = SetCallbackTimer(16, this);
-    }
+    this->animating = true;
+
+    Repaint();
 }
 
 
@@ -856,19 +857,17 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
             this->renderTarget->EndDraw();
 
             ValidateRect(this->window, NULL);
-        }
-        return 0;
 
-    case WM_SIZE:
+            if (this->animating) {
+                Animate();
+            }
+        }
         return 0;
 
     case WM_TIMER:
         {
             if (wParam == this->updateTextTimer) {
                 this->UpdateText();
-            }
-            else if (wParam == this->animationTimer) {
-                this->Animate();
             }
             else {
                 map<UINT_PTR, MessageHandler*>::const_iterator iter = timers.find(wParam);
