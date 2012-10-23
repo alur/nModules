@@ -75,5 +75,6 @@ LRESULT WINAPI Label::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
     else if (uMsg == WM_MOUSELEAVE) {
         this->window->ClearState(this->stateHover);
     }
+    this->eventHandler->HandleMessage(hWnd, uMsg, wParam, lParam);
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

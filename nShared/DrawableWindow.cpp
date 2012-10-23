@@ -602,6 +602,7 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     }
 }
 
+
 /// <summary>
 /// (Re)Creates all device dependent resources
 /// </summary>

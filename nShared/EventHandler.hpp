@@ -7,14 +7,15 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "../nShared/LiteStep.h"
+#include "LiteStep.h"
+#include "Settings.hpp"
 #include <vector>
 
 using std::vector;
 
 class EventHandler {
 public:
-    explicit EventHandler();
+    explicit EventHandler(Settings* settings);
     virtual ~EventHandler();
 
     void HandleMessage(HWND, UINT, WPARAM, LPARAM);
@@ -43,6 +44,8 @@ private:
     } ClickData;
 
     vector<ClickData> m_clickHandlers;
+
+    Settings* settings;
 
     void LoadSettings(bool = false);
     ClickData ParseLine(LPCSTR);

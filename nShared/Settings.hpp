@@ -24,6 +24,8 @@ public:
 
     Settings* CreateChild(LPCSTR prefix);
 
+    Settings* GetGroup();
+
     void AppendGroup(Settings* group);
 
     ARGB GetColor(LPCSTR key, ARGB defValue);

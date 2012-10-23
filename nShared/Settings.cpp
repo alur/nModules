@@ -50,6 +50,11 @@ Settings::Settings(Settings* settings) {
 }
 
 
+Settings* Settings::GetGroup() {
+    return this->group;
+}
+
+
 /// <summary>
 /// Deallocates resources used by the Settings class.
 /// </summary>
