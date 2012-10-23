@@ -2,7 +2,7 @@
  *  TextFunctions.h
  *  The nModules Project
  *
- *  Functions declarations for TextFunctions.cpp.
+ *  Provides Dynamic Text Functions.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once

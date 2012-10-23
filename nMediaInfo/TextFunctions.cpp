@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nMediaInfo.cpp
+ *  TextFunctions.cpp
  *  The nModules Project
  *
- *  Main .cpp file for the nMediaInfo module.
+ *  Provides Dynamic Text Functions.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
@@ -76,7 +76,7 @@ void TextFunctions::_Update() {
     }
 
     // Allocate memory in Winamp's process
-	LPVOID remoteStruct = VirtualAllocEx(winampHandle, NULL, sizeof(fileInfo), MEM_COMMIT, PAGE_READWRITE);
+    LPVOID remoteStruct = VirtualAllocEx(winampHandle, NULL, sizeof(fileInfo), MEM_COMMIT, PAGE_READWRITE);
 
     // Configure the remote extendedFileInfoStructW
     fileInfo.filename = (DWORD)SendMessageW(WA2Window, WM_USER, trackID, IPC_GETPLAYLISTFILEW);
@@ -113,12 +113,12 @@ void TextFunctions::_Update() {
     }
 
     // Deallocate memory from Winamp's process and close the handle.
-	VirtualFreeEx(winampHandle, (LPVOID)fileInfo.metadata, 64, MEM_DECOMMIT);
-	VirtualFreeEx(winampHandle, (LPVOID)fileInfo.metadata, 0, MEM_RELEASE);
-	VirtualFreeEx(winampHandle, remoteStruct, sizeof(fileInfo), MEM_DECOMMIT);
-	VirtualFreeEx(winampHandle, remoteStruct, 0, MEM_RELEASE);
-	VirtualFreeEx(winampHandle, (LPVOID)fileInfo.ret, 512, MEM_DECOMMIT);
-	VirtualFreeEx(winampHandle, (LPVOID)fileInfo.ret, 0, MEM_RELEASE);
+    VirtualFreeEx(winampHandle, (LPVOID)fileInfo.metadata, 64, MEM_DECOMMIT);
+    VirtualFreeEx(winampHandle, (LPVOID)fileInfo.metadata, 0, MEM_RELEASE);
+    VirtualFreeEx(winampHandle, remoteStruct, sizeof(fileInfo), MEM_DECOMMIT);
+    VirtualFreeEx(winampHandle, remoteStruct, 0, MEM_RELEASE);
+    VirtualFreeEx(winampHandle, (LPVOID)fileInfo.ret, 512, MEM_DECOMMIT);
+    VirtualFreeEx(winampHandle, (LPVOID)fileInfo.ret, 0, MEM_RELEASE);
 
     CloseHandle(winampHandle);
 }
