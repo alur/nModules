@@ -11,6 +11,7 @@
 #include "../nShared/Error.h"
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/Versioning.h"
+#include "TextFunctions.h"
 
 // The messages we want from the core
 UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
@@ -43,6 +44,7 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath
         return 1;
 
     g_pMonitorInfo = new MonitorInfo();
+    TextFunctions::_Register();
 
     return 0;
 }
@@ -57,6 +59,8 @@ void quitModule(HINSTANCE hDllInstance) {
         SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)g_hwndMsgHandler, (LPARAM)g_lsMessages);
         DestroyWindow(g_hwndMsgHandler);
     }
+
+    TextFunctions::_Unregister();
 
     UnregisterClass(g_szMsgHandler, hDllInstance);
 }

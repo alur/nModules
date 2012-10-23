@@ -5,18 +5,11 @@
  *  Formats text strings.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma once
-#include "../nShared/Macros.h"
-
-typedef BOOL (__cdecl * FORMATTINGPROC)(LPCWSTR name, UCHAR numArgs, LPCWSTR arguments[], bool* isDynamic);
-
-EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter);
-EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
 
 //----------------------------------------------------------------------------
 // Dynamic text -- Syntax
 //----------------------------------------------------------------------------
-// Sample: "Text and stuff [function2(12) add function3('4', true)] some more text ..."
+// Sample: "Text and stuff [function2(12) + function3('4', true)] some more text ..."
 //         "Some [if function(1)]A[elseif function2(2)]B[else]C[endif] character"
 // Text:
 //  .*

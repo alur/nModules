@@ -27,6 +27,9 @@
     <ClInclude Include="ParsedText.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TextFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nCore.cpp">
@@ -44,7 +47,7 @@
     <ClCompile Include="ParsedText.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IconExtractorService.cpp">
+    <ClCompile Include="TextFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -17,6 +17,7 @@ DrawableSettings::DrawableSettings() {
     this->alwaysOnTop = false;
     this->blurBehind = false;
     this->color = 0xFF000000;
+    this->evaluateText = false;
     StringCchCopyW(this->font, sizeof(this->font)/sizeof(WCHAR), L"Arial");
     this->fontColor = 0xFFFFFFFF;
     this->fontSize = 12.0f;
@@ -58,6 +59,7 @@ void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
     this->blurBehind = settings->GetBool("BlurBehind", defaults->blurBehind);
     this->color = settings->GetColor("Color", defaults->color);
     this->color = this->color & 0xFFFFFF | ((ARGB)settings->GetInt("Alpha", (this->color & 0xFF000000) >> 24) & 0xFF) << 24;
+    this->evaluateText = defaults->evaluateText;
     settings->GetString("Font", this->font, sizeof(this->font)/sizeof(WCHAR), defaults->font);
     this->fontColor = settings->GetColor("FontColor", defaults->fontColor);
     this->fontColor = this->fontColor & 0xFFFFFF | ((ARGB)settings->GetInt("FontAlpha", (this->fontColor & 0xFF000000) >> 24) & 0xFF) << 24;

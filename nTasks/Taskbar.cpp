@@ -221,6 +221,8 @@ void Taskbar::Relayout() {
             iter->second->Show();
         }
     }
+
+    this->Repaint();
 }
 
 

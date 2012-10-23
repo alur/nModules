@@ -14,59 +14,15 @@
 #include "ParsedText.hpp"
 
 using std::map;
-using std::wstring;
-
-// All existing functions.
-map<wstring, FORMATTINGPROC> functionMap;
-
-//
-map<wstring, FORMATTINGPROC> operatorMap;
-
-
-/// <summary>
-/// Registers a new text formatter.
-/// </summary>
-EXPORT_CDECL(BOOL) RegisterFormatter(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter) {
-    //if (g_formatters.find(string(function)) == g_formatters.end()) {
-    //    return FALSE;
-    //}
-    //g_formatters.insert(std::pair<string, FORMATTINGPROC>(string(function), formatProc));
-    return TRUE;
-}
-
-
-/// <summary>
-/// Unregisters a text formatter.
-/// </summary>
-EXPORT_CDECL(BOOL) UnregisterFormatter(LPCWSTR name, UCHAR numArgs) {
-    //g_formatters.erase(string(function));
-    return FALSE;
-}
-
-
-/// <summary>
-/// Formats a piece of text using the registered text formatters.
-/// </summary>
-EXPORT_CDECL(BOOL) FormatText(LPCWSTR pszSource, size_t cchDest, LPWSTR pszDest) {
-    time_t t = time(0);
-    struct tm now;
-    localtime_s(&now, &t);
-    if (wcscmp(pszSource, L"time('HH:mm')") == 0) {
-        return SUCCEEDED(StringCchPrintfW(pszDest, cchDest, L"%02d:%02d", now.tm_hour, now.tm_min));
-    }
-    else {
-        return SUCCEEDED(StringCchCopyW(pszDest, cchDest, pszSource));
-    }
-}
 
 
 /// <summary>
 /// Parses text into
 /// </summary>
 EXPORT_CDECL(IParsedText*) ParseText(LPCWSTR text) {
-    ParsedText* parsedText = new ParsedText();
+    return new ParsedText(text);
 
-    WCHAR segment[MAX_LINE_LENGTH];
+    /* WCHAR segment[MAX_LINE_LENGTH];
 
     LPCWSTR searchPos = text;
     LPCWSTR searchEnd = text + wcslen(text);
@@ -130,7 +86,7 @@ EXPORT_CDECL(IParsedText*) ParseText(LPCWSTR text) {
 
     //parsedText->Optimize();
 
-    return parsedText;
+    return parsedText; */
 }
 
 

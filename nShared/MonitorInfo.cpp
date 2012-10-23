@@ -63,7 +63,7 @@ UINT MonitorInfo::MonitorFromRECT(LPRECT rect) {
     UINT monitor = 0;
 
     // Figure out which monitor contains the bigest part of the RECT.
-    for (int i = 0; i < m_monitors.size(); i++) {
+    for (UINT i = 0; i < m_monitors.size(); i++) {
         area = Math::RectIntersectArea(rect, &m_monitors[i].rect);
         if (area >= maxArea) {
             maxArea = area;

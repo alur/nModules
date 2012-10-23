@@ -28,6 +28,9 @@ public:
     // The background color of the window. Default: 0xFF000000 (black)
     ARGB color;
 
+    // True to evaluate text strings. Not read from RC files. Default: false
+    bool evaluateText;
+
     // The default font to use. Default: Arial
     WCHAR font[MAX_PATH];
 

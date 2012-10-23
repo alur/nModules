@@ -156,14 +156,15 @@
     <ClInclude Include="nCore.h" />
     <ClInclude Include="ParsedText.hpp" />
     <ClInclude Include="TextFormatting.h" />
+    <ClInclude Include="TextFunctions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Formatters.cpp" />
-    <ClCompile Include="IconExtractorService.cpp" />
     <ClCompile Include="InputParsing.cpp" />
     <ClCompile Include="nCore.cpp" />
     <ClCompile Include="ParsedText.cpp" />
     <ClCompile Include="TextFormatting.cpp" />
+    <ClCompile Include="TextFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nCore.rc" />

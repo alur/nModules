@@ -9,6 +9,7 @@
 #pragma once
 
 #include "../nShared/Versioning.h"
+#include "../nCore/IParsedText.hpp"
 
 typedef DWORD ARGB;
 
@@ -41,6 +42,6 @@ namespace nCore {
     namespace System {
         HRESULT Init(HMODULE);
 
-        BOOL FormatText(LPCWSTR pszSource, size_t cchDest, LPWSTR pszDest);
+        IParsedText* ParseText(LPCWSTR text);
     }
 }

@@ -53,8 +53,6 @@ DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instan
     ZeroMemory(&m, sizeof(m));
     m.cyTopHeight = INT_MAX;
     DwmExtendFrameIntoClientArea(this->window, &m);
-
-    this->updateTextTimer = SetCallbackTimer(1000, this);
 }
 
 
@@ -66,7 +64,6 @@ DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, Messa
     this->parent = parent;
     this->timerIDs = NULL;
     this->userMsgIDs = NULL;
-    this->updateTextTimer = NULL;
     this->window = parent->window;
 
     ConstructorCommon(settings, msgHandler);
@@ -83,8 +80,10 @@ void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHa
     this->initialized = false;
     this->isTrackingMouse = false;
     this->msgHandler = msgHandler;
+    this->parsedText = NULL;
     this->renderTarget = NULL;
     this->text[0] = '\0';
+    this->updateTextTimer = 0;
     this->visible = false;
 
     // Create the base state
@@ -106,10 +105,15 @@ DrawableWindow::~DrawableWindow() {
         this->parent->RemoveChild(this);
     }
 
-    if (!this->parent && this->window) {
+    if (this->updateTextTimer) {
         ClearCallbackTimer(this->updateTextTimer);
+    }
+
+    if (!this->parent && this->window) {
         DestroyWindow(this->window);
     }
+
+    SAFEDELETE(this->parsedText);
 
     // Delete all states
     for (STATE iter = this->states.begin(); iter != this->states.end(); iter++) {
@@ -333,6 +337,10 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     
     // Set the text
     SetText(this->baseState->drawingSettings->text);
+
+    if (this->baseState->drawingSettings->evaluateText) {
+        this->updateTextTimer = SetCallbackTimer(1000, this);
+    }
 
     this->initialized = true;
 }
@@ -821,8 +829,14 @@ void DrawableWindow::Hide() {
 
 
 void DrawableWindow::SetText(LPCWSTR text) {
-    StringCchCopyW(this->baseState->drawingSettings->text, sizeof(this->baseState->drawingSettings->text)/sizeof(this->baseState->drawingSettings->text[0]), text);
-    UpdateText();
+    if (this->baseState->drawingSettings->evaluateText) {
+        SAFEDELETE(this->parsedText);
+        this->parsedText = (IParsedText*)nCore::System::ParseText(text);
+        UpdateText();
+    }
+    else {
+        StringCchCopyW(this->text, sizeof(this->text)/sizeof(this->text[0]), text);
+    }
 }
 
 
@@ -994,6 +1008,11 @@ void DrawableWindow::RemoveChild(DrawableWindow* child) {
 /// Forcibly updates the text.
 /// </summary>
 void DrawableWindow::UpdateText() {
-    nCore::System::FormatText(this->baseState->drawingSettings->text, sizeof(this->text)/sizeof(WCHAR), this->text);
+    if (this->baseState->drawingSettings->evaluateText) {
+        this->parsedText->Evaluate(this->text, sizeof(this->text)/sizeof(this->text[0]));
+    }
+    else {
+        StringCchCopyW(this->text, sizeof(this->text)/sizeof(this->text[0]), this->baseState->drawingSettings->text);
+    }
     Repaint();
 }

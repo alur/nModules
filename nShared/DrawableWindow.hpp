@@ -16,6 +16,7 @@
 #include "UIDGenerator.hpp"
 #include "MonitorInfo.hpp"
 #include "Easing.h"
+#include "../nCore/IParsedText.hpp"
 
 
 using std::vector;
@@ -182,6 +183,9 @@ private:
     // Should be called when the active state has changed.
     void HandleActiveStateChange();
 
+    //
+    void Load();
+
     // (Re)Creates D2D device-dependent stuff.
     HRESULT ReCreateDeviceResources();
 
@@ -238,6 +242,9 @@ private:
 
     // The DrawableWindow which is this windows parent.
     DrawableWindow* parent;
+
+    //
+    IParsedText* parsedText;
 
     // The render target to draw to
     ID2D1HwndRenderTarget* renderTarget;

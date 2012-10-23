@@ -75,6 +75,7 @@ void TaskButton::SetIcon(HICON icon) {
 /// </summary>
 void TaskButton::SetText(LPCWSTR title) {
     this->window->SetText(title);
+    this->window->Repaint();
 }
 
 

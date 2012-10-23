@@ -39,7 +39,10 @@ Label::~Label() {
 void Label::Initalize() {
     this->allLabelsIter = g_AllLabels.insert(g_AllLabels.begin(), pair<string, Label*>(string(this->settings->prefix), this));
     
-    this->window->Initialize(new DrawableSettings());
+    DrawableSettings* defaults = new DrawableSettings();
+    defaults->evaluateText = true;
+
+    this->window->Initialize(defaults);
 
     LoadSettings();
 
