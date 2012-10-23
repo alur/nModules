@@ -143,10 +143,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Bangs.cpp" />
     <ClCompile Include="nMediaInfo.cpp" />
     <ClCompile Include="TextFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bangs.h" />
     <ClInclude Include="nMediaInfo.h" />
     <ClInclude Include="TextFunctions.h" />
   </ItemGroup>

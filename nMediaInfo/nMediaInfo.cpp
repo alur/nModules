@@ -11,6 +11,7 @@
 #include <map>
 #include <strsafe.h>
 #include "TextFunctions.h"
+#include "Bangs.h"
 
 using std::map;
 
@@ -46,6 +47,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 
     TextFunctions::_Register();
     TextFunctions::_Update();
+    Bangs::_Register();
 
     return 0;
 }
@@ -56,6 +58,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
     TextFunctions::_UnRegister();
+    Bangs::_Unregister();
 
     if (g_LSModule) {
         delete g_LSModule;
