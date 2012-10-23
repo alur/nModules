@@ -24,6 +24,7 @@ namespace TextFunctions {
     WCHAR albumArtist[4096] = L"";
     WCHAR trackTitle[4096] = L"";
     WCHAR trackArtist[4096] = L"";
+    WCHAR filePath[MAX_PATH] = L"";
 }
 
 
@@ -85,6 +86,9 @@ void TextFunctions::_Update() {
     fileInfo.retlen = 4096*sizeof(WCHAR);
     WriteProcessMemory(winampHandle, remoteStruct, &fileInfo, sizeof(fileInfo), NULL);
 
+    // Read the file path
+    ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &filePath, sizeof(filePath), NULL);
+
     // Read the track title
     WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Title", 64, NULL);
     if (SendMessage(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
@@ -117,7 +121,7 @@ void TextFunctions::_Update() {
     VirtualFreeEx(winampHandle, (LPVOID)fileInfo.metadata, 0, MEM_RELEASE);
     VirtualFreeEx(winampHandle, remoteStruct, sizeof(fileInfo), MEM_DECOMMIT);
     VirtualFreeEx(winampHandle, remoteStruct, 0, MEM_RELEASE);
-    VirtualFreeEx(winampHandle, (LPVOID)fileInfo.ret, 512, MEM_DECOMMIT);
+    VirtualFreeEx(winampHandle, (LPVOID)fileInfo.ret, 4096*sizeof(WCHAR), MEM_DECOMMIT);
     VirtualFreeEx(winampHandle, (LPVOID)fileInfo.ret, 0, MEM_RELEASE);
 
     CloseHandle(winampHandle);

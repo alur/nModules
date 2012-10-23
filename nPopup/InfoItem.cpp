@@ -22,6 +22,7 @@ InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupIte
     defaults->width = 190;
     defaults->height = 20;
     defaults->color = 0xAAFF00FF;
+    defaults->evaluateText = true;
     defaults->fontColor = 0xFF000000;
     MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
     StringCchCopy(defaults->textVerticalAlign, sizeof(defaults->textVerticalAlign), "Middle");

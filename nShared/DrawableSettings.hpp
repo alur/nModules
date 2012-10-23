@@ -68,6 +68,9 @@ public:
     // How to position the image. Fit, Fill, Center, Stretch, or Tile. Default: Tile
     char imageScalingMode[32];
 
+    // True to register this drawable with the core. Ignores .RC settings. Default: False
+    bool registerWithCore;
+
     // Right-to-Left. Default: False
     bool rightToLeft;
 

@@ -15,7 +15,7 @@
 
 class PopupItem : public Drawable {
 public:
-    explicit PopupItem(Drawable* parent, LPCSTR prefix);
+    explicit PopupItem(Drawable* parent, LPCSTR prefix, bool independent = false);
     virtual ~PopupItem();
     void Position(int x, int y);
     virtual LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM) = 0;
@@ -30,6 +30,7 @@ protected:
         COMMAND = 0,
         INFO,
         FOLDER,
+        CONTAINER,
         SEPARATOR
     };
     

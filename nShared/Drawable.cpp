@@ -8,6 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include "Drawable.hpp"
 #include "LSModule.hpp"
+#include "../nCoreCom/Core.h"
 
 
 extern LSModule* g_LSModule;
@@ -19,7 +20,17 @@ extern LSModule* g_LSModule;
 Drawable::Drawable(LPCSTR prefix) {
     this->initialized = false;
     this->settings = new Settings(prefix);
-    this->window = g_LSModule->CreateDrawableWindow(this->settings, this);
+    
+    char parentPrefix[64];
+    this->settings->GetString("Parent", parentPrefix, sizeof(parentPrefix), "");
+    DrawableWindow* parentWindow = (DrawableWindow*)nCore::System::FindRegisteredWindow(parentPrefix);
+    if (parentWindow) {
+        this->window = parentWindow->CreateChild(this->settings, this);
+    }
+    else {
+        this->window = g_LSModule->CreateDrawableWindow(this->settings, this);
+    }
+
     //this->eventHandler = new EventHandler(this->settings);
     this->parent = NULL;
     this->initialized = true;

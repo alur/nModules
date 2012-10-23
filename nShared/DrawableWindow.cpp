@@ -109,6 +109,11 @@ DrawableWindow::~DrawableWindow() {
         ClearCallbackTimer(this->updateTextTimer);
     }
 
+    // Register with the core
+    if (this->baseState->drawingSettings->registerWithCore) {
+        nCore::System::UnRegisterWindow(this->baseState->settings->prefix);
+    }
+
     if (!this->parent && this->window) {
         DestroyWindow(this->window);
     }
@@ -317,6 +322,11 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     // Load the base state's settings.
     this->baseState->defaultSettings = defaultSettings;
     this->baseState->drawingSettings->Load(this->baseState->settings, this->baseState->defaultSettings);
+
+    // Register with the core
+    if (this->baseState->drawingSettings->registerWithCore) {
+        nCore::System::RegisterWindow(this->baseState->settings->prefix, this);
+    }
 
     // Create D2D resources
     ReCreateDeviceResources();
@@ -584,6 +594,11 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
         // Move the origin of the brush to match the overlay position
         overlay->brush->SetTransform(Matrix3x2F::Identity());
         overlay->brush->SetTransform(Matrix3x2F::Translation(overlay->drawingPosition.left, overlay->drawingPosition.top));
+    }
+
+    // Update all children
+    for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
+        (*child)->Move((*child)->baseState->drawingSettings->x, (*child)->baseState->drawingSettings->y);
     }
 }
 

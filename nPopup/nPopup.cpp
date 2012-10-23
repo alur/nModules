@@ -13,6 +13,7 @@
 #include "Popup.hpp"
 #include "PopupItem.hpp"
 #include "SeparatorItem.hpp"
+#include "ContainerItem.hpp"
 #include "CommandItem.hpp"
 #include "FolderItem.hpp"
 #include "InfoItem.hpp"
@@ -248,6 +249,12 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out, LPCSTR parentPrefix) {
             }
             break;
 
+        case POPUPLINETYPE_CONTAINER:
+            {
+                (*out)->AddItem(new ContainerItem(*out, prefix));
+            }
+            break;
+
         case POPUPLINETYPE_NEW:
             {
                 TRACE("Unexpected New: %s", line);
@@ -293,7 +300,7 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
 
     LiteStep::GetToken(linePointer, NULL, &linePointer, FALSE); // Drop *Popup
     
-    // The first token will be ~Folder, ~New, !Separator, !Info, .icon=, or a title.
+    // The first token will be ~Folder, ~New, !Separator, !Info, !Container, .icon=, or a title.
     LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
     if (_stricmp(token, "~New") == 0) {
         return POPUPLINETYPE_ENDNEW;
@@ -303,6 +310,14 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
     }
     else if (_stricmp(token, "!Separator") == 0) {
         return POPUPLINETYPE_SEPARATOR;
+    }
+    else if (_stricmp(token, "!Container") == 0) {
+        // The next token should be a prefix.
+        if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) == FALSE) {
+            return POPUPLINETYPE_INVALID;
+        }
+        StringCchCopy(prefix, cchPrefix, token);
+        return POPUPLINETYPE_CONTAINER;
     }
     else {
         // If we have a .icon, copy it over and move forward.

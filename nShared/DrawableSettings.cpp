@@ -27,6 +27,7 @@ DrawableSettings::DrawableSettings() {
     this->height = 100;
     StringCchCopy(this->image, sizeof(this->image), "");
     StringCchCopy(this->imageScalingMode, sizeof(this->imageScalingMode), "Tile");
+    this->registerWithCore = false;
     this->rightToLeft = false;
     StringCchCopyW(this->text, sizeof(this->text)/sizeof(WCHAR), L"");
     StringCchCopy(this->textAlign, sizeof(this->textAlign), "Left");
@@ -70,6 +71,7 @@ void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
     this->height = settings->GetInt("Height", defaults->height);
     settings->GetString("Image", this->image, sizeof(this->image), defaults->image);
     settings->GetString("ImageScalingMode", this->imageScalingMode, sizeof(this->imageScalingMode), defaults->imageScalingMode);
+    this->registerWithCore = defaults->registerWithCore;
     this->rightToLeft = settings->GetBool("RightToLeft", defaults->rightToLeft);
     settings->GetString("Text", this->text, sizeof(this->text)/sizeof(WCHAR), defaults->text);
     settings->GetString("TextAlign", this->textAlign, sizeof(this->textAlign), defaults->textAlign);

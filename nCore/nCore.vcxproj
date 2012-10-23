@@ -156,15 +156,15 @@
     <ClInclude Include="IParsedText.hpp" />
     <ClInclude Include="nCore.h" />
     <ClInclude Include="ParsedText.hpp" />
-    <ClInclude Include="TextFormatting.h" />
     <ClInclude Include="TextFunctions.h" />
+    <ClInclude Include="WindowRegistrar.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="InputParsing.cpp" />
     <ClCompile Include="nCore.cpp" />
     <ClCompile Include="ParsedText.cpp" />
-    <ClCompile Include="TextFormatting.cpp" />
     <ClCompile Include="TextFunctions.cpp" />
+    <ClCompile Include="WindowRegistrar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nCore.rc" />

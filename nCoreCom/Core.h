@@ -45,5 +45,9 @@ namespace nCore {
         IParsedText* ParseText(LPCWSTR text);
         BOOL RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic);
         BOOL UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
+
+        void RegisterWindow(LPCSTR prefix, LPVOID window);
+        void UnRegisterWindow(LPCSTR prefix);
+        LPVOID FindRegisteredWindow(LPCSTR prefix);
     }
 }

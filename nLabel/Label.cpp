@@ -41,6 +41,7 @@ void Label::Initalize() {
     
     DrawableSettings* defaults = new DrawableSettings();
     defaults->evaluateText = true;
+    defaults->registerWithCore = true;
 
     this->window->Initialize(defaults);
 

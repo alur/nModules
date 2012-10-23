@@ -14,7 +14,7 @@
 extern LSModule* g_LSModule;
 
 
-PopupItem::PopupItem(Drawable* parent, LPCSTR prefix) : Drawable(parent, prefix) {
+PopupItem::PopupItem(Drawable* parent, LPCSTR prefix, bool independent) : Drawable(parent, prefix, independent) {
     this->iconSettings = this->settings->CreateChild("Icon");
     this->itemType = PopupItemType::SEPARATOR;
 }

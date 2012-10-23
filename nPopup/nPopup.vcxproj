@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CommandItem.hpp" />
+    <ClInclude Include="ContainerItem.hpp" />
     <ClInclude Include="ContentPopup.hpp" />
     <ClInclude Include="FolderItem.hpp" />
     <ClInclude Include="FolderPopup.hpp" />
@@ -160,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandItem.cpp" />
+    <ClCompile Include="ContainerItem.cpp" />
     <ClCompile Include="ContentPopup.cpp" />
     <ClCompile Include="FolderItem.cpp" />
     <ClCompile Include="FolderPopup.cpp" />
