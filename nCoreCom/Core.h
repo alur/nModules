@@ -43,5 +43,7 @@ namespace nCore {
         HRESULT Init(HMODULE);
 
         IParsedText* ParseText(LPCWSTR text);
+        BOOL RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic);
+        BOOL UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
     }
 }

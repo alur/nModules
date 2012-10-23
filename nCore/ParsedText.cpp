@@ -11,14 +11,14 @@
 map<wstring, FORMATTINGPROC> functionMap;
 
 
-EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter) {
-    functionMap.insert(std::pair<wstring, FORMATTINGPROC>(wstring(name), formatter)).first;
+EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic) {
+    functionMap[wstring(name)] = formatter;
     return FALSE;
 }
 
 
 EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
-    RegisterDynamicTextFunction(name, numArgs, NULL);
+    RegisterDynamicTextFunction(name, numArgs, NULL, true);
     return FALSE;
 }
 
@@ -37,16 +37,16 @@ ParsedText::ParsedText(LPCWSTR text) {
 }
 
 
-bool ParsedText::IsDynamic() {
-    return true;
-}
-
-
 ParsedText::~ParsedText() {
     for (list<Token>::const_iterator token = this->tokens.begin(); token != this->tokens.end(); ++token) {
         free((LPVOID)token->text);
     }
     this->tokens.clear();
+}
+
+
+bool ParsedText::IsDynamic() {
+    return true;
 }
 
 
@@ -64,7 +64,9 @@ bool ParsedText::Evaluate(LPWSTR dest, size_t cchDest) {
                 token->proc->second(L"", 0, dest, cchDest); 
             }
             else {
+                StringCchCatW(dest, cchDest, L"[");
                 StringCchCatW(dest, cchDest, token->text);
+                StringCchCatW(dest, cchDest, L"]");
             }
             break;
         }

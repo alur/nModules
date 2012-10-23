@@ -41,9 +41,6 @@
     <ClCompile Include="TextFormatting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Formatters.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ParsedText.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

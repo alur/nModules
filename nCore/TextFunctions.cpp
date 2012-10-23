@@ -14,7 +14,7 @@
 
 
 void TextFunctions::_Register() {
-    RegisterDynamicTextFunction(L"Time", 0, Time);
+    RegisterDynamicTextFunction(L"Time", 0, Time, true);
 }
 
 

@@ -79,7 +79,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
-    <OutDir>C:\LiteStep\modules\</OutDir>
+    <OutDir>C:\LiteStep32\debug\modules\</OutDir>
+    <TargetName>$(ProjectName)-1.0</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin\$(Configuration)_$(Platform)\</OutDir>

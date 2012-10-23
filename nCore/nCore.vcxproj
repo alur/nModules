@@ -78,7 +78,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
-    <OutDir>C:\LiteStep\modules\</OutDir>
+    <OutDir>C:\LiteStep32\debug\modules\</OutDir>
+    <TargetName>$(ProjectName)-1.0</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
@@ -159,7 +160,6 @@
     <ClInclude Include="TextFunctions.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Formatters.cpp" />
     <ClCompile Include="InputParsing.cpp" />
     <ClCompile Include="nCore.cpp" />
     <ClCompile Include="ParsedText.cpp" />
