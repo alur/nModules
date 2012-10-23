@@ -143,6 +143,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ResourceCompile Include="nCalendar.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="nCalendar.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="nCalendar.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

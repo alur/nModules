@@ -35,10 +35,10 @@ public:
     RECT padding;
 
     // Horizontal spacing between the items. Default: 2
-    UINT columnSpacing;
+    int columnSpacing;
 
     // Vertical spacing between the items. Default: 2
-    UINT rowSpacing;
+    int rowSpacing;
 
     // Where to start adding items. Default: TopLeft
     STARTPOSITION startPosition;

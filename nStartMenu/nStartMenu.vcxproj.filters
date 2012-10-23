@@ -15,17 +15,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="nClock.h">
+    <ClInclude Include="nStartMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="nClock.rc">
+    <ResourceCompile Include="nStartMenu.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="nClock.cpp">
+    <ClCompile Include="nStartMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

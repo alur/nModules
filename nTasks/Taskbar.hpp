@@ -55,7 +55,7 @@ private:
     map<HWND, TaskButton*> buttons;
 
     // The maximum width of a taskbar button
-    UINT buttonMaxWidth, buttonMaxHeight, buttonWidth, buttonHeight;
+    int buttonMaxWidth, buttonMaxHeight, buttonWidth, buttonHeight;
 
     // The monitor to display tasks for
     UINT monitor;

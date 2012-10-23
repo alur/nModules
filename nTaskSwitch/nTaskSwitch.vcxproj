@@ -148,6 +148,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="nTaskSwitch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nTaskSwitch.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="nTaskSwitch.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

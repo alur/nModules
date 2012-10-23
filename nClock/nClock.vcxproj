@@ -143,6 +143,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="nClock.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nClock.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="nClock.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

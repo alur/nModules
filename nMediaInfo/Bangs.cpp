@@ -52,7 +52,7 @@ void Bangs::_Unregister() {
 /// <summary>
 /// Sets the work area.
 /// </summary>
-void Bangs::MediaPrevious(HWND, LPCSTR pszArgs) {
+void Bangs::MediaPrevious(HWND, LPCSTR) {
     HWND WA2Window = FindWindow("Winamp v1.x", NULL);
     if (WA2Window) {
         SendMessage(WA2Window, WM_COMMAND, 40044, 0);
@@ -63,7 +63,7 @@ void Bangs::MediaPrevious(HWND, LPCSTR pszArgs) {
 /// <summary>
 /// Adds a click handler.
 /// </summary>
-void Bangs::MediaPlay(HWND, LPCSTR pszArgs) {
+void Bangs::MediaPlay(HWND, LPCSTR) {
     HWND WA2Window = FindWindow("Winamp v1.x", NULL);
     if (WA2Window) {
         SendMessage(WA2Window, WM_COMMAND, 40045, 0);
@@ -74,7 +74,7 @@ void Bangs::MediaPlay(HWND, LPCSTR pszArgs) {
 /// <summary>
 /// Removes click handlers.
 /// </summary>
-void Bangs::MediaPause(HWND, LPCSTR pszArgs) {
+void Bangs::MediaPause(HWND, LPCSTR) {
     HWND WA2Window = FindWindow("Winamp v1.x", NULL);
     if (WA2Window) {
         SendMessage(WA2Window, WM_COMMAND, 40046, 0);
@@ -85,14 +85,14 @@ void Bangs::MediaPause(HWND, LPCSTR pszArgs) {
 /// <summary>
 /// Sets the transition duration.
 /// </summary>
-void Bangs::MediaPlayPause(HWND, LPCSTR pszArgs) {
+void Bangs::MediaPlayPause(HWND, LPCSTR) {
 }
 
 
 /// <summary>
 /// Sets the transition square size. Force it to be >= 2.
 /// </summary>
-void Bangs::MediaStop(HWND, LPCSTR pszArgs) {
+void Bangs::MediaStop(HWND, LPCSTR) {
     HWND WA2Window = FindWindow("Winamp v1.x", NULL);
     if (WA2Window) {
         SendMessage(WA2Window, WM_COMMAND, 40047, 0);
@@ -103,7 +103,7 @@ void Bangs::MediaStop(HWND, LPCSTR pszArgs) {
 /// <summary>
 /// Sets the transition effect.
 /// </summary>
-void Bangs::MediaNext(HWND, LPCSTR pszArgs) {
+void Bangs::MediaNext(HWND, LPCSTR) {
     HWND WA2Window = FindWindow("Winamp v1.x", NULL);
     if (WA2Window) {
         SendMessage(WA2Window, WM_COMMAND, 40048, 0);
