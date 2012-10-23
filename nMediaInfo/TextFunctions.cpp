@@ -9,10 +9,11 @@
 #include "TextFunctions.h"
 #include "../nCoreCom/Core.h"
 #include <strsafe.h>
-#include "wa_ipc.h"
 
 #define TEXTFUNCTION(x) BOOL __cdecl x(LPCWSTR /* name */, UCHAR numArgs, LPWSTR dest, size_t cchDest)
-
+#define IPC_GETLISTPOS 125
+#define IPC_GETPLAYLISTFILEW 214
+#define IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE 3027
 
 namespace TextFunctions {
     TEXTFUNCTION(MusicTrackTitle);

@@ -29,9 +29,6 @@
     <ClInclude Include="TextFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wa_ipc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nMediaInfo.rc">
