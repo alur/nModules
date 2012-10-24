@@ -27,9 +27,6 @@
     <ClInclude Include="TextFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WindowRegistrar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nCore.cpp">

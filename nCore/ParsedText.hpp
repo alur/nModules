@@ -10,13 +10,23 @@
 #include "IParsedText.hpp"
 #include <list>
 #include <map>
+#include <set>
 
 using std::list;
 using std::map;
 using std::wstring;
+using std::set;
 
 EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic);
 EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
+EXPORT_CDECL(BOOL) DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs);
+
+typedef struct {
+    FORMATTINGPROC proc;
+    bool dynamic;
+    // All IParsedText classes which currently use this function.
+    set<IParsedText*> users;
+} FormatterData;
 
 class ParsedText : public IParsedText {
 public:
@@ -25,6 +35,10 @@ public:
 
     bool Evaluate(LPWSTR dest, size_t cchDest);
     bool IsDynamic();
+    void DataChanged();
+    void SetChangeHandler(void (*handler)(LPVOID), LPVOID data);
+
+    void ParsedText::Release();
 
 private:
     enum TokenType {
@@ -34,15 +48,18 @@ private:
 
     typedef struct {
         TokenType type;
-        map<wstring, FORMATTINGPROC>::const_iterator proc;
+        map<wstring, FormatterData>::iterator proc;
         LPCWSTR text;
     } Token;
 
     void Parse(LPCWSTR text);
-    void AddToken(TokenType type, map<wstring, FORMATTINGPROC>::const_iterator proc, LPCWSTR text);
+    void AddToken(TokenType type, map<wstring, FormatterData>::iterator proc, LPCWSTR text);
 
     list<Token> tokens;
     LPCWSTR text;
+
+    LPVOID data;
+    void (*changeHandler)(LPVOID);
 };
 
 

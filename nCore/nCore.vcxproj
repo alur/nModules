@@ -157,7 +157,6 @@
     <ClInclude Include="nCore.h" />
     <ClInclude Include="ParsedText.hpp" />
     <ClInclude Include="TextFunctions.h" />
-    <ClInclude Include="WindowRegistrar.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="InputParsing.cpp" />

@@ -25,6 +25,11 @@
 using namespace D2D1;
 
 
+void TextChangeHandler(LPVOID drawable) {
+    ((DrawableWindow*)drawable)->UpdateText();
+}
+
+
 /// <summary>
 /// Constructor used by LSModule to create a top-level window.
 /// </summary>
@@ -83,7 +88,6 @@ void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHa
     this->parsedText = NULL;
     this->renderTarget = NULL;
     this->text[0] = '\0';
-    this->updateTextTimer = 0;
     this->visible = false;
 
     // Create the base state
@@ -105,10 +109,6 @@ DrawableWindow::~DrawableWindow() {
         this->parent->RemoveChild(this);
     }
 
-    if (this->updateTextTimer) {
-        ClearCallbackTimer(this->updateTextTimer);
-    }
-
     // Register with the core
     if (this->baseState->drawingSettings->registerWithCore) {
         nCore::System::UnRegisterWindow(this->baseState->settings->prefix);
@@ -118,7 +118,7 @@ DrawableWindow::~DrawableWindow() {
         DestroyWindow(this->window);
     }
 
-    SAFEDELETE(this->parsedText);
+    SAFERELEASE(this->parsedText);
 
     // Delete all states
     for (STATE iter = this->states.begin(); iter != this->states.end(); iter++) {
@@ -347,10 +347,6 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     
     // Set the text
     SetText(this->baseState->drawingSettings->text);
-
-    if (this->baseState->drawingSettings->evaluateText) {
-        this->updateTextTimer = SetCallbackTimer(1000, this);
-    }
 
     this->initialized = true;
 }
@@ -848,6 +844,7 @@ void DrawableWindow::SetText(LPCWSTR text) {
     if (this->baseState->drawingSettings->evaluateText) {
         SAFEDELETE(this->parsedText);
         this->parsedText = (IParsedText*)nCore::System::ParseText(text);
+        this->parsedText->SetChangeHandler(TextChangeHandler, this);
         UpdateText();
     }
     else {
@@ -927,14 +924,9 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
 
     case WM_TIMER:
         {
-            if (wParam == this->updateTextTimer) {
-                this->UpdateText();
-            }
-            else {
-                map<UINT_PTR, MessageHandler*>::const_iterator iter = timers.find(wParam);
-                if (iter != timers.end()) {
-                    return iter->second->HandleMessage(window, msg, wParam, lParam);
-                }
+            map<UINT_PTR, MessageHandler*>::const_iterator iter = timers.find(wParam);
+            if (iter != timers.end()) {
+                return iter->second->HandleMessage(window, msg, wParam, lParam);
             }
         }
         return 0;

@@ -7,7 +7,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "../nShared/Macros.h"
-#include "WindowRegistrar.h"
 #include <string>
 #include <map>
 

@@ -11,6 +11,7 @@
 IParsedText* (__cdecl * _pParseText)(LPCWSTR);
 BOOL (__cdecl * _pRegisterDynamicTextFunction)(LPCWSTR, UCHAR, FORMATTINGPROC, bool);
 BOOL (__cdecl * _pUnRegisterDynamicTextFunction)(LPCWSTR, UCHAR);
+BOOL (__cdecl * _pDynamicTextChangeNotification)(LPCWSTR, UCHAR);
 void (__cdecl * _pRegisterWindow)(LPCSTR, LPVOID);
 void (__cdecl * _pUnRegisterWindow)(LPCSTR);
 LPVOID (__cdecl * _pFindRegisteredWindow)(LPCSTR);
@@ -24,6 +25,7 @@ HRESULT nCore::System::Init(HMODULE hCoreInstance) {
     INIT_FUNC(_pParseText,IParsedText* (__cdecl *)(LPCWSTR),"ParseText");
     INIT_FUNC(_pRegisterDynamicTextFunction, BOOL (__cdecl *)(LPCWSTR, UCHAR, FORMATTINGPROC, bool), "RegisterDynamicTextFunction");
     INIT_FUNC(_pUnRegisterDynamicTextFunction, BOOL (__cdecl *)(LPCWSTR, UCHAR), "UnRegisterDynamicTextFunction");
+    INIT_FUNC(_pDynamicTextChangeNotification, BOOL (__cdecl *)(LPCWSTR, UCHAR), "DynamicTextChangeNotification");
 
     INIT_FUNC(_pRegisterWindow, void (__cdecl *)(LPCSTR, LPVOID), "RegisterWindow");
     INIT_FUNC(_pUnRegisterWindow, void (__cdecl *)(LPCSTR), "UnRegisterWindow");
@@ -45,6 +47,11 @@ BOOL nCore::System::RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FOR
 
 BOOL nCore::System::UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
     return _pUnRegisterDynamicTextFunction(name, numArgs);
+}
+
+
+BOOL nCore::System::DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs) {
+    return _pDynamicTextChangeNotification(name, numArgs);
 }
 
 

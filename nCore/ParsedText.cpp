@@ -8,17 +8,31 @@
 
 
 // All existing functions.
-map<wstring, FORMATTINGPROC> functionMap;
+map<wstring, FormatterData> functionMap;
+
+map<wstring, FormatterData>::iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
 
 
 EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic) {
-    functionMap[wstring(name)] = formatter;
+    map<wstring, FormatterData>::iterator iter = FindDynamicTextFunction(name, numArgs);
+    iter->second.proc = formatter;
+    iter->second.dynamic = dynamic;
     return FALSE;
 }
 
 
 EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
     RegisterDynamicTextFunction(name, numArgs, NULL, true);
+    DynamicTextChangeNotification(name, numArgs);
+    return FALSE;
+}
+
+
+EXPORT_CDECL(BOOL) DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs) {
+    map<wstring, FormatterData>::iterator iter = FindDynamicTextFunction(name, numArgs);
+    for (set<IParsedText*>::iterator user = iter->second.users.begin(); user != iter->second.users.end(); ++user) {
+        ((ParsedText*)*user)->DataChanged();
+    }
     return FALSE;
 }
 
@@ -31,10 +45,13 @@ EXPORT_CDECL(IParsedText*) ParseText(LPCWSTR text) {
 }
 
 
-map<wstring, FORMATTINGPROC>::const_iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
-    map<wstring, FORMATTINGPROC>::const_iterator ret = functionMap.find(name);
+map<wstring, FormatterData>::iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
+    map<wstring, FormatterData>::iterator ret = functionMap.find(name);
     if (ret == functionMap.end()) {
-        return functionMap.insert(std::pair<wstring, FORMATTINGPROC>(wstring(name), NULL)).first;
+        FormatterData d;
+        d.dynamic = true;
+        d.proc = NULL;
+        return functionMap.insert(std::pair<wstring, FormatterData>(wstring(name), d)).first;
     }
     return ret;
 }
@@ -42,19 +59,35 @@ map<wstring, FORMATTINGPROC>::const_iterator FindDynamicTextFunction(LPCWSTR nam
 
 ParsedText::ParsedText(LPCWSTR text) {
     Parse(text);
+    changeHandler = NULL;
+    data = NULL;
 }
 
 
 ParsedText::~ParsedText() {
-    for (list<Token>::const_iterator token = this->tokens.begin(); token != this->tokens.end(); ++token) {
-        free((LPVOID)token->text);
+    for (list<Token>::iterator token = this->tokens.begin(); token != this->tokens.end(); ++token) {
+        if (token->type == EXPRESSION) {
+            token->proc->second.users.erase(this);
+            free((LPVOID)token->text);
+        }
     }
     this->tokens.clear();
 }
 
 
+void ParsedText::SetChangeHandler(void (*handler)(LPVOID), LPVOID data) {
+    this->data = data;
+    this->changeHandler = handler;
+}
+
+
 bool ParsedText::IsDynamic() {
-    return true;
+    for (list<Token>::const_iterator token = this->tokens.begin(); token != this->tokens.end(); ++token) {
+        if (token->type == EXPRESSION && token->proc->second.dynamic) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -68,8 +101,8 @@ bool ParsedText::Evaluate(LPWSTR dest, size_t cchDest) {
             break;
 
         case EXPRESSION:
-            if (token->proc->second != NULL) {
-                token->proc->second(L"", 0, dest, cchDest); 
+            if (token->proc->second.proc != NULL) {
+                token->proc->second.proc(L"", 0, dest, cchDest); 
             }
             else {
                 StringCchCatW(dest, cchDest, L"[");
@@ -84,12 +117,27 @@ bool ParsedText::Evaluate(LPWSTR dest, size_t cchDest) {
 }
 
 
-void ParsedText::AddToken(TokenType type, map<wstring, FORMATTINGPROC>::const_iterator proc, LPCWSTR str) {
+void ParsedText::AddToken(TokenType type, map<wstring, FormatterData>::iterator proc, LPCWSTR str) {
     Token t;
     t.type = type;
     t.proc = proc;
     t.text = str;
     tokens.push_back(t);
+    if (type == EXPRESSION) {
+        proc->second.users.insert(this);
+    }
+}
+
+
+void ParsedText::DataChanged() {
+    if (this->changeHandler) {
+        this->changeHandler(this->data);
+    }
+}
+
+
+void ParsedText::Release() {
+    delete this;
 }
 
 

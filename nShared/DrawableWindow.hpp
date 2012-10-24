@@ -261,9 +261,6 @@ private:
     // Used by the top-level window to track the mouse.
     TRACKMOUSEEVENT trackMouseStruct;
 
-    // Timer for re-evaulating the text.
-    UINT_PTR updateTextTimer;
-
     // User msg ID generator.
     UIDGenerator<UINT>* userMsgIDs;
 

@@ -125,6 +125,11 @@ void TextFunctions::_Update() {
     VirtualFreeEx(winampHandle, (LPVOID)fileInfo.ret, 0, MEM_RELEASE);
 
     CloseHandle(winampHandle);
+
+    // And finally, send out change notifications.
+    nCore::System::DynamicTextChangeNotification(L"MusicTrackTitle", 0);
+    nCore::System::DynamicTextChangeNotification(L"MusicTrackArtist", 0);
+    nCore::System::DynamicTextChangeNotification(L"MusicAlbumTitle", 0);
 }
 
 

@@ -12,6 +12,7 @@
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/Versioning.h"
 #include "TextFunctions.h"
+#include "ParsedText.hpp"
 
 // The messages we want from the core
 UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
@@ -25,6 +26,9 @@ const VERSION g_version     = MAKE_VERSION(0,2,0,0);
 LPCSTR g_szAppName          = "nCore";
 LPCSTR g_szMsgHandler       = "LSnCore";
 LPCSTR g_szAuthor           = "Alurcard2";
+
+// When the [time] text function should send out change notifications.
+UINT_PTR timeTimer;
 
 
 /// <summary>
@@ -45,6 +49,7 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath
 
     g_pMonitorInfo = new MonitorInfo();
     TextFunctions::_Register();
+    timeTimer = SetTimer(g_hwndMsgHandler, 1, 1000, NULL);
 
     return 0;
 }
@@ -56,6 +61,7 @@ int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath
 void quitModule(HINSTANCE hDllInstance) {
     // Deinitalize
     if (g_hwndMsgHandler) {
+        KillTimer(g_hwndMsgHandler, timeTimer);
         SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)g_hwndMsgHandler, (LPARAM)g_lsMessages);
         DestroyWindow(g_hwndMsgHandler);
     }
@@ -126,6 +132,13 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         case LM_REFRESH: {
             return 0;
         }
+        case WM_TIMER:
+            {
+                if (wParam == timeTimer) {
+                    DynamicTextChangeNotification(L"Time", 0);
+                }
+            }
+            return 0;
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
