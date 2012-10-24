@@ -716,7 +716,13 @@ UINT_PTR DrawableWindow::SetCallbackTimer(UINT elapse, MessageHandler* msgHandle
 void DrawableWindow::Repaint(LPRECT region) {
     if (this->initialized && this->visible) {
         if (this->parent) {
-            this->parent->Repaint(region);
+            if (region) {
+                this->parent->Repaint(region);
+            }
+            else {
+                RECT r = { drawingArea.left, drawingArea.top, drawingArea.right, drawingArea.bottom };
+                this->parent->Repaint(&r);
+            }
         }
         else {
             InvalidateRect(this->window, region, TRUE);

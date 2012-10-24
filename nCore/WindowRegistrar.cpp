@@ -13,6 +13,7 @@
 using std::map;
 using std::string;
 
+
 map<string, LPVOID> registeredWindows;
 
 
