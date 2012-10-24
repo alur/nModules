@@ -32,7 +32,7 @@ private:
         RIGHTDOWN, RIGHTUP, RIGHTDOUBLE,
         X1DOWN, X1UP, X1DOUBLE,
         X2DOWN, X2UP, X2DOUBLE,
-        DROP,
+        ENTER, LEAVE,
         UNKNOWN
     };
 
@@ -52,4 +52,6 @@ private:
     EventType TypeFromString(LPCSTR str);
     WORD ModsFromString(LPSTR str);
     bool Matches(ClickData a, ClickData b);
+
+    bool mouseOver;
 };

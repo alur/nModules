@@ -25,6 +25,7 @@ DrawableSettings::DrawableSettings() {
     StringCchCopy(this->fontStyle, sizeof(this->fontStyle), "Normal");
     StringCchCopy(this->fontWeight, sizeof(this->fontWeight), "Normal");
     this->height = 100;
+    this->hidden = false;
     StringCchCopy(this->image, sizeof(this->image), "");
     StringCchCopy(this->imageScalingMode, sizeof(this->imageScalingMode), "Tile");
     this->registerWithCore = false;
@@ -69,6 +70,7 @@ void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
     settings->GetString("FontStyle", this->fontStyle, sizeof(this->fontStyle), defaults->fontStyle);
     settings->GetString("FontWeight", this->fontWeight, sizeof(this->fontWeight), defaults->fontWeight);
     this->height = settings->GetInt("Height", defaults->height);
+    this->hidden = settings->GetBool("Hidden", defaults->hidden);
     settings->GetString("Image", this->image, sizeof(this->image), defaults->image);
     settings->GetString("ImageScalingMode", this->imageScalingMode, sizeof(this->imageScalingMode), defaults->imageScalingMode);
     this->registerWithCore = defaults->registerWithCore;

@@ -6,9 +6,10 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
-#include "nLabel.h"
 #include "../nShared/LSModule.hpp"
+#include "../nShared/DrawableBangs.h"
 #include "Label.hpp"
+#include "nLabel.h"
 #include <map>
 #include <strsafe.h>
 
@@ -46,6 +47,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
     // Load settings
     LoadSettings();
 
+    DrawableBangs::_Register("nLabel", FindDrawable);
+
     return 0;
 }
 
@@ -54,6 +57,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
+    DrawableBangs::_UnRegister("nLabel");
+
     // Remove all labels
     for (map<string, Label*>::const_iterator iter = g_TopLevelLabels.begin(); iter != g_TopLevelLabels.end(); iter++) {
         delete iter->second;
@@ -109,4 +114,10 @@ void LoadSettings() {
         g_TopLevelLabels.insert(g_TopLevelLabels.begin(), std::pair<string, Label*>(string(szLabel), new Label(szLabel)));
     }
     LiteStep::LCClose(f);
+}
+
+
+Drawable* FindDrawable(LPCSTR prefix) {
+    map<string, Label*>::iterator label = g_AllLabels.find(string(prefix));
+    return label == g_AllLabels.end() ? NULL : label->second;
 }

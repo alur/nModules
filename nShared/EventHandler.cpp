@@ -17,6 +17,7 @@
 /// </summary>
 EventHandler::EventHandler(Settings* settings) {
     this->settings = settings;
+    this->mouseOver = false;
     LoadSettings();
 }
 
@@ -48,6 +49,14 @@ void EventHandler::HandleMessage(HWND, UINT msg, WPARAM wParam, LPARAM lParam) {
         case WM_RBUTTONDOWN: cData.type = RIGHTDOWN; break;
         case WM_RBUTTONUP: cData.type = RIGHTUP; break;
         case WM_RBUTTONDBLCLK: cData.type = RIGHTDOUBLE; break;
+        case WM_MOUSEMOVE:
+            {
+                if (mouseOver) return;
+                mouseOver = true;
+                cData.type = ENTER;
+            }
+            break;
+        case WM_MOUSELEAVE: cData.type = LEAVE; mouseOver = false; break;
         case WM_XBUTTONDOWN:
             switch (GET_XBUTTON_WPARAM(wParam)) {
                 case XBUTTON1: cData.type = X1DOWN; break;
@@ -233,6 +242,10 @@ EventHandler::EventType EventHandler::TypeFromString(LPCSTR str) {
     if (_stricmp(str, "X2ClickDown") == 0) return X2DOWN;
     if (_stricmp(str, "X2ClickUp") == 0) return X2UP;
     if (_stricmp(str, "X2DoubleClick") == 0) return X2DOUBLE;
+
+    if (_stricmp(str, "Leave") == 0) return LEAVE;
+    if (_stricmp(str, "Enter") == 0) return ENTER;
+
 
     return UNKNOWN;
 }

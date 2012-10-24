@@ -26,7 +26,7 @@ namespace Bangs {
     void SetInvalidateAllOnUpdate(HWND, LPCSTR);
 
     typedef struct {
-        char szName[54];
+        char szName[64];
         LiteStep::BANGCOMMANDPROC pCommand;
     } BangItem;
 }

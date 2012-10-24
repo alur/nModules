@@ -23,6 +23,7 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="Debugging.h" />
     <ClInclude Include="Drawable.hpp" />
+    <ClInclude Include="DrawableBangs.h" />
     <ClInclude Include="DrawableSettings.hpp" />
     <ClInclude Include="DrawableWindow.hpp" />
     <ClInclude Include="Easing.h" />
@@ -48,6 +49,7 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Debugging.cpp" />
     <ClCompile Include="Drawable.cpp" />
+    <ClCompile Include="DrawableBangs.cpp" />
     <ClCompile Include="DrawableSettings.cpp" />
     <ClCompile Include="DrawableWindow.cpp" />
     <ClCompile Include="Easing.cpp" />

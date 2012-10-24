@@ -56,6 +56,9 @@ public:
     // The height of the window. Default: 100
     int height;
 
+    // True if the window should start hidden. Default: false
+    bool hidden;
+
     // The image to use for this window. Default: "" (blank)
     char image[MAX_PATH];
 

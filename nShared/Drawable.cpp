@@ -72,3 +72,19 @@ Drawable::~Drawable() {
     SAFEDELETE(this->settings);
     SAFEDELETE(this->eventHandler);
 }
+
+
+/// <summary>
+/// Retrives this drawables window.
+/// </summary>
+DrawableWindow* Drawable::GetWindow() {
+    return this->window;
+}
+
+
+/// <summary>
+/// Retrives this drawables event handler.
+/// </summary>
+EventHandler* Drawable::GetEventHandler() {
+    return this->eventHandler;
+}
