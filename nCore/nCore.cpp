@@ -136,6 +136,7 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
             {
                 if (wParam == timeTimer) {
                     DynamicTextChangeNotification(L"Time", 0);
+                    DynamicTextChangeNotification(L"Time", 1);
                 }
             }
             return 0;

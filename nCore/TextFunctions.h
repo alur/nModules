@@ -9,7 +9,7 @@
 
 #include "IParsedText.hpp"
 
-#define TEXTFUNCTION(x) BOOL __cdecl x(LPCWSTR name, UCHAR numArgs, LPWSTR dest, size_t cchDest)
+#define TEXTFUNCTION(x) BOOL __cdecl x(LPCWSTR name, UCHAR numArgs, LPWSTR* args, LPWSTR dest, size_t cchDest)
 
 namespace TextFunctions {
     void _Register();

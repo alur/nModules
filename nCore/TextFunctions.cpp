@@ -15,17 +15,23 @@
 
 void TextFunctions::_Register() {
     RegisterDynamicTextFunction(L"Time", 0, Time, true);
+    RegisterDynamicTextFunction(L"Time", 1, Time, true);
 }
 
 
 void TextFunctions::_Unregister() {
     UnRegisterDynamicTextFunction(L"Time", 0);
+    UnRegisterDynamicTextFunction(L"Time", 1);
 }
 
 
 TEXTFUNCTION(TextFunctions::Time) {
+    WCHAR date[1024];
     time_t t = time(0);
     struct tm now;
+
     localtime_s(&now, &t);
-    return SUCCEEDED(StringCchPrintfW(dest, cchDest, L"%s%02d:%02d", dest, now.tm_hour, now.tm_min));
+
+    wcsftime(date, 1024, numArgs == 0 ? L"%H:%M" : args[0], &now);
+    return SUCCEEDED(StringCchCatW(dest, cchDest, date));
 }

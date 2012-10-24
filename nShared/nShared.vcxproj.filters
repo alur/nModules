@@ -83,6 +83,9 @@
     <ClInclude Include="DrawableBangs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Strings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MonitorInfo.cpp">
@@ -152,6 +155,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DrawableBangs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Strings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

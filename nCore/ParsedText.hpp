@@ -16,6 +16,7 @@ using std::list;
 using std::map;
 using std::wstring;
 using std::set;
+using std::pair;
 
 EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic);
 EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
@@ -27,6 +28,8 @@ typedef struct {
     // All IParsedText classes which currently use this function.
     set<IParsedText*> users;
 } FormatterData;
+
+typedef map<pair<wstring, UCHAR>, FormatterData> FUNCMAP;
 
 class ParsedText : public IParsedText {
 public:
@@ -48,12 +51,13 @@ private:
 
     typedef struct {
         TokenType type;
-        map<wstring, FormatterData>::iterator proc;
+        FUNCMAP::iterator proc;
         LPCWSTR text;
+        LPWSTR* args;
     } Token;
 
     void Parse(LPCWSTR text);
-    void AddToken(TokenType type, map<wstring, FormatterData>::iterator proc, LPCWSTR text);
+    void AddToken(TokenType type, FUNCMAP::iterator proc, LPCWSTR text, LPWSTR* args);
 
     list<Token> tokens;
     LPCWSTR text;
