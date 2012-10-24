@@ -48,7 +48,9 @@ void Label::Initalize() {
     LoadSettings();
 
     this->stateHover = this->window->AddState("Hover", new DrawableSettings(), 100);
-    this->window->Show();
+    if (!this->window->GetDrawingSettings()->hidden) {
+        this->window->Show();
+    }
 }
 
 
