@@ -58,6 +58,7 @@ DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, "nDesk", g_pCli
     Initialize(defaults);
 
     nCore::System::RegisterWindow("nDesk", this);
+    UpdateWallpaper(true);
 }
 
 
@@ -113,8 +114,9 @@ HRESULT DesktopPainter::ReCreateDeviceResources() {
         //if (SUCCEEDED(hr)) {
         //    UpdateWallpaper(true);
         //}
+        UpdateWallpaper(true);
     }
-    UpdateWallpaper(true);
+    
 
     return hr;
 }
@@ -262,7 +264,6 @@ void DesktopPainter::UpdateWallpaper(bool bNoTransition) {
     // If we are currently doing a transition, end it.
     if (m_pOldWallpaperBrush != NULL) {
         TransitionEnd();
-        KillTimer(m_hWnd, 1337);
     }
 
     m_pOldWallpaperBrush = m_pWallpaperBrush;
