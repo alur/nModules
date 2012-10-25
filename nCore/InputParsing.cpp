@@ -146,6 +146,8 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
     }
 
     // TODO::RGB(), ARGB(), RGBA(), HSL(), AHSL(), HSLA()
+    if (_IsFunctionOf(color, "RGB")) {
+    }
 
     // TODO::Lighten, darken, saturate, desaturate, fadein, fadeout, spin, mix
     if (_IsFunctionOf(color, "lighten")) {

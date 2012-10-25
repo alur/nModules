@@ -1,4 +1,10 @@
-
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *  ParsedText.cpp
+ *  The nModules Project
+ *
+ *  Contains a dynamic text string split up into its tokens.
+ *  
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "../nShared/Macros.h"
 #include "ParsedText.hpp"
@@ -11,41 +17,12 @@
 // All existing functions.
 FUNCMAP functionMap;
 
-FUNCMAP::iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
-
-
-EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic) {
-    FUNCMAP::iterator iter = FindDynamicTextFunction(name, numArgs);
-    iter->second.proc = formatter;
-    iter->second.dynamic = dynamic;
-    return FALSE;
-}
-
-
-EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
-    RegisterDynamicTextFunction(name, numArgs, NULL, true);
-    DynamicTextChangeNotification(name, numArgs);
-    return FALSE;
-}
-
-
-EXPORT_CDECL(BOOL) DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs) {
-    FUNCMAP::iterator iter = FindDynamicTextFunction(name, numArgs);
-    for (set<IParsedText*>::iterator user = iter->second.users.begin(); user != iter->second.users.end(); ++user) {
-        ((ParsedText*)*user)->DataChanged();
-    }
-    return FALSE;
-}
-
 
 /// <summary>
-/// Parses text into
+/// Finds a dynamic text function. If the specified function does not exist, it is created.
 /// </summary>
-EXPORT_CDECL(IParsedText*) ParseText(LPCWSTR text) {
-    return new ParsedText(text);
-}
-
-
+/// <param name="name">The name of the funtion to find.</param>
+/// <param name="numArgs">The number of arguments in the function to find.</param>
 FUNCMAP::iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
     FUNCMAP::iterator ret = functionMap.find(FUNCMAP::key_type(name, numArgs));
     if (ret == functionMap.end()) {
@@ -58,6 +35,60 @@ FUNCMAP::iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
 }
 
 
+/// <summary>
+/// Registers a dynamic text function.
+/// </summary>
+/// <param name="name">The name of the funtion to register.</param>
+/// <param name="numArgs">The number of arguments in the function to register.</param>
+/// <param name="formatter">The evaluator for this function.</param>
+/// <param name="dynamic">True if the value this function returns may change over time.</param.
+EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic) {
+    FUNCMAP::iterator iter = FindDynamicTextFunction(name, numArgs);
+    iter->second.proc = formatter;
+    iter->second.dynamic = dynamic;
+    return FALSE;
+}
+
+
+/// <summary>
+/// Unregisters a dynamic text function.
+/// </summary>
+/// <param name="name">The name of the funtion to unregister.</param>
+/// <param name="numArgs">The number of arguments in the function to unregister.</param>
+EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
+    RegisterDynamicTextFunction(name, numArgs, NULL, true);
+    DynamicTextChangeNotification(name, numArgs);
+    return FALSE;
+}
+
+
+/// <summary>
+/// Should be called when the value of a single registered dynamic text function is changed.
+/// </summary>
+/// <param name="name">The name of the funtion which changed.</param>
+/// <param name="numArgs">The number of arguments in the function which changed.</param>
+EXPORT_CDECL(BOOL) DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs) {
+    FUNCMAP::iterator iter = FindDynamicTextFunction(name, numArgs);
+    for (set<IParsedText*>::iterator user = iter->second.users.begin(); user != iter->second.users.end(); ++user) {
+        ((ParsedText*)*user)->DataChanged();
+    }
+    return FALSE;
+}
+
+
+/// <summary>
+/// Returns a ParsedText object based on the specified text.
+/// </summary>
+/// <param name="text">The text to parse.</param>
+EXPORT_CDECL(IParsedText*) ParseText(LPCWSTR text) {
+    return new ParsedText(text);
+}
+
+
+/// <summary>
+/// Creates a new ParsedText object based on the specified text.
+/// </summary>
+/// <param name="text">The text to parse.</param>
 ParsedText::ParsedText(LPCWSTR text) {
     Parse(text);
     changeHandler = NULL;
@@ -65,6 +96,9 @@ ParsedText::ParsedText(LPCWSTR text) {
 }
 
 
+/// <summary>
+/// Destructor.
+/// </summary>
 ParsedText::~ParsedText() {
     for (list<Token>::iterator token = this->tokens.begin(); token != this->tokens.end(); ++token) {
         if (token->type == EXPRESSION) {
@@ -82,12 +116,18 @@ ParsedText::~ParsedText() {
 }
 
 
+/// <summary>
+/// Specifies a function to be called when this ParsedText has changed.
+/// </summary>
 void ParsedText::SetChangeHandler(void (*handler)(LPVOID), LPVOID data) {
     this->data = data;
     this->changeHandler = handler;
 }
 
 
+/// <summary>
+/// Returns true if the value of this parsedtext may change over time.
+/// </summary>
 bool ParsedText::IsDynamic() {
     for (list<Token>::const_iterator token = this->tokens.begin(); token != this->tokens.end(); ++token) {
         if (token->type == EXPRESSION && token->proc->second.dynamic) {
@@ -98,6 +138,11 @@ bool ParsedText::IsDynamic() {
 }
 
 
+/// <summary>
+/// Evaluates this object using current values.
+/// </summary>
+/// <param name="dest">Output</param>
+/// <param name="cchDest"># of characters in dest</param>
 bool ParsedText::Evaluate(LPWSTR dest, size_t cchDest) {
     dest[0] = '\0';
 
@@ -124,6 +169,9 @@ bool ParsedText::Evaluate(LPWSTR dest, size_t cchDest) {
 }
 
 
+/// <summary>
+/// Pushes a token onto the end.
+/// </summary>
 void ParsedText::AddToken(TokenType type, FUNCMAP::iterator proc, LPCWSTR str, LPWSTR* args) {
     Token t;
     t.type = type;
@@ -137,6 +185,9 @@ void ParsedText::AddToken(TokenType type, FUNCMAP::iterator proc, LPCWSTR str, L
 }
 
 
+/// <summary>
+/// Calls the changehandler for this object.
+/// </summary>
 void ParsedText::DataChanged() {
     if (this->changeHandler) {
         this->changeHandler(this->data);
@@ -144,11 +195,10 @@ void ParsedText::DataChanged() {
 }
 
 
-void ParsedText::Release() {
-    delete this;
-}
-
-
+/// <summary>
+/// Parses text and pushes its tokens onto the end.
+/// </summary>
+/// <param name="text">The text to parse.</param>
 void ParsedText::Parse(LPCWSTR text) {
     // An expression starts with a [, and ends with the first ] which is not enclosed within quotes.
 
@@ -183,7 +233,7 @@ void ParsedText::Parse(LPCWSTR text) {
 
     while (searchPos != NULL && *searchPos != L'\0') {
         switch (mode) {
-        case 0:
+        case 0: // Searching for the begining of the next expression.
             {
                 searchPos = wcswcs(searchPos, L"[");
                 if (searchPos != NULL) {
@@ -194,7 +244,7 @@ void ParsedText::Parse(LPCWSTR text) {
             }
             break;
 
-        case 1:
+        case 1: // Reads the function name.
             {
                 if (*++searchPos == L']') {
                     functionName = Strings::wcsPartialDup(expressionStart + 1, searchPos - expressionStart - 1);
@@ -216,7 +266,7 @@ void ParsedText::Parse(LPCWSTR text) {
             }
             break;
 
-        case 2:
+        case 2: // Reads arguments
             {
                 searchPos = wcswcs(++searchPos, L"'");
                 if (searchPos != NULL) {
@@ -256,7 +306,7 @@ void ParsedText::Parse(LPCWSTR text) {
             }
             break;
 
-        case 9:
+        case 9: // Failure state, does cleanup.
             {
                 expressionStart = NULL;
                 argumentStart = NULL;
@@ -277,7 +327,7 @@ void ParsedText::Parse(LPCWSTR text) {
             }
             break;
 
-        case 10:
+        case 10: // Success state, pushes tokens
             {
                 // pos through expressionStart is regular text
                 AddToken(TEXT, functionMap.end(), Strings::wcsPartialDup(pos, expressionStart - pos), NULL);
@@ -299,4 +349,11 @@ void ParsedText::Parse(LPCWSTR text) {
     if (*pos != '\0') {
         AddToken(TEXT, functionMap.end(), _wcsdup(pos), NULL);
     }
+}
+
+/// <summary>
+/// Deletes this object.
+/// </summary>
+void ParsedText::Release() {
+    delete this;
 }

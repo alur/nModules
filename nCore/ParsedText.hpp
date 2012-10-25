@@ -2,7 +2,7 @@
  *  ParsedText.hpp
  *  The nModules Project
  *
- *  Functions declarations for nCore.cpp
+ *  Contains a dynamic text string split up into its tokens.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
@@ -22,14 +22,21 @@ EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORM
 EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
 EXPORT_CDECL(BOOL) DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs);
 
+// All data used for a dynamic text function.
 typedef struct {
+    // Callback function, or NULL if this function is not registered at this point.
     FORMATTINGPROC proc;
+
+    // True if this function is dynamic.
     bool dynamic;
-    // All IParsedText classes which currently use this function.
+    
+    // All IParsedText objects which currently use this function.
     set<IParsedText*> users;
 } FormatterData;
 
+// The map ty[e used to store the dynamic text functions.
 typedef map<pair<wstring, UCHAR>, FormatterData> FUNCMAP;
+
 
 class ParsedText : public IParsedText {
 public:
@@ -38,10 +45,10 @@ public:
 
     bool Evaluate(LPWSTR dest, size_t cchDest);
     bool IsDynamic();
-    void DataChanged();
     void SetChangeHandler(void (*handler)(LPVOID), LPVOID data);
+    void Release();
 
-    void ParsedText::Release();
+    void DataChanged();
 
 private:
     enum TokenType {
@@ -56,13 +63,17 @@ private:
         LPWSTR* args;
     } Token;
 
+    // Parses text and pushes its tokens onto the end of the string.
     void Parse(LPCWSTR text);
     void AddToken(TokenType type, FUNCMAP::iterator proc, LPCWSTR text, LPWSTR* args);
 
     list<Token> tokens;
     LPCWSTR text;
 
+    // Data sent to the callback function.
     LPVOID data;
+
+    // Callback function -- called when a change occurs.
     void (*changeHandler)(LPVOID);
 };
 
