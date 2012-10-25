@@ -34,7 +34,7 @@ ClickHandler::~ClickHandler() {
 /// <summary>
 /// Call this when a click is triggered.
 /// </summary>
-void ClickHandler::HandleClick(UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT ClickHandler::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
     ClickData cData;
 
     // Find the type of this click event
@@ -85,6 +85,8 @@ void ClickHandler::HandleClick(UINT msg, WPARAM wParam, LPARAM lParam) {
             LiteStep::LSExecute(NULL, iter->action, SW_SHOW);
         }
     }
+
+    return DefWindowProc(window, msg, wParam, lParam);
 }
 
 

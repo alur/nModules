@@ -9,8 +9,9 @@
 
 #include <d2d1.h>
 #include "TransitionEffects.h"
+#include "../nShared/DrawableWindow.hpp"
 
-class DesktopPainter {
+class DesktopPainter : protected DrawableWindow {
 public:
     // Available transition types
     enum TransitionType {
@@ -62,7 +63,7 @@ public:
         INOUTCUBIC
     };
 
-    explicit DesktopPainter(HWND);
+    explicit DesktopPainter(HWND hWnd);
     virtual ~DesktopPainter();
 
     void SetTransitionType(TransitionType);
@@ -99,7 +100,6 @@ private:
     DWORD transitionStartTime;
 
     // Direct2D targets
-    ID2D1HwndRenderTarget* m_pRenderTarget;
     ID2D1BitmapBrush* m_pWallpaperBrush;
     ID2D1BitmapBrush* m_pOldWallpaperBrush;
 

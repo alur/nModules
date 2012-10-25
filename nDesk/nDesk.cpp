@@ -129,25 +129,6 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         }
         return 0;
     
-    case WM_MOUSEWHEEL:
-    case WM_MOUSEHWHEEL:
-    case WM_LBUTTONDOWN:
-    case WM_LBUTTONUP:
-    case WM_LBUTTONDBLCLK:
-    case WM_MBUTTONDOWN:
-    case WM_MBUTTONUP:
-    case WM_MBUTTONDBLCLK:
-    case WM_RBUTTONDOWN:
-    case WM_RBUTTONUP:
-    case WM_RBUTTONDBLCLK:
-    case WM_XBUTTONDOWN:
-    case WM_XBUTTONUP:
-    case WM_XBUTTONDBLCLK:
-        {
-            g_pClickHandler->HandleClick(message, wParam, lParam);
-        }
-        return 0;
-    
     case WM_PAINT:
     case WM_ERASEBKGND:
         return g_pDesktopPainter->HandleMessage(window, message, wParam, lParam);
@@ -156,7 +137,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         {
             // Keep the hWnd at the bottom of the window stack
             WINDOWPOS *c = (WINDOWPOS*)lParam;
-            c->hwnd = g_pDesktopPainter->GetWindow();
+            c->hwnd = window;
             c->hwndInsertAfter = HWND_BOTTOM;
             c->flags |= SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOMOVE;
         }
@@ -201,8 +182,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case WM_ACTIVATEAPP:
     case WM_ACTIVATE:
     case WM_PARENTNOTIFY:
-        SetWindowPos(g_pDesktopPainter->GetWindow(), HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        SetWindowPos(window, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
         break;
     }
+
+    if (g_pDesktopPainter) {
+        return g_pDesktopPainter->HandleMessage(window, message, wParam, lParam);
+    }
+
     return DefWindowProc(window, message, wParam, lParam);
 }

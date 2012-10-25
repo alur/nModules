@@ -31,6 +31,31 @@ void TextChangeHandler(LPVOID drawable) {
 
 
 /// <summary>
+/// Constructor used to create a DrawableWindow for a pre-existing window. Used by nDesk.
+/// </summary>
+DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler* msgHandler) {
+    this->monitorInfo = new MonitorInfo();
+    this->parent = NULL;
+    this->timerIDs = NULL;
+    this->userMsgIDs = NULL;
+    this->window = window;
+
+    Settings* settings = new Settings(prefix);
+    ConstructorCommon(settings, msgHandler);
+    SAFEDELETE(settings);
+    this->initialized = true;
+    this->visible = true;
+
+    // Configure the mouse tracking struct
+    ZeroMemory(&this->trackMouseStruct, sizeof(TRACKMOUSEEVENT));
+    this->trackMouseStruct.cbSize = sizeof(TRACKMOUSEEVENT);
+    this->trackMouseStruct.hwndTrack = NULL;
+    this->trackMouseStruct.dwFlags = NULL;
+    this->trackMouseStruct.dwHoverTime = 200;
+}
+
+
+/// <summary>
 /// Constructor used by LSModule to create a top-level window.
 /// </summary>
 DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) {
@@ -965,7 +990,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
     }
 
     // Let the default messagehandler deal with anything else, if it is initialized.
-    if (this->msgHandler->initialized) {
+    if (this->msgHandler && this->msgHandler->initialized) {
         return this->msgHandler->HandleMessage(window, msg, wParam, lParam);
     }
     else {
@@ -995,14 +1020,30 @@ void DrawableWindow::Paint() {
             this->activeState->textArea, this->activeState->textBrush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         
         // Paint all overlays
-        for (list<Overlay>::iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++) {
-            this->renderTarget->FillRectangle(iter->drawingPosition, iter->brush);
-        }
+        PaintOverlays();
 
         // Paint all children
-        for (list<DrawableWindow*>::const_iterator iter = this->children.begin(); iter != this->children.end(); ++iter) {
-            (*iter)->Paint();
-        }
+        PaintChildren();
+    }
+}
+
+
+/// <summary>
+/// Removes the specified child.
+/// </summary>
+void DrawableWindow::PaintOverlays() {
+    for (list<Overlay>::iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++) {
+        this->renderTarget->FillRectangle(iter->drawingPosition, iter->brush);
+    }
+}
+
+
+/// <summary>
+/// Removes the specified child.
+/// </summary>
+void DrawableWindow::PaintChildren() {
+    for (list<DrawableWindow*>::const_iterator iter = this->children.begin(); iter != this->children.end(); ++iter) {
+        (*iter)->Paint();
     }
 }
 

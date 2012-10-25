@@ -8,15 +8,16 @@
 #pragma once
 
 #include <vector>
+#include "../nShared/MessageHandler.hpp"
 
 using std::vector;
 
-class ClickHandler {
+class ClickHandler : public MessageHandler {
 public:
     explicit ClickHandler();
     virtual ~ClickHandler();
 
-    void HandleClick(UINT, WPARAM, LPARAM);
+    LRESULT HandleMessage(HWND, UINT, WPARAM, LPARAM);
     void Refresh();
 
     void AddHandler(LPCSTR);

@@ -165,7 +165,6 @@ void ParsedText::Parse(LPCWSTR text) {
     // 0 -> Begining of an expression, [
     // 1 -> End of expression or start of arguments, ( or ] --- reverting to 0 on non-alphanumeric
     // 2 -> Arguments
-    // 3 -> End of parameters or , , )
     // 9  -> Failure -> deallocate.
     // 10 -> Success -> push token.
     UINT mode = 0;
@@ -255,9 +254,6 @@ void ParsedText::Parse(LPCWSTR text) {
                     mode = 9;
                 }
             }
-            break;
-
-        case 3:
             break;
 
         case 9:

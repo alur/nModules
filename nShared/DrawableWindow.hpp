@@ -161,8 +161,20 @@ public:
     void UpdateText();
 
 protected:
+    // Used by nDesk.
+    DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler* msgHandler);
+
     // Paints this window.
     void Paint();
+
+    //
+    void PaintOverlays();
+
+    //
+    void PaintChildren();
+
+    // The render target to draw to
+    ID2D1HwndRenderTarget* renderTarget;
 
 private:
     //
@@ -245,9 +257,6 @@ private:
 
     //
     IParsedText* parsedText;
-
-    // The render target to draw to
-    ID2D1HwndRenderTarget* renderTarget;
 
     // All current states.
     list<State> states;
