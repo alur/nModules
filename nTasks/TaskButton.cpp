@@ -100,11 +100,10 @@ void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
 /// Activates this button.
 /// </summary>
 void TaskButton::Activate() {
-    this->window->ActivateState(this->stateActive);
-
     if (this->stateHover->active) {
         this->window->ActivateState(this->stateActiveHover);
     }
+    this->window->ActivateState(this->stateActive);
 
     if (this->isFlashing) {
         this->window->ClearState(this->stateFlashing);
@@ -132,10 +131,10 @@ void TaskButton::Flash() {
     if (!this->isFlashing) {
         this->isFlashing = true;
         this->flashOn = true;
-        this->window->ActivateState(this->stateFlashing);
         if (this->stateHover->active) {
             this->window->ActivateState(this->stateFlashingHover);
         }
+        this->window->ActivateState(this->stateFlashing);
         this->flashTimer = this->window->SetCallbackTimer(this->flashInterval, this);
     }
 }
@@ -226,7 +225,6 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
         {
             if (!this->mouseIsOver) {
                 this->mouseIsOver = true;
-                this->window->ActivateState(this->stateHover);
 
                 RECT r;
                 this->window->GetScreenRect(&r);
@@ -239,6 +237,8 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                 if (this->stateFlashing->active) {
                     this->window->ActivateState(this->stateFlashingHover);
                 }
+
+                this->window->ActivateState(this->stateHover);
             }
         }
         return 0;
@@ -259,10 +259,10 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                 if (this->isFlashing) {
                     this->flashOn = !this->flashOn;
                     if (this->flashOn) {
-                        this->window->ActivateState(this->stateFlashing);
                         if (this->stateHover->active) {
                             this->window->ActivateState(this->stateFlashingHover);
                         }
+                        this->window->ActivateState(this->stateFlashing);
                     }
                     else {
                         this->window->ClearState(this->stateFlashing);
