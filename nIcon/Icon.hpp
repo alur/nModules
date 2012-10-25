@@ -17,10 +17,12 @@ public:
     virtual ~Icon();
 
     HRESULT CompareID(PCITEMID_CHILD id);
-    void SetPosition(int x, int y);
+    void SetPosition(int x, int y, bool noRedraw = false);
     LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
     HRESULT GetDisplayName(SHGDNF flags, LPWSTR buf, UINT cchBuf);
     void Hide();
+    void Rename(PCITEMID_CHILD newItem);
+    void UpdateIcon(bool repaint = true);
 
 private:
     IShellFolder2* shellFolder;

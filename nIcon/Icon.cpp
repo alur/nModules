@@ -100,14 +100,35 @@ LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lPa
 }
 
 
-void Icon::SetPosition(int x, int y) {
+void Icon::SetPosition(int x, int y, bool noRedraw) {
     this->window->Move(x, y);
-    this->window->Repaint();
+    if (!noRedraw) {
+        this->window->Repaint();
+    }
 }
 
 
 void Icon::Hide() {
     this->window->Hide();
+}
+
+
+void Icon::UpdateIcon(bool repaint) {
+    this->window->ClearOverlays();
+    SetIcon();
+    if (repaint) {
+        this->window->Repaint();
+    }
+}
+
+
+void Icon::Rename(PCITEMID_CHILD newItem) {
+    this->item = (PITEMID_CHILD)realloc(this->item, newItem->mkid.cb + 2);
+    memcpy(this->item, newItem, newItem->mkid.cb + 2);
+    
+    WCHAR newName[MAX_PATH];
+    GetDisplayName(SHGDN_NORMAL, newName, MAX_PATH);
+    this->window->SetText(newName);
     this->window->Repaint();
 }
 

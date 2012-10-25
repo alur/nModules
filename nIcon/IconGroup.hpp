@@ -33,10 +33,18 @@ private:
     HRESULT GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR buf, UINT cchBuf);
 
     // 
-    void AddIcon(PCITEMID_CHILD pidl);
+    void AddIcon(PCITEMID_CHILD pidl, bool noRedraw = false);
 
     // 
     void RemoveIcon(PCITEMID_CHILD pidl);
+
+    //
+    void UpdateIcon(PCITEMID_CHILD pidl);
+
+    void UpdateAllIcons();
+
+    //
+    void RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID);
 
     // 
     void PositionIcon(PCITEMID_CHILD pidl, D2D1_RECT_F* position);

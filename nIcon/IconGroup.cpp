@@ -92,16 +92,19 @@ void IconGroup::SetFolder(LPWSTR folder) {
     // Enumerate the contents of this folder
     this->workingFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList);
     while (enumIDList->Next(1, &idNext, NULL) != S_FALSE) {
-        AddIcon(idNext);
+        AddIcon(idNext, true);
     }
     enumIDList->Release();
+
+    this->window->Repaint();
 
     // Register for change notifications
     SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
     this->changeNotifyUID = SHChangeNotifyRegister(
         this->window->GetWindow(),
         SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
-        SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM,
+        SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM
+        | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM | SHCNE_UPDATEDIR | SHCNE_UPDATEIMAGE | SHCNE_ASSOCCHANGED,
         this->changeNotifyMsg,
         1,
         watchEntries);
@@ -115,14 +118,14 @@ void IconGroup::SetFolder(LPWSTR folder) {
 /// <summary>
 /// Add's the icon with the specified ID to the view
 /// </summary>
-void IconGroup::AddIcon(PCITEMID_CHILD pidl) {
+void IconGroup::AddIcon(PCITEMID_CHILD pidl, bool noRedraw) {
     // Don't add existing icons
     if (FindIcon(pidl) != this->icons.end()) return;
 
     D2D1_RECT_F pos;
     PositionIcon(pidl, &pos);
     Icon* icon = new Icon(this, pidl, this->workingFolder);
-    icon->SetPosition((int)pos.left, (int)pos.top);
+    icon->SetPosition((int)pos.left, (int)pos.top, noRedraw);
     icons.push_back(icon);
 }
 
@@ -134,6 +137,22 @@ void IconGroup::RemoveIcon(PCITEMID_CHILD pidl) {
         delete *icon;
         icons.erase(icon);
         this->window->Repaint();
+    }
+}
+
+
+void IconGroup::UpdateIcon(PCITEMID_CHILD pidl) {
+    vector<Icon*>::iterator icon = FindIcon(pidl);
+    if (icon != icons.end()) {
+        (*icon)->UpdateIcon();
+    }
+}
+
+
+void IconGroup::RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID) {
+    vector<Icon*>::iterator icon = FindIcon(oldID);
+    if (icon != icons.end()) {
+        (*icon)->Rename(newID);
     }
 }
 
@@ -157,6 +176,15 @@ vector<Icon*>::iterator IconGroup::FindIcon(PCITEMID_CHILD pidl) {
     }
     return icon;
 }
+
+
+void IconGroup::UpdateAllIcons() {
+    for (vector<Icon*>::iterator icon = this->icons.begin(); icon != this->icons.end(); ++icon) {
+        (*icon)->UpdateIcon(false);
+    }
+    this->window->Repaint();
+}
+
 
 
 /// <summary>
@@ -189,22 +217,15 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
     if (message == this->changeNotifyMsg) {
         long event;
         PIDLIST_ABSOLUTE* idList;
-        WCHAR file1[MAX_PATH], file2[MAX_PATH];
         HANDLE notifyLock = SHChangeNotification_Lock((HANDLE)wParam, (DWORD)lParam, &idList, &event);
 
         if (notifyLock) {
-            if (idList[0]) {
-                GetDisplayNameOf(idList[0], SHGDN_NORMAL, file1, sizeof(file1)/sizeof(WCHAR));
-                if (idList[1]) {
-                    GetDisplayNameOf(idList[1], SHGDN_NORMAL, file2, sizeof(file2)/sizeof(WCHAR));
-                }
-            }
-
             switch (event) {
-            // The attributes of an item or folder has changed.
             case SHCNE_ATTRIBUTES:
+            case SHCNE_UPDATEITEM:
+            case SHCNE_UPDATEDIR:
                 {
-                    TRACEW(L"The attributes of %s has changed", file1);
+                    UpdateIcon(PIDL::GetLastPIDLItem(idList[0]));
                 }
                 break;
 
@@ -222,11 +243,17 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
                 }
                 break;
 
-            // A non-folder item has been renamed.
             case SHCNE_RENAMEITEM:
             case SHCNE_RENAMEFOLDER:
                 {
-                    TRACEW(L"Renamed: %s -> %s", file1, file2);
+                    RenameIcon(PIDL::GetLastPIDLItem(idList[0]), PIDL::GetLastPIDLItem(idList[1]));
+                }
+                break;
+
+            case SHCNE_ASSOCCHANGED:
+            case SHCNE_UPDATEIMAGE:
+                {
+                    UpdateAllIcons();
                 }
                 break;
             }

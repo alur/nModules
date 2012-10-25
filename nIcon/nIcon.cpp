@@ -36,6 +36,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
         return 1;
     }
 
+    OleInitialize(NULL);
+
     pGroup = new IconGroup("DesktopIcons");
 
     return 0;
@@ -54,6 +56,8 @@ void quitModule(HINSTANCE /* instance */) {
     if (g_LSModule) {
         delete g_LSModule;
     }
+
+    OleUninitialize();
 }
 
 
