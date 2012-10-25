@@ -50,6 +50,8 @@ private:
     // Return value of the latest SHChangeNofityRegister call.
     ULONG changeNotifyUID;
 
+    UINT changeNotifyMsg;
+
     // IShellFolder for the folder we are currently in.
     IShellFolder2* workingFolder;
 

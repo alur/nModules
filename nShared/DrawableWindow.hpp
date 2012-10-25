@@ -155,7 +155,7 @@ public:
     void Show();
 
     // Sizes the window to fit the text.
-    void SizeToText(int maxWidth, int maxHeight);
+    void SizeToText(int maxWidth, int maxHeight, int minWidth = 0, int minHeight = 0);
 
     // Forcibly updates the text.
     void UpdateText();

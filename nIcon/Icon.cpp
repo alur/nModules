@@ -22,8 +22,9 @@ Icon::Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder) : 
 
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 64;
-    defaults->height = 90;
+    defaults->height = 120;
     defaults->color = 0;
+    defaults->wordWrap = true;
     GetDisplayName(SHGDN_NORMAL, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
     defaults->textOffsetTop = 64;
     StringCchCopy(defaults->textAlign, sizeof(defaults->textAlign), "Center");
@@ -31,11 +32,19 @@ Icon::Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder) : 
     this->window->Initialize(defaults);
     SetIcon();
     this->window->Show();
+    this->window->SizeToText(64, 300, 64);
+
+    this->selected = false;
 }
 
 
 Icon::~Icon() {
     free(this->item);
+}
+
+
+HRESULT Icon::CompareID(PCITEMID_CHILD id) {
+    return this->shellFolder->CompareIDs(0, this->item, id);
 }
 
 
@@ -46,6 +55,12 @@ LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lPa
             WCHAR command[MAX_LINE_LENGTH];
             this->GetDisplayName(SHGDN_FORPARSING, command, MAX_LINE_LENGTH);
             ShellExecuteW(NULL, NULL, command, NULL, NULL, SW_SHOW);
+        }
+        return 0;
+
+    case WM_LBUTTONDOWN:
+        {
+
         }
         return 0;
 
@@ -87,6 +102,13 @@ LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 void Icon::SetPosition(int x, int y) {
     this->window->Move(x, y);
+    this->window->Repaint();
+}
+
+
+void Icon::Hide() {
+    this->window->Hide();
+    this->window->Repaint();
 }
 
 

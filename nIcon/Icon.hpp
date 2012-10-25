@@ -16,13 +16,17 @@ public:
     explicit Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder);
     virtual ~Icon();
 
+    HRESULT CompareID(PCITEMID_CHILD id);
     void SetPosition(int x, int y);
     LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
     HRESULT GetDisplayName(SHGDNF flags, LPWSTR buf, UINT cchBuf);
+    void Hide();
 
 private:
     IShellFolder2* shellFolder;
     PITEMID_CHILD item;
 
     void SetIcon();
+
+    bool selected;
 };

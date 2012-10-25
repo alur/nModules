@@ -12,4 +12,7 @@
 namespace PIDL {
     // Gets the last item in the PIDL
     PCITEMID_CHILD GetLastPIDLItem(LPITEMIDLIST pidl);
+
+    // Checks if two idlists are equivalent
+    bool Equivalent(LPITEMIDLIST pidl1, LPITEMIDLIST pidl2);
 }

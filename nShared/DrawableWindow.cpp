@@ -36,8 +36,8 @@ void TextChangeHandler(LPVOID drawable) {
 DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler* msgHandler) {
     this->monitorInfo = new MonitorInfo();
     this->parent = NULL;
-    this->timerIDs = NULL;
-    this->userMsgIDs = NULL;
+    this->timerIDs = new UIDGenerator<UINT_PTR>(1);
+    this->userMsgIDs = new UIDGenerator<UINT>(WM_USER);
     this->window = window;
 
     Settings* settings = new Settings(prefix);
@@ -778,9 +778,11 @@ void DrawableWindow::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
 /// <summary>
 /// Sizes the window to fit its current text.
 /// </summary>
-void DrawableWindow::SizeToText(int maxWidth, int maxHeight) {
+void DrawableWindow::SizeToText(int maxWidth, int maxHeight, int minWidth, int minHeight) {
     SIZE s;
     GetDesiredSize(maxWidth, maxHeight, &s);
+    s.cx = max(s.cx, minWidth);
+    s.cy = max(s.cy, minHeight);
     this->SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y, s.cx, s.cy);
 }
 

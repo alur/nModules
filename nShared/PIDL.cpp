@@ -17,3 +17,14 @@ PCITEMID_CHILD PIDL::GetLastPIDLItem(LPITEMIDLIST pidl) {
     }
     return LPITEMIDLIST(((LPBYTE)ret)-lastCB);
 }
+
+
+bool PIDL::Equivalent(LPITEMIDLIST pidl1, LPITEMIDLIST pidl2) {
+    do {
+        if (pidl1->mkid.cb != pidl2->mkid.cb || memcmp(pidl1, pidl2, pidl1->mkid.cb) != 0) {
+            return false;
+        }
+    } while (pidl1->mkid.cb != 0);
+
+    return true;
+}
