@@ -64,8 +64,8 @@ LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM 
     switch (msg) {
     case WM_LBUTTONDOWN:
         {
-            ((Popup*)this->parent)->Close();
             LiteStep::LSExecute(NULL, this->command, SW_SHOW);
+            ((Popup*)this->parent)->Close();
         }
         return 0;
 

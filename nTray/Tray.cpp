@@ -22,6 +22,7 @@ extern bool g_InitPhase;
 /// </summary>
 Tray::Tray(LPCSTR name) : Drawable(name) {
     this->tooltip = new Tooltip("Tooltip", this->settings);
+    this->balloon = new Balloon("Balloon", this->settings);
     this->layoutSettings = new LayoutSettings();
     DrawableSettings* defaults = new DrawableSettings();
     this->window->Initialize(defaults);

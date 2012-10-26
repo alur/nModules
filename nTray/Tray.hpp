@@ -13,6 +13,7 @@
 #include "../nShared/Settings.hpp"
 #include "../nShared/LayoutSettings.hpp"
 #include "../nShared/Tooltip.hpp"
+#include "../nShared/Balloon.hpp"
 
 using std::map;
 
@@ -36,8 +37,11 @@ public:
     // Shows the trays tooltip.
     void ShowTip(LPCWSTR text, LPRECT position);
 
-    // 
+    // Hides the trays tooltip.
     void HideTip();
+
+    // Enques a balloon tip for display.
+    void ShowBalloon();
 
 private:
     // Loads .rc settings for this tray.
@@ -60,4 +64,7 @@ private:
 
     // The tooltip to show.
     Tooltip* tooltip;
+
+    // The balloon to show.
+    Balloon* balloon;
 };
