@@ -41,9 +41,24 @@ public:
     void HideTip();
 
     // Enques a balloon tip for display.
-    void ShowBalloon();
+    void EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD infoFlags, HICON balloonIcon, bool realTime);
 
 private:
+    // Hides the current balloon, and possible shows the next balloon.
+    void ShowNextBalloon();
+
+    // All data required to display a balloon.
+    typedef struct {
+        TrayIcon* icon;
+        LPCWSTR infoTitle;
+        LPCWSTR info;
+        DWORD infoFlags;
+        HICON balloonIcon;
+    } BalloonData;
+
+    // Balloons queued up to be displayed.
+    list<BalloonData> queuedBalloons;
+
     // Loads .rc settings for this tray.
     void LoadSettings(bool isRefresh = false);
 
@@ -51,7 +66,7 @@ private:
     void Relayout();
 
     // Finds the specified icon in the tray.
-    vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* NID);
+    vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* icon);
 
     // The tray icons.
     vector<TrayIcon*> icons;
@@ -70,4 +85,13 @@ private:
 
     // True if we should hide balloons.
     bool hideBalloons;
+
+    // Number of milliseconds to show balloons.
+    int balloonTime;
+
+    // Fires when we should hide the current balloon, and possibly show the next one.
+    UINT_PTR balloonTimer;
+
+    // Standard balloon icons.
+    HICON infoIcon, warningIcon, errorIcon;
 };

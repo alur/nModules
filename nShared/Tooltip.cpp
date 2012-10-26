@@ -20,6 +20,8 @@ Tooltip::Tooltip(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, par
     defaults->textOffsetRight = 2;
     defaults->textOffsetLeft = 2;
     defaults->alwaysOnTop = true;
+    defaults->outlineColor = 0xFF000000;
+    defaults->outlineWidth = 1.5f;
     this->window->Initialize(defaults);
 
     this->maxHeight = settings->GetInt("MaxHeight", 100);

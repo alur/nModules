@@ -16,7 +16,7 @@ public:
     explicit Balloon(LPCSTR prefix, Settings* parentSettings);
     virtual ~Balloon();
 
-    void Show(LPCWSTR text, int x, int y, int duration);
+    void Show(LPCWSTR title, LPCWSTR text, HICON icon, LPSIZE iconSize, LPRECT targetPosition);
     void Hide();
 
     void LoadSettings(bool = false);

@@ -22,15 +22,11 @@ extern HWND g_hWndTrayNotify;
 /// </summary>
 TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings* parentSettings) : Drawable(parent, "Icon") {
     // Init
-    this->balloonIcon = NULL;
     this->callbackID = 0;
     this->callbackMessage = 0xFFFFFFFF;
     this->callbackWindow = NULL;
     this->icon = NULL;
     this->iconSize = 0;
-    this->info[0] = 0;
-    this->infoFlags = 0;
-    this->infoTitle[0] = 0;
     this->showingBalloon = false;
     this->showingTip =  false;
     this->showTip = false;
@@ -113,9 +109,13 @@ void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
     // TODO::NIF_STATE
 
     if ((pNID->uFlags & NIF_INFO ) == NIF_INFO) {
+        WCHAR info[TRAY_MAX_INFO_LENGTH], infoTitle[TRAY_MAX_INFOTITLE_LENGTH];
+
         // uTimeout is only valid on 2000 and XP, so we can safely ignore it.
-        MultiByteToWideChar(CP_ACP, NULL, pNID->szInfo, -1, this->info, TRAY_MAX_INFO_LENGTH);
-        MultiByteToWideChar(CP_ACP, NULL, pNID->szInfoTitle, -1, this->infoTitle, TRAY_MAX_INFOTITLE_LENGTH);
+        MultiByteToWideChar(CP_ACP, NULL, pNID->szInfo, -1, info, TRAY_MAX_INFO_LENGTH);
+        MultiByteToWideChar(CP_ACP, NULL, pNID->szInfoTitle, -1, infoTitle, TRAY_MAX_INFOTITLE_LENGTH);
+
+        ((Tray*)this->parent)->EnqueueBalloon(this, infoTitle, info, pNID->dwInfoFlags, pNID->hBalloonIcon, (pNID->uFlags & NIF_REALTIME) == NIF_REALTIME);
     }
 
     this->showTip = true;

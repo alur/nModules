@@ -126,6 +126,8 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
     defaults->textOffsetRight = 2;
     defaults->textOffsetLeft = 2;
     defaults->alwaysOnTop = true;
+    defaults->outlineColor = 0xAAFFFFFF;
+    defaults->outlineWidth = 2.0f;
     this->window->Initialize(defaults);
 
     char szBuf[32];

@@ -28,7 +28,13 @@ Tray::Tray(LPCSTR name) : Drawable(name) {
     this->window->Initialize(defaults);
     this->window->Show();
 
+    this->balloonTimer = 0;
+
     LoadSettings();
+
+    this->infoIcon = LoadIcon(NULL, IDI_INFORMATION);
+    this->warningIcon = LoadIcon(NULL, IDI_WARNING);
+    this->errorIcon = LoadIcon(NULL, IDI_ERROR);
 }
 
 
@@ -45,6 +51,10 @@ Tray::~Tray() {
     SAFEDELETE(this->tooltip);
     SAFEDELETE(this->balloon);
     SAFEDELETE(this->layoutSettings);
+
+    DestroyIcon(this->infoIcon);
+    DestroyIcon(this->warningIcon);
+    DestroyIcon(this->errorIcon);
 }
 
 
@@ -60,6 +70,7 @@ void Tray::LoadSettings(bool /* IsRefresh */) {
     delete iconSettings;
 
     this->hideBalloons = this->settings->GetBool("HideBalloons", FALSE);
+    this->balloonTime = this->settings->GetInt("BalloonTime", 7000);
 }
 
 
@@ -188,6 +199,16 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lP
             this->window->GetScreenRect(&r);
             MoveWindow(g_hWndTrayNotify, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
         }
+        return 0;
+
+    case WM_TIMER:
+        {
+            if (this->balloonTimer == wParam) {
+                ShowNextBalloon();
+            }
+        }
+        return 0;
+
     default:
         return DefWindowProc(wnd, uMsg, wParam, lParam);
     }
@@ -215,4 +236,110 @@ void Tray::ShowTip(LPCWSTR text, LPRECT position) {
 /// <summary>
 void Tray::HideTip() {
     this->tooltip->Hide();
+}
+
+
+/// <summary>
+/// Enqueues a balloon.
+/// <summary>
+void Tray::EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD infoFlags, HICON balloonIcon, bool realTime) {
+    // Get the user notification state.
+    QUERY_USER_NOTIFICATION_STATE state;
+    SHQueryUserNotificationState(&state);
+
+    // Realtime balloons are discarded unless they can be shown imediately.
+    if (this->hideBalloons || realTime && (this->balloonTimer != 0 || state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME)) {
+        return;
+    }
+
+    BalloonData data;
+    data.icon = icon;
+    data.infoTitle = _wcsdup(infoTitle);
+    data.info = _wcsdup(info);
+    data.infoFlags = infoFlags;
+    data.balloonIcon = balloonIcon;
+
+    this->queuedBalloons.push_back(data);
+
+    if (this->balloonTimer == 0) {
+        ShowNextBalloon();
+    }
+}
+
+
+/// <summary>
+/// Hides the current balloon and shows the next balloon in the queue.
+/// <summary>
+void Tray::ShowNextBalloon() {
+    this->balloon->Hide();
+
+    // Get the user notification state.
+    QUERY_USER_NOTIFICATION_STATE state;
+    SHQueryUserNotificationState(&state);
+    
+    // If we are not accepting notifications at this time, we should wait.
+    if (state != 0 && state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME) {
+        if (this->balloonTimer == 0) {
+            this->balloonTimer = this->window->RegisterUserMessage(this);
+        }
+        return;
+    }
+
+    // Get the balloon to display.
+    BalloonData d;
+    // Discard balloons for icons which have gone away, or if we are in quiet mode.
+    do {
+        // If there are no more balloons
+        if (this->queuedBalloons.empty()) {
+            this->window->ClearCallbackTimer(this->balloonTimer);
+            this->balloonTimer = 0;
+
+            return;
+        }
+
+        d = *(this->queuedBalloons.begin());
+        this->queuedBalloons.pop_front();
+        
+        // TODO::Maybe we should permit balloons for icons which have gone away.
+    } while(FindIcon(d.icon) == this->icons.end() || state == QUNS_QUIET_TIME && (d.infoFlags & NIIF_RESPECT_QUIET_TIME) == NIIF_RESPECT_QUIET_TIME);
+
+    //
+    SIZE iconSize;
+    if ((d.infoFlags & NIIF_LARGE_ICON) == NIIF_LARGE_ICON) {
+        iconSize.cx = GetSystemMetrics(SM_CXICON);
+        iconSize.cy = GetSystemMetrics(SM_CYICON);
+    }
+    else {
+        iconSize.cx = GetSystemMetrics(SM_CXSMICON);
+        iconSize.cy = GetSystemMetrics(SM_CYSMICON);
+    }
+
+    // 
+    HICON icon = NULL;
+    if ((d.infoFlags & NIIF_INFO) == NIIF_INFO) {
+        icon = this->infoIcon;
+    }
+    else if ((d.infoFlags & NIIF_WARNING) == NIIF_WARNING) {
+        icon = this->warningIcon;
+    }
+    else if ((d.infoFlags & NIIF_ERROR) == NIIF_ERROR) {
+        icon = this->errorIcon;
+    }
+    else if ((d.infoFlags & NIIF_USER ) == NIIF_USER && d.balloonIcon != NULL) {
+        icon = d.balloonIcon;
+    }
+
+    if ((d.infoFlags & NIIF_NOSOUND) != NIIF_NOSOUND) {
+        // TODO::Play sound.
+    }
+    
+    if (this->balloonTimer == 0) {
+        this->balloonTimer = this->window->SetCallbackTimer(this->balloonTime, this);
+    }
+
+    //
+    RECT targetPosition;
+    d.icon->GetScreenRect(&targetPosition);
+
+    this->balloon->Show(d.infoTitle, d.info, icon, &iconSize, &targetPosition);
 }

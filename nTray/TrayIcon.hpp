@@ -41,15 +41,11 @@ private:
 
     // Tray data
     WCHAR tip[TRAY_MAX_TIP_LENGTH];
-    WCHAR info[TRAY_MAX_INFO_LENGTH];
-    WCHAR infoTitle[TRAY_MAX_INFOTITLE_LENGTH];
-    DWORD infoFlags;
     UINT version;
     HICON icon;
     HWND callbackWindow;
     UINT callbackID;
     UINT callbackMessage;
-    HICON balloonIcon;
     GUID guid;
     DWORD flags;
 };
