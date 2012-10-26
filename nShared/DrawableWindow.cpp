@@ -775,6 +775,8 @@ void DrawableWindow::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
     IDWriteFactory* factory = NULL;
     IDWriteTextLayout* textLayout = NULL;
     DWRITE_TEXT_METRICS metrics;
+    maxWidth -= this->baseState->drawingSettings->textOffsetLeft + this->baseState->drawingSettings->textOffsetRight;
+    maxHeight -= this->baseState->drawingSettings->textOffsetTop + this->baseState->drawingSettings->textOffsetBottom;
 
     Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&factory));
     factory->CreateTextLayout(this->text, lstrlenW(this->text), this->baseState->textFormat, (float)maxWidth, (float)maxHeight, &textLayout);

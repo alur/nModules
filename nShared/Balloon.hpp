@@ -13,7 +13,7 @@
 
 class Balloon : public Drawable {
 public:
-    explicit Balloon(LPCSTR prefix, Settings* parentSettings);
+    explicit Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, HWND callbackWnd);
     virtual ~Balloon();
 
     void Show(LPCWSTR title, LPCWSTR text, HICON icon, LPSIZE iconSize, LPRECT targetPosition);
@@ -21,4 +21,8 @@ public:
 
     void LoadSettings(bool = false);
     LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+
+private:
+    UINT clickedMessage;
+    HWND callbackWindow;
 };

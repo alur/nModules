@@ -27,7 +27,6 @@ TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings
     this->callbackWindow = NULL;
     this->icon = NULL;
     this->iconSize = 0;
-    this->showingBalloon = false;
     this->showingTip =  false;
     this->showTip = false;
     this->version = 0;

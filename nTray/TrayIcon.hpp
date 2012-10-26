@@ -33,7 +33,6 @@ private:
     //
     int iconSize;
     bool showingTip;
-    bool showingBalloon;
 
     bool showTip; // True if we should show the tooltip
 

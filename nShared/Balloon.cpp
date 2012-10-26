@@ -10,7 +10,7 @@
 #include <strsafe.h>
 
 
-Balloon::Balloon(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings) {
+Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, HWND callbackWnd) : Drawable(prefix, parentSettings) {
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 150;
     defaults->height = 40;
@@ -23,7 +23,11 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, par
     defaults->alwaysOnTop = true;
     defaults->outlineColor = 0xAA000000;
     defaults->outlineWidth = 1.5f;
+    defaults->wordWrap = true;
     this->window->Initialize(defaults);
+
+    this->clickedMessage = clickedMessage;
+    this->callbackWindow = callbackWnd;
 
     // Not working...
     SetParent(this->window->GetWindow(), NULL);
@@ -37,6 +41,10 @@ Balloon::~Balloon() {
 
 
 LRESULT WINAPI Balloon::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    if (message == WM_LBUTTONDOWN) {
+        SendMessage(this->callbackWindow, this->clickedMessage, NULL, NULL);
+        return 0;
+    }
     return DefWindowProc(window, message, wParam, lParam);
 }
 
@@ -52,7 +60,7 @@ void Balloon::Show(LPCWSTR title, LPCWSTR text, HICON icon, LPSIZE iconSize, LPR
     StringCchPrintfW(buf, 1024, L"%s\n%s", title, text);
 
     this->window->SetText(buf);
-    this->window->SizeToText(250, 100, 0, 40);
+    this->window->SizeToText(250, 200, 0, 40);
 
     // Show it centerd on x, 5 px above, while forcing it to stay on the virtual desktop
     MonitorInfo* monInfo = this->window->GetMonitorInformation();

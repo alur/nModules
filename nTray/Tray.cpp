@@ -21,8 +21,9 @@ extern bool g_InitPhase;
 /// Constructor
 /// </summary>
 Tray::Tray(LPCSTR name) : Drawable(name) {
+    this->balloonClickedMessage = this->window->RegisterUserMessage(this);
     this->tooltip = new Tooltip("Tooltip", this->settings);
-    this->balloon = new Balloon("Balloon", this->settings);
+    this->balloon = new Balloon("Balloon", this->settings, this->balloonClickedMessage, this->window->GetWindow());
     this->layoutSettings = new LayoutSettings();
     DrawableSettings* defaults = new DrawableSettings();
     this->window->Initialize(defaults);
@@ -35,6 +36,7 @@ Tray::Tray(LPCSTR name) : Drawable(name) {
     this->infoIcon = LoadIcon(NULL, IDI_INFORMATION);
     this->warningIcon = LoadIcon(NULL, IDI_WARNING);
     this->errorIcon = LoadIcon(NULL, IDI_ERROR);
+    this->activeBalloonIcon = NULL;
 }
 
 
@@ -47,6 +49,8 @@ Tray::~Tray() {
         delete *iter;
     }
     this->icons.clear();
+
+    this->window->ReleaseUserMessage(this->balloonClickedMessage);
 
     SAFEDELETE(this->tooltip);
     SAFEDELETE(this->balloon);
@@ -110,8 +114,13 @@ vector<TrayIcon*>::const_iterator Tray::FindIcon(TrayIcon* pIcon) {
 void Tray::RemoveIcon(TrayIcon* pIcon) {
     vector<TrayIcon*>::const_iterator icon = FindIcon(pIcon);
     if (icon != this->icons.end()) {
-        delete *icon;
         this->icons.erase(icon);
+        
+        if (pIcon == this->activeBalloonIcon) {
+            DismissBalloon(NIN_BALLOONHIDE);
+        }
+        delete pIcon;
+
         Relayout();
         this->window->Repaint();
     }
@@ -193,8 +202,8 @@ void Tray::Relayout() {
 /// <summary>
 /// Handles window events for the tray.
 /// </summary>
-LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg) {
+LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch (message) {
     case WM_MOUSEMOVE:
         if (IsWindow(g_hWndTrayNotify)) {
             RECT r;
@@ -212,7 +221,13 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lP
         return 0;
 
     default:
-        return DefWindowProc(wnd, uMsg, wParam, lParam);
+        {
+            if (message == this->balloonClickedMessage) {
+                this->activeBalloonIcon->SendCallback(NIN_BALLOONUSERCLICK, NULL, NULL);
+                DismissBalloon(NIN_BALLOONHIDE);
+            }
+        }
+        return DefWindowProc(wnd, message, wParam, lParam);
     }
 }
 
@@ -274,10 +289,29 @@ void Tray::EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD
 
 
 /// <summary>
+/// Dismisses a balloon notification prematurely.
+/// <summary>
+void Tray::DismissBalloon(UINT message) {
+    // Reset the timer.
+    SetTimer(this->window->GetWindow(), this->balloonTimer, this->balloonTime, NULL);
+
+    this->balloon->Hide();
+    this->activeBalloonIcon->SendCallback(message, NULL, NULL);
+    this->activeBalloonIcon = NULL;
+
+    ShowNextBalloon();
+}
+
+
+/// <summary>
 /// Hides the current balloon and shows the next balloon in the queue.
 /// <summary>
 void Tray::ShowNextBalloon() {
-    this->balloon->Hide();
+    if (this->activeBalloonIcon != NULL) {
+        this->balloon->Hide();
+        this->activeBalloonIcon->SendCallback(NIN_BALLOONTIMEOUT, NULL, NULL);
+        this->activeBalloonIcon = NULL;
+    }
 
     // Get the user notification state.
     QUERY_USER_NOTIFICATION_STATE state;
@@ -346,6 +380,8 @@ void Tray::ShowNextBalloon() {
     //
     RECT targetPosition;
     d.icon->GetScreenRect(&targetPosition);
+
+    this->activeBalloonIcon = d.icon;
 
     this->balloon->Show(d.infoTitle, d.info, icon, &iconSize, &targetPosition);
 }

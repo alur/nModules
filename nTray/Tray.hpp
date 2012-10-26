@@ -44,6 +44,9 @@ public:
     void EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD infoFlags, HICON balloonIcon, bool realTime);
 
 private:
+    // Dismisses a balloon notification prematurely.
+    void DismissBalloon(UINT message);
+
     // Hides the current balloon, and possible shows the next balloon.
     void ShowNextBalloon();
 
@@ -95,9 +98,15 @@ private:
     // Standard balloon icons.
     HICON infoIcon, warningIcon, errorIcon;
 
-    //
+    // If true, don't play any notification sounds.
     bool noNotificationSounds;
 
-    //
+    // The sound to play when showing new notifications.
     WCHAR notificationSound[128];
+
+    // Message sent by the balloon when it is clicked.
+    UINT balloonClickedMessage;
+
+    // The active balloon icon.
+    TrayIcon* activeBalloonIcon;
 };
