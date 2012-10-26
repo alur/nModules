@@ -9,7 +9,7 @@
 #include "Balloon.hpp"
 
 
-Balloon::Balloon(LPCSTR prefix, Settings* parentSettings) : Tooltip(prefix, parentSettings) {
+Balloon::Balloon(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings) {
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 150;
     defaults->height = 40;

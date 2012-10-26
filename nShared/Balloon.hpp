@@ -11,7 +11,7 @@
 #include "DrawableWindow.hpp"
 #include "Tooltip.hpp"
 
-class Balloon : protected Tooltip {
+class Balloon : public Drawable {
 public:
     explicit Balloon(LPCSTR prefix, Settings* parentSettings);
     virtual ~Balloon();
