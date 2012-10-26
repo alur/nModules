@@ -37,6 +37,8 @@ private:
 
     bool showTip; // True if we should show the tooltip
 
+    DrawableWindow::OVERLAY iconOverlay;
+
     // Tray data
     WCHAR tip[TRAY_MAX_TIP_LENGTH];
     WCHAR info[TRAY_MAX_INFO_LENGTH];

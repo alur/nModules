@@ -60,7 +60,7 @@ public:
         D2D1_RECT_F drawingPosition;
         ID2D1Brush* brush;
     } Overlay;
-    typedef list<Overlay>::iterator OVERLAY;
+    typedef list<Overlay>::iterator OVERLAY, *POVERLAY;
 
     // Constructor used for top-level windows.
     explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler);
@@ -69,9 +69,9 @@ public:
     virtual ~DrawableWindow();
 
     // Adds an overlay.
-    HRESULT AddOverlay(D2D1_RECT_F position, HBITMAP image);
-    HRESULT AddOverlay(D2D1_RECT_F position, HICON icon);
-    HRESULT AddOverlay(D2D1_RECT_F position, IWICBitmap* source);
+    HRESULT AddOverlay(D2D1_RECT_F position, HBITMAP image, POVERLAY overlay);
+    HRESULT AddOverlay(D2D1_RECT_F position, HICON icon, POVERLAY overlay);
+    HRESULT AddOverlay(D2D1_RECT_F position, IWICBitmap* source, POVERLAY overlay);
 
     // Adds a new state.
     STATE AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority);
@@ -159,6 +159,9 @@ public:
 
     // Sizes the window to fit the text.
     void SizeToText(int maxWidth, int maxHeight, int minWidth = 0, int minHeight = 0);
+
+    // Toggles the specified state.
+    void ToggleState(STATE state);
 
     // Forcibly updates the text.
     void UpdateText();

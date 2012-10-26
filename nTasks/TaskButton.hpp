@@ -49,4 +49,6 @@ private:
     UINT_PTR flashTimer;
 
     DrawableWindow::STATE stateHover, stateActive, stateFlashing, stateActiveHover, stateFlashingHover;
+
+    DrawableWindow::OVERLAY iconOverlay;
 };

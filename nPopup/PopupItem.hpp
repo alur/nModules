@@ -41,4 +41,5 @@ protected:
 
     PopupItemType itemType;
 
+    DrawableWindow::OVERLAY iconOverlay;
 };

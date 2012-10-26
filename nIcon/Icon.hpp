@@ -40,11 +40,10 @@ private:
     // Sets the icon.
     void SetIcon();
 
-    // True if the icon is selected.
-    bool selected;
-
     //
-    DrawableWindow::STATE hoverState;
+    DrawableWindow::STATE hoverState, selectedState, focusedState;
+
+    DrawableWindow::OVERLAY iconOverlay;
 
     //
     bool mouseOver;

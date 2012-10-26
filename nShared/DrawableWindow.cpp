@@ -179,7 +179,7 @@ DrawableWindow::~DrawableWindow() {
 /// <summary>
 /// Adds an overlay icon.
 /// </summary>
-HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
+HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon, POVERLAY overlay) {
     IWICBitmap* source = NULL;
     IWICImagingFactory* factory = NULL;
 
@@ -190,7 +190,7 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
 
     // Generate a WIC bitmap and call the overloaded AddOverlay function
     CHECKHR(hr, factory->CreateBitmapFromHICON(icon, &source));
-    CHECKHR(hr, AddOverlay(position, source));
+    CHECKHR(hr, AddOverlay(position, source, overlay));
 
     // Transfer control here if CHECKHR failed
     CHECKHR_END();
@@ -205,7 +205,7 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
 /// <summary>
 /// Adds an overlay image.
 /// </summary>
-HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap) {
+HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap, POVERLAY overlay) {
     IWICBitmap* source = NULL;
     IWICImagingFactory* factory = NULL;
 
@@ -216,7 +216,7 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap) {
 
     // Generate a WIC bitmap and call the overloaded AddOverlay function
     CHECKHR(hr, factory->CreateBitmapFromHBITMAP(bitmap, NULL, WICBitmapUseAlpha, &source));
-    CHECKHR(hr, AddOverlay(position, source));
+    CHECKHR(hr, AddOverlay(position, source, overlay));
 
     // Transfer control here if CHECKHR failed
     CHECKHR_END();
@@ -231,7 +231,7 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap) {
 /// <summary>
 /// Adds an overlay icon.
 /// </summary>
-HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmap* source) {
+HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmap* source, POVERLAY overlayOut) {
     IWICBitmapScaler* scaler = NULL;
     IWICFormatConverter* converter = NULL;
     IWICImagingFactory* factory = NULL;
@@ -279,6 +279,8 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmap* source) {
     // Add the overlays to the overlay list
     if (SUCCEEDED(hr)) {
         this->overlays.push_back(overlay);
+        *overlayOut = this->overlays.end();
+        --*overlayOut;
     }
     else {
         TRACE("DrawableWindow::AddOverlay failed!");
@@ -1064,6 +1066,19 @@ void DrawableWindow::RemoveChild(DrawableWindow* child) {
     this->children.remove(child);
     if (child == this->activeChild) {
         this->activeChild = NULL;
+    }
+}
+
+
+/// <summary>
+/// Toggles the specified state.
+/// </summary>
+void DrawableWindow::ToggleState(STATE state) {
+    if (state->active) {
+        ClearState(state);
+    }
+    else {
+        ActivateState(state);
     }
 }
 

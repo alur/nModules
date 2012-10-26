@@ -37,9 +37,22 @@ Icon::Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder) : 
 
     DrawableSettings* hoverDefaults = new DrawableSettings(*defaults);
     hoverDefaults->color = 0xAA87CEEB;
+    hoverDefaults->outlineColor = 0x99FFFFFF;
+    hoverDefaults->outlineWidth = 1.5f;
     this->hoverState = this->window->AddState("Hover", hoverDefaults, 100);
+
+    DrawableSettings* selectedDefaults = new DrawableSettings(*hoverDefaults);
+    selectedDefaults->color = 0xCC87CEEB;
+    selectedDefaults->outlineColor = 0xCCFFFFFF;
+    selectedDefaults->outlineWidth = 1.5f;
+    this->selectedState = this->window->AddState("Selected", selectedDefaults, 150);
+
+    DrawableSettings* focusedDefaults = new DrawableSettings(*hoverDefaults);
+    focusedDefaults->color = 0xAA87CEEB;
+    focusedDefaults->outlineColor = 0x99FFFFFF;
+    focusedDefaults->outlineWidth = 1.5f;
+    this->focusedState = this->window->AddState("Focused", focusedDefaults, 200);
     
-    this->selected = false;
     this->mouseOver = false;
 
     this->window->Show();
@@ -84,6 +97,7 @@ LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lPa
 
     case WM_LBUTTONDOWN:
         {
+            this->window->ToggleState(this->selectedState);
         }
         return 0;
 
@@ -156,6 +170,9 @@ void Icon::Rename(PCITEMID_CHILD newItem) {
 }
 
 
+/// <summary>
+/// Sets the icon of this item.
+/// </summary>
 void Icon::SetIcon() {
     IExtractIconW* extractIcon = NULL;
     HICON icon = NULL;
@@ -187,7 +204,7 @@ void Icon::SetIcon() {
 
     // Add it as an overlay.
     if (hr == S_OK) {
-        this->window->AddOverlay(pos, icon);
+        this->window->AddOverlay(pos, icon, &this->iconOverlay);
     }
 
     // Let go of the interface.
