@@ -128,14 +128,15 @@ void Popup::Close() {
     CloseChild(true);
     TRACEW(L"PostClose %s", this->window->GetDrawingSettings()->text);
     PostClose();
+    this->mouseOver = false;
     if (this->owner != NULL) {
         this->owner->openChild = NULL;
         ((nPopup::FolderItem*)this->owner->childItem)->ClosingPopup();
         this->owner->childItem = NULL;
-        this->owner->Close();
+        Popup* owner = this->owner;
         this->owner = NULL;
+        owner->Close();
     }
-    this->mouseOver = false;
 }
 
 

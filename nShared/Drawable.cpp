@@ -68,6 +68,7 @@ Drawable::Drawable(Drawable* parent, LPCSTR prefix, bool independent) {
 /// </summary>
 Drawable::~Drawable() {
     this->initialized = false;
+    this->window->Hide();
     SAFEDELETE(this->window);
     SAFEDELETE(this->settings);
     SAFEDELETE(this->eventHandler);

@@ -18,14 +18,14 @@
 
 ContentPopup::ContentPopup(ContentSource source, LPCSTR title, LPCSTR bang, LPCSTR prefix) : Popup(title, bang, prefix) {
     this->loaded = false;
-    this->dynamic = false;
+    this->dynamic = true;
     this->source = source;
 }
 
 
 ContentPopup::ContentPopup(LPCSTR path, bool dynamic, LPCSTR title, LPCSTR bang, LPCSTR prefix) : Popup(title, bang, prefix) {
     this->loaded = false;
-    this->dynamic = false;
+    this->dynamic = dynamic;
     this->source = ContentSource::PATH;
 
     char processedPath[MAX_PATH], originalPath[MAX_PATH];
@@ -65,6 +65,7 @@ bool sorter(PopupItem* a, PopupItem* b) {
 
 void ContentPopup::PreShow() {
     TRACEW(L"ContentPopup::PreShow() %s", this->window->GetDrawingSettings()->text);
+
     if (!this->loaded) {
         LoadContent();
         std::sort(this->items.begin(), this->items.end(), sorter);

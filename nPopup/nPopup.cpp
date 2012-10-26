@@ -101,7 +101,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
 
 /// <summary>
-/// 
+/// Called when a popup bang is executed.
 /// </summary>
 void __cdecl HandlePopupBang(HWND /* owner */, LPCSTR bang, LPCSTR args) {
     for (vector<Popup*>::const_iterator iter = rootPopups.begin(); iter != rootPopups.end(); iter++) {
@@ -116,7 +116,7 @@ void __cdecl HandlePopupBang(HWND /* owner */, LPCSTR bang, LPCSTR args) {
 
 
 /// <summary>
-/// 
+/// Loads RC settings.
 /// </summary>
 void LoadSettings() {
     LoadPopups();
@@ -124,7 +124,7 @@ void LoadSettings() {
 
 
 /// <summary>
-/// Adds a new root-level popup
+/// Adds a new root-level popup.
 /// </summary>
 void AddPopup(Popup* popup) {
     rootPopups.push_back(popup);
