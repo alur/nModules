@@ -67,4 +67,7 @@ private:
 
     // The balloon to show.
     Balloon* balloon;
+
+    // True if we should hide balloons.
+    bool hideBalloons;
 };

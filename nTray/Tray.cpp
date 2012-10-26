@@ -43,6 +43,7 @@ Tray::~Tray() {
     this->icons.clear();
 
     SAFEDELETE(this->tooltip);
+    SAFEDELETE(this->balloon);
     SAFEDELETE(this->layoutSettings);
 }
 
@@ -57,6 +58,8 @@ void Tray::LoadSettings(bool /* IsRefresh */) {
     Settings* iconSettings = this->settings->CreateChild("Icon");
     this->iconSize = iconSettings->GetInt("Size", 16);
     delete iconSettings;
+
+    this->hideBalloons = this->settings->GetBool("HideBalloons", FALSE);
 }
 
 

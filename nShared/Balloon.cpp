@@ -32,7 +32,6 @@ Balloon::~Balloon() {
 }
 
 
-
 LRESULT WINAPI Balloon::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
     return DefWindowProc(window, message, wParam, lParam);
 }
