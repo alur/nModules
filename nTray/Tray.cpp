@@ -252,6 +252,10 @@ void Tray::EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD
         return;
     }
 
+    if (!this->window->IsVisible()) {
+        return;
+    }
+
     BalloonData data;
     data.icon = icon;
     data.infoTitle = _wcsdup(infoTitle);

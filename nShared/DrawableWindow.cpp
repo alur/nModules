@@ -576,6 +576,9 @@ void DrawableWindow::Resize(int width, int height) {
 
 
 bool DrawableWindow::IsVisible() {
+    if (this->parent) {
+        return this->visible && this->parent->IsVisible();
+    }
     return this->visible;
 }
 
