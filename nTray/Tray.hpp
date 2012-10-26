@@ -94,4 +94,10 @@ private:
 
     // Standard balloon icons.
     HICON infoIcon, warningIcon, errorIcon;
+
+    //
+    bool noNotificationSounds;
+
+    //
+    WCHAR notificationSound[128];
 };

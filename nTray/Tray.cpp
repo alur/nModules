@@ -69,8 +69,10 @@ void Tray::LoadSettings(bool /* IsRefresh */) {
     this->iconSize = iconSettings->GetInt("Size", 16);
     delete iconSettings;
 
-    this->hideBalloons = this->settings->GetBool("HideBalloons", FALSE);
+    this->hideBalloons = this->settings->GetBool("HideBalloons", false);
     this->balloonTime = this->settings->GetInt("BalloonTime", 7000);
+    this->noNotificationSounds = this->settings->GetBool("NoNotificationSounds", false);
+    this->settings->GetString("NotificationSound", this->notificationSound, 128, "Notification.Default");
 }
 
 
@@ -332,13 +334,13 @@ void Tray::ShowNextBalloon() {
     else if ((d.infoFlags & NIIF_USER ) == NIIF_USER && d.balloonIcon != NULL) {
         icon = d.balloonIcon;
     }
-
-    if ((d.infoFlags & NIIF_NOSOUND) != NIIF_NOSOUND) {
-        // TODO::Play sound.
-    }
     
     if (this->balloonTimer == 0) {
         this->balloonTimer = this->window->SetCallbackTimer(this->balloonTime, this);
+
+        if ((d.infoFlags & NIIF_NOSOUND) != NIIF_NOSOUND && !this->noNotificationSounds) {
+            PlaySoundW(this->notificationSound, NULL, SND_ALIAS | SND_ASYNC | SND_SYSTEM | SND_NODEFAULT);
+        }
     }
 
     //
