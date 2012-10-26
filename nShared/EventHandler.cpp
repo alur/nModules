@@ -267,6 +267,7 @@ WORD EventHandler::ModsFromString(LPSTR str) {
         else if (_stricmp(tok, "shift") == 0) ret |= MK_SHIFT;
         else if (_stricmp(tok, "mousex1") == 0) ret |= MK_XBUTTON1;
         else if (_stricmp(tok, "mousex2") == 0) ret |= MK_XBUTTON2;
+        else if (_stricmp(tok, "alt")  == 0) ret |= MK_ALT;
         tok = strtok_s(NULL, "+", &context);
     }
 

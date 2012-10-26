@@ -53,6 +53,13 @@ CommandItem::~CommandItem() {
 }
 
 
+int CommandItem::GetDesiredWidth(int maxWidth) {
+    SIZE s;
+    this->window->GetDesiredSize(maxWidth, this->window->GetDrawingSettings()->height, &s);
+    return s.cx;
+}
+
+
 LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
     case WM_LBUTTONDOWN:

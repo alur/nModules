@@ -43,6 +43,9 @@ public:
         // If we are painting an image, the brush for that image.
         ID2D1Brush* imageBrush;
 
+        // 
+        ID2D1Brush* outlineBrush;
+
         // The area we draw text in
         D2D1_RECT_F textArea;
 
@@ -177,6 +180,9 @@ protected:
     ID2D1HwndRenderTarget* renderTarget;
 
 private:
+    // Called by IParsedText objects when we should update the text.
+    static void TextChangeHandler(LPVOID drawable);
+
     //
     void Animate();
 

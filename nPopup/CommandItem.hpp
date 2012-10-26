@@ -16,6 +16,7 @@ public:
     virtual ~CommandItem();
     
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    int GetDesiredWidth(int maxWidth);
 
 private:
     void Init(LPCSTR title, LPCSTR command);

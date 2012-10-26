@@ -28,6 +28,8 @@ DrawableSettings::DrawableSettings() {
     this->hidden = false;
     StringCchCopy(this->image, sizeof(this->image), "");
     StringCchCopy(this->imageScalingMode, sizeof(this->imageScalingMode), "Tile");
+    this->outlineColor = 0x00000000;
+    this->outlineWidth = 0.0f;
     this->registerWithCore = false;
     this->rightToLeft = false;
     StringCchCopyW(this->text, sizeof(this->text)/sizeof(WCHAR), L"");
@@ -73,6 +75,8 @@ void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
     this->hidden = settings->GetBool("Hidden", defaults->hidden);
     settings->GetString("Image", this->image, sizeof(this->image), defaults->image);
     settings->GetString("ImageScalingMode", this->imageScalingMode, sizeof(this->imageScalingMode), defaults->imageScalingMode);
+    this->outlineColor = settings->GetColor("OutlineColor", defaults->outlineColor);
+    this->outlineWidth = settings->GetFloat("OutlineWidth", defaults->outlineWidth);
     this->registerWithCore = defaults->registerWithCore;
     this->rightToLeft = settings->GetBool("RightToLeft", defaults->rightToLeft);
     settings->GetString("Text", this->text, sizeof(this->text)/sizeof(WCHAR), defaults->text);

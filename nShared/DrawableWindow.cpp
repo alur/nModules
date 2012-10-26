@@ -25,7 +25,11 @@
 using namespace D2D1;
 
 
-void TextChangeHandler(LPVOID drawable) {
+/// <summary>
+/// Constructor used to create a DrawableWindow for a pre-existing window. Used by nDesk.
+/// </summary>
+/// <param name="drawable">Pointer to the drawable which should be updated.</param>
+void DrawableWindow::TextChangeHandler(LPVOID drawable) {
     ((DrawableWindow*)drawable)->UpdateText();
 }
 
@@ -155,6 +159,7 @@ DrawableWindow::~DrawableWindow() {
         SAFERELEASE(iter->textBrush);
         SAFERELEASE(iter->textFormat);
         SAFERELEASE(iter->imageBrush);
+        SAFERELEASE(iter->outlineBrush);
     }
     this->states.clear();
 
@@ -424,6 +429,7 @@ HRESULT DrawableWindow::CreateBrushes(State* state) {
 
     this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(state->drawingSettings->color), (ID2D1SolidColorBrush**)&state->backBrush);
     this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(state->drawingSettings->fontColor), (ID2D1SolidColorBrush**)&state->textBrush);
+    this->renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(state->drawingSettings->outlineColor), (ID2D1SolidColorBrush**)&state->outlineBrush);
 
     return S_OK;
 }
@@ -1009,6 +1015,7 @@ void DrawableWindow::Paint() {
         this->renderTarget->SetTransform(Matrix3x2F::Identity());
 
         this->renderTarget->FillRectangle(this->drawingArea, this->activeState->backBrush);
+        this->renderTarget->DrawRectangle(this->drawingArea, this->activeState->outlineBrush, this->activeState->drawingSettings->outlineWidth);
 
         if (this->activeState->imageBrush != NULL) {
             this->renderTarget->FillRectangle(this->drawingArea, this->activeState->imageBrush);

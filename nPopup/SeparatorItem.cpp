@@ -32,6 +32,11 @@ SeparatorItem::~SeparatorItem() {
 }
 
 
+int SeparatorItem::GetDesiredWidth(int /* maxWidth */) {
+    return 0;
+}
+
+
 LRESULT SeparatorItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
     return DefWindowProc(window, msg, wParam, lParam);
 }

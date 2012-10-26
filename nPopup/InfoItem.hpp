@@ -13,7 +13,8 @@ class InfoItem : public PopupItem {
 public:
     explicit InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon = NULL);
     virtual ~InfoItem();
-
+    
+    int GetDesiredWidth(int maxWidth);
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
 private:

@@ -15,6 +15,7 @@ public:
     virtual ~ContainerItem();
     
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    int GetDesiredWidth(int maxWidth);
 
 private:
     DrawableWindow::STATE hoverState;

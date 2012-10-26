@@ -71,6 +71,12 @@ public:
     // How to position the image. Fit, Fill, Center, Stretch, or Tile. Default: Tile
     char imageScalingMode[32];
 
+    // The color of the outline. Default: #0000
+    ARGB outlineColor;
+
+    // The width of the outline. Default: 0
+    float outlineWidth;
+
     // True to register this drawable with the core. Ignores .RC settings. Default: False
     bool registerWithCore;
 

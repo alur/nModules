@@ -20,6 +20,7 @@ namespace nPopup {
         LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
         void ClosingPopup();
+        int GetDesiredWidth(int maxWidth);
 
     private:
         void Init(LPCSTR title, Popup* popup);

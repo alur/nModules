@@ -17,7 +17,7 @@ public:
     explicit ClickHandler();
     virtual ~ClickHandler();
 
-    LRESULT HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
     void Refresh();
 
     void AddHandler(LPCSTR);

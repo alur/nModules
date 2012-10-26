@@ -23,7 +23,7 @@ public:
     bool CompareTo(PopupItem* b);
     void SetIcon(IExtractIconW* extractIcon);
     void SetWidth(int width);
-    int GetDesiredWidth(int maxWidth);
+    virtual int GetDesiredWidth(int maxWidth) = 0;
 
 protected:
     enum PopupItemType {

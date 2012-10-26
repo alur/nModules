@@ -30,11 +30,19 @@ Icon::Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder) : 
     StringCchCopy(defaults->textAlign, sizeof(defaults->textAlign), "Center");
 
     this->window->Initialize(defaults);
+
     SetIcon();
-    this->window->Show();
+
     this->window->SizeToText(64, 300, 64);
 
+    DrawableSettings* hoverDefaults = new DrawableSettings(*defaults);
+    hoverDefaults->color = 0xAA87CEEB;
+    this->hoverState = this->window->AddState("Hover", hoverDefaults, 100);
+    
     this->selected = false;
+    this->mouseOver = false;
+
+    this->window->Show();
 }
 
 
@@ -50,6 +58,22 @@ HRESULT Icon::CompareID(PCITEMID_CHILD id) {
 
 LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch(msg) {
+    case WM_MOUSEMOVE:
+        {
+            if (!this->mouseOver) {
+                this->mouseOver = true;
+                this->window->ActivateState(this->hoverState);
+            }
+        }
+        return 0;
+
+    case WM_MOUSELEAVE:
+        {
+            this->mouseOver = false;
+            this->window->ClearState(this->hoverState);
+        }
+        return 0;
+
     case WM_LBUTTONDBLCLK:
         {
             WCHAR command[MAX_LINE_LENGTH];
@@ -60,7 +84,6 @@ LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lPa
 
     case WM_LBUTTONDOWN:
         {
-
         }
         return 0;
 
@@ -170,6 +193,7 @@ void Icon::SetIcon() {
     // Let go of the interface.
     SAFERELEASE(extractIcon);
 }
+
 
 /// <summary>
 /// Get's the display name of a particular PIDL

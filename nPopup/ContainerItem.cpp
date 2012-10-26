@@ -31,6 +31,11 @@ ContainerItem::~ContainerItem() {
 }
 
 
+int ContainerItem::GetDesiredWidth(int maxWidth) {
+    return min(maxWidth, this->window->GetDrawingSettings()->width);
+}
+
+
 LRESULT ContainerItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
     case WM_MOUSEMOVE:

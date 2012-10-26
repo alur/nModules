@@ -43,6 +43,13 @@ InfoItem::~InfoItem() {
 }
 
 
+int InfoItem::GetDesiredWidth(int maxWidth) {
+    SIZE s;
+    this->window->GetDesiredSize(maxWidth, this->window->GetDrawingSettings()->height, &s);
+    return s.cx;
+}
+
+
 LRESULT InfoItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
     case WM_MOUSEMOVE:
