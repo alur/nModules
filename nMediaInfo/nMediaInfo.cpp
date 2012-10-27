@@ -11,6 +11,7 @@
 #include <map>
 #include <strsafe.h>
 #include "TextFunctions.h"
+#include "CoverArt.hpp"
 #include "Bangs.h"
 
 using std::map;
@@ -21,7 +22,11 @@ LSModule* g_LSModule;
 // The messages we want from the core
 UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
 
+//
 UINT WinampSongChangeMsg = 0;
+
+//
+map<string, CoverArt*> g_CoverArt;
 
 
 /// <summary>
@@ -60,6 +65,11 @@ void quitModule(HINSTANCE /* instance */) {
     TextFunctions::_UnRegister();
     Bangs::_Unregister();
 
+    for (map<string, CoverArt*>::const_iterator coverArt = g_CoverArt.begin(); coverArt != g_CoverArt.end(); ++coverArt) {
+        delete coverArt->second;
+    }
+    g_CoverArt.clear();
+
     if (g_LSModule) {
         delete g_LSModule;
     }
@@ -76,6 +86,9 @@ void quitModule(HINSTANCE /* instance */) {
 LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
     if (message == WinampSongChangeMsg) {
         TextFunctions::_Update();
+        for (map<string, CoverArt*>::const_iterator coverArt = g_CoverArt.begin(); coverArt != g_CoverArt.end(); ++coverArt) {
+            coverArt->second->Update();
+        }
     }
     switch(message) {
     case WM_CREATE:
@@ -100,7 +113,16 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
 
 /// <summary>
-/// Reads through the .rc files and creates labels.
+/// Loads settings.
 /// </summary>
 void LoadSettings() {
+    char szLine[MAX_LINE_LENGTH], szLabel[256];
+    LPSTR szTokens[] = { szLabel };
+    LPVOID f = LiteStep::LCOpen(NULL);
+
+    while (LiteStep::LCReadNextConfig(f, "*nCoverArt", szLine, sizeof(szLine))) {
+        LiteStep::LCTokenize(szLine+strlen("*nCoverArt")+1, szTokens, 1, NULL);
+        g_CoverArt.insert(g_CoverArt.begin(), std::pair<string, CoverArt*>(string(szLabel), new CoverArt(szLabel)));
+    }
+    LiteStep::LCClose(f);
 }

@@ -58,7 +58,7 @@ public:
     // Defines an overlay. A bitmap, or icon, or something.
     class Overlay {
     public:
-        explicit Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmap* source);
+        explicit Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmapSource* source);
         virtual ~Overlay();
 
         HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
@@ -67,11 +67,14 @@ public:
         void UpdatePosition(D2D1_RECT_F parentPosition);
         void Paint(ID2D1RenderTarget* renderTarget);
 
+        void SetSource(IWICBitmapSource* source);
+
     private:
         D2D1_RECT_F position;
         D2D1_RECT_F drawingPosition;
         ID2D1BitmapBrush* brush;
-        IWICBitmap* source; // We need to keep the source image in order to be able to recreate the overlay.
+        IWICBitmapSource* source; // We need to keep the source image in order to be able to recreate the overlay.
+        ID2D1RenderTarget* renderTarget;
     };
     typedef list<Overlay*>::iterator OVERLAY, *POVERLAY;
 
@@ -84,7 +87,7 @@ public:
     // Adds an overlay.
     OVERLAY AddOverlay(D2D1_RECT_F position, HBITMAP image);
     OVERLAY AddOverlay(D2D1_RECT_F position, HICON icon);
-    OVERLAY AddOverlay(D2D1_RECT_F position, IWICBitmap* source);
+    OVERLAY AddOverlay(D2D1_RECT_F position, IWICBitmapSource* source);
 
     // Adds a new state.
     STATE AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority);

@@ -17,10 +17,11 @@
 using namespace D2D1;
 
 
-DrawableWindow::Overlay::Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmap* source) {
+DrawableWindow::Overlay::Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmapSource* source) {
     this->position = position;
     this->source = source;
     this->brush = NULL;
+    this->renderTarget = NULL;
     UpdatePosition(parentPosition);
 }
 
@@ -40,7 +41,9 @@ HRESULT DrawableWindow::Overlay::ReCreateDeviceResources(ID2D1RenderTarget* rend
     
     HRESULT hr = S_OK;
 
-    if (renderTarget != NULL) {
+    this->renderTarget = renderTarget;
+
+    if (renderTarget != NULL && this->source != NULL) {
         assert(this->brush == NULL);
 
         // Create our helper objects.
@@ -112,4 +115,12 @@ void DrawableWindow::Overlay::Paint(ID2D1RenderTarget* renderTarget) {
     if (this->brush != NULL) {
         renderTarget->FillRectangle(this->drawingPosition, this->brush);
     }
+}
+
+
+void DrawableWindow::Overlay::SetSource(IWICBitmapSource* source) {
+    SAFERELEASE(this->brush);
+    SAFERELEASE(this->source);
+    this->source = source;
+    ReCreateDeviceResources(this->renderTarget);
 }

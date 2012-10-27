@@ -29,9 +29,9 @@
 #ifndef _ID3LIB_TAG_H_
 #define _ID3LIB_TAG_H_
 
-#include "id3/id3lib_frame.h"
-#include "id3/field.h"
-#include "id3/utils.h" //for ID3_PATH_LENGTH
+#include "id3lib_frame.h"
+#include "field.h"
+#include "utils.h" //for ID3_PATH_LENGTH
 
 class ID3_Reader;
 class ID3_Writer;

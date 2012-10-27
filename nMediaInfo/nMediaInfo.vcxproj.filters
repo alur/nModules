@@ -24,6 +24,9 @@
     <ClCompile Include="Bangs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CoverArt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="nMediaInfo.h">
@@ -33,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Bangs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CoverArt.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

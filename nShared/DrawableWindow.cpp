@@ -226,7 +226,7 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP
 /// <param name="position">Where to place the overlay, relative to the parent.</param>
 /// <param name="source">The bitmap to use as an overlay.</param>
 /// <returns>An object which can be used to modify/remove this overlay.</returns>
-DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmap* source) {
+DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmapSource* source) {
     // Add the overlays to the overlay list{
     this->overlays.push_back(new Overlay(position, this->drawingArea.rect, source));
     OVERLAY overlayOut = this->overlays.end();

@@ -28,7 +28,7 @@
 #ifndef _ID3LIB_FRAME_H_
 #define _ID3LIB_FRAME_H_
 
-#include "id3/globals.h" //has <stdlib.h> "id3/sized_types.h"
+#include "globals.h" //has <stdlib.h> "id3/sized_types.h"
 
 class ID3_Field;
 class ID3_FrameImpl;
