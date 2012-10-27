@@ -80,9 +80,9 @@ DesktopPainter::~DesktopPainter() {
 /// Releases all D2D device depenent resources
 /// </summary>
 void DesktopPainter::DiscardDeviceResources() {
-    //SAFERELEASE(m_pRenderTarget);
     SAFERELEASE(m_pWallpaperBrush);
     SAFERELEASE(m_pOldWallpaperBrush);
+    DrawableWindow::DiscardDeviceResources();
 }
 
 
@@ -100,23 +100,10 @@ HWND DesktopPainter::GetWindow() {
 HRESULT DesktopPainter::ReCreateDeviceResources() {
     HRESULT hr = S_OK;
 
-    if (!renderTarget) {
-
-        /*ID2D1Factory *pD2DFactory = NULL;
-        Factories::GetD2DFactory(reinterpret_cast<LPVOID*>(&pD2DFactory));
-
-        D2D1_RENDER_TARGET_PROPERTIES p = RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT, PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE));
-        D2D1_HWND_RENDER_TARGET_PROPERTIES h = HwndRenderTargetProperties(m_hWnd, D2D1::SizeU(g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height));
-
-        hr = pD2DFactory->CreateHwndRenderTarget(&p, &h, &m_pRenderTarget);
-        */
-        // Update the wallpaper
-        //if (SUCCEEDED(hr)) {
-        //    UpdateWallpaper(true);
-        //}
+    if (!this->renderTarget) {
+        DrawableWindow::ReCreateDeviceResources();
         UpdateWallpaper(true);
     }
-    
 
     return hr;
 }
@@ -347,10 +334,10 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
     case WM_PAINT:
         if (SUCCEEDED(ReCreateDeviceResources())) {
-            renderTarget->BeginDraw();
+            this->renderTarget->BeginDraw();
 
             // m_pOldWallpaperBrush being non zero indicates that we are in the middle of a transition
-            if (m_pOldWallpaperBrush != NULL) {
+            if (this->m_pOldWallpaperBrush != NULL) {
                 PaintComposite();
             }
             else {
@@ -360,7 +347,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
             PaintChildren();
 
             // If EndDraw fails we need to recreate all device-dependent resources
-            if (renderTarget->EndDraw() == D2DERR_RECREATE_TARGET) {
+            if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET) {
                 DiscardDeviceResources();
             }
         }
@@ -368,7 +355,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
         ValidateRect(hWnd, NULL);
 
-        if (m_pOldWallpaperBrush != NULL) {
+        if (this->m_pOldWallpaperBrush != NULL) {
             Redraw();
         }
 

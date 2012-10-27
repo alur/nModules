@@ -248,7 +248,7 @@ void Tray::InitCompleted() {
 /// Shows the specified tooltip for this tray.
 /// <summary>
 void Tray::ShowTip(LPCWSTR text, LPRECT position) {
-    this->tooltip->Show(text, position, 10);
+    this->tooltip->Show(text, position);
 }
 
 

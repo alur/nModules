@@ -27,6 +27,7 @@ using std::map;
 class DrawableWindow : MessageHandler {
 public:
     // Defines a "State" which the window can be in.
+    // TODO::Make this an inner class instead.
     typedef struct {
         int priority;
         bool active;
@@ -54,13 +55,25 @@ public:
     } State;
     typedef list<State>::iterator STATE;
 
-    // Defines an overlay. A bitmap, or icon, or something. To pounder::All these could be their own full-blown DrawableWindow.
-    typedef struct {
+    // Defines an overlay. A bitmap, or icon, or something.
+    class Overlay {
+    public:
+        explicit Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmap* source);
+        virtual ~Overlay();
+
+        HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
+        void DiscardDeviceResources();
+
+        void UpdatePosition(D2D1_RECT_F parentPosition);
+        void Paint(ID2D1RenderTarget* renderTarget);
+
+    private:
         D2D1_RECT_F position;
         D2D1_RECT_F drawingPosition;
-        ID2D1Brush* brush;
-    } Overlay;
-    typedef list<Overlay>::iterator OVERLAY, *POVERLAY;
+        ID2D1BitmapBrush* brush;
+        IWICBitmap* source; // We need to keep the source image in order to be able to recreate the overlay.
+    };
+    typedef list<Overlay*>::iterator OVERLAY, *POVERLAY;
 
     // Constructor used for top-level windows.
     explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler);
@@ -155,10 +168,10 @@ public:
     void SetTextAlignment(DWRITE_TEXT_ALIGNMENT alignment);
 
     // Sets the text offsets for all states.
-    void DrawableWindow::SetTextOffsets(float left, float top, float right, float bottom);
+    void SetTextOffsets(float left, float top, float right, float bottom);
 
     // Sets the text offsets for the specified state.
-    void DrawableWindow::SetTextOffsets(float left, float top, float right, float bottom, STATE state);
+    void SetTextOffsets(float left, float top, float right, float bottom, STATE state);
 
     // Shows this window.
     void Show();
@@ -188,6 +201,12 @@ protected:
     // The render target to draw to
     ID2D1HwndRenderTarget* renderTarget;
 
+    //
+    void DiscardDeviceResources();
+
+    // (Re)Creates D2D device-dependent stuff.
+    HRESULT ReCreateDeviceResources();
+
 private:
     // Called by IParsedText objects when we should update the text.
     static void TextChangeHandler(LPVOID drawable);
@@ -212,9 +231,6 @@ private:
 
     //
     void Load();
-
-    // (Re)Creates D2D device-dependent stuff.
-    HRESULT ReCreateDeviceResources();
 
     // Removes the specified child.
     void RemoveChild(DrawableWindow* child);
@@ -265,7 +281,7 @@ private:
     MonitorInfo* monitorInfo;
 
     // All current overlays.
-    list<Overlay> overlays;
+    list<Overlay*> overlays;
 
     // The DrawableWindow which is this windows parent.
     DrawableWindow* parent;

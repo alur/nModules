@@ -5,7 +5,7 @@
  *  A generic drawable window.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../nShared/LiteStep.h"
+#include "LiteStep.h"
 #include <windowsx.h>
 #include <strsafe.h>
 #include "../nCoreCom/Core.h"
@@ -149,17 +149,15 @@ DrawableWindow::~DrawableWindow() {
 
     SAFERELEASE(this->parsedText);
 
+    DiscardDeviceResources();
+
     // Delete all states
     for (STATE iter = this->states.begin(); iter != this->states.end(); iter++) {
         SAFEDELETE(iter->defaultSettings);
         SAFEDELETE(iter->drawingSettings);
         SAFEDELETE(iter->settings);
 
-        SAFERELEASE(iter->backBrush);
-        SAFERELEASE(iter->textBrush);
         SAFERELEASE(iter->textFormat);
-        SAFERELEASE(iter->imageBrush);
-        SAFERELEASE(iter->outlineBrush);
     }
     this->states.clear();
 
@@ -168,9 +166,6 @@ DrawableWindow::~DrawableWindow() {
 
     if (!this->parent) {
         SAFERELEASE(this->renderTarget);
-    }
-
-    if (!this->parent) {
         SAFEDELETE(this->monitorInfo);
     }
 }
@@ -195,9 +190,6 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon, POVERLAY ov
     // Transfer control here if CHECKHR failed
     CHECKHR_END();
 
-    //
-    SAFERELEASE(source);
-
     return hr;
 }
 
@@ -221,9 +213,6 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap, POVERLA
     // Transfer control here if CHECKHR failed
     CHECKHR_END();
 
-    //
-    SAFERELEASE(source);
-
     return hr;
 }
 
@@ -232,61 +221,13 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap, POVERLA
 /// Adds an overlay icon.
 /// </summary>
 HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmap* source, POVERLAY overlayOut) {
-    IWICBitmapScaler* scaler = NULL;
-    IWICFormatConverter* converter = NULL;
-    IWICImagingFactory* factory = NULL;
-    ID2D1Bitmap* bitmap = NULL;
-    Overlay overlay;
-    UINT width, height;
-    
-    HRESULT hr = S_OK;
+    // Add the overlays to the overlay list{
+    this->overlays.push_back(new Overlay(position, this->drawingArea.rect, source));
+    *overlayOut = this->overlays.end();
+    --*overlayOut;
+    (*(*overlayOut))->ReCreateDeviceResources(this->renderTarget);
 
-    // Create our helper objects.
-    CHECKHR(hr, Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory)));
-    CHECKHR(hr, factory->CreateBitmapScaler(&scaler));
-    CHECKHR(hr, factory->CreateFormatConverter(&converter));
-
-    // Resize the image
-    CHECKHR(hr, source->GetSize(&width, &height));
-    CHECKHR(hr, scaler->Initialize(source, (UINT)(position.right - position.left), (UINT)(position.bottom - position.top), WICBitmapInterpolationModeCubic));
-    
-    // Convert it to an ID2D1Bitmap
-    CHECKHR(hr, converter->Initialize(scaler, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut));
-    CHECKHR(hr, this->renderTarget->CreateBitmapFromWicBitmap(converter, 0, &bitmap));
-
-    // Create a brush based on the bitmap
-    CHECKHR(hr, this->renderTarget->CreateBitmapBrush(bitmap, reinterpret_cast<ID2D1BitmapBrush**>(&overlay.brush)));
-    
-    // Make the position relative to the drawing area.
-    overlay.position = position;
-    overlay.drawingPosition = overlay.position;
-    overlay.drawingPosition.left += this->drawingArea.rect.left;
-    overlay.drawingPosition.right += this->drawingArea.rect.left;
-    overlay.drawingPosition.top += this->drawingArea.rect.top;
-    overlay.drawingPosition.bottom += this->drawingArea.rect.top;
-
-    // Move the origin of the brush to match the overlay position
-    overlay.brush->SetTransform(Matrix3x2F::Translation(overlay.drawingPosition.left, overlay.drawingPosition.top));
-
-    // Transfer control here if CHECKHR failed
-    CHECKHR_END();
-
-    // Release stuff
-    SAFERELEASE(scaler);
-    SAFERELEASE(converter);
-    SAFERELEASE(bitmap);
-
-    // Add the overlays to the overlay list
-    if (SUCCEEDED(hr)) {
-        this->overlays.push_back(overlay);
-        *overlayOut = this->overlays.end();
-        --*overlayOut;
-    }
-    else {
-        TRACE("DrawableWindow::AddOverlay failed!");
-    }
-
-    return hr;
+    return S_OK;
 }
 
 
@@ -340,10 +281,39 @@ void DrawableWindow::SetAnimation(int x, int y, int width, int height, int durat
 /// Removes all overlays from the window.
 /// </summary>
 void DrawableWindow::ClearOverlays() {
-    for (list<Overlay>::iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++) {
-        SAFERELEASE(iter->brush);
+    for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
+        delete *overlay;
     }
     this->overlays.clear();
+}
+
+
+/// <summary>
+/// Discards all device dependent resources
+/// </summary>
+void DrawableWindow::DiscardDeviceResources() {
+    if (!this->parent) {
+        SAFERELEASE(this->renderTarget);
+    }
+    else {
+        this->renderTarget = NULL;
+    }
+    
+    for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
+        (*overlay)->DiscardDeviceResources();
+    }
+
+    for (list<State>::iterator state = this->states.begin(); state != this->states.end(); ++state) {
+        SAFERELEASE(state->backBrush);
+        SAFERELEASE(state->imageBrush);
+        SAFERELEASE(state->outlineBrush);
+        SAFERELEASE(state->textBrush);
+    }
+
+    // Discard resources for all children as well.
+    for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
+        (*child)->DiscardDeviceResources();
+    }
 }
 
 
@@ -360,14 +330,14 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
         nCore::System::RegisterWindow(this->baseState->settings->prefix, this);
     }
 
-    // Create D2D resources
-    ReCreateDeviceResources();
-
     // Put the window in its correct position.
     SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y,
         this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
     this->drawingArea.radiusX = this->baseState->drawingSettings->cornerRadiusX;
     this->drawingArea.radiusY = this->baseState->drawingSettings->cornerRadiusY;
+
+    // Create D2D resources
+    ReCreateDeviceResources();
 
     // AlwaysOnTop... TODO::Fix this!
     if (!this->parent && this->baseState->drawingSettings->alwaysOnTop) {
@@ -377,7 +347,6 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
 
     // Create the text format
     CreateTextFormat(this->baseState->drawingSettings, &this->baseState->textFormat);
-    CreateBrushes(&(*this->baseState));
     
     // Set the text
     SetText(this->baseState->drawingSettings->text);
@@ -596,8 +565,10 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     if (!this->parent) {
         SetWindowPos(this->window, 0, x, y, width, height, SWP_NOZORDER);
         this->drawingArea.rect = D2D1::RectF(0, 0, (float)width, (float)height);
-        D2D1_SIZE_U size = D2D1::SizeU(width, height);
-        this->renderTarget->Resize(size);
+        if (this->renderTarget) {
+            D2D1_SIZE_U size = D2D1::SizeU(width, height);
+            this->renderTarget->Resize(size);
+        }
     }
     else {
         this->drawingArea.rect = D2D1::RectF(
@@ -619,15 +590,7 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
 
     // Update all overlays
     for (OVERLAY overlay = overlays.begin(); overlay != overlays.end(); ++overlay) {
-        overlay->drawingPosition = overlay->position;
-        overlay->drawingPosition.left += this->drawingArea.rect.left;
-        overlay->drawingPosition.right += this->drawingArea.rect.left;
-        overlay->drawingPosition.top += this->drawingArea.rect.top;
-        overlay->drawingPosition.bottom += this->drawingArea.rect.top;
-
-        // Move the origin of the brush to match the overlay position
-        overlay->brush->SetTransform(Matrix3x2F::Identity());
-        overlay->brush->SetTransform(Matrix3x2F::Translation(overlay->drawingPosition.left, overlay->drawingPosition.top));
+        (*overlay)->UpdatePosition(this->drawingArea.rect);
     }
 
     // Update all children
@@ -661,6 +624,19 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
         }
         else {
             this->renderTarget = this->parent->renderTarget;
+        }
+
+        for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
+            CreateBrushes(&(*state));
+        }
+
+        for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
+            (*overlay)->ReCreateDeviceResources(this->renderTarget);
+        }
+
+        // Recreate resources for all children as well.
+        for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
+            (*child)->ReCreateDeviceResources();
         }
     }
 
@@ -978,10 +954,16 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
 
     case WM_PAINT:
         {
-            this->renderTarget->BeginDraw();
-            this->renderTarget->Clear();
-            Paint();
-            this->renderTarget->EndDraw();
+            if (SUCCEEDED(ReCreateDeviceResources())) {
+                this->renderTarget->BeginDraw();
+                this->renderTarget->Clear();
+                Paint();
+
+                // If EndDraw fails we need to recreate all device-dependent resources
+                if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET) {
+                    DiscardDeviceResources();
+                }
+            }
 
             ValidateRect(this->window, NULL);
 
@@ -1071,8 +1053,8 @@ void DrawableWindow::Paint() {
 /// Removes the specified child.
 /// </summary>
 void DrawableWindow::PaintOverlays() {
-    for (list<Overlay>::iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++) {
-        this->renderTarget->FillRectangle(iter->drawingPosition, iter->brush);
+    for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
+        (*overlay)->Paint(this->renderTarget);
     }
 }
 
@@ -1081,8 +1063,8 @@ void DrawableWindow::PaintOverlays() {
 /// Removes the specified child.
 /// </summary>
 void DrawableWindow::PaintChildren() {
-    for (list<DrawableWindow*>::const_iterator iter = this->children.begin(); iter != this->children.end(); ++iter) {
-        (*iter)->Paint();
+    for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
+        (*child)->Paint();
     }
 }
 

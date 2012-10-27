@@ -37,7 +37,7 @@ Tooltip::~Tooltip() {
 }
 
 
-void Tooltip::Show(LPCWSTR text, LPRECT position, int duration) {
+void Tooltip::Show(LPCWSTR text, LPRECT position) {
     this->window->SetText(text);
     this->window->SizeToText(this->maxWidth, this->maxHeight);
 

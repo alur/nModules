@@ -104,7 +104,7 @@ void Balloon::Show(LPCWSTR title, LPCWSTR text, HICON icon, LPSIZE iconSize, LPR
     this->titleWindow->SizeToText(400, 16, 0, 16);
 
     this->window->SetText(text);
-    this->window->SizeToText(400, 400, this->titleWindow->GetDrawingSettings()->width + this->window->GetDrawingSettings()->textOffsetLeft + 24, 8 + iconSize->cy);
+    this->window->SizeToText(400, 400, this->titleWindow->GetDrawingSettings()->width + (int)this->window->GetDrawingSettings()->textOffsetLeft + 24, 8 + iconSize->cy);
 
     this->closeBtnWindow->Move(this->window->GetDrawingSettings()->width - 20, 4);
 

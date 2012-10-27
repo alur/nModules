@@ -74,12 +74,12 @@ void DrawableBangs::Show(HWND, LPCSTR args) {
 /// <summary>
 /// Adds an event handler.
 /// </summary>
-void DrawableBangs::On(HWND, LPCSTR args) {
+void DrawableBangs::On(HWND, LPCSTR /* args */) {
 }
 
 
 /// <summary>
 /// Removes an event handler.
 /// </summary>
-void DrawableBangs::Off(HWND, LPCSTR args) {
+void DrawableBangs::Off(HWND, LPCSTR /* args */) {
 }

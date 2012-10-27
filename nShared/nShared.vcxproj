@@ -53,6 +53,7 @@
     <ClCompile Include="DrawableBangs.cpp" />
     <ClCompile Include="DrawableSettings.cpp" />
     <ClCompile Include="DrawableWindow.cpp" />
+    <ClCompile Include="DrawableWindowOverlay.cpp" />
     <ClCompile Include="Easing.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="EventHandler.cpp" />
