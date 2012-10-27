@@ -260,10 +260,10 @@ HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmap* source, POV
     // Make the position relative to the drawing area.
     overlay.position = position;
     overlay.drawingPosition = overlay.position;
-    overlay.drawingPosition.left += this->drawingArea.left;
-    overlay.drawingPosition.right += this->drawingArea.left;
-    overlay.drawingPosition.top += this->drawingArea.top;
-    overlay.drawingPosition.bottom += this->drawingArea.top;
+    overlay.drawingPosition.left += this->drawingArea.rect.left;
+    overlay.drawingPosition.right += this->drawingArea.rect.left;
+    overlay.drawingPosition.top += this->drawingArea.rect.top;
+    overlay.drawingPosition.bottom += this->drawingArea.rect.top;
 
     // Move the origin of the brush to match the overlay position
     overlay.brush->SetTransform(Matrix3x2F::Translation(overlay.drawingPosition.left, overlay.drawingPosition.top));
@@ -366,6 +366,8 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     // Put the window in its correct position.
     SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y,
         this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
+    this->drawingArea.radiusX = this->baseState->drawingSettings->cornerRadiusX;
+    this->drawingArea.radiusY = this->baseState->drawingSettings->cornerRadiusY;
 
     // AlwaysOnTop... TODO::Fix this!
     if (!this->parent && this->baseState->drawingSettings->alwaysOnTop) {
@@ -418,7 +420,7 @@ HRESULT DrawableWindow::CreateBrushes(State* state) {
             }
 
             if (SUCCEEDED(hr)) {
-                brush->SetTransform(Matrix3x2F::Translation(this->drawingArea.left, this->drawingArea.top));
+                brush->SetTransform(Matrix3x2F::Translation(this->drawingArea.rect.left, this->drawingArea.rect.top));
                 state->imageBrush = brush;
             }
 
@@ -593,22 +595,22 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     // Position the window and/or set the backarea.
     if (!this->parent) {
         SetWindowPos(this->window, 0, x, y, width, height, SWP_NOZORDER);
-        this->drawingArea = D2D1::RectF(0, 0, (float)width, (float)height);
+        this->drawingArea.rect = D2D1::RectF(0, 0, (float)width, (float)height);
         D2D1_SIZE_U size = D2D1::SizeU(width, height);
         this->renderTarget->Resize(size);
     }
     else {
-        this->drawingArea = D2D1::RectF(
-            this->parent->drawingArea.left + x,
-            this->parent->drawingArea.top + y,
-            this->parent->drawingArea.left + x + width,
-            this->parent->drawingArea.top + y + height
+        this->drawingArea.rect = D2D1::RectF(
+            this->parent->drawingArea.rect.left + x,
+            this->parent->drawingArea.rect.top + y,
+            this->parent->drawingArea.rect.left + x + width,
+            this->parent->drawingArea.rect.top + y + height
         );
     }
 
     // The text area is offset from the drawing area.
     for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
-        state->textArea = this->drawingArea;
+        state->textArea = this->drawingArea.rect;
         state->textArea.bottom -= state->drawingSettings->textOffsetBottom;
         state->textArea.top += state->drawingSettings->textOffsetTop;
         state->textArea.left += state->drawingSettings->textOffsetLeft;
@@ -618,10 +620,10 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     // Update all overlays
     for (OVERLAY overlay = overlays.begin(); overlay != overlays.end(); ++overlay) {
         overlay->drawingPosition = overlay->position;
-        overlay->drawingPosition.left += this->drawingArea.left;
-        overlay->drawingPosition.right += this->drawingArea.left;
-        overlay->drawingPosition.top += this->drawingArea.top;
-        overlay->drawingPosition.bottom += this->drawingArea.top;
+        overlay->drawingPosition.left += this->drawingArea.rect.left;
+        overlay->drawingPosition.right += this->drawingArea.rect.left;
+        overlay->drawingPosition.top += this->drawingArea.rect.top;
+        overlay->drawingPosition.bottom += this->drawingArea.rect.top;
 
         // Move the origin of the brush to match the overlay position
         overlay->brush->SetTransform(Matrix3x2F::Identity());
@@ -687,10 +689,10 @@ MonitorInfo* DrawableWindow::GetMonitorInformation() {
 void DrawableWindow::GetScreenRect(LPRECT rect) {
     RECT r;
     GetWindowRect(this->window, &r);
-    rect->left = r.left + (LONG)this->drawingArea.left;
-    rect->top = r.top + (LONG)this->drawingArea.top;
-    rect->right = r.left + (LONG)this->drawingArea.right;
-    rect->bottom = r.top + (LONG)this->drawingArea.bottom;
+    rect->left = r.left + (LONG)this->drawingArea.rect.left;
+    rect->top = r.top + (LONG)this->drawingArea.rect.top;
+    rect->right = r.left + (LONG)this->drawingArea.rect.right;
+    rect->bottom = r.top + (LONG)this->drawingArea.rect.bottom;
 }
 
 
@@ -756,7 +758,7 @@ void DrawableWindow::Repaint(LPRECT region) {
                 this->parent->Repaint(region);
             }
             else {
-                RECT r = { drawingArea.left, drawingArea.top, drawingArea.right, drawingArea.bottom };
+                RECT r = { (int)drawingArea.rect.left, (int)drawingArea.rect.top, (int)drawingArea.rect.right, (int)drawingArea.rect.bottom };
                 this->parent->Repaint(&r);
             }
         }
@@ -775,8 +777,8 @@ void DrawableWindow::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
     IDWriteFactory* factory = NULL;
     IDWriteTextLayout* textLayout = NULL;
     DWRITE_TEXT_METRICS metrics;
-    maxWidth -= this->baseState->drawingSettings->textOffsetLeft + this->baseState->drawingSettings->textOffsetRight;
-    maxHeight -= this->baseState->drawingSettings->textOffsetTop + this->baseState->drawingSettings->textOffsetBottom;
+    maxWidth -= int(this->baseState->drawingSettings->textOffsetLeft + this->baseState->drawingSettings->textOffsetRight);
+    maxHeight -= int(this->baseState->drawingSettings->textOffsetTop + this->baseState->drawingSettings->textOffsetBottom);
 
     Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&factory));
     factory->CreateTextLayout(this->text, lstrlenW(this->text), this->baseState->textFormat, (float)maxWidth, (float)maxHeight, &textLayout);
@@ -814,7 +816,7 @@ DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* 
 
     state.drawingSettings->Load(state.settings, defaultSettings);
 
-    state.textArea = this->drawingArea;
+    state.textArea = this->drawingArea.rect;
     state.textArea.bottom -= state.drawingSettings->textOffsetBottom;
     state.textArea.top += state.drawingSettings->textOffsetTop;
     state.textArea.left += state.drawingSettings->textOffsetLeft;
@@ -899,6 +901,27 @@ void DrawableWindow::SetText(LPCWSTR text) {
 }
 
 
+void DrawableWindow::SetTextOffsets(float left, float top, float right, float bottom) {
+    for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
+        SetTextOffsets(left, top, right, bottom, state);
+    }
+}
+
+
+void DrawableWindow::SetTextOffsets(float left, float top, float right, float bottom, STATE state) {
+    state->drawingSettings->textOffsetBottom = bottom;
+    state->drawingSettings->textOffsetLeft = left;
+    state->drawingSettings->textOffsetRight = right;
+    state->drawingSettings->textOffsetTop = top;
+
+    state->textArea = this->drawingArea.rect;
+    state->textArea.bottom -= state->drawingSettings->textOffsetBottom;
+    state->textArea.top += state->drawingSettings->textOffsetTop;
+    state->textArea.left += state->drawingSettings->textOffsetLeft;
+    state->textArea.right -= state->drawingSettings->textOffsetRight;
+}
+
+
 /// <summary>
 /// Handles window messages for this drawablewindow.
 /// </summary>
@@ -910,7 +933,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         MessageHandler* handler = NULL;
 
         for (list<DrawableWindow*>::const_iterator iter = this->children.begin(); iter != this->children.end(); ++iter) {
-            D2D1_RECT_F* pos = &(*iter)->drawingArea;
+            D2D1_RECT_F* pos = &(*iter)->drawingArea.rect;
             if (xPos >= pos->left && xPos <= pos->right && yPos >= pos->top && yPos <= pos->bottom) {
                 handler = *iter;
                 break;
@@ -1021,11 +1044,11 @@ void DrawableWindow::Paint() {
     if (this->visible) {
         this->renderTarget->SetTransform(Matrix3x2F::Identity());
 
-        this->renderTarget->FillRectangle(this->drawingArea, this->activeState->backBrush);
-        this->renderTarget->DrawRectangle(this->drawingArea, this->activeState->outlineBrush, this->activeState->drawingSettings->outlineWidth);
+        this->renderTarget->FillRoundedRectangle(this->drawingArea, this->activeState->backBrush);
+        this->renderTarget->DrawRoundedRectangle(this->drawingArea, this->activeState->outlineBrush, this->activeState->drawingSettings->outlineWidth);
 
         if (this->activeState->imageBrush != NULL) {
-            this->renderTarget->FillRectangle(this->drawingArea, this->activeState->imageBrush);
+            this->renderTarget->FillRoundedRectangle(this->drawingArea, this->activeState->imageBrush);
         }
     
         this->renderTarget->SetTransform(

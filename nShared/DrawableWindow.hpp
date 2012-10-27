@@ -154,6 +154,12 @@ public:
     // Sets the text alignment of this drawablewindow.
     void SetTextAlignment(DWRITE_TEXT_ALIGNMENT alignment);
 
+    // Sets the text offsets for all states.
+    void DrawableWindow::SetTextOffsets(float left, float top, float right, float bottom);
+
+    // Sets the text offsets for the specified state.
+    void DrawableWindow::SetTextOffsets(float left, float top, float right, float bottom, STATE state);
+
     // Shows this window.
     void Show();
 
@@ -244,7 +250,7 @@ private:
     list<DrawableWindow*> children;
 
     // The area we draw in.
-    D2D1_RECT_F drawingArea;
+    D2D1_ROUNDED_RECT drawingArea;
 
     // If Initalize has been called.
     bool initialized;

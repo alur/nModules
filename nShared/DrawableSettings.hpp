@@ -28,6 +28,12 @@ public:
     // The background color of the window. Default: 0xFF000000 (black)
     ARGB color;
 
+    // The x corner radius. Default: 0
+    float cornerRadiusX;
+
+    // The y corner radius. Default: 0
+    float cornerRadiusY;
+
     // True to evaluate text strings. Not read from RC files. Default: false
     bool evaluateText;
 
