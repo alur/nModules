@@ -43,11 +43,11 @@ void Label::Initalize() {
     defaults->evaluateText = true;
     defaults->registerWithCore = true;
 
-    this->window->Initialize(defaults);
+    this->window->Initialize(defaults, new DrawableStateSettings());
 
     LoadSettings();
 
-    this->stateHover = this->window->AddState("Hover", new DrawableSettings(), 100);
+    this->stateHover = this->window->AddState("Hover", new DrawableStateSettings(), 100);
     if (!this->window->GetDrawingSettings()->hidden) {
         this->window->Show();
     }

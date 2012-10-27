@@ -124,11 +124,13 @@ void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHa
     this->activeChild = NULL;
     this->animating = false;
     ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
+    this->drawingSettings = new DrawableSettings();
     this->initialized = false;
     this->isTrackingMouse = false;
     this->msgHandler = msgHandler;
     this->parsedText = NULL;
     this->renderTarget = NULL;
+    this->settings = new Settings(settings);
     this->text[0] = '\0';
     this->visible = false;
 
@@ -136,7 +138,7 @@ void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHa
     State state = {0};
     state.active = true;
     state.settings = new Settings(settings);
-    state.drawingSettings = new DrawableSettings();
+    state.drawingSettings = new DrawableStateSettings();
     this->activeState = this->baseState = this->states.insert(this->states.begin(), state);
 }
 
@@ -152,7 +154,7 @@ DrawableWindow::~DrawableWindow() {
     }
 
     // Register with the core
-    if (this->baseState->drawingSettings->registerWithCore) {
+    if (this->drawingSettings->registerWithCore) {
         nCore::System::UnRegisterWindow(this->baseState->settings->prefix);
     }
 
@@ -181,6 +183,10 @@ DrawableWindow::~DrawableWindow() {
         SAFERELEASE(this->renderTarget);
         SAFEDELETE(this->monitorInfo);
     }
+
+    SAFEDELETE(this->drawingSettings);
+    SAFEDELETE(this->defaultSettings);
+    SAFEDELETE(this->settings);
 }
 
 
@@ -271,14 +277,14 @@ DrawableWindow::PAINTER DrawableWindow::AddPrePainter(IPainter* painter) {
 /// <param name="defaultSettings">The default settings for this state.</param>
 /// <param name="defaultPriority">The default priority for this state. Higher priority states take precedence over lower priority states.</param>
 /// <returns>An object which can be used to activate/clear this state.</returns>
-DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority) {
+DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableStateSettings* defaultSettings, int defaultPriority) {
     State state;
     state.defaultSettings = defaultSettings;
     state.settings = this->baseState->settings->CreateChild(prefix);
     state.settings->AppendGroup(this->baseState->settings);
     state.priority = state.settings->GetInt("Priority", defaultPriority);
     state.active = false;
-    state.drawingSettings = new DrawableSettings();
+    state.drawingSettings = new DrawableStateSettings();
 
     state.drawingSettings->Load(state.settings, defaultSettings);
 
@@ -450,7 +456,7 @@ DrawableWindow* DrawableWindow::CreateChild(Settings* childSettings, MessageHand
 /// <param name="drawingSettings">The settings to create the textformat with.</param>
 /// <param name="textFormat">Out. The textformat.</param>
 /// <returns>S_OK</returns>
-HRESULT DrawableWindow::CreateTextFormat(DrawableSettings* drawingSettings, IDWriteTextFormat** textFormat) {
+HRESULT DrawableWindow::CreateTextFormat(DrawableStateSettings* drawingSettings, IDWriteTextFormat** textFormat) {
     // Font weight
     DWRITE_FONT_WEIGHT fontWeight;
     if (_stricmp(drawingSettings->fontWeight, "Thin") == 0)
@@ -635,7 +641,7 @@ void DrawableWindow::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
 /// </summary>
 /// <returns>The drawing settings for the default state.</returns>
 DrawableSettings* DrawableWindow::GetDrawingSettings() {
-    return this->baseState->drawingSettings;
+    return this->drawingSettings;
 }
 
 
@@ -816,27 +822,32 @@ void DrawableWindow::Hide() {
 /// Initalizes this window.
 /// </summary>
 /// <param name="defaultSettings">The default settings for this window.</param>
-void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
+/// <param name="baseStateDefaults">The default settings for the base state.</param>
+void DrawableWindow::Initialize(DrawableSettings* defaultSettings, DrawableStateSettings* baseStateDefaults) {
+    // Load settings.
+    this->defaultSettings = defaultSettings;
+    this->drawingSettings->Load(this->settings, this->defaultSettings);
+
     // Load the base state's settings.
-    this->baseState->defaultSettings = defaultSettings;
+    this->baseState->defaultSettings = baseStateDefaults;
     this->baseState->drawingSettings->Load(this->baseState->settings, this->baseState->defaultSettings);
 
     // Register with the core.
-    if (this->baseState->drawingSettings->registerWithCore) {
+    if (this->drawingSettings->registerWithCore) {
         nCore::System::RegisterWindow(this->baseState->settings->prefix, this);
     }
 
     // Put the window in its correct position.
-    SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y,
-        this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
-    this->drawingArea.radiusX = this->baseState->drawingSettings->cornerRadiusX;
-    this->drawingArea.radiusY = this->baseState->drawingSettings->cornerRadiusY;
+    SetPosition(this->drawingSettings->x, this->drawingSettings->y,
+        this->drawingSettings->width, this->drawingSettings->height);
+    this->drawingArea.radiusX = this->drawingSettings->cornerRadiusX;
+    this->drawingArea.radiusY = this->drawingSettings->cornerRadiusY;
 
     // Create D2D resources.
     ReCreateDeviceResources();
 
     // AlwaysOnTop... TODO::Fix this!
-    if (!this->parent && this->baseState->drawingSettings->alwaysOnTop) {
+    if (!this->parent && this->drawingSettings->alwaysOnTop) {
         SetParent(this->window, NULL);
         SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
     }
@@ -845,7 +856,7 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
     CreateTextFormat(this->baseState->drawingSettings, &this->baseState->textFormat);
     
     // Set the text.
-    SetText(this->baseState->drawingSettings->text);
+    SetText(this->drawingSettings->text);
 
     this->initialized = true;
 }
@@ -869,7 +880,7 @@ bool DrawableWindow::IsVisible() {
 /// <param name="x">The x coordinate to move the window to. Relative to the parent.</param>
 /// <param name="y">The y coordinate to move the window to. Relative to the parent.</param>
 void DrawableWindow::Move(int x, int y) {
-    SetPosition(x, y, this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
+    SetPosition(x, y, this->drawingSettings->width, this->drawingSettings->height);
 }
 
 
@@ -889,7 +900,7 @@ void DrawableWindow::Paint() {
     
         this->renderTarget->SetTransform(
             Matrix3x2F::Rotation(this->activeState->drawingSettings->textRotation,
-            Point2F(this->activeState->drawingSettings->width/2.0f,this->activeState->drawingSettings->height/2.0f)));
+            Point2F(this->drawingSettings->width/2.0f,this->drawingSettings->height/2.0f)));
 
         this->renderTarget->DrawText(this->text, lstrlenW(this->text), this->activeState->textFormat, 
             this->activeState->textArea, this->activeState->textBrush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
@@ -971,7 +982,7 @@ void DrawableWindow::ReleaseUserMessage(UINT message) {
 /// <param name="width">The width to resize the window to.</param>
 /// <param name="height">The height to resize the window to.</param>
 void DrawableWindow::Resize(int width, int height) {
-    SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y, width, height);
+    SetPosition(this->drawingSettings->x, this->drawingSettings->y, width, height);
 }
 
 
@@ -989,7 +1000,7 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
 
             // Create the render target
             if (SUCCEEDED(hr)) {
-                D2D1_SIZE_U size = D2D1::SizeU(this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
+                D2D1_SIZE_U size = D2D1::SizeU(this->drawingSettings->width, this->drawingSettings->height);
                 hr = pD2DFactory->CreateHwndRenderTarget(
                     RenderTargetProperties(
                         D2D1_RENDER_TARGET_TYPE_DEFAULT,
@@ -1079,10 +1090,10 @@ void DrawableWindow::Repaint(LPRECT region) {
 void DrawableWindow::SetAnimation(int x, int y, int width, int height, int duration, Easing::EasingType easing) {
     RECT target = { x, y, x + width, y + height };
     this->animationTarget = target;
-    this->animationStart.top = this->baseState->drawingSettings->y;
-    this->animationStart.left = this->baseState->drawingSettings->x;
-    this->animationStart.bottom = this->baseState->drawingSettings->y + this->baseState->drawingSettings->height;
-    this->animationStart.right = this->baseState->drawingSettings->x + this->baseState->drawingSettings->width;
+    this->animationStart.top = this->drawingSettings->y;
+    this->animationStart.left = this->drawingSettings->x;
+    this->animationStart.bottom = this->drawingSettings->y + this->drawingSettings->height;
+    this->animationStart.right = this->drawingSettings->x + this->drawingSettings->width;
     this->animationEasing = easing;
 
     // TODO::Not too fond of using GetTickCount.
@@ -1122,10 +1133,10 @@ UINT_PTR DrawableWindow::SetCallbackTimer(UINT elapse, MessageHandler* msgHandle
 /// <param name="height">The height to resize the window to.</param>
 void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     // Update the drawing settings.
-    this->baseState->drawingSettings->x = x;
-    this->baseState->drawingSettings->y = y;
-    this->baseState->drawingSettings->width = width;
-    this->baseState->drawingSettings->height = height;
+    this->drawingSettings->x = x;
+    this->drawingSettings->y = y;
+    this->drawingSettings->width = width;
+    this->drawingSettings->height = height;
 
     // Position the window and/or set the backarea.
     if (!this->parent) {
@@ -1161,7 +1172,7 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
 
     // Update all children
     for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
-        (*child)->Move((*child)->baseState->drawingSettings->x, (*child)->baseState->drawingSettings->y);
+        (*child)->Move((*child)->drawingSettings->x, (*child)->drawingSettings->y);
     }
 }
 
@@ -1189,7 +1200,7 @@ void DrawableWindow::SizeToText(int maxWidth, int maxHeight, int minWidth, int m
     GetDesiredSize(maxWidth, maxHeight, &s);
     s.cx = max(s.cx, minWidth);
     s.cy = max(s.cy, minHeight);
-    this->SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y, s.cx, s.cy);
+    this->SetPosition(this->drawingSettings->x, this->drawingSettings->y, s.cx, s.cy);
 }
 
 
@@ -1198,7 +1209,7 @@ void DrawableWindow::SizeToText(int maxWidth, int maxHeight, int minWidth, int m
 /// </summary>
 /// <param name="text">The text for this window.</param>
 void DrawableWindow::SetText(LPCWSTR text) {
-    if (this->baseState->drawingSettings->evaluateText) {
+    if (this->drawingSettings->evaluateText) {
         SAFEDELETE(this->parsedText);
         this->parsedText = (IParsedText*)nCore::System::ParseText(text);
         this->parsedText->SetChangeHandler(TextChangeHandler, this);
@@ -1264,11 +1275,11 @@ void DrawableWindow::ToggleState(STATE state) {
 /// Forcibly updates the text.
 /// </summary>
 void DrawableWindow::UpdateText() {
-    if (this->baseState->drawingSettings->evaluateText) {
+    if (this->drawingSettings->evaluateText) {
         this->parsedText->Evaluate(this->text, sizeof(this->text)/sizeof(this->text[0]));
     }
     else {
-        StringCchCopyW(this->text, sizeof(this->text)/sizeof(this->text[0]), this->baseState->drawingSettings->text);
+        StringCchCopyW(this->text, sizeof(this->text)/sizeof(this->text[0]), this->drawingSettings->text);
     }
     Repaint();
 }

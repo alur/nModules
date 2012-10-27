@@ -26,14 +26,14 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
 
     this->iconSettings = this->settings->CreateChild("Icon");
 
-    this->window->Initialize(new DrawableSettings());
+    this->window->Initialize(new DrawableSettings(), new DrawableStateSettings());
 
     // Add states to the window
-    this->stateFlashingHover = this->window->AddState("FlashingHover", new DrawableSettings(), 150); 
-    this->stateActiveHover = this->window->AddState("ActiveHover", new DrawableSettings(), 125);
-    this->stateHover = this->window->AddState("Hover", new DrawableSettings(), 100);
-    this->stateActive = this->window->AddState("Active", new DrawableSettings(), 75);
-    this->stateFlashing = this->window->AddState("Flashing", new DrawableSettings(), 50);
+    this->stateFlashingHover = this->window->AddState("FlashingHover", new DrawableStateSettings(), 150); 
+    this->stateActiveHover = this->window->AddState("ActiveHover", new DrawableStateSettings(), 125);
+    this->stateHover = this->window->AddState("Hover", new DrawableStateSettings(), 100);
+    this->stateActive = this->window->AddState("Active", new DrawableStateSettings(), 75);
+    this->stateFlashing = this->window->AddState("Flashing", new DrawableStateSettings(), 50);
 
     // Initalize variables
     this->mouseIsOver = false;

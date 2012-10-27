@@ -28,7 +28,7 @@ Taskbar::Taskbar(LPCSTR name) : Drawable(name) {
     this->layoutSettings->Load(this->settings, defaults);
     delete defaults;
     
-    this->window->Initialize(new DrawableSettings());
+    this->window->Initialize(new DrawableSettings(), new DrawableStateSettings());
     this->window->Show();
 }
 

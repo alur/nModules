@@ -36,16 +36,20 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     settings->GetOffsetRect("PaddingLeft", "PaddingTop", "PaddingRight", "PaddingBottom", &this->padding, 5, 5, 5, 5);
 
     DrawableSettings* defaultSettings = new DrawableSettings();
-    defaultSettings->color = 0x440000FF;
-    defaultSettings->textRotation = -45.0f;
-    defaultSettings->fontSize = 32.0f;
     defaultSettings->alwaysOnTop = true;
     defaultSettings->width = 200;
     StringCchCopyW(defaultSettings->text, MAX_LINE_LENGTH, L"nDemo");
     MultiByteToWideChar(CP_ACP, 0, title, (int)strlen(title)+1, defaultSettings->text, sizeof(defaultSettings->text)/sizeof(defaultSettings->text[0]));
-    StringCchCopy(defaultSettings->textAlign, sizeof(defaultSettings->textAlign), "Center");
-    StringCchCopy(defaultSettings->textVerticalAlign, sizeof(defaultSettings->textVerticalAlign), "Middle");
-    this->window->Initialize(defaultSettings);
+
+    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    defaultState->color = 0x440000FF;
+    defaultState->textRotation = -45.0f;
+    defaultState->fontSize = 32.0f;
+    StringCchCopy(defaultState->textAlign, sizeof(defaultState->textAlign), "Center");
+    StringCchCopy(defaultState->textVerticalAlign, sizeof(defaultState->textVerticalAlign), "Middle");
+
+    this->window->Initialize(defaultSettings, defaultState);
+
     SetParent(this->window->GetWindowHandle(), NULL);
     SetWindowLongPtr(this->window->GetWindowHandle(), GWL_EXSTYLE, GetWindowLongPtr(this->window->GetWindowHandle(), GWL_EXSTYLE) & ~WS_EX_NOACTIVATE);
     this->sized = false;

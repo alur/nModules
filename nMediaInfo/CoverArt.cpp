@@ -29,7 +29,7 @@ CoverArt::CoverArt(LPCSTR name) : Drawable(name) {
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 200;
     defaults->height = 200;
-    this->window->Initialize(defaults);
+    this->window->Initialize(defaults, new DrawableStateSettings());
 
     D2D1_RECT_F pos = {
         0, 0,

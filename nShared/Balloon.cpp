@@ -12,54 +12,64 @@
 
 
 Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, MessageHandler* callbackHandler) : Drawable(prefix, parentSettings) {
+    // Inialize the window.
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 150;
     defaults->height = 40;
-    defaults->color = 0xCCFAFAD2;
-    defaults->fontColor = 0xFF000000;
-    defaults->textOffsetTop = 4;
-    defaults->textOffsetBottom = 4;
-    defaults->textOffsetRight = 4;
-    defaults->textOffsetLeft = 40;
     defaults->alwaysOnTop = true;
-    defaults->outlineColor = 0xAA000000;
-    defaults->outlineWidth = 1.5f;
     defaults->cornerRadiusX = 4.0f;
     defaults->cornerRadiusY = 4.0f;
-    defaults->wordWrap = true;
-    this->window->Initialize(defaults);
+
+    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    defaultState->color = 0xCCFAFAD2;
+    defaultState->fontColor = 0xFF000000;
+    defaultState->textOffsetTop = 4;
+    defaultState->textOffsetBottom = 4;
+    defaultState->textOffsetRight = 4;
+    defaultState->textOffsetLeft = 40;
+    defaultState->outlineColor = 0xAA000000;
+    defaultState->outlineWidth = 1.5f;
+    defaultState->wordWrap = true;
+
+    this->window->Initialize(defaults, defaultState);
 
     this->clickedMessage = clickedMessage;
     this->callbackHandler = callbackHandler;
 
-    //this->closeBtnWindow = new DrawableWindow(this->window, 
-
+    // Create the a child window for the title of the balloon.
     this->titleSettings = parentSettings->CreateChild("Title");
     this->titleWindow = this->window->CreateChild(this->titleSettings, this);
     DrawableSettings* titleDefaults = new DrawableSettings();
     titleDefaults->x = 4;
     titleDefaults->y = 4;
-    titleDefaults->fontColor = 0xFF000000;
-    titleDefaults->color = 0;
-    StringCchCopy(titleDefaults->fontWeight, sizeof(titleDefaults->fontWeight), "Bold");
-    this->titleWindow->Initialize(titleDefaults);
+
+    DrawableStateSettings* titleBaseStateDefaults = new DrawableStateSettings();
+    titleBaseStateDefaults->fontColor = 0xFF000000;
+    titleBaseStateDefaults->color = 0;
+    StringCchCopy(titleBaseStateDefaults->fontWeight, sizeof(titleBaseStateDefaults->fontWeight), "Bold");
+
+    this->titleWindow->Initialize(titleDefaults, titleBaseStateDefaults);
     this->titleWindow->Show();
 
+    // And another for the x button in the top right corner.
     this->closeBtnSettings = parentSettings->CreateChild("CloseButton");
     this->closeBtnWindow = this->window->CreateChild(this->closeBtnSettings, this);
     DrawableSettings* closeBtnDefaults = new DrawableSettings();
-    closeBtnDefaults->color = 0xAA77AACC;
-    closeBtnDefaults->fontColor = 0xFF000000;
     closeBtnDefaults->width = 16;
     closeBtnDefaults->height = 16;
     closeBtnDefaults->cornerRadiusX = 2.0f;
     closeBtnDefaults->cornerRadiusY = 2.0f;
-    closeBtnDefaults->outlineColor = 0xFF000000;
-    closeBtnDefaults->outlineWidth = 1.0f;
-    StringCchCopy(closeBtnDefaults->fontWeight, sizeof(closeBtnDefaults->fontWeight), "Bold");
-    StringCchCopy(closeBtnDefaults->textAlign, sizeof(closeBtnDefaults->textAlign), "Center");
-    StringCchCopy(closeBtnDefaults->textVerticalAlign, sizeof(closeBtnDefaults->textVerticalAlign), "Middle");
-    this->closeBtnWindow->Initialize(closeBtnDefaults);
+
+    DrawableStateSettings* closeBtnBaseStateDefaults = new DrawableStateSettings();
+    closeBtnBaseStateDefaults->color = 0xAA77AACC;
+    closeBtnBaseStateDefaults->fontColor = 0xFF000000;
+    closeBtnBaseStateDefaults->outlineColor = 0xFF000000;
+    closeBtnBaseStateDefaults->outlineWidth = 1.0f;
+    StringCchCopy(closeBtnBaseStateDefaults->fontWeight, sizeof(closeBtnBaseStateDefaults->fontWeight), "Bold");
+    StringCchCopy(closeBtnBaseStateDefaults->textAlign, sizeof(closeBtnBaseStateDefaults->textAlign), "Center");
+    StringCchCopy(closeBtnBaseStateDefaults->textVerticalAlign, sizeof(closeBtnBaseStateDefaults->textVerticalAlign), "Middle");
+
+    this->closeBtnWindow->Initialize(closeBtnDefaults, closeBtnBaseStateDefaults);
     this->closeBtnWindow->SetText(L"X");
     this->closeBtnWindow->Show();
 
@@ -87,23 +97,25 @@ LRESULT WINAPI Balloon::HandleMessage(HWND window, UINT message, WPARAM wParam, 
 
 
 void Balloon::Show(LPCWSTR title, LPCWSTR text, HICON icon, LPSIZE iconSize, LPRECT targetPosition) {
+    int offsetLeft;
     if (icon != NULL) {
         D2D1_RECT_F f = { 4, 4, float(4 + iconSize->cx), float(4 + iconSize->cy) };
         this->window->AddOverlay(f, icon);
 
-        this->window->SetTextOffsets(float(iconSize->cx + 8), 20, 4, 4);
+        offsetLeft = iconSize->cx + 8;
         this->titleWindow->Move(iconSize->cx + 8, 4);
     }
     else {
-        this->window->SetTextOffsets(4, 20, 4, 4);
+        offsetLeft = 4;
         this->titleWindow->Move(4, 4);
     }
+    this->window->SetTextOffsets((float)offsetLeft, 20, 4, 4);
 
     this->titleWindow->SetText(title);
     this->titleWindow->SizeToText(400, 16, 0, 16);
 
     this->window->SetText(text);
-    this->window->SizeToText(400, 400, this->titleWindow->GetDrawingSettings()->width + (int)this->window->GetDrawingSettings()->textOffsetLeft + 24, 8 + iconSize->cy);
+    this->window->SizeToText(400, 400, this->titleWindow->GetDrawingSettings()->width + offsetLeft + 24, 8 + iconSize->cy);
 
     this->closeBtnWindow->Move(this->window->GetDrawingSettings()->width - 20, 4);
 

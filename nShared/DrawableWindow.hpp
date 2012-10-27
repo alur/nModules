@@ -8,6 +8,7 @@
 #pragma once
 
 #include "DrawableSettings.hpp"
+#include "DrawableStateSettings.hpp"
 #include "MessageHandler.hpp"
 #include <d2d1.h>
 #include <vector>
@@ -33,8 +34,8 @@ public:
         int priority;
         bool active;
         Settings* settings;
-        DrawableSettings* drawingSettings;
-        DrawableSettings* defaultSettings;
+        DrawableStateSettings* drawingSettings;
+        DrawableStateSettings* defaultSettings;
 
         // The brush we are currently painting the background with.
         ID2D1Brush* backBrush;
@@ -97,7 +98,7 @@ public:
     PAINTER AddPostPainter(IPainter* painter);
 
     // Adds a new state.
-    STATE AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority);
+    STATE AddState(LPCSTR prefix, DrawableStateSettings* defaultSettings, int defaultPriority);
 
     // Marks a particular state as active.
     void ActivateState(STATE state);
@@ -136,7 +137,7 @@ public:
     void Hide();
 
     // Initializes the DrawableWindow.
-    void Initialize(DrawableSettings* defaultSettings);
+    void Initialize(DrawableSettings* defaultSettings, DrawableStateSettings* baseStateDefaults);
 
     // Returns whether or not this window is visible.
     bool IsVisible();
@@ -228,7 +229,7 @@ private:
     void ConstructorCommon(Settings* settings, MessageHandler* msgHandler);
 
     // Creates an IDWriteTextFormat based on a DrawableSettings.
-    HRESULT CreateTextFormat(DrawableSettings* drawingSettings, IDWriteTextFormat** textFormat);
+    HRESULT CreateTextFormat(DrawableStateSettings* drawingSettings, IDWriteTextFormat** textFormat);
 
     // Creates the brushes for a particular state.
     HRESULT CreateBrushes(State* state);
@@ -269,8 +270,14 @@ private:
     // The children of this drawablewindow.
     list<DrawableWindow*> children;
 
+    // The default drawing settings.
+    DrawableSettings* defaultSettings;
+
     // The area we draw in.
     D2D1_ROUNDED_RECT drawingArea;
+
+    // The drawing settings.
+    DrawableSettings* drawingSettings;
 
     // If Initalize has been called.
     bool initialized;
@@ -298,6 +305,9 @@ private:
 
     // Painters called before children and overlays are painted.
     list<IPainter*> prePainters;
+
+    // Settings.
+    Settings* settings;
 
     // All current states.
     list<State> states;

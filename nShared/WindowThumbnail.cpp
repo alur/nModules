@@ -119,16 +119,19 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 150;
     defaults->height = 40;
-    defaults->color = 0xAA009900;
-    defaults->fontColor = 0xFF000000;
-    defaults->textOffsetTop = 2;
-    defaults->textOffsetBottom = 2;
-    defaults->textOffsetRight = 2;
-    defaults->textOffsetLeft = 2;
     defaults->alwaysOnTop = true;
-    defaults->outlineColor = 0xAAFFFFFF;
-    defaults->outlineWidth = 2.0f;
-    this->window->Initialize(defaults);
+    
+    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    defaultState->color = 0xAA009900;
+    defaultState->fontColor = 0xFF000000;
+    defaultState->textOffsetTop = 2;
+    defaultState->textOffsetBottom = 2;
+    defaultState->textOffsetRight = 2;
+    defaultState->textOffsetLeft = 2;
+    defaultState->outlineColor = 0xAAFFFFFF;
+    defaultState->outlineWidth = 2.0f;
+
+    this->window->Initialize(defaults,  defaultState);
 
     char szBuf[32];
 

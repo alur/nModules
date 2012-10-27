@@ -13,16 +13,19 @@ Tooltip::Tooltip(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, par
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 150;
     defaults->height = 40;
-    defaults->color = 0xCCFAFAD2;
-    defaults->fontColor = 0xFF000000;
-    defaults->textOffsetTop = 2;
-    defaults->textOffsetBottom = 2;
-    defaults->textOffsetRight = 2;
-    defaults->textOffsetLeft = 2;
     defaults->alwaysOnTop = true;
-    defaults->outlineColor = 0xFF000000;
-    defaults->outlineWidth = 1.5f;
-    this->window->Initialize(defaults);
+
+    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    defaultState->color = 0xCCFAFAD2;
+    defaultState->fontColor = 0xFF000000;
+    defaultState->textOffsetTop = 2;
+    defaultState->textOffsetBottom = 2;
+    defaultState->textOffsetRight = 2;
+    defaultState->textOffsetLeft = 2;
+    defaultState->outlineColor = 0xFF000000;
+    defaultState->outlineWidth = 1.5f;
+
+    this->window->Initialize(defaults, defaultState);
 
     this->maxHeight = settings->GetInt("MaxHeight", 100);
     this->maxWidth = settings->GetInt("MaxWidth", 300);

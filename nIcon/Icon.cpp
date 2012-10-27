@@ -23,31 +23,33 @@ Icon::Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder) : 
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 64;
     defaults->height = 120;
-    defaults->color = 0;
-    defaults->wordWrap = true;
     GetDisplayName(SHGDN_NORMAL, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
-    defaults->textOffsetTop = 64;
-    StringCchCopy(defaults->textAlign, sizeof(defaults->textAlign), "Center");
 
-    this->window->Initialize(defaults);
+    DrawableStateSettings* baseStateDefaults = new DrawableStateSettings();
+    baseStateDefaults->color = 0;
+    baseStateDefaults->wordWrap = true;
+    baseStateDefaults->textOffsetTop = 64;
+    StringCchCopy(baseStateDefaults->textAlign, sizeof(baseStateDefaults->textAlign), "Center");
+
+    this->window->Initialize(defaults, baseStateDefaults);
 
     SetIcon();
 
     this->window->SizeToText(64, 300, 64);
 
-    DrawableSettings* hoverDefaults = new DrawableSettings(*defaults);
+    DrawableStateSettings* hoverDefaults = new DrawableStateSettings(*baseStateDefaults);
     hoverDefaults->color = 0xAA87CEEB;
     hoverDefaults->outlineColor = 0x99FFFFFF;
     hoverDefaults->outlineWidth = 1.5f;
     this->hoverState = this->window->AddState("Hover", hoverDefaults, 100);
 
-    DrawableSettings* selectedDefaults = new DrawableSettings(*hoverDefaults);
+    DrawableStateSettings* selectedDefaults = new DrawableStateSettings(*hoverDefaults);
     selectedDefaults->color = 0xCC87CEEB;
     selectedDefaults->outlineColor = 0xCCFFFFFF;
     selectedDefaults->outlineWidth = 1.5f;
     this->selectedState = this->window->AddState("Selected", selectedDefaults, 150);
 
-    DrawableSettings* focusedDefaults = new DrawableSettings(*hoverDefaults);
+    DrawableStateSettings* focusedDefaults = new DrawableStateSettings(*hoverDefaults);
     focusedDefaults->color = 0xAA87CEEB;
     focusedDefaults->outlineColor = 0x99FFFFFF;
     focusedDefaults->outlineWidth = 1.5f;

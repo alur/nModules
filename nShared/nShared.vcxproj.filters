@@ -89,6 +89,9 @@
     <ClInclude Include="IPainter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DrawableStateSettings.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MonitorInfo.cpp">
@@ -167,6 +170,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DrawableWindowState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawableStateSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

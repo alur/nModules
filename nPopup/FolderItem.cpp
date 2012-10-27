@@ -36,15 +36,19 @@ void nPopup::FolderItem::Init(LPCSTR title, Popup* popup) {
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 190;
     defaults->height = 20;
-    defaults->color = 0xAA00FFFF;
-    defaults->fontColor = 0xFF000000;
     MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
-    StringCchCopy(defaults->textVerticalAlign, sizeof(defaults->textVerticalAlign), "Middle");
-    defaults->textOffsetLeft = 20;
-    defaults->textOffsetRight = 5;
-    this->window->Initialize(defaults);
-    this->hoverState = this->window->AddState("Hover", new DrawableSettings(*defaults), 100);
-    this->openState = this->window->AddState("Open", new DrawableSettings(*defaults), 80);
+
+    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    defaultState->color = 0xAA00FFFF;
+    defaultState->fontColor = 0xFF000000;
+    StringCchCopy(defaultState->textVerticalAlign, sizeof(defaultState->textVerticalAlign), "Middle");
+    defaultState->textOffsetLeft = 20;
+    defaultState->textOffsetRight = 5;
+
+    this->window->Initialize(defaults, defaultState);
+
+    this->hoverState = this->window->AddState("Hover", new DrawableStateSettings(*defaultState), 100);
+    this->openState = this->window->AddState("Open", new DrawableStateSettings(*defaultState), 80);
 }
 
 

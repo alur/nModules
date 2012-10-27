@@ -28,13 +28,15 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     this->changeNotifyUID = 0;
 
     DrawableSettings* defaults = new DrawableSettings();
-    defaults->color = 0x00000000;
     defaults->width = 500;
     defaults->height = 300;
 
+    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    defaultState->color = 0x00000000;
+
     this->settings->GetString("Folder", path, sizeof(path), "Desktop");
 
-    this->window->Initialize(defaults);
+    this->window->Initialize(defaults, defaultState);
     this->window->Show();
 
     this->changeNotifyMsg = this->window->RegisterUserMessage(this);
