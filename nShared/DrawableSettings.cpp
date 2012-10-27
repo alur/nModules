@@ -65,7 +65,7 @@ void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
     this->blurBehind = settings->GetBool("BlurBehind", defaults->blurBehind);
     this->color = settings->GetColor("Color", defaults->color);
     this->color = this->color & 0xFFFFFF | ((ARGB)settings->GetInt("Alpha", (this->color & 0xFF000000) >> 24) & 0xFF) << 24;
-    this->cornerRadiusX = settings->GetFloat("CornerRaidusX", defaults->cornerRadiusX);
+    this->cornerRadiusX = settings->GetFloat("CornerRadiusX", defaults->cornerRadiusX);
     this->cornerRadiusY = settings->GetFloat("CornerRadiusY", defaults->cornerRadiusY);
     this->evaluateText = defaults->evaluateText;
     settings->GetString("Font", this->font, sizeof(this->font)/sizeof(WCHAR), defaults->font);
