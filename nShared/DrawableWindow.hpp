@@ -17,6 +17,7 @@
 #include "MonitorInfo.hpp"
 #include "Easing.h"
 #include "../nCore/IParsedText.hpp"
+#include "IPainter.hpp"
 
 
 using std::vector;
@@ -56,17 +57,16 @@ public:
     typedef list<State>::iterator STATE;
 
     // Defines an overlay. A bitmap, or icon, or something.
-    class Overlay {
+    class Overlay : IPainter {
     public:
         explicit Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmapSource* source);
         virtual ~Overlay();
 
-        HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
         void DiscardDeviceResources();
+        void Paint(ID2D1RenderTarget* renderTarget);
+        HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
 
         void UpdatePosition(D2D1_RECT_F parentPosition);
-        void Paint(ID2D1RenderTarget* renderTarget);
-
         void SetSource(IWICBitmapSource* source);
 
     private:
@@ -76,7 +76,10 @@ public:
         IWICBitmapSource* source; // We need to keep the source image in order to be able to recreate the overlay.
         ID2D1RenderTarget* renderTarget;
     };
-    typedef list<Overlay*>::iterator OVERLAY, *POVERLAY;
+    typedef list<Overlay*>::iterator OVERLAY;
+
+    // Returned from Add Pre/Post painter.
+    typedef list<IPainter*>::iterator PAINTER;
 
     // Constructor used for top-level windows.
     explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler);
@@ -88,6 +91,10 @@ public:
     OVERLAY AddOverlay(D2D1_RECT_F position, HBITMAP image);
     OVERLAY AddOverlay(D2D1_RECT_F position, HICON icon);
     OVERLAY AddOverlay(D2D1_RECT_F position, IWICBitmapSource* source);
+
+    // Adds custom painters
+    PAINTER AddPrePainter(IPainter* painter);
+    PAINTER AddPostPainter(IPainter* painter);
 
     // Adds a new state.
     STATE AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority);
@@ -285,6 +292,12 @@ private:
 
     // The current text of this window.
     IParsedText* parsedText;
+
+    // Painters called after children and overlays are painted.
+    list<IPainter*> postPainters;
+
+    // Painters called before children and overlays are painted.
+    list<IPainter*> prePainters;
 
     // All current states.
     list<State> states;

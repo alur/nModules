@@ -30,6 +30,7 @@
     <ClInclude Include="Error.h" />
     <ClInclude Include="EventHandler.hpp" />
     <ClInclude Include="Factories.h" />
+    <ClInclude Include="IPainter.hpp" />
     <ClInclude Include="LiteStep.h" />
     <ClInclude Include="MessageHandler.hpp" />
     <ClInclude Include="LayoutSettings.hpp" />

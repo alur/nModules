@@ -221,7 +221,7 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP
 
 
 /// <summary>
-/// Adds an overlay icon.
+/// Adds an overlay image.
 /// </summary>
 /// <param name="position">Where to place the overlay, relative to the parent.</param>
 /// <param name="source">The bitmap to use as an overlay.</param>
@@ -233,6 +233,34 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBit
     (*--overlayOut)->ReCreateDeviceResources(this->renderTarget);
 
     return overlayOut;
+}
+
+
+/// <summary>
+/// Adds a custom painter which is called after children and overlays.
+/// </summary>
+/// <param name="painter">The painter.</param>
+/// <returns>An object which can be used to modify/remove this painter.</returns>
+DrawableWindow::PAINTER DrawableWindow::AddPostPainter(IPainter* painter) {
+    this->postPainters.push_back(painter);
+    PAINTER ret = this->postPainters.end();
+    (*--ret)->ReCreateDeviceResources(this->renderTarget);
+
+    return ret;
+}
+
+
+/// <summary>
+/// Adds a custom painter which is called before children and overlays.
+/// </summary>
+/// <param name="painter">The painter.</param>
+/// <returns>An object which can be used to modify/remove this painter.</returns>
+DrawableWindow::PAINTER DrawableWindow::AddPrePainter(IPainter* painter) {
+    this->prePainters.push_back(painter);
+    PAINTER ret = this->prePainters.end();
+    (*--ret)->ReCreateDeviceResources(this->renderTarget);
+
+    return ret;
 }
 
 
@@ -563,6 +591,14 @@ void DrawableWindow::DiscardDeviceResources() {
         SAFERELEASE(state->outlineBrush);
         SAFERELEASE(state->textBrush);
     }
+    
+    for (PAINTER painter = this->prePainters.begin(); painter != this->prePainters.end(); ++painter) {
+        (*painter)->DiscardDeviceResources();
+    }
+    
+    for (PAINTER painter = this->postPainters.begin(); painter != this->postPainters.end(); ++painter) {
+        (*painter)->DiscardDeviceResources();
+    }
 
     // Discard resources for all children as well.
     for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
@@ -858,11 +894,21 @@ void DrawableWindow::Paint() {
         this->renderTarget->DrawText(this->text, lstrlenW(this->text), this->activeState->textFormat, 
             this->activeState->textArea, this->activeState->textBrush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         
+        // Pre painters
+        for (PAINTER painter = this->prePainters.begin(); painter != this->prePainters.end(); ++painter) {
+            (*painter)->Paint(this->renderTarget);
+        }
+
         // Paint all overlays
         PaintOverlays();
 
         // Paint all children
         PaintChildren();
+
+        // Post painters
+        for (PAINTER painter = this->postPainters.begin(); painter != this->postPainters.end(); ++painter) {
+            (*painter)->Paint(this->renderTarget);
+        }
     }
 }
 
@@ -965,6 +1011,14 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
 
             for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
                 (*overlay)->ReCreateDeviceResources(this->renderTarget);
+            }
+    
+            for (PAINTER painter = this->prePainters.begin(); painter != this->prePainters.end(); ++painter) {
+                (*painter)->ReCreateDeviceResources(this->renderTarget);
+            }
+    
+            for (PAINTER painter = this->postPainters.begin(); painter != this->postPainters.end(); ++painter) {
+                (*painter)->ReCreateDeviceResources(this->renderTarget);
             }
 
             // Recreate resources for all children as well.
