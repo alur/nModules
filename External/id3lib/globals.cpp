@@ -1,5 +1,7 @@
+// $Id: globals.cpp,v 1.6 2002/07/02 22:12:57 t1mpy Exp $
+
 // id3lib: a C++ library for creating and manipulating id3v1/v2 tags
-// Copyright 2002 Thijmen Klok
+// Copyright 1999, 2000  Scott Thomas Haug
 
 // This library is free software; you can redistribute it and/or modify it
 // under the terms of the GNU Library General Public License as published by
@@ -22,22 +24,29 @@
 // id3lib.  These files are distributed with id3lib at
 // http://download.sourceforge.net/id3lib/
 
-#ifndef STREAMS_H_DEFINE
-#define STREAMS_H_DEFINE
-#include <fstream>
-#include <iostream>
-#include <iosfwd>
+#include "id3/globals.h" //has <stdlib.h> "id3/sized_types.h"
 
-using std::ifstream;
-using std::ofstream;
-using std::fstream;
+#if defined HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-using std::iostream;
-using std::ostream;
-using std::istream;
-using std::ios;
+#ifdef _cplusplus
+extern "C"
+{
+#endif
 
-using std::streamoff;
+	/*
+  const char * const ID3LIB_NAME           = _ID3LIB_NAME;
+  const char * const ID3LIB_VERSION        = _ID3LIB_VERSION;
+  const char * const ID3LIB_FULL_NAME      = _ID3LIB_FULLNAME;
+  const int ID3LIB_MAJOR_VERSION = _ID3LIB_MAJOR_VERSION;
+  const int ID3LIB_MINOR_VERSION = _ID3LIB_MINOR_VERSION;
+  const int ID3LIB_PATCH_VERSION = _ID3LIB_PATCH_VERSION;
+  const int ID3LIB_INTERFACE_AGE = _ID3LIB_INTERFACE_AGE;
+  const int ID3LIB_BINARY_AGE = _ID3LIB_BINARY_AGE;
+  */
 
-#endif // STREAMS_H_DEFINE
+#ifdef _cplusplus
+}
+#endif
 

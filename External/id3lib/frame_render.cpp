@@ -26,14 +26,14 @@
 // http://download.sourceforge.net/id3lib/
 
 #if defined HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 
 
 //#include <string.h>
 #include <memory.h>
-#include <zlib.h>
+#include "../zlib/zlib.h"
 
 #include "tag.h"
 #include "frame_impl.h"

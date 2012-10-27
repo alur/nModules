@@ -1,7 +1,8 @@
-// $Id: globals.cpp,v 1.6 2002/07/02 22:12:57 t1mpy Exp $
+// $Id: header.cpp,v 1.11 2002/07/31 13:20:49 t1mpy Exp $
 
 // id3lib: a C++ library for creating and manipulating id3v1/v2 tags
 // Copyright 1999, 2000  Scott Thomas Haug
+// Copyright 2002  Thijmen Klok (thijmen@id3lib.org)
 
 // This library is free software; you can redistribute it and/or modify it
 // under the terms of the GNU Library General Public License as published by
@@ -24,29 +25,39 @@
 // id3lib.  These files are distributed with id3lib at
 // http://download.sourceforge.net/id3lib/
 
-#include "id3/globals.h" //has <stdlib.h> "id3/sized_types.h"
+#include "header.h"
 
 #if defined HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
-#ifdef _cplusplus
-extern "C"
+bool ID3_Header::SetSpec(ID3_V2Spec spec)
 {
-#endif
-
-	/*
-  const char * const ID3LIB_NAME           = _ID3LIB_NAME;
-  const char * const ID3LIB_VERSION        = _ID3LIB_VERSION;
-  const char * const ID3LIB_FULL_NAME      = _ID3LIB_FULLNAME;
-  const int ID3LIB_MAJOR_VERSION = _ID3LIB_MAJOR_VERSION;
-  const int ID3LIB_MINOR_VERSION = _ID3LIB_MINOR_VERSION;
-  const int ID3LIB_PATCH_VERSION = _ID3LIB_PATCH_VERSION;
-  const int ID3LIB_INTERFACE_AGE = _ID3LIB_INTERFACE_AGE;
-  const int ID3LIB_BINARY_AGE = _ID3LIB_BINARY_AGE;
-  */
-
-#ifdef _cplusplus
+  static ID3_Header::Info _spec_info[] =
+  {
+  // Warning, EXT SIZE are minimum sizes, they can be bigger
+  // SIZEOF SIZEOF SIZEOF IS EXT EXT  EXPERIM
+  // FRID   FRSZ   FRFL   HEADER SIZE BIT
+    {  3,     3,     0,     false, 0,   false }, // ID3V2_2_0
+    {  3,     3,     0,     true,  8,   true  }, // ID3V2_2_1
+    {  4,     4,     2,     false, 10,  false }, // ID3V2_3_0
+    {  4,     4,     2,     false, 6,   false }  // ID3V2_4_0
+  };
+  
+  bool changed = false;
+  if (spec < ID3V2_EARLIEST || spec > ID3V2_LATEST)
+  {
+    changed = _spec != ID3V2_UNKNOWN;
+    _spec = ID3V2_UNKNOWN;
+    _info = NULL;
+  }
+  else
+  {
+    changed = _spec != spec;
+    _spec = spec;
+    _info = &_spec_info[_spec - ID3V2_EARLIEST];
+  }
+  _changed = _changed || changed;
+  return changed;
 }
-#endif
 

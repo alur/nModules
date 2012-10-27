@@ -29,7 +29,7 @@
 #define _ID3LIB_UTILS_H_
 
 #if defined HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include "id3/id3lib_streams.h"

@@ -25,13 +25,13 @@
 // http://download.sourceforge.net/id3lib/
 
 #if defined HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 
 
 #include "id3/io_decorators.h" //has "readers.h" "io_helpers.h" "utils.h"
-#include "zlib.h"
+#include "../zlib/zlib.h"
 
 using namespace dami;
 

@@ -1,4 +1,4 @@
-// $Id: header.cpp,v 1.11 2002/07/31 13:20:49 t1mpy Exp $
+// $Id: spec.cpp,v 1.2 2002/07/31 13:20:49 t1mpy Exp $
 
 // id3lib: a C++ library for creating and manipulating id3v1/v2 tags
 // Copyright 1999, 2000  Scott Thomas Haug
@@ -25,39 +25,85 @@
 // id3lib.  These files are distributed with id3lib at
 // http://download.sourceforge.net/id3lib/
 
-#include "header.h"
-
 #if defined HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
-bool ID3_Header::SetSpec(ID3_V2Spec spec)
+#include "spec.h"
+
+ID3_V2Spec ID3_VerRevToV2Spec(uchar ver, uchar rev)
 {
-  static ID3_Header::Info _spec_info[] =
+  ID3_V2Spec spec = ID3V2_UNKNOWN;
+  if (2 == ver)
   {
-  // Warning, EXT SIZE are minimum sizes, they can be bigger
-  // SIZEOF SIZEOF SIZEOF IS EXT EXT  EXPERIM
-  // FRID   FRSZ   FRFL   HEADER SIZE BIT
-    {  3,     3,     0,     false, 0,   false }, // ID3V2_2_0
-    {  3,     3,     0,     true,  8,   true  }, // ID3V2_2_1
-    {  4,     4,     2,     false, 10,  false }, // ID3V2_3_0
-    {  4,     4,     2,     false, 6,   false }  // ID3V2_4_0
-  };
-  
-  bool changed = false;
-  if (spec < ID3V2_EARLIEST || spec > ID3V2_LATEST)
+    if (0 == rev)
+    {
+      spec = ID3V2_2_0;
+    }
+    else if (1 == rev)
+    {
+      spec = ID3V2_2_1;
+    }
+  } 
+  else if (3 == ver)
   {
-    changed = _spec != ID3V2_UNKNOWN;
-    _spec = ID3V2_UNKNOWN;
-    _info = NULL;
+    if (0 == rev)
+    {
+      spec = ID3V2_3_0;
+    }
   }
-  else
+  else if (4 == ver)
   {
-    changed = _spec != spec;
-    _spec = spec;
-    _info = &_spec_info[_spec - ID3V2_EARLIEST];
+    if (0 == rev)
+    {
+      spec = ID3V2_4_0;
+    }
   }
-  _changed = _changed || changed;
-  return changed;
+
+  return spec;
+}
+
+uchar ID3_V2SpecToVer(ID3_V2Spec spec)
+{
+  uchar ver = 0;
+  switch (spec)
+  {
+    case ID3V2_2_0:
+    case ID3V2_2_1:
+      ver = 2;
+      break;
+    case ID3V2_3_0:
+      ver = 3;
+      break;
+    case ID3V2_4_0:
+      ver = 4;
+      break;
+    default:
+      break;
+  }
+  return ver;
+}
+
+uchar ID3_V2SpecToRev(ID3_V2Spec spec)
+{
+  uchar rev = 0;
+  switch (spec)
+  {
+    case ID3V2_4_0:
+      rev = 0;
+      break;
+    case ID3V2_3_0:
+      rev = 0;
+      break;
+    case ID3V2_2_1:
+      rev = 1;
+      break;
+    case ID3V2_2_0:
+      rev = 0;
+      break;
+    default:
+      break;
+  }
+  return rev;
 }
 
