@@ -159,12 +159,17 @@ void IconGroup::RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID) {
 
 
 void IconGroup::PositionIcon(PCITEMID_CHILD /* pidl */, D2D1_RECT_F* position) {
-    static float pos = 5;
-    position->bottom = 64;
-    position->left = 0 + pos;
-    position->right = 64 + pos;
-    position->top = 5;
-    pos += 80;
+    static float xPos = 5;
+    static float yPos = 5;
+    position->bottom = 64 + yPos;
+    position->left = 0 + xPos;
+    position->right = 64 + xPos;
+    position->top = yPos;
+    xPos += 80;
+    if (xPos > this->window->GetDrawingSettings()->width - 80) {
+        xPos = 5;
+        yPos += 100;
+    }
 }
 
 
