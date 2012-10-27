@@ -14,7 +14,7 @@ public:
     explicit SeparatorItem(Drawable* parent);
     virtual ~SeparatorItem();
 
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
     int GetDesiredWidth(int maxWidth);
 
 private:

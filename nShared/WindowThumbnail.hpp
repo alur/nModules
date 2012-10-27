@@ -27,7 +27,7 @@ public:
     void Hide();
 
     void LoadSettings(bool = false);
-    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow);
 
 private:
     HWND hwnd;

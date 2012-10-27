@@ -50,7 +50,7 @@ int InfoItem::GetDesiredWidth(int maxWidth) {
 }
 
 
-LRESULT InfoItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT InfoItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
     switch (msg) {
     case WM_MOUSEMOVE:
         {

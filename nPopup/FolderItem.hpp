@@ -17,7 +17,7 @@ namespace nPopup {
         explicit FolderItem(Drawable* parent, LPCSTR title, Popup* popup, HICON customIcon);
         virtual ~FolderItem();
 
-        LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+        LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
         void ClosingPopup();
         int GetDesiredWidth(int maxWidth);

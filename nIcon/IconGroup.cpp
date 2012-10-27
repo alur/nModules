@@ -214,7 +214,7 @@ HRESULT IconGroup::GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR bu
 /// <summary>
 /// 
 /// </summary>
-LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
     if (message == this->changeNotifyMsg) {
         long event;
         PIDLIST_ABSOLUTE* idList;

@@ -29,7 +29,7 @@ public:
     void RemoveIcon(TrayIcon*);
 
     // Handles window messages for the tray.
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
     // Should be called when the initalization phase is done -- repaint the tray.
     void InitCompleted();

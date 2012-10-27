@@ -47,7 +47,7 @@ public:
     HINSTANCE GetInstance();
 
     //
-    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID extra);
 
 private:
     // The window class used by the message handler.

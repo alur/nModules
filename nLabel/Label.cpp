@@ -70,7 +70,7 @@ void Label::LoadSettings(bool /* isRefresh */) {
 }
 
 
-LRESULT WINAPI Label::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI Label::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LPVOID) {
     if (uMsg == WM_MOUSEMOVE) {
         this->window->ActivateState(this->stateHover);
     }

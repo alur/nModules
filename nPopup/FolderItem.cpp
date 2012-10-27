@@ -63,7 +63,7 @@ int nPopup::FolderItem::GetDesiredWidth(int maxWidth) {
 }
 
 
-LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
     switch (msg) {
     case WM_MOUSEMOVE:
         {

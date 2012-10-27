@@ -178,7 +178,7 @@ void TrayIcon::SendCallback(UINT message, WPARAM /* wParam */, LPARAM /* lParam 
 /// <summary>
 /// Handles window messages for the icon's window.
 /// </summary>
-LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
     if (message >= WM_MOUSEFIRST && message <= WM_MOUSELAST && this->showTip) {
         if (message == WM_MOUSEMOVE && !this->showingTip) {
             if (!IsWindow(this->callbackWindow)) {

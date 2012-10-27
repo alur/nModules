@@ -69,7 +69,7 @@ HRESULT Icon::CompareID(PCITEMID_CHILD id) {
 }
 
 
-LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI Icon::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
     switch(msg) {
     case WM_MOUSEMOVE:
         {

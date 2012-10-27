@@ -165,7 +165,7 @@ HINSTANCE LSModule::GetInstance() {
 /// <summary>
 /// Intercepts LiteStep messages before the module can get to them.
 /// </summary>
-LRESULT WINAPI LSModule::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI LSModule::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
     switch (message) {
     case LM_GETREVID:
         {

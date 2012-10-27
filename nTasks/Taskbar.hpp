@@ -38,7 +38,7 @@ public:
     bool MonitorChanged(HWND hWnd, UINT monitor, TaskButton** out);
     void RemoveTask(HWND);
     void Relayout();
-    LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
+    LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow);
     void Repaint();
 
 private:

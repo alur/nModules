@@ -14,7 +14,7 @@ public:
     explicit ContainerItem(Drawable* parent, LPCSTR prefix);
     virtual ~ContainerItem();
     
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
     int GetDesiredWidth(int maxWidth);
 
 private:

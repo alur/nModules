@@ -15,7 +15,7 @@ public:
     explicit CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, HICON customIcon);
     virtual ~CommandItem();
     
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
     int GetDesiredWidth(int maxWidth);
 
 private:

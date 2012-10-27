@@ -24,7 +24,7 @@ public:
     explicit IconGroup(LPCSTR prefix);
     virtual ~IconGroup();
 
-    LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID);
 
     void SetFolder(LPWSTR path);
     

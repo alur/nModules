@@ -23,7 +23,7 @@ extern bool g_InitPhase;
 Tray::Tray(LPCSTR name) : Drawable(name) {
     this->balloonClickedMessage = this->window->RegisterUserMessage(this);
     this->tooltip = new Tooltip("Tooltip", this->settings);
-    this->balloon = new Balloon("Balloon", this->settings, this->balloonClickedMessage, this->window->GetWindow());
+    this->balloon = new Balloon("Balloon", this->settings, this->balloonClickedMessage, this);
     this->layoutSettings = new LayoutSettings();
     DrawableSettings* defaults = new DrawableSettings();
     this->window->Initialize(defaults);
@@ -202,7 +202,7 @@ void Tray::Relayout() {
 /// <summary>
 /// Handles window events for the tray.
 /// </summary>
-LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
     this->eventHandler->HandleMessage(wnd, message, wParam, lParam);
     switch (message) {
     case WM_MOUSEMOVE:
@@ -224,7 +224,10 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM
     default:
         {
             if (message == this->balloonClickedMessage) {
-                this->activeBalloonIcon->SendCallback(NIN_BALLOONUSERCLICK, NULL, NULL);
+                // wParam is NULL if the dialog was clicked. 1 if the x was clicked.
+                if (wParam == NULL) {
+                    this->activeBalloonIcon->SendCallback(NIN_BALLOONUSERCLICK, NULL, NULL);
+                }
                 DismissBalloon(NIN_BALLOONHIDE);
             }
         }

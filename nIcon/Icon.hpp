@@ -18,7 +18,7 @@ public:
 
     HRESULT CompareID(PCITEMID_CHILD id);
     void SetPosition(int x, int y, bool noRedraw = false);
-    LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID);
     HRESULT GetDisplayName(SHGDNF flags, LPWSTR buf, UINT cchBuf);
 
     // Hides this icon.

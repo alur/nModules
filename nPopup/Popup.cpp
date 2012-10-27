@@ -257,7 +257,7 @@ void Popup::Show(LPRECT position, Popup* owner) {
 }
 
 
-LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
     switch (msg) {
     case WM_ACTIVATE:
         if (LOWORD(wParam) == WA_INACTIVE && this->window->IsVisible()) {

@@ -266,7 +266,7 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
 }
 
 
-LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow) {
     if (message >= WM_USER) {
         WATCHFOLDERMAP::const_iterator folder = this->watchedFolders.find(message);
         if (folder != this->watchedFolders.end()) {
@@ -305,5 +305,5 @@ LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wPa
             return 0;
         }
     }
-    return Popup::HandleMessage(window, message, wParam, lParam); 
+    return Popup::HandleMessage(window, message, wParam, lParam, drawableWindow); 
 }

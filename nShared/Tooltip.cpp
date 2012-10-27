@@ -65,6 +65,6 @@ void Tooltip::LoadSettings(bool /*bIsRefresh*/) {
 }
 
 
-LRESULT WINAPI Tooltip::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI Tooltip::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
     return DefWindowProc(window, message, wParam, lParam);
 }

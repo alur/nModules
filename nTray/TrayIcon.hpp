@@ -19,7 +19,7 @@ public:
     void Show();
 
     void LoadSettings(bool isRefresh = false);
-    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow);
     void SendCallback(UINT message, WPARAM wParam, LPARAM lParam);
     void GetScreenRect(LPRECT rect);
 

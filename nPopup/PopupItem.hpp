@@ -18,7 +18,7 @@ public:
     explicit PopupItem(Drawable* parent, LPCSTR prefix, bool independent = false);
     virtual ~PopupItem();
     void Position(int x, int y);
-    virtual LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM) = 0;
+    virtual LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID) = 0;
     int GetHeight();
     bool CompareTo(PopupItem* b);
     void SetIcon(IExtractIconW* extractIcon);

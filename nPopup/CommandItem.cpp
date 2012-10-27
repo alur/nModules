@@ -60,7 +60,7 @@ int CommandItem::GetDesiredWidth(int maxWidth) {
 }
 
 
-LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
     switch (msg) {
     case WM_LBUTTONDOWN:
         {

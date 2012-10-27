@@ -925,7 +925,7 @@ void DrawableWindow::SetTextOffsets(float left, float top, float right, float bo
 /// <summary>
 /// Handles window messages for this drawablewindow.
 /// </summary>
-LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
     // Forward mouse messages to the lowest level child window which the mouse is over.
     if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) {
         int xPos = GET_X_LPARAM(lParam); 
@@ -947,7 +947,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
             }
             if (handler != activeChild) {
                 if (activeChild != NULL) {
-                    activeChild->HandleMessage(window, WM_MOUSELEAVE, NULL, NULL);
+                    activeChild->HandleMessage(window, WM_MOUSELEAVE, NULL, NULL, this);
                 }
                 activeChild = (DrawableWindow*)handler;
             }
@@ -958,7 +958,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         }
 
         // Let our messagehandler deal with it.
-        return handler->HandleMessage(window, msg, wParam, lParam);
+        return handler->HandleMessage(window, msg, wParam, lParam, this);
     }
 
     // Handle DrawableWindow messages.
@@ -967,7 +967,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         {
             isTrackingMouse = false;
             if (activeChild != NULL) {
-                activeChild->HandleMessage(window, WM_MOUSELEAVE, NULL, NULL);
+                activeChild->HandleMessage(window, WM_MOUSELEAVE, NULL, NULL, this);
                 activeChild = NULL;
             }
         }
@@ -995,7 +995,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         {
             map<UINT_PTR, MessageHandler*>::const_iterator iter = timers.find(wParam);
             if (iter != timers.end()) {
-                return iter->second->HandleMessage(window, msg, wParam, lParam);
+                return iter->second->HandleMessage(window, msg, wParam, lParam, this);
             }
         }
         return 0;
@@ -1023,13 +1023,13 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
     if (msg >= WM_USER) {
         map<UINT,MessageHandler*>::const_iterator handler = this->userMessages.find(msg);
         if (handler != this->userMessages.end()) {
-            return handler->second->HandleMessage(window, msg, wParam, lParam);
+            return handler->second->HandleMessage(window, msg, wParam, lParam, this);
         }
     }
 
     // Let the default messagehandler deal with anything else, if it is initialized.
     if (this->msgHandler && this->msgHandler->initialized) {
-        return this->msgHandler->HandleMessage(window, msg, wParam, lParam);
+        return this->msgHandler->HandleMessage(window, msg, wParam, lParam, this);
     }
     else {
         return DefWindowProc(window, msg, wParam, lParam);

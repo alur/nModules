@@ -19,9 +19,9 @@ public:
         int width, int height, HWND parent, HMENU menu, HINSTANCE instance, MessageHandler* messageHandler);
 
     // Implemented by the derived class, handles the window messages.
-    virtual LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
+    virtual LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID extra) = 0;
 
-    //
+    // True if this object is ready to receive messages.
     bool initialized;
 
 private:

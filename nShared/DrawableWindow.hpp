@@ -107,7 +107,7 @@ public:
     HWND GetWindow();
 
     // Handles window messages.
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
     // Hides this window.
     void Hide();

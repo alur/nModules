@@ -31,7 +31,7 @@ public:
     virtual ~ContentPopup();
 
     //
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
 protected:
     void PreShow();

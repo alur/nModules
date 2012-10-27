@@ -15,7 +15,7 @@ public:
     explicit Label(LPCSTR name);
     explicit Label(LPCSTR name, Drawable* parent);
     virtual ~Label();
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
 private:
     void Initalize();

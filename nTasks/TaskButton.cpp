@@ -197,7 +197,7 @@ void TaskButton::GetMinRect(LPPOINTS lpPoints) {
 /// <summary>
 /// Handles window messages for this button.
 /// </summary>
-LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
     switch (message) {
     case WM_LBUTTONUP:
         {

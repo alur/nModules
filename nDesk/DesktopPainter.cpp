@@ -374,7 +374,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
         return 0;
     }
-    return DrawableWindow::HandleMessage(hWnd, uMsg, wParam, lParam);
+    return DrawableWindow::HandleMessage(hWnd, uMsg, wParam, lParam, NULL);
 }
 
 

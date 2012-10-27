@@ -34,7 +34,7 @@ ClickHandler::~ClickHandler() {
 /// <summary>
 /// Call this when a click is triggered.
 /// </summary>
-LRESULT ClickHandler::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT ClickHandler::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
     ClickData cData;
 
     // Find the type of this click event

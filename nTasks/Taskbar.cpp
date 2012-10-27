@@ -229,7 +229,8 @@ void Taskbar::Relayout() {
 /// <summary>
 /// Handles window messages for this taskbar.
 /// </summary>
-LRESULT WINAPI Taskbar::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI Taskbar::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
+    this->eventHandler->HandleMessage(window, message, wParam, lParam);
     return DefWindowProc(window, message, wParam, lParam);
 }
 

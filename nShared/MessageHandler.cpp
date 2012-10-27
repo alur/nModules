@@ -32,7 +32,7 @@ HWND MessageHandler::CreateMessageWindowEx(DWORD exStyle, LPCTSTR className, LPC
 /// Wrapper since we can't point to a member function directly.
 /// </summary>
 LRESULT WINAPI MessageHandler::WindowProcedure(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
-    return ((MessageHandler *)GetWindowLongPtr(window, 0))->HandleMessage(window, msg, wParam, lParam);
+    return ((MessageHandler *)GetWindowLongPtr(window, 0))->HandleMessage(window, msg, wParam, lParam, NULL);
 }
 
 
@@ -45,7 +45,7 @@ LRESULT WINAPI MessageHandler::WindowProcedureInit(HWND window, UINT msg, WPARAM
         MessageHandler* msgHandler = (MessageHandler *)((LPCREATESTRUCT)lParam)->lpCreateParams;
         SetWindowLongPtr(window, GWLP_MESSAGEHANDLER, (LONG_PTR)msgHandler);
         SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)&MessageHandler::WindowProcedure);
-        return msgHandler->HandleMessage(window, msg, wParam, lParam);
+        return msgHandler->HandleMessage(window, msg, wParam, lParam, NULL);
     }
     return DefWindowProc(window, msg, wParam, lParam);
 }

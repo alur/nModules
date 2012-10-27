@@ -29,7 +29,7 @@ public:
     void Show();
 
     void LoadSettings(bool = false);
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
 private:
     // Settings for painting the icon in the button.

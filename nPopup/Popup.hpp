@@ -37,7 +37,7 @@ public:
     LPCSTR GetBang();
 
     //
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
     //
     bool noIcons;

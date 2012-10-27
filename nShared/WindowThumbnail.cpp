@@ -154,7 +154,7 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
 }
 
 
-LRESULT WINAPI WindowThumbnail::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI WindowThumbnail::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
     switch (message) {
     case WM_SIZE:
         {
