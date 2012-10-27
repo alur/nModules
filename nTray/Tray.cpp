@@ -203,6 +203,7 @@ void Tray::Relayout() {
 /// Handles window events for the tray.
 /// </summary>
 LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    this->eventHandler->HandleMessage(wnd, message, wParam, lParam);
     switch (message) {
     case WM_MOUSEMOVE:
         if (IsWindow(g_hWndTrayNotify)) {
