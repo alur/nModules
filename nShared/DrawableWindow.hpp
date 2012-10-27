@@ -82,9 +82,9 @@ public:
     virtual ~DrawableWindow();
 
     // Adds an overlay.
-    HRESULT AddOverlay(D2D1_RECT_F position, HBITMAP image, POVERLAY overlay);
-    HRESULT AddOverlay(D2D1_RECT_F position, HICON icon, POVERLAY overlay);
-    HRESULT AddOverlay(D2D1_RECT_F position, IWICBitmap* source, POVERLAY overlay);
+    OVERLAY AddOverlay(D2D1_RECT_F position, HBITMAP image);
+    OVERLAY AddOverlay(D2D1_RECT_F position, HICON icon);
+    OVERLAY AddOverlay(D2D1_RECT_F position, IWICBitmap* source);
 
     // Adds a new state.
     STATE AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority);

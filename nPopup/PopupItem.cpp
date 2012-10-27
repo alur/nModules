@@ -74,7 +74,7 @@ void PopupItem::AddIcon(HICON icon) {
     f.bottom = f.top + this->iconSettings->GetFloat("Size", 16.0f);
     f.left = this->iconSettings->GetFloat("Y", 2.0f);
     f.right = f.left + this->iconSettings->GetFloat("Size", 16.0f);
-    this->window->AddOverlay(f, icon, &this->iconOverlay);
+    this->iconOverlay = this->window->AddOverlay(f, icon);
 }
 
 

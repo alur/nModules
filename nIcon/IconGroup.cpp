@@ -158,7 +158,7 @@ void IconGroup::RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID) {
 }
 
 
-void IconGroup::PositionIcon(PCITEMID_CHILD pidl, D2D1_RECT_F* position) {
+void IconGroup::PositionIcon(PCITEMID_CHILD /* pidl */, D2D1_RECT_F* position) {
     static float pos = 5;
     position->bottom = 64;
     position->left = 0 + pos;

@@ -33,7 +33,7 @@ EventHandler::~EventHandler() {
 /// <summary>
 /// Call this when a click is triggered.
 /// </summary>
-void EventHandler::HandleMessage(HWND, UINT msg, WPARAM wParam, LPARAM lParam) {
+void EventHandler::HandleMessage(HWND, UINT msg, WPARAM wParam, LPARAM /* lParam */) {
     ClickData cData;
 
     // Find the type of this click event

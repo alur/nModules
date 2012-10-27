@@ -62,7 +62,7 @@ DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler* msgHa
 /// <summary>
 /// Constructor used by LSModule to create a top-level window.
 /// </summary>
-DrawableWindow::DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) {
+DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) {
     this->monitorInfo = new MonitorInfo();
     this->parent = NULL;
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
@@ -174,60 +174,43 @@ DrawableWindow::~DrawableWindow() {
 /// <summary>
 /// Adds an overlay icon.
 /// </summary>
-HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon, POVERLAY overlay) {
+DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
     IWICBitmap* source = NULL;
     IWICImagingFactory* factory = NULL;
 
-    HRESULT hr = S_OK;
-    
-    //
-    CHECKHR(hr, Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory)));
+    Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
 
     // Generate a WIC bitmap and call the overloaded AddOverlay function
-    CHECKHR(hr, factory->CreateBitmapFromHICON(icon, &source));
-    CHECKHR(hr, AddOverlay(position, source, overlay));
-
-    // Transfer control here if CHECKHR failed
-    CHECKHR_END();
-
-    return hr;
+    factory->CreateBitmapFromHICON(icon, &source);
+    return AddOverlay(position, source);
 }
 
 
 /// <summary>
 /// Adds an overlay image.
 /// </summary>
-HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap, POVERLAY overlay) {
+DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap) {
     IWICBitmap* source = NULL;
     IWICImagingFactory* factory = NULL;
-
-    HRESULT hr = S_OK;
     
-    //
-    CHECKHR(hr, Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory)));
+    Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
 
     // Generate a WIC bitmap and call the overloaded AddOverlay function
-    CHECKHR(hr, factory->CreateBitmapFromHBITMAP(bitmap, NULL, WICBitmapUseAlpha, &source));
-    CHECKHR(hr, AddOverlay(position, source, overlay));
-
-    // Transfer control here if CHECKHR failed
-    CHECKHR_END();
-
-    return hr;
+    factory->CreateBitmapFromHBITMAP(bitmap, NULL, WICBitmapUseAlpha, &source);
+    return AddOverlay(position, source);
 }
 
 
 /// <summary>
 /// Adds an overlay icon.
 /// </summary>
-HRESULT DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmap* source, POVERLAY overlayOut) {
+DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmap* source) {
     // Add the overlays to the overlay list{
     this->overlays.push_back(new Overlay(position, this->drawingArea.rect, source));
-    *overlayOut = this->overlays.end();
-    --*overlayOut;
-    (*(*overlayOut))->ReCreateDeviceResources(this->renderTarget);
+    OVERLAY overlayOut = this->overlays.end();
+    (*--overlayOut)->ReCreateDeviceResources(this->renderTarget);
 
-    return S_OK;
+    return overlayOut;
 }
 
 

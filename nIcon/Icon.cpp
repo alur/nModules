@@ -204,7 +204,7 @@ void Icon::SetIcon() {
 
     // Add it as an overlay.
     if (hr == S_OK) {
-        this->window->AddOverlay(pos, icon, &this->iconOverlay);
+        this->iconOverlay = this->window->AddOverlay(pos, icon);
     }
 
     // Let go of the interface.

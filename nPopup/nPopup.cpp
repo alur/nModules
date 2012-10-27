@@ -103,7 +103,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// <summary>
 /// Called when a popup bang is executed.
 /// </summary>
-void __cdecl HandlePopupBang(HWND /* owner */, LPCSTR bang, LPCSTR args) {
+void __cdecl HandlePopupBang(HWND /* owner */, LPCSTR bang, LPCSTR /* args */) {
     for (vector<Popup*>::const_iterator iter = rootPopups.begin(); iter != rootPopups.end(); iter++) {
         if (_stricmp(bang, (*iter)->GetBang()) == 0) {
             Popup* popup = *iter;

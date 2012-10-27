@@ -88,9 +88,8 @@ LRESULT WINAPI Balloon::HandleMessage(HWND window, UINT message, WPARAM wParam, 
 
 void Balloon::Show(LPCWSTR title, LPCWSTR text, HICON icon, LPSIZE iconSize, LPRECT targetPosition) {
     if (icon != NULL) {
-        DrawableWindow::OVERLAY overlay;
         D2D1_RECT_F f = { 4, 4, float(4 + iconSize->cx), float(4 + iconSize->cy) };
-        this->window->AddOverlay(f, icon, &overlay);
+        this->window->AddOverlay(f, icon);
 
         this->window->SetTextOffsets(float(iconSize->cx + 8), 20, 4, 4);
         this->titleWindow->Move(iconSize->cx + 8, 4);

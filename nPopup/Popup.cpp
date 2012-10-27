@@ -75,7 +75,7 @@ void Popup::AddItem(PopupItem* item) {
 }
 
 
-void Popup::RemoveItem(PopupItem* item) {
+void Popup::RemoveItem(PopupItem* /* item */) {
 }
 
 

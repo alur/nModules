@@ -138,7 +138,7 @@ void TrayIcon::SetIcon(HICON icon) {
         this->window->ClearOverlays();
         D2D1_RECT_F f;
         f.bottom = (float)this->iconSize; f.top = 0; f.left = 0; f.right = (float)this->iconSize;
-        this->window->AddOverlay(f, this->icon, &this->iconOverlay);
+        this->iconOverlay = this->window->AddOverlay(f, this->icon);
         this->window->Repaint();
     }
 }
