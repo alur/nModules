@@ -9,6 +9,7 @@
 #include <strsafe.h>
 #include "../nShared/Macros.h"
 #include "../nShared/Color.h"
+#include <dwmapi.h>
 
 
 /// <summary>
@@ -154,6 +155,13 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
     }
 
     if (_IsFunctionOf(color, "darken")) {
+    }
+
+    //
+    if (_stricmp(color, "DWMColor") == 0) {
+        BOOL b;
+        DwmGetColorizationColor(target, &b);
+        return true;
     }
 
     // Known colors
