@@ -37,6 +37,9 @@ void DrawableWindow::TextChangeHandler(LPVOID drawable) {
 /// <summary>
 /// Constructor used to create a DrawableWindow for a pre-existing window. Used by nDesk.
 /// </summary>
+/// <param name="window">The window to draw to.</param>
+/// <param name="prefix">The settings prefix to use.</param>
+/// <param name="msgHandler">The default message handler for this window.</param>
 DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler* msgHandler) {
     this->monitorInfo = new MonitorInfo();
     this->parent = NULL;
@@ -62,6 +65,11 @@ DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler* msgHa
 /// <summary>
 /// Constructor used by LSModule to create a top-level window.
 /// </summary>
+/// <param name="parent">The window to use as a parent for this top-level window.</param>
+/// <param name="windowClass">The windowclass to use for the top-level window.</param>
+/// <param name="instance">Used for creating the window.</param>
+/// <param name="settings">The settings to use.</param>
+/// <param name="msgHandler">The default message handler for this window.</param>
 DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) {
     this->monitorInfo = new MonitorInfo();
     this->parent = NULL;
@@ -93,6 +101,9 @@ DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE 
 /// <summary>
 /// Constructor used by CreateChild to create a child window.
 /// </summary>
+/// <param name="parent">The parent of this window.</param>
+/// <param name="settings">The settings to use.</param>
+/// <param name="msgHandler">The default message handler for this window.</param>
 DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler) {
     this->monitorInfo = parent->monitorInfo;
     this->parent = parent;
@@ -105,8 +116,10 @@ DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, Messa
 
 
 /// <summary>
-/// Called by the constructors, intializes variables.
+/// Called by the constructors, initializes variables.
 /// </summary>
+/// <param name="settings">The settings to use.</param>
+/// <param name="msgHandler">The default message handler for this window.</param>
 void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHandler) {
     this->activeChild = NULL;
     this->animating = false;
@@ -174,6 +187,9 @@ DrawableWindow::~DrawableWindow() {
 /// <summary>
 /// Adds an overlay icon.
 /// </summary>
+/// <param name="position">Where to place the overlay, relative to the parent.</param>
+/// <param name="icon">The icon to use as an overlay.</param>
+/// <returns>An object which can be used to modify/remove this overlay.</returns>
 DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
     IWICBitmap* source = NULL;
     IWICImagingFactory* factory = NULL;
@@ -189,6 +205,9 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON i
 /// <summary>
 /// Adds an overlay image.
 /// </summary>
+/// <param name="position">Where to place the overlay, relative to the parent.</param>
+/// <param name="bitmap">The bitmap to use as an overlay.</param>
+/// <returns>An object which can be used to modify/remove this overlay.</returns>
 DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap) {
     IWICBitmap* source = NULL;
     IWICImagingFactory* factory = NULL;
@@ -204,6 +223,9 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP
 /// <summary>
 /// Adds an overlay icon.
 /// </summary>
+/// <param name="position">Where to place the overlay, relative to the parent.</param>
+/// <param name="source">The bitmap to use as an overlay.</param>
+/// <returns>An object which can be used to modify/remove this overlay.</returns>
 DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmap* source) {
     // Add the overlays to the overlay list{
     this->overlays.push_back(new Overlay(position, this->drawingArea.rect, source));
@@ -211,6 +233,53 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBit
     (*--overlayOut)->ReCreateDeviceResources(this->renderTarget);
 
     return overlayOut;
+}
+
+
+/// <summary>
+/// Adds a new state.
+/// </summary>
+/// <param name="prefix">The prefix for this state. This is appended to the prefix of this window.</param>
+/// <param name="defaultSettings">The default settings for this state.</param>
+/// <param name="defaultPriority">The default priority for this state. Higher priority states take precedence over lower priority states.</param>
+/// <returns>An object which can be used to activate/clear this state.</returns>
+DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority) {
+    State state;
+    state.defaultSettings = defaultSettings;
+    state.settings = this->baseState->settings->CreateChild(prefix);
+    state.settings->AppendGroup(this->baseState->settings);
+    state.priority = state.settings->GetInt("Priority", defaultPriority);
+    state.active = false;
+    state.drawingSettings = new DrawableSettings();
+
+    state.drawingSettings->Load(state.settings, defaultSettings);
+
+    state.textArea = this->drawingArea.rect;
+    state.textArea.bottom -= state.drawingSettings->textOffsetBottom;
+    state.textArea.top += state.drawingSettings->textOffsetTop;
+    state.textArea.left += state.drawingSettings->textOffsetLeft;
+    state.textArea.right -= state.drawingSettings->textOffsetRight;
+
+    CreateTextFormat(state.drawingSettings, &state.textFormat);
+    CreateBrushes(&state);
+
+    // Insert the state based on its priority.
+    list<State>::iterator iter;
+    for (iter = this->states.begin(); iter != this->states.end() && iter->priority > state.priority; ++iter);
+    return this->states.insert(iter, state);
+}
+
+
+/// <summary>
+/// Actives a certain state.
+/// </summary>
+/// <param name="state">The state to activate.</param>
+void DrawableWindow::ActivateState(DrawableWindow::STATE state) {
+    state->active = true;
+    if (this->activeState == this->states.end() || this->activeState->priority < state->priority) {
+        this->activeState = state;
+        Repaint();
+    }
 }
 
 
@@ -239,24 +308,18 @@ void DrawableWindow::Animate() {
 
 
 /// <summary>
-/// Starts a new animation, or updates the parameters of the current one.
+/// Clears the specified callback timer, stoping the timer and unregistering the timer ID from the handler that owns it.
 /// </summary>
-void DrawableWindow::SetAnimation(int x, int y, int width, int height, int duration, Easing::EasingType easing) {
-    RECT target = { x, y, x + width, y + height };
-    this->animationTarget = target;
-    this->animationStart.top = this->baseState->drawingSettings->y;
-    this->animationStart.left = this->baseState->drawingSettings->x;
-    this->animationStart.bottom = this->baseState->drawingSettings->y + this->baseState->drawingSettings->height;
-    this->animationStart.right = this->baseState->drawingSettings->x + this->baseState->drawingSettings->width;
-    this->animationEasing = easing;
-
-    // TODO::Not too fond of using GetTickCount.
-    this->animationStartTime = GetTickCount();
-    this->animationEndTime = this->animationStartTime + duration;
-
-    this->animating = true;
-
-    Repaint();
+/// <param name="timer">The ID of the timer to clear.</param>
+void DrawableWindow::ClearCallbackTimer(UINT_PTR timer) {
+    if (!this->parent) {
+        KillTimer(this->window, timer);
+        this->timers.erase(timer);
+        this->timerIDs->ReleaseID(timer);
+    }
+    else {
+        this->parent->ClearCallbackTimer(timer);
+    }
 }
 
 
@@ -272,75 +335,24 @@ void DrawableWindow::ClearOverlays() {
 
 
 /// <summary>
-/// Discards all device dependent resources
+/// Clears a certain state.
 /// </summary>
-void DrawableWindow::DiscardDeviceResources() {
-    if (!this->parent) {
-        SAFERELEASE(this->renderTarget);
+/// <param name="state">The state to clear.</param>
+void DrawableWindow::ClearState(DrawableWindow::STATE state) {
+    state->active = false;
+    if (state == this->activeState) {
+        // We just cleared the active state, find the highest priority next active state.
+        for (state++; state != this->states.end() && !state->active; state++);
+        this->activeState = state;
+        Repaint();
     }
-    else {
-        this->renderTarget = NULL;
-    }
-    
-    for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
-        (*overlay)->DiscardDeviceResources();
-    }
-
-    for (list<State>::iterator state = this->states.begin(); state != this->states.end(); ++state) {
-        SAFERELEASE(state->backBrush);
-        SAFERELEASE(state->imageBrush);
-        SAFERELEASE(state->outlineBrush);
-        SAFERELEASE(state->textBrush);
-    }
-
-    // Discard resources for all children as well.
-    for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
-        (*child)->DiscardDeviceResources();
-    }
-}
-
-
-/// <summary>
-/// Initalizes this window.
-/// </summary>
-void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
-    // Load the base state's settings.
-    this->baseState->defaultSettings = defaultSettings;
-    this->baseState->drawingSettings->Load(this->baseState->settings, this->baseState->defaultSettings);
-
-    // Register with the core
-    if (this->baseState->drawingSettings->registerWithCore) {
-        nCore::System::RegisterWindow(this->baseState->settings->prefix, this);
-    }
-
-    // Put the window in its correct position.
-    SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y,
-        this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
-    this->drawingArea.radiusX = this->baseState->drawingSettings->cornerRadiusX;
-    this->drawingArea.radiusY = this->baseState->drawingSettings->cornerRadiusY;
-
-    // Create D2D resources
-    ReCreateDeviceResources();
-
-    // AlwaysOnTop... TODO::Fix this!
-    if (!this->parent && this->baseState->drawingSettings->alwaysOnTop) {
-        SetParent(this->window, NULL);
-        SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
-    }
-
-    // Create the text format
-    CreateTextFormat(this->baseState->drawingSettings, &this->baseState->textFormat);
-    
-    // Set the text
-    SetText(this->baseState->drawingSettings->text);
-
-    this->initialized = true;
 }
 
 
 /// <summary>
 /// Creates the brushes for the specified state.
 /// </summary>
+/// <param name="state">The state to create brushes for.</param>
 HRESULT DrawableWindow::CreateBrushes(State* state) {
     state->imageBrush = NULL;
 
@@ -392,8 +404,24 @@ HRESULT DrawableWindow::CreateBrushes(State* state) {
 
 
 /// <summary>
+/// Creates a child window.
+/// </summary>
+/// <param name="childSettings">The settings the child window should use.</param>
+/// <param name="msgHandler">The default message handler for the child window.</param>
+/// <returns>The child window.</returns>
+DrawableWindow* DrawableWindow::CreateChild(Settings* childSettings, MessageHandler* msgHandler) {
+    DrawableWindow* child = new DrawableWindow(this, childSettings, msgHandler);
+    children.push_back(child);
+    return child;
+}
+
+
+/// <summary>
 /// Creates a textFormat based on the specified drawingSettings.
 /// </summary>
+/// <param name="drawingSettings">The settings to create the textformat with.</param>
+/// <param name="textFormat">Out. The textformat.</param>
+/// <returns>S_OK</returns>
 HRESULT DrawableWindow::CreateTextFormat(DrawableSettings* drawingSettings, IDWriteTextFormat** textFormat) {
     // Font weight
     DWRITE_FONT_WEIGHT fontWeight;
@@ -514,217 +542,31 @@ HRESULT DrawableWindow::CreateTextFormat(DrawableSettings* drawingSettings, IDWr
 }
 
 
-DrawableSettings* DrawableWindow::GetDrawingSettings() {
-    return this->baseState->drawingSettings;
-}
-
-
-void DrawableWindow::Move(int x, int y) {
-    SetPosition(x, y, this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
-}
-
-
-void DrawableWindow::Resize(int width, int height) {
-    SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y, width, height);
-}
-
-
-bool DrawableWindow::IsVisible() {
-    if (this->parent) {
-        return this->visible && this->parent->IsVisible();
-    }
-    return this->visible;
-}
-
-
-void DrawableWindow::SetPosition(int x, int y, int width, int height) {
-    //
-    this->baseState->drawingSettings->x = x;
-    this->baseState->drawingSettings->y = y;
-    this->baseState->drawingSettings->width = width;
-    this->baseState->drawingSettings->height = height;
-
-    // Position the window and/or set the backarea.
+/// <summary>
+/// Discards all device dependent resources.
+/// </summary>
+void DrawableWindow::DiscardDeviceResources() {
     if (!this->parent) {
-        SetWindowPos(this->window, 0, x, y, width, height, SWP_NOZORDER);
-        this->drawingArea.rect = D2D1::RectF(0, 0, (float)width, (float)height);
-        if (this->renderTarget) {
-            D2D1_SIZE_U size = D2D1::SizeU(width, height);
-            this->renderTarget->Resize(size);
-        }
+        SAFERELEASE(this->renderTarget);
     }
     else {
-        this->drawingArea.rect = D2D1::RectF(
-            this->parent->drawingArea.rect.left + x,
-            this->parent->drawingArea.rect.top + y,
-            this->parent->drawingArea.rect.left + x + width,
-            this->parent->drawingArea.rect.top + y + height
-        );
+        this->renderTarget = NULL;
+    }
+    
+    for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
+        (*overlay)->DiscardDeviceResources();
     }
 
-    // The text area is offset from the drawing area.
-    for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
-        state->textArea = this->drawingArea.rect;
-        state->textArea.bottom -= state->drawingSettings->textOffsetBottom;
-        state->textArea.top += state->drawingSettings->textOffsetTop;
-        state->textArea.left += state->drawingSettings->textOffsetLeft;
-        state->textArea.right -= state->drawingSettings->textOffsetRight;
+    for (list<State>::iterator state = this->states.begin(); state != this->states.end(); ++state) {
+        SAFERELEASE(state->backBrush);
+        SAFERELEASE(state->imageBrush);
+        SAFERELEASE(state->outlineBrush);
+        SAFERELEASE(state->textBrush);
     }
 
-    // Update all overlays
-    for (OVERLAY overlay = overlays.begin(); overlay != overlays.end(); ++overlay) {
-        (*overlay)->UpdatePosition(this->drawingArea.rect);
-    }
-
-    // Update all children
+    // Discard resources for all children as well.
     for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
-        (*child)->Move((*child)->baseState->drawingSettings->x, (*child)->baseState->drawingSettings->y);
-    }
-}
-
-
-/// <summary>
-/// (Re)Creates all device dependent resources
-/// </summary>
-HRESULT DrawableWindow::ReCreateDeviceResources() {
-    HRESULT hr = S_OK;
-
-    if (!this->renderTarget) {
-        if (!this->parent) {
-            ID2D1Factory *pD2DFactory = NULL;
-            Factories::GetD2DFactory(reinterpret_cast<LPVOID*>(&pD2DFactory));
-
-            // Create the render target
-            D2D1_SIZE_U size = D2D1::SizeU(this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
-            pD2DFactory->CreateHwndRenderTarget(
-                RenderTargetProperties(
-                    D2D1_RENDER_TARGET_TYPE_DEFAULT,
-                    PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)
-                ),
-                HwndRenderTargetProperties(this->window, size),
-                &this->renderTarget
-            );
-        }
-        else {
-            this->renderTarget = this->parent->renderTarget;
-        }
-
-        for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
-            CreateBrushes(&(*state));
-        }
-
-        for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
-            (*overlay)->ReCreateDeviceResources(this->renderTarget);
-        }
-
-        // Recreate resources for all children as well.
-        for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
-            (*child)->ReCreateDeviceResources();
-        }
-    }
-
-    return hr;
-}
-
-
-/// <summary>
-/// Creates a child window.
-/// </summary>
-DrawableWindow* DrawableWindow::CreateChild(Settings* childSettings, MessageHandler* msgHandler) {
-    DrawableWindow* child = new DrawableWindow(this, childSettings, msgHandler);
-    children.push_back(child);
-    return child;
-}
-
-
-MonitorInfo* DrawableWindow::GetMonitorInformation() {
-    return this->monitorInfo;
-}
-
-
-/// <summary>
-/// Gets the screen position of the window.
-/// </summary>
-void DrawableWindow::GetScreenRect(LPRECT rect) {
-    RECT r;
-    GetWindowRect(this->window, &r);
-    rect->left = r.left + (LONG)this->drawingArea.rect.left;
-    rect->top = r.top + (LONG)this->drawingArea.rect.top;
-    rect->right = r.left + (LONG)this->drawingArea.rect.right;
-    rect->bottom = r.top + (LONG)this->drawingArea.rect.bottom;
-}
-
-
-HWND DrawableWindow::GetWindow() {
-    return this->window;
-}
-
-
-void DrawableWindow::ClearCallbackTimer(UINT_PTR timer) {
-    if (!this->parent) {
-        KillTimer(this->window, timer);
-        this->timers.erase(timer);
-        this->timerIDs->ReleaseID(timer);
-    }
-    else {
-        this->parent->ClearCallbackTimer(timer);
-    }
-}
-
-
-UINT DrawableWindow::RegisterUserMessage(MessageHandler* msgHandler) {
-    if (!this->parent) {
-        UINT ret = this->userMsgIDs->GetNewID();
-        this->userMessages.insert(std::pair<UINT, MessageHandler*>(ret, msgHandler));
-        return ret;
-    }
-    else {
-        return this->parent->RegisterUserMessage(msgHandler);
-    }
-}
-
-
-void DrawableWindow::ReleaseUserMessage(UINT message) {
-    if (!this->parent) {
-        this->userMessages.erase(message);
-        this->userMsgIDs->ReleaseID(message);
-    }
-    else {
-        this->parent->ReleaseUserMessage(message);
-    }
-}
-
-
-UINT_PTR DrawableWindow::SetCallbackTimer(UINT elapse, MessageHandler* msgHandler) {
-    if (!this->parent) {
-        UINT_PTR ret = SetTimer(this->window, this->timerIDs->GetNewID(), elapse, NULL);
-        this->timers.insert(std::pair<UINT_PTR, MessageHandler*>(ret, msgHandler));
-        return ret;
-    }
-    else {
-        return this->parent->SetCallbackTimer(elapse, msgHandler);
-    }
-}
-
-
-/// <summary>
-/// Repaints the entire window.
-/// </summary>
-void DrawableWindow::Repaint(LPRECT region) {
-    if (this->initialized && this->visible) {
-        if (this->parent) {
-            if (region) {
-                this->parent->Repaint(region);
-            }
-            else {
-                RECT r = { (int)drawingArea.rect.left, (int)drawingArea.rect.top, (int)drawingArea.rect.right, (int)drawingArea.rect.bottom };
-                this->parent->Repaint(&r);
-            }
-        }
-        else {
-            InvalidateRect(this->window, region, TRUE);
-            UpdateWindow(this->window);
-        }
+        (*child)->DiscardDeviceResources();
     }
 }
 
@@ -732,6 +574,9 @@ void DrawableWindow::Repaint(LPRECT region) {
 /// <summary>
 /// Gets the "Desired" size of the window, given the specified constraints.
 /// </summary>
+/// <param name="maxWidth">Out. The maximum width to return.</param>
+/// <param name="maxHeight">Out. The maximum height to return.</param>
+/// <param name="size">Out. The desired size will be placed in this SIZE.</param>
 void DrawableWindow::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
     IDWriteFactory* factory = NULL;
     IDWriteTextLayout* textLayout = NULL;
@@ -750,141 +595,56 @@ void DrawableWindow::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
 
 
 /// <summary>
-/// Sizes the window to fit its current text.
+/// Returns the drawing settings for the default state.
 /// </summary>
-void DrawableWindow::SizeToText(int maxWidth, int maxHeight, int minWidth, int minHeight) {
-    SIZE s;
-    GetDesiredSize(maxWidth, maxHeight, &s);
-    s.cx = max(s.cx, minWidth);
-    s.cy = max(s.cy, minHeight);
-    this->SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y, s.cx, s.cy);
+/// <returns>The drawing settings for the default state.</returns>
+DrawableSettings* DrawableWindow::GetDrawingSettings() {
+    return this->baseState->drawingSettings;
 }
 
 
 /// <summary>
-/// Adds a new state.
+/// Returns an up-to-date MonitorInfo class.
 /// </summary>
-DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableSettings* defaultSettings, int defaultPriority) {
-    State state;
-    state.defaultSettings = defaultSettings;
-    state.settings = this->baseState->settings->CreateChild(prefix);
-    state.settings->AppendGroup(this->baseState->settings);
-    state.priority = state.settings->GetInt("Priority", defaultPriority);
-    state.active = false;
-    state.drawingSettings = new DrawableSettings();
-
-    state.drawingSettings->Load(state.settings, defaultSettings);
-
-    state.textArea = this->drawingArea.rect;
-    state.textArea.bottom -= state.drawingSettings->textOffsetBottom;
-    state.textArea.top += state.drawingSettings->textOffsetTop;
-    state.textArea.left += state.drawingSettings->textOffsetLeft;
-    state.textArea.right -= state.drawingSettings->textOffsetRight;
-
-    CreateTextFormat(state.drawingSettings, &state.textFormat);
-    CreateBrushes(&state);
-
-    // Insert the state based on its priority.
-    list<State>::iterator iter;
-    for (iter = this->states.begin(); iter != this->states.end() && iter->priority > state.priority; iter++);
-    return this->states.insert(iter, state);
+/// <returns>An up-to-date MonitorInfo class.</returns>
+MonitorInfo* DrawableWindow::GetMonitorInformation() {
+    return this->monitorInfo;
 }
 
 
 /// <summary>
-/// Actives a certain state.
+/// Gets the screen position of the window.
 /// </summary>
-void DrawableWindow::ActivateState(DrawableWindow::STATE state) {
-    state->active = true;
-    if (this->activeState == this->states.end() || this->activeState->priority < state->priority) {
-        this->activeState = state;
-        HandleActiveStateChange();
-    }
+/// <param name="rect">Out. The screen position of this window will be placed in this rect.</param>
+void DrawableWindow::GetScreenRect(LPRECT rect) {
+    RECT r;
+    GetWindowRect(this->window, &r);
+    rect->left = r.left + (LONG)this->drawingArea.rect.left;
+    rect->top = r.top + (LONG)this->drawingArea.rect.top;
+    rect->right = r.left + (LONG)this->drawingArea.rect.right;
+    rect->bottom = r.top + (LONG)this->drawingArea.rect.bottom;
 }
 
 
 /// <summary>
-/// Clears a certain state.
+/// Returns the window handle of the top-level window this window belongs to.
 /// </summary>
-void DrawableWindow::ClearState(DrawableWindow::STATE state) {
-    state->active = false;
-    if (state == this->activeState) {
-        // We just cleared the active state, find the highest priority next active state.
-        for (state++; state != this->states.end() && !state->active; state++);
-        this->activeState = state;
-        HandleActiveStateChange();
-    }
+/// <returns>the window handle.</returns>
+HWND DrawableWindow::GetWindowHandle() {
+    return this->window;
 }
 
 
 /// <summary>
-/// 
+/// Handles window messages for this drawablewindow. Any messages forwarded from here will have the extra parameter set to this.
 /// </summary>
-void DrawableWindow::HandleActiveStateChange() {
-    Repaint();
-}
-
-
-/// <summary>
-/// Shows the window.
-/// </summary>
-void DrawableWindow::Show() {
-    if (!this->parent) {
-        ShowWindow(this->window, SW_SHOWNOACTIVATE);
-    }
-    this->visible = true;
-}
-
-
-/// <summary>
-/// Hides the window.
-/// </summary>
-void DrawableWindow::Hide() {
-    this->visible = false;
-    if (!this->parent) {
-        ShowWindow(this->window, SW_HIDE);
-    }
-}
-
-
-void DrawableWindow::SetText(LPCWSTR text) {
-    if (this->baseState->drawingSettings->evaluateText) {
-        SAFEDELETE(this->parsedText);
-        this->parsedText = (IParsedText*)nCore::System::ParseText(text);
-        this->parsedText->SetChangeHandler(TextChangeHandler, this);
-        UpdateText();
-    }
-    else {
-        StringCchCopyW(this->text, sizeof(this->text)/sizeof(this->text[0]), text);
-    }
-}
-
-
-void DrawableWindow::SetTextOffsets(float left, float top, float right, float bottom) {
-    for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
-        SetTextOffsets(left, top, right, bottom, state);
-    }
-}
-
-
-void DrawableWindow::SetTextOffsets(float left, float top, float right, float bottom, STATE state) {
-    state->drawingSettings->textOffsetBottom = bottom;
-    state->drawingSettings->textOffsetLeft = left;
-    state->drawingSettings->textOffsetRight = right;
-    state->drawingSettings->textOffsetTop = top;
-
-    state->textArea = this->drawingArea.rect;
-    state->textArea.bottom -= state->drawingSettings->textOffsetBottom;
-    state->textArea.top += state->drawingSettings->textOffsetTop;
-    state->textArea.left += state->drawingSettings->textOffsetLeft;
-    state->textArea.right -= state->drawingSettings->textOffsetRight;
-}
-
-
-/// <summary>
-/// Handles window messages for this drawablewindow.
-/// </summary>
-LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
+/// <param name="window">The handle of the window this message was sent to.</param>
+/// <param name="msg">The message.</param>
+/// <param name="wParam">Message data.</param>
+/// <param name="lParam">Message data</param>
+/// <param name="extra">Message data. Not used.</param>
+/// <returns>Something</returns>
+LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID /* extra */) {
     // Forward mouse messages to the lowest level child window which the mouse is over.
     if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) {
         int xPos = GET_X_LPARAM(lParam); 
@@ -1003,6 +763,81 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
 
 
 /// <summary>
+/// Hides the window.
+/// </summary>
+void DrawableWindow::Hide() {
+    this->visible = false;
+    if (!this->parent) {
+        ShowWindow(this->window, SW_HIDE);
+    }
+    else {
+        this->parent->Repaint();
+    }
+}
+
+
+/// <summary>
+/// Initalizes this window.
+/// </summary>
+/// <param name="defaultSettings">The default settings for this window.</param>
+void DrawableWindow::Initialize(DrawableSettings* defaultSettings) {
+    // Load the base state's settings.
+    this->baseState->defaultSettings = defaultSettings;
+    this->baseState->drawingSettings->Load(this->baseState->settings, this->baseState->defaultSettings);
+
+    // Register with the core.
+    if (this->baseState->drawingSettings->registerWithCore) {
+        nCore::System::RegisterWindow(this->baseState->settings->prefix, this);
+    }
+
+    // Put the window in its correct position.
+    SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y,
+        this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
+    this->drawingArea.radiusX = this->baseState->drawingSettings->cornerRadiusX;
+    this->drawingArea.radiusY = this->baseState->drawingSettings->cornerRadiusY;
+
+    // Create D2D resources.
+    ReCreateDeviceResources();
+
+    // AlwaysOnTop... TODO::Fix this!
+    if (!this->parent && this->baseState->drawingSettings->alwaysOnTop) {
+        SetParent(this->window, NULL);
+        SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+    }
+
+    // Create the text format.
+    CreateTextFormat(this->baseState->drawingSettings, &this->baseState->textFormat);
+    
+    // Set the text.
+    SetText(this->baseState->drawingSettings->text);
+
+    this->initialized = true;
+}
+
+
+/// <summary>
+/// Check if this window is currently visible.
+/// </summary>
+/// <returns>True if this window and all its ancestors are visible.</returns>
+bool DrawableWindow::IsVisible() {
+    if (this->parent) {
+        return this->visible && this->parent->IsVisible();
+    }
+    return this->visible;
+}
+
+
+/// <summary>
+/// Moves the window.
+/// </summary>
+/// <param name="x">The x coordinate to move the window to. Relative to the parent.</param>
+/// <param name="y">The y coordinate to move the window to. Relative to the parent.</param>
+void DrawableWindow::Move(int x, int y) {
+    SetPosition(x, y, this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
+}
+
+
+/// <summary>
 /// Removes the specified child.
 /// </summary>
 void DrawableWindow::Paint() {
@@ -1033,17 +868,7 @@ void DrawableWindow::Paint() {
 
 
 /// <summary>
-/// Removes the specified child.
-/// </summary>
-void DrawableWindow::PaintOverlays() {
-    for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
-        (*overlay)->Paint(this->renderTarget);
-    }
-}
-
-
-/// <summary>
-/// Removes the specified child.
+/// Paints all child windows.
 /// </summary>
 void DrawableWindow::PaintChildren() {
     for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
@@ -1053,8 +878,110 @@ void DrawableWindow::PaintChildren() {
 
 
 /// <summary>
+/// Paints all overlays.
+/// </summary>
+void DrawableWindow::PaintOverlays() {
+    for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
+        (*overlay)->Paint(this->renderTarget);
+    }
+}
+
+
+/// <summary>
+/// Registers an user message (>= WM_USER) which will be forwarded to the specified handler.
+/// </summary>
+/// <param name="msgHandler">The handler which will receive the message.</param>
+/// <returns>The assigned message ID.</returns>
+UINT DrawableWindow::RegisterUserMessage(MessageHandler* msgHandler) {
+    if (!this->parent) {
+        UINT ret = this->userMsgIDs->GetNewID();
+        this->userMessages.insert(std::pair<UINT, MessageHandler*>(ret, msgHandler));
+        return ret;
+    }
+    else {
+        return this->parent->RegisterUserMessage(msgHandler);
+    }
+}
+
+
+/// <summary>
+/// Releases a user message. It will no longer be forwarded to the specified handler if received.
+/// </summary>
+/// <param name="message">The ID of the message to release.</param>
+void DrawableWindow::ReleaseUserMessage(UINT message) {
+    if (!this->parent) {
+        this->userMessages.erase(message);
+        this->userMsgIDs->ReleaseID(message);
+    }
+    else {
+        this->parent->ReleaseUserMessage(message);
+    }
+}
+
+
+/// <summary>
+/// Resize the window.
+/// </summary>
+/// <param name="width">The width to resize the window to.</param>
+/// <param name="height">The height to resize the window to.</param>
+void DrawableWindow::Resize(int width, int height) {
+    SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y, width, height);
+}
+
+
+/// <summary>
+/// (Re)Creates all device-dependent resources.
+/// </summary>
+/// <returns>S_OK if successful, an error code otherwise.</returns>
+HRESULT DrawableWindow::ReCreateDeviceResources() {
+    HRESULT hr = S_OK;
+
+    if (!this->renderTarget) {
+        if (!this->parent) {
+            ID2D1Factory *pD2DFactory = NULL;
+            hr = Factories::GetD2DFactory(reinterpret_cast<LPVOID*>(&pD2DFactory));
+
+            // Create the render target
+            if (SUCCEEDED(hr)) {
+                D2D1_SIZE_U size = D2D1::SizeU(this->baseState->drawingSettings->width, this->baseState->drawingSettings->height);
+                hr = pD2DFactory->CreateHwndRenderTarget(
+                    RenderTargetProperties(
+                        D2D1_RENDER_TARGET_TYPE_DEFAULT,
+                        PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)
+                    ),
+                    HwndRenderTargetProperties(this->window, size),
+                    &this->renderTarget
+                );
+            }
+        }
+        else {
+            this->renderTarget = this->parent->renderTarget;
+        }
+
+        if (SUCCEEDED(hr)) {
+            for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
+                CreateBrushes(&(*state));
+            }
+
+            for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
+                (*overlay)->ReCreateDeviceResources(this->renderTarget);
+            }
+
+            // Recreate resources for all children as well.
+            for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
+                (*child)->ReCreateDeviceResources();
+            }
+        }
+    }
+
+    return hr;
+}
+
+
+/// <summary>
 /// Removes the specified child.
 /// </summary>
+/// <param name="child">The child to remove.</param>
 void DrawableWindow::RemoveChild(DrawableWindow* child) {
     this->children.remove(child);
     if (child == this->activeChild) {
@@ -1064,8 +991,211 @@ void DrawableWindow::RemoveChild(DrawableWindow* child) {
 
 
 /// <summary>
+/// Repaints the window.
+/// </summary>
+/// <param name="region">The area of the window to repaint. If NULL, the whole window is repainted.</param>
+void DrawableWindow::Repaint(LPRECT region) {
+    if (this->initialized && this->visible) {
+        if (this->parent) {
+            if (region) {
+                this->parent->Repaint(region);
+            }
+            else {
+                RECT r = { (int)drawingArea.rect.left, (int)drawingArea.rect.top, (int)drawingArea.rect.right, (int)drawingArea.rect.bottom };
+                this->parent->Repaint(&r);
+            }
+        }
+        else {
+            InvalidateRect(this->window, region, TRUE);
+            UpdateWindow(this->window);
+        }
+    }
+}
+
+
+/// <summary>
+/// Starts a new animation, or updates the parameters of the current one.
+/// </summary>
+/// <param name="x">The x coordinate to animate to.</param>
+/// <param name="y">The y coordinate to animate to.</param>
+/// <param name="width">The width to animate to.</param>
+/// <param name="height">The height to animate to.</param>
+/// <param name="duration">The number of milliseconds to complete the animation in.</param>
+/// <param name="easing">The easing to use.</param>
+void DrawableWindow::SetAnimation(int x, int y, int width, int height, int duration, Easing::EasingType easing) {
+    RECT target = { x, y, x + width, y + height };
+    this->animationTarget = target;
+    this->animationStart.top = this->baseState->drawingSettings->y;
+    this->animationStart.left = this->baseState->drawingSettings->x;
+    this->animationStart.bottom = this->baseState->drawingSettings->y + this->baseState->drawingSettings->height;
+    this->animationStart.right = this->baseState->drawingSettings->x + this->baseState->drawingSettings->width;
+    this->animationEasing = easing;
+
+    // TODO::Not too fond of using GetTickCount.
+    this->animationStartTime = GetTickCount();
+    this->animationEndTime = this->animationStartTime + duration;
+
+    this->animating = true;
+
+    Repaint();
+}
+
+
+/// <summary>
+/// Creates a new timer which is forwarded to the specified handler.
+/// </summary>
+/// <param name="elapse">The uElapse parameter of SetTimer.</param>
+/// <param name="msgHandler">The handler WM_TIMER messags with this ID are sent to.</param>
+/// <returns>The assigned timer ID.</returns>
+UINT_PTR DrawableWindow::SetCallbackTimer(UINT elapse, MessageHandler* msgHandler) {
+    if (!this->parent) {
+        UINT_PTR ret = SetTimer(this->window, this->timerIDs->GetNewID(), elapse, NULL);
+        this->timers.insert(std::pair<UINT_PTR, MessageHandler*>(ret, msgHandler));
+        return ret;
+    }
+    else {
+        return this->parent->SetCallbackTimer(elapse, msgHandler);
+    }
+}
+
+
+/// <summary>
+/// Moves and resizes the window.
+/// </summary>
+/// <param name="x">The x coordinate to move the window to. Relative to the parent.</param>
+/// <param name="y">The y coordinate to move the window to. Relative to the parent.</param>
+/// <param name="width">The width to resize the window to.</param>
+/// <param name="height">The height to resize the window to.</param>
+void DrawableWindow::SetPosition(int x, int y, int width, int height) {
+    // Update the drawing settings.
+    this->baseState->drawingSettings->x = x;
+    this->baseState->drawingSettings->y = y;
+    this->baseState->drawingSettings->width = width;
+    this->baseState->drawingSettings->height = height;
+
+    // Position the window and/or set the backarea.
+    if (!this->parent) {
+        SetWindowPos(this->window, 0, x, y, width, height, SWP_NOZORDER);
+        this->drawingArea.rect = D2D1::RectF(0, 0, (float)width, (float)height);
+        if (this->renderTarget) {
+            D2D1_SIZE_U size = D2D1::SizeU(width, height);
+            this->renderTarget->Resize(size);
+        }
+    }
+    else {
+        this->drawingArea.rect = D2D1::RectF(
+            this->parent->drawingArea.rect.left + x,
+            this->parent->drawingArea.rect.top + y,
+            this->parent->drawingArea.rect.left + x + width,
+            this->parent->drawingArea.rect.top + y + height
+        );
+    }
+
+    // The text area is offset from the drawing area.
+    for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
+        state->textArea = this->drawingArea.rect;
+        state->textArea.bottom -= state->drawingSettings->textOffsetBottom;
+        state->textArea.top += state->drawingSettings->textOffsetTop;
+        state->textArea.left += state->drawingSettings->textOffsetLeft;
+        state->textArea.right -= state->drawingSettings->textOffsetRight;
+    }
+
+    // Update all overlays
+    for (OVERLAY overlay = overlays.begin(); overlay != overlays.end(); ++overlay) {
+        (*overlay)->UpdatePosition(this->drawingArea.rect);
+    }
+
+    // Update all children
+    for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
+        (*child)->Move((*child)->baseState->drawingSettings->x, (*child)->baseState->drawingSettings->y);
+    }
+}
+
+
+/// <summary>
+/// Shows the window.
+/// </summary>
+void DrawableWindow::Show() {
+    if (!this->parent) {
+        ShowWindow(this->window, SW_SHOWNOACTIVATE);
+    }
+    this->visible = true;
+}
+
+
+/// <summary>
+/// Sizes the window to fit its current text.
+/// </summary>
+/// <param name="maxWidth">The maximum width to size the window to.</param>
+/// <param name="maxHeight">The maximum height to size the window to.</param>
+/// <param name="minWidth">The minimum width to size the window to.</param>
+/// <param name="minHeight">The minimum height to size the window to.</param>
+void DrawableWindow::SizeToText(int maxWidth, int maxHeight, int minWidth, int minHeight) {
+    SIZE s;
+    GetDesiredSize(maxWidth, maxHeight, &s);
+    s.cx = max(s.cx, minWidth);
+    s.cy = max(s.cy, minHeight);
+    this->SetPosition(this->baseState->drawingSettings->x, this->baseState->drawingSettings->y, s.cx, s.cy);
+}
+
+
+/// <summary>
+/// Sets the text for this window.
+/// </summary>
+/// <param name="text">The text for this window.</param>
+void DrawableWindow::SetText(LPCWSTR text) {
+    if (this->baseState->drawingSettings->evaluateText) {
+        SAFEDELETE(this->parsedText);
+        this->parsedText = (IParsedText*)nCore::System::ParseText(text);
+        this->parsedText->SetChangeHandler(TextChangeHandler, this);
+        UpdateText();
+    }
+    else {
+        StringCchCopyW(this->text, sizeof(this->text)/sizeof(this->text[0]), text);
+    }
+}
+
+
+/// <summary>
+/// Sets the text offsets for all states.
+/// </summary>
+/// <param name="left">The text offset from the left.</param>
+/// <param name="top">The text offset from the top.</param>
+/// <param name="right">The text offset from the right.</param>
+/// <param name="bottom">The text offset from the bottom.</param>
+void DrawableWindow::SetTextOffsets(float left, float top, float right, float bottom) {
+    for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
+        SetTextOffsets(left, top, right, bottom, state);
+    }
+}
+
+
+/// <summary>
+/// Sets the text offsets for the specified state.
+/// </summary>
+/// <param name="left">The text offset from the left.</param>
+/// <param name="top">The text offset from the top.</param>
+/// <param name="right">The text offset from the right.</param>
+/// <param name="bottom">The text offset from the bottom.</param>
+/// <param name="state">The state to set the offsets for.</param>
+void DrawableWindow::SetTextOffsets(float left, float top, float right, float bottom, STATE state) {
+    state->drawingSettings->textOffsetBottom = bottom;
+    state->drawingSettings->textOffsetLeft = left;
+    state->drawingSettings->textOffsetRight = right;
+    state->drawingSettings->textOffsetTop = top;
+
+    state->textArea = this->drawingArea.rect;
+    state->textArea.bottom -= state->drawingSettings->textOffsetBottom;
+    state->textArea.top += state->drawingSettings->textOffsetTop;
+    state->textArea.left += state->drawingSettings->textOffsetLeft;
+    state->textArea.right -= state->drawingSettings->textOffsetRight;
+}
+
+
+/// <summary>
 /// Toggles the specified state.
 /// </summary>
+/// <param name="state">The state to toggle</param>
 void DrawableWindow::ToggleState(STATE state) {
     if (state->active) {
         ClearState(state);

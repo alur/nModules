@@ -46,8 +46,8 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     StringCchCopy(defaultSettings->textAlign, sizeof(defaultSettings->textAlign), "Center");
     StringCchCopy(defaultSettings->textVerticalAlign, sizeof(defaultSettings->textVerticalAlign), "Middle");
     this->window->Initialize(defaultSettings);
-    SetParent(this->window->GetWindow(), NULL);
-    SetWindowLongPtr(this->window->GetWindow(), GWL_EXSTYLE, GetWindowLongPtr(this->window->GetWindow(), GWL_EXSTYLE) & ~WS_EX_NOACTIVATE);
+    SetParent(this->window->GetWindowHandle(), NULL);
+    SetWindowLongPtr(this->window->GetWindowHandle(), GWL_EXSTYLE, GetWindowLongPtr(this->window->GetWindowHandle(), GWL_EXSTYLE) & ~WS_EX_NOACTIVATE);
     this->sized = false;
     this->mouseOver = false;
     this->childItem = NULL;
@@ -82,8 +82,8 @@ void Popup::RemoveItem(PopupItem* /* item */) {
 void Popup::CloseChild(bool closing) {
     if (this->openChild != NULL) {
         if (!closing) {
-            SetFocus(this->window->GetWindow());
-            SetActiveWindow(this->window->GetWindow());
+            SetFocus(this->window->GetWindowHandle());
+            SetActiveWindow(this->window->GetWindowHandle());
         }
 
         this->openChild->owner = NULL;
@@ -114,7 +114,7 @@ LPCSTR Popup::GetBang() {
 
 
 bool Popup::CheckFocus(HWND newActive, __int8 direction) {
-    if (this->window->GetWindow() == newActive || this->mouseOver)
+    if (this->window->GetWindowHandle() == newActive || this->mouseOver)
         return true;
     return direction & 1 && this->owner && this->owner->CheckFocus(newActive, 1)
         || direction & 2 && this->openChild && this->openChild->CheckFocus(newActive, 2);
@@ -207,7 +207,7 @@ void Popup::Size() {
 
 void Popup::Show(LPRECT position, Popup* owner) {
     this->owner = owner;
-    SetParent(this->window->GetWindow(), NULL);
+    SetParent(this->window->GetWindowHandle(), NULL);
     PreShow();
 
     MonitorInfo* monInfo = this->window->GetMonitorInformation();
@@ -251,9 +251,9 @@ void Popup::Show(LPRECT position, Popup* owner) {
     this->window->Move(x, y);
 
     this->window->Show();
-    SetWindowPos(this->window->GetWindow(), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-    SetFocus(this->window->GetWindow());
-    SetActiveWindow(this->window->GetWindow());
+    SetWindowPos(this->window->GetWindowHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    SetFocus(this->window->GetWindowHandle());
+    SetActiveWindow(this->window->GetWindowHandle());
 }
 
 

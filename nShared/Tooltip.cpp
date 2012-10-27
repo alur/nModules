@@ -28,8 +28,8 @@ Tooltip::Tooltip(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, par
     this->maxWidth = settings->GetInt("MaxWidth", 300);
 
     // Not working...
-    SetParent(this->window->GetWindow(), NULL);
-    SetWindowPos(this->window->GetWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+    SetParent(this->window->GetWindowHandle(), NULL);
+    SetWindowPos(this->window->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 }
 
 

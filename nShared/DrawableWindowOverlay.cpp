@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableWindow.cpp
+ *  DrawableWindowOverlay.cpp
  *  The nModules Project
  *
  *  An overlay for a drawable window. An image or an icon.

@@ -44,7 +44,7 @@ public:
         // If we are painting an image, the brush for that image.
         ID2D1Brush* imageBrush;
 
-        // 
+        // The brush to paint the outlien width.
         ID2D1Brush* outlineBrush;
 
         // The area we draw text in
@@ -117,7 +117,7 @@ public:
     void GetScreenRect(LPRECT rect);
 
     // Returns the handle to the top-level window in this window stack.
-    HWND GetWindow();
+    HWND GetWindowHandle();
 
     // Handles window messages.
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
@@ -192,16 +192,16 @@ protected:
     // Paints this window.
     void Paint();
 
-    //
+    // Paints all overlays.
     void PaintOverlays();
 
-    //
+    // Paints all children.
     void PaintChildren();
 
-    // The render target to draw to
+    // The render target to draw to.
     ID2D1HwndRenderTarget* renderTarget;
 
-    //
+    // Discards device-dependent stuff.
     void DiscardDeviceResources();
 
     // (Re)Creates D2D device-dependent stuff.
@@ -226,12 +226,6 @@ private:
     // Constructor used by CreateChild to create a child window.
     explicit DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler);
 
-    // Should be called when the active state has changed.
-    void HandleActiveStateChange();
-
-    //
-    void Load();
-
     // Removes the specified child.
     void RemoveChild(DrawableWindow* child);
 
@@ -241,13 +235,13 @@ private:
     // The currently active state, or states.end().
     list<State>::iterator activeState;
 
-    //
+    // True if we are currently animating.
     bool animating;
 
     // The easing we are using for the current animation.
     Easing::EasingType animationEasing;
 
-    //
+    // The time when the animation should end.
     DWORD animationEndTime;
 
     // If we are currently doing an animation, the position at the start of the animation.
@@ -286,7 +280,7 @@ private:
     // The DrawableWindow which is this windows parent.
     DrawableWindow* parent;
 
-    //
+    // The current text of this window.
     IParsedText* parsedText;
 
     // All current states.

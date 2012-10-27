@@ -172,7 +172,7 @@ void TaskButton::ShowMenu() {
     POINT pt;
     GetCursorPos(&pt);
     
-    int command = TrackPopupMenu(this->menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, this->window->GetWindow(), NULL);
+    int command = TrackPopupMenu(this->menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, this->window->GetWindowHandle(), NULL);
     if (command != 0) {
         PostMessage(this->watchedWindow, WM_SYSCOMMAND, (WPARAM)command, MAKELPARAM(pt.x, pt.y));
     }

@@ -297,7 +297,7 @@ void Tray::EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD
 /// <summary>
 void Tray::DismissBalloon(UINT message) {
     // Reset the timer.
-    SetTimer(this->window->GetWindow(), this->balloonTimer, this->balloonTime, NULL);
+    SetTimer(this->window->GetWindowHandle(), this->balloonTimer, this->balloonTime, NULL);
 
     this->balloon->Hide();
     this->activeBalloonIcon->SendCallback(message, NULL, NULL);

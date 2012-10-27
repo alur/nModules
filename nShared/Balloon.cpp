@@ -64,8 +64,8 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     this->closeBtnWindow->Show();
 
     // Not working...
-    SetParent(this->window->GetWindow(), NULL);
-    SetWindowPos(this->window->GetWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+    SetParent(this->window->GetWindowHandle(), NULL);
+    SetWindowPos(this->window->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 }
 
 

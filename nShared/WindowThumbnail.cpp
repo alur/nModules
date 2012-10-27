@@ -16,7 +16,7 @@ WindowThumbnail::WindowThumbnail(LPCSTR prefix, Settings* parentSettings) : Draw
     LoadSettings();
 
     // Not working...
-    SetWindowPos(this->window->GetWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+    SetWindowPos(this->window->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 }
 
 
@@ -34,7 +34,7 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
         DwmUnregisterThumbnail(this->thumbnailHandle);
     }
 
-    hr = DwmRegisterThumbnail(this->window->GetWindow(), hwnd, &this->thumbnailHandle);
+    hr = DwmRegisterThumbnail(this->window->GetWindowHandle(), hwnd, &this->thumbnailHandle);
     
     if (SUCCEEDED(hr)) {
         hr = DwmQueryThumbnailSourceSize(this->thumbnailHandle, &sourceSize);
@@ -102,7 +102,7 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
 
     if (SUCCEEDED(hr)) {
         this->window->Show();
-        SetWindowPos(this->window->GetWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+        SetWindowPos(this->window->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
     }
 }
 

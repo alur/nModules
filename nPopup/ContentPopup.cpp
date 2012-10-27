@@ -204,7 +204,7 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
         SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
         UINT message = this->window->RegisterUserMessage(this);
         ULONG shnrUID = SHChangeNotifyRegister(
-            this->window->GetWindow(),
+            this->window->GetWindowHandle(),
             SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
             SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM,
             message,

@@ -102,7 +102,7 @@ void IconGroup::SetFolder(LPWSTR folder) {
     // Register for change notifications
     SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
     this->changeNotifyUID = SHChangeNotifyRegister(
-        this->window->GetWindow(),
+        this->window->GetWindowHandle(),
         SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
         SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM
         | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM | SHCNE_UPDATEDIR | SHCNE_UPDATEIMAGE | SHCNE_ASSOCCHANGED,
