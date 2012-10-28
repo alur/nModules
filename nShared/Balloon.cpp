@@ -19,13 +19,13 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     defaults->alwaysOnTop = true;
 
     StateSettings* defaultState = new StateSettings();
-    defaultState->color = 0xCCFAFAD2;
-    defaultState->fontColor = 0xFF000000;
+    defaultState->backgroundBrush.color = 0xCCFAFAD2;
+    defaultState->textBrush.color = 0xFF000000;
     defaultState->textOffsetTop = 4;
     defaultState->textOffsetBottom = 4;
     defaultState->textOffsetRight = 4;
     defaultState->textOffsetLeft = 40;
-    defaultState->outlineColor = 0xAA000000;
+    defaultState->outlineBrush.color = 0xAA000000;
     defaultState->outlineWidth = 1.5f;
     defaultState->wordWrap = true;
     defaultState->cornerRadiusX = 4.0f;
@@ -44,8 +44,8 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     titleDefaults->y = 4;
 
     StateSettings* titleBaseStateDefaults = new StateSettings();
-    titleBaseStateDefaults->fontColor = 0xFF000000;
-    titleBaseStateDefaults->color = 0;
+    titleBaseStateDefaults->textBrush.color = 0xFF000000;
+    titleBaseStateDefaults->backgroundBrush.color = 0;
     StringCchCopy(titleBaseStateDefaults->fontWeight, sizeof(titleBaseStateDefaults->fontWeight), "Bold");
 
     this->titleWindow->Initialize(titleDefaults, titleBaseStateDefaults);
@@ -59,9 +59,9 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     closeBtnDefaults->height = 16;
 
     StateSettings* closeBtnBaseStateDefaults = new StateSettings();
-    closeBtnBaseStateDefaults->color = 0xAA77AACC;
-    closeBtnBaseStateDefaults->fontColor = 0xFF000000;
-    closeBtnBaseStateDefaults->outlineColor = 0xFF000000;
+    closeBtnBaseStateDefaults->backgroundBrush.color = 0xAA77AACC;
+    closeBtnBaseStateDefaults->textBrush.color = 0xFF000000;
+    closeBtnBaseStateDefaults->outlineBrush.color = 0xFF000000;
     closeBtnBaseStateDefaults->outlineWidth = 1.0f;
     closeBtnBaseStateDefaults->cornerRadiusX = 2.0f;
     closeBtnBaseStateDefaults->cornerRadiusY = 2.0f;

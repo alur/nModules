@@ -42,7 +42,6 @@
     <ClInclude Include="LSModule.hpp" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="MonitorInfo.hpp" />
-    <ClInclude Include="nShared.h" />
     <ClInclude Include="PIDL.h" />
     <ClInclude Include="Settings.hpp" />
     <ClInclude Include="Strings.h" />

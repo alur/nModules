@@ -21,6 +21,7 @@
 #include "Easing.h"
 #include "../nCore/IParsedText.hpp"
 #include "IPainter.hpp"
+#include "BrushSettings.hpp"
 
 
 using std::vector;

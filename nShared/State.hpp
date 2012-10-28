@@ -8,6 +8,7 @@
 #pragma once
 
 #include "StateSettings.hpp"
+#include "Brush.hpp"
 #include "IPainter.hpp"
 
 class State : IPainter {
@@ -40,6 +41,9 @@ private:
     // Creates the text format for this state.
     HRESULT CreateTextFormat();
 
+    // Creates 
+    HRESULT CreateBrush(BrushSettings* settings, ID2D1Brush* brush);
+
     // The current drawing settings.
     StateSettings* drawingSettings;
 
@@ -47,16 +51,13 @@ private:
     StateSettings* defaultSettings;
 
     // The brush we are currently painting the background with.
-    ID2D1Brush* backBrush;
+    Brush* backBrush;
 
     // The brush we are currently painting the text with.
-    ID2D1Brush* textBrush;
-
-    // If we are painting an image, the brush for that image.
-    ID2D1Brush* imageBrush;
+    Brush* textBrush;
 
     // The brush to paint the outline with.
-    ID2D1Brush* outlineBrush;
+    Brush* outlineBrush;
 
     // The area we draw text in
     D2D1_RECT_F textArea;

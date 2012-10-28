@@ -19,8 +19,8 @@ ContainerItem::ContainerItem(Drawable* parent, LPCSTR prefix) : PopupItem(parent
     defaults->registerWithCore = true;
 
     StateSettings* defaultState = new StateSettings();
-    defaultState->color = 0xAAFFFFFF;
-    defaultState->fontColor = 0xFF000000;
+    defaultState->backgroundBrush.color = 0xAAFFFFFF;
+    defaultState->textBrush.color = 0xFF000000;
 
     this->window->Initialize(defaults, defaultState);
 

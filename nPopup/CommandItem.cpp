@@ -39,8 +39,8 @@ void CommandItem::Init(LPCSTR title, LPCSTR command) {
     MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
 
     StateSettings* defaultState = new StateSettings();
-    defaultState->color = 0xAAFFFF00;
-    defaultState->fontColor = 0xFF000000;
+    defaultState->backgroundBrush.color = 0xAAFFFF00;
+    defaultState->textBrush.color = 0xFF000000;
     StringCchCopy(defaultState->textVerticalAlign, sizeof(defaultState->textVerticalAlign), "Middle");
     defaultState->textOffsetLeft = 20;
     defaultState->textOffsetRight = 5;

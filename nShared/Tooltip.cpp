@@ -16,13 +16,13 @@ Tooltip::Tooltip(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, par
     defaults->alwaysOnTop = true;
 
     StateSettings* defaultState = new StateSettings();
-    defaultState->color = 0xCCFAFAD2;
-    defaultState->fontColor = 0xFF000000;
+    defaultState->backgroundBrush.color = 0xCCFAFAD2;
+    defaultState->textBrush.color = 0xFF000000;
     defaultState->textOffsetTop = 2;
     defaultState->textOffsetBottom = 2;
     defaultState->textOffsetRight = 2;
     defaultState->textOffsetLeft = 2;
-    defaultState->outlineColor = 0xFF000000;
+    defaultState->outlineBrush.color = 0xFF000000;
     defaultState->outlineWidth = 1.5f;
 
     this->window->Initialize(defaults, defaultState);

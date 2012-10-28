@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableSettings.hpp
+ *  StateSettings.hpp
  *  The nModules Project
  *
- *  Settings used by DrawableWindow.
+ *  Settings used by states.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
@@ -10,6 +10,7 @@
 #include <d2d1.h>
 #include <dwrite.h>
 #include "Settings.hpp"
+#include "BrushSettings.hpp"
 
 class StateSettings {
 public:
@@ -18,9 +19,15 @@ public:
 
     // Loads the actual settings.
     void Load(Settings* settings, StateSettings* defaults);
+    
+    // The settings to use for the background brush.
+    BrushSettings backgroundBrush;
+    
+    // The settings to use for the text brush.
+    BrushSettings textBrush;
 
-    // The background color of the window. Default: 0xFF000000 (black)
-    ARGB color;
+    // The settings to use for the outline brush.
+    BrushSettings outlineBrush;
 
     // The x corner radius. Default: 0
     float cornerRadiusX;
@@ -30,9 +37,6 @@ public:
 
     // The default font to use. Default: Arial
     WCHAR font[MAX_PATH];
-
-    // The default font color to use. Default: 0xFFFFFFFF (white)
-    ARGB fontColor;
 
     // The default font size. Default: 12
     float fontSize;
@@ -49,21 +53,6 @@ public:
     // Semi Light, Normal, Regular, Medium, Semi Bold, Bold, Extra Bold, 
     // Ultra Bold, Black, Heavy, Extra Black, Ultra Black. Default: Normal
     char fontWeight[16];
-
-    // The image to use for this window. Default: "" (blank)
-    char image[MAX_PATH];
-
-    // The maximum opacity of the image. 0 to 1. Default: 1
-    float imageOpacity;
-
-    // The rotation of the image, in degrees. Default: 0
-    float imageRotation;
-
-    // How to position the image. Fit, Fill, Center, Stretch, or Tile. Default: Tile
-    char imageScalingMode[32];
-
-    // The color of the outline. Default: #0000
-    ARGB outlineColor;
 
     // The width of the outline. Default: 0
     float outlineWidth;

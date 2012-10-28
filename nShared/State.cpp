@@ -20,15 +20,14 @@ using namespace D2D1;
 
 State::State(Settings* settings, int defaultPriority, LPCWSTR text) {
     this->active = false;
-    this->backBrush = NULL;
+    this->backBrush = new Brush();
     this->defaultSettings = NULL;
     this->drawingSettings = new StateSettings();
-    this->imageBrush = NULL;
-    this->outlineBrush = NULL;
+    this->outlineBrush = new Brush();
     this->priority = settings->GetInt("Priority", defaultPriority);
     this->settings = settings;
     this->text = text;
-    this->textBrush = NULL;
+    this->textBrush = new Brush();
     this->textFormat = NULL;
 }
 
@@ -39,6 +38,9 @@ State::~State() {
     SAFEDELETE(this->defaultSettings);
     SAFEDELETE(this->drawingSettings);
     SAFERELEASE(this->textFormat);
+    SAFEDELETE(this->backBrush);
+    SAFEDELETE(this->outlineBrush);
+    SAFEDELETE(this->textBrush);
 }
 
 
@@ -52,6 +54,10 @@ void State::UpdatePosition(D2D1_RECT_F position) {
     this->textArea.top += this->drawingSettings->textOffsetTop;
     this->textArea.left += this->drawingSettings->textOffsetLeft;
     this->textArea.right -= this->drawingSettings->textOffsetRight;
+
+    this->backBrush->UpdatePosition(position);
+    this->outlineBrush->UpdatePosition(position);
+    this->textBrush->UpdatePosition(position);
 }
 
 
@@ -62,77 +68,39 @@ void State::Load(StateSettings* defaultSettings) {
     this->drawingArea.radiusX = this->drawingSettings->cornerRadiusX;
     this->drawingArea.radiusY = this->drawingSettings->cornerRadiusY;
 
+    this->backBrush->Load(&this->drawingSettings->backgroundBrush);
+    this->outlineBrush->Load(&this->drawingSettings->outlineBrush);
+    this->textBrush->Load(&this->drawingSettings->textBrush);
+
     CreateTextFormat();
 }
 
 
 void State::DiscardDeviceResources() {
-    SAFERELEASE(this->backBrush);
-    SAFERELEASE(this->imageBrush);
-    SAFERELEASE(this->outlineBrush);
-    SAFERELEASE(this->textBrush);
+    backBrush->Discard();
+    outlineBrush->Discard();
+    textBrush->Discard();
 }
 
 
 void State::Paint(ID2D1RenderTarget* renderTarget) {
-    renderTarget->FillRoundedRectangle(this->drawingArea, this->backBrush);
-    renderTarget->DrawRoundedRectangle(this->drawingArea, this->outlineBrush, this->drawingSettings->outlineWidth);
-
-    if (this->imageBrush != NULL) {
-        renderTarget->FillRoundedRectangle(this->drawingArea, this->imageBrush);
+    if (this->backBrush->brush) {
+        renderTarget->FillRoundedRectangle(this->drawingArea, this->backBrush->brush);
     }
-    
-    renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, this->textRotationOrigin));
-    renderTarget->DrawText(this->text, lstrlenW(this->text), this->textFormat, this->textArea, this->textBrush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+    if (this->outlineBrush->brush) {
+        renderTarget->DrawRoundedRectangle(this->drawingArea, this->outlineBrush->brush, this->drawingSettings->outlineWidth);
+    }
+    if (this->textBrush->brush) {
+        renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, this->textRotationOrigin));
+        renderTarget->DrawText(this->text, lstrlenW(this->text), this->textFormat, this->textArea, this->textBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+    }
 }
 
 
 HRESULT State::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
-    this->imageBrush = NULL;
-
-    // Create the background brush
-    if (this->drawingSettings->image[0] != 0) {
-        IWICImagingFactory* factory = NULL;
-        IWICBitmap* wicBitmap = NULL;
-        IWICFormatConverter* converter = NULL;
-        ID2D1BitmapBrush* brush = NULL;
-        ID2D1Bitmap* bitmap = NULL;
-        Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
-        
-        HBITMAP hBitmap = LiteStep::LoadLSImage(this->drawingSettings->image, NULL);
-        if (hBitmap) {
-            HRESULT hr;
-
-            hr = factory->CreateFormatConverter(&converter);
-            if (SUCCEEDED(hr)) {
-                hr = factory->CreateBitmapFromHBITMAP(hBitmap, NULL, WICBitmapUseAlpha, &wicBitmap);
-            }
-            if (SUCCEEDED(hr)) {
-                hr = converter->Initialize(wicBitmap, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut);
-            }
-            if (SUCCEEDED(hr)) {
-                hr = renderTarget->CreateBitmapFromWicBitmap(converter, NULL, &bitmap);
-            }
-            if (SUCCEEDED(hr)) {
-                hr = renderTarget->CreateBitmapBrush(bitmap, &brush);
-            }
-
-            if (SUCCEEDED(hr)) {
-                brush->SetTransform(Matrix3x2F::Translation(this->drawingArea.rect.left, this->drawingArea.rect.top));
-                this->imageBrush = brush;
-            }
-
-            DeleteObject(hBitmap);
-            SAFERELEASE(wicBitmap);
-            SAFERELEASE(bitmap);
-            SAFERELEASE(converter);
-        }
-    }
-
-    renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->drawingSettings->color), (ID2D1SolidColorBrush**)&this->backBrush);
-    renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->drawingSettings->fontColor), (ID2D1SolidColorBrush**)&this->textBrush);
-    renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->drawingSettings->outlineColor), (ID2D1SolidColorBrush**)&this->outlineBrush);
-
+    backBrush->ReCreate(renderTarget);
+    outlineBrush->ReCreate(renderTarget);
+    textBrush->ReCreate(renderTarget);
     return S_OK;
 }
 
@@ -158,7 +126,6 @@ void State::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
     size->cx = long(metrics.width + this->drawingSettings->textOffsetLeft + this->drawingSettings->textOffsetRight) + 1;
     size->cy = long(metrics.height + this->drawingSettings->textOffsetTop + this->drawingSettings->textOffsetBottom) + 1;
 }
-
 
 
 /// <summary>

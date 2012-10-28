@@ -122,13 +122,13 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
     defaults->alwaysOnTop = true;
     
     StateSettings* defaultState = new StateSettings();
-    defaultState->color = 0xAA009900;
-    defaultState->fontColor = 0xFF000000;
+    defaultState->backgroundBrush.color = 0xAA009900;
+    defaultState->textBrush.color = 0xFF000000;
     defaultState->textOffsetTop = 2;
     defaultState->textOffsetBottom = 2;
     defaultState->textOffsetRight = 2;
     defaultState->textOffsetLeft = 2;
-    defaultState->outlineColor = 0xAAFFFFFF;
+    defaultState->outlineBrush.color = 0xAAFFFFFF;
     defaultState->outlineWidth = 2.0f;
 
     this->window->Initialize(defaults,  defaultState);
