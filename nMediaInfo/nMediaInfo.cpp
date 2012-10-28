@@ -28,17 +28,12 @@ UINT WinampSongChangeMsg = 0;
 //
 map<string, CoverArt*> g_CoverArt;
 
-//
-CRITICAL_SECTION updateInformation;
-
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
 int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
     g_LSModule = new LSModule(parent, "nMediaInfo", "Alurcard2", MAKE_VERSION(0,2,0,0), instance);
-
-    InitializeCriticalSection(&updateInformation);
     
     if (!g_LSModule->Initialize()) {
         delete g_LSModule;
@@ -90,14 +85,7 @@ void quitModule(HINSTANCE /* instance */) {
 /// <param name="lParam">lParam</param>
 LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
     if (message == WinampSongChangeMsg) {
-        EnterCriticalSection(&updateInformation);
-
-        TextFunctions::_Update();
-        for (map<string, CoverArt*>::const_iterator coverArt = g_CoverArt.begin(); coverArt != g_CoverArt.end(); ++coverArt) {
-            coverArt->second->Update();
-        }
-
-        LeaveCriticalSection(&updateInformation);
+        Update();
     }
     switch(message) {
     case WM_CREATE:
@@ -134,4 +122,21 @@ void LoadSettings() {
         g_CoverArt.insert(g_CoverArt.begin(), std::pair<string, CoverArt*>(string(szLabel), new CoverArt(szLabel)));
     }
     LiteStep::LCClose(f);
+}
+
+
+void Update() {
+    static bool open = true;
+
+    if (open) {
+        // Winamp will spam a lot of Update messages on every track change, and they go through asynchronously.
+        // I was unable to solve this with either mutexes or critical sections for some reason. (maybe it's not a threading problem?).
+        // This solution seems to work good though, and comes with added benefit of usually ignoring the extra messages.
+        open = false;
+        TextFunctions::_Update();
+        for (map<string, CoverArt*>::const_iterator coverArt = g_CoverArt.begin(); coverArt != g_CoverArt.end(); ++coverArt) {
+            coverArt->second->Update();
+        }
+        open = true;
+    }
 }
