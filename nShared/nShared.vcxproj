@@ -20,6 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Balloon.hpp" />
+    <ClInclude Include="Brush.hpp" />
+    <ClInclude Include="BrushSettings.hpp" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Debugging.h" />
     <ClInclude Include="Drawable.hpp" />
@@ -49,6 +51,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Balloon.cpp" />
+    <ClCompile Include="Brush.cpp" />
+    <ClCompile Include="BrushSettings.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Debugging.cpp" />
     <ClCompile Include="Drawable.cpp" />

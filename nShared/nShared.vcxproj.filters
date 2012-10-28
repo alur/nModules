@@ -92,6 +92,12 @@
     <ClInclude Include="DrawableStateSettings.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Brush.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BrushSettings.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MonitorInfo.cpp">
@@ -173,6 +179,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DrawableStateSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Brush.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BrushSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

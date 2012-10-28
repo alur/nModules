@@ -29,12 +29,40 @@ using std::map;
 class DrawableWindow : MessageHandler {
 public:
     // Defines a "State" which the window can be in.
-    // TODO::Make this an inner class instead.
-    typedef struct {
+    class State : IPainter {
+    public:
+        explicit State(Settings* settings, int defaultPriority, LPCWSTR text);
+        virtual ~State();
+
+        void Load(DrawableStateSettings* defaultSettings);
+        void UpdatePosition(D2D1_RECT_F position);
+        DrawableStateSettings* GetSettings();
+        
+        // Gets the "desired" size for a given width and height.
+        void GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size);
+
+        void DiscardDeviceResources();
+        void Paint(ID2D1RenderTarget* renderTarget);
+        HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
+        void SetTextOffsets(float left, float top, float right, float bottom);
+
+        // The priority of this state.
         int priority;
+
+        // Whether or not this state is currently active.
         bool active;
+
+        // Settings.
         Settings* settings;
+
+    private:
+        // Creates the text format for this state.
+        HRESULT CreateTextFormat();
+
+        // The current drawing settings.
         DrawableStateSettings* drawingSettings;
+
+        // The default drawing settings.
         DrawableStateSettings* defaultSettings;
 
         // The brush we are currently painting the background with.
@@ -46,7 +74,7 @@ public:
         // If we are painting an image, the brush for that image.
         ID2D1Brush* imageBrush;
 
-        // The brush to paint the outlien width.
+        // The brush to paint the outline with.
         ID2D1Brush* outlineBrush;
 
         // The area we draw text in
@@ -54,8 +82,17 @@ public:
 
         // Defines how the text is formatted.
         IDWriteTextFormat* textFormat;
-    } State;
-    typedef list<State>::iterator STATE;
+
+        // Points to the windows text.
+        LPCWSTR text;
+
+        // The area we draw in.
+        D2D1_ROUNDED_RECT drawingArea;
+
+        // The point we rotate text around.
+        D2D1_POINT_2F textRotationOrigin;
+    };
+    typedef list<State*>::iterator STATE;
 
     // Defines an overlay. A bitmap, or icon, or something.
     class Overlay : IPainter {
@@ -181,9 +218,6 @@ public:
     // Sets the text offsets for all states.
     void SetTextOffsets(float left, float top, float right, float bottom);
 
-    // Sets the text offsets for the specified state.
-    void SetTextOffsets(float left, float top, float right, float bottom, STATE state);
-
     // Shows this window.
     void Show();
 
@@ -228,12 +262,6 @@ private:
     // Called by the constructors, intializes variables.
     void ConstructorCommon(Settings* settings, MessageHandler* msgHandler);
 
-    // Creates an IDWriteTextFormat based on a DrawableSettings.
-    HRESULT CreateTextFormat(DrawableStateSettings* drawingSettings, IDWriteTextFormat** textFormat);
-
-    // Creates the brushes for a particular state.
-    HRESULT CreateBrushes(State* state);
-
     // Constructor used by CreateChild to create a child window.
     explicit DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler);
 
@@ -244,7 +272,7 @@ private:
     DrawableWindow* activeChild;
 
     // The currently active state, or states.end().
-    list<State>::iterator activeState;
+    STATE activeState;
 
     // True if we are currently animating.
     bool animating;
@@ -265,7 +293,7 @@ private:
     RECT animationTarget;
 
     // The base state -- the one to use when no others are active.
-    list<State>::iterator baseState;
+    STATE baseState;
 
     // The children of this drawablewindow.
     list<DrawableWindow*> children;
@@ -274,7 +302,7 @@ private:
     DrawableSettings* defaultSettings;
 
     // The area we draw in.
-    D2D1_ROUNDED_RECT drawingArea;
+    D2D1_RECT_F drawingArea;
 
     // The drawing settings.
     DrawableSettings* drawingSettings;
@@ -310,7 +338,7 @@ private:
     Settings* settings;
 
     // All current states.
-    list<State> states;
+    list<State*> states;
 
     // Timer ID generator.
     UIDGenerator<UINT_PTR>* timerIDs;

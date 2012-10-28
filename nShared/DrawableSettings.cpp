@@ -16,8 +16,6 @@
 DrawableSettings::DrawableSettings() {
     this->alwaysOnTop = false;
     this->blurBehind = false;
-    this->cornerRadiusX = 0.0f;
-    this->cornerRadiusY = 0.0f;
     this->evaluateText = false;
     this->height = 100;
     this->hidden = false;
@@ -42,8 +40,6 @@ DrawableSettings::~DrawableSettings() {
 void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
     this->alwaysOnTop = settings->GetBool("AlwaysOnTop", defaults->alwaysOnTop);
     this->blurBehind = settings->GetBool("BlurBehind", defaults->blurBehind);
-    this->cornerRadiusX = settings->GetFloat("CornerRadiusX", defaults->cornerRadiusX);
-    this->cornerRadiusY = settings->GetFloat("CornerRadiusY", defaults->cornerRadiusY);
     this->evaluateText = defaults->evaluateText;
     this->height = settings->GetInt("Height", defaults->height);
     this->hidden = settings->GetBool("Hidden", defaults->hidden);

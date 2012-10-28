@@ -100,7 +100,7 @@ void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
 /// Activates this button.
 /// </summary>
 void TaskButton::Activate() {
-    if (this->stateHover->active) {
+    if ((*this->stateHover)->active) {
         this->window->ActivateState(this->stateActiveHover);
     }
     this->window->ActivateState(this->stateActive);
@@ -131,7 +131,7 @@ void TaskButton::Flash() {
     if (!this->isFlashing) {
         this->isFlashing = true;
         this->flashOn = true;
-        if (this->stateHover->active) {
+        if ((*this->stateHover)->active) {
             this->window->ActivateState(this->stateFlashingHover);
         }
         this->window->ActivateState(this->stateFlashing);
@@ -230,11 +230,11 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                 this->window->GetScreenRect(&r);
                 ((Taskbar*)this->parent)->ShowThumbnail(this->watchedWindow, &r);
 
-                if (this->stateActive->active) {
+                if ((*this->stateActive)->active) {
                     this->window->ActivateState(this->stateActiveHover);
                 }
 
-                if (this->stateFlashing->active) {
+                if ((*this->stateFlashing)->active) {
                     this->window->ActivateState(this->stateFlashingHover);
                 }
 
@@ -259,7 +259,7 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                 if (this->isFlashing) {
                     this->flashOn = !this->flashOn;
                     if (this->flashOn) {
-                        if (this->stateHover->active) {
+                        if ((*this->stateHover)->active) {
                             this->window->ActivateState(this->stateFlashingHover);
                         }
                         this->window->ActivateState(this->stateFlashing);

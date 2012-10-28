@@ -15,6 +15,8 @@
 /// </summary>
 DrawableStateSettings::DrawableStateSettings() {
     this->color = 0xFF000000;
+    this->cornerRadiusX = 0.0f;
+    this->cornerRadiusY = 0.0f;
     StringCchCopyW(this->font, sizeof(this->font)/sizeof(WCHAR), L"Arial");
     this->fontColor = 0xFFFFFFFF;
     this->fontSize = 12.0f;
@@ -51,6 +53,8 @@ DrawableStateSettings::~DrawableStateSettings() {
 void DrawableStateSettings::Load(Settings* settings, DrawableStateSettings* defaults) {
     this->color = settings->GetColor("Color", defaults->color);
     this->color = this->color & 0xFFFFFF | ((ARGB)settings->GetInt("Alpha", (this->color & 0xFF000000) >> 24) & 0xFF) << 24;
+    this->cornerRadiusX = settings->GetFloat("CornerRadiusX", defaults->cornerRadiusX);
+    this->cornerRadiusY = settings->GetFloat("CornerRadiusY", defaults->cornerRadiusY);
     settings->GetString("Font", this->font, sizeof(this->font)/sizeof(WCHAR), defaults->font);
     this->fontColor = settings->GetColor("FontColor", defaults->fontColor);
     this->fontColor = this->fontColor & 0xFFFFFF | ((ARGB)settings->GetInt("FontAlpha", (this->fontColor & 0xFF000000) >> 24) & 0xFF) << 24;

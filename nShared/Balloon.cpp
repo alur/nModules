@@ -17,8 +17,6 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     defaults->width = 150;
     defaults->height = 40;
     defaults->alwaysOnTop = true;
-    defaults->cornerRadiusX = 4.0f;
-    defaults->cornerRadiusY = 4.0f;
 
     DrawableStateSettings* defaultState = new DrawableStateSettings();
     defaultState->color = 0xCCFAFAD2;
@@ -30,6 +28,8 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     defaultState->outlineColor = 0xAA000000;
     defaultState->outlineWidth = 1.5f;
     defaultState->wordWrap = true;
+    defaultState->cornerRadiusX = 4.0f;
+    defaultState->cornerRadiusY = 4.0f;
 
     this->window->Initialize(defaults, defaultState);
 
@@ -57,14 +57,14 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     DrawableSettings* closeBtnDefaults = new DrawableSettings();
     closeBtnDefaults->width = 16;
     closeBtnDefaults->height = 16;
-    closeBtnDefaults->cornerRadiusX = 2.0f;
-    closeBtnDefaults->cornerRadiusY = 2.0f;
 
     DrawableStateSettings* closeBtnBaseStateDefaults = new DrawableStateSettings();
     closeBtnBaseStateDefaults->color = 0xAA77AACC;
     closeBtnBaseStateDefaults->fontColor = 0xFF000000;
     closeBtnBaseStateDefaults->outlineColor = 0xFF000000;
     closeBtnBaseStateDefaults->outlineWidth = 1.0f;
+    closeBtnBaseStateDefaults->cornerRadiusX = 2.0f;
+    closeBtnBaseStateDefaults->cornerRadiusY = 2.0f;
     StringCchCopy(closeBtnBaseStateDefaults->fontWeight, sizeof(closeBtnBaseStateDefaults->fontWeight), "Bold");
     StringCchCopy(closeBtnBaseStateDefaults->textAlign, sizeof(closeBtnBaseStateDefaults->textAlign), "Center");
     StringCchCopy(closeBtnBaseStateDefaults->textVerticalAlign, sizeof(closeBtnBaseStateDefaults->textVerticalAlign), "Middle");
