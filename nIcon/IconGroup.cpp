@@ -31,7 +31,7 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     defaults->width = 500;
     defaults->height = 300;
 
-    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    StateSettings* defaultState = new StateSettings();
     defaultState->color = 0x00000000;
 
     this->settings->GetString("Folder", path, sizeof(path), "Desktop");

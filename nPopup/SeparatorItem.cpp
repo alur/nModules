@@ -19,13 +19,13 @@ SeparatorItem::SeparatorItem(Drawable* parent) : PopupItem(parent, "SeparatorIte
     defaults->width = 190;
     defaults->height = 5;
 
-    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    StateSettings* defaultState = new StateSettings();
     defaultState->color = 0xAA000000;
     defaultState->fontColor = 0xFF000000;
 
     this->window->Initialize(defaults, defaultState);
 
-    this->hoverState = this->window->AddState("Hover", new DrawableStateSettings(*defaultState), 100);
+    this->hoverState = this->window->AddState("Hover", 100, new StateSettings(*defaultState));
 
     this->window->Show();
 }

@@ -267,7 +267,7 @@ DrawableWindow::PAINTER DrawableWindow::AddPrePainter(IPainter* painter) {
 /// <param name="defaultSettings">The default settings for this state.</param>
 /// <param name="defaultPriority">The default priority for this state. Higher priority states take precedence over lower priority states.</param>
 /// <returns>An object which can be used to activate/clear this state.</returns>
-DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, DrawableStateSettings* defaultSettings, int defaultPriority) {
+DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, int defaultPriority, StateSettings* defaultSettings) {
     State* state = new State((*this->baseState)->settings->CreateChild(prefix), defaultPriority, this->text);
     state->settings->AppendGroup((*this->baseState)->settings);
     state->Load(defaultSettings);
@@ -606,9 +606,9 @@ void DrawableWindow::Hide() {
 /// </summary>
 /// <param name="defaultSettings">The default settings for this window.</param>
 /// <param name="baseStateDefaults">The default settings for the base state.</param>
-void DrawableWindow::Initialize(DrawableSettings* defaultSettings, DrawableStateSettings* baseStateDefaults) {
+void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings* baseStateDefaults) {
     // Load settings.
-    this->defaultSettings = defaultSettings;
+    this->defaultSettings = defaultSettings ? defaultSettings : new DrawableSettings();
     this->drawingSettings->Load(this->settings, this->defaultSettings);
 
     // Load the base state

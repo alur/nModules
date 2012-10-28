@@ -121,7 +121,7 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
     defaults->height = 40;
     defaults->alwaysOnTop = true;
     
-    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    StateSettings* defaultState = new StateSettings();
     defaultState->color = 0xAA009900;
     defaultState->fontColor = 0xFF000000;
     defaultState->textOffsetTop = 2;

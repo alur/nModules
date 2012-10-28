@@ -7,13 +7,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
-#include "DrawableStateSettings.hpp"
+#include "StateSettings.hpp"
 
 
 /// <summary>
 /// Initalizes the class to all default settings.
 /// </summary>
-DrawableStateSettings::DrawableStateSettings() {
+StateSettings::StateSettings() {
     this->color = 0xFF000000;
     this->cornerRadiusX = 0.0f;
     this->cornerRadiusY = 0.0f;
@@ -43,14 +43,14 @@ DrawableStateSettings::DrawableStateSettings() {
 /// <summary>
 /// Destructor.
 /// </summary>
-DrawableStateSettings::~DrawableStateSettings() {
+StateSettings::~StateSettings() {
 }
 
 
 /// <summary>
 /// Loads settings from an RC file using the specified defaults.
 /// </summary>
-void DrawableStateSettings::Load(Settings* settings, DrawableStateSettings* defaults) {
+void StateSettings::Load(Settings* settings, StateSettings* defaults) {
     this->color = settings->GetColor("Color", defaults->color);
     this->color = this->color & 0xFFFFFF | ((ARGB)settings->GetInt("Alpha", (this->color & 0xFF000000) >> 24) & 0xFF) << 24;
     this->cornerRadiusX = settings->GetFloat("CornerRadiusX", defaults->cornerRadiusX);

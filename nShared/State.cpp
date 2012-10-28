@@ -7,7 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "LiteStep.h"
 #include "Debugging.h"
-#include "DrawableWindow.hpp"
+#include "State.hpp"
 #include "Factories.h"
 #include "Macros.h"
 #include <d2d1.h>
@@ -18,11 +18,11 @@
 using namespace D2D1;
 
 
-DrawableWindow::State::State(Settings* settings, int defaultPriority, LPCWSTR text) {
+State::State(Settings* settings, int defaultPriority, LPCWSTR text) {
     this->active = false;
     this->backBrush = NULL;
     this->defaultSettings = NULL;
-    this->drawingSettings = new DrawableStateSettings();
+    this->drawingSettings = new StateSettings();
     this->imageBrush = NULL;
     this->outlineBrush = NULL;
     this->priority = settings->GetInt("Priority", defaultPriority);
@@ -33,7 +33,7 @@ DrawableWindow::State::State(Settings* settings, int defaultPriority, LPCWSTR te
 }
 
 
-DrawableWindow::State::~State() {
+State::~State() {
     DiscardDeviceResources();
     SAFEDELETE(this->settings);
     SAFEDELETE(this->defaultSettings);
@@ -42,7 +42,7 @@ DrawableWindow::State::~State() {
 }
 
 
-void DrawableWindow::State::UpdatePosition(D2D1_RECT_F position) {
+void State::UpdatePosition(D2D1_RECT_F position) {
     this->drawingArea.rect = position;
     this->textRotationOrigin.x = position.left + (position.right - position.left)/2.0f;
     this->textRotationOrigin.y = position.top + (position.bottom - position.top)/2.0f;
@@ -55,9 +55,9 @@ void DrawableWindow::State::UpdatePosition(D2D1_RECT_F position) {
 }
 
 
-void DrawableWindow::State::Load(DrawableStateSettings* defaultSettings) {
-    this->defaultSettings = defaultSettings;
-    this->drawingSettings->Load(this->settings, defaultSettings);
+void State::Load(StateSettings* defaultSettings) {
+    this->defaultSettings = defaultSettings ? defaultSettings : new StateSettings();
+    this->drawingSettings->Load(this->settings, this->defaultSettings);
 
     this->drawingArea.radiusX = this->drawingSettings->cornerRadiusX;
     this->drawingArea.radiusY = this->drawingSettings->cornerRadiusY;
@@ -66,7 +66,7 @@ void DrawableWindow::State::Load(DrawableStateSettings* defaultSettings) {
 }
 
 
-void DrawableWindow::State::DiscardDeviceResources() {
+void State::DiscardDeviceResources() {
     SAFERELEASE(this->backBrush);
     SAFERELEASE(this->imageBrush);
     SAFERELEASE(this->outlineBrush);
@@ -74,7 +74,7 @@ void DrawableWindow::State::DiscardDeviceResources() {
 }
 
 
-void DrawableWindow::State::Paint(ID2D1RenderTarget* renderTarget) {
+void State::Paint(ID2D1RenderTarget* renderTarget) {
     renderTarget->FillRoundedRectangle(this->drawingArea, this->backBrush);
     renderTarget->DrawRoundedRectangle(this->drawingArea, this->outlineBrush, this->drawingSettings->outlineWidth);
 
@@ -87,7 +87,7 @@ void DrawableWindow::State::Paint(ID2D1RenderTarget* renderTarget) {
 }
 
 
-HRESULT DrawableWindow::State::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
+HRESULT State::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
     this->imageBrush = NULL;
 
     // Create the background brush
@@ -143,7 +143,7 @@ HRESULT DrawableWindow::State::ReCreateDeviceResources(ID2D1RenderTarget* render
 /// <param name="maxWidth">Out. The maximum width to return.</param>
 /// <param name="maxHeight">Out. The maximum height to return.</param>
 /// <param name="size">Out. The desired size will be placed in this SIZE.</param>
-void DrawableWindow::State::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
+void State::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
     IDWriteFactory* factory = NULL;
     IDWriteTextLayout* textLayout = NULL;
     DWRITE_TEXT_METRICS metrics;
@@ -167,7 +167,7 @@ void DrawableWindow::State::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE s
 /// <param name="drawingSettings">The settings to create the textformat with.</param>
 /// <param name="textFormat">Out. The textformat.</param>
 /// <returns>S_OK</returns>
-HRESULT DrawableWindow::State::CreateTextFormat() {
+HRESULT State::CreateTextFormat() {
     // Font weight
     DWRITE_FONT_WEIGHT fontWeight;
     if (_stricmp(drawingSettings->fontWeight, "Thin") == 0)
@@ -295,7 +295,7 @@ HRESULT DrawableWindow::State::CreateTextFormat() {
 /// <param name="right">The text offset from the right.</param>
 /// <param name="bottom">The text offset from the bottom.</param>
 /// <param name="state">The state to set the offsets for.</param>
-void DrawableWindow::State::SetTextOffsets(float left, float top, float right, float bottom) {
+void State::SetTextOffsets(float left, float top, float right, float bottom) {
     this->drawingSettings->textOffsetBottom = bottom;
     this->drawingSettings->textOffsetLeft = left;
     this->drawingSettings->textOffsetRight = right;

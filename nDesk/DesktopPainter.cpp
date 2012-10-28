@@ -55,7 +55,7 @@ DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, "nDesk", g_pCli
     defaults->height = g_pMonitorInfo->m_virtualDesktop.height;
     defaults->x = g_pMonitorInfo->m_virtualDesktop.rect.left;
     defaults->y = g_pMonitorInfo->m_virtualDesktop.rect.top;
-    Initialize(defaults, new DrawableStateSettings());
+    Initialize(defaults);
 
     nCore::System::RegisterWindow("nDesk", this);
     UpdateWallpaper(true);

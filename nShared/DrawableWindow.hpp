@@ -8,7 +8,9 @@
 #pragma once
 
 #include "DrawableSettings.hpp"
-#include "DrawableStateSettings.hpp"
+#include "StateSettings.hpp"
+#include "State.hpp"
+#include "Overlay.hpp"
 #include "MessageHandler.hpp"
 #include <d2d1.h>
 #include <vector>
@@ -28,95 +30,8 @@ using std::map;
 
 class DrawableWindow : MessageHandler {
 public:
-    // Defines a "State" which the window can be in.
-    class State : IPainter {
-    public:
-        explicit State(Settings* settings, int defaultPriority, LPCWSTR text);
-        virtual ~State();
-
-        void Load(DrawableStateSettings* defaultSettings);
-        void UpdatePosition(D2D1_RECT_F position);
-        DrawableStateSettings* GetSettings();
-        
-        // Gets the "desired" size for a given width and height.
-        void GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size);
-
-        void DiscardDeviceResources();
-        void Paint(ID2D1RenderTarget* renderTarget);
-        HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
-        void SetTextOffsets(float left, float top, float right, float bottom);
-
-        // The priority of this state.
-        int priority;
-
-        // Whether or not this state is currently active.
-        bool active;
-
-        // Settings.
-        Settings* settings;
-
-    private:
-        // Creates the text format for this state.
-        HRESULT CreateTextFormat();
-
-        // The current drawing settings.
-        DrawableStateSettings* drawingSettings;
-
-        // The default drawing settings.
-        DrawableStateSettings* defaultSettings;
-
-        // The brush we are currently painting the background with.
-        ID2D1Brush* backBrush;
-
-        // The brush we are currently painting the text with.
-        ID2D1Brush* textBrush;
-
-        // If we are painting an image, the brush for that image.
-        ID2D1Brush* imageBrush;
-
-        // The brush to paint the outline with.
-        ID2D1Brush* outlineBrush;
-
-        // The area we draw text in
-        D2D1_RECT_F textArea;
-
-        // Defines how the text is formatted.
-        IDWriteTextFormat* textFormat;
-
-        // Points to the windows text.
-        LPCWSTR text;
-
-        // The area we draw in.
-        D2D1_ROUNDED_RECT drawingArea;
-
-        // The point we rotate text around.
-        D2D1_POINT_2F textRotationOrigin;
-    };
     typedef list<State*>::iterator STATE;
-
-    // Defines an overlay. A bitmap, or icon, or something.
-    class Overlay : IPainter {
-    public:
-        explicit Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmapSource* source);
-        virtual ~Overlay();
-
-        void DiscardDeviceResources();
-        void Paint(ID2D1RenderTarget* renderTarget);
-        HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
-
-        void UpdatePosition(D2D1_RECT_F parentPosition);
-        void SetSource(IWICBitmapSource* source);
-
-    private:
-        D2D1_RECT_F position;
-        D2D1_RECT_F drawingPosition;
-        ID2D1BitmapBrush* brush;
-        IWICBitmapSource* source; // We need to keep the source image in order to be able to recreate the overlay.
-        ID2D1RenderTarget* renderTarget;
-    };
     typedef list<Overlay*>::iterator OVERLAY;
-
-    // Returned from Add Pre/Post painter.
     typedef list<IPainter*>::iterator PAINTER;
 
     // Constructor used for top-level windows.
@@ -135,7 +50,7 @@ public:
     PAINTER AddPostPainter(IPainter* painter);
 
     // Adds a new state.
-    STATE AddState(LPCSTR prefix, DrawableStateSettings* defaultSettings, int defaultPriority);
+    STATE AddState(LPCSTR prefix, int defaultPriority, StateSettings* defaultSettings = NULL);
 
     // Marks a particular state as active.
     void ActivateState(STATE state);
@@ -174,7 +89,7 @@ public:
     void Hide();
 
     // Initializes the DrawableWindow.
-    void Initialize(DrawableSettings* defaultSettings, DrawableStateSettings* baseStateDefaults);
+    void Initialize(DrawableSettings* defaultSettings = NULL, StateSettings* baseStateDefaults = NULL);
 
     // Returns whether or not this window is visible.
     bool IsVisible();

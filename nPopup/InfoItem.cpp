@@ -24,7 +24,7 @@ InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupIte
     defaults->evaluateText = true;
     MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
 
-    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    StateSettings* defaultState = new StateSettings();
     defaultState->color = 0xAAFF00FF;
     defaultState->fontColor = 0xFF000000;
     StringCchCopy(defaultState->textVerticalAlign, sizeof(defaultState->textVerticalAlign), "Middle");
@@ -35,7 +35,7 @@ InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupIte
 
     ParseDotIcon(customIcon);
 
-    this->hoverState = this->window->AddState("Hover", new DrawableStateSettings(*defaultState), 100);
+    this->hoverState = this->window->AddState("Hover", 100, new StateSettings(*defaultState));
 
     this->window->Show();
 }

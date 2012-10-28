@@ -41,7 +41,7 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     StringCchCopyW(defaultSettings->text, MAX_LINE_LENGTH, L"nDemo");
     MultiByteToWideChar(CP_ACP, 0, title, (int)strlen(title)+1, defaultSettings->text, sizeof(defaultSettings->text)/sizeof(defaultSettings->text[0]));
 
-    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    StateSettings* defaultState = new StateSettings();
     defaultState->color = 0x440000FF;
     defaultState->textRotation = -45.0f;
     defaultState->fontSize = 32.0f;

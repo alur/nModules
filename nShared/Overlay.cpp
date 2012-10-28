@@ -7,7 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "LiteStep.h"
 #include "Debugging.h"
-#include "DrawableWindow.hpp"
+#include "Overlay.hpp"
 #include "Factories.h"
 #include "Macros.h"
 #include <d2d1.h>
@@ -17,7 +17,7 @@
 using namespace D2D1;
 
 
-DrawableWindow::Overlay::Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmapSource* source) {
+Overlay::Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmapSource* source) {
     this->position = position;
     this->source = source;
     this->brush = NULL;
@@ -26,13 +26,13 @@ DrawableWindow::Overlay::Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPositio
 }
 
 
-DrawableWindow::Overlay::~Overlay() {
+Overlay::~Overlay() {
     DiscardDeviceResources();
     SAFERELEASE(this->source);
 }
 
 
-HRESULT DrawableWindow::Overlay::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
+HRESULT Overlay::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
     IWICBitmapScaler* scaler = NULL;
     IWICFormatConverter* converter = NULL;
     IWICImagingFactory* factory = NULL;
@@ -91,12 +91,12 @@ HRESULT DrawableWindow::Overlay::ReCreateDeviceResources(ID2D1RenderTarget* rend
 }
 
 
-void DrawableWindow::Overlay::DiscardDeviceResources() {
+void Overlay::DiscardDeviceResources() {
     SAFERELEASE(this->brush);
 }
 
 
-void DrawableWindow::Overlay::UpdatePosition(D2D1_RECT_F parentPosition) {
+void Overlay::UpdatePosition(D2D1_RECT_F parentPosition) {
     this->drawingPosition = this->position;
     this->drawingPosition.left += parentPosition.left;
     this->drawingPosition.right += parentPosition.left;
@@ -111,14 +111,14 @@ void DrawableWindow::Overlay::UpdatePosition(D2D1_RECT_F parentPosition) {
 }
 
 
-void DrawableWindow::Overlay::Paint(ID2D1RenderTarget* renderTarget) {
+void Overlay::Paint(ID2D1RenderTarget* renderTarget) {
     if (this->brush != NULL) {
         renderTarget->FillRectangle(this->drawingPosition, this->brush);
     }
 }
 
 
-void DrawableWindow::Overlay::SetSource(IWICBitmapSource* source) {
+void Overlay::SetSource(IWICBitmapSource* source) {
     SAFERELEASE(this->brush);
     SAFERELEASE(this->source);
     this->source = source;

@@ -15,7 +15,7 @@ Tooltip::Tooltip(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, par
     defaults->height = 40;
     defaults->alwaysOnTop = true;
 
-    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    StateSettings* defaultState = new StateSettings();
     defaultState->color = 0xCCFAFAD2;
     defaultState->fontColor = 0xFF000000;
     defaultState->textOffsetTop = 2;

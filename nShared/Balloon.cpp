@@ -18,7 +18,7 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     defaults->height = 40;
     defaults->alwaysOnTop = true;
 
-    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    StateSettings* defaultState = new StateSettings();
     defaultState->color = 0xCCFAFAD2;
     defaultState->fontColor = 0xFF000000;
     defaultState->textOffsetTop = 4;
@@ -43,7 +43,7 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     titleDefaults->x = 4;
     titleDefaults->y = 4;
 
-    DrawableStateSettings* titleBaseStateDefaults = new DrawableStateSettings();
+    StateSettings* titleBaseStateDefaults = new StateSettings();
     titleBaseStateDefaults->fontColor = 0xFF000000;
     titleBaseStateDefaults->color = 0;
     StringCchCopy(titleBaseStateDefaults->fontWeight, sizeof(titleBaseStateDefaults->fontWeight), "Bold");
@@ -58,7 +58,7 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     closeBtnDefaults->width = 16;
     closeBtnDefaults->height = 16;
 
-    DrawableStateSettings* closeBtnBaseStateDefaults = new DrawableStateSettings();
+    StateSettings* closeBtnBaseStateDefaults = new StateSettings();
     closeBtnBaseStateDefaults->color = 0xAA77AACC;
     closeBtnBaseStateDefaults->fontColor = 0xFF000000;
     closeBtnBaseStateDefaults->outlineColor = 0xFF000000;

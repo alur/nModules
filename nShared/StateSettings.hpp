@@ -11,13 +11,13 @@
 #include <dwrite.h>
 #include "Settings.hpp"
 
-class DrawableStateSettings {
+class StateSettings {
 public:
-    explicit DrawableStateSettings();
-    virtual ~DrawableStateSettings();
+    explicit StateSettings();
+    virtual ~StateSettings();
 
     // Loads the actual settings.
-    void Load(Settings* settings, DrawableStateSettings* defaults);
+    void Load(Settings* settings, StateSettings* defaults);
 
     // The background color of the window. Default: 0xFF000000 (black)
     ARGB color;

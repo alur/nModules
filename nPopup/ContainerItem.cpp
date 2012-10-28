@@ -18,13 +18,13 @@ ContainerItem::ContainerItem(Drawable* parent, LPCSTR prefix) : PopupItem(parent
     DrawableSettings* defaults = new DrawableSettings();
     defaults->registerWithCore = true;
 
-    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    StateSettings* defaultState = new StateSettings();
     defaultState->color = 0xAAFFFFFF;
     defaultState->fontColor = 0xFF000000;
 
     this->window->Initialize(defaults, defaultState);
 
-    this->hoverState = this->window->AddState("Hover", new DrawableStateSettings(*defaultState), 100);
+    this->hoverState = this->window->AddState("Hover", 100, new StateSettings(*defaultState));
 
     this->window->Show();
 }

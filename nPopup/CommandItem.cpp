@@ -38,7 +38,7 @@ void CommandItem::Init(LPCSTR title, LPCSTR command) {
     defaults->height = 20;
     MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
 
-    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    StateSettings* defaultState = new StateSettings();
     defaultState->color = 0xAAFFFF00;
     defaultState->fontColor = 0xFF000000;
     StringCchCopy(defaultState->textVerticalAlign, sizeof(defaultState->textVerticalAlign), "Middle");
@@ -46,7 +46,7 @@ void CommandItem::Init(LPCSTR title, LPCSTR command) {
     defaultState->textOffsetRight = 5;
 
     this->window->Initialize(defaults, defaultState);
-    this->hoverState = this->window->AddState("Hover", new DrawableStateSettings(*defaultState), 100);
+    this->hoverState = this->window->AddState("Hover", 100, new StateSettings(*defaultState));
 }
 
 

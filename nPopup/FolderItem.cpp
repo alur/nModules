@@ -38,7 +38,7 @@ void nPopup::FolderItem::Init(LPCSTR title, Popup* popup) {
     defaults->height = 20;
     MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
 
-    DrawableStateSettings* defaultState = new DrawableStateSettings();
+    StateSettings* defaultState = new StateSettings();
     defaultState->color = 0xAA00FFFF;
     defaultState->fontColor = 0xFF000000;
     StringCchCopy(defaultState->textVerticalAlign, sizeof(defaultState->textVerticalAlign), "Middle");
@@ -47,8 +47,8 @@ void nPopup::FolderItem::Init(LPCSTR title, Popup* popup) {
 
     this->window->Initialize(defaults, defaultState);
 
-    this->hoverState = this->window->AddState("Hover", new DrawableStateSettings(*defaultState), 100);
-    this->openState = this->window->AddState("Open", new DrawableStateSettings(*defaultState), 80);
+    this->hoverState = this->window->AddState("Hover", 100, new StateSettings(*defaultState));
+    this->openState = this->window->AddState("Open", 80, new StateSettings(*defaultState));
 }
 
 
