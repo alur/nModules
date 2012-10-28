@@ -17,6 +17,9 @@
 // Safe way to release objects which require ->Release()
 #define SAFERELEASE(x) if (x != NULL) { (x)->Release(); x = NULL; }
 
+// Safe way to free memory
+#define SAFEFREE(x) if (x != NULL) { free(x); x = NULL; }
+
 // Easy DLL import/export
 #define EXPORT_CDECL(type) EXTERN_C __declspec(dllexport) type __cdecl
 #define EXPORT_STDCALL(type) EXTERN_C __declspec(dllexport) type __stdcall

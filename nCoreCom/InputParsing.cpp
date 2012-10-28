@@ -9,6 +9,7 @@
 #include "Core.h"
 
 // Pointers to the functions in the core.
+bool (__cdecl * _pParseColor)(LPCSTR, ARGB*);
 bool (__cdecl * _pParseCoordinate)(LPCSTR, int *, bool, bool);
 bool (__cdecl * _pParseLength)(LPCSTR, int *, bool, bool);
 bool (__cdecl * _pParseMonitor)(LPCSTR, UINT *);
@@ -28,19 +29,20 @@ UINT (__cdecl * _pGetPrefixedRCMonitor)(LPCSTR, LPCSTR, UINT);
 /// </summary>
 /// <returns>True if the core is succefully initalized.</returns>
 HRESULT nCore::InputParsing::Init(HMODULE hCoreInstance) {
-    INIT_FUNC(_pParseCoordinate,bool (__cdecl *)(LPCSTR, int *, bool, bool),"ParseCoordinateEx")
-    INIT_FUNC(_pParseLength,bool (__cdecl *)(LPCSTR, int *, bool, bool),"ParseLength")
-    INIT_FUNC(_pParseMonitor,bool (__cdecl *)(LPCSTR, UINT *),"ParseMonitor")
-    INIT_FUNC(_pParseBool,bool (__cdecl *)(LPCSTR),"ParseBool")
+    INIT_FUNC(_pParseColor,bool (__cdecl *)(LPCSTR, ARGB*),"ParseColor");
+    INIT_FUNC(_pParseCoordinate,bool (__cdecl *)(LPCSTR, int *, bool, bool),"ParseCoordinateEx");
+    INIT_FUNC(_pParseLength,bool (__cdecl *)(LPCSTR, int *, bool, bool),"ParseLength");
+    INIT_FUNC(_pParseMonitor,bool (__cdecl *)(LPCSTR, UINT *),"ParseMonitor");
+    INIT_FUNC(_pParseBool,bool (__cdecl *)(LPCSTR),"ParseBool");
 
-    INIT_FUNC(_pGetPrefixedRCInt,int (__cdecl *)(LPCSTR, LPCSTR, int),"GetPrefixedRCInt")
-    INIT_FUNC(_pGetPrefixedRCFloat,float (__cdecl *)(LPCSTR, LPCSTR, float),"GetPrefixedRCFloat")
-    INIT_FUNC(_pGetPrefixedRCDouble,double (__cdecl *)(LPCSTR, LPCSTR, double),"GetPrefixedRCDouble")
-    INIT_FUNC(_pGetPrefixedRCColor,ARGB (__cdecl *)(LPCSTR, LPCSTR, int),"GetPrefixedRCColor")
-    INIT_FUNC(_pGetPrefixedRCBool,bool (__cdecl *)(LPCSTR, LPCSTR, bool),"GetPrefixedRCBool")
-    INIT_FUNC(_pGetPrefixedRCString,bool (__cdecl *)(LPCSTR, LPCSTR, LPSTR, LPCSTR, UINT),"GetPrefixedRCString")
-    INIT_FUNC(_pGetPrefixedRCWString,bool (__cdecl *)(LPCSTR, LPCSTR, LPWSTR, LPCSTR, UINT),"GetPrefixedRCWString")
-    INIT_FUNC(_pGetPrefixedRCMonitor,UINT (__cdecl *)(LPCSTR, LPCSTR, UINT),"GetPrefixedRCMonitor")
+    INIT_FUNC(_pGetPrefixedRCInt,int (__cdecl *)(LPCSTR, LPCSTR, int),"GetPrefixedRCInt");
+    INIT_FUNC(_pGetPrefixedRCFloat,float (__cdecl *)(LPCSTR, LPCSTR, float),"GetPrefixedRCFloat");
+    INIT_FUNC(_pGetPrefixedRCDouble,double (__cdecl *)(LPCSTR, LPCSTR, double),"GetPrefixedRCDouble");
+    INIT_FUNC(_pGetPrefixedRCColor,ARGB (__cdecl *)(LPCSTR, LPCSTR, int),"GetPrefixedRCColor");
+    INIT_FUNC(_pGetPrefixedRCBool,bool (__cdecl *)(LPCSTR, LPCSTR, bool),"GetPrefixedRCBool");
+    INIT_FUNC(_pGetPrefixedRCString,bool (__cdecl *)(LPCSTR, LPCSTR, LPSTR, LPCSTR, UINT),"GetPrefixedRCString");
+    INIT_FUNC(_pGetPrefixedRCWString,bool (__cdecl *)(LPCSTR, LPCSTR, LPWSTR, LPCSTR, UINT),"GetPrefixedRCWString");
+    INIT_FUNC(_pGetPrefixedRCMonitor,UINT (__cdecl *)(LPCSTR, LPCSTR, UINT),"GetPrefixedRCMonitor");
 
     return S_OK;
 }
@@ -80,6 +82,11 @@ bool nCore::InputParsing::ParseLength(LPCSTR szLength, int * target, bool canBeR
 /// <returns>True if pszMonitor is a valid length.</return>
 bool nCore::InputParsing::ParseMonitor(LPCSTR pszMonitor, UINT * target) {
     return _pParseMonitor(pszMonitor, target);
+}
+
+
+bool nCore::InputParsing::ParseColor(LPCSTR pszColor, ARGB * target) {
+    return _pParseColor(pszColor, target);
 }
 
 

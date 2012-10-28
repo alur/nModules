@@ -13,11 +13,14 @@
 #include "LiteStep.h"
 #include "Macros.h"
 #include <wincodec.h>
+#include "../nCoreCom/Core.h"
 
 
 Brush::Brush() {
     this->brushType = SolidColor;
     this->brush = NULL;
+    this->gradientStops = NULL;
+    this->gradientStopCount = 0;
 }
 
 
@@ -34,9 +37,15 @@ void Brush::Load(BrushSettings* settings) {
     }
     else if (_stricmp(this->brushSettings.brushType, "LinearGradient") == 0) {
         this->brushType = LinearGradient;
+        this->gradientStart = D2D1::Point2F(this->brushSettings.gradientStartX, this->brushSettings.gradientStartY);
+        this->gradientEnd = D2D1::Point2F(this->brushSettings.gradientEndX, this->brushSettings.gradientEndY);
+        LoadGradientStops();
     }
     else if (_stricmp(this->brushSettings.brushType, "RadialGradient") == 0) {
         this->brushType = RadialGradient;
+        this->gradientCenter = D2D1::Point2F(this->brushSettings.gradientCenterX, this->brushSettings.gradientCenterY);
+        this->gradientOriginOffset = D2D1::Point2F(this->brushSettings.gradientOriginOffsetX, this->brushSettings.gradientOriginOffsetY);
+        LoadGradientStops();
     }
     else {
         this->brushType = SolidColor;
@@ -44,12 +53,34 @@ void Brush::Load(BrushSettings* settings) {
 }
 
 
+void Brush::LoadGradientStops() {
+    char colorToken[MAX_LINE_LENGTH], stopToken[MAX_LINE_LENGTH];
+    LPCSTR colorPointer = this->brushSettings.gradientColors, stopPointer = this->brushSettings.gradientStops;
+
+    using namespace LiteStep;
+    using namespace nCore::InputParsing;
+
+    while (GetToken(colorPointer, colorToken, &colorPointer, FALSE) != FALSE && GetToken(stopPointer, stopToken, &stopPointer, FALSE) != FALSE) {
+        ARGB color;
+        float stop;
+        char* endPtr;
+
+        ParseColor(colorToken, &color);
+        stop = (float)strtod(stopToken, &endPtr);
+
+        this->gradientStops = (D2D1_GRADIENT_STOP*)realloc(this->gradientStops, ++this->gradientStopCount*sizeof(D2D1_GRADIENT_STOP));
+        this->gradientStops[this->gradientStopCount-1].color = Color::ARGBToD2D(color);
+        this->gradientStops[this->gradientStopCount-1].position = stop;
+    }
+}
+
+
 void Brush::UpdatePosition(D2D1_RECT_F position) {
     this->position = position;
 
-    if (this->brushType == Image && this->brush) {
-        (reinterpret_cast<ID2D1BitmapBrush*>(this->brush))->SetTransform(D2D1::Matrix3x2F::Identity());
-        (reinterpret_cast<ID2D1BitmapBrush*>(this->brush))->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
+    if (this->brush) {
+        this->brush->SetTransform(D2D1::Matrix3x2F::Identity());
+        this->brush->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
     }
 }
 
@@ -57,6 +88,7 @@ void Brush::UpdatePosition(D2D1_RECT_F position) {
 //
 void Brush::Discard() {
     SAFERELEASE(this->brush);
+    SAFEFREE(this->gradientStops);
 }
 
 
@@ -76,13 +108,24 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
 
         case LinearGradient:
             {
-                renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->brushSettings.color), (ID2D1SolidColorBrush**)&this->brush);
+                ID2D1GradientStopCollection* stops;
+                renderTarget->CreateGradientStopCollection(this->gradientStops, this->gradientStopCount, &stops);
+                renderTarget->CreateLinearGradientBrush(
+                    D2D1::LinearGradientBrushProperties(this->gradientStart, this->gradientEnd),
+                    stops, reinterpret_cast<ID2D1LinearGradientBrush**>(&this->brush));
+                stops->Release();
             }
             break;
 
         case RadialGradient:
             {
-                renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->brushSettings.color), (ID2D1SolidColorBrush**)&this->brush);
+                ID2D1GradientStopCollection* stops;
+                renderTarget->CreateGradientStopCollection(this->gradientStops, this->gradientStopCount, &stops);
+                renderTarget->CreateRadialGradientBrush(
+                    D2D1::RadialGradientBrushProperties(this->gradientCenter, this->gradientOriginOffset,
+                    this->brushSettings.gradientRadiusX, this->brushSettings.gradientRadiusY),
+                    stops, reinterpret_cast<ID2D1RadialGradientBrush**>(&this->brush));
+                stops->Release();
             }
             break;
 
@@ -111,7 +154,7 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
                             hr = renderTarget->CreateBitmapBrush(bitmap, reinterpret_cast<ID2D1BitmapBrush**>(&this->brush));
                         }
                         if (SUCCEEDED(hr)) {
-                            (reinterpret_cast<ID2D1BitmapBrush*>(this->brush))->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
+                            this->brush->SetOpacity(this->brushSettings.imageOpacity);
                         }
 
                         DeleteObject(hBitmap);
@@ -124,9 +167,12 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
                     }
                 }
             }
-
             break;
         }
+    }
+
+    if (SUCCEEDED(hr)) {
+        this->brush->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
     }
 
     return hr;

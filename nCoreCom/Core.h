@@ -24,6 +24,7 @@ namespace nCore {
     namespace InputParsing {
         HRESULT Init(HMODULE);
 
+        bool ParseColor(LPCSTR pszColor, ARGB * target);
         bool ParseCoordinate(LPCSTR, int *, bool canBeRelative = true, bool canBeNegative = true);
         bool ParseLength(LPCSTR, int *, bool canBeRelative = true, bool canBeNegative = false);
         bool ParseMonitor(LPCSTR pszMonitor, UINT * target);

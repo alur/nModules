@@ -163,7 +163,7 @@ bool CoverArt::SetCoverFromFolder(LPCWSTR filePath) {
         StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, canidate->c_str());
 
 		if (FindFirstFileW(artPath, &FindFileData) != INVALID_HANDLE_VALUE) {
-            // Todo::We could try other fils if this fails.
+            // Todo::We could try other files if this fails.
             StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, FindFileData.cFileName);
 
             hr = Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));

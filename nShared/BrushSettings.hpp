@@ -25,19 +25,40 @@ public:
     // The color of a SolidColor brush. Default: 0xFF000000 (black)
     ARGB color;
 
-    // The angle along which the stops are located for a LinearGradient. Default: 0
-    float gradientAngle;
-
     // The colors to use in a gradient. Default: black
     char gradientColors[4096];
 
+    // The x coordinate of the center of a gradient. Default: 0
+    float gradientCenterX;
+
+    // The y coordinate of the center of a gradient. Default: 0
+    float gradientCenterY;
+
     // The x coordinate of the origin of a gradient. Default: 0
-    float gradientOriginX;
+    float gradientEndX;
 
     // The y coordinate of the origin of a gradient. Default: 0
-    float gradientOriginY;
+    float gradientEndY;
 
-    // The locations along the gradient where the color changes. Default: ""
+    // The x coordinate of the origin of a gradient. Default: 0
+    float gradientOriginOffsetX;
+
+    // The y coordinate of the origin of a gradient. Default: 0
+    float gradientOriginOffsetY;
+
+    // The x coordinate of the origin of a gradient. Default: 0
+    float gradientRadiusX;
+
+    // The y coordinate of the origin of a gradient. Default: 0
+    float gradientRadiusY;
+
+    // The x coordinate of the origin of a gradient. Default: 0
+    float gradientStartX;
+
+    // The y coordinate of the origin of a gradient. Default: 0
+    float gradientStartY;
+
+    // The locations along the gradient where the color changes. Default: "0.0"
     char gradientStops[4096];
 
     // The image to use for this window. Default: "" (blank)
