@@ -126,11 +126,9 @@ bool Popup::CheckFocus(HWND newActive, __int8 direction) {
 
 
 void Popup::Close() {
-    TRACEW(L"Closing %s", this->window->GetDrawingSettings()->text);
     this->window->Hide();
     this->expandLeft = settings->GetBool("ExpandLeft", false);
     CloseChild(true);
-    TRACEW(L"PostClose %s", this->window->GetDrawingSettings()->text);
     PostClose();
     this->mouseOver = false;
     if (this->owner != NULL) {

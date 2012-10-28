@@ -43,7 +43,6 @@ ContentPopup::ContentPopup(LPCSTR path, bool dynamic, LPCSTR title, LPCSTR bang,
 
 
 ContentPopup::~ContentPopup() {
-    TRACEW(L"~ContentPopup %s", this->window->GetDrawingSettings()->text);
     for (WATCHFOLDERMAP::const_iterator iter = this->watchedFolders.begin(); iter != this->watchedFolders.end(); ++iter) {
         iter->second.second->Release();
         this->window->ReleaseUserMessage(iter->first);
@@ -64,7 +63,6 @@ bool sorter(PopupItem* a, PopupItem* b) {
 
 
 void ContentPopup::PreShow() {
-    TRACEW(L"ContentPopup::PreShow() %s", this->window->GetDrawingSettings()->text);
 
     if (!this->loaded) {
         LoadContent();
@@ -75,7 +73,6 @@ void ContentPopup::PreShow() {
 
 
 void ContentPopup::PostClose() {
-    TRACEW(L"ContentPopup::PostClose() %s", this->window->GetDrawingSettings()->text);
     if (this->dynamic) {
         for (WATCHFOLDERMAP::const_iterator iter = this->watchedFolders.begin(); iter != this->watchedFolders.end(); ++iter) {
             iter->second.second->Release();
@@ -95,7 +92,6 @@ void ContentPopup::PostClose() {
 
 
 void ContentPopup::LoadContent() {
-    TRACEW(L"ContentPopup::LoadContent() %s", this->window->GetDrawingSettings()->text);
     switch (this->source) {
     case ADMIN_TOOLS:
         LoadShellFolder(FOLDERID_AdminTools);
