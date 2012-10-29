@@ -58,6 +58,8 @@ void State::UpdatePosition(D2D1_RECT_F position) {
     this->backBrush->UpdatePosition(position);
     this->outlineBrush->UpdatePosition(position);
     this->textBrush->UpdatePosition(position);
+
+    this->drawingArea.rect = this->backBrush->brushPosition;
 }
 
 
@@ -101,6 +103,8 @@ HRESULT State::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
     backBrush->ReCreate(renderTarget);
     outlineBrush->ReCreate(renderTarget);
     textBrush->ReCreate(renderTarget);
+
+    this->drawingArea.rect = this->backBrush->brushPosition;
     return S_OK;
 }
 

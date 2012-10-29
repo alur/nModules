@@ -32,6 +32,8 @@ BrushSettings::BrushSettings() {
     this->imageOpacity = 1.0f;
     this->imageRotation = 0.0f;
     StringCchCopy(this->imageScalingMode, sizeof(this->imageScalingMode), "Tile");
+    StringCchCopy(this->tilingModeX, sizeof(this->tilingModeX), "Tile");
+    StringCchCopy(this->tilingModeY, sizeof(this->tilingModeY), "Tile");
 }
 
 
@@ -65,4 +67,6 @@ void BrushSettings::Load(Settings* settings, BrushSettings* defaults) {
     this->imageOpacity = settings->GetInt("Alpha", int(defaults->imageOpacity*255))/255.0f;
     this->imageRotation = settings->GetFloat("ImageRotation", defaults->imageRotation);
     settings->GetString("ImageScalingMode", this->imageScalingMode, sizeof(this->imageScalingMode), defaults->imageScalingMode);
+    settings->GetString("TilingModeX", this->tilingModeX, sizeof(this->tilingModeX), defaults->tilingModeX);
+    settings->GetString("TilingModeY", this->tilingModeY, sizeof(this->tilingModeY), defaults->tilingModeY);
 }

@@ -50,6 +50,42 @@ void Brush::Load(BrushSettings* settings) {
     else {
         this->brushType = SolidColor;
     }
+
+    if (_stricmp(this->brushSettings.imageScalingMode, "Tile") == 0) {
+        this->scalingMode = Tile;
+    }
+    else if (_stricmp(this->brushSettings.imageScalingMode, "Fit") == 0) {
+        this->scalingMode = Fit;
+    }
+    else if (_stricmp(this->brushSettings.imageScalingMode, "Fill") == 0) {
+        this->scalingMode = Fill;
+    }
+    else if (_stricmp(this->brushSettings.imageScalingMode, "Stretch") == 0) {
+        this->scalingMode = Stretch;
+    }
+    else {
+        this->scalingMode = Center;
+    }
+
+    if (_stricmp(this->brushSettings.tilingModeX, "Mirror") == 0) {
+        this->tileModeX = D2D1_EXTEND_MODE_MIRROR;
+    }
+    else if (_stricmp(this->brushSettings.tilingModeX, "Clamp") == 0) {
+        this->tileModeX = D2D1_EXTEND_MODE_CLAMP;
+    }
+    else {
+        this->tileModeX = D2D1_EXTEND_MODE_WRAP;
+    }
+
+    if (_stricmp(this->brushSettings.tilingModeY, "Mirror") == 0) {
+        this->tileModeY = D2D1_EXTEND_MODE_MIRROR;
+    }
+    else if (_stricmp(this->brushSettings.tilingModeY, "Clamp") == 0) {
+        this->tileModeY = D2D1_EXTEND_MODE_CLAMP;
+    }
+    else {
+        this->tileModeY = D2D1_EXTEND_MODE_WRAP;
+    }
 }
 
 
@@ -71,16 +107,6 @@ void Brush::LoadGradientStops() {
         this->gradientStops = (D2D1_GRADIENT_STOP*)realloc(this->gradientStops, ++this->gradientStopCount*sizeof(D2D1_GRADIENT_STOP));
         this->gradientStops[this->gradientStopCount-1].color = Color::ARGBToD2D(color);
         this->gradientStops[this->gradientStopCount-1].position = stop;
-    }
-}
-
-
-void Brush::UpdatePosition(D2D1_RECT_F position) {
-    this->position = position;
-
-    if (this->brush) {
-        this->brush->SetTransform(D2D1::Matrix3x2F::Identity());
-        this->brush->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
     }
 }
 
@@ -131,40 +157,38 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
 
         case Image:
             {
-                if (this->brushSettings.image[0] != 0) {
-                    IWICImagingFactory* factory = NULL;
-                    IWICBitmap* wicBitmap = NULL;
-                    IWICFormatConverter* converter = NULL;
-                    ID2D1Bitmap* bitmap = NULL;
-                    Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
+                IWICImagingFactory* factory = NULL;
+                IWICBitmap* wicBitmap = NULL;
+                IWICFormatConverter* converter = NULL;
+                ID2D1Bitmap* bitmap = NULL;
+                Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
         
-                    HBITMAP hBitmap = LiteStep::LoadLSImage(this->brushSettings.image, NULL);
-                    if (hBitmap) {
-                        hr = factory->CreateFormatConverter(&converter);
-                        if (SUCCEEDED(hr)) {
-                            hr = factory->CreateBitmapFromHBITMAP(hBitmap, NULL, WICBitmapUseAlpha, &wicBitmap);
-                        }
-                        if (SUCCEEDED(hr)) {
-                            hr = converter->Initialize(wicBitmap, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut);
-                        }
-                        if (SUCCEEDED(hr)) {
-                            hr = renderTarget->CreateBitmapFromWicBitmap(converter, NULL, &bitmap);
-                        }
-                        if (SUCCEEDED(hr)) {
-                            hr = renderTarget->CreateBitmapBrush(bitmap, reinterpret_cast<ID2D1BitmapBrush**>(&this->brush));
-                        }
-                        if (SUCCEEDED(hr)) {
-                            this->brush->SetOpacity(this->brushSettings.imageOpacity);
-                        }
+                HBITMAP hBitmap = LiteStep::LoadLSImage(this->brushSettings.image, NULL);
+                if (hBitmap) {
+                    hr = factory->CreateFormatConverter(&converter);
+                    if (SUCCEEDED(hr)) {
+                        hr = factory->CreateBitmapFromHBITMAP(hBitmap, NULL, WICBitmapUseAlpha, &wicBitmap);
+                    }
+                    if (SUCCEEDED(hr)) {
+                        hr = converter->Initialize(wicBitmap, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut);
+                    }
+                    if (SUCCEEDED(hr)) {
+                        hr = renderTarget->CreateBitmapFromWicBitmap(converter, NULL, &bitmap);
+                    }
+                    if (SUCCEEDED(hr)) {
+                        hr = renderTarget->CreateBitmapBrush(bitmap, reinterpret_cast<ID2D1BitmapBrush**>(&this->brush));
+                    }
+                    if (SUCCEEDED(hr)) {
+                        this->brush->SetOpacity(this->brushSettings.imageOpacity);
+                    }
 
-                        DeleteObject(hBitmap);
-                        SAFERELEASE(wicBitmap);
-                        SAFERELEASE(bitmap);
-                        SAFERELEASE(converter);
-                    }
-                    else {
-                        hr = E_FAIL;
-                    }
+                    DeleteObject(hBitmap);
+                    SAFERELEASE(wicBitmap);
+                    SAFERELEASE(bitmap);
+                    SAFERELEASE(converter);
+                }
+                else {
+                    hr = E_FAIL;
                 }
             }
             break;
@@ -172,8 +196,94 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
     }
 
     if (SUCCEEDED(hr)) {
-        this->brush->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
+        UpdatePosition(this->position);
     }
 
     return hr;
+}
+
+
+void Brush::ScaleImage() {
+    ID2D1Bitmap* bitmap;
+    reinterpret_cast<ID2D1BitmapBrush*>(this->brush)->GetBitmap(&bitmap);
+    D2D1_SIZE_F size = bitmap->GetSize();
+    bitmap->Release();
+
+    using namespace D2D1;
+
+    D2D1_POINT_2F centerPoint = Point2F(
+        this->position.left + (this->position.right - this->position.left)/2.0f,
+        this->position.top + (this->position.bottom - this->position.top)/2.0f
+    );
+
+    switch(this->scalingMode) {
+    case Center:
+        {
+            this->brush->SetTransform(Matrix3x2F::Translation(centerPoint.x - size.width/2.0f, centerPoint.y - size.height/2.0f));
+            this->brushPosition.left = max(centerPoint.x - size.width/2.0f, this->position.left);
+            this->brushPosition.top = max(centerPoint.y - size.height/2.0f, this->position.top);
+            this->brushPosition.right = min(this->brushPosition.left + size.width, this->position.right);
+            this->brushPosition.bottom = min(this->brushPosition.top + size.height, this->position.bottom);
+        }
+        break;
+
+    case Stretch:
+        {
+            this->brush->SetTransform(
+                Matrix3x2F::Translation(this->position.left, this->position.top) *
+                Matrix3x2F::Scale(
+                    (this->position.right - this->position.left)/size.width,
+                    (this->position.bottom - this->position.top)/size.height,
+                    Point2F(this->position.left, this->position.top)
+                )
+            );
+        }
+        break;
+
+    case Fit:
+        {
+            float scale = min((this->position.right - this->position.left)/size.width, (this->position.bottom - this->position.top)/size.height);
+            this->brush->SetTransform(
+                Matrix3x2F::Translation(centerPoint.x - size.width/2.0f, centerPoint.y - size.height/2.0f) *
+                Matrix3x2F::Scale(scale, scale, centerPoint)
+            );
+            this->brushPosition.left = centerPoint.x - scale*size.width/2.0f;
+            this->brushPosition.top = centerPoint.y - scale*size.height/2.0f;
+            this->brushPosition.right = this->brushPosition.left + scale*size.width;
+            this->brushPosition.bottom = this->brushPosition.top + scale*size.height;
+        }
+        break;
+
+    case Fill:
+        {
+            float scale = max((this->position.right - this->position.left)/size.width, (this->position.bottom - this->position.top)/size.height);
+            this->brush->SetTransform(
+                Matrix3x2F::Translation(centerPoint.x - size.width/2.0f, centerPoint.y - size.height/2.0f) *
+                Matrix3x2F::Scale(scale, scale, centerPoint)
+            );
+        }
+        break;
+
+    case Tile:
+        {
+            this->brush->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
+            reinterpret_cast<ID2D1BitmapBrush*>(this->brush)->SetExtendModeX(this->tileModeX);
+            reinterpret_cast<ID2D1BitmapBrush*>(this->brush)->SetExtendModeY(this->tileModeY);
+        }
+        break;
+    }
+}
+
+
+void Brush::UpdatePosition(D2D1_RECT_F position) {
+    this->position = this->brushPosition = position;
+
+    if (this->brush) {
+        if (this->brushType == Image) {
+            ScaleImage();
+        }
+        else {
+            this->brush->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
+        }
+    }
 }

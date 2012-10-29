@@ -72,4 +72,10 @@ public:
 
     // How to position the image. Fit, Fill, Center, Stretch, or Tile. Default: Tile
     char imageScalingMode[32];
+
+    // Horizontal tiling mode. Clamp, Tile, or Mirror. Default: Tile
+    char tilingModeX[32];
+
+    // Vertical tiling mode. Clamp, Tile, or Mirror. Default: Tile
+    char tilingModeY[32];
 };

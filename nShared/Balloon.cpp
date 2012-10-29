@@ -96,6 +96,12 @@ LRESULT WINAPI Balloon::HandleMessage(HWND window, UINT message, WPARAM wParam, 
 }
 
 
+void Balloon::Hide() {
+    this->window->ClearOverlays();
+    this->window->Hide();
+}
+
+
 void Balloon::Show(LPCWSTR title, LPCWSTR text, HICON icon, LPSIZE iconSize, LPRECT targetPosition) {
     int offsetLeft;
     if (icon != NULL) {
@@ -128,10 +134,4 @@ void Balloon::Show(LPCWSTR title, LPCWSTR text, HICON icon, LPSIZE iconSize, LPR
             monInfo->m_virtualDesktop.rect.bottom - this->window->GetDrawingSettings()->height));
 
     this->window->Show();
-}
-
-
-void Balloon::Hide() {
-    this->window->ClearOverlays();
-    this->window->Hide();
 }

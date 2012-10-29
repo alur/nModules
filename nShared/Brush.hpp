@@ -23,6 +23,9 @@ public:
     // The brush.
     ID2D1Brush* brush;
 
+    //
+    D2D1_RECT_F brushPosition;
+
     // Discards the brush.
     void Discard();
 
@@ -30,22 +33,37 @@ public:
     HRESULT ReCreate(ID2D1RenderTarget* renderTarget);
 
 private:
-    // The various brush types.
+    // The type of brush this is.
     enum BrushType {
         SolidColor,
         LinearGradient,
         RadialGradient,
         Image
-    };
+    } brushType;
+
+    // How to scale the brush.
+    enum ImageScalingMode {
+        Fit,
+        Fill,
+        Stretch,
+        Center,
+        Tile
+    } scalingMode;
 
     // Loads render targets.
     void LoadGradientStops();
+
+    //
+    void ScaleImage();
     
     // The current drawing settings.
     BrushSettings brushSettings;
 
-    // The type of brush this is.
-    BrushType brushType;
+    //
+    D2D1_EXTEND_MODE tileModeX;
+
+    //
+    D2D1_EXTEND_MODE tileModeY;
 
     // The current position of the 
     D2D1_RECT_F position;
