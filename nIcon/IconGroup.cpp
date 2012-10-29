@@ -102,7 +102,7 @@ void IconGroup::SetFolder(LPWSTR folder) {
     this->window->Repaint();
 
     // Register for change notifications
-    SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
+    SHChangeNotifyEntry watchEntries[] = { idList, FALSE };
     this->changeNotifyUID = SHChangeNotifyRegister(
         this->window->GetWindowHandle(),
         SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
@@ -225,9 +225,18 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
     if (message == this->changeNotifyMsg) {
         long event;
         PIDLIST_ABSOLUTE* idList;
+        WCHAR file1[MAX_PATH] = L"", file2[MAX_PATH] = L"";
         HANDLE notifyLock = SHChangeNotification_Lock((HANDLE)wParam, (DWORD)lParam, &idList, &event);
 
         if (notifyLock) {
+            if (idList[0]) {
+                GetDisplayNameOf(idList[0], SHGDN_FORPARSING, file1, sizeof(file1)/sizeof(WCHAR));
+                if (idList[1]) {
+                    GetDisplayNameOf(idList[1], SHGDN_FORPARSING, file2, sizeof(file2)/sizeof(WCHAR));
+                }
+            }
+            TRACEW(L"ChangeNotifyEvent[%d]: %s %s %l", event, file1, file2);
+
             switch (event) {
             case SHCNE_ATTRIBUTES:
             case SHCNE_UPDATEITEM:
