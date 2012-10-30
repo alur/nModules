@@ -666,6 +666,7 @@ void DrawableWindow::Move(int x, int y) {
 /// </summary>
 void DrawableWindow::Paint() {
     if (this->visible) {
+        this->renderTarget->PushAxisAlignedClip(this->drawingArea, D2D1_ANTIALIAS_MODE_ALIASED);
         this->renderTarget->SetTransform(Matrix3x2F::Identity());
 
         // Paint the active state.
@@ -686,6 +687,8 @@ void DrawableWindow::Paint() {
         for (PAINTER painter = this->postPainters.begin(); painter != this->postPainters.end(); ++painter) {
             (*painter)->Paint(this->renderTarget);
         }
+
+        this->renderTarget->PopAxisAlignedClip();
     }
 }
 

@@ -112,7 +112,7 @@ void WindowManager::AddWindow(HWND hWnd) {
         wndInfo.uMonitor = g_pMonitorInfo->MonitorFromHWND(hWnd);
 
         if (windowMap.find(hWnd) != windowMap.end()) {
-            TRACE("AddWindow called with existing window!: %u %s", hWnd, szTitle);
+            TRACEW(L"AddWindow called with existing window!: %u %s", hWnd, szTitle);
             return;
         }
 
