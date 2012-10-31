@@ -49,6 +49,10 @@ StateSettings::~StateSettings() {
 /// Loads settings from an RC file using the specified defaults.
 /// </summary>
 void StateSettings::Load(Settings* settings, StateSettings* defaults) {
+    if (!defaults) {
+        defaults = this;
+    }
+
     this->cornerRadiusX = settings->GetFloat("CornerRadiusX", defaults->cornerRadiusX);
     this->cornerRadiusY = settings->GetFloat("CornerRadiusY", defaults->cornerRadiusY);
     settings->GetString("Font", this->font, sizeof(this->font)/sizeof(WCHAR), defaults->font);

@@ -10,22 +10,22 @@
 
 
 Tooltip::Tooltip(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings) {
-    DrawableSettings* defaults = new DrawableSettings();
-    defaults->width = 150;
-    defaults->height = 40;
-    defaults->alwaysOnTop = true;
+    DrawableSettings defaults;
+    defaults.width = 150;
+    defaults.height = 40;
+    defaults.alwaysOnTop = true;
 
-    StateSettings* defaultState = new StateSettings();
-    defaultState->backgroundBrush.color = 0xCCFAFAD2;
-    defaultState->textBrush.color = 0xFF000000;
-    defaultState->textOffsetTop = 2;
-    defaultState->textOffsetBottom = 2;
-    defaultState->textOffsetRight = 2;
-    defaultState->textOffsetLeft = 2;
-    defaultState->outlineBrush.color = 0xFF000000;
-    defaultState->outlineWidth = 1.5f;
+    StateSettings defaultState;
+    defaultState.backgroundBrush.color = 0xCCFAFAD2;
+    defaultState.textBrush.color = 0xFF000000;
+    defaultState.textOffsetTop = 2;
+    defaultState.textOffsetBottom = 2;
+    defaultState.textOffsetRight = 2;
+    defaultState.textOffsetLeft = 2;
+    defaultState.outlineBrush.color = 0xFF000000;
+    defaultState.outlineWidth = 1.5f;
 
-    this->window->Initialize(defaults, defaultState);
+    this->window->Initialize(&defaults, &defaultState);
 
     this->maxHeight = settings->GetInt("MaxHeight", 100);
     this->maxWidth = settings->GetInt("MaxWidth", 300);

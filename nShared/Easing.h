@@ -18,6 +18,5 @@ namespace Easing {
         SINE
     };
 
-
     float Transform(float progress, EasingType easingType);
 }

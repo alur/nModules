@@ -116,22 +116,22 @@ void WindowThumbnail::Hide() {
 
 
 void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
-    DrawableSettings* defaults = new DrawableSettings();
-    defaults->width = 150;
-    defaults->height = 40;
-    defaults->alwaysOnTop = true;
+    DrawableSettings defaults;
+    defaults.width = 150;
+    defaults.height = 40;
+    defaults.alwaysOnTop = true;
     
-    StateSettings* defaultState = new StateSettings();
-    defaultState->backgroundBrush.color = 0xAA009900;
-    defaultState->textBrush.color = 0xFF000000;
-    defaultState->textOffsetTop = 2;
-    defaultState->textOffsetBottom = 2;
-    defaultState->textOffsetRight = 2;
-    defaultState->textOffsetLeft = 2;
-    defaultState->outlineBrush.color = 0xAAFFFFFF;
-    defaultState->outlineWidth = 2.0f;
+    StateSettings defaultState;
+    defaultState.backgroundBrush.color = 0xAA009900;
+    defaultState.textBrush.color = 0xFF000000;
+    defaultState.textOffsetTop = 2;
+    defaultState.textOffsetBottom = 2;
+    defaultState.textOffsetRight = 2;
+    defaultState.textOffsetLeft = 2;
+    defaultState.outlineBrush.color = 0xAAFFFFFF;
+    defaultState.outlineWidth = 2.0f;
 
-    this->window->Initialize(defaults,  defaultState);
+    this->window->Initialize(&defaults,  &defaultState);
 
     char szBuf[32];
 

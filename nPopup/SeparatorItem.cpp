@@ -15,17 +15,17 @@ extern LSModule* g_LSModule;
 
 
 SeparatorItem::SeparatorItem(Drawable* parent) : PopupItem(parent, "SeparatorItem") {
-    DrawableSettings* defaults = new DrawableSettings();
-    defaults->width = 190;
-    defaults->height = 5;
+    DrawableSettings defaults;
+    defaults.width = 190;
+    defaults.height = 5;
 
-    StateSettings* defaultState = new StateSettings();
-    defaultState->backgroundBrush.color = 0xAA000000;
-    defaultState->textBrush.color = 0xFF000000;
+    StateSettings defaultState;
+    defaultState.backgroundBrush.color = 0xAA000000;
+    defaultState.textBrush.color = 0xFF000000;
 
-    this->window->Initialize(defaults, defaultState);
+    this->window->Initialize(&defaults, &defaultState);
 
-    this->hoverState = this->window->AddState("Hover", 100, new StateSettings(*defaultState));
+    this->hoverState = this->window->AddState("Hover", 100, &defaultState);
 
     this->window->Show();
 }

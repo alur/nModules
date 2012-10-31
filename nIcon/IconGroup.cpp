@@ -27,16 +27,16 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     // Initalize all variables.
     this->changeNotifyUID = 0;
 
-    DrawableSettings* defaults = new DrawableSettings();
-    defaults->width = 500;
-    defaults->height = 300;
+    DrawableSettings defaults;
+    defaults.width = 500;
+    defaults.height = 300;
 
-    StateSettings* defaultState = new StateSettings();
-    defaultState->backgroundBrush.color = 0x00000000;
+    StateSettings defaultState;
+    defaultState.backgroundBrush.color = 0x00000000;
 
     this->settings->GetString("Folder", path, sizeof(path), "Desktop");
 
-    this->window->Initialize(defaults, defaultState);
+    this->window->Initialize(&defaults, &defaultState);
     this->window->Show();
 
     this->changeNotifyMsg = this->window->RegisterUserMessage(this);

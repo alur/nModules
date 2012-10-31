@@ -21,7 +21,6 @@ using namespace D2D1;
 State::State(Settings* settings, int defaultPriority, LPCWSTR* text) {
     this->active = false;
     this->backBrush = new Brush();
-    this->defaultSettings = NULL;
     this->drawingSettings = new StateSettings();
     this->outlineBrush = new Brush();
     this->priority = settings->GetInt("Priority", defaultPriority);
@@ -35,7 +34,6 @@ State::State(Settings* settings, int defaultPriority, LPCWSTR* text) {
 State::~State() {
     DiscardDeviceResources();
     SAFEDELETE(this->settings);
-    SAFEDELETE(this->defaultSettings);
     SAFEDELETE(this->drawingSettings);
     SAFERELEASE(this->textFormat);
     SAFEDELETE(this->backBrush);
@@ -64,8 +62,7 @@ void State::UpdatePosition(D2D1_RECT_F position) {
 
 
 void State::Load(StateSettings* defaultSettings) {
-    this->defaultSettings = defaultSettings ? defaultSettings : new StateSettings();
-    this->drawingSettings->Load(this->settings, this->defaultSettings);
+    this->drawingSettings->Load(this->settings, defaultSettings);
 
     this->drawingArea.radiusX = this->drawingSettings->cornerRadiusX;
     this->drawingArea.radiusY = this->drawingSettings->cornerRadiusY;

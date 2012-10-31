@@ -35,23 +35,23 @@ void nPopup::FolderItem::Init(LPCSTR title, Popup* popup) {
     this->popup = popup;
     this->itemType = PopupItemType::FOLDER;
 
-    DrawableSettings* defaults = new DrawableSettings();
-    defaults->width = 190;
-    defaults->height = 20;
+    DrawableSettings defaults;
+    defaults.width = 190;
+    defaults.height = 20;
     MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, titleWide, MAX_LINE_LENGTH);
 
-    StateSettings* defaultState = new StateSettings();
-    defaultState->backgroundBrush.color = 0xAA00FFFF;
-    defaultState->textBrush.color = 0xFF000000;
-    StringCchCopy(defaultState->textVerticalAlign, sizeof(defaultState->textVerticalAlign), "Middle");
-    defaultState->textOffsetLeft = 20;
-    defaultState->textOffsetRight = 5;
+    StateSettings defaultState;
+    defaultState.backgroundBrush.color = 0xAA00FFFF;
+    defaultState.textBrush.color = 0xFF000000;
+    StringCchCopy(defaultState.textVerticalAlign, sizeof(defaultState.textVerticalAlign), "Middle");
+    defaultState.textOffsetLeft = 20;
+    defaultState.textOffsetRight = 5;
 
-    this->window->Initialize(defaults, defaultState);
+    this->window->Initialize(&defaults, &defaultState);
     this->window->SetText(titleWide);
 
-    this->hoverState = this->window->AddState("Hover", 100, new StateSettings(*defaultState));
-    this->openState = this->window->AddState("Open", 80, new StateSettings(*defaultState));
+    this->hoverState = this->window->AddState("Hover", 100, &defaultState);
+    this->openState = this->window->AddState("Open", 80, &defaultState);
 }
 
 

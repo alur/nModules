@@ -50,12 +50,12 @@ DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, "nDesk", g_pCli
     m_TransitionSettings.fFadeTime = 0.2f;
     SetTransitionType(NONE);
 
-    DrawableSettings* defaults = new DrawableSettings;
-    defaults->width = g_pMonitorInfo->m_virtualDesktop.width;
-    defaults->height = g_pMonitorInfo->m_virtualDesktop.height;
-    defaults->x = g_pMonitorInfo->m_virtualDesktop.rect.left;
-    defaults->y = g_pMonitorInfo->m_virtualDesktop.rect.top;
-    Initialize(defaults);
+    DrawableSettings defaults;
+    defaults.width = g_pMonitorInfo->m_virtualDesktop.width;
+    defaults.height = g_pMonitorInfo->m_virtualDesktop.height;
+    defaults.x = g_pMonitorInfo->m_virtualDesktop.rect.left;
+    defaults.y = g_pMonitorInfo->m_virtualDesktop.rect.top;
+    Initialize(&defaults);
 
     nCore::System::RegisterWindow("nDesk", this);
     UpdateWallpaper(true);

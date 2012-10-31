@@ -35,9 +35,10 @@ TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings
 
     // Create the drawable window
     this->settings = parentSettings->CreateChild("Icon");
-    StateSettings* defaultStateSettings = new StateSettings();
-    defaultStateSettings->backgroundBrush.color = 0x00000000;
-    this->window->Initialize(NULL, defaultStateSettings);
+
+    StateSettings defaultStateSettings;
+    defaultStateSettings.backgroundBrush.color = 0x00000000;
+    this->window->Initialize(NULL, &defaultStateSettings);
     this->showingTip = false;
 
     //

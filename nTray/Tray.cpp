@@ -25,8 +25,8 @@ Tray::Tray(LPCSTR name) : Drawable(name) {
     this->tooltip = new Tooltip("Tooltip", this->settings);
     this->balloon = new Balloon("Balloon", this->settings, this->balloonClickedMessage, this);
     this->layoutSettings = new LayoutSettings();
-    DrawableSettings* defaults = new DrawableSettings();
-    this->window->Initialize(defaults);
+
+    this->window->Initialize();
     this->window->Show();
 
     this->balloonTimer = 0;

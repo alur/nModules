@@ -37,19 +37,19 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     this->confineToWorkArea = settings->GetBool("ConfineToWorkArea", false);
     settings->GetOffsetRect("PaddingLeft", "PaddingTop", "PaddingRight", "PaddingBottom", &this->padding, 5, 5, 5, 5);
 
-    DrawableSettings* defaultSettings = new DrawableSettings();
-    defaultSettings->alwaysOnTop = true;
-    defaultSettings->width = 200;
+    DrawableSettings defaultSettings;
+    defaultSettings.alwaysOnTop = true;
+    defaultSettings.width = 200;
     MultiByteToWideChar(CP_ACP, 0, title, (int)strlen(title)+1, buf, MAX_LINE_LENGTH);
 
-    StateSettings* defaultState = new StateSettings();
-    defaultState->backgroundBrush.color = 0x440000FF;
-    defaultState->textRotation = -45.0f;
-    defaultState->fontSize = 32.0f;
-    StringCchCopy(defaultState->textAlign, sizeof(defaultState->textAlign), "Center");
-    StringCchCopy(defaultState->textVerticalAlign, sizeof(defaultState->textVerticalAlign), "Middle");
+    StateSettings defaultState;
+    defaultState.backgroundBrush.color = 0x440000FF;
+    defaultState.textRotation = -45.0f;
+    defaultState.fontSize = 32.0f;
+    StringCchCopy(defaultState.textAlign, sizeof(defaultState.textAlign), "Center");
+    StringCchCopy(defaultState.textVerticalAlign, sizeof(defaultState.textVerticalAlign), "Middle");
 
-    this->window->Initialize(defaultSettings, defaultState);
+    this->window->Initialize(&defaultSettings, &defaultState);
     this->window->SetText(buf);
 
     SetParent(this->window->GetWindowHandle(), NULL);

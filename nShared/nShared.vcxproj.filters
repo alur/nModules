@@ -9,6 +9,15 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Drawables">
+      <UniqueIdentifier>{67e18d2f-7ec7-4362-bc30-8650a36c4d9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Drawables\Source Files">
+      <UniqueIdentifier>{71b1d9c9-05e5-4389-9f86-b873bd95b3db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Drawables\Header Files">
+      <UniqueIdentifier>{046c26a5-1724-445d-a138-3f5a6b2f7ed4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MonitorInfo.hpp">
@@ -59,19 +68,10 @@
     <ClInclude Include="UIDGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Tooltip.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Balloon.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PIDL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LiteStep.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowThumbnail.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Easing.h">
@@ -100,6 +100,18 @@
     </ClInclude>
     <ClInclude Include="Brush.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RelativeValue.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Balloon.hpp">
+      <Filter>Drawables\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tooltip.hpp">
+      <Filter>Drawables\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowThumbnail.hpp">
+      <Filter>Drawables\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -151,19 +163,10 @@
     <ClCompile Include="UIDGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Balloon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tooltip.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PIDL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LiteStep.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowThumbnail.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Easing.cpp">
@@ -189,6 +192,18 @@
     </ClCompile>
     <ClCompile Include="Brush.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RelativeValue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Balloon.cpp">
+      <Filter>Drawables\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tooltip.cpp">
+      <Filter>Drawables\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowThumbnail.cpp">
+      <Filter>Drawables\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

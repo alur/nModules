@@ -180,7 +180,6 @@ DrawableWindow::~DrawableWindow() {
     }
 
     SAFEDELETE(this->drawingSettings);
-    SAFEDELETE(this->defaultSettings);
     SAFEDELETE(this->settings);
     free((LPVOID)this->text);
 }
@@ -610,8 +609,7 @@ void DrawableWindow::Hide() {
 /// <param name="baseStateDefaults">The default settings for the base state.</param>
 void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings* baseStateDefaults) {
     // Load settings.
-    this->defaultSettings = defaultSettings ? defaultSettings : new DrawableSettings();
-    this->drawingSettings->Load(this->settings, this->defaultSettings);
+    this->drawingSettings->Load(this->settings, defaultSettings);
 
     // Load the base state
     (*this->baseState)->Load(baseStateDefaults);

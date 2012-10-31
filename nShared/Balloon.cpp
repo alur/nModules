@@ -13,25 +13,25 @@
 
 Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, MessageHandler* callbackHandler) : Drawable(prefix, parentSettings) {
     // Inialize the window.
-    DrawableSettings* defaults = new DrawableSettings();
-    defaults->width = 150;
-    defaults->height = 40;
-    defaults->alwaysOnTop = true;
+    DrawableSettings defaults;
+    defaults.width = 150;
+    defaults.height = 40;
+    defaults.alwaysOnTop = true;
 
-    StateSettings* defaultState = new StateSettings();
-    defaultState->backgroundBrush.color = 0xCCFAFAD2;
-    defaultState->textBrush.color = 0xFF000000;
-    defaultState->textOffsetTop = 4;
-    defaultState->textOffsetBottom = 4;
-    defaultState->textOffsetRight = 4;
-    defaultState->textOffsetLeft = 40;
-    defaultState->outlineBrush.color = 0xAA000000;
-    defaultState->outlineWidth = 1.5f;
-    defaultState->wordWrap = true;
-    defaultState->cornerRadiusX = 4.0f;
-    defaultState->cornerRadiusY = 4.0f;
+    StateSettings defaultState;
+    defaultState.backgroundBrush.color = 0xCCFAFAD2;
+    defaultState.textBrush.color = 0xFF000000;
+    defaultState.textOffsetTop = 4;
+    defaultState.textOffsetBottom = 4;
+    defaultState.textOffsetRight = 4;
+    defaultState.textOffsetLeft = 40;
+    defaultState.outlineBrush.color = 0xAA000000;
+    defaultState.outlineWidth = 1.5f;
+    defaultState.wordWrap = true;
+    defaultState.cornerRadiusX = 4.0f;
+    defaultState.cornerRadiusY = 4.0f;
 
-    this->window->Initialize(defaults, defaultState);
+    this->window->Initialize(&defaults, &defaultState);
 
     this->clickedMessage = clickedMessage;
     this->callbackHandler = callbackHandler;
@@ -39,16 +39,16 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     // Create the a child window for the title of the balloon.
     this->titleSettings = parentSettings->CreateChild("Title");
     this->titleWindow = this->window->CreateChild(this->titleSettings, this);
-    DrawableSettings* titleDefaults = new DrawableSettings();
-    titleDefaults->x = 4;
-    titleDefaults->y = 4;
+    DrawableSettings titleDefaults;
+    titleDefaults.x = 4;
+    titleDefaults.y = 4;
 
-    StateSettings* titleBaseStateDefaults = new StateSettings();
-    titleBaseStateDefaults->textBrush.color = 0xFF000000;
-    titleBaseStateDefaults->backgroundBrush.color = 0;
-    StringCchCopy(titleBaseStateDefaults->fontWeight, sizeof(titleBaseStateDefaults->fontWeight), "Bold");
+    StateSettings titleBaseStateDefaults;
+    titleBaseStateDefaults.textBrush.color = 0xFF000000;
+    titleBaseStateDefaults.backgroundBrush.color = 0;
+    StringCchCopy(titleBaseStateDefaults.fontWeight, sizeof(titleBaseStateDefaults.fontWeight), "Bold");
 
-    this->titleWindow->Initialize(titleDefaults, titleBaseStateDefaults);
+    this->titleWindow->Initialize(&titleDefaults, &titleBaseStateDefaults);
     this->titleWindow->Show();
 
     // And another for the x button in the top right corner.

@@ -41,6 +41,9 @@ DrawableSettings::~DrawableSettings() {
 /// </summary>
 void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
     WCHAR buf[MAX_LINE_LENGTH];
+    if (!defaults) {
+        defaults = this;
+    }
 
     this->alwaysOnTop = settings->GetBool("AlwaysOnTop", defaults->alwaysOnTop);
     this->blurBehind = settings->GetBool("BlurBehind", defaults->blurBehind);

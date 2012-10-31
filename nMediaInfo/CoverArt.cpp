@@ -26,10 +26,10 @@
 /// </summary>
 /// <param name="name">The settings prefix to use.</param>
 CoverArt::CoverArt(LPCSTR name) : Drawable(name) {
-    DrawableSettings* defaults = new DrawableSettings();
-    defaults->width = 200;
-    defaults->height = 200;
-    this->window->Initialize(defaults);
+    DrawableSettings defaults;
+    defaults.width = 200;
+    defaults.height = 200;
+    this->window->Initialize(&defaults);
 
     D2D1_RECT_F pos = {
         0, 0,

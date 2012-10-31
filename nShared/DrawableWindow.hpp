@@ -214,9 +214,6 @@ private:
     // The children of this drawablewindow.
     list<DrawableWindow*> children;
 
-    // The default drawing settings.
-    DrawableSettings* defaultSettings;
-
     // The area we draw in.
     D2D1_RECT_F drawingArea;
 

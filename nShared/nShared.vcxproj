@@ -28,6 +28,7 @@
     <ClInclude Include="DrawableBangs.h" />
     <ClInclude Include="DrawableSettings.hpp" />
     <ClInclude Include="Overlay.hpp" />
+    <ClInclude Include="RelativeValue.hpp" />
     <ClInclude Include="State.hpp" />
     <ClInclude Include="StateSettings.hpp" />
     <ClInclude Include="DrawableWindow.hpp" />
@@ -59,6 +60,7 @@
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="DrawableBangs.cpp" />
     <ClCompile Include="DrawableSettings.cpp" />
+    <ClCompile Include="RelativeValue.cpp" />
     <ClCompile Include="StateSettings.cpp" />
     <ClCompile Include="DrawableWindow.cpp" />
     <ClCompile Include="Overlay.cpp" />

@@ -47,9 +47,6 @@ private:
     // The current drawing settings.
     StateSettings* drawingSettings;
 
-    // The default drawing settings.
-    StateSettings* defaultSettings;
-
     // The brush we are currently painting the background with.
     Brush* backBrush;
 

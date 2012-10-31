@@ -20,25 +20,25 @@ InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupIte
     this->title = _strdup(title);
     this->itemType = PopupItemType::INFO;
 
-    DrawableSettings* defaults = new DrawableSettings();
-    defaults->width = 190;
-    defaults->height = 20;
-    defaults->evaluateText = true;
+    DrawableSettings defaults;
+    defaults.width = 190;
+    defaults.height = 20;
+    defaults.evaluateText = true;
     MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, titleWide, MAX_LINE_LENGTH);
 
-    StateSettings* defaultState = new StateSettings();
-    defaultState->backgroundBrush.color = 0xAAFF00FF;
-    defaultState->textBrush.color = 0xFF000000;
-    StringCchCopy(defaultState->textVerticalAlign, sizeof(defaultState->textVerticalAlign), "Middle");
-    defaultState->textOffsetLeft = 20;
-    defaultState->textOffsetRight = 5;
+    StateSettings defaultState;
+    defaultState.backgroundBrush.color = 0xAAFF00FF;
+    defaultState.textBrush.color = 0xFF000000;
+    StringCchCopy(defaultState.textVerticalAlign, sizeof(defaultState.textVerticalAlign), "Middle");
+    defaultState.textOffsetLeft = 20;
+    defaultState.textOffsetRight = 5;
 
-    this->window->Initialize(defaults, defaultState);
+    this->window->Initialize(&defaults, &defaultState);
     this->window->SetText(titleWide);
 
     ParseDotIcon(customIcon);
 
-    this->hoverState = this->window->AddState("Hover", 100, new StateSettings(*defaultState));
+    this->hoverState = this->window->AddState("Hover", 100, &defaultState);
 
     this->window->Show();
 }

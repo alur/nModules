@@ -17,45 +17,46 @@ extern LSModule* g_LSModule;
 
 Icon::Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder) : Drawable(parent, "Icon") {
     WCHAR name[MAX_PATH];
+
     this->shellFolder = shellFolder;
     this->item = (PITEMID_CHILD)malloc(item->mkid.cb + 2);
     memcpy(this->item, item, item->mkid.cb + 2);
 
-    DrawableSettings* defaults = new DrawableSettings();
-    defaults->width = 64;
-    defaults->height = 120;
+    DrawableSettings defaults;
+    defaults.width = 64;
+    defaults.height = 120;
     GetDisplayName(SHGDN_NORMAL, name, MAX_PATH);
 
-    StateSettings* baseStateDefaults = new StateSettings();
-    baseStateDefaults->backgroundBrush.color = 0;
-    baseStateDefaults->wordWrap = true;
-    baseStateDefaults->textOffsetTop = 64;
-    StringCchCopy(baseStateDefaults->textAlign, sizeof(baseStateDefaults->textAlign), "Center");
+    StateSettings baseStateDefaults;
+    baseStateDefaults.backgroundBrush.color = 0;
+    baseStateDefaults.wordWrap = true;
+    baseStateDefaults.textOffsetTop = 64;
+    StringCchCopy(baseStateDefaults.textAlign, sizeof(baseStateDefaults.textAlign), "Center");
 
-    this->window->Initialize(defaults, baseStateDefaults);
+    this->window->Initialize(&defaults, &baseStateDefaults);
     this->window->SetText(name);
 
     SetIcon();
 
     this->window->SizeToText(64, 300, 64);
 
-    StateSettings* hoverDefaults = new StateSettings(*baseStateDefaults);
-    hoverDefaults->backgroundBrush.color = 0xAA87CEEB;
-    hoverDefaults->outlineBrush.color = 0x99FFFFFF;
-    hoverDefaults->outlineWidth = 1.5f;
-    this->hoverState = this->window->AddState("Hover", 100, hoverDefaults);
+    StateSettings hoverDefaults(baseStateDefaults);
+    hoverDefaults.backgroundBrush.color = 0xAA87CEEB;
+    hoverDefaults.outlineBrush.color = 0x99FFFFFF;
+    hoverDefaults.outlineWidth = 1.5f;
+    this->hoverState = this->window->AddState("Hover", 100, &hoverDefaults);
 
-    StateSettings* selectedDefaults = new StateSettings(*hoverDefaults);
-    selectedDefaults->backgroundBrush.color = 0xCC87CEEB;
-    selectedDefaults->outlineBrush.color = 0xCCFFFFFF;
-    selectedDefaults->outlineWidth = 1.5f;
-    this->selectedState = this->window->AddState("Selected", 150, selectedDefaults);
+    StateSettings selectedDefaults(hoverDefaults);
+    selectedDefaults.backgroundBrush.color = 0xCC87CEEB;
+    selectedDefaults.outlineBrush.color = 0xCCFFFFFF;
+    selectedDefaults.outlineWidth = 1.5f;
+    this->selectedState = this->window->AddState("Selected", 150, &selectedDefaults);
 
-    StateSettings* focusedDefaults = new StateSettings(*hoverDefaults);
-    focusedDefaults->backgroundBrush.color = 0xAA87CEEB;
-    focusedDefaults->outlineBrush.color = 0x99FFFFFF;
-    focusedDefaults->outlineWidth = 1.5f;
-    this->focusedState = this->window->AddState("Focused", 200, focusedDefaults);
+    StateSettings focusedDefaults(hoverDefaults);
+    focusedDefaults.backgroundBrush.color = 0xAA87CEEB;
+    focusedDefaults.outlineBrush.color = 0x99FFFFFF;
+    focusedDefaults.outlineWidth = 1.5f;
+    this->focusedState = this->window->AddState("Focused", 200, &focusedDefaults);
     
     this->mouseOver = false;
 
