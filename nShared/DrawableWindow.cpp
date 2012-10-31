@@ -20,6 +20,7 @@
 #include "Debugging.h"
 #include "Color.h"
 #include "MessageHandler.hpp"
+#include "Strings.h"
 
 
 using namespace D2D1;
@@ -131,11 +132,11 @@ void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHa
     this->parsedText = NULL;
     this->renderTarget = NULL;
     this->settings = new Settings(settings);
-    this->text[0] = '\0';
+    this->text = NULL;
     this->visible = false;
 
     // Create the base state
-    State* state = new State(new Settings(settings), 0, this->text);
+    State* state = new State(new Settings(settings), 0, &this->text);
     state->active = true;
     this->activeState = this->baseState = this->states.insert(this->states.begin(), state);
 }
@@ -181,6 +182,7 @@ DrawableWindow::~DrawableWindow() {
     SAFEDELETE(this->drawingSettings);
     SAFEDELETE(this->defaultSettings);
     SAFEDELETE(this->settings);
+    free((LPVOID)this->text);
 }
 
 
@@ -268,7 +270,7 @@ DrawableWindow::PAINTER DrawableWindow::AddPrePainter(IPainter* painter) {
 /// <param name="defaultPriority">The default priority for this state. Higher priority states take precedence over lower priority states.</param>
 /// <returns>An object which can be used to activate/clear this state.</returns>
 DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, int defaultPriority, StateSettings* defaultSettings) {
-    State* state = new State((*this->baseState)->settings->CreateChild(prefix), defaultPriority, this->text);
+    State* state = new State((*this->baseState)->settings->CreateChild(prefix), defaultPriority, &this->text);
     state->settings->AppendGroup((*this->baseState)->settings);
     state->Load(defaultSettings);
     state->UpdatePosition(this->drawingArea);
@@ -981,7 +983,7 @@ void DrawableWindow::SetText(LPCWSTR text) {
         UpdateText();
     }
     else {
-        StringCchCopyW(this->text, sizeof(this->text)/sizeof(this->text[0]), text);
+        this->text = Strings::ReallocOverwriteW((LPWSTR)this->text, text);
     }
 }
 
@@ -1019,10 +1021,12 @@ void DrawableWindow::ToggleState(STATE state) {
 /// </summary>
 void DrawableWindow::UpdateText() {
     if (this->drawingSettings->evaluateText) {
-        this->parsedText->Evaluate(this->text, sizeof(this->text)/sizeof(this->text[0]));
+        WCHAR buf[4096];
+        this->parsedText->Evaluate(buf, 4096);
+        this->text = Strings::ReallocOverwriteW((LPWSTR)this->text, buf);
     }
     else {
-        StringCchCopyW(this->text, sizeof(this->text)/sizeof(this->text[0]), this->drawingSettings->text);
+        this->text = Strings::ReallocOverwriteW((LPWSTR)this->text, this->drawingSettings->text);
     }
     Repaint();
 }

@@ -15,6 +15,8 @@ extern LSModule* g_LSModule;
 
 
 InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupItem(parent, "InfoItem") {
+    WCHAR titleWide[MAX_LINE_LENGTH];
+
     this->title = _strdup(title);
     this->itemType = PopupItemType::INFO;
 
@@ -22,7 +24,7 @@ InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupIte
     defaults->width = 190;
     defaults->height = 20;
     defaults->evaluateText = true;
-    MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
+    MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, titleWide, MAX_LINE_LENGTH);
 
     StateSettings* defaultState = new StateSettings();
     defaultState->backgroundBrush.color = 0xAAFF00FF;
@@ -32,6 +34,7 @@ InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupIte
     defaultState->textOffsetRight = 5;
 
     this->window->Initialize(defaults, defaultState);
+    this->window->SetText(titleWide);
 
     ParseDotIcon(customIcon);
 

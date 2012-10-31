@@ -8,6 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "DrawableSettings.hpp"
+#include "Strings.h"
 
 
 /// <summary>
@@ -20,7 +21,7 @@ DrawableSettings::DrawableSettings() {
     this->height = 100;
     this->hidden = false;
     this->registerWithCore = false;
-    StringCchCopyW(this->text, sizeof(this->text)/sizeof(WCHAR), L"");
+    this->text = _wcsdup(L"");
     this->width = 100;
     this->x = 0;
     this->y = 0;
@@ -31,6 +32,7 @@ DrawableSettings::DrawableSettings() {
 /// Destructor.
 /// </summary>
 DrawableSettings::~DrawableSettings() {
+    free(this->text);
 }
 
 
@@ -38,13 +40,16 @@ DrawableSettings::~DrawableSettings() {
 /// Loads settings from an RC file using the specified defaults.
 /// </summary>
 void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
+    WCHAR buf[MAX_LINE_LENGTH];
+
     this->alwaysOnTop = settings->GetBool("AlwaysOnTop", defaults->alwaysOnTop);
     this->blurBehind = settings->GetBool("BlurBehind", defaults->blurBehind);
     this->evaluateText = defaults->evaluateText;
     this->height = settings->GetInt("Height", defaults->height);
     this->hidden = settings->GetBool("Hidden", defaults->hidden);
     this->registerWithCore = defaults->registerWithCore;
-    settings->GetString("Text", this->text, sizeof(this->text)/sizeof(WCHAR), defaults->text);
+    settings->GetString("Text", buf, MAX_LINE_LENGTH, defaults->text);
+    this->text = Strings::ReallocOverwriteW(this->text, buf);
     this->width = settings->GetInt("Width", defaults->width);
     this->x = settings->GetInt("X", defaults->x);
     this->y = settings->GetInt("Y", defaults->y);

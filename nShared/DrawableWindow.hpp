@@ -278,5 +278,5 @@ private:
     HWND window;
 
     // The text we are currently drawing
-    WCHAR text[MAX_LINE_LENGTH];
+    LPCWSTR text;
 };

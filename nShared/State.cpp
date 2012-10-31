@@ -18,7 +18,7 @@
 using namespace D2D1;
 
 
-State::State(Settings* settings, int defaultPriority, LPCWSTR text) {
+State::State(Settings* settings, int defaultPriority, LPCWSTR* text) {
     this->active = false;
     this->backBrush = new Brush();
     this->defaultSettings = NULL;
@@ -94,7 +94,7 @@ void State::Paint(ID2D1RenderTarget* renderTarget) {
     }
     if (this->textBrush->brush) {
         renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, this->textRotationOrigin));
-        renderTarget->DrawText(this->text, lstrlenW(this->text), this->textFormat, this->textArea, this->textBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+        renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textFormat, this->textArea, this->textBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
     }
 }
 
@@ -123,7 +123,7 @@ void State::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
     maxHeight -= int(this->drawingSettings->textOffsetTop + this->drawingSettings->textOffsetBottom);
 
     Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&factory));
-    factory->CreateTextLayout(this->text, lstrlenW(this->text), this->textFormat, (float)maxWidth, (float)maxHeight, &textLayout);
+    factory->CreateTextLayout(*this->text, lstrlenW(*this->text), this->textFormat, (float)maxWidth, (float)maxHeight, &textLayout);
     textLayout->GetMetrics(&metrics);
     SAFERELEASE(textLayout);
 

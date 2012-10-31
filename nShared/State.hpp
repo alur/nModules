@@ -13,7 +13,7 @@
 
 class State : IPainter {
 public:
-    explicit State(Settings* settings, int defaultPriority, LPCWSTR text);
+    explicit State(Settings* settings, int defaultPriority, LPCWSTR* text);
     virtual ~State();
 
     void Load(StateSettings* defaultSettings);
@@ -66,7 +66,7 @@ private:
     IDWriteTextFormat* textFormat;
 
     // Points to the windows text.
-    LPCWSTR text;
+    LPCWSTR* text;
 
     // The area we draw in.
     D2D1_ROUNDED_RECT drawingArea;

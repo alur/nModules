@@ -18,6 +18,8 @@ extern LSModule* g_LSModule;
 
 
 Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
+    WCHAR buf[MAX_LINE_LENGTH];
+
     if (bang != NULL) {
         this->bang = _strdup(bang);
     }
@@ -38,8 +40,7 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     DrawableSettings* defaultSettings = new DrawableSettings();
     defaultSettings->alwaysOnTop = true;
     defaultSettings->width = 200;
-    StringCchCopyW(defaultSettings->text, MAX_LINE_LENGTH, L"nDemo");
-    MultiByteToWideChar(CP_ACP, 0, title, (int)strlen(title)+1, defaultSettings->text, sizeof(defaultSettings->text)/sizeof(defaultSettings->text[0]));
+    MultiByteToWideChar(CP_ACP, 0, title, (int)strlen(title)+1, buf, MAX_LINE_LENGTH);
 
     StateSettings* defaultState = new StateSettings();
     defaultState->backgroundBrush.color = 0x440000FF;
@@ -49,6 +50,7 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     StringCchCopy(defaultState->textVerticalAlign, sizeof(defaultState->textVerticalAlign), "Middle");
 
     this->window->Initialize(defaultSettings, defaultState);
+    this->window->SetText(buf);
 
     SetParent(this->window->GetWindowHandle(), NULL);
     SetWindowLongPtr(this->window->GetWindowHandle(), GWL_EXSTYLE, GetWindowLongPtr(this->window->GetWindowHandle(), GWL_EXSTYLE) & ~WS_EX_NOACTIVATE);

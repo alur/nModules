@@ -57,7 +57,7 @@ private:
     void ScaleImage();
     
     // The current drawing settings.
-    BrushSettings brushSettings;
+    BrushSettings* brushSettings;
 
     //
     D2D1_EXTEND_MODE tileModeX;

@@ -38,7 +38,7 @@ public:
     bool registerWithCore;
 
     // The text to display. Default: "" (blank)
-    WCHAR text[MAX_LINE_LENGTH];
+    LPWSTR text;
 
     // The width of the window. Default: 100
     int width;

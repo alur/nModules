@@ -29,6 +29,8 @@ CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, HICON i
 
 
 void CommandItem::Init(LPCSTR title, LPCSTR command) {
+    WCHAR titleWide[MAX_LINE_LENGTH];
+
     this->title = _strdup(title);
     this->command = _strdup(command);
     this->itemType = PopupItemType::COMMAND;
@@ -36,7 +38,7 @@ void CommandItem::Init(LPCSTR title, LPCSTR command) {
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 190;
     defaults->height = 20;
-    MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
+    MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, titleWide, MAX_LINE_LENGTH);
 
     StateSettings* defaultState = new StateSettings();
     defaultState->backgroundBrush.color = 0xAAFFFF00;
@@ -46,6 +48,8 @@ void CommandItem::Init(LPCSTR title, LPCSTR command) {
     defaultState->textOffsetRight = 5;
 
     this->window->Initialize(defaults, defaultState);
+    this->window->SetText(titleWide);
+
     this->hoverState = this->window->AddState("Hover", 100, new StateSettings(*defaultState));
 }
 

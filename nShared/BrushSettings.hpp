@@ -14,6 +14,7 @@
 class BrushSettings {
 public:
     explicit BrushSettings();
+    explicit BrushSettings(const BrushSettings &source);
     virtual ~BrushSettings();
 
     // Loads the actual settings.
@@ -26,7 +27,7 @@ public:
     ARGB color;
 
     // The colors to use in a gradient. Default: black
-    char gradientColors[4096];
+    LPSTR gradientColors;
 
     // The x coordinate of the center of a gradient. Default: 0
     float gradientCenterX;
@@ -59,10 +60,10 @@ public:
     float gradientStartY;
 
     // The locations along the gradient where the color changes. Default: "0.0"
-    char gradientStops[4096];
+    LPSTR gradientStops;
 
     // The image to use for this window. Default: "" (blank)
-    char image[MAX_PATH];
+    LPSTR image;
 
     // The maximum opacity of the image. 0 to 1. Default: 1
     float imageOpacity;

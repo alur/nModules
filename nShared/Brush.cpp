@@ -30,57 +30,57 @@ Brush::~Brush() {
 
 
 void Brush::Load(BrushSettings* settings) {
-    this->brushSettings = *settings;
+    this->brushSettings = settings;
 
-    if (_stricmp(this->brushSettings.brushType, "Image") == 0) {
+    if (_stricmp(this->brushSettings->brushType, "Image") == 0) {
         this->brushType = Image;
     }
-    else if (_stricmp(this->brushSettings.brushType, "LinearGradient") == 0) {
+    else if (_stricmp(this->brushSettings->brushType, "LinearGradient") == 0) {
         this->brushType = LinearGradient;
-        this->gradientStart = D2D1::Point2F(this->brushSettings.gradientStartX, this->brushSettings.gradientStartY);
-        this->gradientEnd = D2D1::Point2F(this->brushSettings.gradientEndX, this->brushSettings.gradientEndY);
+        this->gradientStart = D2D1::Point2F(this->brushSettings->gradientStartX, this->brushSettings->gradientStartY);
+        this->gradientEnd = D2D1::Point2F(this->brushSettings->gradientEndX, this->brushSettings->gradientEndY);
         LoadGradientStops();
     }
-    else if (_stricmp(this->brushSettings.brushType, "RadialGradient") == 0) {
+    else if (_stricmp(this->brushSettings->brushType, "RadialGradient") == 0) {
         this->brushType = RadialGradient;
-        this->gradientCenter = D2D1::Point2F(this->brushSettings.gradientCenterX, this->brushSettings.gradientCenterY);
-        this->gradientOriginOffset = D2D1::Point2F(this->brushSettings.gradientOriginOffsetX, this->brushSettings.gradientOriginOffsetY);
+        this->gradientCenter = D2D1::Point2F(this->brushSettings->gradientCenterX, this->brushSettings->gradientCenterY);
+        this->gradientOriginOffset = D2D1::Point2F(this->brushSettings->gradientOriginOffsetX, this->brushSettings->gradientOriginOffsetY);
         LoadGradientStops();
     }
     else {
         this->brushType = SolidColor;
     }
 
-    if (_stricmp(this->brushSettings.imageScalingMode, "Tile") == 0) {
+    if (_stricmp(this->brushSettings->imageScalingMode, "Tile") == 0) {
         this->scalingMode = Tile;
     }
-    else if (_stricmp(this->brushSettings.imageScalingMode, "Fit") == 0) {
+    else if (_stricmp(this->brushSettings->imageScalingMode, "Fit") == 0) {
         this->scalingMode = Fit;
     }
-    else if (_stricmp(this->brushSettings.imageScalingMode, "Fill") == 0) {
+    else if (_stricmp(this->brushSettings->imageScalingMode, "Fill") == 0) {
         this->scalingMode = Fill;
     }
-    else if (_stricmp(this->brushSettings.imageScalingMode, "Stretch") == 0) {
+    else if (_stricmp(this->brushSettings->imageScalingMode, "Stretch") == 0) {
         this->scalingMode = Stretch;
     }
     else {
         this->scalingMode = Center;
     }
 
-    if (_stricmp(this->brushSettings.tilingModeX, "Mirror") == 0) {
+    if (_stricmp(this->brushSettings->tilingModeX, "Mirror") == 0) {
         this->tileModeX = D2D1_EXTEND_MODE_MIRROR;
     }
-    else if (_stricmp(this->brushSettings.tilingModeX, "Clamp") == 0) {
+    else if (_stricmp(this->brushSettings->tilingModeX, "Clamp") == 0) {
         this->tileModeX = D2D1_EXTEND_MODE_CLAMP;
     }
     else {
         this->tileModeX = D2D1_EXTEND_MODE_WRAP;
     }
 
-    if (_stricmp(this->brushSettings.tilingModeY, "Mirror") == 0) {
+    if (_stricmp(this->brushSettings->tilingModeY, "Mirror") == 0) {
         this->tileModeY = D2D1_EXTEND_MODE_MIRROR;
     }
-    else if (_stricmp(this->brushSettings.tilingModeY, "Clamp") == 0) {
+    else if (_stricmp(this->brushSettings->tilingModeY, "Clamp") == 0) {
         this->tileModeY = D2D1_EXTEND_MODE_CLAMP;
     }
     else {
@@ -91,7 +91,7 @@ void Brush::Load(BrushSettings* settings) {
 
 void Brush::LoadGradientStops() {
     char colorToken[MAX_LINE_LENGTH], stopToken[MAX_LINE_LENGTH];
-    LPCSTR colorPointer = this->brushSettings.gradientColors, stopPointer = this->brushSettings.gradientStops;
+    LPCSTR colorPointer = this->brushSettings->gradientColors, stopPointer = this->brushSettings->gradientStops;
 
     using namespace LiteStep;
     using namespace nCore::InputParsing;
@@ -128,7 +128,7 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
         switch (this->brushType) {
         case SolidColor:
             {
-                renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->brushSettings.color), (ID2D1SolidColorBrush**)&this->brush);
+                renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->brushSettings->color), (ID2D1SolidColorBrush**)&this->brush);
             }
             break;
 
@@ -149,7 +149,7 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
                 renderTarget->CreateGradientStopCollection(this->gradientStops, this->gradientStopCount, &stops);
                 renderTarget->CreateRadialGradientBrush(
                     D2D1::RadialGradientBrushProperties(this->gradientCenter, this->gradientOriginOffset,
-                    this->brushSettings.gradientRadiusX, this->brushSettings.gradientRadiusY),
+                    this->brushSettings->gradientRadiusX, this->brushSettings->gradientRadiusY),
                     stops, reinterpret_cast<ID2D1RadialGradientBrush**>(&this->brush));
                 stops->Release();
             }
@@ -163,7 +163,7 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
                 ID2D1Bitmap* bitmap = NULL;
                 Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
         
-                HBITMAP hBitmap = LiteStep::LoadLSImage(this->brushSettings.image, NULL);
+                HBITMAP hBitmap = LiteStep::LoadLSImage(this->brushSettings->image, NULL);
                 if (hBitmap) {
                     hr = factory->CreateFormatConverter(&converter);
                     if (SUCCEEDED(hr)) {
@@ -179,7 +179,7 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
                         hr = renderTarget->CreateBitmapBrush(bitmap, reinterpret_cast<ID2D1BitmapBrush**>(&this->brush));
                     }
                     if (SUCCEEDED(hr)) {
-                        this->brush->SetOpacity(this->brushSettings.imageOpacity);
+                        this->brush->SetOpacity(this->brushSettings->imageOpacity);
                     }
 
                     DeleteObject(hBitmap);

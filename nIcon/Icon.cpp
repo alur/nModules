@@ -16,6 +16,7 @@ extern LSModule* g_LSModule;
 
 
 Icon::Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder) : Drawable(parent, "Icon") {
+    WCHAR name[MAX_PATH];
     this->shellFolder = shellFolder;
     this->item = (PITEMID_CHILD)malloc(item->mkid.cb + 2);
     memcpy(this->item, item, item->mkid.cb + 2);
@@ -23,7 +24,7 @@ Icon::Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder) : 
     DrawableSettings* defaults = new DrawableSettings();
     defaults->width = 64;
     defaults->height = 120;
-    GetDisplayName(SHGDN_NORMAL, defaults->text, sizeof(defaults->text)/sizeof(defaults->text[0]));
+    GetDisplayName(SHGDN_NORMAL, name, MAX_PATH);
 
     StateSettings* baseStateDefaults = new StateSettings();
     baseStateDefaults->backgroundBrush.color = 0;
@@ -32,6 +33,7 @@ Icon::Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder) : 
     StringCchCopy(baseStateDefaults->textAlign, sizeof(baseStateDefaults->textAlign), "Center");
 
     this->window->Initialize(defaults, baseStateDefaults);
+    this->window->SetText(name);
 
     SetIcon();
 
