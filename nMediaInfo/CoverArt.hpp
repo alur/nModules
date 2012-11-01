@@ -29,6 +29,8 @@ private:
     bool SetCoverFromFolder(LPCWSTR filePath);
     void SetDefaultCover();
 
+    WCHAR defaultCoverArt[MAX_PATH];
+
     // The names to search for when looking in folders. May include wildcards.
     list<wstring> folderCanidates;
 };

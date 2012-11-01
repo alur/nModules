@@ -2,8 +2,8 @@
  *  Core.h
  *  The nModules Project
  *
- *  Functions declarations for the CoreCom. All functions exported by nCore
- *  and some Init functions.
+ *  Functions declarations for the CoreCom library. All functions exported by
+ *  nCore and some Init functions.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
@@ -16,7 +16,8 @@ typedef DWORD ARGB;
 #define INIT_FUNC(var,type,name) var = (type)GetProcAddress(hCoreInstance,name); if (var == NULL) return E_NOTIMPL;
 
 namespace nCore {
-    HRESULT Init(VERSION minVersion);
+    HRESULT Connect(VERSION minVersion);
+    void Disconnect();
     bool Initalized();
 
     VERSION GetVersion();

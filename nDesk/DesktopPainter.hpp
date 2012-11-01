@@ -52,17 +52,6 @@ public:
         SQUARES_COUNTERCLOCKWISE_OUT
     };
 
-    // Available easing types
-    enum EasingType {
-        LINEAR,
-        INQUAD,
-        OUTQUAD,
-        INOUTQUAD,
-        INCUBIC,
-        OUTQUBIC,
-        INOUTCUBIC
-    };
-
     explicit DesktopPainter(HWND hWnd);
     virtual ~DesktopPainter();
 

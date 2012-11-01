@@ -41,6 +41,8 @@ CoverArt::CoverArt(LPCSTR name) : Drawable(name) {
     this->folderCanidates.push_back(L"*.jpg");
     this->folderCanidates.push_back(L"*.png");
 
+    this->settings->GetString("DefaultCoverArt", this->defaultCoverArt, MAX_PATH, "");
+
     Update();
 
     this->window->Show();
@@ -193,5 +195,24 @@ bool CoverArt::SetCoverFromFolder(LPCWSTR filePath) {
 /// Sets the default cover -- when we couldn't find any other cover.
 /// </summary>
 void CoverArt::SetDefaultCover() {
-    (*this->coverArt)->SetSource(NULL);
+    IWICImagingFactory* factory = NULL;
+    IWICBitmapDecoder* decoder = NULL;
+    IWICBitmapFrameDecode* source = NULL;
+    HRESULT hr = E_FAIL;
+
+    hr = Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
+    if (SUCCEEDED(hr)) {
+        hr = factory->CreateDecoderFromFilename(this->defaultCoverArt, NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
+    }
+    if (SUCCEEDED(hr)) {
+        hr = decoder->GetFrame(0, &source);
+    }
+    if (SUCCEEDED(hr)) {
+        (*this->coverArt)->SetSource(source);
+    }
+    else {
+        (*this->coverArt)->SetSource(NULL);
+    }
+
+    SAFERELEASE(decoder);
 }

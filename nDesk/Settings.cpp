@@ -35,16 +35,6 @@ void nDesk::Settings::Load() {
 
 
 /// <summary>
-/// String -> EasingType
-/// </summary>
-DesktopPainter::EasingType nDesk::Settings::EasingFromString(LPCSTR pszEasing) {
-    if (_stricmp(pszEasing, "InQuad") == 0) return DesktopPainter::EasingType::INQUAD;
-
-    return DesktopPainter::EasingType::LINEAR;
-}
-
-
-/// <summary>
 /// String -> TransitionType
 /// </summary>
 DesktopPainter::TransitionType nDesk::Settings::TransitionTypeFromString(LPCSTR pszTransition) {

@@ -74,6 +74,9 @@ LSModule::~LSModule() {
 
     // Let go of any factories we allocated.
     Factories::Release();
+
+    // Disconnect from the core
+    nCore::Disconnect();
 }
 
 
@@ -132,7 +135,7 @@ bool LSModule::Initialize(PWNDCLASSEX customMessageClass, PWNDCLASSEX customDraw
 /// </summary>
 /// <param name="minimumCoreVersion">The minimum core version which is acceptable.</param>
 bool LSModule::ConnectToCore(VERSION minimumCoreVersion) {
-    switch (nCore::Init(minimumCoreVersion)) {
+    switch (nCore::Connect(minimumCoreVersion)) {
     case S_OK:
         break;
     default:

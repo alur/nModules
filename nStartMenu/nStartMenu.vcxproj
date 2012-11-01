@@ -145,12 +145,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="nStartMenu.h" />
+    <ClInclude Include="StartMenu.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nStartMenu.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nStartMenu.cpp" />
+    <ClCompile Include="StartMenu.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

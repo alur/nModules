@@ -562,11 +562,11 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
             }
         }
 
-        SAFERELEASE(pConverter)
-        SAFERELEASE(pDecoder)
-        SAFERELEASE(pBitmap)
-        SAFERELEASE(pSource)
-        SAFERELEASE(pScaler)
+        SAFERELEASE(pConverter);
+        SAFERELEASE(pDecoder);
+        SAFERELEASE(pBitmap);
+        SAFERELEASE(pSource);
+        SAFERELEASE(pScaler);
     }
 
     // Finish rendering

@@ -16,12 +16,13 @@ VERSION (__stdcall * _pGetVersion)();
 
 
 /// <summary>
-/// Initalizes the core communications.
+/// Initalizes communication with the core.
 /// </summary>
-/// <param name="minVersion">The minimum required core version.</param>
-/// <returns>True if the core is succefully initalized.</returns>
-HRESULT nCore::Init(VERSION minVersion) {
+/// <param name="minVersion">The minimum core version.</param>
+/// <returns>S_OK if the core is succefully initalized.</returns>
+HRESULT nCore::Connect(VERSION minVersion) {
     HWND coreHWnd = FindWindow("LSnCore", NULL);
+
     if (!coreHWnd) {
         return E_FAIL;
     }
@@ -30,7 +31,7 @@ HRESULT nCore::Init(VERSION minVersion) {
 
     HMODULE hCoreInstance = (HMODULE)GetWindowLongPtr(coreHWnd, GWLP_USERDATA);
     
-    INIT_FUNC(_pGetVersion,VERSION (__stdcall *)(),"GetCoreVersion")
+    INIT_FUNC(_pGetVersion,VERSION (__stdcall *)(),"GetCoreVersion");
 
     // Should check the version here
     VERSION coreVersion = GetVersion();
@@ -39,15 +40,29 @@ HRESULT nCore::Init(VERSION minVersion) {
         return E_FAIL;
     }
     // The minor version must be >=
+    if (GetMinorVersion(minVersion) > GetMinorVersion(coreVersion)) {
+        return E_FAIL;
+    }
     // If the minor version ==, the patch version must be >=
+    if (GetMinorVersion(minVersion) == GetMinorVersion(coreVersion) && GetPatchVersion(minVersion) > GetPatchVersion(minVersion)) {
+        return E_FAIL;
+    }
     
-    HRESULT hr;
+    HRESULT hr = S_OK;
+
     if (!SUCCEEDED(hr = System::Init(hCoreInstance))) return hr;
     if (!SUCCEEDED(hr = InputParsing::Init(hCoreInstance))) return hr;
 
     initialized = true;
 
     return S_OK;
+}
+
+
+/// <summary>
+/// Disconnects from the core.
+/// </summary>
+void nCore::Disconnect() {
 }
 
 
