@@ -154,17 +154,17 @@ bool CoverArt::SetCoverFromFolder(LPCWSTR filePath) {
     IWICBitmapFrameDecode* source = NULL;
     HRESULT hr = E_FAIL;
 
-	StringCchCopyW(folderPath, sizeof(folderPath), filePath);
-	PathRemoveFileSpecW(folderPath);
+    StringCchCopyW(folderPath, sizeof(folderPath), filePath);
+    PathRemoveFileSpecW(folderPath);
 
     // Check each covername
-	WCHAR artPath[MAX_PATH];
-	WIN32_FIND_DATAW FindFileData;
+    WCHAR artPath[MAX_PATH];
+    WIN32_FIND_DATAW FindFileData;
 
     for (list<wstring>::const_iterator canidate = this->folderCanidates.begin(); canidate != this->folderCanidates.end(); ++canidate) {
         StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, canidate->c_str());
 
-		if (FindFirstFileW(artPath, &FindFileData) != INVALID_HANDLE_VALUE) {
+        if (FindFirstFileW(artPath, &FindFileData) != INVALID_HANDLE_VALUE) {
             // Todo::We could try other files if this fails.
             StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, FindFileData.cFileName);
 
@@ -182,11 +182,11 @@ bool CoverArt::SetCoverFromFolder(LPCWSTR filePath) {
             SAFERELEASE(decoder);
 
             if (SUCCEEDED(hr)) {
-			    return true;
+                return true;
             }
-		}
-	}
-
+        }
+    }
+    
     return false;
 }
 

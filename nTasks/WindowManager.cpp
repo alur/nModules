@@ -401,9 +401,9 @@ bool WindowManager::IsTaskbarWindow(HWND hWnd) {
         return true;
     else if (GetParent(hWnd) != NULL) // Windows with parents should not be shown
         return false;
-    else if (GetWindow(hWnd, GW_OWNER) != NULL) // Windows with owner should not be shown
+    else if (GetWindow(hWnd, GW_OWNER) != NULL) // Windows with owners should not be shown
         return false;
-    else if ((exStyle & WS_EX_TOOLWINDOW) == WS_EX_TOOLWINDOW) // Toolwindows should not be shown on the taskbar
+    else if ((exStyle & WS_EX_TOOLWINDOW) == WS_EX_TOOLWINDOW) // Tool windows should not be shown on the taskbar
         return false;
 
     return true;

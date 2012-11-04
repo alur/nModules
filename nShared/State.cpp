@@ -92,6 +92,7 @@ void State::Paint(ID2D1RenderTarget* renderTarget) {
     if (this->textBrush->brush) {
         renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, this->textRotationOrigin));
         renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textFormat, this->textArea, this->textBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+        renderTarget->SetTransform(Matrix3x2F::Identity());
     }
 }
 

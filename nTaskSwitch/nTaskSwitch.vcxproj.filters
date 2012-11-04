@@ -18,6 +18,9 @@
     <ClInclude Include="nTaskSwitch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TaskSwitcher.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nTaskSwitch.rc">
@@ -26,6 +29,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nTaskSwitch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskSwitcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

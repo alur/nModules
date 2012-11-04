@@ -667,7 +667,6 @@ void DrawableWindow::Move(int x, int y) {
 void DrawableWindow::Paint() {
     if (this->visible) {
         this->renderTarget->PushAxisAlignedClip(this->drawingArea, D2D1_ANTIALIAS_MODE_ALIASED);
-        this->renderTarget->SetTransform(Matrix3x2F::Identity());
 
         // Paint the active state.
         (*this->activeState)->Paint(this->renderTarget);
@@ -687,7 +686,7 @@ void DrawableWindow::Paint() {
         for (PAINTER painter = this->postPainters.begin(); painter != this->postPainters.end(); ++painter) {
             (*painter)->Paint(this->renderTarget);
         }
-
+        
         this->renderTarget->PopAxisAlignedClip();
     }
 }
@@ -925,17 +924,13 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
         );
     }
 
-    // The text area is offset from the drawing area.
+    // Update all paintables.
     for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
         (*state)->UpdatePosition(this->drawingArea);
     }
-
-    // Update all overlays
     for (OVERLAY overlay = overlays.begin(); overlay != overlays.end(); ++overlay) {
         (*overlay)->UpdatePosition(this->drawingArea);
     }
-
-    // Update all children
     for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
         (*child)->Move((*child)->drawingSettings->x, (*child)->drawingSettings->y);
     }

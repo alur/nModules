@@ -27,8 +27,12 @@
     <ClInclude Include="Drawable.hpp" />
     <ClInclude Include="DrawableBangs.h" />
     <ClInclude Include="DrawableSettings.hpp" />
+    <ClInclude Include="ImageBrush.hpp" />
+    <ClInclude Include="LinearGradientBrush.hpp" />
     <ClInclude Include="Overlay.hpp" />
+    <ClInclude Include="RadialGradientBrush.hpp" />
     <ClInclude Include="RelativeValue.hpp" />
+    <ClInclude Include="SolidColorBrush.hpp" />
     <ClInclude Include="State.hpp" />
     <ClInclude Include="StateSettings.hpp" />
     <ClInclude Include="DrawableWindow.hpp" />

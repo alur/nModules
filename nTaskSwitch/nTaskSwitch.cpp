@@ -10,6 +10,7 @@
 #include "../nShared/LSModule.hpp"
 #include <map>
 #include <strsafe.h>
+#include "TaskSwitcher.hpp"
 
 using std::map;
 
@@ -18,6 +19,13 @@ LSModule* g_LSModule;
 
 // The messages we want from the core
 UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
+
+//
+TaskSwitcher* g_TaskSwitcher;
+
+//
+#define HOTKEY_ALTTAB 1
+#define HOTKEY_SHIFTALTTAB 2
 
 
 /// <summary>
@@ -39,6 +47,11 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
     // Load settings
     LoadSettings();
 
+    RegisterHotKey(g_LSModule->GetMessageWindow(), HOTKEY_ALTTAB, MOD_ALT, VK_TAB);
+    RegisterHotKey(g_LSModule->GetMessageWindow(), HOTKEY_SHIFTALTTAB, MOD_ALT | MOD_SHIFT, VK_TAB);
+
+    g_TaskSwitcher = new TaskSwitcher();
+
     return 0;
 }
 
@@ -47,6 +60,11 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
+    delete g_TaskSwitcher;
+
+    UnregisterHotKey(g_LSModule->GetMessageWindow(), HOTKEY_ALTTAB);
+    UnregisterHotKey(g_LSModule->GetMessageWindow(), HOTKEY_SHIFTALTTAB);
+
     if (g_LSModule) {
         delete g_LSModule;
     }
@@ -76,6 +94,24 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_REFRESH:
         {
+        }
+        return 0;
+
+    case WM_HOTKEY:
+        {
+            switch (wParam) {
+            case HOTKEY_ALTTAB:
+                {
+                    g_TaskSwitcher->HandleAltTab();
+                }
+                break;
+
+            case HOTKEY_SHIFTALTTAB:
+                {
+                    g_TaskSwitcher->HandleAltShiftTab();
+                }
+                break;
+            }
         }
         return 0;
     }
