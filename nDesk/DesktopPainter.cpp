@@ -218,16 +218,18 @@ void DesktopPainter::Resize() {
     SetWindowPos(m_hWnd, HWND_BOTTOM, g_pMonitorInfo->m_virtualDesktop.rect.left, g_pMonitorInfo->m_virtualDesktop.rect.top,
         g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height, SWP_NOACTIVATE|SWP_NOSENDCHANGING);
 
-    // Resize the render target
-    renderTarget->Resize(D2D1::SizeU(g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height));
-
     CalculateSizeDepdenentStuff();
 
     if (m_TransitionEffect) {
         m_TransitionEffect->Resize();
     }
 
-    UpdateWallpaper(true);
+    if (this->renderTarget) {
+        // Resize the render target
+        renderTarget->Resize(D2D1::SizeU(g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height));
+
+        UpdateWallpaper(true);
+    }
 }
 
 
