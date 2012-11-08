@@ -79,7 +79,7 @@ void PopupItem::AddIcon(HICON icon) {
 
 
 bool PopupItem::CompareTo(PopupItem* b) {
-    return this->itemType > b->itemType || this->itemType == b->itemType && _wcsicmp(this->window->GetDrawingSettings()->text, b->window->GetDrawingSettings()->text) < 0;
+    return this->itemType > b->itemType || this->itemType == b->itemType && _wcsicmp(this->window->GetText(), b->window->GetText()) < 0;
 }
 
 

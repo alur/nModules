@@ -453,6 +453,15 @@ void DrawableWindow::GetScreenRect(LPRECT rect) {
 
 
 /// <summary>
+/// Returns the current text of this window.
+/// </summary>
+/// <returns>The current parsed text.</returns>
+LPCWSTR DrawableWindow::GetText() {
+    return this->text;
+}
+
+
+/// <summary>
 /// Returns the window handle of the top-level window this window belongs to.
 /// </summary>
 /// <returns>the window handle.</returns>
@@ -470,7 +479,9 @@ HWND DrawableWindow::GetWindowHandle() {
 /// <param name="lParam">Message data</param>
 /// <param name="extra">Message data. Not used.</param>
 /// <returns>Something</returns>
-LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID /* extra */) {
+LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID extra) {
+    UNREFERENCED_PARAMETER(extra);
+
     // Forward mouse messages to the lowest level child window which the mouse is over.
     if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) {
         int xPos = GET_X_LPARAM(lParam); 
@@ -519,6 +530,8 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         break;
 
     case WM_ERASEBKGND:
+        {
+        }
         return 1;
 
     case WM_PAINT:
@@ -556,7 +569,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
             switch (wParam) {
             case SPI_SETWORKAREA:
                 {
-                    this->monitorInfo->Update();    
+                    this->monitorInfo->Update();
                 }
                 break;
             }

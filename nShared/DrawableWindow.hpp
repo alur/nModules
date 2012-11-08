@@ -83,6 +83,9 @@ public:
     // Returns the handle to the top-level window in this window stack.
     HWND GetWindowHandle();
 
+    // Retrives the "parsed" text.
+    LPCWSTR GetText();
+
     // Handles window messages.
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
