@@ -27,16 +27,23 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
     this->targetWindow = targetWindow;
     DwmRegisterThumbnail(this->window->GetWindowHandle(), targetWindow, &this->thumbnail);
 
+    SIZE sourceSize;
+
     this->settings->GetOffsetRect("MarginLeft", "MarginTop", "MarginRight", "MarginBottom", &this->thumbnailMargins, 5, 5, 5, 5);
+    DwmQueryThumbnailSourceSize(this->thumbnail, &sourceSize);
+
+    double scale = min(width/(double)sourceSize.cx, height/(double)sourceSize.cy);
+    sourceSize.cx *= scale;
+    sourceSize.cy *= scale;
 
     DWM_THUMBNAIL_PROPERTIES properties;
     properties.dwFlags = DWM_TNP_VISIBLE | DWM_TNP_SOURCECLIENTAREAONLY | DWM_TNP_RECTDESTINATION;
     properties.fSourceClientAreaOnly = FALSE;
     properties.fVisible = TRUE;
-    properties.rcDestination.bottom = y + height - this->thumbnailMargins.bottom;
-    properties.rcDestination.top = y + this->thumbnailMargins.top;
-    properties.rcDestination.left = x + this->thumbnailMargins.left;
-    properties.rcDestination.right = x + width - this->thumbnailMargins.right;
+    properties.rcDestination.bottom = y + height - this->thumbnailMargins.bottom - (height - sourceSize.cy)/2;
+    properties.rcDestination.top = y + this->thumbnailMargins.top + (height - sourceSize.cy)/2;
+    properties.rcDestination.left = x + this->thumbnailMargins.left + (width - sourceSize.cx)/2;
+    properties.rcDestination.right = x + width - this->thumbnailMargins.right - (width - sourceSize.cx)/2;
 
     DwmUpdateThumbnailProperties(this->thumbnail, &properties);
 
