@@ -18,22 +18,41 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
     defaults.width = width;
     defaults.height = height;
 
-    this->window->Initialize();
+    StateSettings stateDefaults;
+    stateDefaults.backgroundBrush.color = 0x00000000;
+
+    this->window->Initialize(&defaults, &stateDefaults);
     this->window->Show();
 
     this->targetWindow = targetWindow;
     DwmRegisterThumbnail(this->window->GetWindowHandle(), targetWindow, &this->thumbnail);
 
+    this->settings->GetOffsetRect("MarginLeft", "MarginTop", "MarginRight", "MarginBottom", &this->thumbnailMargins, 5, 5, 5, 5);
+
     DWM_THUMBNAIL_PROPERTIES properties;
     properties.dwFlags = DWM_TNP_VISIBLE | DWM_TNP_SOURCECLIENTAREAONLY | DWM_TNP_RECTDESTINATION;
     properties.fSourceClientAreaOnly = FALSE;
     properties.fVisible = TRUE;
-    properties.rcDestination.bottom = y + height - 10;
-    properties.rcDestination.top = y + 10;
-    properties.rcDestination.left = x + 10; 
-    properties.rcDestination.right = x + width - 10;
+    properties.rcDestination.bottom = y + height - this->thumbnailMargins.bottom;
+    properties.rcDestination.top = y + this->thumbnailMargins.top;
+    properties.rcDestination.left = x + this->thumbnailMargins.left;
+    properties.rcDestination.right = x + width - this->thumbnailMargins.right;
 
     DwmUpdateThumbnailProperties(this->thumbnail, &properties);
+
+    //
+    StateSettings hoverDefaults(stateDefaults);
+    hoverDefaults.backgroundBrush.color = 0xCC888888;
+
+    this->stateHover = this->window->AddState("Hover", 100, &hoverDefaults);
+
+
+    //
+    StateSettings selectedDefaults(stateDefaults);
+    selectedDefaults.outlineBrush.color = 0xFFFFFFFF;
+    selectedDefaults.outlineWidth = 5;
+
+    this->stateSelected = this->window->AddState("Selected", 150, &selectedDefaults);
 }
 
 
@@ -57,8 +76,32 @@ void TaskThumbnail::Activate() {
 }
 
 
+void TaskThumbnail::Select() {
+    this->window->ActivateState(this->stateSelected);
+}
+
+
+void TaskThumbnail::Deselect() {
+    this->window->ClearState(this->stateSelected);
+}
+
+
 LRESULT WINAPI TaskThumbnail::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID extra) {
     UNREFERENCED_PARAMETER(extra);
+
+    switch (message) {
+    case WM_MOUSEMOVE:
+        {
+            this->window->ActivateState(this->stateHover);
+        }
+        return 0;
+
+    case WM_MOUSELEAVE:
+        {
+            this->window->ClearState(this->stateHover);
+        }
+        return 0;
+    }
 
     return DefWindowProc(window, message, wParam, lParam);
 }

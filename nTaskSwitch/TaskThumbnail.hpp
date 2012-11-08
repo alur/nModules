@@ -21,8 +21,14 @@ public:
     void Preview();
     void Activate();
 
+    void Select();
+    void Deselect();
+
     HWND targetWindow;
 
 private:
     HTHUMBNAIL thumbnail;
+
+    DrawableWindow::STATE stateHover, stateSelected;
+    RECT thumbnailMargins;
 };

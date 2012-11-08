@@ -36,7 +36,7 @@ private:
     int selectedWindow;
 
     void LoadSettings();
-    void UpdateActiveWindow();
+    void UpdateActiveWindow(int delta);
 
     void AddWindow(HWND window);
 

@@ -88,8 +88,7 @@ LRESULT WINAPI TaskSwitcher::HandleMessage(HWND window, UINT message, WPARAM wPa
 
 void TaskSwitcher::HandleAltTab() {
     if (this->window->IsVisible()) {
-        ++this->selectedWindow;
-        UpdateActiveWindow();
+        UpdateActiveWindow(1);
     }
     else {
         Show();
@@ -99,8 +98,7 @@ void TaskSwitcher::HandleAltTab() {
 
 void TaskSwitcher::HandleAltShiftTab() {
     if (this->window->IsVisible()) {
-        --this->selectedWindow;
-        UpdateActiveWindow();
+        UpdateActiveWindow(-1);
     }
     else {
         Show();
@@ -142,7 +140,7 @@ void TaskSwitcher::Show() {
     SetActiveWindow(this->window->GetWindowHandle());
     SetForegroundWindow(this->window->GetWindowHandle());
     EnumDesktopWindows(NULL, LoadWindowsCallback, (LPARAM)this);
-    UpdateActiveWindow();
+    UpdateActiveWindow(0);
 }
 
 
@@ -188,14 +186,21 @@ bool TaskSwitcher::IsTaskbarWindow(HWND hWnd) {
 /// <summary>
 /// 
 /// </summary>
-void TaskSwitcher::UpdateActiveWindow() {
+void TaskSwitcher::UpdateActiveWindow(int delta) {
+    this->shownWindows[this->selectedWindow]->Deselect();
+
     WCHAR text[MAX_PATH];
+
+    this->selectedWindow += delta;
+
     if (this->selectedWindow < 0) {
         this->selectedWindow = int(this->shownWindows.size() - 1);
     }
     else if (this->selectedWindow >= this->shownWindows.size()) {
         this->selectedWindow = 0;
     }
+
+    this->shownWindows[this->selectedWindow]->Select();
 
     GetWindowTextW(this->shownWindows[this->selectedWindow]->targetWindow, text, MAX_PATH);
     this->window->SetText(text);
