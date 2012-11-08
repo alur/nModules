@@ -8,9 +8,12 @@
 #pragma once
 
 #include <dwmapi.h>
+#include "../nShared/Drawable.hpp"
 #include "../nShared/DrawableWindow.hpp"
+#include "../nShared/LayoutSettings.hpp"
+#include "TaskThumbnail.hpp"
 
-class TaskSwitcher : public MessageHandler {
+class TaskSwitcher : public Drawable {
 public:
     explicit TaskSwitcher();
     virtual ~TaskSwitcher();
@@ -21,24 +24,24 @@ public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
 private:
-    typedef struct {
-        HTHUMBNAIL thumbnail;
-        HWND window;
-    } ShownWindow;
-
     static bool IsTaskbarWindow(HWND hWnd);
     static BOOL CALLBACK LoadWindowsCallback(HWND window, LPARAM taskSwitcher);
 
-    vector<ShownWindow> shownWindows;
+    int windowsPerRow;
+
+    int taskWidth;
+    int taskHeight;
+
+    vector<TaskThumbnail*> shownWindows;
     int selectedWindow;
 
     void LoadSettings();
     void UpdateActiveWindow();
 
     void AddWindow(HWND window);
-    void LoadWindows();
-    void ClearWindows();
 
-    Settings* settings;
-    DrawableWindow* window;
+    void Show();
+    void Hide();
+
+    LayoutSettings layoutSettings;
 };

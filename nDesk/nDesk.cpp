@@ -16,6 +16,7 @@
 #include "WorkArea.h"
 #include "Bangs.h"
 #include "Settings.h"
+#include <dwmapi.h>
 
 
 // The messages we want from the core
@@ -66,6 +67,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
         g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.width,
         g_pMonitorInfo->m_virtualDesktop.height, SWP_NOACTIVATE | SWP_NOSENDCHANGING);
     ShowWindow(g_pDesktopPainter->GetWindow(), SW_SHOWNOACTIVATE);
+    BOOL excludeFromPeek = TRUE;
+    DwmSetWindowAttribute(g_pDesktopPainter->GetWindow(), DWMWA_EXCLUDED_FROM_PEEK, &excludeFromPeek, sizeof(BOOL));
 
     // Load bang commands
     Bangs::_Register();

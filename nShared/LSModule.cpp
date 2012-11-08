@@ -125,6 +125,7 @@ bool LSModule::Initialize(PWNDCLASSEX customMessageClass, PWNDCLASSEX customDraw
     {
         return false;
     }
+    SetWindowLongPtr(this->messageHandler, GWLP_USERDATA, MAGIC_DWORD);
 
     return true;
 }

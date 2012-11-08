@@ -335,32 +335,37 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
         return 1;
 
     case WM_PAINT:
-        if (SUCCEEDED(ReCreateDeviceResources())) {
-            this->renderTarget->BeginDraw();
+        {
+            if (SUCCEEDED(ReCreateDeviceResources())) {
+                this->renderTarget->BeginDraw();
 
-            // m_pOldWallpaperBrush being non zero indicates that we are in the middle of a transition
+                // m_pOldWallpaperBrush being non zero indicates that we are in the middle of a transition
+                if (this->m_pOldWallpaperBrush != NULL) {
+                    PaintComposite();
+                }
+                else {
+                    Paint();
+                }
+
+                PaintChildren();
+
+                // If EndDraw fails we need to recreate all device-dependent resources
+                if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET) {
+                    DiscardDeviceResources();
+                }
+            }
+
+            ValidateRect(hWnd, NULL);
+
             if (this->m_pOldWallpaperBrush != NULL) {
-                PaintComposite();
-            }
-            else {
-                Paint();
-            }
-
-            PaintChildren();
-
-            // If EndDraw fails we need to recreate all device-dependent resources
-            if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET) {
-                DiscardDeviceResources();
+                Redraw();
             }
         }
+        return 0;
 
-
-        ValidateRect(hWnd, NULL);
-
-        if (this->m_pOldWallpaperBrush != NULL) {
-            Redraw();
+    case WM_NCPAINT:
+        {
         }
-
         return 0;
     }
     return DrawableWindow::HandleMessage(hWnd, uMsg, wParam, lParam, NULL);

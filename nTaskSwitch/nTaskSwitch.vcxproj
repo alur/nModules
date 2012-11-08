@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="nTaskSwitch.h" />
     <ClInclude Include="TaskSwitcher.hpp" />
+    <ClInclude Include="TaskThumbnail.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nTaskSwitch.rc" />
@@ -157,6 +158,7 @@
   <ItemGroup>
     <ClCompile Include="nTaskSwitch.cpp" />
     <ClCompile Include="TaskSwitcher.cpp" />
+    <ClCompile Include="TaskThumbnail.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
