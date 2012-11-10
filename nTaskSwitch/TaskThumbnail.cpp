@@ -72,8 +72,8 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
     double scale = min(
         (width - this->thumbnailMargins.left - this->thumbnailMargins.right)/(double)sourceSize.cx,
         (height - this->thumbnailMargins.bottom - this->thumbnailMargins.top)/(double)sourceSize.cy);
-    sourceSize.cx *= scale;
-    sourceSize.cy *= scale;
+    sourceSize.cx = long(sourceSize.cx*scale);
+    sourceSize.cy = long(sourceSize.cy*scale);
 
     int horizontalOffset = (width - this->thumbnailMargins.left - this->thumbnailMargins.right - sourceSize.cx)/2;
     int verticalOffset = (height - this->thumbnailMargins.top - this->thumbnailMargins.bottom - sourceSize.cy)/2;
@@ -90,15 +90,19 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
     //
     StateSettings hoverDefaults(stateDefaults);
     hoverDefaults.backgroundBrush.color = 0xCC888888;
-
     this->stateHover = this->window->AddState("Hover", 100, &hoverDefaults);
 
     //
     StateSettings selectedDefaults(stateDefaults);
     selectedDefaults.outlineBrush.color = 0xFFFFFFFF;
     selectedDefaults.outlineWidth = 5;
-
     this->stateSelected = this->window->AddState("Selected", 150, &selectedDefaults);
+
+    //
+    StateSettings selectedHoverDefaults(hoverDefaults);
+    selectedHoverDefaults.outlineBrush.color = 0xFFFFFFFF;
+    selectedHoverDefaults.outlineWidth = 5;
+    this->stateSelectedHover = this->window->AddState("SelectedHover", 200, &selectedHoverDefaults);
 }
 
 
@@ -134,12 +138,16 @@ void TaskThumbnail::Activate() {
 
 
 void TaskThumbnail::Select() {
+    if ((*this->stateHover)->active) {
+        this->window->ActivateState(this->stateSelectedHover);
+    }
     this->window->ActivateState(this->stateSelected);
 }
 
 
 void TaskThumbnail::Deselect() {
     this->window->ClearState(this->stateSelected);
+    this->window->ClearState(this->stateSelectedHover);
 }
 
 
@@ -149,6 +157,9 @@ LRESULT WINAPI TaskThumbnail::HandleMessage(HWND window, UINT message, WPARAM wP
     switch (message) {
     case WM_MOUSEMOVE:
         {
+            if ((*this->stateSelected)->active) {
+                this->window->ActivateState(this->stateSelectedHover);
+            }
             this->window->ActivateState(this->stateHover);
             ((TaskSwitcher*)this->parent)->HoveringOverTask(this);
         }
@@ -157,6 +168,7 @@ LRESULT WINAPI TaskThumbnail::HandleMessage(HWND window, UINT message, WPARAM wP
     case WM_MOUSELEAVE:
         {
             this->window->ClearState(this->stateHover);
+            this->window->ClearState(this->stateSelectedHover);
         }
         return 0;
 

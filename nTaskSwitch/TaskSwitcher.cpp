@@ -58,11 +58,11 @@ void TaskSwitcher::LoadSettings() {
 
     StateSettings stateDefaults;
     stateDefaults.backgroundBrush.color = 0xDD000000;
-    stateDefaults.fontSize = 20;
-    StringCchCopy(stateDefaults.fontStyle, sizeof(stateDefaults.fontStyle), "Bold");
+    stateDefaults.fontSize = 16;
+    StringCchCopy(stateDefaults.fontWeight, sizeof(stateDefaults.fontWeight), "Light");
     StringCchCopy(stateDefaults.textAlign, sizeof(stateDefaults.textAlign), "Center");
     stateDefaults.textBrush.color = 0xFFFFFFFF;
-    stateDefaults.textOffsetTop = 20;
+    stateDefaults.textOffsetTop = 10;
     BOOL b;
     DwmGetColorizationColor(&stateDefaults.backgroundBrush.color, &b);
 
@@ -73,9 +73,9 @@ void TaskSwitcher::LoadSettings() {
     this->peekDelay = this->settings->GetInt("PeekDelay", SHRegGetIntW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AltTab\\LivePreview_ms", 1000));
 
     LayoutSettings layoutDefaults;
-    layoutDefaults.padding.left = 40;
-    layoutDefaults.padding.right = 40;
-    layoutDefaults.padding.top = 60;
+    layoutDefaults.padding.left = 20;
+    layoutDefaults.padding.right = 20;
+    layoutDefaults.padding.top = 40;
     layoutDefaults.padding.bottom = 40;
     layoutDefaults.rowSpacing = 0;
     layoutDefaults.columnSpacing = 0;
@@ -248,6 +248,7 @@ void TaskSwitcher::UpdateActiveWindow(int delta) {
             }
 
             this->shownWindows[this->selectedWindow]->Select();
+            this->hoveredThumbnail = NULL;
         }
 
         HWND targetWindow = this->hoveredThumbnail ? this->hoveredThumbnail->targetWindow : this->shownWindows[this->selectedWindow]->targetWindow;

@@ -28,6 +28,6 @@ public:
 private:
     HTHUMBNAIL thumbnail;
 
-    DrawableWindow::STATE stateHover, stateSelected;
+    DrawableWindow::STATE stateHover, stateSelected, stateSelectedHover;
     RECT thumbnailMargins;
 };
