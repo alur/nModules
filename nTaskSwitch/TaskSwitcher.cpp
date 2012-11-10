@@ -10,6 +10,7 @@
 #include "../nShared/LSModule.hpp"
 #include "../nShared/Debugging.h"
 #include <strsafe.h>
+#include <Shlwapi.h>
 
 
 extern LSModule* g_LSModule;
@@ -30,6 +31,7 @@ TaskSwitcher::TaskSwitcher() : Drawable("nTaskSwitch") {
 
 
 TaskSwitcher::~TaskSwitcher() {
+    Hide();
 }
 
 
@@ -54,18 +56,22 @@ void TaskSwitcher::LoadSettings() {
     StringCchCopy(stateDefaults.textAlign, sizeof(stateDefaults.textAlign), "Center");
     stateDefaults.textBrush.color = 0xFFFFFFFF;
     stateDefaults.textOffsetTop = 20;
+    BOOL b;
+    DwmGetColorizationColor(&stateDefaults.backgroundBrush.color, &b);
 
     this->window->Initialize(&defaults, &stateDefaults);
 
     this->windowsPerRow = this->settings->GetInt("WindowsPerRow", 7);
+    // LivePreview_ms doesn't seem to have any effect on explorer in windows 8.
+    this->peekDelay = this->settings->GetInt("PeekDelay", SHRegGetIntW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AltTab\\LivePreview_ms", 1000));
 
     LayoutSettings layoutDefaults;
     layoutDefaults.padding.left = 40;
     layoutDefaults.padding.right = 40;
-    layoutDefaults.padding.top = 80;
+    layoutDefaults.padding.top = 60;
     layoutDefaults.padding.bottom = 40;
-    layoutDefaults.rowSpacing = 10;
-    layoutDefaults.columnSpacing = 10;
+    layoutDefaults.rowSpacing = 0;
+    layoutDefaults.columnSpacing = 0;
 
     this->layoutSettings.Load(this->settings, &layoutDefaults);
 
@@ -81,6 +87,13 @@ LRESULT WINAPI TaskSwitcher::HandleMessage(HWND window, UINT message, WPARAM wPa
         Hide();
         return 0;
     }
+    else if (message == WM_TIMER && wParam == this->peekTimer && this->window->IsVisible()) {
+        this->peeking = true;
+        if (this->shownWindows.size() > 0) {
+            DwmpActivateLivePreview(1, this->shownWindows[this->selectedWindow]->targetWindow, this->window->GetWindowHandle(), 1);
+        }
+        return 0;
+    }
 
     return DefWindowProc(window, message, wParam, lParam);
 }
@@ -91,7 +104,7 @@ void TaskSwitcher::HandleAltTab() {
         UpdateActiveWindow(1);
     }
     else {
-        Show();
+        Show(1);
     }
 }
 
@@ -101,12 +114,13 @@ void TaskSwitcher::HandleAltShiftTab() {
         UpdateActiveWindow(-1);
     }
     else {
-        Show();
+        Show(-1);
     }
 }
 
 
 void TaskSwitcher::Hide() {
+    this->window->ClearCallbackTimer(this->peekTimer);
     this->window->Hide();
 
     if (this->shownWindows.size() != 0) {
@@ -134,13 +148,27 @@ void TaskSwitcher::AddWindow(HWND window) {
 }
 
 
-void TaskSwitcher::Show() {
+void TaskSwitcher::Show(int delta) {
     this->selectedWindow = 0;
-    this->window->Show();
+    this->peeking = false;
+
     SetActiveWindow(this->window->GetWindowHandle());
     SetForegroundWindow(this->window->GetWindowHandle());
     EnumDesktopWindows(NULL, LoadWindowsCallback, (LPARAM)this);
-    UpdateActiveWindow(0);
+
+    int height = this->layoutSettings.padding.top + this->layoutSettings.padding.bottom + (int)this->shownWindows.size() / this->windowsPerRow * (this->taskHeight + this->layoutSettings.rowSpacing) + this->taskHeight;
+
+    this->window->SetPosition(
+        this->window->GetDrawingSettings()->x,
+        this->window->GetMonitorInformation()->m_monitors[0].workAreaHeight/2 - height/2 + this->window->GetMonitorInformation()->m_monitors[0].workArea.top,
+        this->window->GetDrawingSettings()->width, 
+        height);
+
+    this->window->Show();
+
+    this->peekTimer = this->window->SetCallbackTimer(this->peekDelay, this);
+    
+    UpdateActiveWindow(delta);
 }
 
 
@@ -207,5 +235,10 @@ void TaskSwitcher::UpdateActiveWindow(int delta) {
     this->window->Repaint();
     TRACEW(L"TaskSwitch: %d, %s", this->selectedWindow, text);
 
-    DwmpActivateLivePreview(1, this->shownWindows[this->selectedWindow]->targetWindow, this->window->GetWindowHandle(), 1);
+    if (this->peeking) {
+        DwmpActivateLivePreview(1, this->shownWindows[this->selectedWindow]->targetWindow, this->window->GetWindowHandle(), 1);
+    }
+    else {
+        SetTimer(this->window->GetWindowHandle(), this->peekTimer, this->peekDelay, NULL);
+    }
 }

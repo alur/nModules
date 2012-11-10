@@ -27,21 +27,27 @@ private:
     static bool IsTaskbarWindow(HWND hWnd);
     static BOOL CALLBACK LoadWindowsCallback(HWND window, LPARAM taskSwitcher);
 
-    int windowsPerRow;
-
-    int taskWidth;
-    int taskHeight;
-
-    vector<TaskThumbnail*> shownWindows;
-    int selectedWindow;
-
     void LoadSettings();
     void UpdateActiveWindow(int delta);
 
     void AddWindow(HWND window);
 
-    void Show();
+    void Show(int delta);
     void Hide();
+
+    //
+    // Settings
+    int windowsPerRow; // How many windows there should be per row.
+    int peekDelay; // When the taskswitcher has been inactive for this many ms; put it in peek mode.
+
+    int taskWidth;
+    int taskHeight;
+
+    bool peeking;
+    UINT_PTR peekTimer;
+
+    vector<TaskThumbnail*> shownWindows;
+    int selectedWindow;
 
     LayoutSettings layoutSettings;
 };
