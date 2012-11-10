@@ -17,9 +17,13 @@ class TaskSwitcher : public Drawable {
 public:
     explicit TaskSwitcher();
     virtual ~TaskSwitcher();
+    
+    void Hide();
 
     void HandleAltTab();
     void HandleAltShiftTab();
+
+    void HoveringOverTask(TaskThumbnail* task);
 
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
@@ -34,8 +38,6 @@ private:
     void Preview(HWND window);
 
     void Show(int delta);
-    void Hide();
-    void HoveringOverTask(TaskThumbnail* task);
 
     //
     // Settings
@@ -50,6 +52,7 @@ private:
 
     vector<TaskThumbnail*> shownWindows;
     int selectedWindow;
+    TaskThumbnail* hoveredThumbnail;
 
     LayoutSettings layoutSettings;
 };

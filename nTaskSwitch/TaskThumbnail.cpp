@@ -10,6 +10,7 @@
 #include "../nShared/Debugging.h"
 #include <strsafe.h>
 #include <Shldisp.h>
+#include "TaskSwitcher.hpp"
 
 
 static HWND desktopWindow = NULL;
@@ -149,12 +150,19 @@ LRESULT WINAPI TaskThumbnail::HandleMessage(HWND window, UINT message, WPARAM wP
     case WM_MOUSEMOVE:
         {
             this->window->ActivateState(this->stateHover);
+            ((TaskSwitcher*)this->parent)->HoveringOverTask(this);
         }
         return 0;
 
     case WM_MOUSELEAVE:
         {
             this->window->ClearState(this->stateHover);
+        }
+        return 0;
+
+    case WM_NCLBUTTONDOWN:
+        {
+            ((TaskSwitcher*)this->parent)->Hide();
         }
         return 0;
     }
