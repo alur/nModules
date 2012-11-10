@@ -18,7 +18,6 @@ public:
 
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
-    void Preview();
     void Activate();
 
     void Select();

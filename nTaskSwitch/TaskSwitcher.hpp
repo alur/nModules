@@ -31,9 +31,11 @@ private:
     void UpdateActiveWindow(int delta);
 
     void AddWindow(HWND window);
+    void Preview(HWND window);
 
     void Show(int delta);
     void Hide();
+    void HoveringOverTask(TaskThumbnail* task);
 
     //
     // Settings

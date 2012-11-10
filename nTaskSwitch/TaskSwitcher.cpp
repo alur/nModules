@@ -15,12 +15,18 @@
 
 extern LSModule* g_LSModule;
 static UINT (* DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = NULL;
+static HWND desktopWindow = NULL;
 
 
 TaskSwitcher::TaskSwitcher() : Drawable("nTaskSwitch") {
     if (DwmpActivateLivePreview == NULL) {
         DwmpActivateLivePreview = (UINT (*)(UINT, HWND, HWND, UINT))GetProcAddress(GetModuleHandle("DWMAPI.DLL"), (LPCSTR)0x71);
     }
+    if (desktopWindow == NULL) {
+        desktopWindow = FindWindowW(L"DesktopBackgroundClass", NULL);
+    }
+
+    this->peekTimer = 0;
 
     LoadSettings();
     
@@ -76,7 +82,7 @@ void TaskSwitcher::LoadSettings() {
     this->layoutSettings.Load(this->settings, &layoutDefaults);
 
     this->taskWidth = (this->window->GetDrawingSettings()->width - this->layoutSettings.padding.left - this->layoutSettings.padding.right - (this->windowsPerRow - 1) * this->layoutSettings.columnSpacing)/this->windowsPerRow;
-    this->taskHeight = int(this->taskWidth/1.6f);
+    this->taskHeight = int(this->taskWidth/1.518f);
 }
 
 
@@ -89,9 +95,9 @@ LRESULT WINAPI TaskSwitcher::HandleMessage(HWND window, UINT message, WPARAM wPa
     }
     else if (message == WM_TIMER && wParam == this->peekTimer && this->window->IsVisible()) {
         this->peeking = true;
-        if (this->shownWindows.size() > 0) {
-            DwmpActivateLivePreview(1, this->shownWindows[this->selectedWindow]->targetWindow, this->window->GetWindowHandle(), 1);
-        }
+        Preview(this->shownWindows[this->selectedWindow]->targetWindow);
+        this->window->ClearCallbackTimer(this->peekTimer);
+        this->peekTimer = 0;
         return 0;
     }
 
@@ -120,7 +126,10 @@ void TaskSwitcher::HandleAltShiftTab() {
 
 
 void TaskSwitcher::Hide() {
-    this->window->ClearCallbackTimer(this->peekTimer);
+    if (this->peekTimer != 0) {
+        this->window->ClearCallbackTimer(this->peekTimer);
+        this->peekTimer = 0;
+    }
     this->window->Hide();
 
     if (this->shownWindows.size() != 0) {
@@ -156,7 +165,11 @@ void TaskSwitcher::Show(int delta) {
     SetForegroundWindow(this->window->GetWindowHandle());
     EnumDesktopWindows(NULL, LoadWindowsCallback, (LPARAM)this);
 
-    int height = this->layoutSettings.padding.top + this->layoutSettings.padding.bottom + (int)this->shownWindows.size() / this->windowsPerRow * (this->taskHeight + this->layoutSettings.rowSpacing) + this->taskHeight;
+    if (desktopWindow) {
+        AddWindow(desktopWindow);
+    }
+
+    int height = this->layoutSettings.padding.top + this->layoutSettings.padding.bottom + ((int)this->shownWindows.size() - 1) / this->windowsPerRow * (this->taskHeight + this->layoutSettings.rowSpacing) + this->taskHeight;
 
     this->window->SetPosition(
         this->window->GetDrawingSettings()->x,
@@ -230,15 +243,29 @@ void TaskSwitcher::UpdateActiveWindow(int delta) {
 
     this->shownWindows[this->selectedWindow]->Select();
 
-    GetWindowTextW(this->shownWindows[this->selectedWindow]->targetWindow, text, MAX_PATH);
-    this->window->SetText(text);
-    this->window->Repaint();
-    TRACEW(L"TaskSwitch: %d, %s", this->selectedWindow, text);
-
-    if (this->peeking) {
-        DwmpActivateLivePreview(1, this->shownWindows[this->selectedWindow]->targetWindow, this->window->GetWindowHandle(), 1);
+    if (this->shownWindows[this->selectedWindow]->targetWindow == desktopWindow) {
+        this->window->SetText(L"Desktop");
     }
     else {
+        GetWindowTextW(this->shownWindows[this->selectedWindow]->targetWindow, text, MAX_PATH);
+        this->window->SetText(text);
+    }
+    this->window->Repaint();
+
+    Preview(this->shownWindows[this->selectedWindow]->targetWindow);
+}
+
+
+void TaskSwitcher::Preview(HWND window) {
+    if (this->peeking) {
+        if (window == desktopWindow) {
+            DwmpActivateLivePreview(1, GetDesktopWindow(), this->window->GetWindowHandle(), 1);
+        }
+        else {
+            DwmpActivateLivePreview(1, window, this->window->GetWindowHandle(), 1);
+        }
+    }
+    else if (this->peekTimer != 0) {
         SetTimer(this->window->GetWindowHandle(), this->peekTimer, this->peekDelay, NULL);
     }
 }
