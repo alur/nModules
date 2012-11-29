@@ -105,6 +105,56 @@ inline bool _IsFunctionOf(LPCSTR source, LPCSTR name) {
 
 
 /// <summary>
+/// Grabs the first maxParams parameters from the function contained in the given string.
+/// </summary>
+/// <returns>The number of parameters actually retrived.</returns>
+int _GetParameters(LPCSTR source, UCHAR maxParams, LPSTR dests[], size_t cchDest) {
+    // *(),
+    int currentParam = 0;
+    int parenDepth = 0;
+
+    LPCSTR pos = strchr(source, '(');
+    LPCSTR paramStart = pos + 1;
+
+    bool done = false;
+    while (!done && currentParam < maxParams) {
+        switch (*++pos)
+        {
+        case '\0':
+            done = true;
+            break;
+
+        case '(':
+            ++parenDepth;
+            break;
+
+        case ',':
+            if (parenDepth == 0)
+            {
+                StringCchCopyN(dests[currentParam++], cchDest, paramStart, pos - paramStart);
+                paramStart = pos + 1;
+            }
+            break;
+
+        case ')':
+            if (parenDepth == 0)
+            {
+                StringCchCopyN(dests[currentParam++], cchDest, paramStart, pos - paramStart);
+                done = true;
+            }
+            else
+            {
+                --parenDepth;
+            }
+            break;
+        }
+    }
+
+    return currentParam;
+}
+
+
+/// <summary>
 /// Parses a user specified color.
 /// </summary>
 EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
@@ -148,10 +198,26 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
 
     // TODO::RGB(), ARGB(), RGBA(), HSL(), AHSL(), HSLA()
     if (_IsFunctionOf(color, "RGB")) {
+        char red[8], green[8], blue[8];
+        LPSTR params[] = { red, green, blue };
+
+        _GetParameters(color, 3, params, 8);
+
+        LPSTR endPtrRed, endPtrGreen, endPtrBlue;
+        ARGB redValue = strtoul(red, &endPtrRed, 0);
+        ARGB greenValue = strtoul(green, &endPtrGreen, 0);
+        ARGB blueValue = strtoul(blue, &endPtrBlue, 0);
+        
+        if (endPtrRed != '\0' || endPtrGreen != '\0' || endPtrBlue != '\0')
+            return false;
+
+        *target = redValue << 16 | greenValue << 8 | blueValue;
+        return true;
     }
 
     // TODO::Lighten, darken, saturate, desaturate, fadein, fadeout, spin, mix
     if (_IsFunctionOf(color, "lighten")) {
+
     }
 
     if (_IsFunctionOf(color, "darken")) {
