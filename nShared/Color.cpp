@@ -237,7 +237,7 @@ AHSL Color::ARGBToAHSL(ARGB color) {
         ret.hue = int(60.0f*((c.r - c.g)/C + 4.0f));
     }
 
-    float L = (M - m)/2.0f;
+    float L = (M + m)/2.0f;
 
     ret.lightness = UCHAR(COLOR_MAX_LIGHTNESS*L);
     ret.saturation = UCHAR(COLOR_MAX_SATURATION*C/(1.0f-fabs(2.0f*L - 1.0f)));

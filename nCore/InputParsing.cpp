@@ -360,7 +360,7 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
         if (!_GetColorAndAmount(color, &parsedColor, &amount))
             return false;
 
-        long newAlpha = clamp((parsedColor >> 24) + amount, 0, 100);
+        long newAlpha = clamp((parsedColor >> 24) + amount, 0, 255);
         *target = newAlpha << 24 | parsedColor & 0xFFFFFF;
         return true;
     }
@@ -370,7 +370,7 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
         if (!_GetColorAndAmount(color, &parsedColor, &amount))
             return false;
 
-        long newAlpha = clamp((parsedColor >> 24) - amount, 0, 100);
+        long newAlpha = clamp((parsedColor >> 24) - amount, 0, 255);
         *target = newAlpha << 24 | parsedColor & 0xFFFFFF;
         return true;
     }
@@ -384,7 +384,7 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
 
         hslColor.hue += amount;
         hslColor.hue %= 360;
-        if (hslColor.hue < 360)
+        if (hslColor.hue < 0)
             hslColor.hue += 360;
 
         *target = Color::AHSLToARGB(hslColor);
