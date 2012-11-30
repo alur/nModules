@@ -195,13 +195,13 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
             return false;
         }
     }
-
     // TODO::RGB(), ARGB(), RGBA(), HSL(), AHSL(), HSLA()
-    if (_IsFunctionOf(color, "RGB")) {
+    else if (_IsFunctionOf(color, "RGB")) {
         char red[8], green[8], blue[8];
         LPSTR params[] = { red, green, blue };
 
-        _GetParameters(color, 3, params, 8);
+        if (_GetParameters(color, 3, params, 8) != 3)
+            return false;
 
         LPSTR endPtrRed, endPtrGreen, endPtrBlue;
         ARGB redValue = strtoul(red, &endPtrRed, 0);
@@ -211,20 +211,58 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
         if (endPtrRed != '\0' || endPtrGreen != '\0' || endPtrBlue != '\0')
             return false;
 
-        *target = redValue << 16 | greenValue << 8 | blueValue;
+        *target = 0xFF000000 | redValue << 16 | greenValue << 8 | blueValue;
         return true;
     }
+    else if (_IsFunctionOf(color, "ARGB") || _IsFunctionOf(color, "RGBA")) {
+        char red[8], green[8], blue[8], alpha[8];
+        LPSTR params[4];
 
-    // TODO::Lighten, darken, saturate, desaturate, fadein, fadeout, spin, mix
-    if (_IsFunctionOf(color, "lighten")) {
+        if (_IsFunctionOf(color, "ARGB")) {
+            params[0] = alpha; params[1] = red; params[2] = green; params[3] = blue;
+        }
+        else {
+            params[0] = red; params[1] = green; params[2] = blue; params[3] = alpha;
+        }
 
+        if (_GetParameters(color, 4, params, 8) != 4)
+            return false;
+
+        LPSTR endPtrRed, endPtrGreen, endPtrBlue, endPtrAlpha;
+        ARGB redValue = strtoul(red, &endPtrRed, 0);
+        ARGB greenValue = strtoul(green, &endPtrGreen, 0);
+        ARGB blueValue = strtoul(blue, &endPtrBlue, 0);
+        ARGB alphaValue = strtoul(alpha, &endPtrAlpha, 0);
+        
+        if (endPtrRed != '\0' || endPtrGreen != '\0' || endPtrBlue != '\0' || endPtrAlpha != '\0')
+            return false;
+
+        *target = alphaValue << 24 | redValue << 16 | greenValue << 8 | blueValue;
+        return true;
     }
-
-    if (_IsFunctionOf(color, "darken")) {
+    else if (_IsFunctionOf(color, "HSL")) {
     }
-
-    //
-    if (_stricmp(color, "DWMColor") == 0) {
+    else if (_IsFunctionOf(color, "HSLA")) {
+    }
+    else if (_IsFunctionOf(color, "AHSL")) {
+    }
+    else if (_IsFunctionOf(color, "lighten")) {
+    }
+    else if (_IsFunctionOf(color, "darken")) {
+    }
+    else if (_IsFunctionOf(color, "saturate")) {
+    }
+    else if (_IsFunctionOf(color, "desaturate")) {
+    }
+    else if (_IsFunctionOf(color, "fadein")) {
+    }
+    else if (_IsFunctionOf(color, "fadeout")) {
+    }
+    else if (_IsFunctionOf(color, "spin")) {
+    }
+    else if (_IsFunctionOf(color, "mix")) {
+    }
+    else if (_stricmp(color, "DWMColor") == 0) {
         BOOL b;
         DwmGetColorizationColor(target, &b);
         return true;
