@@ -330,6 +330,18 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
         *target = Color::AHSLToARGB(hslColor);
         return true;
     }
+    else if (_IsFunctionOf(color, "SetLightness")) { // SetLightness(color, amount) -- Sets the lightness of the color to the specified amount.
+        ARGB parsedColor;
+        long amount;
+        if (!_GetColorAndAmount(color, &parsedColor, &amount))
+            return false;
+
+        AHSL hslColor = Color::ARGBToAHSL(parsedColor);
+        hslColor.lightness = (UCHAR)clamp(amount, 0, COLOR_MAX_LIGHTNESS);
+
+        *target = Color::AHSLToARGB(hslColor);
+        return true;
+    }
     else if (_IsFunctionOf(color, "Saturate")) { // Saturate(color, amount) -- Increases the saturation by amount.
         ARGB parsedColor;
         long amount;
@@ -354,6 +366,18 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
         *target = Color::AHSLToARGB(hslColor);
         return true;
     }
+    else if (_IsFunctionOf(color, "SetSaturation")) { // SetSaturation(color, amount) -- Sets the saturation to amount.
+        ARGB parsedColor;
+        long amount;
+        if (!_GetColorAndAmount(color, &parsedColor, &amount))
+            return false;
+
+        AHSL hslColor = Color::ARGBToAHSL(parsedColor);
+        hslColor.saturation = (UCHAR)clamp(amount, 0, COLOR_MAX_SATURATION);
+
+        *target = Color::AHSLToARGB(hslColor);
+        return true;
+    }
     else if (_IsFunctionOf(color, "Fadein")) { // Fadein(color, amount) -- Increases the alpha by amount.
         ARGB parsedColor;
         long amount;
@@ -374,6 +398,15 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
         *target = newAlpha << 24 | parsedColor & 0xFFFFFF;
         return true;
     }
+    else if (_IsFunctionOf(color, "SetAlpha")) { // SetAlpha(color, amount) -- Sets the alpha to the specified amount.
+        ARGB parsedColor;
+        long amount;
+        if (!_GetColorAndAmount(color, &parsedColor, &amount))
+            return false;
+
+        *target = clamp(amount, 0, 255) << 24 | parsedColor & 0xFFFFFF;
+        return true;
+    }
     else if (_IsFunctionOf(color, "Spin")) { // Spin(color, amount) -- Spins the hue of the color by amount.
         ARGB parsedColor;
         long amount;
@@ -383,6 +416,22 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
         AHSL hslColor = Color::ARGBToAHSL(parsedColor);
 
         hslColor.hue += amount;
+        hslColor.hue %= 360;
+        if (hslColor.hue < 0)
+            hslColor.hue += 360;
+
+        *target = Color::AHSLToARGB(hslColor);
+        return true;
+    }
+    else if (_IsFunctionOf(color, "SetHue")) { // SetHue(color, amount) -- Sets the hue to the specified amount.
+        ARGB parsedColor;
+        long amount;
+        if (!_GetColorAndAmount(color, &parsedColor, &amount))
+            return false;
+
+        AHSL hslColor = Color::ARGBToAHSL(parsedColor);
+
+        hslColor.hue = amount;
         hslColor.hue %= 360;
         if (hslColor.hue < 0)
             hslColor.hue += 360;
