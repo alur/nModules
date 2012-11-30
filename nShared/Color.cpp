@@ -149,7 +149,7 @@ ARGB Color::AHSLToARGB(int alpha, int hue, int saturation, int lightness) {
     float h = hue/60.0f;
     float chroma = nSaturation * (1 - fabs(2 * nLightness - 1));
     float m = nLightness - chroma / 2.0f;
-    float x = chroma*(1-fabs((h / 2.0f) - floor(h / 2.0f) - 1));
+    float x = chroma*(1.0f - fabs(fmodf(h, 2.0f) - 1.0f));
 
     switch ((int)h)
     {
@@ -186,7 +186,7 @@ ARGB Color::AHSVToARGB(int alpha, int hue, int saturation, int value) {
     float h = hue/60.0f;
     float chroma = nValue * nSaturation;
     float m = nValue - chroma;
-    float x = chroma*(1-fabs((h / 2.0f) - floor(h / 2.0f) - 1));
+    float x = chroma*(1.0f - fabs(fmodf(h, 2.0f) - 1.0f));
 
     switch ((int)h)
     {

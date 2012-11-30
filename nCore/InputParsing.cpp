@@ -165,7 +165,7 @@ int _GetColorDefParams(LPCSTR source, UCHAR maxParams, int* out) {
     for (int i = 0; i < numParams; ++i) {
         out[i] = strtoul(params[i], &endPtr, 0);
 
-        if (endPtr != '\0') {
+        if (*endPtr != '\0') {
             return i;
         }
     }
