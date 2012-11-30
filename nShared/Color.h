@@ -12,6 +12,17 @@
 // Color of the format AARRGGBB.
 typedef DWORD ARGB;
 
+//
+typedef struct {
+    UCHAR alpha;
+    int hue;
+    UCHAR saturation;
+    union {
+        UCHAR lightness;
+        UCHAR value;
+    };
+} AHSL, ASHV;
+
 // HSL/HSV max hue
 #define COLOR_MAX_HUE 359
 
@@ -36,12 +47,16 @@ namespace Color {
 
     //
     ARGB AHSLToARGB(int alpha, int hue, int saturation, int lightness);
+    ARGB AHSLToARGB(AHSL color);
 
     //
     ARGB HSVToARGB(int hue, int saturation, int value);
 
     // 
     ARGB AHSVToARGB(int alpha, int hue, int saturation, int value);
+
+    //
+    AHSL ARGBToAHSL(ARGB color);
 
     // Converts ARGB to D2D_COLOR_F
     D2D_COLOR_F ARGBToD2D(ARGB argb);

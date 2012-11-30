@@ -13,6 +13,9 @@
 #include <dwmapi.h>
 
 
+EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target);
+
+
 /// <summary>
 /// Parses a user inputed coordinate.
 /// </summary>
@@ -174,6 +177,23 @@ int _GetColorDefParams(LPCSTR source, UCHAR maxParams, int* out) {
 }
 
 
+bool _GetColorAndAmount(LPCSTR source, ARGB* color, long* amount) {
+    char val1[MAX_LINE_LENGTH], val2[MAX_LINE_LENGTH];
+    LPSTR params[] = { val1, val2 };
+    char * endPtr;
+
+    if (_GetParameters(source, 2, params, MAX_LINE_LENGTH) != 2)
+        return false;
+
+    *amount = strtol(val2, &endPtr, 0);
+
+    if (*endPtr != '\0' || !ParseColor(val1, color))
+        return false;
+
+    return true;
+}
+
+
 /// <summary>
 /// Parses a user specified color.
 /// </summary>
@@ -287,34 +307,91 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
         return true;
     }
     else if (_IsFunctionOf(color, "Lighten")) { // Lighten(color, amount) -- Increases the lightness of the color by the specified amount.
+        ARGB parsedColor;
+        long amount;
+        if (!_GetColorAndAmount(color, &parsedColor, &amount))
+            return false;
 
-    }
-    else if (_IsFunctionOf(color, "Darken")) {
-        // Darken(color, amount) -- 
+        AHSL hslColor = Color::ARGBToAHSL(parsedColor);
+        hslColor.lightness = (UCHAR)clamp(hslColor.lightness + amount, 0, COLOR_MAX_LIGHTNESS);
 
+        *target = Color::AHSLToARGB(hslColor);
+        return true;
     }
-    else if (_IsFunctionOf(color, "Saturate")) {
-        // Saturate(color, amount) -- Increases the saturation by amount.
+    else if (_IsFunctionOf(color, "Darken")) { // Darken(color, amount) -- Decreases the lightness of the color by the specified amount.
+        ARGB parsedColor;
+        long amount;
+        if (!_GetColorAndAmount(color, &parsedColor, &amount))
+            return false;
 
-    }
-    else if (_IsFunctionOf(color, "Desaturate")) {
-        // Desaturate(color, amount) -- Decreases the saturation by amount.
+        AHSL hslColor = Color::ARGBToAHSL(parsedColor);
+        hslColor.lightness = (UCHAR)clamp(hslColor.lightness - amount, 0, COLOR_MAX_LIGHTNESS);
 
+        *target = Color::AHSLToARGB(hslColor);
+        return true;
     }
-    else if (_IsFunctionOf(color, "Fadein")) {
-        // Fadein(color, amount) -- Increases the alpha by amount.
+    else if (_IsFunctionOf(color, "Saturate")) { // Saturate(color, amount) -- Increases the saturation by amount.
+        ARGB parsedColor;
+        long amount;
+        if (!_GetColorAndAmount(color, &parsedColor, &amount))
+            return false;
 
-    }
-    else if (_IsFunctionOf(color, "Fadeout")) {
-        // Fadeout(color, amount) -- Reduces the alpha by amount.
+        AHSL hslColor = Color::ARGBToAHSL(parsedColor);
+        hslColor.saturation = (UCHAR)clamp(hslColor.saturation + amount, 0, COLOR_MAX_SATURATION);
 
+        *target = Color::AHSLToARGB(hslColor);
+        return true;
     }
-    else if (_IsFunctionOf(color, "Spin")) {
-        // Spin(color, amount) -- Spins the hue of the color by amount.
+    else if (_IsFunctionOf(color, "Desaturate")) { // Desaturate(color, amount) -- Decreases the saturation by amount.
+        ARGB parsedColor;
+        long amount;
+        if (!_GetColorAndAmount(color, &parsedColor, &amount))
+            return false;
 
+        AHSL hslColor = Color::ARGBToAHSL(parsedColor);
+        hslColor.saturation = (UCHAR)clamp(hslColor.saturation - amount, 0, COLOR_MAX_SATURATION);
+
+        *target = Color::AHSLToARGB(hslColor);
+        return true;
     }
-    else if (_IsFunctionOf(color, "Mix")) {
-        // Mix(color1, color2, weight) -- Mixes color1 and color2.
+    else if (_IsFunctionOf(color, "Fadein")) { // Fadein(color, amount) -- Increases the alpha by amount.
+        ARGB parsedColor;
+        long amount;
+        if (!_GetColorAndAmount(color, &parsedColor, &amount))
+            return false;
+
+        long newAlpha = clamp((parsedColor >> 24) + amount, 0, 100);
+        *target = newAlpha << 24 | parsedColor & 0xFFFFFF;
+        return true;
+    }
+    else if (_IsFunctionOf(color, "Fadeout")) { // Fadeout(color, amount) -- Reduces the alpha by amount.
+        ARGB parsedColor;
+        long amount;
+        if (!_GetColorAndAmount(color, &parsedColor, &amount))
+            return false;
+
+        long newAlpha = clamp((parsedColor >> 24) - amount, 0, 100);
+        *target = newAlpha << 24 | parsedColor & 0xFFFFFF;
+        return true;
+    }
+    else if (_IsFunctionOf(color, "Spin")) { // Spin(color, amount) -- Spins the hue of the color by amount.
+        ARGB parsedColor;
+        long amount;
+        if (!_GetColorAndAmount(color, &parsedColor, &amount))
+            return false;
+
+        AHSL hslColor = Color::ARGBToAHSL(parsedColor);
+
+        hslColor.hue += amount;
+        hslColor.hue %= 360;
+        if (hslColor.hue < 360)
+            hslColor.hue += 360;
+
+        *target = Color::AHSLToARGB(hslColor);
+        return true;
+    }
+    else if (_IsFunctionOf(color, "Mix")) { // Mix(color1, color2, weight) -- Mixes color1 and color2.
+        // TODO::Implement this
     }
     else if (_stricmp(color, "DWMColor") == 0) {
         BOOL b;

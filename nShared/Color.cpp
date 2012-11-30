@@ -140,6 +140,11 @@ ARGB Color::HSLToARGB(int hue, int saturation, int lightness) {
 }
 
 
+ARGB Color::AHSLToARGB(AHSL color) {
+    return AHSLToARGB(color.alpha, color.hue, color.saturation, color.lightness);
+}
+
+
 //
 ARGB Color::AHSLToARGB(int alpha, int hue, int saturation, int lightness) {
     // Normalize the input
@@ -205,4 +210,37 @@ ARGB Color::AHSVToARGB(int alpha, int hue, int saturation, int value) {
     }
 
     return Color::ARGBToARGB(alpha, 0, 0, 0);
+}
+
+
+//
+AHSL Color::ARGBToAHSL(ARGB color) {
+    AHSL ret;
+    D2D_COLOR_F c = ARGBToD2D(color);
+
+    ret.alpha = color >> 24;
+
+    float M = max(c.r, max(c.g, c.b));
+    float m = min(c.r, min(c.g, c.b));
+    float C = M - m;
+
+    if (C == 0) {
+        ret.hue = 0;
+    }
+    else if (M == c.r) {
+        ret.hue = int(60.0f*(fmodf((c.g - c.b)/C, 6.0f)));
+    }
+    else if (M == c.g) {
+        ret.hue = int(60.0f*((c.b - c.r)/C + 2.0f));
+    }
+    else {
+        ret.hue = int(60.0f*((c.r - c.g)/C + 4.0f));
+    }
+
+    float L = (M - m)/2.0f;
+
+    ret.lightness = UCHAR(COLOR_MAX_LIGHTNESS*L);
+    ret.saturation = UCHAR(COLOR_MAX_SATURATION*C/(1.0f-fabs(2.0f*L - 1.0f)));
+
+    return ret;
 }
