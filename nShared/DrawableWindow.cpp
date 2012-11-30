@@ -471,6 +471,18 @@ HWND DrawableWindow::GetWindowHandle() {
 
 
 /// <summary>
+/// Callback function for Paint(). Tells the specified window to repaint itself.
+/// </summary>
+/// <returns>TRUE</returns>
+BOOL CALLBACK ChildPainter(HWND hwnd, LPARAM lParam) {
+    UNREFERENCED_PARAMETER(lParam);
+
+    SendMessage(hwnd, WM_PAINT, NULL, NULL);
+    return TRUE;
+}
+
+
+/// <summary>
 /// Handles window messages for this drawablewindow. Any messages forwarded from here will have the extra parameter set to this.
 /// </summary>
 /// <param name="window">The handle of the window this message was sent to.</param>
@@ -546,6 +558,9 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
                     DiscardDeviceResources();
                 }
             }
+
+            // Paint actual owned/child windows.
+            EnumChildWindows(this->window, ChildPainter, NULL);
 
             ValidateRect(this->window, NULL);
 

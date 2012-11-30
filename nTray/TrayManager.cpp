@@ -154,6 +154,7 @@ void TrayManager::DeleteIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
 /// <summary>
 /// Modifies an existing icon.
 /// </summary>
+/// <param name="pNID"></param>
 void TrayManager::ModifyIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
     TRAYICONDATAITER icon = FindIcon(pNID);
     if (icon != g_currentIcons.end()) {
@@ -170,7 +171,9 @@ void TrayManager::ModifyIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
 /// <summary>
 /// Returns the focus to one of the trays.
 /// </summary>
-void TrayManager::SetFocus(LiteStep::LPLSNOTIFYICONDATA /* pNID */) {
+/// <param name="pNID">The </param>
+void TrayManager::SetFocus(LiteStep::LPLSNOTIFYICONDATA pNID) {
+    UNREFERENCED_PARAMETER(pNID);
 }
 
 

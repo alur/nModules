@@ -11,7 +11,9 @@
 #include "../nShared/LSModule.hpp"
 #include "Taskbar.hpp"
 
+
 extern LSModule* g_LSModule;
+
 
 /// <summary>
 /// Constructor
