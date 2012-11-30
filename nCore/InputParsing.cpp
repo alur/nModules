@@ -9,6 +9,7 @@
 #include <strsafe.h>
 #include "../nShared/Macros.h"
 #include "../nShared/Color.h"
+#include "../nShared/Math.h"
 #include <dwmapi.h>
 
 
@@ -154,6 +155,25 @@ int _GetParameters(LPCSTR source, UCHAR maxParams, LPSTR dests[], size_t cchDest
 }
 
 
+int _GetColorDefParams(LPCSTR source, UCHAR maxParams, int* out) {
+    char val1[8], val2[8], val3[8], val4[8];
+    LPSTR params[] = { val1, val2, val3, val4 };
+    char * endPtr;
+
+    int numParams = _GetParameters(source, maxParams, params, 8);
+    
+    for (int i = 0; i < numParams; ++i) {
+        out[i] = strtoul(params[i], &endPtr, 0);
+
+        if (endPtr != '\0') {
+            return i;
+        }
+    }
+
+    return numParams;
+}
+
+
 /// <summary>
 /// Parses a user specified color.
 /// </summary>
@@ -162,7 +182,6 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
     size_t length;
     StringCchLength(color, MAX_LINE_LENGTH, &length);
 
-    // #RGB, #ARGB, #RRGGBB, #AARRGGBB
     if (color[0] == '#') {
         // Try to parse the input as a hex string
         char * endPtr;
@@ -171,8 +190,8 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
             return false;
         
         switch (length) {
-        case 4:
-        case 5:
+        case 4: // #RGB
+        case 5: // #ARGB
             // Alpha
             *target = length == 4 ? 0xFF000000 : ((0xF000 & colorValue) << 16 | (0xF000 & colorValue) << 12);
             // Red
@@ -183,11 +202,11 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
             *target |= (0xF & colorValue) << 4 | (0xF & colorValue);
             return true;
 
-        case 7:
+        case 7: // #RRGGBB
             *target = 0xFF000000 | colorValue;
             return true;
 
-        case 9:
+        case 9: // #AARRGGBB
             *target = colorValue;
             return true;
 
@@ -195,72 +214,107 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
             return false;
         }
     }
-    // TODO::RGB(), ARGB(), RGBA(), HSL(), AHSL(), HSLA()
-    else if (_IsFunctionOf(color, "RGB")) {
-        char red[8], green[8], blue[8];
-        LPSTR params[] = { red, green, blue };
-
-        if (_GetParameters(color, 3, params, 8) != 3)
+    else if (_IsFunctionOf(color, "RGB")) { // RGB(red, green, blue)
+        int params[3];
+        if (_GetColorDefParams(color, 3, params) != 3)
             return false;
 
-        LPSTR endPtrRed, endPtrGreen, endPtrBlue;
-        ARGB redValue = strtoul(red, &endPtrRed, 0);
-        ARGB greenValue = strtoul(green, &endPtrGreen, 0);
-        ARGB blueValue = strtoul(blue, &endPtrBlue, 0);
-        
-        if (endPtrRed != '\0' || endPtrGreen != '\0' || endPtrBlue != '\0')
-            return false;
-
-        *target = 0xFF000000 | redValue << 16 | greenValue << 8 | blueValue;
+        *target = Color::RGBToARGB(clamp(params[0], 0, 255), clamp(params[1], 0, 255), clamp(params[2], 0, 255));
         return true;
     }
-    else if (_IsFunctionOf(color, "ARGB") || _IsFunctionOf(color, "RGBA")) {
-        char red[8], green[8], blue[8], alpha[8];
-        LPSTR params[4];
-
-        if (_IsFunctionOf(color, "ARGB")) {
-            params[0] = alpha; params[1] = red; params[2] = green; params[3] = blue;
-        }
-        else {
-            params[0] = red; params[1] = green; params[2] = blue; params[3] = alpha;
-        }
-
-        if (_GetParameters(color, 4, params, 8) != 4)
+    else if (_IsFunctionOf(color, "ARGB")) { // ARGB(alpha, red, green, blue)
+        int params[4];
+        if (_GetColorDefParams(color, 4, params) != 4)
             return false;
 
-        LPSTR endPtrRed, endPtrGreen, endPtrBlue, endPtrAlpha;
-        ARGB redValue = strtoul(red, &endPtrRed, 0);
-        ARGB greenValue = strtoul(green, &endPtrGreen, 0);
-        ARGB blueValue = strtoul(blue, &endPtrBlue, 0);
-        ARGB alphaValue = strtoul(alpha, &endPtrAlpha, 0);
-        
-        if (endPtrRed != '\0' || endPtrGreen != '\0' || endPtrBlue != '\0' || endPtrAlpha != '\0')
-            return false;
-
-        *target = alphaValue << 24 | redValue << 16 | greenValue << 8 | blueValue;
+        *target = Color::ARGBToARGB(clamp(params[0], 0, 255), clamp(params[1], 0, 255), clamp(params[2], 0, 255), clamp(params[3], 0, 255));
         return true;
     }
-    else if (_IsFunctionOf(color, "HSL")) {
+    else if (_IsFunctionOf(color, "RGBA")) { // RGBA(red, green, alpha, blue)
+        int params[4];
+        if (_GetColorDefParams(color, 4, params) != 4)
+            return false;
+
+        *target = Color::ARGBToARGB(clamp(params[3], 0, 255), clamp(params[0], 0, 255), clamp(params[1], 0, 255), clamp(params[2], 0, 255));
+        return true;
     }
-    else if (_IsFunctionOf(color, "HSLA")) {
+    else if (_IsFunctionOf(color, "HSL")) { // HSL(hue, saturation, lightness)
+        int params[3];
+        if (_GetColorDefParams(color, 3, params) != 3)
+            return false;
+
+        *target = Color::HSLToARGB(clamp(params[0], 0, COLOR_MAX_HUE), clamp(params[1], 0, COLOR_MAX_SATURATION), clamp(params[2], 0, COLOR_MAX_LIGHTNESS));
+        return true;
     }
-    else if (_IsFunctionOf(color, "AHSL")) {
+    else if (_IsFunctionOf(color, "HSLA")) { // HSLA(hue, saturation, lightness, alpha)
+        int params[4];
+        if (_GetColorDefParams(color, 4, params) != 4)
+            return false;
+
+        *target = Color::AHSLToARGB(clamp(params[3], 0, 255), clamp(params[0], 0, COLOR_MAX_HUE), clamp(params[1], 0, COLOR_MAX_SATURATION), clamp(params[2], 0, COLOR_MAX_LIGHTNESS));
+        return true;
     }
-    else if (_IsFunctionOf(color, "lighten")) {
+    else if (_IsFunctionOf(color, "AHSL")) { // AHSL(alpha, hue, saturation, lightness)
+        int params[4];
+        if (_GetColorDefParams(color, 4, params) != 4)
+            return false;
+
+        *target = Color::AHSLToARGB(clamp(params[0], 0, 255), clamp(params[1], 0, COLOR_MAX_HUE), clamp(params[2], 0, COLOR_MAX_SATURATION), clamp(params[3], 0, COLOR_MAX_LIGHTNESS));
+        return true;
     }
-    else if (_IsFunctionOf(color, "darken")) {
+    else if (_IsFunctionOf(color, "HSV")) { // HSV(hue, saturation, value)
+        int params[3];
+        if (_GetColorDefParams(color, 3, params) != 3)
+            return false;
+
+        *target = Color::HSVToARGB(clamp(params[0], 0, COLOR_MAX_HUE), clamp(params[1], 0, COLOR_MAX_SATURATION), clamp(params[2], 0, COLOR_MAX_VALUE));
+        return true;
     }
-    else if (_IsFunctionOf(color, "saturate")) {
+    else if (_IsFunctionOf(color, "HSVA")) { // HSVA(hue, saturation, value, alpha)
+        int params[4];
+        if (_GetColorDefParams(color, 4, params) != 4)
+            return false;
+
+        *target = Color::AHSVToARGB(clamp(params[3], 0, 255), clamp(params[0], 0, COLOR_MAX_HUE), clamp(params[1], 0, COLOR_MAX_SATURATION), clamp(params[2], 0, COLOR_MAX_VALUE));
+        return true;
     }
-    else if (_IsFunctionOf(color, "desaturate")) {
+    else if (_IsFunctionOf(color, "AHSV")) { // AHSV(alpha, hue, saturation, value)
+        int params[4];
+        if (_GetColorDefParams(color, 4, params) != 4)
+            return false;
+
+        *target = Color::AHSVToARGB(clamp(params[0], 0, 255), clamp(params[1], 0, COLOR_MAX_HUE), clamp(params[2], 0, COLOR_MAX_SATURATION), clamp(params[3], 0, COLOR_MAX_VALUE));
+        return true;
     }
-    else if (_IsFunctionOf(color, "fadein")) {
+    else if (_IsFunctionOf(color, "Lighten")) { // Lighten(color, amount) -- Increases the lightness of the color by the specified amount.
+
     }
-    else if (_IsFunctionOf(color, "fadeout")) {
+    else if (_IsFunctionOf(color, "Darken")) {
+        // Darken(color, amount) -- 
+
     }
-    else if (_IsFunctionOf(color, "spin")) {
+    else if (_IsFunctionOf(color, "Saturate")) {
+        // Saturate(color, amount) -- Increases the saturation by amount.
+
     }
-    else if (_IsFunctionOf(color, "mix")) {
+    else if (_IsFunctionOf(color, "Desaturate")) {
+        // Desaturate(color, amount) -- Decreases the saturation by amount.
+
+    }
+    else if (_IsFunctionOf(color, "Fadein")) {
+        // Fadein(color, amount) -- Increases the alpha by amount.
+
+    }
+    else if (_IsFunctionOf(color, "Fadeout")) {
+        // Fadeout(color, amount) -- Reduces the alpha by amount.
+
+    }
+    else if (_IsFunctionOf(color, "Spin")) {
+        // Spin(color, amount) -- Spins the hue of the color by amount.
+
+    }
+    else if (_IsFunctionOf(color, "Mix")) {
+        // Mix(color1, color2, weight) -- Mixes color1 and color2.
     }
     else if (_stricmp(color, "DWMColor") == 0) {
         BOOL b;

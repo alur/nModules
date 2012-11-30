@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Color.h"
+#include <math.h>
 
 namespace Color {
 
@@ -109,7 +110,7 @@ D2D_COLOR_F Color::ARGBToD2D(ARGB argb) {
 /// Converts a D2D_COLOR_F formatted color to the ARGB format.
 /// </summary>
 ARGB Color::D2DToARGB(D2D_COLOR_F d2d) {
-    return ARGB(d2d.a * 255) << 24 | ARGB(d2d.r * 255) << 16 | ARGB(d2d.g * 255) << 8 | ARGB(d2d.b * 255); 
+    return ARGBToARGB(ARGB(d2d.a * 255), ARGB(d2d.r * 255), ARGB(d2d.g * 255), ARGB(d2d.b * 255));
 }
 
 
@@ -118,4 +119,90 @@ ARGB Color::D2DToARGB(D2D_COLOR_F d2d) {
 /// </summary>
 Color::KnownColor* Color::GetKnownColors() {
     return Color::knownColors;
+}
+
+
+// Converts red, green, blue values to ARGB.
+ARGB Color::RGBToARGB(int red, int green, int blue) {
+    return ARGBToARGB(0xFF, red, green, blue);
+}
+
+
+// Converts ARGB values to an ARGB.
+ARGB Color::ARGBToARGB(int alpha, int red, int green, int blue) {
+    return alpha << 24 | red << 16 | green << 8 | blue; 
+}
+
+
+//
+ARGB Color::HSLToARGB(int hue, int saturation, int lightness) {
+    return AHSLToARGB(0xFF, hue, saturation, lightness);
+}
+
+
+//
+ARGB Color::AHSLToARGB(int alpha, int hue, int saturation, int lightness) {
+    // Normalize the input
+    float nSaturation = float(saturation)/COLOR_MAX_SATURATION;
+    float nLightness = float(lightness)/COLOR_MAX_LIGHTNESS;
+
+    float h = hue/60.0f;
+    float chroma = nSaturation * (1 - fabs(2 * nLightness - 1));
+    float m = nLightness - chroma / 2.0f;
+    float x = chroma*(1-fabs((h / 2.0f) - floor(h / 2.0f) - 1));
+
+    switch ((int)h)
+    {
+    case 0:
+        return Color::ARGBToARGB(alpha, ARGB((chroma + m) * 255), ARGB((x + m) * 255), ARGB(m * 255));
+    case 1:
+        return Color::ARGBToARGB(alpha, ARGB((x + m) * 255), ARGB((chroma + m) * 255), ARGB(m * 255));
+    case 2:
+        return Color::ARGBToARGB(alpha, ARGB(m * 255), ARGB((chroma + m) * 255), ARGB((x + m) * 255));
+    case 3:
+        return Color::ARGBToARGB(alpha, ARGB(m * 255), ARGB((x + m) * 255), ARGB((chroma + m) * 255));
+    case 4:
+        return Color::ARGBToARGB(alpha, ARGB((x + m) * 255), ARGB(m * 255), ARGB((chroma + m) * 255));
+    case 5:
+        return Color::ARGBToARGB(alpha, ARGB((chroma + m) * 255), ARGB(m * 255), ARGB((x + m) * 255));
+    }
+
+    return Color::ARGBToARGB(alpha, 0, 0, 0);
+}
+
+
+//
+ARGB Color::HSVToARGB(int hue, int saturation, int value) {
+    return AHSVToARGB(0xFF, hue, saturation, value);
+}
+
+
+// 
+ARGB Color::AHSVToARGB(int alpha, int hue, int saturation, int value) {
+    // Normalize the input
+    float nSaturation = float(saturation)/COLOR_MAX_SATURATION;
+    float nValue = float(value)/COLOR_MAX_VALUE;
+
+    float h = hue/60.0f;
+    float chroma = nValue * nSaturation;
+    float m = nValue - chroma;
+    float x = chroma*(1-fabs((h / 2.0f) - floor(h / 2.0f) - 1));
+
+    switch ((int)h)
+    {
+    case 0:
+        return Color::ARGBToARGB(alpha, ARGB((chroma + m) * 255), ARGB((x + m) * 255), ARGB(m * 255));
+    case 1:
+        return Color::ARGBToARGB(alpha, ARGB((x + m) * 255), ARGB((chroma + m) * 255), ARGB(m * 255));
+    case 2:
+        return Color::ARGBToARGB(alpha, ARGB(m * 255), ARGB((chroma + m) * 255), ARGB((x + m) * 255));
+    case 3:
+        return Color::ARGBToARGB(alpha, ARGB(m * 255), ARGB((x + m) * 255), ARGB((chroma + m) * 255));
+    case 4:
+        return Color::ARGBToARGB(alpha, ARGB((x + m) * 255), ARGB(m * 255), ARGB((chroma + m) * 255));
+    case 5:
+        return Color::ARGBToARGB(alpha, ARGB((chroma + m) * 255), ARGB(m * 255), ARGB((x + m) * 255));
+    }
+
+    return Color::ARGBToARGB(alpha, 0, 0, 0);
 }

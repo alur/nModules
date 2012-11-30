@@ -7,6 +7,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#define clamp(a,b,c) min(max((a),(b)), (c))
+
 namespace Math {
     int RectArea(LPRECT rect);
     int RectIntersectArea(LPRECT rect1, LPRECT rect2);
