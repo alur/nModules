@@ -17,6 +17,7 @@
 #include "Bangs.h"
 #include "Settings.h"
 #include <dwmapi.h>
+#include "../nShared/Color.h"
 
 
 // The messages we want from the core
@@ -79,6 +80,24 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     // Reset the work area for all monitors
     WorkArea::ResetWorkAreas(g_pMonitorInfo);
     WorkArea::LoadSettings(g_pMonitorInfo);
+
+    // Used to generate the table for: http://portfolio.alurcard2.net/#!/wiki/Named%20Colors
+    /*/
+    TRACE("[tr][th]Name[/th][th]Color[/th][th]#ARGB[/th][th]Alpha[/th][th]RGB[/th][th]HSL[/th][th]HSV[/th][/tr]");
+    Color::KnownColor* knownColors = Color::GetKnownColors();
+    for (int i = 0; knownColors[i].name != NULL; i++) {
+        AHSL ahsl = Color::ARGBToAHSL(knownColors[i].color);
+        AHSV ahsv = Color::ARGBToAHSV(knownColors[i].color);
+
+        TRACE("[tr][td]%s[/td][td][coloredblock=rgba(%u,%u,%u,%f) width=100%%][/td][td]#%08X[/td][td]%u[/td][td]%u, %u, %u[/td][td]%u, %u, %u[/td][td]%u, %u, %u[/td][/tr]",
+            knownColors[i].name, // Name
+            knownColors[i].color >> 16 & 0xFF, knownColors[i].color >> 8 & 0xFF, knownColors[i].color & 0xFF, (knownColors[i].color >> 24) / 255.0f,  // Block color
+            knownColors[i].color, knownColors[i].color >> 24, // #ARGB, Alpha
+            knownColors[i].color >> 16 & 0xFF, knownColors[i].color >> 8 & 0xFF, knownColors[i].color & 0xFF, // RGB
+            ahsl.hue, ahsl.saturation, ahsl.lightness, ahsv.hue, ahsv.saturation, ahsv.value // HSL, HSV
+            );
+    }
+    /*/
 
     return 0;
 }

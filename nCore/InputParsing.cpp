@@ -263,7 +263,7 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
         if (_GetColorDefParams(color, 3, params) != 3)
             return false;
 
-        *target = Color::HSLToARGB(clamp(params[0], 0, COLOR_MAX_HUE), clamp(params[1], 0, COLOR_MAX_SATURATION), clamp(params[2], 0, COLOR_MAX_LIGHTNESS));
+        *target = Color::HSLToARGB(clamp(params[0], 0, COLOR_MAX_HUE), (float)clamp(params[1], 0, COLOR_MAX_SATURATION), (float)clamp(params[2], 0, COLOR_MAX_LIGHTNESS));
         return true;
     }
     else if (_IsFunctionOf(color, "HSLA")) { // HSLA(hue, saturation, lightness, alpha)
@@ -271,7 +271,7 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
         if (_GetColorDefParams(color, 4, params) != 4)
             return false;
 
-        *target = Color::AHSLToARGB(clamp(params[3], 0, 255), clamp(params[0], 0, COLOR_MAX_HUE), clamp(params[1], 0, COLOR_MAX_SATURATION), clamp(params[2], 0, COLOR_MAX_LIGHTNESS));
+        *target = Color::AHSLToARGB(clamp(params[3], 0, 255), clamp(params[0], 0, COLOR_MAX_HUE), (float)clamp(params[1], 0, COLOR_MAX_SATURATION), (float)clamp(params[2], 0, COLOR_MAX_LIGHTNESS));
         return true;
     }
     else if (_IsFunctionOf(color, "AHSL")) { // AHSL(alpha, hue, saturation, lightness)
@@ -279,7 +279,7 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
         if (_GetColorDefParams(color, 4, params) != 4)
             return false;
 
-        *target = Color::AHSLToARGB(clamp(params[0], 0, 255), clamp(params[1], 0, COLOR_MAX_HUE), clamp(params[2], 0, COLOR_MAX_SATURATION), clamp(params[3], 0, COLOR_MAX_LIGHTNESS));
+        *target = Color::AHSLToARGB(clamp(params[0], 0, 255), clamp(params[1], 0, COLOR_MAX_HUE), (float)clamp(params[2], 0, COLOR_MAX_SATURATION), (float)clamp(params[3], 0, COLOR_MAX_LIGHTNESS));
         return true;
     }
     else if (_IsFunctionOf(color, "HSV")) { // HSV(hue, saturation, value)

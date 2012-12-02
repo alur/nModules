@@ -14,14 +14,14 @@ typedef DWORD ARGB;
 
 //
 typedef struct {
-    UCHAR alpha;
+    int alpha;
     int hue;
-    UCHAR saturation;
+    float saturation;
     union {
-        UCHAR lightness;
-        UCHAR value;
+        float lightness;
+        float value;
     };
-} AHSL, ASHV;
+} AHSL, AHSV;
 
 // HSL/HSV max hue
 #define COLOR_MAX_HUE 359
@@ -41,12 +41,13 @@ namespace Color {
 
     // Converts ARGB values to an ARGB.
     ARGB ARGBToARGB(int alpha, int red, int green, int blue);
+    ARGB ARGBfToARGB(int alpha, float red, float green, float blue);
 
     //
-    ARGB HSLToARGB(int hue, int saturation, int lightness);
+    ARGB HSLToARGB(int hue, float saturation, float lightness);
 
     //
-    ARGB AHSLToARGB(int alpha, int hue, int saturation, int lightness);
+    ARGB AHSLToARGB(int alpha, int hue, float saturation, float lightness);
     ARGB AHSLToARGB(AHSL color);
 
     //
@@ -57,6 +58,9 @@ namespace Color {
 
     //
     AHSL ARGBToAHSL(ARGB color);
+
+    //
+    AHSV ARGBToAHSV(ARGB color);
 
     // Converts ARGB to D2D_COLOR_F
     D2D_COLOR_F ARGBToD2D(ARGB argb);
