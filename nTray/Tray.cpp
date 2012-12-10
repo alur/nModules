@@ -206,10 +206,12 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM
     this->eventHandler->HandleMessage(wnd, message, wParam, lParam);
     switch (message) {
     case WM_MOUSEMOVE:
-        if (IsWindow(g_hWndTrayNotify)) {
-            RECT r;
-            this->window->GetScreenRect(&r);
-            MoveWindow(g_hWndTrayNotify, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
+        {
+            if (IsWindow(g_hWndTrayNotify)) {
+                RECT r;
+                this->window->GetScreenRect(&r);
+                MoveWindow(g_hWndTrayNotify, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
+            }
         }
         return 0;
 
@@ -388,4 +390,8 @@ void Tray::ShowNextBalloon() {
     this->activeBalloonIcon = d.icon;
 
     this->balloon->Show(d.infoTitle, d.info, icon, &iconSize, &targetPosition);
+
+    // Free memory
+    free((LPVOID)d.infoTitle);
+    free((LPVOID)d.info);
 }
