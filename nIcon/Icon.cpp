@@ -7,6 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
+#include <Shlwapi.h>
 #include "../nShared/Macros.h"
 #include "Icon.hpp"
 #include "../nShared/LSModule.hpp"
@@ -222,19 +223,13 @@ void Icon::SetIcon() {
 /// </summary>
 HRESULT Icon::GetDisplayName(SHGDNF flags, LPWSTR buf, UINT cchBuf) {
     STRRET ret;
-    HRESULT hr = S_OK;
+    HRESULT hr;
 
-    CHECKHR(hr, this->shellFolder->GetDisplayNameOf(this->item, flags, &ret));
-    switch (ret.uType) {
-    case STRRET_CSTR:
-    case STRRET_OFFSET:
-        return E_NOTIMPL;
-    case STRRET_WSTR:
-        StringCchCopyW(buf, cchBuf, ret.pOleStr);
-        CoTaskMemFree(ret.pOleStr);
+    hr = this->shellFolder->GetDisplayNameOf(this->item, flags, &ret);
+
+    if (SUCCEEDED(hr)) {
+        hr = StrRetToBufW(&ret, this->item, buf, cchBuf);
     }
-
-    CHECKHR_END();
 
     return hr;
 }

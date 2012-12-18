@@ -8,6 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include <windowsx.h>
 #include <strsafe.h>
+#include <Shlwapi.h>
 #include "IconGroup.hpp"
 #include "../nShared/Macros.h"
 #include "../nShared/Debugging.h"
@@ -200,19 +201,13 @@ void IconGroup::UpdateAllIcons() {
 /// </summary>
 HRESULT IconGroup::GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR buf, UINT cchBuf) {
     STRRET ret;
-    HRESULT hr = S_OK;
+    HRESULT hr;
 
-    CHECKHR(hr, this->rootFolder->GetDisplayNameOf(pidl, flags, &ret));
-    switch (ret.uType) {
-    case STRRET_CSTR:
-    case STRRET_OFFSET:
-        return E_NOTIMPL;
-    case STRRET_WSTR:
-        StringCchCopyW(buf, cchBuf, ret.pOleStr);
-        CoTaskMemFree(ret.pOleStr);
+    hr = this->rootFolder->GetDisplayNameOf(pidl, flags, &ret);
+
+    if (SUCCEEDED(hr)) {
+        hr = StrRetToBufW(&ret, pidl, buf, cchBuf);
     }
-
-    CHECKHR_END();
 
     return hr;
 }
