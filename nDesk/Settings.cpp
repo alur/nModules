@@ -10,6 +10,15 @@
 
 extern DesktopPainter* g_pDesktopPainter;
 
+char onResolutionChange[MAX_LINE_LENGTH];
+
+
+void nDesk::Settings::OnResolutionChange() {
+    if (onResolutionChange[0] != '\0') {
+        LiteStep::LSExecute(NULL, onResolutionChange, SW_SHOW);
+    }
+}
+
 
 /// <summary>
 /// Loads all settings from .RC files and applies them.
@@ -19,17 +28,20 @@ void nDesk::Settings::Load() {
 
     char buf[MAX_LINE_LENGTH];
 
+    //
+    LiteStep::GetRCString("nDeskOnResolutionChange",  onResolutionChange, "", sizeof(onResolutionChange));
+
     // Defaults to 625ms
     g_pDesktopPainter->SetTransitionTime(LiteStep::GetRCInt("nDeskTransitionDuration", 625));
 
-    //
+    // 
     g_pDesktopPainter->SetSquareSize(LiteStep::GetRCInt("nDeskTransitionSquareSize", 150));
 
     // 
     LiteStep::GetRCString("nDeskTransitionEffect",  buf, "FadeOut", sizeof(buf));
     g_pDesktopPainter->SetTransitionType(TransitionTypeFromString(buf));
 
-    //
+    // 
     g_pDesktopPainter->SetInvalidateAllOnUpdate(LiteStep::GetRCBoolDef("nDeskInvalidateAllOnUpdate", FALSE) != FALSE);
 }
 

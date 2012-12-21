@@ -11,6 +11,7 @@
 namespace nDesk {
     namespace Settings {
         void Load();
+        void OnResolutionChange();
         DesktopPainter::TransitionType TransitionTypeFromString(LPCSTR pszTransition);
     }
 }
