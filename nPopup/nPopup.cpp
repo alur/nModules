@@ -221,19 +221,19 @@ bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out, LPCSTR parentPrefix) {
 
         case POPUPLINETYPE_CONTENT:
             {
-                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(source, title, command, parentPrefix), icon));
+                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(source, title, command, prefix[0] == '\0' ? parentPrefix : prefix), icon));
             }
             break;
 
         case POPUPLINETYPE_CONTENTPATH:
             {
-                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(command, false, title, "", parentPrefix), icon));
+                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(command, false, title, "", prefix[0] == '\0' ? parentPrefix : prefix), icon));
             }
             break;
 
         case POPUPLINETYPE_CONTENTPATHDYNAMIC:
             {
-                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(command, true, title, "", parentPrefix), icon));
+                (*out)->AddItem(new nPopup::FolderItem(*out, title, new ContentPopup(command, true, title, "", prefix[0] == '\0' ? parentPrefix : prefix), icon));
             }
             break;
 
@@ -352,84 +352,84 @@ POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source,
                 return POPUPLINETYPE_INVALID;
             }
 
+
+            POPUPLINETYPE type;
+
             if (_stricmp(token, "!New") == 0) {
                 // !New is followed by the bang command
                 if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) == FALSE) {
                     return POPUPLINETYPE_INVALID;
                 }
                 StringCchCopy(command, cchCommand, token);
-
-                // Which may be followed by a prefix
-                if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) != FALSE) {
-                    StringCchCopy(prefix, cchPrefix, token);
-                }
-                else {
-                    prefix[0] = '\0';
-                }
-                return POPUPLINETYPE_NEW;
+                type = POPUPLINETYPE_NEW;
             }
             else if (_stricmp(token, "Folder") == 0) {
-                // Folder may be followed by a prefix
-                if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) != FALSE) {
-                    StringCchCopy(prefix, cchPrefix, token);
-                }
-                else {
-                    prefix[0] = '\0';
-                }
-                return POPUPLINETYPE_FOLDER;
+                type = POPUPLINETYPE_FOLDER;
             }
             else if (_stricmp(token, "!PopupAdminTools") == 0) {
                 *source = ContentPopup::ContentSource::ADMIN_TOOLS;
-                return POPUPLINETYPE_CONTENT;
+                type = POPUPLINETYPE_CONTENT;
             }
             else if (_stricmp(token, "!PopupControlPanel") == 0) {
                 *source = ContentPopup::ContentSource::CONTROL_PANEL;
-                return POPUPLINETYPE_CONTENT;
+                type = POPUPLINETYPE_CONTENT;
             }
             else if (_stricmp(token, "!PopupMyComputer") == 0) {
                 *source = ContentPopup::ContentSource::MY_COMPUTER;
-                return POPUPLINETYPE_CONTENT;
+                type = POPUPLINETYPE_CONTENT;
             }
             else if (_stricmp(token, "!PopupNetwork") == 0) {
                 *source = ContentPopup::ContentSource::NETWORK;
-                return POPUPLINETYPE_CONTENT;
+                type = POPUPLINETYPE_CONTENT;
             }
             else if (_stricmp(token, "!PopupPrinters") == 0) {
                 *source = ContentPopup::ContentSource::PRINTERS;
-                return POPUPLINETYPE_CONTENT;
+                type = POPUPLINETYPE_CONTENT;
             }
             else if (_stricmp(token, "!PopupPrograms") == 0) {
                 *source = ContentPopup::ContentSource::PROGRAMS;
-                return POPUPLINETYPE_CONTENT;
+                type = POPUPLINETYPE_CONTENT;
             }
             else if (_stricmp(token, "!PopupRecentDocuments") == 0) {
                 *source = ContentPopup::ContentSource::RECENT_DOCUMENTS;
-                return POPUPLINETYPE_CONTENT;
+                type = POPUPLINETYPE_CONTENT;
             }
             else if (_stricmp(token, "!PopupRecycleBin") == 0) {
                 *source = ContentPopup::ContentSource::RECYCLE_BIN;
-                return POPUPLINETYPE_CONTENT;
+                type = POPUPLINETYPE_CONTENT;
             }
             else if (_stricmp(token, "!PopupStartMenu") == 0) {
                 *source = ContentPopup::ContentSource::START_MENU;
-                return POPUPLINETYPE_CONTENT;
+                type = POPUPLINETYPE_CONTENT;
             }
             else if (_strnicmp(token, "!PopupFolder:", strlen("!PopupFolder:")) == 0) {
                 *source = ContentPopup::ContentSource::PATH;
                 StringCchCopy(command, cchCommand, commandPointer + strlen("!PopupFolder:") + 1);
                 command[strlen(command)-1] = '\0';
-                return POPUPLINETYPE_CONTENTPATH;
+                type = POPUPLINETYPE_CONTENTPATH;
             }
             else if (_strnicmp(token, "!PopupDynamicFolder:", strlen("!PopupDynamicFolder:")) == 0) {
                 *source = ContentPopup::ContentSource::PATH;
                 StringCchCopy(command, cchCommand, commandPointer + strlen("!PopupDynamicFolder:") + 1);
                 command[strlen(command)-1] = '\0';
-                return POPUPLINETYPE_CONTENTPATHDYNAMIC;
+                type = POPUPLINETYPE_CONTENTPATHDYNAMIC;
             }
             else {
                 StringCchCopy(command, cchCommand, commandPointer);
-                return POPUPLINETYPE_COMMAND;
+                type = POPUPLINETYPE_COMMAND;
             }
+
+            // Everything, save commands, may be followed by a prefix.
+            if (type != POPUPLINETYPE_COMMAND) {
+                if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) != FALSE) {
+                    StringCchCopy(prefix, cchPrefix, token);
+                }
+                else {
+                    prefix[0] = '\0';
+                }
+            }
+
+            return type;
         }
     }
 }
