@@ -10,14 +10,8 @@
 
 extern DesktopPainter* g_pDesktopPainter;
 
+//
 char onResolutionChange[MAX_LINE_LENGTH];
-
-
-void nDesk::Settings::OnResolutionChange() {
-    if (onResolutionChange[0] != '\0') {
-        LiteStep::LSExecute(NULL, onResolutionChange, SW_SHOW);
-    }
-}
 
 
 /// <summary>
@@ -85,4 +79,14 @@ DesktopPainter::TransitionType nDesk::Settings::TransitionTypeFromString(LPCSTR 
     if (_stricmp(pszTransition, "SquaresCounterClockwiseOut") == 0) return DesktopPainter::TransitionType::SQUARES_COUNTERCLOCKWISE_OUT;
     
     return DesktopPainter::TransitionType::NONE;
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+void nDesk::Settings::OnResolutionChange() {
+    if (onResolutionChange[0] != '\0') {
+        LiteStep::LSExecute(NULL, onResolutionChange, SW_SHOW);
+    }
 }

@@ -156,6 +156,10 @@ void Icon::Hide() {
 }
 
 
+/// <summary>
+/// Updates the icon.
+/// </summary>
+/// <param name="repaint">Repaints the icon.</param>
 void Icon::UpdateIcon(bool repaint) {
     this->window->ClearOverlays();
     SetIcon();
@@ -165,6 +169,10 @@ void Icon::UpdateIcon(bool repaint) {
 }
 
 
+/// <summary>
+/// Updates the displayed name for this icon.
+/// </summary>
+/// <param name="newItem">The item ID for the new icon.</param>
 void Icon::Rename(PCITEMID_CHILD newItem) {
     this->item = (PITEMID_CHILD)realloc(this->item, newItem->mkid.cb + 2);
     memcpy(this->item, newItem, newItem->mkid.cb + 2);

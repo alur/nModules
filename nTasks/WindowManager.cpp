@@ -117,8 +117,8 @@ void WindowManager::AddWindow(HWND hWnd) {
         }
 
         // Add it to any taskbar that wants it
-        for (TASKBARCITER iter = g_Taskbars.begin(); iter != g_Taskbars.end(); iter++) {
-            TaskButton* taskButton = iter->second->AddTask(hWnd, wndInfo.uMonitor, initalizing);
+        for (TASKBARCITER taskbar = g_Taskbars.begin(); taskbar != g_Taskbars.end(); ++taskbar) {
+            TaskButton* taskButton = taskbar->second->AddTask(hWnd, wndInfo.uMonitor, initalizing);
 
             // If the taskbar created a button for this window
             if (taskButton != NULL) {
@@ -228,8 +228,9 @@ void WindowManager::RemoveWindow(HWND hWnd) {
         // TRACE("RemoveWindow called with invalid HWND: %u", hWnd);
     }
 
-    if (activeWindow == hWnd)
+    if (activeWindow == hWnd) {
         activeWindow = NULL;
+    }
 }
 
 
@@ -358,7 +359,7 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         UpdateWindowMonitors();
         return 0;
 
-        //
+        // 
     case WM_TIMER:
         switch(wParam) {
         case TIMER_CHECKMONITOR:
@@ -366,12 +367,13 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             return 0;
         }
         
+        // 
     case WM_ADDED_EXISTING:
         {
             // Relayout all taskbars.
             initalizing = false;
-            for (TASKBARCITER iter = g_Taskbars.begin(); iter != g_Taskbars.end(); iter++) {
-                iter->second->Relayout();
+            for (TASKBARCITER taskbar = g_Taskbars.begin(); taskbar != g_Taskbars.end(); ++taskbar) {
+                taskbar->second->Relayout();
             }
         }
         return 0;

@@ -22,12 +22,20 @@ public:
 
     void Select();
     void Deselect();
+    
+    void UpdateIconPosition();
 
     HWND targetWindow;
 
 private:
+    void UpdateIcon();
+    void SetIcon(HICON icon);
+    static void CALLBACK UpdateIconCallback(HWND hWnd, UINT uMsg, ULONG_PTR dwData, LRESULT lResult);
+
     HTHUMBNAIL thumbnail;
+    WPARAM requestedIcon;
 
     DrawableWindow::STATE stateHover, stateSelected, stateSelectedHover;
+    DrawableWindow* iconOverlayWindow;
     RECT thumbnailMargins;
 };

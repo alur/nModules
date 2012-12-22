@@ -183,6 +183,10 @@ void TaskSwitcher::Show(int delta) {
         this->window->GetDrawingSettings()->width, 
         height);
 
+    for (vector<TaskThumbnail*>::iterator iter = this->shownWindows.begin(); iter != this->shownWindows.end(); ++iter) {
+        (*iter)->UpdateIconPosition();
+    }
+
     this->window->Show();
 
     this->peekTimer = this->window->SetCallbackTimer(this->peekDelay, this);

@@ -16,6 +16,8 @@
 static HWND desktopWindow = NULL;
 static UINT (* DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = NULL;
 
+extern LSModule* g_LSModule;
+
 
 TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, int width, int height) : Drawable(parent, "Task") {
     if (DwmpActivateLivePreview == NULL) {
@@ -43,7 +45,7 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
     // 
     DWM_THUMBNAIL_PROPERTIES properties;
     properties.dwFlags = DWM_TNP_SOURCECLIENTAREAONLY;
-    properties.fSourceClientAreaOnly = TRUE;
+    properties.fSourceClientAreaOnly = FALSE;
     
     if (targetWindow == desktopWindow) {
         properties.dwFlags |= DWM_TNP_RECTSOURCE;
@@ -67,7 +69,7 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
     else {
         DwmQueryThumbnailSourceSize(this->thumbnail, &sourceSize);
     }
-    this->settings->GetOffsetRect("MarginLeft", "MarginTop", "MarginRight", "MarginBottom", &this->thumbnailMargins, 5, 5, 5, 5);
+    this->settings->GetOffsetRect("MarginLeft", "MarginTop", "MarginRight", "MarginBottom", &this->thumbnailMargins, 10, 10, 10, 10);
 
     double scale = min(
         (width - this->thumbnailMargins.left - this->thumbnailMargins.right)/(double)sourceSize.cx,
@@ -103,22 +105,48 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
     selectedHoverDefaults.outlineBrush.color = 0xFFFFFFFF;
     selectedHoverDefaults.outlineWidth = 5;
     this->stateSelectedHover = this->window->AddState("SelectedHover", 200, &selectedHoverDefaults);
+
+    //
+    this->iconOverlayWindow = g_LSModule->CreateDrawableWindow(this->settings, this);
+
+    DrawableSettings iconDefaults;
+    iconDefaults.alwaysOnTop = true;
+
+    StateSettings iconStateDefaults;
+    iconStateDefaults.backgroundBrush.color = 0;
+    
+    RECT r;
+    this->window->GetScreenRect(&r);
+    this->iconOverlayWindow->Initialize(&iconDefaults, &iconStateDefaults);
+    this->iconOverlayWindow->SetPosition(r.right - 32 - horizontalOffset - this->thumbnailMargins.right + 4,
+        r.bottom - 32 - verticalOffset - this->thumbnailMargins.bottom + 4, 32, 32);
+
+    SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+
+    TRACE("INIT: %x, %x", this, this->iconOverlayWindow);
+
+    UpdateIcon();
+}
+
+
+void TaskThumbnail::UpdateIconPosition() {
+    TRACE("UpdateIconPosition: %x, %x", this, this->iconOverlayWindow);
+    RECT r;
+    this->window->GetScreenRect(&r);
+    this->window->SetPosition(r.left, r.top, 100, 100);
+    //this->iconOverlayWindow->SetPosition(r.left, r.top, 32, 32);
 }
 
 
 TaskThumbnail::~TaskThumbnail() {
+    TRACE("~TaskThumbnail: %x, %x", this, this->iconOverlayWindow);
+    delete this->iconOverlayWindow;
     DwmUnregisterThumbnail(this->thumbnail);
 }
 
 
 void TaskThumbnail::Activate() {
     if (this->targetWindow == desktopWindow) {
-        /*
-        IShellDispatch4 *pShellDisp = NULL;
-        CoCreateInstance(CLSID_Shell, NULL, CLSCTX_SERVER, IID_IDispatch, (LPVOID *) &pShellDisp);
-        pShellDisp->ToggleDesktop();
-        pShellDisp->Release();
-        */
         LiteStep::LSExecute(NULL, "!MinimizeWindows", SW_NORMAL);
     }
     else {
@@ -172,7 +200,7 @@ LRESULT WINAPI TaskThumbnail::HandleMessage(HWND window, UINT message, WPARAM wP
         }
         return 0;
 
-    case WM_NCLBUTTONDOWN:
+    case WM_LBUTTONDOWN:
         {
             ((TaskSwitcher*)this->parent)->Hide();
         }
@@ -180,4 +208,77 @@ LRESULT WINAPI TaskThumbnail::HandleMessage(HWND window, UINT message, WPARAM wP
     }
 
     return DefWindowProc(window, message, wParam, lParam);
+}
+
+
+void TaskThumbnail::SetIcon(HICON icon) {
+    D2D1_RECT_F pos;
+    pos.right = 32;
+    pos.bottom = 32;
+    pos.left = 0;
+    pos.top = 0;
+
+    this->iconOverlayWindow->AddOverlay(pos, icon);
+    this->iconOverlayWindow->Show();
+}
+
+
+/// <summary>
+/// Updates the icon
+/// </summary>
+void TaskThumbnail::UpdateIcon() {
+    if (this->targetWindow != desktopWindow) {
+        this->requestedIcon = ICON_BIG;
+        SendMessageCallback(this->targetWindow, WM_GETICON, ICON_BIG, NULL, UpdateIconCallback, (ULONG_PTR)this);
+    }
+    else {
+        HICON icon = ExtractIcon(g_LSModule->GetInstance(), "shell32.dll", 34);
+
+        if (icon) {
+            SetIcon(icon);
+            DestroyIcon(icon);
+        }
+    }
+}
+
+
+/// <summary>
+/// Updates the icon
+/// </summary>
+void CALLBACK TaskThumbnail::UpdateIconCallback(HWND hWnd, UINT uMsg, ULONG_PTR dwData, LRESULT lResult) {
+    // We really only expect WM_GETICON messages.
+    if (uMsg == WM_GETICON) {
+        TaskThumbnail* taskThumbnail = (TaskThumbnail*)dwData;
+
+        // If we got an icon back, use it.
+        if (lResult != NULL) {
+            taskThumbnail->SetIcon((HICON)lResult);
+        }
+        else switch (taskThumbnail->requestedIcon) {
+        case ICON_BIG:
+            {
+                taskThumbnail->requestedIcon = ICON_SMALL;
+                SendMessageCallback(hWnd, WM_GETICON, ICON_SMALL, NULL, UpdateIconCallback, dwData);
+            }
+            break;
+
+        case ICON_SMALL:
+            {
+                taskThumbnail->requestedIcon = ICON_SMALL2;
+                SendMessageCallback(hWnd, WM_GETICON, ICON_SMALL2, NULL, UpdateIconCallback, dwData);
+            }
+            break;
+
+        case ICON_SMALL2:
+            {
+                HICON hIcon;
+                hIcon = (HICON)GetClassLongPtr(hWnd, GCLP_HICON);
+                if (!hIcon) {
+                    hIcon = (HICON)GetClassLongPtr(hWnd, GCLP_HICONSM);
+                }
+                taskThumbnail->SetIcon(hIcon);
+            }
+            break;
+        }
+    }
 }
