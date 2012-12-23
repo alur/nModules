@@ -257,7 +257,6 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
                 for (iter = this->items.begin(); iter != this->items.end() && !(*iter)->CheckMerge(wideName); ++iter);
                 if (iter != this->items.end()) {
                     item = NULL;
-                    TRACEW(wideName);
                     ((ContentPopup*)((nPopup::FolderItem*)*iter)->GetPopup())->AddPath(command);
                 }
                 else {
@@ -269,7 +268,7 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
                 item = new CommandItem(this, name, quotedCommand);
             }
 
-            if (!this->noIcons) {
+            if (!this->noIcons && item != NULL) {
                 // Get the IExtractIcon interface for this item.
                 hr = targetFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&itemID, IID_IExtractIconW, NULL, reinterpret_cast<LPVOID*>(&extractIcon));
 
@@ -278,7 +277,7 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
                 }
             }
 
-            if (item) {
+            if (item != NULL) {
                 AddItem(item);
             }
 
