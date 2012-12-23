@@ -63,7 +63,6 @@ bool sorter(PopupItem* a, PopupItem* b) {
 
 
 void ContentPopup::PreShow() {
-
     if (!this->loaded) {
         LoadContent();
         std::sort(this->items.begin(), this->items.end(), sorter);
@@ -87,6 +86,20 @@ void ContentPopup::PostClose() {
         this->items.clear();
 
         this->loaded = false;
+    }
+}
+
+
+void ContentPopup::AddPath(LPCSTR path) {
+    char processedPath[MAX_PATH];
+
+    PathCanonicalize(processedPath, path);
+    PathRemoveBackslash(processedPath);
+    this->paths.push_back(_strdup(processedPath));
+
+    if (this->loaded) {
+        LoadPath(processedPath);
+        std::sort(this->items.begin(), this->items.end(), sorter);
     }
 }
 
@@ -225,6 +238,7 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
     bool openable;
     HRESULT hr;
     PopupItem* item;
+    vector<PopupItem*>::const_iterator iter;
 
     if (SUCCEEDED(targetFolder->GetDisplayNameOf(itemID, SHGDN_NORMAL, &ret))) {
         StrRetToStr(&ret, NULL, &name);
@@ -237,7 +251,18 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
             openable = SUCCEEDED(hr) && !dontExpandFolders && (((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE));
 
             if (openable) {
-                item = new nPopup::FolderItem(this, name, new ContentPopup(command, this->dynamic, name, NULL, this->settings->prefix));
+                WCHAR wideName[MAX_PATH];
+                MultiByteToWideChar(CP_ACP, NULL, name, -1, wideName, MAX_PATH);
+                
+                for (iter = this->items.begin(); iter != this->items.end() && !(*iter)->CheckMerge(wideName); ++iter);
+                if (iter != this->items.end()) {
+                    item = NULL;
+                    TRACEW(wideName);
+                    ((ContentPopup*)((nPopup::FolderItem*)*iter)->GetPopup())->AddPath(command);
+                }
+                else {
+                    item = new nPopup::FolderItem(this, name, new ContentPopup(command, this->dynamic, name, NULL, this->settings->prefix));
+                }
             }
             else {
                 StringCchPrintf(quotedCommand, sizeof(quotedCommand), "\"%s\"", command);
@@ -253,7 +278,9 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
                 }
             }
 
-            AddItem(item);
+            if (item) {
+                AddItem(item);
+            }
 
             CoTaskMemFree(command);
         }

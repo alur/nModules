@@ -21,6 +21,7 @@ namespace nPopup {
 
         void ClosingPopup();
         int GetDesiredWidth(int maxWidth);
+        Popup* GetPopup();
 
     private:
         void Init(LPCSTR title, Popup* popup);

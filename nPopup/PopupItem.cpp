@@ -40,6 +40,11 @@ void PopupItem::SetWidth(int width) {
 }
 
 
+bool PopupItem::CheckMerge(LPCWSTR name) {
+    return this->itemType == PopupItemType::FOLDER && _wcsicmp(name, this->window->GetText()) == 0;
+}
+
+
 bool PopupItem::ParseDotIcon(LPCSTR dotIcon) {
     if (dotIcon == NULL || ((Popup*)this->parent)->noIcons) {
         return false;

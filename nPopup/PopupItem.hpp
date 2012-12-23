@@ -24,6 +24,7 @@ public:
     void SetIcon(IExtractIconW* extractIcon);
     void SetWidth(int width);
     virtual int GetDesiredWidth(int maxWidth) = 0;
+    bool CheckMerge(LPCWSTR name);
 
 protected:
     enum PopupItemType {

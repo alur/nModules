@@ -39,6 +39,9 @@ protected:
 
 private:
     //
+    void AddPath(LPCSTR path);
+
+    //
     void LoadContent();
 
     //

@@ -100,3 +100,11 @@ LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, 
 void nPopup::FolderItem::ClosingPopup() {
     this->window->ClearState(this->openState);
 }
+
+
+/// <summary>
+/// 
+/// </summary>
+Popup* nPopup::FolderItem::GetPopup() {
+    return this->popup;
+}
