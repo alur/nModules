@@ -32,7 +32,7 @@ ContentPopup::ContentPopup(LPCSTR path, bool dynamic, LPCSTR title, LPCSTR bang,
     LPCSTR splitter, end = strchr(path, '\0');
     do {
         splitter = strchr(path, '|');
-        StringCchCopyN(originalPath, MAX_PATH, path, (splitter != NULL ? splitter : end) - path);
+        StringCchCopyNA(originalPath, MAX_PATH, path, (splitter != nullptr ? splitter : end) - path);
         PathCanonicalize(processedPath, originalPath);
         PathRemoveBackslash(processedPath);
 
@@ -57,15 +57,10 @@ ContentPopup::~ContentPopup() {
 }
 
 
-bool sorter(PopupItem* a, PopupItem* b) {
-    return a->CompareTo(b);
-}
-
-
 void ContentPopup::PreShow() {
     if (!this->loaded) {
         LoadContent();
-        std::sort(this->items.begin(), this->items.end(), sorter);
+        std::sort(this->items.begin(), this->items.end(), [] (PopupItem* a, PopupItem* b) { return a->CompareTo(b); });
         this->loaded = true;
     }
 }
@@ -99,7 +94,7 @@ void ContentPopup::AddPath(LPCSTR path) {
 
     if (this->loaded) {
         LoadPath(processedPath);
-        std::sort(this->items.begin(), this->items.end(), sorter);
+        std::sort(this->items.begin(), this->items.end(), [] (PopupItem* a, PopupItem* b) { return a->CompareTo(b); });
     }
 }
 
@@ -157,7 +152,7 @@ void ContentPopup::LoadShellFolder(GUID folder, bool dontExpandFolders) {
     PIDLIST_ABSOLUTE idList;
     IShellFolder *targetFolder, *rootFolder;
 
-    // Get the root ISHellFolder
+    // Get the root IShellFolder
     SHGetDesktopFolder(reinterpret_cast<IShellFolder**>(&rootFolder));
     SHGetKnownFolderIDList(folder, NULL, NULL, &idList);
     rootFolder->BindToObject(idList, NULL, IID_IShellFolder, reinterpret_cast<LPVOID*>(&targetFolder));
@@ -179,7 +174,7 @@ void ContentPopup::LoadPath(LPCSTR path) {
 
     MultiByteToWideChar(CP_ACP, NULL, path, -1, widePath, MAX_PATH);
 
-    // Get the root ISHellFolder
+    // Get the root IShellFolder
     SHGetDesktopFolder(reinterpret_cast<IShellFolder**>(&rootFolder));
     rootFolder->ParseDisplayName(NULL, NULL, widePath, NULL, &idList, NULL);
     rootFolder->BindToObject(idList, NULL, IID_IShellFolder, reinterpret_cast<LPVOID*>(&targetFolder));
@@ -205,6 +200,7 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
     if (SUCCEEDED(targetFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList))) {
         while (enumIDList->Next(1, &idNext, NULL) != S_FALSE) {
             LoadSingleItem(targetFolder, idNext, dontExpandFolders);
+            CoTaskMemFree(idNext);
         }
         enumIDList->Release();
     
@@ -222,10 +218,6 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
 
         this->watchedFolders.insert(WATCHFOLDERMAP::value_type(message, std::pair<UINT, IShellFolder*>(shnrUID, targetFolder)));
     }
-
-    if (idNext) {
-        CoTaskMemFree(idNext);
-    }
 }
 
 
@@ -237,7 +229,7 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
     char quotedCommand[MAX_LINE_LENGTH];
     bool openable;
     HRESULT hr;
-    PopupItem* item;
+    PopupItem* item; 
     vector<PopupItem*>::const_iterator iter;
 
     if (SUCCEEDED(targetFolder->GetDisplayNameOf(itemID, SHGDN_NORMAL, &ret))) {
@@ -303,7 +295,7 @@ LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wPa
                 case SHCNE_MKDIR:
                     {
                         LoadSingleItem(folder->second.second, (PIDLIST_RELATIVE)PIDL::GetLastPIDLItem(idList[0]), false);
-                        std::sort(this->items.begin(), this->items.end(), sorter);
+                        std::sort(this->items.begin(), this->items.end(), [] (PopupItem* a, PopupItem* b) { return a->CompareTo(b); });
                     }
                     break;
 

@@ -65,8 +65,8 @@ void quitModule(HINSTANCE /* instance */) {
     TextFunctions::_UnRegister();
     Bangs::_Unregister();
 
-    for (map<string, CoverArt*>::const_iterator coverArt = g_CoverArt.begin(); coverArt != g_CoverArt.end(); ++coverArt) {
-        delete coverArt->second;
+    for (auto &coverArt : g_CoverArt) {
+        delete coverArt.second;
     }
     g_CoverArt.clear();
 
@@ -134,8 +134,8 @@ void Update() {
         // This solution seems to work good though, and comes with added benefit of usually ignoring the extra messages.
         open = false;
         TextFunctions::_Update();
-        for (map<string, CoverArt*>::const_iterator coverArt = g_CoverArt.begin(); coverArt != g_CoverArt.end(); ++coverArt) {
-            coverArt->second->Update();
+        for (auto &coverArt : g_CoverArt) {
+            coverArt.second->Update();
         }
         open = true;
     }

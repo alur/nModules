@@ -19,8 +19,8 @@ namespace Bangs {
     void MediaStop(HWND, LPCSTR);
     void MediaNext(HWND, LPCSTR);
 
-    typedef struct {
+    struct BangItem {
         char szName[54];
         LiteStep::BANGCOMMANDPROC pCommand;
-    } BangItem;
+    };
 }

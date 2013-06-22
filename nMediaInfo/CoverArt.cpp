@@ -36,7 +36,7 @@ CoverArt::CoverArt(LPCSTR name) : Drawable(name) {
         (float)this->window->GetDrawingSettings()->width,
         (float)this->window->GetDrawingSettings()->height
     };
-    this->coverArt = this->window->AddOverlay(pos, (IWICBitmap*)NULL);
+    this->coverArt = this->window->AddOverlay(pos, (IWICBitmap*)nullptr);
 
     this->folderCanidates.push_back(L"*.jpg");
     this->folderCanidates.push_back(L"*.png");
@@ -67,7 +67,7 @@ void CoverArt::Update() {
     WCHAR filePath[MAX_PATH];
 
     // Get Winamps HWND
-    if ((WA2Window = FindWindow("Winamp v1.x", NULL)) == NULL) {
+    if ((WA2Window = FindWindow("Winamp v1.x", nullptr)) == nullptr) {
         return;
     }
 
@@ -76,12 +76,12 @@ void CoverArt::Update() {
 
     // Open a handle to winamp
     GetWindowThreadProcessId(WA2Window, &winampProc);
-    if ((winampHandle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, false, winampProc)) == NULL) {
+    if ((winampHandle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, false, winampProc)) == nullptr) {
         return;
     }
 
     // Read the file path
-    ReadProcessMemory(winampHandle, (LPCVOID)SendMessageW(WA2Window, WM_USER, trackID, IPC_GETPLAYLISTFILEW), &filePath, sizeof(filePath), NULL);
+    ReadProcessMemory(winampHandle, (LPCVOID)SendMessageW(WA2Window, WM_USER, trackID, IPC_GETPLAYLISTFILEW), &filePath, sizeof(filePath), nullptr);
 
     CloseHandle(winampHandle);
 
@@ -110,22 +110,22 @@ LRESULT WINAPI CoverArt::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 /// <param name="filePath">Path to the file to get the cover from.</param>
 bool CoverArt::SetCoverFromTag(LPCWSTR filePathW) {
     char filePath[MAX_PATH];
-    WideCharToMultiByte(CP_ACP, 0, filePathW, -1, filePath, sizeof(filePath), NULL, NULL);
+    WideCharToMultiByte(CP_ACP, 0, filePathW, -1, filePath, sizeof(filePath), nullptr, nullptr);
 
 	ID3_Tag tag(filePath);
-	ID3_Frame* frame;
-    IWICImagingFactory* factory = NULL;
-    IWICBitmapDecoder* decoder = NULL;
-    IWICBitmapFrameDecode* source = NULL;
+	ID3_Frame *frame;
+    IWICImagingFactory *factory = nullptr;
+    IWICBitmapDecoder *decoder = nullptr;
+    IWICBitmapFrameDecode *source = nullptr;
     HRESULT hr = E_FAIL;
     
     frame = tag.Find(ID3FID_PICTURE, ID3FN_PICTURETYPE, ID3PT_COVERFRONT);
-    if (frame != NULL) {
-        IStream* stream = SHCreateMemStream(frame->Field(ID3FN_DATA).GetRawBinary(), (UINT)frame->Field(ID3FN_DATA).Size());
+    if (frame != nullptr) {
+        IStream *stream = SHCreateMemStream(frame->Field(ID3FN_DATA).GetRawBinary(), (UINT)frame->Field(ID3FN_DATA).Size());
         if (stream) {
             hr = Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
             if (SUCCEEDED(hr)) {
-                hr = factory->CreateDecoderFromStream(stream, NULL, WICDecodeMetadataCacheOnDemand, &decoder);
+                hr = factory->CreateDecoderFromStream(stream, nullptr, WICDecodeMetadataCacheOnDemand, &decoder);
             }
             if (SUCCEEDED(hr)) {
                 hr = decoder->GetFrame(0, &source);
@@ -149,9 +149,9 @@ bool CoverArt::SetCoverFromTag(LPCWSTR filePathW) {
 /// <param name="filePath">Path to the file to get the cover from.</param>
 bool CoverArt::SetCoverFromFolder(LPCWSTR filePath) {
     WCHAR folderPath[MAX_PATH] = {0};
-    IWICImagingFactory* factory = NULL;
-    IWICBitmapDecoder* decoder = NULL;
-    IWICBitmapFrameDecode* source = NULL;
+    IWICImagingFactory *factory = nullptr;
+    IWICBitmapDecoder *decoder = nullptr;
+    IWICBitmapFrameDecode *source = nullptr;
     HRESULT hr = E_FAIL;
 
     StringCchCopyW(folderPath, sizeof(folderPath), filePath);
@@ -161,16 +161,16 @@ bool CoverArt::SetCoverFromFolder(LPCWSTR filePath) {
     WCHAR artPath[MAX_PATH];
     WIN32_FIND_DATAW FindFileData;
 
-    for (list<wstring>::const_iterator canidate = this->folderCanidates.begin(); canidate != this->folderCanidates.end(); ++canidate) {
-        StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, canidate->c_str());
+    for (auto &canidate : this->folderCanidates) {
+        StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, canidate.c_str());
 
-        if (FindFirstFileW(artPath, &FindFileData) != INVALID_HANDLE_VALUE) {
+        while (FindFirstFileW(artPath, &FindFileData) != INVALID_HANDLE_VALUE) {
             // Todo::We could try other files if this fails.
             StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, FindFileData.cFileName);
 
             hr = Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
             if (SUCCEEDED(hr)) {
-                hr = factory->CreateDecoderFromFilename(artPath, NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
+                hr = factory->CreateDecoderFromFilename(artPath, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
             }
             if (SUCCEEDED(hr)) {
                 hr = decoder->GetFrame(0, &source);
@@ -195,14 +195,14 @@ bool CoverArt::SetCoverFromFolder(LPCWSTR filePath) {
 /// Sets the default cover -- when we couldn't find any other cover.
 /// </summary>
 void CoverArt::SetDefaultCover() {
-    IWICImagingFactory* factory = NULL;
-    IWICBitmapDecoder* decoder = NULL;
-    IWICBitmapFrameDecode* source = NULL;
+    IWICImagingFactory *factory = nullptr;
+    IWICBitmapDecoder *decoder = nullptr;
+    IWICBitmapFrameDecode *source = nullptr;
     HRESULT hr = E_FAIL;
 
     hr = Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
     if (SUCCEEDED(hr)) {
-        hr = factory->CreateDecoderFromFilename(this->defaultCoverArt, NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
+        hr = factory->CreateDecoderFromFilename(this->defaultCoverArt, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
     }
     if (SUCCEEDED(hr)) {
         hr = decoder->GetFrame(0, &source);
@@ -211,7 +211,7 @@ void CoverArt::SetDefaultCover() {
         (*this->coverArt)->SetSource(source);
     }
     else {
-        (*this->coverArt)->SetSource(NULL);
+        (*this->coverArt)->SetSource(nullptr);
     }
 
     SAFERELEASE(decoder);

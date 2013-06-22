@@ -16,8 +16,8 @@ UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 // The LiteStep module class
 LSModule* g_LSModule;
 
-//
-IconGroup* pGroup;
+// All current icon groups
+map<string, IconGroup*> g_iconGroups;
 
 
 /// <summary>
@@ -38,7 +38,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 
     OleInitialize(NULL);
 
-    pGroup = new IconGroup("DesktopIcons");
+    LoadSettings();
 
     return 0;
 }
@@ -48,9 +48,11 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
-    if (pGroup) {
-        delete pGroup;
+    // Remove all groups
+    for (map<string, IconGroup*>::const_iterator iter = g_iconGroups.begin(); iter != g_iconGroups.end(); iter++) {
+        delete iter->second;
     }
+    g_iconGroups.clear();
 
     // Deinitalize
     if (g_LSModule) {
@@ -88,4 +90,20 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         return 0;
     }
     return DefWindowProc(window, message, wParam, lParam);
+}
+
+
+/// <summary>
+/// Reads through the .rc files and creates labels.
+/// </summary>
+void LoadSettings() {
+    char szLine[MAX_LINE_LENGTH], szLabel[256];
+    LPSTR szTokens[] = { szLabel };
+    LPVOID f = LiteStep::LCOpen(NULL);
+
+    while (LiteStep::LCReadNextConfig(f, "*nIcon", szLine, sizeof(szLine))) {
+        LiteStep::LCTokenize(szLine+strlen("*nIcon")+1, szTokens, 1, NULL);
+        g_iconGroups.insert(g_iconGroups.begin(), std::pair<string, IconGroup*>(string(szLabel), new IconGroup(szLabel)));
+    }
+    LiteStep::LCClose(f);
 }

@@ -68,8 +68,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
     // Remove all trays
-    for (map<string, Tray*>::const_iterator iter = g_Trays.begin(); iter != g_Trays.end(); iter++) {
-        delete iter->second;
+    for (auto &tray : g_Trays) {
+        delete tray.second;
     }
     g_Trays.clear();
 

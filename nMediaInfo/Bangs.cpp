@@ -10,7 +10,7 @@
 #include "Bangs.h"
 #include "../nCoreCom/Core.h"
 
-#define IPC_STARTPLAY 102
+#define IPC_ISPLAYING 104
 
 namespace Bangs {
     BangItem BangMap[] = {
@@ -19,8 +19,7 @@ namespace Bangs {
         { "MediaPause",         MediaPause          },
         { "MediaPlayPause",     MediaPlayPause      },
         { "MediaStop",          MediaStop           },
-        { "MediaNext",          MediaNext           },
-        { NULL,                 NULL                }
+        { "MediaNext",          MediaNext           }
     };
 }
 
@@ -30,9 +29,9 @@ namespace Bangs {
 /// </summary>
 void Bangs::_Register() {
     char szBangName[64];
-    for (int i = 0; BangMap[i].pCommand != NULL; i++) {
-        StringCchPrintf(szBangName, sizeof(szBangName), "!%s", BangMap[i].szName);
-        LiteStep::AddBangCommand(szBangName, BangMap[i].pCommand);
+    for (BangItem &bangItem : BangMap) {
+        StringCchPrintfA(szBangName, sizeof(szBangName), "!%s", bangItem.szName);
+        LiteStep::AddBangCommand(szBangName, bangItem.pCommand);
     }
 }
 
@@ -42,70 +41,81 @@ void Bangs::_Register() {
 /// </summary>
 void Bangs::_Unregister() {
     char szBangName[64];
-    for (int i = 0; BangMap[i].pCommand != NULL; i++) {
-        StringCchPrintf(szBangName, sizeof(szBangName), "!%s", BangMap[i].szName);
+    for (BangItem &bangItem : BangMap) {
+        StringCchPrintfA(szBangName, sizeof(szBangName), "!%s", bangItem.szName);
         LiteStep::RemoveBangCommand(szBangName);
     }
 }
 
 
 /// <summary>
-/// Sets the work area.
+/// Skips to the previous track
 /// </summary>
 void Bangs::MediaPrevious(HWND, LPCSTR) {
-    HWND WA2Window = FindWindow("Winamp v1.x", NULL);
-    if (WA2Window) {
-        SendMessage(WA2Window, WM_COMMAND, 40044, 0);
+    HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
+    if (WA2Window != nullptr) {
+        PostMessageW(WA2Window, WM_COMMAND, 40044, 0);
     }
 }
 
 
 /// <summary>
-/// Adds a click handler.
+/// Starts playing.
 /// </summary>
 void Bangs::MediaPlay(HWND, LPCSTR) {
-    HWND WA2Window = FindWindow("Winamp v1.x", NULL);
-    if (WA2Window) {
-        SendMessage(WA2Window, WM_COMMAND, 40045, 0);
+    HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
+    if (WA2Window != nullptr) {
+        PostMessageW(WA2Window, WM_COMMAND, 40045, 0);
     }
 }
 
 
 /// <summary>
-/// Removes click handlers.
+/// Pauses the current track.
 /// </summary>
 void Bangs::MediaPause(HWND, LPCSTR) {
-    HWND WA2Window = FindWindow("Winamp v1.x", NULL);
-    if (WA2Window) {
-        SendMessage(WA2Window, WM_COMMAND, 40046, 0);
+    HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
+    if (WA2Window != nullptr) {
+        PostMessageW(WA2Window, WM_COMMAND, 40046, 0);
     }
 }
 
 
 /// <summary>
-/// Sets the transition duration.
+/// Pauses the current track if currently playing. Plays if stoped.
 /// </summary>
 void Bangs::MediaPlayPause(HWND, LPCSTR) {
-}
-
-
-/// <summary>
-/// Sets the transition square size. Force it to be >= 2.
-/// </summary>
-void Bangs::MediaStop(HWND, LPCSTR) {
-    HWND WA2Window = FindWindow("Winamp v1.x", NULL);
-    if (WA2Window) {
-        SendMessage(WA2Window, WM_COMMAND, 40047, 0);
+    HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
+    if (WA2Window != nullptr) {
+        SendMessageCallbackW(WA2Window, WM_USER, 0, IPC_ISPLAYING, [] (HWND hwnd, UINT, ULONG_PTR, LRESULT result) {
+            if (result == 0) { // Stoped, play
+                PostMessageW(hwnd, WM_COMMAND, 40045, 0);
+            }
+            else { // Pause
+                PostMessageW(hwnd, WM_COMMAND, 40046, 0);
+            }
+        }, NULL);
     }
 }
 
 
 /// <summary>
-/// Sets the transition effect.
+/// Stops playing.
+/// </summary>
+void Bangs::MediaStop(HWND, LPCSTR) {
+    HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
+    if (WA2Window != nullptr) {
+        PostMessageW(WA2Window, WM_COMMAND, 40047, 0);
+    }
+}
+
+
+/// <summary>
+/// Skips to the next track.
 /// </summary>
 void Bangs::MediaNext(HWND, LPCSTR) {
-    HWND WA2Window = FindWindow("Winamp v1.x", NULL);
-    if (WA2Window) {
-        SendMessage(WA2Window, WM_COMMAND, 40048, 0);
+    HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
+    if (WA2Window != nullptr) {
+        PostMessageW(WA2Window, WM_COMMAND, 40048, 0);
     }
 }

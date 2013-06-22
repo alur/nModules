@@ -30,6 +30,9 @@ public:
     // Updates the icon.
     void UpdateIcon(bool repaint = true);
 
+    // Shows the right-click menu for the icon.
+    void ShowContextMenu();
+
 private:
     // Pointer to the shellfolder this item is in.
     IShellFolder2* shellFolder;
@@ -40,11 +43,18 @@ private:
     // Sets the icon.
     void SetIcon();
 
-    //
+    // 
     DrawableWindow::STATE hoverState, selectedState, focusedState;
 
+    //
     DrawableWindow::OVERLAY iconOverlay;
 
-    //
+    // True if the mouse is currently above the icon.
     bool mouseOver;
+
+    //
+    bool mouseDown;
+
+    // The last place the mouse was 
+    POINT mouseDownPosition;
 };
