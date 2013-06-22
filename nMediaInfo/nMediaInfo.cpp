@@ -86,6 +86,7 @@ void quitModule(HINSTANCE /* instance */) {
 LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
     if (message == WinampSongChangeMsg) {
         Update();
+        return 1;
     }
     switch(message) {
     case WM_CREATE:
@@ -125,6 +126,9 @@ void LoadSettings() {
 }
 
 
+/// <summary>
+/// Updates the cover art.
+/// </summary>
 void Update() {
     static bool open = true;
 

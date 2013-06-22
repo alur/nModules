@@ -11,10 +11,10 @@
 #include "../nShared/LSModule.hpp"
 
 // The messages we want from the core
-UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
+UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
 
 // The LiteStep module class
-LSModule* g_LSModule;
+LSModule *g_LSModule;
 
 // All current icon groups
 map<string, IconGroup*> g_iconGroups;
@@ -49,8 +49,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
     // Remove all groups
-    for (map<string, IconGroup*>::const_iterator iter = g_iconGroups.begin(); iter != g_iconGroups.end(); iter++) {
-        delete iter->second;
+    for (auto group : g_iconGroups) {
+        delete group.second;
     }
     g_iconGroups.clear();
 
