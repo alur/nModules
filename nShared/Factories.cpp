@@ -14,9 +14,9 @@
 #include "Macros.h"
 
 namespace Factories {
-    IDWriteFactory *pDWFactory = NULL;
-    ID2D1Factory *pD2DFactory = NULL;
-    IWICImagingFactory *pWICFactory = NULL;
+    IDWriteFactory *pDWFactory = nullptr;
+    ID2D1Factory *pD2DFactory = nullptr;
+    IWICImagingFactory *pWICFactory = nullptr;
 }
 
 
@@ -34,7 +34,7 @@ void Factories::Release() {
 /// Fetches a directwrite factory.
 /// </summary>
 HRESULT Factories::GetDWriteFactory(LPVOID* ppFactory) {
-    if (!pDWFactory) {
+    if (pDWFactory == nullptr) {
         HRESULT hr;
         if (!SUCCEEDED(hr = DWriteCreateFactory(
             DWRITE_FACTORY_TYPE_SHARED,
@@ -51,11 +51,20 @@ HRESULT Factories::GetDWriteFactory(LPVOID* ppFactory) {
 /// Fetches a direct2d factory.
 /// </summary>
 HRESULT Factories::GetD2DFactory(LPVOID* ppFactory) {
-    if (!pD2DFactory) {
+    if (pD2DFactory == nullptr) {
+        D2D1_FACTORY_OPTIONS d2dFactoryOptions;
         HRESULT hr;
+        ZeroMemory(&d2dFactoryOptions, sizeof(D2D1_FACTORY_OPTIONS));
+        #if defined(_DEBUG)
+            // If the project is in a debug build, enable Direct2D debugging via SDK Layers.
+            d2dFactoryOptions.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
+        #endif
+
         if (!SUCCEEDED(hr = D2D1CreateFactory(
             D2D1_FACTORY_TYPE_MULTI_THREADED,
-            &pD2DFactory
+            __uuidof(ID2D1Factory),
+            &d2dFactoryOptions,
+            reinterpret_cast<LPVOID*>(&pD2DFactory)
         ))) return hr;
     }
     *ppFactory = pD2DFactory;
@@ -67,18 +76,12 @@ HRESULT Factories::GetD2DFactory(LPVOID* ppFactory) {
 /// Fetches a WIC factory.
 /// </summary>
 HRESULT Factories::GetWICFactory(LPVOID* ppFactory) {
-    if (!pWICFactory) {
+    if (pWICFactory == nullptr) {
         HRESULT hr;
 
-        // VS2010 does not define CLSID_WICImagingFactory1 
-#ifdef __IWICImagingFactory2_FWD_DEFINED__
-        GUID guid = CLSID_WICImagingFactory1;
-#else
-        GUID guid = CLSID_WICImagingFactory;
-#endif
         if (!SUCCEEDED(hr = CoCreateInstance(
-            guid,
-            NULL,
+            CLSID_WICImagingFactory1,
+            nullptr,
             CLSCTX_INPROC_SERVER,
             IID_IWICImagingFactory,
             (LPVOID*)&pWICFactory
