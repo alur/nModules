@@ -1,21 +1,21 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*  CoverArt.hpp
+*  CoverArt.cpp
 *  The nModules Project
 *
 *  Renders cover art.
 *   
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma once
-
 #include "../nShared/LiteStep.h"
 #include "CoverArt.hpp"
 #define ID3LIB_LINKOPTION 1
-#include "..\External\id3lib\id3\tag.h"
+#include "../External/id3lib/id3/tag.h"
 #include <wincodec.h>
 #include "../nShared/Factories.h"
 #include "../nShared/Macros.h"
 #include <Shlwapi.h>
 #include <strsafe.h>
+#include "../nShared/FileIterator.hpp"
+#include "../nShared/Debugging.h"
 
 #define IPC_GETLISTPOS 125
 #define IPC_GETPLAYLISTFILEW 214
@@ -31,12 +31,12 @@ CoverArt::CoverArt(LPCSTR name) : Drawable(name) {
     defaults.height = 200;
     this->window->Initialize(&defaults);
 
-    D2D1_RECT_F pos = {
+    D2D1_RECT_F pos = D2D1::RectF(
         0, 0,
         (float)this->window->GetDrawingSettings()->width,
         (float)this->window->GetDrawingSettings()->height
-    };
-    this->coverArt = this->window->AddOverlay(pos, (IWICBitmap*)nullptr);
+    );
+    this->coverArt = this->window->AddOverlay(pos, (IWICBitmapSource*)nullptr);
 
     this->folderCanidates.push_back(L"*.jpg");
     this->folderCanidates.push_back(L"*.png");
@@ -159,14 +159,10 @@ bool CoverArt::SetCoverFromFolder(LPCWSTR filePath) {
 
     // Check each covername
     WCHAR artPath[MAX_PATH];
-    WIN32_FIND_DATAW FindFileData;
-
     for (auto &canidate : this->folderCanidates) {
         StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, canidate.c_str());
-
-        while (FindFirstFileW(artPath, &FindFileData) != INVALID_HANDLE_VALUE) {
-            // Todo::We could try other files if this fails.
-            StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, FindFileData.cFileName);
+        for (auto &file : FileIterator(artPath)) {
+            StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, file.cFileName);
 
             hr = Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
             if (SUCCEEDED(hr)) {

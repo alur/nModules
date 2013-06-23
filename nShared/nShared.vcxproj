@@ -27,6 +27,7 @@
     <ClInclude Include="Drawable.hpp" />
     <ClInclude Include="DrawableBangs.h" />
     <ClInclude Include="DrawableSettings.hpp" />
+    <ClInclude Include="FileIterator.hpp" />
     <ClInclude Include="ImageBrush.hpp" />
     <ClInclude Include="LinearGradientBrush.hpp" />
     <ClInclude Include="Overlay.hpp" />
@@ -64,6 +65,8 @@
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="DrawableBangs.cpp" />
     <ClCompile Include="DrawableSettings.cpp" />
+    <ClCompile Include="FileIterator.cpp" />
+    <ClCompile Include="FileIteratorIterator.cpp" />
     <ClCompile Include="RelativeValue.cpp" />
     <ClCompile Include="StateSettings.cpp" />
     <ClCompile Include="DrawableWindow.cpp" />

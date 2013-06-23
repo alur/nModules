@@ -38,7 +38,7 @@ HWND g_window;
 /// </summary>
 int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
     // Initialize
-    g_LSModule = new LSModule(parent, "nKey", "Alurcard2", MAKE_VERSION(1,0,0,0), instance);
+    g_LSModule = new LSModule(parent, "nKey", "Alurcard2", MAKE_VERSION(1, 1, 0, 0), instance);
     
     if (!g_LSModule->Initialize()) {
         delete g_LSModule;
@@ -57,15 +57,15 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
     // Remove all hotkeys
-    for (map<int, LPCSTR>::const_iterator iter = g_hotKeys.begin(); iter != g_hotKeys.end(); iter++) {
-        UnregisterHotKey(g_window, iter->first);
-        free((LPVOID)iter->second);
+    for (auto hotkey : g_hotKeys) {
+        UnregisterHotKey(g_window, hotkey.first);
+        free(const_cast<LPSTR>(hotkey.second));
     }
     g_hotKeys.clear();
 
     // Clear g_vkCodes
-    for (map<LPCSTR, UINT>::const_iterator iter = g_vkCodes.begin(); iter != g_vkCodes.end(); iter++) {
-        free((LPVOID)iter->first);
+    for (auto code : g_vkCodes) {
+        free(const_cast<LPSTR>(code.first));
     }
     g_vkCodes.clear();
 
@@ -137,8 +137,8 @@ void LoadVKeyTable() {
 
     LiteStep::GetRCLine("nKeyVKTable", path, sizeof(path), "");
     if (fopen_s(&file, path, "r") == 0) {
-        while (fgets(line, sizeof(line), file) != NULL) {
-            if (LiteStep::LCTokenize(line, tokens, 2, NULL) == 2) {
+        while (fgets(line, sizeof(line), file) != nullptr) {
+            if (LiteStep::LCTokenize(line, tokens, 2, nullptr) == 2) {
                 u = strtoul(szCode, &endPtr, 0);
 
                 if (szCode[0] != '\0' && *endPtr == '\0') {

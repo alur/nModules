@@ -87,6 +87,6 @@ DesktopPainter::TransitionType nDesk::Settings::TransitionTypeFromString(LPCSTR 
 /// </summary>
 void nDesk::Settings::OnResolutionChange() {
     if (onResolutionChange[0] != '\0') {
-        LiteStep::LSExecute(NULL, onResolutionChange, SW_SHOW);
+        LiteStep::LSExecute(nullptr, onResolutionChange, SW_SHOW);
     }
 }

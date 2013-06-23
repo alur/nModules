@@ -78,7 +78,7 @@ namespace Bangs {
             if (WA2Window != nullptr) {
                 PostMessageW(WA2Window, WM_COMMAND, WINAMP_BUTTON_NEXT, 0);
             }
-        }),
+        })
     };
     
 

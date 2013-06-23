@@ -61,7 +61,7 @@ void TextFunctions::_Update() {
     } fileInfo;
 
     // Get Winamps HWND
-    if ((WA2Window = FindWindow("Winamp v1.x", NULL)) == NULL) {
+    if ((WA2Window = FindWindowW(L"Winamp v1.x", nullptr)) == nullptr) {
         StringCchCopyW(trackTitle, sizeof(trackTitle), L"");
         return;
     }
@@ -71,46 +71,46 @@ void TextFunctions::_Update() {
 
     // Open a handle to winamp
     GetWindowThreadProcessId(WA2Window, &winampProc);
-    if ((winampHandle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, false, winampProc)) == NULL) {
+    if ((winampHandle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, false, winampProc)) == nullptr) {
         StringCchCopyW(trackTitle, sizeof(trackTitle), L"");
         return;
     }
 
     // Allocate memory in Winamp's process
-    LPVOID remoteStruct = VirtualAllocEx(winampHandle, NULL, sizeof(fileInfo), MEM_COMMIT, PAGE_READWRITE);
+    LPVOID remoteStruct = VirtualAllocEx(winampHandle, nullptr, sizeof(fileInfo), MEM_COMMIT, PAGE_READWRITE);
 
     // Configure the remote extendedFileInfoStructW
     fileInfo.filename = (DWORD)SendMessageW(WA2Window, WM_USER, trackID, IPC_GETPLAYLISTFILEW);
-    fileInfo.metadata = (DWORD)VirtualAllocEx(winampHandle, NULL, 64, MEM_COMMIT, PAGE_READWRITE);
-    fileInfo.ret = (DWORD)VirtualAllocEx(winampHandle, NULL, 4096*sizeof(WCHAR), MEM_COMMIT, PAGE_READWRITE);;
+    fileInfo.metadata = (DWORD)VirtualAllocEx(winampHandle, nullptr, 64, MEM_COMMIT, PAGE_READWRITE);
+    fileInfo.ret = (DWORD)VirtualAllocEx(winampHandle, nullptr, 4096*sizeof(WCHAR), MEM_COMMIT, PAGE_READWRITE);;
     fileInfo.retlen = 4096*sizeof(WCHAR);
-    WriteProcessMemory(winampHandle, remoteStruct, &fileInfo, sizeof(fileInfo), NULL);
+    WriteProcessMemory(winampHandle, remoteStruct, &fileInfo, sizeof(fileInfo), nullptr);
 
     // Read the file path
-    ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &filePath, sizeof(filePath), NULL);
+    ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &filePath, sizeof(filePath), nullptr);
 
     // Read the track title
-    WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Title", 64, NULL);
+    WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Title", 64, nullptr);
     if (SendMessage(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
-        ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &trackTitle, sizeof(trackTitle), NULL);
+        ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &trackTitle, sizeof(trackTitle), nullptr);
     }
     else {
         trackTitle[0] = '\0';
     }
 
     // Read the track artist
-    WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Artist", 64, NULL);
+    WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Artist", 64, nullptr);
     if (SendMessage(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
-        ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &trackArtist, sizeof(trackArtist), NULL);
+        ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &trackArtist, sizeof(trackArtist), nullptr);
     }
     else {
         trackArtist[0] = '\0';
     }
 
     // Read the album title
-    WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Album", 64, NULL);
+    WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Album", 64, nullptr);
     if (SendMessage(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
-        ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &albumTitle, sizeof(albumTitle), NULL);
+        ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &albumTitle, sizeof(albumTitle), nullptr);
     }
     else {
         albumTitle[0] = '\0';

@@ -18,9 +18,10 @@ public:
     explicit CoverArt(LPCSTR name);
     virtual ~CoverArt();
 
+public:
     void Update();
 
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID) override;
 
 private:
     DrawableWindow::OVERLAY coverArt;
@@ -29,6 +30,8 @@ private:
     bool SetCoverFromFolder(LPCWSTR filePath);
     void SetDefaultCover();
 
+private:
+    // Path to the default cover art.
     WCHAR defaultCoverArt[MAX_PATH];
 
     // The names to search for when looking in folders. May include wildcards.

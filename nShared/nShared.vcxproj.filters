@@ -18,6 +18,12 @@
     <Filter Include="Header Files\Brushes">
       <UniqueIdentifier>{31715971-4ffc-42dc-8d01-df45be900325}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Utilities">
+      <UniqueIdentifier>{d4d1a08f-ca84-4186-912a-28f7d6be7a3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utilities">
+      <UniqueIdentifier>{b2ebf9e7-4511-421b-9291-c3ea01dd0d17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MonitorInfo.hpp">
@@ -125,6 +131,9 @@
     <ClInclude Include="SolidColorBrush.hpp">
       <Filter>Header Files\Brushes</Filter>
     </ClInclude>
+    <ClInclude Include="FileIterator.hpp">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MonitorInfo.cpp">
@@ -216,6 +225,12 @@
     </ClCompile>
     <ClCompile Include="Tooltip.cpp">
       <Filter>Source Files\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="FileIterator.cpp">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="FileIteratorIterator.cpp">
+      <Filter>Source Files\Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

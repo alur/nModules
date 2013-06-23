@@ -16,7 +16,7 @@
 /// </summary>
 /// <param name="mInfo"></param>
 /// <param name="pszLine"></param>
-void WorkArea::ParseLine(MonitorInfo * mInfo, LPCSTR pszLine) {
+void WorkArea::ParseLine(MonitorInfo *mInfo, LPCSTR pszLine) {
     char szMonitor[16], szLeft[16], szTop[16], szRight[16], szBottom[16];
     LPSTR szTokens[] = { szMonitor, szLeft, szTop, szRight, szBottom };
     int left, top, right, bottom;
@@ -25,12 +25,12 @@ void WorkArea::ParseLine(MonitorInfo * mInfo, LPCSTR pszLine) {
     using namespace nCore::InputParsing;
 
     // Parse the input string
-    if (LiteStep::LCTokenize(pszLine, szTokens, 5, NULL) == 5) {
+    if (LiteStep::LCTokenize(pszLine, szTokens, 5, nullptr) == 5) {
         if (ParseCoordinate(szLeft, &left) && ParseCoordinate(szTop, &top) && ParseCoordinate(szRight, &right) && ParseCoordinate(szBottom, &bottom)) {
             if (_stricmp("all", szMonitor) == 0) {
-                for (std::vector<MonitorInfo::Monitor>::iterator iter = mInfo->m_monitors.begin(); iter != mInfo->m_monitors.end(); iter++) {
-                    RECT r = { iter->rect.left + left, iter->rect.top + top, iter->rect.right - right, iter->rect.bottom - bottom };
-                    SystemParametersInfo(SPI_SETWORKAREA, 0, &r, NULL);
+                for (auto &monitor : mInfo->m_monitors) {
+                    RECT r = { monitor.rect.left + left, monitor.rect.top + top, monitor.rect.right - right, monitor.rect.bottom - bottom };
+                    SystemParametersInfo(SPI_SETWORKAREA, 1, &r, 0);
                 }
                 return;
             }
@@ -38,7 +38,7 @@ void WorkArea::ParseLine(MonitorInfo * mInfo, LPCSTR pszLine) {
                 if (monitor < mInfo->m_monitors.size()) {
                     RECT mRect = mInfo->m_monitors[monitor].rect;
                     RECT r = { mRect.left + left, mRect.top + top, mRect.right - right, mRect.bottom - bottom };
-                    SystemParametersInfo(SPI_SETWORKAREA, 0, &r, NULL);
+                    SystemParametersInfo(SPI_SETWORKAREA, 1, &r, 0);
                 }
                 return;
             }
@@ -53,14 +53,14 @@ void WorkArea::ParseLine(MonitorInfo * mInfo, LPCSTR pszLine) {
 /// Reads and applies all settings from the RC files.
 /// </summary>
 /// <param name="mInfo">A current MonitorInfo.</param>
-void WorkArea::LoadSettings(MonitorInfo * mInfo, bool /* bIsRefresh */) {
+void WorkArea::LoadSettings(MonitorInfo *mInfo, bool /* bIsRefresh */) {
     char szLine[MAX_LINE_LENGTH];
     LPVOID f = LiteStep::LCOpen(NULL);
     while (LiteStep::LCReadNextConfig(f, "*nDeskWorkArea", szLine, sizeof(szLine))) {
         ParseLine(mInfo, szLine+strlen("*nDeskWorkArea")+1);
     }
     LiteStep::LCClose(f);
-    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, NULL);
+    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
 }
 
 
@@ -68,9 +68,9 @@ void WorkArea::LoadSettings(MonitorInfo * mInfo, bool /* bIsRefresh */) {
 /// Resets the workareas for all monitors.
 /// </summary>
 /// <param name="mInfo">A current MonitorInfo.</param>
-void WorkArea::ResetWorkAreas(MonitorInfo * mInfo) {
-    for (std::vector<MonitorInfo::Monitor>::iterator iter = mInfo->m_monitors.begin(); iter != mInfo->m_monitors.end(); iter++) {
-        SystemParametersInfo(SPI_SETWORKAREA, 0, &iter->rect, NULL);
+void WorkArea::ResetWorkAreas(MonitorInfo *mInfo) {
+    for (auto &monitor : mInfo->m_monitors) {
+        SystemParametersInfo(SPI_SETWORKAREA, 1, &monitor.rect, 0);
     }
-    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, NULL);
+    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
 }

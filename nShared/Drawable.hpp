@@ -20,19 +20,19 @@ public:
     explicit Drawable(LPCSTR prefix, Settings* parentSettings);
     virtual ~Drawable();
 
-    DrawableWindow* GetWindow();
-    EventHandler* GetEventHandler();
+    DrawableWindow *GetWindow();
+    EventHandler *GetEventHandler();
 
 protected:
     // Used for reading litestep settings.
-    Settings* settings;
+    Settings *settings;
 
     // The object which does actual drawing.
-    DrawableWindow* window;
+    DrawableWindow *window;
 
     // The parent drawable, if there is one.
-    Drawable* parent;
+    Drawable *parent;
 
     // Handles events.
-    EventHandler* eventHandler;
+    EventHandler *eventHandler;
 };
