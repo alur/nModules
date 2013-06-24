@@ -206,10 +206,10 @@ void ParsedText::Parse(LPCWSTR text) {
     LPCWSTR pos = text;
 
     // The start of the current expression.
-    LPCWSTR expressionStart = NULL;
+    LPCWSTR expressionStart = nullptr;
 
     // If we have read a whole function name, pointer to it. Otherwise, NULL;
-    LPWSTR functionName = NULL;
+    LPWSTR functionName = nullptr;
 
     // What we are currently searching for
     // 0 -> Begining of an expression, [
@@ -223,20 +223,20 @@ void ParsedText::Parse(LPCWSTR text) {
     UCHAR numArgs = 0;
 
     //
-    LPWSTR* arguments = NULL;
+    LPWSTR* arguments = nullptr;
 
     //
-    LPCWSTR argumentStart = NULL;
+    LPCWSTR argumentStart = nullptr;
 
     //
     LPCWSTR searchPos = text;
 
-    while (searchPos != NULL && *searchPos != L'\0') {
+    while (searchPos != nullptr && *searchPos != L'\0') {
         switch (mode) {
         case 0: // Searching for the begining of the next expression.
             {
                 searchPos = wcswcs(searchPos, L"[");
-                if (searchPos != NULL) {
+                if (searchPos != nullptr) {
                     expressionStart = searchPos;
                     ++searchPos;
                     mode = 1;
@@ -269,7 +269,7 @@ void ParsedText::Parse(LPCWSTR text) {
         case 2: // Reads arguments
             {
                 searchPos = wcswcs(++searchPos, L"'");
-                if (searchPos != NULL) {
+                if (searchPos != nullptr) {
                     ++numArgs;
                     arguments = (LPWSTR*)realloc(arguments, numArgs*sizeof(LPWSTR));
                     arguments[numArgs-1] = Strings::wcsPartialDup(argumentStart + 1, searchPos - argumentStart - 1);
@@ -308,18 +308,18 @@ void ParsedText::Parse(LPCWSTR text) {
 
         case 9: // Failure state, does cleanup.
             {
-                expressionStart = NULL;
-                argumentStart = NULL;
+                expressionStart = nullptr;
+                argumentStart = nullptr;
                 if (functionName) {
                     free(functionName);
-                    functionName = NULL;
+                    functionName = nullptr;
                 }
                 if (arguments) {
                     for (int i = 0; i < numArgs; ++i) {
                         free(arguments[i]);
                     }
                     free(arguments);
-                    arguments = NULL;
+                    arguments = nullptr;
                 }
                 mode = 0;
                 numArgs = 0;
@@ -330,13 +330,13 @@ void ParsedText::Parse(LPCWSTR text) {
         case 10: // Success state, pushes tokens
             {
                 // pos through expressionStart is regular text
-                AddToken(TEXT, functionMap.end(), Strings::wcsPartialDup(pos, expressionStart - pos), NULL);
+                AddToken(TEXT, functionMap.end(), Strings::wcsPartialDup(pos, expressionStart - pos), nullptr);
 
                 //
                 AddToken(EXPRESSION, FindDynamicTextFunction(functionName, numArgs),
-                    Strings::wcsPartialDup(expressionStart, searchPos - expressionStart), arguments);
+                    Strings::wcsPartialDup(expressionStart + 1, searchPos - expressionStart - 1), arguments);
                 free(functionName);
-                functionName = NULL;
+                functionName = nullptr;
                 
                 pos = ++searchPos;
                 mode = 0;
@@ -347,7 +347,7 @@ void ParsedText::Parse(LPCWSTR text) {
 
     // If there is anything left in the string, it is a text segment.
     if (*pos != '\0') {
-        AddToken(TEXT, functionMap.end(), _wcsdup(pos), NULL);
+        AddToken(TEXT, functionMap.end(), _wcsdup(pos), nullptr);
     }
 }
 

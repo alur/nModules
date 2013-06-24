@@ -34,7 +34,7 @@ typedef struct {
     set<IParsedText*> users;
 } FormatterData;
 
-// The map ty[e used to store the dynamic text functions.
+// The map type used to store the dynamic text functions.
 typedef map<pair<wstring, UCHAR>, FormatterData> FUNCMAP;
 
 
