@@ -7,8 +7,8 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "CoverArt.hpp"
-#define ID3LIB_LINKOPTION 1
-#include "../External/id3lib/id3/tag.h"
+//#define ID3LIB_LINKOPTION 1
+//#include "../External/id3lib/id3/tag.h"
 #include <wincodec.h>
 #include "../nShared/Factories.h"
 #include "../nShared/Macros.h"
@@ -16,6 +16,14 @@
 #include <strsafe.h>
 #include "../nShared/FileIterator.hpp"
 #include "../nShared/Debugging.h"
+
+#define TAGLIB_STATIC
+#include "../External/taglib/fileref.h"
+#include "../External/taglib/mpeg/mpegfile.h"
+#include "../External/taglib/mpeg/id3v2/id3v2tag.h"
+#include "../External/taglib/mpeg/id3v2/frames/attachedpictureframe.h"
+#include "../External/taglib/flac/flacfile.h"
+#include "../External/taglib/mp4/mp4file.h"
 
 #define IPC_GETLISTPOS 125
 #define IPC_GETPLAYLISTFILEW 214
@@ -108,20 +116,20 @@ LRESULT WINAPI CoverArt::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 /// Tries to set the cover based on the Tags of the specified file.
 /// </summary>
 /// <param name="filePath">Path to the file to get the cover from.</param>
-bool CoverArt::SetCoverFromTag(LPCWSTR filePathW) {
-    char filePath[MAX_PATH];
-    WideCharToMultiByte(CP_ACP, 0, filePathW, -1, filePath, sizeof(filePath), nullptr, nullptr);
+bool CoverArt::SetCoverFromTag(LPCWSTR filePath) {
+    LPCWSTR extension = wcsrchr(filePath, L'.');
 
-	ID3_Tag tag(filePath);
-	ID3_Frame *frame;
-    IWICImagingFactory *factory = nullptr;
-    IWICBitmapDecoder *decoder = nullptr;
-    IWICBitmapFrameDecode *source = nullptr;
-    HRESULT hr = E_FAIL;
-    
-    frame = tag.Find(ID3FID_PICTURE, ID3FN_PICTURETYPE, ID3PT_COVERFRONT);
-    if (frame != nullptr) {
-        IStream *stream = SHCreateMemStream(frame->Field(ID3FN_DATA).GetRawBinary(), (UINT)frame->Field(ID3FN_DATA).Size());
+    if (extension == nullptr) {
+        return false;
+    }
+
+    auto ParseImage = [this] (const BYTE *data, UINT size) {
+        IWICImagingFactory *factory = nullptr;
+        IWICBitmapDecoder *decoder = nullptr;
+        IWICBitmapFrameDecode *source = nullptr;
+        HRESULT hr = E_FAIL;
+
+        IStream *stream = SHCreateMemStream(data, size);
         if (stream) {
             hr = Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
             if (SUCCEEDED(hr)) {
@@ -137,9 +145,40 @@ bool CoverArt::SetCoverFromTag(LPCWSTR filePathW) {
             SAFERELEASE(decoder);
             SAFERELEASE(stream);
         }
+
+        return hr == S_OK;
+    };
+
+    ++extension;
+
+    if (_wcsicmp(extension, L"mp3") == 0) {
+        TagLib::MPEG::File mp3File(filePath);
+        if (mp3File.ID3v2Tag()->frameListMap().contains("APIC")) {
+            for (auto frame : mp3File.ID3v2Tag()->frameListMap()["APIC"]) {
+                auto picFrame = (TagLib::ID3v2::AttachedPictureFrame *)frame;
+                if (picFrame->type() == TagLib::ID3v2::AttachedPictureFrame::FrontCover) {
+                    return ParseImage((const BYTE *)picFrame->picture().data(), picFrame->picture().size());
+                }
+            }
+        }
+    }
+    else if (_wcsicmp(extension, L"flac") == 0) {
+        TagLib::FLAC::File flacFile(filePath);
+        for (auto &picture : flacFile.pictureList()) {
+            if (picture->type() == TagLib::FLAC::Picture::FrontCover) {
+                return ParseImage((const BYTE *)picture->data().data(), picture->data().size());
+            }
+        }
+    }
+    else if (_wcsicmp(extension, L"mp4") == 0) {
+        TagLib::MP4::File mp4File(filePath);
+        if (mp4File.tag()->itemListMap().contains("covr")) {
+            auto &cover = mp4File.tag()->itemListMap()["covr"].toCoverArtList().front();
+            return ParseImage((const BYTE *)cover.data().data(), cover.data().size());
+        }
     }
 
-    return hr == S_OK;
+    return false;
 }
 
 
