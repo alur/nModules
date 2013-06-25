@@ -21,13 +21,15 @@
 
 
 // The messages we want from the core
-UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
+UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
 // Class pointers
-DesktopPainter* g_pDesktopPainter;
-MonitorInfo* g_pMonitorInfo;
-ClickHandler* g_pClickHandler;
-LSModule* g_pLSModule;
+DesktopPainter *g_pDesktopPainter;
+MonitorInfo *g_pMonitorInfo;
+ClickHandler *g_pClickHandler;
+
+//
+LSModule gLSModule("nDesk", "Alurcard2", MAKE_VERSION(1, 0, 0, 0));
 
 
 /// <summary>
@@ -43,20 +45,16 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.style = CS_DBLCLKS;
 
-    g_pLSModule = new LSModule(parent, "nDesk", "Alurcard2", MAKE_VERSION(0,2,0,0), instance);
-
-    if (!g_pLSModule->ConnectToCore(MAKE_VERSION(0,2,0,0))) {
-        delete g_pLSModule;
+    if (!gLSModule.ConnectToCore(MAKE_VERSION(0, 2, 0, 0))) {
         return 1;
     }
 
     // Initialize
     g_pMonitorInfo = new MonitorInfo();
     g_pClickHandler = new ClickHandler();
-    g_pDesktopPainter = NULL; // Initalized on WM_CREATE
+    g_pDesktopPainter = nullptr; // Initalized on WM_CREATE
     
-    if (!g_pLSModule->Initialize(&wc, NULL)) {
-        delete g_pLSModule;
+    if (!gLSModule.Initialize(parent, instance, &wc, nullptr)) {
         delete g_pMonitorInfo;
         delete g_pClickHandler;
         return 1;
@@ -117,7 +115,9 @@ void quitModule(HINSTANCE /* instance */) {
     if (g_pDesktopPainter) delete g_pDesktopPainter;
     if (g_pClickHandler) delete g_pClickHandler;
     if (g_pMonitorInfo) delete g_pMonitorInfo;
-    if (g_pLSModule) delete g_pLSModule;
+
+    //
+    gLSModule.DeInitalize();
 }
 
 
@@ -132,14 +132,14 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     switch(message) {
     case WM_CREATE:
         {
-            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
             g_pDesktopPainter = new DesktopPainter(window);
         }
         return 0;
 
     case WM_DESTROY:
         {
-            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
         }
         return 0;
 

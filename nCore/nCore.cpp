@@ -22,7 +22,7 @@ HWND g_hwndMsgHandler;
 MonitorInfo* g_pMonitorInfo;
 
 // Constants
-const VERSION g_version     = MAKE_VERSION(0,2,0,0);
+const VERSION g_version     = MAKE_VERSION(0, 2, 0, 0);
 LPCSTR g_szAppName          = "nCore";
 LPCSTR g_szMsgHandler       = "LSnCore";
 LPCSTR g_szAuthor           = "Alurcard2";

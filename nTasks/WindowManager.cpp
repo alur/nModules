@@ -28,7 +28,7 @@ using std::pair;
 // All current taskbars
 extern map<LPCSTR, Taskbar*> g_Taskbars;
 
-extern LSModule* g_LSModule;
+extern LSModule gLSModule;
 
 namespace WindowManager {
     UINT __stdcall ThreadAddExisting(LPVOID);
@@ -72,7 +72,7 @@ void WindowManager::Start() {
     osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     GetVersionEx(&osv);
     if (osv.dwMajorVersion < 6 || osv.dwMajorVersion == 6 && osv.dwMinorVersion < 2) {
-        SetTimer(g_LSModule->GetMessageWindow(), TIMER_CHECKMONITOR, 250, NULL);
+        SetTimer(gLSModule.GetMessageWindow(), TIMER_CHECKMONITOR, 250, NULL);
     }
 }
 
@@ -86,7 +86,7 @@ void WindowManager::Stop() {
     assert(isStarted);
 
     // Clean up
-    KillTimer(g_LSModule->GetMessageWindow(), TIMER_CHECKMONITOR);
+    KillTimer(gLSModule.GetMessageWindow(), TIMER_CHECKMONITOR);
     delete g_pMonitorInfo;
     activeWindow = NULL;
     windowMap.clear();
@@ -487,7 +487,7 @@ void WindowManager::AddExisting() {
 /// </summary>
 UINT __stdcall WindowManager::ThreadAddExisting(LPVOID) {
     EnumDesktopWindows(NULL, ThreadAddExistingCallback, NULL);
-    PostMessage(g_LSModule->GetMessageWindow(), WM_ADDED_EXISTING, NULL, NULL);
+    PostMessage(gLSModule.GetMessageWindow(), WM_ADDED_EXISTING, NULL, NULL);
     return 0;
 }
 
@@ -497,7 +497,7 @@ UINT __stdcall WindowManager::ThreadAddExisting(LPVOID) {
 /// </summary>
 BOOL CALLBACK WindowManager::ThreadAddExistingCallback(HWND window, LPARAM) {
     if (IsTaskbarWindow(window)) {
-        PostMessage(g_LSModule->GetMessageWindow(), LM_WINDOWCREATED, (WPARAM)window, NULL);
+        PostMessage(gLSModule.GetMessageWindow(), LM_WINDOWCREATED, (WPARAM)window, NULL);
     }
     return TRUE;
 }

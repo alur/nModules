@@ -16,7 +16,7 @@
 static HWND desktopWindow = NULL;
 static UINT (* DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = NULL;
 
-extern LSModule* g_LSModule;
+extern LSModule gLSModule;
 
 
 TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, int width, int height) : Drawable(parent, "Task") {
@@ -107,7 +107,7 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
     this->stateSelectedHover = this->window->AddState("SelectedHover", 200, &selectedHoverDefaults);
 
     //
-    this->iconOverlayWindow = g_LSModule->CreateDrawableWindow(this->settings, this);
+    this->iconOverlayWindow = gLSModule.CreateDrawableWindow(this->settings, this);
 
     DrawableSettings iconDefaults;
     iconDefaults.alwaysOnTop = true;
@@ -232,7 +232,7 @@ void TaskThumbnail::UpdateIcon() {
         SendMessageCallback(this->targetWindow, WM_GETICON, ICON_BIG, NULL, UpdateIconCallback, (ULONG_PTR)this);
     }
     else {
-        HICON icon = ExtractIcon(g_LSModule->GetInstance(), "shell32.dll", 34);
+        HICON icon = ExtractIcon(gLSModule.GetInstance(), "shell32.dll", 34);
 
         if (icon) {
             SetIcon(icon);

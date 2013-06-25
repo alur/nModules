@@ -11,32 +11,28 @@
 #include "../nShared/LSModule.hpp"
 
 // The messages we want from the core
-UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
-
-// The LiteStep module class
-LSModule *g_LSModule;
+const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
 // All current icon groups
-map<string, IconGroup*> g_iconGroups;
+map<string, IconGroup*> gIconGroups;
+
+// The LiteStep module class
+LSModule gLSModule("nIcon", "Alurcard2", MAKE_VERSION(0, 2, 0, 0));
 
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
-    g_LSModule = new LSModule(parent, "nIcon", "Alurcard2", MAKE_VERSION(0,2,0,0), instance);
-    
-    if (!g_LSModule->Initialize()) {
-        delete g_LSModule;
+int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
+    if (!gLSModule.Initialize(parent, instance)) {
         return 1;
     }
 
-    if (!g_LSModule->ConnectToCore(MAKE_VERSION(0,2,0,0))) {
-        delete g_LSModule;
+    if (!gLSModule.ConnectToCore(MAKE_VERSION(0, 2, 0, 0))) {
         return 1;
     }
 
-    OleInitialize(NULL);
+    OleInitialize(nullptr);
 
     LoadSettings();
 
@@ -49,15 +45,12 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
     // Remove all groups
-    for (auto group : g_iconGroups) {
+    for (auto group : gIconGroups) {
         delete group.second;
     }
-    g_iconGroups.clear();
+    gIconGroups.clear();
 
-    // Deinitalize
-    if (g_LSModule) {
-        delete g_LSModule;
-    }
+    gLSModule.DeInitalize();
 
     OleUninitialize();
 }
@@ -74,13 +67,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     switch(message) {
     case WM_CREATE:
         {
-            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
         }
         return 0;
 
     case WM_DESTROY:
         {
-            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
         }
         return 0;
 
@@ -99,11 +92,12 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 void LoadSettings() {
     char szLine[MAX_LINE_LENGTH], szLabel[256];
     LPSTR szTokens[] = { szLabel };
-    LPVOID f = LiteStep::LCOpen(NULL);
+    LPVOID f = LiteStep::LCOpen(nullptr);
 
     while (LiteStep::LCReadNextConfig(f, "*nIcon", szLine, sizeof(szLine))) {
-        LiteStep::LCTokenize(szLine+strlen("*nIcon")+1, szTokens, 1, NULL);
-        g_iconGroups.insert(g_iconGroups.begin(), std::pair<string, IconGroup*>(string(szLabel), new IconGroup(szLabel)));
+        LiteStep::LCTokenize(szLine+strlen("*nIcon")+1, szTokens, 1, nullptr);
+
+        gIconGroups.insert(gIconGroups.begin(), std::pair<string, IconGroup*>(string(szLabel), new IconGroup(szLabel)));
     }
     LiteStep::LCClose(f);
 }

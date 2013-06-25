@@ -14,9 +14,6 @@
 #include "FolderItem.hpp"
 
 
-extern LSModule* g_LSModule;
-
-
 Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     WCHAR buf[MAX_LINE_LENGTH];
 

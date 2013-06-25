@@ -25,11 +25,12 @@ EXPORT_CDECL(void) quitModule(HINSTANCE instance);
 
 class LSModule : public MessageHandler {
 public:
-    explicit LSModule(HWND parent, LPCSTR moduleName, LPCSTR author, VERSION version, HINSTANCE instance);
+    explicit LSModule(LPCSTR moduleName, LPCSTR author, VERSION version);
     virtual ~LSModule();
 
     // Registers window classes and creates the message handler window.
-    bool Initialize(PWNDCLASSEX customMessageClass = NULL, PWNDCLASSEX customDrawableClass = NULL);
+    bool Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMessageClass = nullptr, PWNDCLASSEX customDrawableClass = nullptr);
+    void DeInitalize();
     
     // Connects to nCore.
     bool ConnectToCore(VERSION minimumCoreVersion);
@@ -47,7 +48,7 @@ public:
     HINSTANCE GetInstance();
 
     //
-    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID extra);
+    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID extra) override;
 
 private:
     // The window class used by the message handler.

@@ -31,16 +31,14 @@ BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */)
 /// <summary>
 /// Initializes all variables.
 /// </summary>
-/// <param name="parent">The HWND passed to initModuleEx.</param>
 /// <param name="moduleName">The name of this module, used for handling LM_GETREVID and window classes.</param>
 /// <param name="author">Name of the author(s), used for handling LM_GETREVID.</param>
 /// <param name="version">The version of the module, used for handling LM_GETREVID.</param>
-/// <param name="instance">The instance of this module.</param>
-LSModule::LSModule(HWND parent, LPCSTR moduleName, LPCSTR author, VERSION version, HINSTANCE instance) {
+LSModule::LSModule(LPCSTR moduleName, LPCSTR author, VERSION version) {
     this->author = _strdup(author);
     this->drawableClass = 0;
     this->instance = instance;
-    this->messageHandler = NULL;
+    this->messageHandler = nullptr;
     this->messageHandlerClass = 0;
     this->moduleName = _strdup(moduleName);
     this->parent = parent;
@@ -53,9 +51,9 @@ LSModule::LSModule(HWND parent, LPCSTR moduleName, LPCSTR author, VERSION versio
 /// </summary>
 LSModule::~LSModule() {
     // Destroy the message handler.
-    if (this->messageHandler != NULL) {
+    if (this->messageHandler != nullptr) {
         DestroyWindow(this->messageHandler);
-        this->messageHandler = NULL;
+        this->messageHandler = nullptr;
     }
 
     // Unregister window classes.
@@ -72,9 +70,6 @@ LSModule::~LSModule() {
     free((LPVOID)this->moduleName);
     free((LPVOID)this->author);
 
-    // Let go of any factories we allocated.
-    Factories::Release();
-
     // Disconnect from the core
     nCore::Disconnect();
 }
@@ -83,11 +78,16 @@ LSModule::~LSModule() {
 /// <summary>
 /// Initalizes the module. Registers window classes and connects with the core.
 /// </summary>
+/// <param name="parent">The HWND passed to initModuleEx.</param>
+/// <param name="instance">The instance of this module.</param>
 /// <param name="customMessageClass">Custom window class to use for the message handler.</param>
 /// <param name="customDrawableClass">Custom window class to use for the drawable window.</param>
-bool LSModule::Initialize(PWNDCLASSEX customMessageClass, PWNDCLASSEX customDrawableClass) {
+bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMessageClass, PWNDCLASSEX customDrawableClass) {
     WNDCLASSEX wc;
     char className[MAX_PATH];
+
+    this->parent = parent;
+    this->instance = instance;
 
     // Register the messageHandler window class
     StringCchPrintf(className, sizeof(className), "LS%sMessageHandler", this->moduleName);
@@ -132,6 +132,15 @@ bool LSModule::Initialize(PWNDCLASSEX customMessageClass, PWNDCLASSEX customDraw
 
 
 /// <summary>
+/// Deinitalizes
+/// </summary>
+void LSModule::DeInitalize() {
+    // Let go of any factories we allocated.
+    Factories::Release();
+}
+
+
+/// <summary>
 /// Tries to connect to nCore.
 /// </summary>
 /// <param name="minimumCoreVersion">The minimum core version which is acceptable.</param>
@@ -160,6 +169,7 @@ DrawableWindow* LSModule::CreateDrawableWindow(Settings* settings, MessageHandle
 HWND LSModule::GetMessageWindow() {
     return this->messageHandler;
 }
+
 
 HINSTANCE LSModule::GetInstance() {
     return this->instance;

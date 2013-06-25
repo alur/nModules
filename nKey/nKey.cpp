@@ -15,7 +15,7 @@
 using std::map;
 
 // The messages we want from the core
-UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
+UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
 // All hotkey mappings
 map<int, LPCSTR> g_hotKeys;
@@ -27,7 +27,7 @@ map<LPCSTR, UINT> g_vkCodes;
 int g_id = 0;
 
 // The LiteStep module class
-LSModule* g_LSModule;
+LSModule gLSModule("nKey", "Alurcard2", MAKE_VERSION(1, 0, 0, 0));
 
 //
 HWND g_window;
@@ -36,12 +36,9 @@ HWND g_window;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
-    // Initialize
-    g_LSModule = new LSModule(parent, "nKey", "Alurcard2", MAKE_VERSION(1, 1, 0, 0), instance);
-    
-    if (!g_LSModule->Initialize()) {
-        delete g_LSModule;
+int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
+    // Initialize    
+    if (!gLSModule.Initialize(parent, instance)) {
         return 1;
     }
 
@@ -68,11 +65,6 @@ void quitModule(HINSTANCE /* instance */) {
         free(const_cast<LPSTR>(code.first));
     }
     g_vkCodes.clear();
-
-    // Deinitalize
-    if (g_LSModule) {
-        delete g_LSModule;
-    }
 }
 
 
@@ -88,13 +80,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case WM_CREATE:
         {
             g_window = window;
-            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
         }
         return 0;
 
     case WM_DESTROY:
         {
-            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
         }
         return 0;
 

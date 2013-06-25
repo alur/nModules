@@ -11,7 +11,7 @@
 #include "../nShared/Debugging.h"
 
 
-extern LSModule* g_LSModule;
+extern LSModule gLSModule;
 
 
 PopupItem::PopupItem(Drawable* parent, LPCSTR prefix, bool independent) : Drawable(parent, prefix, independent) {
@@ -61,7 +61,7 @@ bool PopupItem::ParseDotIcon(LPCSTR dotIcon) {
         nIndex = 0;
     }
     
-    HICON icon = ExtractIcon(g_LSModule->GetInstance(), dotIcon, nIndex);
+    HICON icon = ExtractIcon(gLSModule.GetInstance(), dotIcon, nIndex);
 
     if (icon == NULL) {
         return false;
@@ -116,7 +116,7 @@ void PopupItem::SetIcon(IExtractIconW* extractIcon) {
         }
 
         if (hr == S_FALSE) {
-            icon = ExtractIconW(g_LSModule->GetInstance(), iconFile, iconIndex);
+            icon = ExtractIconW(gLSModule.GetInstance(), iconFile, iconIndex);
         }
 
         if (SUCCEEDED(hr) && icon != NULL) {
@@ -126,7 +126,7 @@ void PopupItem::SetIcon(IExtractIconW* extractIcon) {
             TRACEW(L"Failed to extract icon %s,%i", iconFile, iconIndex);
 
             // Try to fall back to the default icon.
-            icon = ExtractIconW(g_LSModule->GetInstance(), L"shell32.dll", 1);
+            icon = ExtractIconW(gLSModule.GetInstance(), L"shell32.dll", 1);
 
             if (icon != NULL) {
                 AddIcon(icon);

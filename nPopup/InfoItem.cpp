@@ -11,9 +11,6 @@
 #include "../nShared/LSModule.hpp"
 
 
-extern LSModule* g_LSModule;
-
-
 InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupItem(parent, "InfoItem") {
     WCHAR titleWide[MAX_LINE_LENGTH];
 

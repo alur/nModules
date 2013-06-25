@@ -12,7 +12,6 @@
 #include "TrayIcon.hpp"
 
 
-extern LSModule* g_LSModule;
 extern HWND g_hWndTrayNotify;
 extern bool g_InitPhase;
 

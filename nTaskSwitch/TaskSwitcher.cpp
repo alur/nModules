@@ -13,7 +13,6 @@
 #include <Shlwapi.h>
 
 
-extern LSModule* g_LSModule;
 static UINT (* DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = NULL;
 static HWND desktopWindow = NULL;
 

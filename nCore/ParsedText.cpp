@@ -28,7 +28,7 @@ FUNCMAP::iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
     if (ret == functionMap.end()) {
         FormatterData d;
         d.dynamic = true;
-        d.proc = NULL;
+        d.proc = nullptr;
         return functionMap.insert(FUNCMAP::value_type(FUNCMAP::key_type(wstring(name), numArgs), d)).first;
     }
     return ret;
@@ -56,7 +56,7 @@ EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORM
 /// <param name="name">The name of the funtion to unregister.</param>
 /// <param name="numArgs">The number of arguments in the function to unregister.</param>
 EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
-    RegisterDynamicTextFunction(name, numArgs, NULL, true);
+    RegisterDynamicTextFunction(name, numArgs, nullptr, true);
     DynamicTextChangeNotification(name, numArgs);
     return FALSE;
 }
@@ -91,8 +91,8 @@ EXPORT_CDECL(IParsedText*) ParseText(LPCWSTR text) {
 /// <param name="text">The text to parse.</param>
 ParsedText::ParsedText(LPCWSTR text) {
     Parse(text);
-    changeHandler = NULL;
-    data = NULL;
+    changeHandler = nullptr;
+    data = nullptr;
 }
 
 
@@ -129,8 +129,8 @@ void ParsedText::SetChangeHandler(void (*handler)(LPVOID), LPVOID data) {
 /// Returns true if the value of this parsedtext may change over time.
 /// </summary>
 bool ParsedText::IsDynamic() {
-    for (list<Token>::const_iterator token = this->tokens.begin(); token != this->tokens.end(); ++token) {
-        if (token->type == EXPRESSION && token->proc->second.dynamic) {
+    for (auto &token : this->tokens) {
+        if (token.type == EXPRESSION && token.proc->second.dynamic) {
             return true;
         }
     }
@@ -153,7 +153,7 @@ bool ParsedText::Evaluate(LPWSTR dest, size_t cchDest) {
             break;
 
         case EXPRESSION:
-            if (token->proc->second.proc != NULL) {
+            if (token->proc->second.proc != nullptr) {
                 token->proc->second.proc(L"", (UCHAR)token->proc->first.second, token->args, dest, cchDest); 
             }
             else {

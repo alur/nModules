@@ -15,10 +15,10 @@
 using std::map;
 
 // The LSModule class
-LSModule* g_LSModule;
+LSModule gLSModule("nTaskSwitch", "Alurcard2", MAKE_VERSION(0, 2, 0, 0));
 
 // The messages we want from the core
-UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
+const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
 //
 TaskSwitcher* g_TaskSwitcher;
@@ -31,24 +31,20 @@ TaskSwitcher* g_TaskSwitcher;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
-    g_LSModule = new LSModule(parent, "nTaskSwitch", "Alurcard2", MAKE_VERSION(0,2,0,0), instance);
-    
-    if (!g_LSModule->Initialize()) {
-        delete g_LSModule;
+int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
+    if (!gLSModule.Initialize(parent, instance)) {
         return 1;
     }
 
-    if (!g_LSModule->ConnectToCore(MAKE_VERSION(0,2,0,0))) {
-        delete g_LSModule;
+    if (!gLSModule.ConnectToCore(MAKE_VERSION(0, 2, 0, 0))) {
         return 1;
     }
 
     // Load settings
     LoadSettings();
 
-    RegisterHotKey(g_LSModule->GetMessageWindow(), HOTKEY_ALTTAB, MOD_ALT, VK_TAB);
-    RegisterHotKey(g_LSModule->GetMessageWindow(), HOTKEY_SHIFTALTTAB, MOD_ALT | MOD_SHIFT, VK_TAB);
+    RegisterHotKey(gLSModule.GetMessageWindow(), HOTKEY_ALTTAB, MOD_ALT, VK_TAB);
+    RegisterHotKey(gLSModule.GetMessageWindow(), HOTKEY_SHIFTALTTAB, MOD_ALT | MOD_SHIFT, VK_TAB);
 
     g_TaskSwitcher = new TaskSwitcher();
 
@@ -62,12 +58,10 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
 void quitModule(HINSTANCE /* instance */) {
     delete g_TaskSwitcher;
 
-    UnregisterHotKey(g_LSModule->GetMessageWindow(), HOTKEY_ALTTAB);
-    UnregisterHotKey(g_LSModule->GetMessageWindow(), HOTKEY_SHIFTALTTAB);
+    UnregisterHotKey(gLSModule.GetMessageWindow(), HOTKEY_ALTTAB);
+    UnregisterHotKey(gLSModule.GetMessageWindow(), HOTKEY_SHIFTALTTAB);
 
-    if (g_LSModule) {
-        delete g_LSModule;
-    }
+    gLSModule.DeInitalize();
 }
 
 
@@ -82,13 +76,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     switch(message) {
     case WM_CREATE:
         {
-            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
         }
         return 0;
 
     case WM_DESTROY:
         {
-            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
         }
         return 0;
 

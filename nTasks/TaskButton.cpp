@@ -13,7 +13,6 @@
 #include "TaskButton.hpp"
 #include "../nShared/Debugging.h"
 
-extern LSModule* g_LSModule;
 
 /// <summary>
 /// Constructor

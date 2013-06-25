@@ -13,7 +13,7 @@
 #include "Windowsx.h"
 
 
-extern LSModule* g_LSModule;
+extern LSModule gLSModule;
 extern HWND g_hWndTrayNotify;
 
 
@@ -190,7 +190,7 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam,
                 lsNID.uID = this->callbackID;
                 lsNID.guidItem = this->guid;
                 lsNID.uFlags = this->flags & NIF_GUID;
-                PostMessage(g_LSModule->GetMessageWindow(), LM_SYSTRAY, NIM_DELETE, (LPARAM)&lsNID);
+                PostMessage(gLSModule.GetMessageWindow(), LM_SYSTRAY, NIM_DELETE, (LPARAM)&lsNID);
                 return 0;
             }
             RECT r;

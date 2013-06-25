@@ -9,6 +9,7 @@
 #include "TextFunctions.h"
 #include "../nCoreCom/Core.h"
 #include <strsafe.h>
+#include "../nShared/Debugging.h"
 
 #define TEXTFUNCTION(x) BOOL __cdecl x(LPCWSTR /* name */, UCHAR /* numArgs */, LPWSTR* /* args */, LPWSTR dest, size_t cchDest)
 #define IPC_GETLISTPOS 125
@@ -68,6 +69,7 @@ void TextFunctions::_Update() {
 
     // Get some basic info
     trackID = (int)SendMessageW(WA2Window, WM_USER, 0, IPC_GETLISTPOS);
+    TRACE("trackID: %d", trackID);
 
     // Open a handle to winamp
     GetWindowThreadProcessId(WA2Window, &winampProc);
@@ -87,20 +89,22 @@ void TextFunctions::_Update() {
     WriteProcessMemory(winampHandle, remoteStruct, &fileInfo, sizeof(fileInfo), nullptr);
 
     // Read the file path
-    ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &filePath, sizeof(filePath), nullptr);
+    ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.filename, &filePath, sizeof(filePath), nullptr);
+    TRACEW(L"filePath: %s", filePath);
 
     // Read the track title
     WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Title", 64, nullptr);
-    if (SendMessage(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
+    if (SendMessageW(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
         ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &trackTitle, sizeof(trackTitle), nullptr);
     }
     else {
         trackTitle[0] = '\0';
     }
+    TRACEW(L"trackTitle: %s", trackTitle);
 
     // Read the track artist
     WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Artist", 64, nullptr);
-    if (SendMessage(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
+    if (SendMessageW(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
         ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &trackArtist, sizeof(trackArtist), nullptr);
     }
     else {
@@ -109,7 +113,7 @@ void TextFunctions::_Update() {
 
     // Read the album title
     WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Album", 64, nullptr);
-    if (SendMessage(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
+    if (SendMessageW(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
         ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &albumTitle, sizeof(albumTitle), nullptr);
     }
     else {

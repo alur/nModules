@@ -16,10 +16,10 @@
 using std::map;
 
 // The LSModule class
-LSModule* g_LSModule;
+LSModule gLSModule("nLabel", "Alurcard2", MAKE_VERSION(0, 2, 0, 0));
 
 // The messages we want from the core
-UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, NULL };
+UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
 // All the top-level labels we currently have loaded
 map<string, Label*> g_TopLevelLabels;
@@ -31,16 +31,12 @@ map<string, Label*> g_AllLabels;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
-    g_LSModule = new LSModule(parent, "nLabel", "Alurcard2", MAKE_VERSION(0,2,0,0), instance);
-    
-    if (!g_LSModule->Initialize()) {
-        delete g_LSModule;
+int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
+    if (!gLSModule.Initialize(parent, instance)) {
         return 1;
     }
 
-    if (!g_LSModule->ConnectToCore(MAKE_VERSION(0,2,0,0))) {
-        delete g_LSModule;
+    if (!gLSModule.ConnectToCore(MAKE_VERSION(0, 2, 0, 0))) {
         return 1;
     }
 
@@ -60,14 +56,13 @@ void quitModule(HINSTANCE /* instance */) {
     DrawableBangs::_UnRegister("nLabel");
 
     // Remove all labels
-    for (map<string, Label*>::const_iterator iter = g_TopLevelLabels.begin(); iter != g_TopLevelLabels.end(); iter++) {
-        delete iter->second;
+    for (auto label : g_TopLevelLabels) {
+        delete label.second;
     }
-    g_TopLevelLabels.clear();
+    
+    gLSModule.DeInitalize();
 
-    if (g_LSModule) {
-        delete g_LSModule;
-    }
+    g_TopLevelLabels.clear();
 }
 
 
@@ -82,13 +77,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     switch(message) {
     case WM_CREATE:
         {
-            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
         }
         return 0;
 
     case WM_DESTROY:
         {
-            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
         }
         return 0;
 

@@ -37,6 +37,8 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
 
     this->settings->GetString("Folder", path, sizeof(path), "Desktop");
 
+    DragAcceptFiles(this->window->GetWindowHandle(), TRUE);
+
     this->window->Initialize(&defaults, &defaultState);
     this->window->Show();
 

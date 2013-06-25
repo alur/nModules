@@ -20,7 +20,7 @@ using std::string;
 #define TIMER_INIT_COMPLETED 1
 
 // The messages we want from the core
-UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, LM_SYSTRAYINFOEVENT, NULL };
+const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, LM_SYSTRAYINFOEVENT, 0 };
 
 // Handle to the tray notify window
 HWND g_hWndTrayNotify;
@@ -29,7 +29,7 @@ HWND g_hWndTrayNotify;
 map<string, Tray*> g_Trays;
 
 // The LiteStep module class
-LSModule* g_LSModule;
+LSModule gLSModule("nTray", "Alurcard2", MAKE_VERSION(0, 2, 0, 0));
 
 // True for the first 100ms of nTrays life. Speeds up loading.
 bool g_InitPhase;
@@ -38,18 +38,14 @@ bool g_InitPhase;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* szPath */) {
+int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     g_InitPhase = true;
 
-    g_LSModule = new LSModule(parent, "nTray", "Alurcard2", MAKE_VERSION(0,2,0,0), instance);
-    
-    if (!g_LSModule->Initialize()) {
-        delete g_LSModule;
+    if (!gLSModule.Initialize(parent, instance)) {
         return 1;
     }
 
-    if (!g_LSModule->ConnectToCore(MAKE_VERSION(0,2,0,0))) {
-        delete g_LSModule;
+    if (!gLSModule.ConnectToCore(MAKE_VERSION(0, 2, 0, 0))) {
         return 1;
     }
 
@@ -75,9 +71,7 @@ void quitModule(HINSTANCE /* instance */) {
 
     TrayManager::Stop();
 
-    if (g_LSModule) {
-        delete g_LSModule;
-    }
+    gLSModule.DeInitalize();
 }
 
 
@@ -93,13 +87,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case WM_CREATE:
         {
             SetTimer(window, TIMER_INIT_COMPLETED, 100, NULL);
-            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
         }
         return 0;
 
     case WM_DESTROY:
         {
-            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)g_lsMessages);
+            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
         }
         return 0;
 

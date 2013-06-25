@@ -11,9 +11,6 @@
 #include "../nShared/LSModule.hpp"
 
 
-extern LSModule* g_LSModule;
-
-
 SeparatorItem::SeparatorItem(Drawable* parent) : PopupItem(parent, "SeparatorItem") {
     DrawableSettings defaults;
     defaults.width = 190;

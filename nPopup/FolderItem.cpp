@@ -11,9 +11,6 @@
 #include "../nShared/LSModule.hpp"
 
 
-extern LSModule* g_LSModule;
-
-
 nPopup::FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, LPCSTR customIcon) : PopupItem(parent, "FolderItem") {
     Init(title, popup);
     ParseDotIcon(customIcon);

@@ -12,9 +12,6 @@
 #include "Taskbar.hpp"
 
 
-extern LSModule* g_LSModule;
-
-
 /// <summary>
 /// Constructor
 /// </summary>

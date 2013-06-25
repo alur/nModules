@@ -11,7 +11,7 @@
 #include "../nCoreCom/Core.h"
 
 
-extern LSModule* g_LSModule;
+extern LSModule gLSModule;
 
 
 /// <summary>
@@ -28,7 +28,7 @@ Drawable::Drawable(LPCSTR prefix) {
         this->window = parentWindow->CreateChild(this->settings, this);
     }
     else {
-        this->window = g_LSModule->CreateDrawableWindow(this->settings, this);
+        this->window = gLSModule.CreateDrawableWindow(this->settings, this);
     }
 
     this->eventHandler = new EventHandler(this->settings);
@@ -43,7 +43,7 @@ Drawable::Drawable(LPCSTR prefix) {
 Drawable::Drawable(LPCSTR prefix, Settings* parentSettings) {
     this->initialized = false;
     this->settings = parentSettings->CreateChild(prefix);
-    this->window = g_LSModule->CreateDrawableWindow(this->settings, this);
+    this->window = gLSModule.CreateDrawableWindow(this->settings, this);
     this->eventHandler = new EventHandler(this->settings);
     this->parent = NULL;
     this->initialized = true;
