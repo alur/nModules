@@ -170,10 +170,12 @@ bool CoverArt::SetCoverFromTag(LPCWSTR filePath) {
             }
         }
     }
-    else if (_wcsicmp(extension, L"mp4") == 0) {
+    else if (_wcsicmp(extension, L"mp4") == 0 || _wcsicmp(extension, L"m4a") == 0) {
         TagLib::MP4::File mp4File(filePath);
         if (mp4File.tag()->itemListMap().contains("covr")) {
-            auto &cover = mp4File.tag()->itemListMap()["covr"].toCoverArtList().front();
+            auto map = mp4File.tag()->itemListMap()["covr"];
+            auto list = map.toCoverArtList();
+            auto cover = list.front();
             return ParseImage((const BYTE *)cover.data().data(), cover.data().size());
         }
     }
