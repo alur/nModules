@@ -15,9 +15,6 @@
 #include "../nShared/LSModule.hpp"
 #include "../nShared/PIDL.h"
 
-// 
-extern LSModule* g_LSModule;
-
 
 /// <summary>
 /// Constructor
@@ -37,9 +34,8 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
 
     this->settings->GetString("Folder", path, sizeof(path), "Desktop");
 
-    DragAcceptFiles(this->window->GetWindowHandle(), TRUE);
-
     this->window->Initialize(&defaults, &defaultState);
+    this->window->AddDropRegion();
     this->window->Show();
 
     this->changeNotifyMsg = this->window->RegisterUserMessage(this);

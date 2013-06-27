@@ -246,7 +246,7 @@ void TaskSwitcher::UpdateActiveWindow(int delta) {
             if (this->selectedWindow < 0) {
                 this->selectedWindow = int(this->shownWindows.size() - 1);
             }
-            else if (this->selectedWindow >= this->shownWindows.size()) {
+            else if (this->selectedWindow >= int(this->shownWindows.size())) {
                 this->selectedWindow = 0;
             }
 

@@ -75,7 +75,7 @@ namespace Bangs {
 void Bangs::_Register() {
     char bangName[64];
     for (auto &bang : bangMap) {
-        StringCchPrintf(bangName, _countof(bangName), "!nDesk%s", bang.name);
+        StringCchPrintfA(bangName, _countof(bangName), "!nDesk%s", bang.name);
         LiteStep::AddBangCommand(bangName, bang.command);
     }
 }
@@ -87,7 +87,7 @@ void Bangs::_Register() {
 void Bangs::_Unregister() {
     char bangName[64];
     for (auto &bang : bangMap) {
-        StringCchPrintf(bangName, _countof(bangName), "!nDesk%s", bang.name);
+        StringCchPrintfA(bangName, _countof(bangName), "!nDesk%s", bang.name);
         LiteStep::RemoveBangCommand(bangName);
     }
 }

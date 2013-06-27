@@ -12,9 +12,6 @@
 #include "Icon.hpp"
 #include "../nShared/LSModule.hpp"
 
-// 
-extern LSModule* g_LSModule;
-
 
 Icon::Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder) : Drawable(parent, "Icon") {
     WCHAR name[MAX_PATH];

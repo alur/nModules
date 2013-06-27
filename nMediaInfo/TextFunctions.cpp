@@ -69,7 +69,7 @@ void TextFunctions::_Update() {
 
     // Get some basic info
     trackID = (int)SendMessageW(WA2Window, WM_USER, 0, IPC_GETLISTPOS);
-    TRACE("trackID: %d", trackID);
+    //TRACE("trackID: %d", trackID);
 
     // Open a handle to winamp
     GetWindowThreadProcessId(WA2Window, &winampProc);
@@ -90,7 +90,7 @@ void TextFunctions::_Update() {
 
     // Read the file path
     ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.filename, &filePath, sizeof(filePath), nullptr);
-    TRACEW(L"filePath: %s", filePath);
+    //TRACEW(L"filePath: %s", filePath);
 
     // Read the track title
     WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Title", 64, nullptr);
@@ -100,7 +100,7 @@ void TextFunctions::_Update() {
     else {
         trackTitle[0] = '\0';
     }
-    TRACEW(L"trackTitle: %s", trackTitle);
+    //TRACEW(L"trackTitle: %s", trackTitle);
 
     // Read the track artist
     WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Artist", 64, nullptr);

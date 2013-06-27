@@ -58,7 +58,7 @@ namespace Bangs {
         BangItem("!MediaPlayPause", [] (HWND, LPCSTR) {
             HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
             if (WA2Window != nullptr) {
-                SendMessageCallbackW(WA2Window, WM_USER, 0, IPC_ISPLAYING, [] (HWND hwnd, UINT, ULONG_PTR, LRESULT result) {
+                SendMessageCallbackW(WA2Window, WM_USER, 0, IPC_ISPLAYING, (SENDASYNCPROC) [] (HWND hwnd, UINT, ULONG_PTR, LRESULT result) {
                     PostMessageW(hwnd, WM_COMMAND, result == 0 ? WINAMP_BUTTON_PLAY : WINAMP_BUTTON_PAUSE, 0);
                 }, NULL);
             }

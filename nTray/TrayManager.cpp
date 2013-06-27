@@ -265,7 +265,7 @@ LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 /// Called when the init phase has ended.
 /// <summary>
 void TrayManager::InitCompleted() {
-    for (TRAYSCITER iter = g_Trays.begin(); iter != g_Trays.end(); iter++) {
-        iter->second->InitCompleted();
+    for (auto &tray : g_Trays) {
+        tray.second->InitCompleted();
     }
 }

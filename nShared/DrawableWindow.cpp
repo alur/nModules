@@ -41,7 +41,7 @@ void DrawableWindow::TextChangeHandler(LPVOID drawable) {
 /// <param name="window">The window to draw to.</param>
 /// <param name="prefix">The settings prefix to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
-DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler* msgHandler) {
+DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHandler) {
     this->monitorInfo = new MonitorInfo();
     this->parent = NULL;
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
@@ -973,6 +973,11 @@ void DrawableWindow::Show() {
         ShowWindow(this->window, SW_SHOWNOACTIVATE);
     }
     this->visible = true;
+}
+
+
+void DrawableWindow::AddDropRegion() {
+    RegisterDragDrop(GetWindowHandle(), (IDropTarget*)this);
 }
 
 

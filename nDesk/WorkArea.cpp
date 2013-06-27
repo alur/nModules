@@ -30,7 +30,7 @@ void WorkArea::ParseLine(MonitorInfo *mInfo, LPCSTR pszLine) {
             if (_stricmp("all", szMonitor) == 0) {
                 for (auto &monitor : mInfo->m_monitors) {
                     RECT r = { monitor.rect.left + left, monitor.rect.top + top, monitor.rect.right - right, monitor.rect.bottom - bottom };
-                    SystemParametersInfo(SPI_SETWORKAREA, 1, &r, 0);
+                    SystemParametersInfoW(SPI_SETWORKAREA, 1, &r, 0);
                 }
                 return;
             }
@@ -38,7 +38,7 @@ void WorkArea::ParseLine(MonitorInfo *mInfo, LPCSTR pszLine) {
                 if (monitor < mInfo->m_monitors.size()) {
                     RECT mRect = mInfo->m_monitors[monitor].rect;
                     RECT r = { mRect.left + left, mRect.top + top, mRect.right - right, mRect.bottom - bottom };
-                    SystemParametersInfo(SPI_SETWORKAREA, 1, &r, 0);
+                    SystemParametersInfoW(SPI_SETWORKAREA, 1, &r, 0);
                 }
                 return;
             }
@@ -53,14 +53,12 @@ void WorkArea::ParseLine(MonitorInfo *mInfo, LPCSTR pszLine) {
 /// Reads and applies all settings from the RC files.
 /// </summary>
 /// <param name="mInfo">A current MonitorInfo.</param>
-void WorkArea::LoadSettings(MonitorInfo *mInfo, bool /* bIsRefresh */) {
-    char szLine[MAX_LINE_LENGTH];
-    LPVOID f = LiteStep::LCOpen(NULL);
-    while (LiteStep::LCReadNextConfig(f, "*nDeskWorkArea", szLine, sizeof(szLine))) {
-        ParseLine(mInfo, szLine+strlen("*nDeskWorkArea")+1);
-    }
-    LiteStep::LCClose(f);
-    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
+void WorkArea::LoadSettings(MonitorInfo *mInfo, bool /* isRefresh */) {
+    LiteStep::IterateOverLines("*nDeskWorkArea", [mInfo] (LPCSTR line) {
+        ParseLine(mInfo, line);
+    });
+
+    SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
 }
 
 
@@ -70,7 +68,7 @@ void WorkArea::LoadSettings(MonitorInfo *mInfo, bool /* bIsRefresh */) {
 /// <param name="mInfo">A current MonitorInfo.</param>
 void WorkArea::ResetWorkAreas(MonitorInfo *mInfo) {
     for (auto &monitor : mInfo->m_monitors) {
-        SystemParametersInfo(SPI_SETWORKAREA, 1, &monitor.rect, 0);
+        SystemParametersInfoW(SPI_SETWORKAREA, 1, &monitor.rect, 0);
     }
-    SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
+    SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
 }

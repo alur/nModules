@@ -8,6 +8,10 @@
 #pragma once
 
 #include <Windows.h>
+#include <functional>
+
 namespace LiteStep {
-#include "../headers/lsapi.h"
+    #include "../headers/lsapi.h"
+
+    void IterateOverLines(LPCSTR keyName, std::function<void(LPCSTR line)> callback);
 }

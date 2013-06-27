@@ -5,12 +5,17 @@
  *  Handles clicks on the desktop.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../nShared/LiteStep.h"
+#include <algorithm>
+#include <functional>
 #include <strsafe.h>
+#include <Windows.h>
 #include <Windowsx.h>
-#include "ClickHandler.hpp"
-#include "../nShared/MonitorInfo.hpp"
+
 #include "../nCoreCom/Core.h"
+#include "../nShared/LiteStep.h"
+#include "../nShared/MonitorInfo.hpp"
+
+#include "ClickHandler.hpp"
 
 extern MonitorInfo * g_pMonitorInfo;
 
@@ -81,8 +86,8 @@ LRESULT ClickHandler::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM
     cData.area.top = cData.area.bottom = GET_Y_LPARAM(lParam) + g_pMonitorInfo->m_virtualDesktop.rect.top;
 
     for (vector<ClickData>::const_iterator iter = m_clickHandlers.begin(); iter != m_clickHandlers.end(); iter++) {
-        if (ClickHandler::Matches(cData, *iter)) {
-            LiteStep::LSExecute(NULL, iter->action, SW_SHOW);
+        if (Matches(cData, *iter)) {
+            LiteStep::LSExecute(nullptr, iter->action, SW_SHOW);
         }
     }
 
@@ -102,12 +107,9 @@ void ClickHandler::Refresh() {
 /// Loads click settings.
 /// </summary>
 void ClickHandler::LoadSettings(bool /* bIsRefresh */) {
-    char szLine[MAX_LINE_LENGTH];
-    LPVOID f = LiteStep::LCOpen(NULL);
-    while (LiteStep::LCReadNextConfig(f, "*nDeskOn", szLine, sizeof(szLine))) {
-        AddHandler(szLine+strlen("*nDeskOn")+1);
-    }
-    LiteStep::LCClose(f);
+    LiteStep::IterateOverLines("*nDeskOn", [this] (LPCSTR line) -> void {
+        AddHandler(line);
+    });
 }
 
 
@@ -132,7 +134,7 @@ ClickHandler::ClickData ClickHandler::ParseLine(LPCSTR szLine) {
     cData.mods = ModsFromString(szToken);
 
     // Guess that the rest is an action for now
-    StringCchCopy(cData.action, sizeof(cData.action), pszNext);
+    StringCchCopyA(cData.action, sizeof(cData.action), pszNext);
     cData.area = g_pMonitorInfo->m_virtualDesktop.rect;
 
     // Check if we have 4 valid coordinates followed by some action
@@ -160,7 +162,7 @@ ClickHandler::ClickData ClickHandler::ParseLine(LPCSTR szLine) {
     cData.area.bottom = top + height;
 
     // Then the rest is the action
-    StringCchCopy(cData.action, sizeof(cData.action), pszNext);
+    StringCchCopyA(cData.action, sizeof(cData.action), pszNext);
 
     return cData;
 }
@@ -184,12 +186,7 @@ void ClickHandler::AddHandler(LPCSTR szLine) {
 /// Removes any handlers matching the spcified criterias.
 /// </summary>
 void ClickHandler::RemoveHandlers(LPCSTR szLine) {
-    ClickData cData = ParseLine(szLine);
-    for (vector<ClickData>::const_iterator iter = m_clickHandlers.begin(); iter != m_clickHandlers.end(); iter++) {
-        if (Matches(*iter, cData)) {
-            m_clickHandlers.erase(iter);
-        }
-    }
+    std::remove_if(m_clickHandlers.begin(), m_clickHandlers.end(), std::bind(&ClickHandler::Matches, this, ParseLine(szLine), std::placeholders::_1));
 }
 
 

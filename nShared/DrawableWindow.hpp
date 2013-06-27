@@ -29,7 +29,7 @@ using std::list;
 using std::map;
 
 
-class DrawableWindow : MessageHandler {
+class DrawableWindow : MessageHandler, IDropTarget {
 public:
     typedef list<State*>::iterator STATE;
     typedef list<Overlay*>::iterator OVERLAY;
@@ -87,7 +87,7 @@ public:
     LPCWSTR GetText();
 
     // Handles window messages.
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID) override;
 
     // Hides this window.
     void Hide();
@@ -140,6 +140,8 @@ public:
     // Shows this window.
     void Show();
 
+    void AddDropRegion();
+
     // Sizes the window to fit the text.
     void SizeToText(int maxWidth, int maxHeight, int minWidth = 0, int minHeight = 0);
 
@@ -148,6 +150,19 @@ public:
 
     // Forcibly updates the text.
     void UpdateText();
+
+    // IUnknown
+    ULONG WINAPI AddRef();
+    HRESULT WINAPI QueryInterface(REFIID riid, void **ppvObject);
+    ULONG WINAPI Release();
+
+    // IDropTarget
+public:
+    HRESULT WINAPI DragEnter(IDataObject *dataObj, DWORD keyState, POINTL point, DWORD *effect) override;
+    HRESULT WINAPI DragOver(DWORD keyState, POINTL point, DWORD *effect) override;
+    HRESULT WINAPI DragLeave() override;
+    HRESULT WINAPI Drop(IDataObject *dataObj, DWORD keyState, POINTL point, DWORD *effect) override;
+
 
 protected:
     // Used by nDesk.
