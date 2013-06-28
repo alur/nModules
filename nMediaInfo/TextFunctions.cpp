@@ -55,9 +55,9 @@ void TextFunctions::_Update() {
 
     // Winamp expects a 32bit struct so we can't use the ones in WA_IPC.
     struct {
-        DWORD filename;
-        DWORD metadata;
-        DWORD ret;
+        DWORD filename; // LPCWSTR
+        DWORD metadata; // LPCWSTR
+        DWORD ret;      // LPWSTR
         UINT retlen;
     } fileInfo;
 
@@ -85,11 +85,16 @@ void TextFunctions::_Update() {
     fileInfo.filename = (DWORD)SendMessageW(WA2Window, WM_USER, trackID, IPC_GETPLAYLISTFILEW);
     fileInfo.metadata = (DWORD)VirtualAllocEx(winampHandle, nullptr, 64, MEM_COMMIT, PAGE_READWRITE);
     fileInfo.ret = (DWORD)VirtualAllocEx(winampHandle, nullptr, 4096*sizeof(WCHAR), MEM_COMMIT, PAGE_READWRITE);;
-    fileInfo.retlen = 4096*sizeof(WCHAR);
+    fileInfo.retlen = 4096;
     WriteProcessMemory(winampHandle, remoteStruct, &fileInfo, sizeof(fileInfo), nullptr);
 
     // Read the file path
-    ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.filename, &filePath, sizeof(filePath), nullptr);
+    WCHAR newFilePath[MAX_PATH];
+    ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.filename, &newFilePath, sizeof(newFilePath), nullptr);
+    if (wcscmp(newFilePath, filePath) == 0) {
+        return;
+    }
+    memcpy(filePath, newFilePath, sizeof(filePath));
     //TRACEW(L"filePath: %s", filePath);
 
     // Read the track title
