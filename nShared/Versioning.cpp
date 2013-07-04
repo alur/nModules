@@ -11,34 +11,48 @@
 
 
 /// <summary>
+/// Gets a particular part of the version number.
+/// </summary>
+#define GET_VERSION_PART(version, part) VERSION_PART(((version) & (VERSION(VERSION_PART(-1)) << 8*sizeof(VERSION_PART)*(part))) >> 8*sizeof(VERSION_PART)*(part))
+
+
+/// <summary>
 /// Gets the major version
 /// </summary>
-USHORT GetMajorVersion(VERSION v) {
-    return (USHORT)((v & 0xFFFF000000000000) >> 48);
+VERSION MakeVersion(VERSION_PART major, VERSION_PART minor, VERSION_PART patch, VERSION_PART build) {
+    return VERSION(major) << 48 | VERSION(minor) << 32 | VERSION(patch) << 16 | VERSION(build);
+}
+
+
+/// <summary>
+/// Gets the major version
+/// </summary>
+VERSION_PART GetMajorVersion(VERSION version) {
+    return GET_VERSION_PART(version, 3);
 }
 
 
 /// <summary>
 /// Gets the minor version
 /// </summary>
-USHORT GetMinorVersion(VERSION v) {
-    return (USHORT)((v & 0xFFFF00000000) >> 32);
+VERSION_PART GetMinorVersion(VERSION version) {
+    return GET_VERSION_PART(version, 2);
 }
 
 
 /// <summary>
 /// Gets the patch version
 /// </summary>
-USHORT GetPatchVersion(VERSION v) {
-    return (USHORT)((v & 0xFFFF0000) >> 16);
+VERSION_PART GetPatchVersion(VERSION version) {
+    return GET_VERSION_PART(version, 1);
 }
 
 
 /// <summary>
 /// Gets the build version
 /// </summary>
-USHORT GetBuildVersion(VERSION v) {
-    return (USHORT)(v & 0xFFFF);
+VERSION_PART GetBuildVersion(VERSION version) {
+    return GET_VERSION_PART(version, 0);
 }
 
 

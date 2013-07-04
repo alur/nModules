@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -50,7 +50,6 @@
     <ClInclude Include="MonitorInfo.hpp" />
     <ClInclude Include="PIDL.h" />
     <ClInclude Include="Settings.hpp" />
-    <ClInclude Include="Strings.h" />
     <ClInclude Include="Tooltip.hpp" />
     <ClInclude Include="UIDGenerator.hpp" />
     <ClInclude Include="Versioning.h" />
@@ -86,7 +85,6 @@
     <ClCompile Include="MonitorInfo.cpp" />
     <ClCompile Include="PIDL.cpp" />
     <ClCompile Include="Settings.cpp" />
-    <ClCompile Include="Strings.cpp" />
     <ClCompile Include="Tooltip.cpp" />
     <ClCompile Include="UIDGenerator.cpp" />
     <ClCompile Include="Versioning.cpp" />
@@ -106,26 +104,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -174,7 +172,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;Utilities.lib</AdditionalDependencies>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
@@ -193,7 +191,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;Utilities.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -211,6 +209,8 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <StringPooling>true</StringPooling>
       <OmitFramePointers>true</OmitFramePointers>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -220,7 +220,7 @@
     <Lib>
       <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;Utilities.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -238,6 +238,8 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <StringPooling>true</StringPooling>
       <OmitFramePointers>true</OmitFramePointers>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -246,7 +248,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;Utilities.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>

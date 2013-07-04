@@ -28,7 +28,7 @@ UINT (__cdecl * _pGetPrefixedRCMonitor)(LPCSTR, LPCSTR, UINT);
 /// Initalizes the core communications.
 /// </summary>
 /// <returns>True if the core is succefully initalized.</returns>
-HRESULT nCore::InputParsing::Init(HMODULE hCoreInstance) {
+HRESULT nCore::InputParsing::_Init(HMODULE hCoreInstance) {
     INIT_FUNC(_pParseColor,bool (__cdecl *)(LPCSTR, ARGB*),"ParseColor");
     INIT_FUNC(_pParseCoordinate,bool (__cdecl *)(LPCSTR, int *, bool, bool),"ParseCoordinateEx");
     INIT_FUNC(_pParseLength,bool (__cdecl *)(LPCSTR, int *, bool, bool),"ParseLength");

@@ -8,7 +8,10 @@
 #pragma once
 
 #include "../nShared/Drawable.hpp"
+#define TAGLIB_STATIC
+#include "../External/taglib/mpeg/id3v2/frames/attachedpictureframe.h"
 #include <list>
+#include "../Utilities/EnumArray.hpp"
 
 using std::wstring;
 using std::list;
@@ -24,16 +27,23 @@ public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID) override;
 
 private:
-    DrawableWindow::OVERLAY coverArt;
-
     bool SetCoverFromTag(LPCWSTR filePath);
     bool SetCoverFromFolder(LPCWSTR filePath);
     void SetDefaultCover();
 
 private:
+    void LoadSettings();
+
+private:
+    //
+    DrawableWindow::OVERLAY mCoverArt;
+
     // Path to the default cover art.
-    WCHAR defaultCoverArt[MAX_PATH];
+    WCHAR mDefaultCoverArt[MAX_PATH];
 
     // The names to search for when looking in folders. May include wildcards.
-    list<wstring> folderCanidates;
+    list<wstring> mFolderCanidates;
+
+    //
+    EnumArray<BYTE, TagLib::ID3v2::AttachedPictureFrame::Type> mID3CoverTypePriority;
 };

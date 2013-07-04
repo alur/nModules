@@ -12,11 +12,12 @@
 #include "nLabel.h"
 #include <map>
 #include <strsafe.h>
+#include "Version.h"
 
 using std::map;
 
 // The LSModule class
-LSModule gLSModule("nLabel", "Alurcard2", MAKE_VERSION(0, 2, 0, 0));
+LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
 UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
@@ -36,7 +37,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
         return 1;
     }
 
-    if (!gLSModule.ConnectToCore(MAKE_VERSION(0, 2, 0, 0))) {
+    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION))) {
         return 1;
     }
 
@@ -112,7 +113,7 @@ void LoadSettings() {
 }
 
 
-Drawable* FindDrawable(LPCSTR prefix) {
+Drawable *FindDrawable(LPCSTR prefix) {
     map<string, Label*>::iterator label = g_AllLabels.find(string(prefix));
-    return label == g_AllLabels.end() ? NULL : label->second;
+    return label == g_AllLabels.end() ? nullptr : label->second;
 }

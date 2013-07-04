@@ -7,15 +7,12 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-typedef DWORDLONG VERSION;
+typedef unsigned __int64 VERSION;
+typedef unsigned __int16 VERSION_PART;
 
-/// <summary>
-/// Macro for making a VERSION from 4 shorts.
-/// </summary>
-#define MAKE_VERSION(major,minor,patch,build) (((VERSION)major << 48) | ((VERSION)minor << 32) | ((VERSION)patch << 16) | (VERSION)build)
-
-USHORT GetMajorVersion(VERSION);
-USHORT GetMinorVersion(VERSION);
-USHORT GetPatchVersion(VERSION);
-USHORT GetBuildVersion(VERSION);
+VERSION MakeVersion(VERSION_PART major, VERSION_PART minor, VERSION_PART patch, VERSION_PART build);
+VERSION_PART GetMajorVersion(VERSION);
+VERSION_PART GetMinorVersion(VERSION);
+VERSION_PART GetPatchVersion(VERSION);
+VERSION_PART GetBuildVersion(VERSION);
 HRESULT GetVersionString(VERSION, LPSTR, size_t, bool=false);

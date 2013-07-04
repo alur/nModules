@@ -20,10 +20,11 @@
 #include "ContentPopup.hpp"
 #include "FolderPopup.hpp"
 #include "nPopup.h"
+#include "Version.h"
 
 
 // The LSModule class
-LSModule gLSModule("nPopup", "Alurcard2", MAKE_VERSION(0, 2, 0, 0));
+LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
 UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
@@ -40,7 +41,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
         return 1;
     }
 
-    if (!gLSModule.ConnectToCore(MAKE_VERSION(0, 2, 0, 0))) {
+    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION))) {
         return 1;
     }
 

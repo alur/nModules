@@ -8,7 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "DrawableSettings.hpp"
-#include "Strings.h"
+#include "../Utilities/StringUtils.h"
 
 
 /// <summary>
@@ -52,7 +52,7 @@ void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
     this->hidden = settings->GetBool("Hidden", defaults->hidden);
     this->registerWithCore = defaults->registerWithCore;
     settings->GetString("Text", buf, MAX_LINE_LENGTH, defaults->text);
-    this->text = Strings::ReallocOverwriteW(this->text, buf);
+    this->text = StringUtils::ReallocOverwrite(this->text, buf);
     this->width = settings->GetInt("Width", defaults->width);
     this->x = settings->GetInt("X", defaults->x);
     this->y = settings->GetInt("Y", defaults->y);

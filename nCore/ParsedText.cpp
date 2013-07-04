@@ -11,7 +11,7 @@
 #include <regex>
 #include <strsafe.h>
 #include "../nShared/Debugging.h"
-#include "../nShared/Strings.h"
+#include "../Utilities/StringUtils.h"
 
 
 // All existing functions.
@@ -247,13 +247,13 @@ void ParsedText::Parse(LPCWSTR text) {
         case 1: // Reads the function name.
             {
                 if (*++searchPos == L']') {
-                    functionName = Strings::wcsPartialDup(expressionStart + 1, searchPos - expressionStart - 1);
+                    functionName = StringUtils::PartialDup(expressionStart + 1, searchPos - expressionStart - 1);
                     mode = 10;
                 }
                 else if (*searchPos == L'(') {
                     if (*++searchPos == L'\'') {
                         argumentStart = searchPos;
-                        functionName = Strings::wcsPartialDup(expressionStart + 1, searchPos - expressionStart - 2);
+                        functionName = StringUtils::PartialDup(expressionStart + 1, searchPos - expressionStart - 2);
                         mode = 2;
                     }
                     else {
@@ -272,7 +272,7 @@ void ParsedText::Parse(LPCWSTR text) {
                 if (searchPos != nullptr) {
                     ++numArgs;
                     arguments = (LPWSTR*)realloc(arguments, numArgs*sizeof(LPWSTR));
-                    arguments[numArgs-1] = Strings::wcsPartialDup(argumentStart + 1, searchPos - argumentStart - 1);
+                    arguments[numArgs-1] = StringUtils::PartialDup(argumentStart + 1, searchPos - argumentStart - 1);
 
                     if (*++searchPos == L',') {
                         // We REQUIRE a space after the ,
@@ -330,11 +330,11 @@ void ParsedText::Parse(LPCWSTR text) {
         case 10: // Success state, pushes tokens
             {
                 // pos through expressionStart is regular text
-                AddToken(TEXT, functionMap.end(), Strings::wcsPartialDup(pos, expressionStart - pos), nullptr);
+                AddToken(TEXT, functionMap.end(), StringUtils::PartialDup(pos, expressionStart - pos), nullptr);
 
                 //
                 AddToken(EXPRESSION, FindDynamicTextFunction(functionName, numArgs),
-                    Strings::wcsPartialDup(expressionStart + 1, searchPos - expressionStart - 1), arguments);
+                    StringUtils::PartialDup(expressionStart + 1, searchPos - expressionStart - 1), arguments);
                 free(functionName);
                 functionName = nullptr;
                 
@@ -350,6 +350,7 @@ void ParsedText::Parse(LPCWSTR text) {
         AddToken(TEXT, functionMap.end(), _wcsdup(pos), nullptr);
     }
 }
+
 
 /// <summary>
 /// Deletes this object.

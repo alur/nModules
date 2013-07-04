@@ -42,6 +42,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nCoreCom", "nCoreCom\nCoreC
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nShared", "nShared\nShared.vcxproj", "{91B4220F-6589-4739-BCA7-3FF9F83FCE04}"
+	ProjectSection(ProjectDependencies) = postProject
+		{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C} = {84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nKey", "nKey\nKey.vcxproj", "{07FDB39B-D23E-45D6-852F-125DBADB7C2D}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -103,6 +106,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nWallpaper", "nWallpaper\nW
 	ProjectSection(ProjectDependencies) = postProject
 		{91B4220F-6589-4739-BCA7-3FF9F83FCE04} = {91B4220F-6589-4739-BCA7-3FF9F83FCE04}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utilities", "Utilities\Utilities.vcxproj", "{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -256,6 +261,14 @@ Global
 		{D7D8046B-B227-41DA-85E6-F11D02237A28}.Release|Win32.Build.0 = Release|Win32
 		{D7D8046B-B227-41DA-85E6-F11D02237A28}.Release|x64.ActiveCfg = Release|x64
 		{D7D8046B-B227-41DA-85E6-F11D02237A28}.Release|x64.Build.0 = Release|x64
+		{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C}.Debug|Win32.Build.0 = Debug|Win32
+		{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C}.Debug|x64.ActiveCfg = Debug|x64
+		{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C}.Debug|x64.Build.0 = Debug|x64
+		{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C}.Release|Win32.ActiveCfg = Release|Win32
+		{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C}.Release|Win32.Build.0 = Release|Win32
+		{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C}.Release|x64.ActiveCfg = Release|x64
+		{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -278,6 +291,7 @@ Global
 		{D7D8046B-B227-41DA-85E6-F11D02237A28} = {A97FAB90-A70A-45D6-AF0A-510944EB46A3}
 		{91B4220F-6589-4739-BCA7-3FF9F83FCE04} = {89964B45-85F2-4A2C-BA7D-2698E96A3609}
 		{66F96FF8-FEC5-455A-BEAC-3975DB89A772} = {89964B45-85F2-4A2C-BA7D-2698E96A3609}
+		{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C} = {89964B45-85F2-4A2C-BA7D-2698E96A3609}
 		{0118E777-9742-4EB4-85EC-FB3E16E059A9} = {775BCCF7-072F-4F72-B412-8E2E1D3ED2A9}
 	EndGlobalSection
 EndGlobal

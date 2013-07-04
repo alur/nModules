@@ -50,8 +50,8 @@ HRESULT nCore::Connect(VERSION minVersion) {
     
     HRESULT hr = S_OK;
 
-    if (!SUCCEEDED(hr = System::Init(hCoreInstance))) return hr;
-    if (!SUCCEEDED(hr = InputParsing::Init(hCoreInstance))) return hr;
+    if (!SUCCEEDED(hr = System::_Init(hCoreInstance))) return hr;
+    if (!SUCCEEDED(hr = InputParsing::_Init(hCoreInstance))) return hr;
 
     initialized = true;
 

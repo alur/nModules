@@ -13,19 +13,18 @@
 #include "../nShared/Versioning.h"
 #include "TextFunctions.h"
 #include "ParsedText.hpp"
+#include "Version.h"
+
 
 // The messages we want from the core
 UINT g_lsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 HWND g_hwndMsgHandler;
 
 // Class pointers
-MonitorInfo* g_pMonitorInfo;
+MonitorInfo *g_pMonitorInfo;
 
 // Constants
-const VERSION g_version     = MAKE_VERSION(0, 2, 0, 0);
-LPCSTR g_szAppName          = "nCore";
-LPCSTR g_szMsgHandler       = "LSnCore";
-LPCSTR g_szAuthor           = "Alurcard2";
+LPCSTR g_szMsgHandler = "LSnCore";
 
 // When the [time] text function should send out change notifications.
 UINT_PTR timeTimer;
@@ -35,21 +34,21 @@ UINT_PTR timeTimer;
 /// Gets the current core version.
 /// </summary>
 EXPORT_CDECL(VERSION) GetCoreVersion() {
-    return g_version;
+    return MakeVersion(MODULE_VERSION);
 }
 
 
 /// <summary>
 /// Called by the core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND /* hWndParent */, HINSTANCE hDllInstance, LPCSTR /* szPath */) {
+int initModuleEx(HWND /* parent */, HINSTANCE instance, LPCSTR /* path */) {
     // Initialize
-    if (!CreateMainWindow(hDllInstance))
+    if (!CreateMainWindow(instance))
         return 1;
 
     g_pMonitorInfo = new MonitorInfo();
     TextFunctions::_Register();
-    timeTimer = SetTimer(g_hwndMsgHandler, 1, 1000, NULL);
+    timeTimer = SetTimer(g_hwndMsgHandler, 1, 1000, nullptr);
 
     return 0;
 }
@@ -119,9 +118,9 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch(uMsg) {
         case LM_GETREVID: {
             size_t uLength;
-            StringCchPrintf((LPSTR)lParam, 64, "%s: ", g_szAppName);
+            StringCchPrintf((LPSTR)lParam, 64, "%s: ", MODULE_NAME);
 			uLength = strlen((LPSTR)lParam);
-			GetVersionString(g_version, (LPSTR)lParam + uLength, 64 - uLength, false);
+            GetVersionString(MakeVersion(MODULE_VERSION), (LPSTR)lParam + uLength, 64 - uLength, false);
             
             if (SUCCEEDED(StringCchLength((LPSTR)lParam, 64, &uLength)))
                 return uLength;

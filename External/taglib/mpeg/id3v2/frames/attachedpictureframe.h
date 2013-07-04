@@ -52,7 +52,7 @@ namespace TagLib {
       /*!
        * This describes the function or content of the picture.
        */
-      enum Type {
+      enum class Type {
         //! A type not enumerated below
         Other              = 0x00,
         //! 32x32 PNG image that should be used as the file icon
@@ -94,7 +94,9 @@ namespace TagLib {
         //! Logo of the band or performer
         BandLogo           = 0x13,
         //! Logo of the publisher (record company)
-        PublisherLogo      = 0x14
+        PublisherLogo      = 0x14,
+        //
+        Count
       };
 
       /*!

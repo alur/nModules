@@ -8,7 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "BrushSettings.hpp"
-#include "Strings.h"
+#include "../Utilities/StringUtils.h"
 
 
 /// <summary>
@@ -84,7 +84,7 @@ void BrushSettings::Load(Settings* settings, BrushSettings* defaults) {
     this->gradientEndX = settings->GetFloat("GradientEndX", defaults->gradientEndX);
     this->gradientEndY = settings->GetFloat("GradientEndY", defaults->gradientEndY);
     settings->GetString("GradientColors", buf, sizeof(buf), defaults->gradientColors);
-    this->gradientColors = Strings::ReallocOverwrite(this->gradientColors, buf);
+    this->gradientColors = StringUtils::ReallocOverwrite(this->gradientColors, buf);
     this->gradientCenterX = settings->GetFloat("GradientCenterX", defaults->gradientCenterX);
     this->gradientCenterY = settings->GetFloat("GradientCenterY", defaults->gradientCenterY);
     this->gradientOriginOffsetX = settings->GetFloat("GradientOriginOffsetX", defaults->gradientOriginOffsetX);
@@ -94,9 +94,9 @@ void BrushSettings::Load(Settings* settings, BrushSettings* defaults) {
     this->gradientStartX = settings->GetFloat("GradientStartX", defaults->gradientStartX);
     this->gradientStartY = settings->GetFloat("GradientStartY", defaults->gradientStartY);
     settings->GetString("GradientStops", buf, sizeof(buf), defaults->gradientStops);
-    this->gradientStops = Strings::ReallocOverwrite(this->gradientStops, buf);
+    this->gradientStops = StringUtils::ReallocOverwrite(this->gradientStops, buf);
     settings->GetString("Image", buf, sizeof(buf), defaults->image);
-    this->image = Strings::ReallocOverwrite(this->image, buf);
+    this->image = StringUtils::ReallocOverwrite(this->image, buf);
     this->imageOpacity = settings->GetInt("Alpha", int(defaults->imageOpacity*255))/255.0f;
     this->imageRotation = settings->GetFloat("ImageRotation", defaults->imageRotation);
     settings->GetString("ImageScalingMode", this->imageScalingMode, sizeof(this->imageScalingMode), defaults->imageScalingMode);

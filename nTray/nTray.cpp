@@ -11,6 +11,7 @@
 #include "Tray.hpp"
 #include "TrayManager.h"
 #include "../nShared/LSModule.hpp"
+#include "Version.h"
 
 
 using std::map;
@@ -29,7 +30,7 @@ HWND g_hWndTrayNotify;
 map<string, Tray*> g_Trays;
 
 // The LiteStep module class
-LSModule gLSModule("nTray", "Alurcard2", MAKE_VERSION(0, 2, 0, 0));
+LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
 
 // True for the first 100ms of nTrays life. Speeds up loading.
 bool g_InitPhase;
@@ -44,8 +45,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     if (!gLSModule.Initialize(parent, instance)) {
         return 1;
     }
-
-    if (!gLSModule.ConnectToCore(MAKE_VERSION(0, 2, 0, 0))) {
+    
+    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION))) {
         return 1;
     }
 

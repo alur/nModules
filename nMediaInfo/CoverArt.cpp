@@ -7,21 +7,19 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "CoverArt.hpp"
-//#define ID3LIB_LINKOPTION 1
-//#include "../External/id3lib/id3/tag.h"
-#include <wincodec.h>
 #include "../nShared/Factories.h"
 #include "../nShared/Macros.h"
-#include <Shlwapi.h>
-#include <strsafe.h>
 #include "../nShared/FileIterator.hpp"
 #include "../nShared/Debugging.h"
+
+#include <Shlwapi.h>
+#include <strsafe.h>
+#include <wincodec.h>
 
 #define TAGLIB_STATIC
 #include "../External/taglib/fileref.h"
 #include "../External/taglib/mpeg/mpegfile.h"
 #include "../External/taglib/mpeg/id3v2/id3v2tag.h"
-#include "../External/taglib/mpeg/id3v2/frames/attachedpictureframe.h"
 #include "../External/taglib/flac/flacfile.h"
 #include "../External/taglib/mp4/mp4file.h"
 
@@ -39,18 +37,7 @@ CoverArt::CoverArt(LPCSTR name) : Drawable(name) {
     defaults.height = 200;
     this->window->Initialize(&defaults);
 
-    D2D1_RECT_F pos = D2D1::RectF(
-        0, 0,
-        (float)this->window->GetDrawingSettings()->width,
-        (float)this->window->GetDrawingSettings()->height
-    );
-    this->coverArt = this->window->AddOverlay(pos, (IWICBitmapSource*)nullptr);
-
-    this->folderCanidates.push_back(L"*.jpg");
-    this->folderCanidates.push_back(L"*.png");
-
-    this->settings->GetString("DefaultCoverArt", this->defaultCoverArt, MAX_PATH, "");
-
+    LoadSettings();
     Update();
 
     this->window->Show();
@@ -61,6 +48,33 @@ CoverArt::CoverArt(LPCSTR name) : Drawable(name) {
 /// Destructor.
 /// </summary>
 CoverArt::~CoverArt() {
+}
+
+
+/// <summary>
+/// Loads .RC settings
+/// </summary>
+void CoverArt::LoadSettings() {
+    // Position the image so that it covers the entire window.
+    D2D1_RECT_F pos = D2D1::RectF(
+        0, 0,
+        (float)this->window->GetDrawingSettings()->width,
+        (float)this->window->GetDrawingSettings()->height
+    );
+    mCoverArt = this->window->AddOverlay(pos, (IWICBitmapSource*)nullptr);
+
+    // (group)FileNames -- The file names to search for.
+    WCHAR fileNames[MAX_LINE_LENGTH];
+    this->settings->GetString("FileNames", fileNames, _countof(fileNames), L"*.png|*.jpg|*.jpeg|*.bmp");
+    //for (LPCWSTR fileName : ExplodedString(fileNames, L"|")) {
+    //   mFolderCanidates.push_back(fileName);
+    //}
+
+    // (group)ID3Priority -- The 
+    mID3CoverTypePriority.SetAll(0xFF);
+    mID3CoverTypePriority[TagLib::ID3v2::AttachedPictureFrame::Type::FrontCover] = 1;
+
+    this->settings->GetString("DefaultCoverArt", mDefaultCoverArt, MAX_PATH, "");
 }
 
 
@@ -123,7 +137,7 @@ bool CoverArt::SetCoverFromTag(LPCWSTR filePath) {
         return false;
     }
 
-    auto ParseImage = [this] (const BYTE *data, UINT size) {
+    auto ParseImage = [this] (LPCBYTE data, UINT size) {
         IWICImagingFactory *factory = nullptr;
         IWICBitmapDecoder *decoder = nullptr;
         IWICBitmapFrameDecode *source = nullptr;
@@ -139,7 +153,7 @@ bool CoverArt::SetCoverFromTag(LPCWSTR filePath) {
                 hr = decoder->GetFrame(0, &source);
             }
             if (SUCCEEDED(hr)) {
-                (*this->coverArt)->SetSource(source);
+                (*mCoverArt)->SetSource(source);
             }
 
             SAFERELEASE(decoder);
@@ -152,13 +166,22 @@ bool CoverArt::SetCoverFromTag(LPCWSTR filePath) {
     ++extension;
 
     if (_wcsicmp(extension, L"mp3") == 0) {
+        TagLib::ID3v2::AttachedPictureFrame *pictureFrame = nullptr;
+        BYTE picturePriority = 0xFF;
+
         TagLib::MPEG::File mp3File(filePath);
         if (mp3File.ID3v2Tag()->frameListMap().contains("APIC")) {
             for (auto frame : mp3File.ID3v2Tag()->frameListMap()["APIC"]) {
                 auto picFrame = (TagLib::ID3v2::AttachedPictureFrame *)frame;
-                if (picFrame->type() == TagLib::ID3v2::AttachedPictureFrame::FrontCover) {
-                    return ParseImage((const BYTE *)picFrame->picture().data(), picFrame->picture().size());
+
+                BYTE priority = mID3CoverTypePriority[picFrame->type()];
+                if (priority < picturePriority) {
+                    pictureFrame = picFrame;
+                    picturePriority = priority;
                 }
+            }
+            if (pictureFrame != nullptr) {
+                return ParseImage((LPCBYTE)pictureFrame->picture().data(), pictureFrame->picture().size());
             }
         }
     }
@@ -166,7 +189,7 @@ bool CoverArt::SetCoverFromTag(LPCWSTR filePath) {
         TagLib::FLAC::File flacFile(filePath);
         for (auto &picture : flacFile.pictureList()) {
             if (picture->type() == TagLib::FLAC::Picture::FrontCover) {
-                return ParseImage((const BYTE *)picture->data().data(), picture->data().size());
+                return ParseImage((LPCBYTE)picture->data().data(), picture->data().size());
             }
         }
     }
@@ -176,7 +199,7 @@ bool CoverArt::SetCoverFromTag(LPCWSTR filePath) {
             auto map = mp4File.tag()->itemListMap()["covr"];
             auto list = map.toCoverArtList();
             auto cover = list.front();
-            return ParseImage((const BYTE *)cover.data().data(), cover.data().size());
+            return ParseImage((LPCBYTE)cover.data().data(), cover.data().size());
         }
     }
 
@@ -200,7 +223,7 @@ bool CoverArt::SetCoverFromFolder(LPCWSTR filePath) {
 
     // Check each covername
     WCHAR artPath[MAX_PATH];
-    for (auto &canidate : this->folderCanidates) {
+    for (auto &canidate : mFolderCanidates) {
         StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, canidate.c_str());
         for (auto &file : FileIterator(artPath)) {
             StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, file.cFileName);
@@ -213,7 +236,7 @@ bool CoverArt::SetCoverFromFolder(LPCWSTR filePath) {
                 hr = decoder->GetFrame(0, &source);
             }
             if (SUCCEEDED(hr)) {
-                (*this->coverArt)->SetSource(source);
+                (*mCoverArt)->SetSource(source);
             }
 
             SAFERELEASE(decoder);
@@ -239,16 +262,16 @@ void CoverArt::SetDefaultCover() {
 
     hr = Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
     if (SUCCEEDED(hr)) {
-        hr = factory->CreateDecoderFromFilename(this->defaultCoverArt, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
+        hr = factory->CreateDecoderFromFilename(mDefaultCoverArt, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
     }
     if (SUCCEEDED(hr)) {
         hr = decoder->GetFrame(0, &source);
     }
     if (SUCCEEDED(hr)) {
-        (*this->coverArt)->SetSource(source);
+        (*mCoverArt)->SetSource(source);
     }
     else {
-        (*this->coverArt)->SetSource(nullptr);
+        (*mCoverArt)->SetSource(nullptr);
     }
 
     SAFERELEASE(decoder);

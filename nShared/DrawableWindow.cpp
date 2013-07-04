@@ -20,7 +20,7 @@
 #include "Debugging.h"
 #include "Color.h"
 #include "MessageHandler.hpp"
-#include "Strings.h"
+#include "../Utilities/StringUtils.h"
 
 
 using namespace D2D1;
@@ -1009,7 +1009,7 @@ void DrawableWindow::SetText(LPCWSTR text) {
         UpdateText();
     }
     else {
-        this->text = Strings::ReallocOverwriteW((LPWSTR)this->text, text);
+        this->text = StringUtils::ReallocOverwrite(const_cast<LPWSTR>(this->text), text);
     }
 }
 
@@ -1049,10 +1049,10 @@ void DrawableWindow::UpdateText() {
     if (this->drawingSettings->evaluateText) {
         WCHAR buf[4096];
         this->parsedText->Evaluate(buf, 4096);
-        this->text = Strings::ReallocOverwriteW((LPWSTR)this->text, buf);
+        this->text = StringUtils::ReallocOverwrite(const_cast<LPWSTR>(this->text), buf);
     }
     else {
-        this->text = Strings::ReallocOverwriteW((LPWSTR)this->text, this->drawingSettings->text);
+        this->text = StringUtils::ReallocOverwrite(const_cast<LPWSTR>(this->text), this->drawingSettings->text);
     }
     Repaint();
 }

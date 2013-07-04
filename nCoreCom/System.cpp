@@ -21,7 +21,7 @@ LPVOID (__cdecl * _pFindRegisteredWindow)(LPCSTR);
 /// Initalizes the core communications.
 /// </summary>
 /// <returns>True if the core is succefully initalized.</returns>
-HRESULT nCore::System::Init(HMODULE hCoreInstance) {
+HRESULT nCore::System::_Init(HMODULE hCoreInstance) {
     INIT_FUNC(_pParseText,IParsedText* (__cdecl *)(LPCWSTR),"ParseText");
     INIT_FUNC(_pRegisterDynamicTextFunction, BOOL (__cdecl *)(LPCWSTR, UCHAR, FORMATTINGPROC, bool), "RegisterDynamicTextFunction");
     INIT_FUNC(_pUnRegisterDynamicTextFunction, BOOL (__cdecl *)(LPCWSTR, UCHAR), "UnRegisterDynamicTextFunction");

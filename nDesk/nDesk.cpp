@@ -18,6 +18,7 @@
 #include "Settings.h"
 #include <dwmapi.h>
 #include "../nShared/Color.h"
+#include "Version.h"
 
 
 // The messages we want from the core
@@ -28,8 +29,8 @@ DesktopPainter *g_pDesktopPainter;
 MonitorInfo *g_pMonitorInfo;
 ClickHandler *g_pClickHandler;
 
-//
-LSModule gLSModule("nDesk", "Alurcard2", MAKE_VERSION(1, 0, 0, 0));
+// The LSModule class
+LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
 
 
 /// <summary>
@@ -44,8 +45,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     wc.hIconSm = 0;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.style = CS_DBLCLKS;
-
-    if (!gLSModule.ConnectToCore(MAKE_VERSION(0, 2, 0, 0))) {
+    
+    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION))) {
         return 1;
     }
 

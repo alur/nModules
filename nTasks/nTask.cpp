@@ -11,11 +11,12 @@
 #include "Taskbar.hpp"
 #include "WindowManager.h"
 #include "Constants.h"
+#include "Version.h"
 
 using std::map;
 
 // The LSModule class
-LSModule gLSModule("nTask", "Alurcard2", MAKE_VERSION(0, 2, 0, 0));
+LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
 const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_WINDOWCREATED, LM_WINDOWACTIVATED,
@@ -33,8 +34,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     if (!gLSModule.Initialize(parent, instance)) {
         return 1;
     }
-
-    if (!gLSModule.ConnectToCore(MAKE_VERSION(0, 2, 0, 0))) {
+    
+    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION))) {
         return 1;
     }
 

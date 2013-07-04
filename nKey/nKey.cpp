@@ -11,6 +11,8 @@
 #include "../nShared/Error.h"
 #include "../nShared/LSModule.hpp"
 #include <map>
+#include "Version.h"
+
 
 using std::map;
 
@@ -27,7 +29,7 @@ map<LPCSTR, UINT> g_vkCodes;
 int g_id = 0;
 
 // The LiteStep module class
-LSModule gLSModule("nKey", "Alurcard2", MAKE_VERSION(1, 0, 0, 0));
+LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
 
 //
 HWND g_window;
@@ -202,7 +204,7 @@ UINT ParseKey(LPCSTR szKey) {
         }
     }
     // Fail
-    return (UINT)-1;
+    return UINT(-1);
 }
 
 

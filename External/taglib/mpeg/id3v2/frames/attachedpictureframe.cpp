@@ -35,7 +35,7 @@ class AttachedPictureFrame::AttachedPictureFramePrivate
 {
 public:
   AttachedPictureFramePrivate() : textEncoding(String::Latin1),
-                                  type(AttachedPictureFrame::Other) {}
+                                  type(AttachedPictureFrame::Type::Other) {}
 
   String::Type textEncoding;
   String mimeType;
