@@ -60,12 +60,12 @@ UINT MonitorInfo::MonitorFromHWND(HWND hWnd) {
 UINT MonitorInfo::MonitorFromRECT(LPRECT rect) {
     int maxArea = 0;
     int area = 0;
-    UINT monitor = 0;
+    UINT monitor = UINT(-1);
 
     // Figure out which monitor contains the bigest part of the RECT.
     for (UINT i = 0; i < m_monitors.size(); i++) {
         area = Math::RectIntersectArea(rect, &m_monitors[i].rect);
-        if (area >= maxArea) {
+        if (area > maxArea) {
             maxArea = area;
             monitor = i;
         }
