@@ -5,7 +5,6 @@
  *  Version information for nClock.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "afxres.h"
 #include "Version.h"
 
 VS_VERSION_INFO VERSIONINFO

@@ -5,7 +5,6 @@
  *  Version information for nDesk.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "afxres.h"
 #include "Version.h"
 
 VS_VERSION_INFO VERSIONINFO
