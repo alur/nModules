@@ -11,7 +11,6 @@
 #include "../nShared/Macros.h"
 #include <strsafe.h>
 
-extern LSModule* g_LSModule;
 extern map<string, Label*> g_AllLabels;
 
 

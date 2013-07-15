@@ -136,7 +136,7 @@ void Tray::Relayout() {
 
     switch (this->layoutSettings->startPosition) {
     default:
-    case LayoutSettings::TOPLEFT:
+    case LayoutSettings::StartPosition::TopLeft:
         {
             x0 = this->layoutSettings->padding.left;
             y0 = this->layoutSettings->padding.top;
@@ -145,7 +145,7 @@ void Tray::Relayout() {
         }
         break;
 
-    case LayoutSettings::TOPRIGHT:
+    case LayoutSettings::StartPosition::TopRight:
         {
             x0 = drawingSettings->width - this->layoutSettings->padding.right - this->iconSize;
             y0 = this->layoutSettings->padding.top;
@@ -154,7 +154,7 @@ void Tray::Relayout() {
         }
         break;
 
-    case LayoutSettings::BOTTOMLEFT:
+    case LayoutSettings::StartPosition::BottomLeft:
         {
             x0 = this->layoutSettings->padding.left;
             y0 = drawingSettings->height - this->layoutSettings->padding.bottom - this->iconSize;
@@ -163,7 +163,7 @@ void Tray::Relayout() {
         }
         break;
 
-    case LayoutSettings::BOTTOMRIGHT:
+    case LayoutSettings::StartPosition::BottomRight:
         {
             x0 = drawingSettings->width - this->layoutSettings->padding.right - this->iconSize;
             y0 = drawingSettings->height - this->layoutSettings->padding.bottom - this->iconSize;
@@ -173,7 +173,7 @@ void Tray::Relayout() {
         break;
     }
 
-    if (this->layoutSettings->primaryDirection == LayoutSettings::HORIZONTAL) {
+    if (this->layoutSettings->primaryDirection == LayoutSettings::Direction::Horizontal) {
         int x = x0, y = y0;
         for (vector<TrayIcon*>::const_iterator iter = this->icons.begin(); iter != this->icons.end(); iter++) {
             (*iter)->Reposition(x, y, this->iconSize, this->iconSize);

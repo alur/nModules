@@ -12,17 +12,17 @@
 class LayoutSettings {
 public:
     // Possible start positions.
-    enum STARTPOSITION {
-        TOPLEFT = 0,
-        TOPRIGHT,
-        BOTTOMLEFT,
-        BOTTOMRIGHT
+    enum class StartPosition {
+        TopLeft = 0,
+        TopRight,
+        BottomLeft,
+        BottomRight
     };
 
     // Which direction to go first from the start.
-    enum DIRECTION {
-        HORIZONTAL = 0,
-        VERTICAL
+    enum class Direction {
+        Horizontal = 0,
+        Vertical
     };
 
     explicit LayoutSettings();
@@ -31,7 +31,7 @@ public:
     // Loads the actual settings.
     void Load(Settings* settings, LayoutSettings* defaults);
 
-    // Padding around the items. Default: 0,0,0,0
+    // Padding around the items. Default: 0, 0, 0, 0
     RECT padding;
 
     // Horizontal spacing between the items. Default: 2
@@ -41,8 +41,8 @@ public:
     int rowSpacing;
 
     // Where to start adding items. Default: TopLeft
-    STARTPOSITION startPosition;
+    StartPosition startPosition;
 
     // Direction to go first from the starting position. Default: Horizontal
-    DIRECTION primaryDirection;
+    Direction primaryDirection;
 };

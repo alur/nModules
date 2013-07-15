@@ -34,6 +34,27 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
 
     this->settings->GetString("Folder", path, sizeof(path), "Desktop");
 
+    // Icon settings
+    Settings* iconSettings = this->settings->CreateChild("Icon");
+    this->iconSize = iconSettings->GetInt("Size", 64);
+    delete iconSettings;
+
+    // Tile settings
+    Settings* tileSettings = this->settings->CreateChild("Tile");
+    this->tileHeight = tileSettings->GetInt("Height", 100);
+    this->tileWidth = tileSettings->GetInt("Width", 80);
+    delete tileSettings;
+
+    //
+    LayoutSettings layoutDefaults;
+    layoutDefaults.columnSpacing = 20;
+    layoutDefaults.rowSpacing = 20;
+    layoutDefaults.startPosition = LayoutSettings::StartPosition::TopLeft;
+    layoutDefaults.primaryDirection = LayoutSettings::Direction::Horizontal;
+    layoutSettings.Load(this->settings, &layoutDefaults);
+
+    mNextPositionID = 0;
+
     this->window->Initialize(&defaults, &defaultState);
     this->window->AddDropRegion();
     this->window->Show();
@@ -159,18 +180,29 @@ void IconGroup::RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID) {
 }
 
 
+POINT IconGroup::PointFromPositionID(int id)
+{
+    POINT pt;
+
+    int iconsPerRow = (this->window->GetDrawingSettings()->width - layoutSettings.padding.left - layoutSettings.padding.right) / (tileWidth + layoutSettings.columnSpacing);
+
+    int row = id / iconsPerRow;
+    int column = id % iconsPerRow;
+
+    pt.x = layoutSettings.padding.left + column * (tileWidth + layoutSettings.columnSpacing);
+    pt.y = layoutSettings.padding.top + row * (tileHeight + layoutSettings.rowSpacing);
+
+    return pt;
+}
+
+
 void IconGroup::PositionIcon(PCITEMID_CHILD /* pidl */, D2D1_RECT_F* position) {
-    static float xPos = 5;
-    static float yPos = 5;
-    position->bottom = 80 + yPos;
-    position->left = 0 + xPos;
-    position->right = 80 + xPos;
-    position->top = yPos;
-    xPos += 100;
-    if (xPos > this->window->GetDrawingSettings()->width - 80) {
-        xPos = 5;
-        yPos += 100;
-    }
+    POINT pos = PointFromPositionID(mNextPositionID++);
+
+    position->bottom = pos.y + tileHeight;
+    position->left = pos.x;
+    position->right = pos.x + tileWidth;
+    position->top = pos.y;
 }
 
 

@@ -12,8 +12,10 @@
 #include "../nShared/Settings.hpp"
 #include "IIconEventHandler.hpp"
 #include "Icon.hpp"
+#include "../nShared/LayoutSettings.hpp"
 #include <ShlObj.h>
 #include <map>
+#include <stack>
 
 
 using std::map;
@@ -41,6 +43,7 @@ private:
     //
     void UpdateIcon(PCITEMID_CHILD pidl);
 
+    //
     void UpdateAllIcons();
 
     //
@@ -51,6 +54,27 @@ private:
 
     //
     vector<Icon*>::iterator FindIcon(PCITEMID_CHILD pidl);
+
+private:
+    //
+    LayoutSettings layoutSettings;
+
+    // All available icon positions.
+    std::stack<POINT> mIconPositions;
+
+    //
+    int iconSize;
+
+    //
+    int tileWidth;
+
+    //
+    int tileHeight;
+
+    // Positioning
+    POINT PointFromPositionID(int id);
+    std::stack<int> mEmptySpots;
+    int mNextPositionID;
 
     // All icons currently part of this group.
     vector<Icon*> icons;

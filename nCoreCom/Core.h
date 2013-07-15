@@ -26,20 +26,20 @@ namespace nCore {
     namespace InputParsing {
         HRESULT _Init(HMODULE);
 
-        bool ParseColor(LPCSTR pszColor, ARGB * target);
+        bool ParseColor(LPCSTR pszColor, ARGB *target);
         bool ParseCoordinate(LPCSTR, int *, bool canBeRelative = true, bool canBeNegative = true);
         bool ParseLength(LPCSTR, int *, bool canBeRelative = true, bool canBeNegative = false);
         bool ParseMonitor(LPCSTR pszMonitor, UINT * target);
         bool ParseBool(LPCSTR pszBool);
 
-        int GetPrefixedRCInt(LPCSTR szPrefix, LPCSTR szOption, int nDefault);
-        float GetPrefixedRCFloat(LPCSTR szPrefix, LPCSTR szOption, float fDefault);
-        double GetPrefixedRCDouble(LPCSTR szPrefix, LPCSTR szOption, double dDefault);
-        ARGB GetPrefixedRCColor(LPCSTR szPrefix, LPCSTR szOption, int nDefault);
-        bool GetPrefixedRCBool(LPCSTR szPrefix, LPCSTR szOption, bool bDefault);
-        bool GetPrefixedRCString(LPCSTR szPrefix, LPCSTR szOption, LPSTR pszBuffer, LPCSTR pszDefault, UINT cbBuffer);
-        bool GetPrefixedRCWString(LPCSTR szPrefix, LPCSTR szOption, LPWSTR pszwBuffer, LPCSTR pszDefault, UINT cbBuffer);
-        UINT GetPrefixedRCMonitor(LPCSTR szPrefix, LPCSTR szOption, UINT uDefault);
+        int GetPrefixedRCInt(LPCSTR prefix, LPCSTR option, int defValue);
+        float GetPrefixedRCFloat(LPCSTR prefix, LPCSTR option, float defValue);
+        double GetPrefixedRCDouble(LPCSTR prefix, LPCSTR option, double defValue);
+        ARGB GetPrefixedRCColor(LPCSTR prefix, LPCSTR option, int defValue);
+        bool GetPrefixedRCBool(LPCSTR prefix, LPCSTR option, bool defValue);
+        bool GetPrefixedRCString(LPCSTR prefix, LPCSTR option, LPSTR pszBuffer, LPCSTR pszDefault, UINT cbBuffer);
+        bool GetPrefixedRCWString(LPCSTR prefix, LPCSTR option, LPWSTR pszwBuffer, LPCSTR pszDefault, UINT cbBuffer);
+        UINT GetPrefixedRCMonitor(LPCSTR prefix, LPCSTR option, UINT uDefault);
     }
     
     namespace System {

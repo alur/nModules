@@ -19,9 +19,9 @@ LayoutSettings::LayoutSettings() {
     this->padding.top = 0;
     this->padding.right = 0;
     this->padding.bottom = 0;
-    this->primaryDirection = DIRECTION::HORIZONTAL;
+    this->primaryDirection = Direction::Horizontal;
     this->rowSpacing = 2;
-    this->startPosition = STARTPOSITION::TOPLEFT;
+    this->startPosition = StartPosition::TopLeft;
 }
 
 
@@ -43,25 +43,25 @@ void LayoutSettings::Load(Settings* settings, LayoutSettings* defaults) {
 
     settings->GetString("Start", buffer, sizeof(buffer), "TopLeft");
     if (_stricmp(buffer, "TopRight") == 0) {
-        this->startPosition = STARTPOSITION::TOPRIGHT;
+        this->startPosition = StartPosition::TopRight;
     }
     else if (_stricmp(buffer, "BottomLeft") == 0) {
-        this->startPosition = STARTPOSITION::BOTTOMLEFT;
+        this->startPosition = StartPosition::BottomLeft;
     }
     else if (_stricmp(buffer, "BottomRight") == 0) {
-        this->startPosition = STARTPOSITION::BOTTOMRIGHT;
+        this->startPosition = StartPosition::BottomRight;
     }
     else {
-        this->startPosition = STARTPOSITION::TOPLEFT;
+        this->startPosition = StartPosition::TopLeft;
     }
 
     this->rowSpacing = settings->GetInt("RowSpacing", defaults->rowSpacing);
 
     settings->GetString("PrimaryDirection", buffer, sizeof(buffer), "Horizontal");
     if (_stricmp(buffer, "Vertical") == 0) {
-        this->primaryDirection = DIRECTION::VERTICAL;
+        this->primaryDirection = Direction::Vertical;
     }
     else {
-        this->primaryDirection = DIRECTION::HORIZONTAL;
+        this->primaryDirection = Direction::Horizontal;
     }
 }

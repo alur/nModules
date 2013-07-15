@@ -152,7 +152,7 @@ void Taskbar::Relayout() {
 
     switch (this->layoutSettings->startPosition) {
     default:
-    case LayoutSettings::TOPLEFT:
+    case LayoutSettings::StartPosition::TopLeft:
         {
             x0 = this->layoutSettings->padding.left;
             y0 = this->layoutSettings->padding.top;
@@ -161,7 +161,7 @@ void Taskbar::Relayout() {
         }
         break;
 
-    case LayoutSettings::TOPRIGHT:
+    case LayoutSettings::StartPosition::TopRight:
         {
             x0 = drawingSettings->width - this->layoutSettings->padding.right;
             y0 = this->layoutSettings->padding.top;
@@ -170,7 +170,7 @@ void Taskbar::Relayout() {
         }
         break;
 
-    case LayoutSettings::BOTTOMLEFT:
+    case LayoutSettings::StartPosition::BottomLeft:
         {
             x0 = this->layoutSettings->padding.left;
             y0 = drawingSettings->height - this->layoutSettings->padding.bottom;
@@ -179,7 +179,7 @@ void Taskbar::Relayout() {
         }
         break;
 
-    case LayoutSettings::BOTTOMRIGHT:
+    case LayoutSettings::StartPosition::BottomRight:
         {
             x0 = drawingSettings->width - this->layoutSettings->padding.right;
             y0 = drawingSettings->height - this->layoutSettings->padding.bottom;
@@ -189,7 +189,7 @@ void Taskbar::Relayout() {
         break;
     }
 
-    if (this->layoutSettings->primaryDirection == LayoutSettings::HORIZONTAL) {
+    if (this->layoutSettings->primaryDirection == LayoutSettings::Direction::Horizontal) {
         spacePerLine = drawingSettings->width - this->layoutSettings->padding.left - this->layoutSettings->padding.right;
         lines = (drawingSettings->height + this->layoutSettings->rowSpacing - this->layoutSettings->padding.top - this->layoutSettings->padding.bottom)/(this->layoutSettings->rowSpacing + this->buttonHeight);
         // We need to consider that buttons can't be split between multiple lines.
