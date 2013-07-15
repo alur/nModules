@@ -20,3 +20,12 @@ void LiteStep::IterateOverLines(LPCSTR keyName, std::function<void(LPCSTR line)>
     }
     LiteStep::LCClose(f);
 }
+
+
+void LiteStep::IterateOverTokens(LPCWSTR str, std::function<void (LPCWSTR token)> callback) {
+    LPCWSTR next = str;
+    WCHAR token[MAX_LINE_LENGTH];
+    while (GetTokenW(next, token, &next, false)) {
+        callback(token);
+    }
+}

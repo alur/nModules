@@ -12,6 +12,8 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
+#include <initializer_list>
+
 template<class ElementType, class IndexType>
 class EnumArray {
 public:
@@ -21,6 +23,7 @@ public:
     explicit EnumArray() {
     }
     
+
     /// <summary>
     /// Constructor
     /// </summary>
@@ -33,6 +36,17 @@ public:
         }
 
         va_end(list);
+    }
+
+    
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    explicit EnumArray(std::initializer_list<ElementType> init) {
+        ElementType *element = &mArray;
+        for (ElementType &initalizer : init) {
+            *element++ = initalizer;
+        }
     }
 
 public:

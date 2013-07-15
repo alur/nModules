@@ -48,3 +48,14 @@ LPWSTR StringUtils::ReallocOverwrite(LPWSTR dest, LPCWSTR str) {
     ret[cch] = '\0';
     return ret;
 }
+
+
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="str"></param>
+/// <param name="tokens"></param>
+//std::vector<std::wstring> Explode(LPCWSTR str, LPCWSTR tokens) {
+
+//}

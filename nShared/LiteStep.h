@@ -13,5 +13,6 @@
 namespace LiteStep {
     #include "../headers/lsapi.h"
 
-    void IterateOverLines(LPCSTR keyName, std::function<void(LPCSTR line)> callback);
+    void IterateOverLines(LPCSTR keyName, std::function<void (LPCSTR line)> callback);
+    void IterateOverTokens(LPCWSTR str, std::function<void (LPCWSTR token)> callback);
 }

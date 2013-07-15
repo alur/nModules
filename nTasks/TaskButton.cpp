@@ -25,7 +25,11 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
 
     this->iconSettings = this->settings->CreateChild("Icon");
 
-    this->window->Initialize();
+    //
+    StateSettings stateDefaults;
+    stateDefaults.backgroundBrush.color = 0x00000000;
+
+    this->window->Initialize(nullptr, &stateDefaults);
 
     // Add states to the window
     this->stateFlashingHover = this->window->AddState("FlashingHover", 150); 

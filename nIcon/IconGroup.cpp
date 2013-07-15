@@ -67,7 +67,7 @@ IconGroup::~IconGroup() {
 
 
 /// <summary>
-/// Destructor
+/// 
 /// </summary>
 void IconGroup::SetFolder(LPWSTR folder) {
     PIDLIST_RELATIVE idList, idNext;
@@ -162,11 +162,11 @@ void IconGroup::RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID) {
 void IconGroup::PositionIcon(PCITEMID_CHILD /* pidl */, D2D1_RECT_F* position) {
     static float xPos = 5;
     static float yPos = 5;
-    position->bottom = 64 + yPos;
+    position->bottom = 80 + yPos;
     position->left = 0 + xPos;
-    position->right = 64 + xPos;
+    position->right = 80 + xPos;
     position->top = yPos;
-    xPos += 80;
+    xPos += 100;
     if (xPos > this->window->GetDrawingSettings()->width - 80) {
         xPos = 5;
         yPos += 100;

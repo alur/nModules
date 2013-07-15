@@ -18,6 +18,7 @@
 #include <assert.h>
 #include <process.h>
 #include "Constants.h"
+#include <VersionHelpers.h>
 
 
 using std::map;
@@ -67,12 +68,8 @@ void WindowManager::Start() {
 
     // If we are running something prior to Windows 8 we need to manually keep track of which
     // monitor a window is on.
-    OSVERSIONINFO osv;
-    ZeroMemory(&osv, sizeof(osv));
-    osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    GetVersionEx(&osv);
-    if (osv.dwMajorVersion < 6 || osv.dwMajorVersion == 6 && osv.dwMinorVersion < 2) {
-        SetTimer(gLSModule.GetMessageWindow(), TIMER_CHECKMONITOR, 250, NULL);
+    if (!IsWindows8OrGreater()) {
+        SetTimer(gLSModule.GetMessageWindow(), TIMER_CHECKMONITOR, 250, nullptr);
     }
 }
 
@@ -308,7 +305,6 @@ void WindowManager::UpdateWindowMonitors() {
 /// </summary>
 LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
-
         // A window is being minimized or restored, the system needs the coordinates of
         // the taskbutton for the window animation.
     case LM_GETMINRECT:

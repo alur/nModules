@@ -21,6 +21,9 @@ public:
     explicit CoverArt(LPCSTR name);
     virtual ~CoverArt();
 
+private:
+    static TagLib::ID3v2::AttachedPictureFrame::Type ID3TypeFromString(LPCWSTR str);
+
 public:
     void Update();
 

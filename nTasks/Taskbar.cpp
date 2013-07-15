@@ -23,11 +23,15 @@ Taskbar::Taskbar(LPCSTR name) : Drawable(name) {
     LoadSettings();
 
     this->layoutSettings = new LayoutSettings();
-    LayoutSettings* defaults = new LayoutSettings();
-    this->layoutSettings->Load(this->settings, defaults);
-    delete defaults;
+    LayoutSettings defaults;
+    this->layoutSettings->Load(this->settings, &defaults);
+
+
+    DrawableSettings drawableDefaults;
+    drawableDefaults.width = 200;
+    drawableDefaults.height = 30;
     
-    this->window->Initialize();
+    this->window->Initialize(&drawableDefaults);
     this->window->Show();
 }
 

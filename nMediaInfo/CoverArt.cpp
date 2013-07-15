@@ -11,6 +11,7 @@
 #include "../nShared/Macros.h"
 #include "../nShared/FileIterator.hpp"
 #include "../nShared/Debugging.h"
+#include "../Utilities/StringUtils.h"
 
 #include <Shlwapi.h>
 #include <strsafe.h>
@@ -52,6 +53,50 @@ CoverArt::~CoverArt() {
 
 
 /// <summary>
+/// Retrives the Type that corresponds to str. If str does not correspond to a valid type,
+/// Count is returned.
+/// </summary>
+TagLib::ID3v2::AttachedPictureFrame::Type CoverArt::ID3TypeFromString(LPCWSTR str) {
+    using namespace TagLib::ID3v2;
+    
+    static const struct {
+        AttachedPictureFrame::Type type;
+        LPCWSTR name;
+    } pictureTypes [] = {
+        { AttachedPictureFrame::Type::Other,              L"Other"              },
+        { AttachedPictureFrame::Type::FileIcon,           L"FileIcon"           },
+        { AttachedPictureFrame::Type::OtherFileIcon,      L"OtherFileIcon"      },
+        { AttachedPictureFrame::Type::FrontCover,         L"FrontCover"         },
+        { AttachedPictureFrame::Type::BackCover,          L"BackCover"          },
+        { AttachedPictureFrame::Type::LeafletPage,        L"LeafletPage"        },
+        { AttachedPictureFrame::Type::Media,              L"Media"              },
+        { AttachedPictureFrame::Type::LeadArtist,         L"LeadArtist"         },
+        { AttachedPictureFrame::Type::Artist,             L"Artist"             },
+        { AttachedPictureFrame::Type::Conductor,          L"Conductor"          },
+        { AttachedPictureFrame::Type::Band,               L"Band"               },
+        { AttachedPictureFrame::Type::Composer,           L"Composer"           },
+        { AttachedPictureFrame::Type::Lyricist,           L"Lyricist"           },
+        { AttachedPictureFrame::Type::RecordingLocation,  L"RecordingLocation"  },
+        { AttachedPictureFrame::Type::DuringRecording,    L"DuringRecording"    },
+        { AttachedPictureFrame::Type::DuringPerformance,  L"DuringPerformance"  },
+        { AttachedPictureFrame::Type::MovieScreenCapture, L"MovieScreenCapture" },
+        { AttachedPictureFrame::Type::ColouredFish,       L"ColouredFish"       },
+        { AttachedPictureFrame::Type::Illustration,       L"Illustration"       },
+        { AttachedPictureFrame::Type::BandLogo,           L"BandLogo"           },
+        { AttachedPictureFrame::Type::PublisherLogo,      L"PublisherLogo"      }
+    };
+
+    for (auto type : pictureTypes) {
+        if (_wcsicmp(type.name, str) == 0) {
+            return type.type;
+        }
+    }
+
+    return AttachedPictureFrame::Type::Count;
+}
+
+
+/// <summary>
 /// Loads .RC settings
 /// </summary>
 void CoverArt::LoadSettings() {
@@ -65,14 +110,22 @@ void CoverArt::LoadSettings() {
 
     // (group)FileNames -- The file names to search for.
     WCHAR fileNames[MAX_LINE_LENGTH];
-    this->settings->GetString("FileNames", fileNames, _countof(fileNames), L"*.png|*.jpg|*.jpeg|*.bmp");
-    //for (LPCWSTR fileName : ExplodedString(fileNames, L"|")) {
-    //   mFolderCanidates.push_back(fileName);
-    //}
+    this->settings->GetString("FileNames", fileNames, _countof(fileNames), L"AlbumArt*Large.jpg folder.jpg *.jpg *.png *.jpeg *.bmp");
+    LiteStep::IterateOverTokens(fileNames, [this] (LPCWSTR fileName) {
+       mFolderCanidates.push_back(fileName);
+    });
 
-    // (group)ID3Priority -- The 
+    // (group)ID3Priority
+    WCHAR ID3Priority[MAX_LINE_LENGTH];
+    this->settings->GetString("ID3Priority", ID3Priority, _countof(ID3Priority), L"FrontCover Other");
     mID3CoverTypePriority.SetAll(0xFF);
-    mID3CoverTypePriority[TagLib::ID3v2::AttachedPictureFrame::Type::FrontCover] = 1;
+    BYTE priority = 0;
+    LiteStep::IterateOverTokens(ID3Priority, [this, &priority] (LPCWSTR str) {
+        auto type = ID3TypeFromString(str);
+        if (type != TagLib::ID3v2::AttachedPictureFrame::Type::Count && mID3CoverTypePriority[type] == 0xFF) {
+            mID3CoverTypePriority[type] = ++priority;
+        }
+    });
 
     this->settings->GetString("DefaultCoverArt", mDefaultCoverArt, MAX_PATH, "");
 }

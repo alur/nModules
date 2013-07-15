@@ -144,6 +144,7 @@ EXTERN_CDECL(BOOL) GetRCString(LPCSTR pszKeyName, LPSTR pszBuffer, LPCSTR pszDef
 EXTERN_CDECL(VOID) GetResStr(HINSTANCE hInstance, UINT uID, LPSTR pszBuffer, UINT cbBuffer, LPCSTR pszDefault);
 EXTERN_CDECL(VOID) GetResStrEx(HINSTANCE hInstance, UINT uID, LPSTR pszBuffer, UINT cbBuffer, LPCSTR pszDefault, ...);
 EXTERN_CDECL(BOOL) GetToken(LPCSTR pszString, LPSTR pszBuffer, LPCSTR *ppszNext, BOOL fBrackets);
+EXTERN_CDECL(BOOL) GetTokenW(LPCWSTR pszString, LPWSTR pszBuffer, LPCWSTR *ppszNext, BOOL fBrackets);
 EXTERN_CDECL(BOOL) is_valid_pattern(LPCSTR pszPattern, INT *pnError);
 EXTERN_CDECL(BOOL) LCClose(LPVOID pFile);
 EXTERN_CDECL(LPVOID) LCOpen(LPCSTR pszPath);

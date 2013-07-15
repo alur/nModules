@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EnumArray.hpp" />
+    <ClInclude Include="Iterator.hpp" />
     <ClInclude Include="StringUtils.h" />
   </ItemGroup>
   <ItemGroup>
