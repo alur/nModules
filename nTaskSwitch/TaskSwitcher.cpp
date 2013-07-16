@@ -72,16 +72,16 @@ void TaskSwitcher::LoadSettings() {
     this->peekDelay = this->settings->GetInt("PeekDelay", SHRegGetIntW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AltTab\\LivePreview_ms", 1000));
 
     LayoutSettings layoutDefaults;
-    layoutDefaults.padding.left = 20;
-    layoutDefaults.padding.right = 20;
-    layoutDefaults.padding.top = 40;
-    layoutDefaults.padding.bottom = 40;
-    layoutDefaults.rowSpacing = 0;
-    layoutDefaults.columnSpacing = 0;
+    layoutDefaults.mPadding.left = 20;
+    layoutDefaults.mPadding.right = 20;
+    layoutDefaults.mPadding.top = 40;
+    layoutDefaults.mPadding.bottom = 40;
+    layoutDefaults.mRowSpacing = 0;
+    layoutDefaults.mColumnSpacing = 0;
 
     this->layoutSettings.Load(this->settings, &layoutDefaults);
 
-    this->taskWidth = (this->window->GetDrawingSettings()->width - this->layoutSettings.padding.left - this->layoutSettings.padding.right - (this->windowsPerRow - 1) * this->layoutSettings.columnSpacing)/this->windowsPerRow;
+    this->taskWidth = (this->window->GetDrawingSettings()->width - this->layoutSettings.mPadding.left - this->layoutSettings.mPadding.right - (this->windowsPerRow - 1) * this->layoutSettings.mColumnSpacing)/this->windowsPerRow;
     this->taskHeight = int(this->taskWidth/1.518f);
 }
 
@@ -153,8 +153,8 @@ void TaskSwitcher::AddWindow(HWND window) {
     this->shownWindows.push_back(new TaskThumbnail(
         this,
         window,
-        this->layoutSettings.padding.left + this->shownWindows.size() % this->windowsPerRow * (this->taskWidth + this->layoutSettings.columnSpacing),
-        this->layoutSettings.padding.top + (int)this->shownWindows.size() / this->windowsPerRow * (this->taskHeight + this->layoutSettings.rowSpacing),
+        this->layoutSettings.mPadding.left + this->shownWindows.size() % this->windowsPerRow * (this->taskWidth + this->layoutSettings.mColumnSpacing),
+        this->layoutSettings.mPadding.top + (int)this->shownWindows.size() / this->windowsPerRow * (this->taskHeight + this->layoutSettings.mRowSpacing),
         this->taskWidth,
         this->taskHeight
     ));
@@ -174,7 +174,7 @@ void TaskSwitcher::Show(int delta) {
         AddWindow(desktopWindow);
     }
 
-    int height = this->layoutSettings.padding.top + this->layoutSettings.padding.bottom + ((int)this->shownWindows.size() - 1) / this->windowsPerRow * (this->taskHeight + this->layoutSettings.rowSpacing) + this->taskHeight;
+    int height = this->layoutSettings.mPadding.top + this->layoutSettings.mPadding.bottom + ((int)this->shownWindows.size() - 1) / this->windowsPerRow * (this->taskHeight + this->layoutSettings.mRowSpacing) + this->taskHeight;
 
     this->window->SetPosition(
         this->window->GetDrawingSettings()->x,

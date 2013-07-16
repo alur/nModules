@@ -9,7 +9,7 @@
 
 
 /// <summary>
-/// 
+/// Iterates over all lines with the specified key name.
 /// </summary>
 void LiteStep::IterateOverLines(LPCSTR keyName, std::function<void(LPCSTR line)> callback) {
     char line[MAX_LINE_LENGTH];
@@ -22,6 +22,21 @@ void LiteStep::IterateOverLines(LPCSTR keyName, std::function<void(LPCSTR line)>
 }
 
 
+/// <summary>
+/// Iterates over all tokens in the specified line
+/// </summary>
+void LiteStep::IterateOverTokens(LPCSTR str, std::function<void (LPCSTR token)> callback) {
+    LPCSTR next = str;
+    CHAR token[MAX_LINE_LENGTH];
+    while (GetToken(next, token, &next, false)) {
+        callback(token);
+    }
+}
+
+
+/// <summary>
+/// Iterates over all tokens in the specified line
+/// </summary>
 void LiteStep::IterateOverTokens(LPCWSTR str, std::function<void (LPCWSTR token)> callback) {
     LPCWSTR next = str;
     WCHAR token[MAX_LINE_LENGTH];

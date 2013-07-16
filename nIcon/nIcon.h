@@ -8,3 +8,5 @@
 #pragma once
 
 void LoadSettings();
+void Refresh();
+void CreateGroup(LPCSTR groupName);

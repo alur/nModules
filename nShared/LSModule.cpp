@@ -9,7 +9,7 @@
 #include <strsafe.h>
 #include "LSModule.hpp"
 #include "Factories.h"
-#include "Error.h"
+#include "ErrorHandler.h"
 #include "DrawableWindow.hpp"
 #include "../nCoreCom/Core.h"
 
@@ -43,6 +43,8 @@ LSModule::LSModule(LPCSTR moduleName, LPCSTR author, VERSION version) {
     this->moduleName = _strdup(moduleName);
     this->parent = parent;
     this->version = version;
+
+    ErrorHandler::Initialize(moduleName);
 }
 
 
@@ -149,7 +151,7 @@ bool LSModule::ConnectToCore(VERSION minimumCoreVersion) {
     case S_OK:
         break;
     default:
-        ErrorMessage(E_LVL_ERROR, "There was a problem connecting to nCore!");
+        ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("There was a problem connecting to nCore!"));
         return false;
     }
 

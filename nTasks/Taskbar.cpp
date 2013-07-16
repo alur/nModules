@@ -150,12 +150,12 @@ void Taskbar::Relayout() {
 
     if (this->buttons.size() == 0) return;
 
-    switch (this->layoutSettings->startPosition) {
+    switch (this->layoutSettings->mStartPosition) {
     default:
     case LayoutSettings::StartPosition::TopLeft:
         {
-            x0 = this->layoutSettings->padding.left;
-            y0 = this->layoutSettings->padding.top;
+            x0 = this->layoutSettings->mPadding.left;
+            y0 = this->layoutSettings->mPadding.top;
             xdir = 1;
             ydir = 1;
         }
@@ -163,8 +163,8 @@ void Taskbar::Relayout() {
 
     case LayoutSettings::StartPosition::TopRight:
         {
-            x0 = drawingSettings->width - this->layoutSettings->padding.right;
-            y0 = this->layoutSettings->padding.top;
+            x0 = drawingSettings->width - this->layoutSettings->mPadding.right;
+            y0 = this->layoutSettings->mPadding.top;
             xdir = -1;
             ydir = 1;
         }
@@ -172,8 +172,8 @@ void Taskbar::Relayout() {
 
     case LayoutSettings::StartPosition::BottomLeft:
         {
-            x0 = this->layoutSettings->padding.left;
-            y0 = drawingSettings->height - this->layoutSettings->padding.bottom;
+            x0 = this->layoutSettings->mPadding.left;
+            y0 = drawingSettings->height - this->layoutSettings->mPadding.bottom;
             xdir = 1;
             ydir = -1;
         }
@@ -181,45 +181,45 @@ void Taskbar::Relayout() {
 
     case LayoutSettings::StartPosition::BottomRight:
         {
-            x0 = drawingSettings->width - this->layoutSettings->padding.right;
-            y0 = drawingSettings->height - this->layoutSettings->padding.bottom;
+            x0 = drawingSettings->width - this->layoutSettings->mPadding.right;
+            y0 = drawingSettings->height - this->layoutSettings->mPadding.bottom;
             xdir = -1;
             ydir = -1;
         }
         break;
     }
 
-    if (this->layoutSettings->primaryDirection == LayoutSettings::Direction::Horizontal) {
-        spacePerLine = drawingSettings->width - this->layoutSettings->padding.left - this->layoutSettings->padding.right;
-        lines = (drawingSettings->height + this->layoutSettings->rowSpacing - this->layoutSettings->padding.top - this->layoutSettings->padding.bottom)/(this->layoutSettings->rowSpacing + this->buttonHeight);
+    if (this->layoutSettings->mPrimaryDirection == LayoutSettings::Direction::Horizontal) {
+        spacePerLine = drawingSettings->width - this->layoutSettings->mPadding.left - this->layoutSettings->mPadding.right;
+        lines = (drawingSettings->height + this->layoutSettings->mRowSpacing - this->layoutSettings->mPadding.top - this->layoutSettings->mPadding.bottom)/(this->layoutSettings->mRowSpacing + this->buttonHeight);
         // We need to consider that buttons can't be split between multiple lines.
-        buttonSize = (int)min(this->buttonMaxWidth, min(spacePerLine * lines / (int)this->buttons.size(), spacePerLine / (int)ceil(this->buttons.size() / (float)lines)) - this->layoutSettings->columnSpacing);
+        buttonSize = (int)min(this->buttonMaxWidth, min(spacePerLine * lines / (int)this->buttons.size(), spacePerLine / (int)ceil(this->buttons.size() / (float)lines)) - this->layoutSettings->mColumnSpacing);
         if (ydir == -1) y0 -= this->buttonHeight;
         if (xdir == -1) x0 -= buttonSize;
         int x = x0, y = y0;
         for (map<HWND, TaskButton*>::const_iterator iter = this->buttons.begin(); iter != this->buttons.end(); iter++) {
             iter->second->Reposition(x, y, buttonSize, this->buttonHeight);
-            x += xdir*(buttonSize + this->layoutSettings->columnSpacing);
-            if (x < this->layoutSettings->padding.left || x > drawingSettings->width - this->layoutSettings->padding.right - buttonSize) {
+            x += xdir*(buttonSize + this->layoutSettings->mColumnSpacing);
+            if (x < this->layoutSettings->mPadding.left || x > drawingSettings->width - this->layoutSettings->mPadding.right - buttonSize) {
                 x = x0;
-                y += ydir*(this->buttonHeight + this->layoutSettings->rowSpacing);
+                y += ydir*(this->buttonHeight + this->layoutSettings->mRowSpacing);
             }
             iter->second->Show();
         }
     }
     else {
-        spacePerLine = drawingSettings->height - this->layoutSettings->padding.top - this->layoutSettings->padding.bottom;
-        lines = (drawingSettings->width + this->layoutSettings->columnSpacing - this->layoutSettings->padding.left - this->layoutSettings->padding.right)/(this->layoutSettings->columnSpacing + this->buttonWidth);
-        buttonSize = (int)min(this->buttonMaxHeight, min(spacePerLine * lines / (int)this->buttons.size(), spacePerLine / (int)ceil(this->buttons.size() / (float)lines)) - this->layoutSettings->rowSpacing);
+        spacePerLine = drawingSettings->height - this->layoutSettings->mPadding.top - this->layoutSettings->mPadding.bottom;
+        lines = (drawingSettings->width + this->layoutSettings->mColumnSpacing - this->layoutSettings->mPadding.left - this->layoutSettings->mPadding.right)/(this->layoutSettings->mColumnSpacing + this->buttonWidth);
+        buttonSize = (int)min(this->buttonMaxHeight, min(spacePerLine * lines / (int)this->buttons.size(), spacePerLine / (int)ceil(this->buttons.size() / (float)lines)) - this->layoutSettings->mRowSpacing);
         if (ydir == -1) y0 -= buttonSize;
         if (xdir == -1) x0 -= this->buttonWidth;
         int x = x0, y = y0;
         for (map<HWND, TaskButton*>::const_iterator iter = this->buttons.begin(); iter != this->buttons.end(); iter++) {
             iter->second->Reposition(x, y, this->buttonWidth, buttonSize);
-            y += ydir*(buttonSize + this->layoutSettings->rowSpacing);
-            if (y < this->layoutSettings->padding.top || y > drawingSettings->height - this->layoutSettings->padding.bottom - buttonSize) {
+            y += ydir*(buttonSize + this->layoutSettings->mRowSpacing);
+            if (y < this->layoutSettings->mPadding.top || y > drawingSettings->height - this->layoutSettings->mPadding.bottom - buttonSize) {
                 y = y0;
-                x += xdir*(this->buttonWidth + this->layoutSettings->columnSpacing);
+                x += xdir*(this->buttonWidth + this->layoutSettings->mColumnSpacing);
             }
             iter->second->Show();
         }

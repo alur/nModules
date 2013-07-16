@@ -9,6 +9,7 @@
 #include "nIcon.h"
 #include "IconGroup.hpp"
 #include "../nShared/LSModule.hpp"
+#include "../nShared/ErrorHandler.h"
 #include "Version.h"
 
 
@@ -81,6 +82,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_REFRESH:
         {
+            Refresh();
         }
         return 0;
     }
@@ -92,14 +94,31 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// Reads through the .rc files and creates labels.
 /// </summary>
 void LoadSettings() {
-    char szLine[MAX_LINE_LENGTH], szLabel[256];
-    LPSTR szTokens[] = { szLabel };
-    LPVOID f = LiteStep::LCOpen(nullptr);
+    LiteStep::IterateOverLines("*nIcon", [] (LPCSTR line) -> void {
+        LiteStep::IterateOverTokens(line, [] (LPCSTR token) -> void {
+            CreateGroup(token);
+        });
+    });
+}
 
-    while (LiteStep::LCReadNextConfig(f, "*nIcon", szLine, sizeof(szLine))) {
-        LiteStep::LCTokenize(szLine+strlen("*nIcon")+1, szTokens, 1, nullptr);
 
-        gIconGroups.insert(gIconGroups.begin(), std::pair<string, IconGroup*>(string(szLabel), new IconGroup(szLabel)));
+/// <summary>
+/// Updates settings from the RC.
+/// </summary>
+void Refresh() {
+
+}
+
+
+/// <summary>
+/// Creates a new group with the specified name.
+/// </summary>
+/// <param name="groupName">The name of the group to create.</param>
+void CreateGroup(LPCSTR groupName) {
+    if (gIconGroups.find(groupName) == gIconGroups.end()) {
+        gIconGroups[groupName] = new IconGroup(groupName);
     }
-    LiteStep::LCClose(f);
+    else {
+        ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("Attempt to (re)create the already existing group %s!"), groupName);
+    }
 }

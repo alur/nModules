@@ -8,7 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include "WorkArea.h"
 #include "../nCoreCom/Core.h"
-#include "../nShared/Error.h"
+#include "../nShared/ErrorHandler.h"
 
 
 /// <summary>
@@ -45,7 +45,7 @@ void WorkArea::ParseLine(MonitorInfo *mInfo, LPCSTR pszLine) {
         }
     }
 
-    ErrorMessage(E_LVL_WARNING, "%s\nIs not a valid workarea declaration!", pszLine);
+    ErrorHandler::Error(ErrorHandler::Level::Warning, "%s\nIs not a valid workarea declaration!", pszLine);
 }
 
 

@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Icon.hpp
+ *  IconTile.hpp
  *  The nModules Project
  *
  *  A single icon in an IconGroup.
@@ -11,16 +11,18 @@
 #include "../nShared/DrawableWindow.hpp"
 #include <ShlObj.h>
 
-class Icon : public Drawable {
+class IconTile : public Drawable {
 public:
-    explicit Icon(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder);
-    virtual ~Icon();
+    explicit IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder, int width, int height);
+    virtual ~IconTile();
 
+public:
     HRESULT CompareID(PCITEMID_CHILD id);
     void SetPosition(int x, int y, bool noRedraw = false);
     LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID);
     HRESULT GetDisplayName(SHGDNF flags, LPWSTR buf, UINT cchBuf);
 
+public:
     // Hides this icon.
     void Hide();
 
@@ -34,27 +36,31 @@ public:
     void ShowContextMenu();
 
 private:
-    // Pointer to the shellfolder this item is in.
-    IShellFolder2* shellFolder;
-
-    // The PID of this icon.
-    PITEMID_CHILD item;
-
     // Sets the icon.
     void SetIcon();
 
-    // 
-    DrawableWindow::STATE hoverState, selectedState, focusedState;
+private:
+    // Pointer to the shellfolder this item is in.
+    IShellFolder2* mShellFolder;
+
+    // The PID of this icon.
+    PITEMID_CHILD mItem;
 
     //
-    DrawableWindow::OVERLAY iconOverlay;
+    int mIconSize;
+
+    // 
+    DrawableWindow::STATE mHoverState, mSelectedState, mFocusedState;
+
+    //
+    DrawableWindow::OVERLAY mIconOverlay;
 
     // True if the mouse is currently above the icon.
-    bool mouseOver;
+    bool mMouseOver;
 
     //
-    bool mouseDown;
+    bool mMouseDown;
 
-    // The last place the mouse was 
-    POINT mouseDownPosition;
+    // Where the mouse was when the 
+    POINT mMouseDownPosition;
 };

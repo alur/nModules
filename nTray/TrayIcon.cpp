@@ -148,6 +148,14 @@ void TrayIcon::SetIcon(HICON icon) {
 /// <summary>
 /// Repositions the icon.
 /// </summary>
+void TrayIcon::Reposition(RECT rect) {
+    this->window->SetPosition(rect);
+}
+
+
+/// <summary>
+/// Repositions the icon.
+/// </summary>
 void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height) {
     this->window->SetPosition(x, y, width, height);
 }

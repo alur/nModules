@@ -8,7 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "nCore.h"
-#include "../nShared/Error.h"
+#include "../nShared/ErrorHandler.h"
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/Versioning.h"
 #include "TextFunctions.h"
@@ -85,7 +85,7 @@ bool CreateMainWindow(HINSTANCE hDllInstance) {
     wc.style = CS_NOCLOSE;
 
     if (!RegisterClassEx(&wc)) {
-        ErrorMessage(E_LVL_ERROR, TEXT("Failed to register nCore's window class!"));
+        ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("Failed to register nCore's window class!"));
         return false;
     }
 
@@ -94,7 +94,7 @@ bool CreateMainWindow(HINSTANCE hDllInstance) {
         0, 0, 0, 0, NULL, NULL, hDllInstance, NULL);
 
     if (!g_hwndMsgHandler) {
-        ErrorMessage(E_LVL_ERROR, TEXT("Failed to create nCore's message handler!"));
+        ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("Failed to create nCore's message handler!"));
         UnregisterClass(g_szMsgHandler, hDllInstance);
         return false;
     }

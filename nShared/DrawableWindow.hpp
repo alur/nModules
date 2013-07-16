@@ -126,6 +126,7 @@ public:
     void SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT alignment);
 
     // Sets the position of this drawablewindow, relative to its parent.
+    void SetPosition(RECT rect);
     void SetPosition(int x, int y, int width, int height);
 
     // Sets the text of this window.

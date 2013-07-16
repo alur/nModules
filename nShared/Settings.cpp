@@ -8,7 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "Settings.hpp"
-#include "Error.h"
+#include "ErrorHandler.h"
 #include "../nCoreCom/Core.h"
 #include "../nShared/Macros.h"
 
@@ -126,7 +126,7 @@ Settings* Settings::GreateGroup(LPCSTR pszPrev[]) {
                 }
                 StringCchCat(szMsg, sizeof(szMsg), szBuf);
                 
-                ErrorMessage(E_LVL_ERROR, szMsg);
+                ErrorHandler::Error(ErrorHandler::Level::Critical, szMsg);
                 
                 // And break out of the chain
                 free((LPVOID)pszPrev);

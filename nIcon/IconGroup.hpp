@@ -11,14 +11,10 @@
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/Settings.hpp"
 #include "IIconEventHandler.hpp"
-#include "Icon.hpp"
+#include "IconTile.hpp"
 #include "../nShared/LayoutSettings.hpp"
 #include <ShlObj.h>
-#include <map>
-#include <stack>
-
-
-using std::map;
+#include <set>
 
 
 class IconGroup : public IIconEventHandler, public Drawable {
@@ -27,66 +23,41 @@ public:
     virtual ~IconGroup();
 
     LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID);
-
     void SetFolder(LPWSTR path);
     
 private:
     //
     HRESULT GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR buf, UINT cchBuf);
-
-    // 
     void AddIcon(PCITEMID_CHILD pidl, bool noRedraw = false);
-
-    // 
     void RemoveIcon(PCITEMID_CHILD pidl);
-
-    //
     void UpdateIcon(PCITEMID_CHILD pidl);
-
-    //
     void UpdateAllIcons();
-
-    //
     void RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID);
-
-    // 
     void PositionIcon(PCITEMID_CHILD pidl, D2D1_RECT_F* position);
-
-    //
-    vector<Icon*>::iterator FindIcon(PCITEMID_CHILD pidl);
+    IconTile* FindIcon(PCITEMID_CHILD pidl);
 
 private:
     //
-    LayoutSettings layoutSettings;
-
-    // All available icon positions.
-    std::stack<POINT> mIconPositions;
+    LayoutSettings mLayoutSettings;
 
     //
-    int iconSize;
-
-    //
-    int tileWidth;
-
-    //
-    int tileHeight;
+    int mTileWidth;
+    int mTileHeight;
 
     // Positioning
-    POINTF PointFromPositionID(int id);
-    std::stack<int> mEmptySpots;
+    std::set<int> mEmptySpots;
     int mNextPositionID;
 
     // All icons currently part of this group.
-    vector<Icon*> icons;
+    std::vector<IconTile*> mIcons;
 
     // Return value of the latest SHChangeNofityRegister call.
-    ULONG changeNotifyUID;
-
-    UINT changeNotifyMsg;
+    ULONG mChangeNotifyUID;
+    UINT mChangeNotifyMsg;
 
     // IShellFolder for the folder we are currently in.
-    IShellFolder2* workingFolder;
+    IShellFolder2* mWorkingFolder;
 
     // IShellFolder for the root of the file system.
-    IShellFolder2* rootFolder;
+    IShellFolder2* mRootFolder;
 };

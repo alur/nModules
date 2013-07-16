@@ -8,7 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "nKey.h"
-#include "../nShared/Error.h"
+#include "../nShared/ErrorHandler.h"
 #include "../nShared/LSModule.hpp"
 #include <map>
 #include "Version.h"

@@ -9,6 +9,7 @@
 #include <windowsx.h>
 #include <strsafe.h>
 #include <Shlwapi.h>
+#include <algorithm>
 #include "IconGroup.hpp"
 #include "../nShared/Macros.h"
 #include "../nShared/Debugging.h"
@@ -23,7 +24,7 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     WCHAR path[MAX_PATH];
 
     // Initalize all variables.
-    this->changeNotifyUID = 0;
+    this->mChangeNotifyUID = 0;
 
     DrawableSettings defaults;
     defaults.width = 500;
@@ -33,29 +34,29 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     defaultState.backgroundBrush.color = 0x00000000;
 
     this->settings->GetString("Folder", path, sizeof(path), "Desktop");
-
+    
     // Icon settings
-    Settings* iconSettings = this->settings->CreateChild("Icon");
-    this->iconSize = iconSettings->GetInt("Size", 64);
+    Settings *iconSettings = this->settings->CreateChild("Icon");
+    int iconSize = iconSettings->GetInt("Size", 48);
     delete iconSettings;
 
     // Tile settings
-    Settings* tileSettings = this->settings->CreateChild("Tile");
-    this->tileHeight = tileSettings->GetInt("Height", 100);
-    this->tileWidth = tileSettings->GetInt("Width", 80);
+    Settings *tileSettings = this->settings->CreateChild("Tile");
+    mTileHeight = tileSettings->GetInt("Height", iconSize + 20);
+    mTileWidth = tileSettings->GetInt("Width", iconSize + 20);
     delete tileSettings;
 
     //
     LayoutSettings layoutDefaults;
-    layoutDefaults.columnSpacing = 20;
-    layoutDefaults.rowSpacing = 20;
-    layoutDefaults.padding.left = 5;
-    layoutDefaults.padding.top = 5;
-    layoutDefaults.padding.right = 5;
-    layoutDefaults.padding.bottom = 5;
-    layoutDefaults.startPosition = LayoutSettings::StartPosition::TopLeft;
-    layoutDefaults.primaryDirection = LayoutSettings::Direction::Horizontal;
-    layoutSettings.Load(this->settings, &layoutDefaults);
+    layoutDefaults.mColumnSpacing = 10;
+    layoutDefaults.mRowSpacing = 10;
+    layoutDefaults.mPadding.left = 5;
+    layoutDefaults.mPadding.top = 5;
+    layoutDefaults.mPadding.right = 5;
+    layoutDefaults.mPadding.bottom = 5;
+    layoutDefaults.mStartPosition = LayoutSettings::StartPosition::TopLeft;
+    layoutDefaults.mPrimaryDirection = LayoutSettings::Direction::Horizontal;
+    mLayoutSettings.Load(this->settings, &layoutDefaults);
 
     mNextPositionID = 0;
 
@@ -63,7 +64,7 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     this->window->AddDropRegion();
     this->window->Show();
 
-    this->changeNotifyMsg = this->window->RegisterUserMessage(this);
+    mChangeNotifyMsg = this->window->RegisterUserMessage(this);
 
     SetFolder(path);
 }
@@ -73,21 +74,21 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
 /// Destructor
 /// </summary>
 IconGroup::~IconGroup() {
-    if (this->changeNotifyUID != 0) {
-        SHChangeNotifyDeregister(this->changeNotifyUID);
+    if (mChangeNotifyUID != 0) {
+        SHChangeNotifyDeregister(mChangeNotifyUID);
     }
 
-    if (this->changeNotifyMsg) {
-        this->window->ReleaseUserMessage(this->changeNotifyMsg);
+    if (mChangeNotifyMsg) {
+        this->window->ReleaseUserMessage(mChangeNotifyMsg);
     }
 
-    for (vector<Icon*>::const_iterator iter = icons.begin(); iter != icons.end(); iter++) {
-        delete *iter;
+    for (auto icon : mIcons) {
+        delete icon;
     }
-    icons.clear();
+    mIcons.clear();
 
-    SAFERELEASE(this->workingFolder);
-    SAFERELEASE(this->rootFolder);
+    SAFERELEASE(mWorkingFolder);
+    SAFERELEASE(mRootFolder);
 }
 
 
@@ -99,25 +100,25 @@ void IconGroup::SetFolder(LPWSTR folder) {
     IEnumIDList* enumIDList;
 
     // Just in case we are switching folders, deregister for old notifications
-    if (this->changeNotifyUID != 0) {
-        SHChangeNotifyDeregister(this->changeNotifyUID);
+    if (mChangeNotifyUID != 0) {
+        SHChangeNotifyDeregister(mChangeNotifyUID);
     }
 
     // Get the root ISHellFolder
-    SHGetDesktopFolder(reinterpret_cast<IShellFolder**>(&this->rootFolder));
+    SHGetDesktopFolder(reinterpret_cast<IShellFolder**>(&mRootFolder));
 
     // Get the folder we are interested in
     if (_wcsicmp(folder, L"desktop") == 0) {
         SHGetKnownFolderIDList(FOLDERID_Desktop, 0, NULL, &idList);
-        SHGetDesktopFolder(reinterpret_cast<IShellFolder**>(&this->workingFolder));
+        SHGetDesktopFolder(reinterpret_cast<IShellFolder**>(&mWorkingFolder));
     }
     else {
-        this->rootFolder->ParseDisplayName(NULL, NULL, folder, NULL, &idList, NULL);
-        this->rootFolder->BindToObject(idList, NULL, IID_IShellFolder, reinterpret_cast<LPVOID*>(&this->workingFolder));
+        mRootFolder->ParseDisplayName(NULL, NULL, folder, NULL, &idList, NULL);
+        mRootFolder->BindToObject(idList, NULL, IID_IShellFolder, reinterpret_cast<LPVOID*>(&mWorkingFolder));
     }
 
     // Enumerate the contents of this folder
-    this->workingFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList);
+    mWorkingFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList);
     while (enumIDList->Next(1, &idNext, NULL) != S_FALSE) {
         AddIcon(idNext, true);
     }
@@ -127,12 +128,12 @@ void IconGroup::SetFolder(LPWSTR folder) {
 
     // Register for change notifications
     SHChangeNotifyEntry watchEntries[] = { idList, FALSE };
-    this->changeNotifyUID = SHChangeNotifyRegister(
+    mChangeNotifyUID = SHChangeNotifyRegister(
         this->window->GetWindowHandle(),
         SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
         SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM
         | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM | SHCNE_UPDATEDIR | SHCNE_UPDATEIMAGE | SHCNE_ASSOCCHANGED,
-        this->changeNotifyMsg,
+        mChangeNotifyMsg,
         1,
         watchEntries);
 
@@ -147,83 +148,63 @@ void IconGroup::SetFolder(LPWSTR folder) {
 /// </summary>
 void IconGroup::AddIcon(PCITEMID_CHILD pidl, bool noRedraw) {
     // Don't add existing icons
-    if (FindIcon(pidl) != this->icons.end()) return;
+    if (FindIcon(pidl) != nullptr) return;
 
     D2D1_RECT_F pos;
     PositionIcon(pidl, &pos);
-    Icon* icon = new Icon(this, pidl, this->workingFolder);
+    IconTile* icon = new IconTile(this, pidl, mWorkingFolder, mTileWidth, mTileHeight);
     icon->SetPosition((int)pos.left, (int)pos.top, noRedraw);
-    icons.push_back(icon);
+    mIcons.push_back(icon);
 }
 
 
 void IconGroup::RemoveIcon(PCITEMID_CHILD pidl) {
-    vector<Icon*>::iterator icon = FindIcon(pidl);
-    if (icon != icons.end()) {
-        (*icon)->Hide();
-        delete *icon;
-        icons.erase(icon);
-        this->window->Repaint();
-    }
+    std::remove_if(mIcons.begin(), mIcons.end(), [pidl] (IconTile *icon) -> bool {
+        if (icon->CompareID(pidl) == 0) {
+            delete icon;
+            return true;
+        }
+        return false;
+    });
+    this->window->Repaint();
 }
 
 
 void IconGroup::UpdateIcon(PCITEMID_CHILD pidl) {
-    vector<Icon*>::iterator icon = FindIcon(pidl);
-    if (icon != icons.end()) {
-        (*icon)->UpdateIcon();
+    auto icon = FindIcon(pidl);
+    if (icon != nullptr) {
+        icon->UpdateIcon();
     }
 }
 
 
 void IconGroup::RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID) {
-    vector<Icon*>::iterator icon = FindIcon(oldID);
-    if (icon != icons.end()) {
-        (*icon)->Rename(newID);
+    auto icon = FindIcon(oldID);
+    if (icon != nullptr) {
+        icon->Rename(newID);
     }
 }
 
 
-POINTF IconGroup::PointFromPositionID(int id)
-{
-    POINTF pt;
-
-    int iconsPerRow = max(1, (this->window->GetDrawingSettings()->width - layoutSettings.padding.left - layoutSettings.padding.right) / (tileWidth + layoutSettings.columnSpacing));
-
-    int row = id / iconsPerRow;
-    int column = id % iconsPerRow;
-
-    pt.x = (FLOAT)layoutSettings.padding.left + column * (tileWidth + layoutSettings.columnSpacing);
-    pt.y = (FLOAT)layoutSettings.padding.top + row * (tileHeight + layoutSettings.rowSpacing);
-
-    return pt;
+void IconGroup::PositionIcon(PCITEMID_CHILD /* pidl */, D2D1_RECT_F *position) {
+    RECT r = mLayoutSettings.RectFromID(mNextPositionID++, mTileWidth, mTileHeight, this->window->GetDrawingSettings()->width, this->window->GetDrawingSettings()->height);
+    *position = D2D1::RectF(FLOAT(r.left), FLOAT(r.top), FLOAT(r.right), FLOAT(r.bottom));
 }
 
 
-void IconGroup::PositionIcon(PCITEMID_CHILD /* pidl */, D2D1_RECT_F* position) {
-    POINTF pos = PointFromPositionID(mNextPositionID++);
-
-    position->bottom = pos.y + tileHeight;
-    position->left = pos.x;
-    position->right = pos.x + tileWidth;
-    position->top = pos.y;
-}
-
-
-vector<Icon*>::iterator IconGroup::FindIcon(PCITEMID_CHILD pidl) {
-    vector<Icon*>::iterator icon;
-    for (icon = this->icons.begin(); icon != this->icons.end(); ++icon) {
-        if ((*icon)->CompareID(pidl) == 0) {
+IconTile* IconGroup::FindIcon(PCITEMID_CHILD pidl) {
+    for (auto icon : mIcons) {
+        if (icon->CompareID(pidl) == 0) {
             return icon;
         }
     }
-    return icon;
+    return nullptr;
 }
 
 
 void IconGroup::UpdateAllIcons() {
-    for (vector<Icon*>::iterator icon = this->icons.begin(); icon != this->icons.end(); ++icon) {
-        (*icon)->UpdateIcon(false);
+    for (auto icon : mIcons) {
+        icon->UpdateIcon(false);
     }
     this->window->Repaint();
 }
@@ -237,7 +218,7 @@ HRESULT IconGroup::GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR bu
     STRRET ret;
     HRESULT hr;
 
-    hr = this->rootFolder->GetDisplayNameOf(pidl, flags, &ret);
+    hr = mRootFolder->GetDisplayNameOf(pidl, flags, &ret);
 
     if (SUCCEEDED(hr)) {
         hr = StrRetToBufW(&ret, pidl, buf, cchBuf);
@@ -251,7 +232,7 @@ HRESULT IconGroup::GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR bu
 /// 
 /// </summary>
 LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
-    if (message == this->changeNotifyMsg) {
+    if (message == mChangeNotifyMsg) {
         long event;
         PIDLIST_ABSOLUTE* idList;
         WCHAR file1[MAX_PATH] = L"", file2[MAX_PATH] = L"";

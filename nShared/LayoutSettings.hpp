@@ -31,18 +31,24 @@ public:
     // Loads the actual settings.
     void Load(Settings* settings, LayoutSettings* defaults);
 
+    // Calculates the positioning of an item based on its position ID.
+    RECT RectFromID(int id, int itemWidth, int itemHeight, int containerWidth, int containerHeight);
+
+    // Returns the length needed to contain the specified number of items.
+    int LengthFromNumberOfItems(int numItems, int itemWidth, int itemHeight);
+
     // Padding around the items. Default: 0, 0, 0, 0
-    RECT padding;
+    RECT mPadding;
 
     // Horizontal spacing between the items. Default: 2
-    int columnSpacing;
+    int mColumnSpacing;
 
     // Vertical spacing between the items. Default: 2
-    int rowSpacing;
+    int mRowSpacing;
 
     // Where to start adding items. Default: TopLeft
-    StartPosition startPosition;
+    StartPosition mStartPosition;
 
     // Direction to go first from the starting position. Default: Horizontal
-    Direction primaryDirection;
+    Direction mPrimaryDirection;
 };

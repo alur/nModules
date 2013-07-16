@@ -14,7 +14,8 @@ class TrayIcon : public Drawable {
 public:
     explicit TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings* parentSettings);
     virtual ~TrayIcon();
-
+    
+    void Reposition(RECT rect);
     void Reposition(UINT x, UINT y, UINT width, UINT height);
     void Show();
 

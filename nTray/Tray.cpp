@@ -130,70 +130,11 @@ void Tray::RemoveIcon(TrayIcon* pIcon) {
 /// Repositions/Resizes all icons.
 /// </summary>
 void Tray::Relayout() {
-    int x0, y0, xdir, ydir;
+    int i = 0;
+    DrawableSettings *drawingSettings = this->window->GetDrawingSettings();
 
-    DrawableSettings* drawingSettings = this->window->GetDrawingSettings();
-
-    switch (this->layoutSettings->startPosition) {
-    default:
-    case LayoutSettings::StartPosition::TopLeft:
-        {
-            x0 = this->layoutSettings->padding.left;
-            y0 = this->layoutSettings->padding.top;
-            xdir = 1;
-            ydir = 1;
-        }
-        break;
-
-    case LayoutSettings::StartPosition::TopRight:
-        {
-            x0 = drawingSettings->width - this->layoutSettings->padding.right - this->iconSize;
-            y0 = this->layoutSettings->padding.top;
-            xdir = -1;
-            ydir = 1;
-        }
-        break;
-
-    case LayoutSettings::StartPosition::BottomLeft:
-        {
-            x0 = this->layoutSettings->padding.left;
-            y0 = drawingSettings->height - this->layoutSettings->padding.bottom - this->iconSize;
-            xdir = 1;
-            ydir = -1;
-        }
-        break;
-
-    case LayoutSettings::StartPosition::BottomRight:
-        {
-            x0 = drawingSettings->width - this->layoutSettings->padding.right - this->iconSize;
-            y0 = drawingSettings->height - this->layoutSettings->padding.bottom - this->iconSize;
-            xdir = -1;
-            ydir = -1;
-        }
-        break;
-    }
-
-    if (this->layoutSettings->primaryDirection == LayoutSettings::Direction::Horizontal) {
-        int x = x0, y = y0;
-        for (vector<TrayIcon*>::const_iterator iter = this->icons.begin(); iter != this->icons.end(); iter++) {
-            (*iter)->Reposition(x, y, this->iconSize, this->iconSize);
-            x += xdir*(this->iconSize + this->layoutSettings->columnSpacing);
-            if (x < this->layoutSettings->padding.left || x > drawingSettings->width - this->layoutSettings->padding.right - this->iconSize) {
-                x = x0;
-                y += ydir*(this->iconSize + this->layoutSettings->rowSpacing);
-            }
-        }
-    }
-    else {
-        int x = x0, y = y0;
-        for (vector<TrayIcon*>::const_iterator iter = this->icons.begin(); iter != this->icons.end(); iter++) {
-            (*iter)->Reposition(x, y, this->iconSize, this->iconSize);
-            y += ydir*(this->iconSize + this->layoutSettings->rowSpacing);
-            if (y < this->layoutSettings->padding.top || y > drawingSettings->height - this->layoutSettings->padding.bottom - this->iconSize) {
-                y = y0;
-                x += xdir*(this->iconSize + this->layoutSettings->columnSpacing);
-            }
-        }
+    for (auto icon : this->icons) {
+        icon->Reposition(this->layoutSettings->RectFromID(i++, this->iconSize, this->iconSize, drawingSettings->width, drawingSettings->height));
     }
 }
 

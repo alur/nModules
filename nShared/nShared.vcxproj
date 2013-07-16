@@ -38,7 +38,7 @@
     <ClInclude Include="StateSettings.hpp" />
     <ClInclude Include="DrawableWindow.hpp" />
     <ClInclude Include="Easing.h" />
-    <ClInclude Include="Error.h" />
+    <ClInclude Include="ErrorHandler.h" />
     <ClInclude Include="EventHandler.hpp" />
     <ClInclude Include="Factories.h" />
     <ClInclude Include="IPainter.hpp" />
@@ -74,7 +74,7 @@
     <ClCompile Include="Overlay.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="Easing.cpp" />
-    <ClCompile Include="Error.cpp" />
+    <ClCompile Include="ErrorHandler.cpp" />
     <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="Factories.cpp" />
     <ClCompile Include="LayoutSettings.cpp" />

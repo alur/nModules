@@ -923,6 +923,15 @@ UINT_PTR DrawableWindow::SetCallbackTimer(UINT elapse, MessageHandler* msgHandle
 /// <summary>
 /// Moves and resizes the window.
 /// </summary>
+/// <param name="rect">The new position of the window.</param>
+void DrawableWindow::SetPosition(RECT rect) {
+    SetPosition(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+}
+
+
+/// <summary>
+/// Moves and resizes the window.
+/// </summary>
 /// <param name="x">The x coordinate to move the window to. Relative to the parent.</param>
 /// <param name="y">The y coordinate to move the window to. Relative to the parent.</param>
 /// <param name="width">The width to resize the window to.</param>
