@@ -16,4 +16,5 @@ namespace TextFunctions {
     void _Unregister();
 
     TEXTFUNCTION(Time);
+    TEXTFUNCTION(Br);
 }

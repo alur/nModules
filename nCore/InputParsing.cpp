@@ -13,7 +13,7 @@
 #include <dwmapi.h>
 
 
-EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target);
+EXPORT_CDECL(bool) ParseColor(LPCSTR color, LPARGB target);
 
 
 /// <summary>
@@ -24,8 +24,8 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target);
 /// <param name="canBeRelative">Ttrue if the coordinate can be relative to a monitor.</param>
 /// <param name="canBeNegative">True if the coordinate can be negative.</param>
 /// <returns>True if szCoordinate is a valid coordinate.</return>
-EXPORT_CDECL(bool) ParseCoordinateEx(LPCSTR coordinate, int * target, bool /* canBeRelative */ = true, bool canBeNegative = true) {
-    char * endPtr;
+EXPORT_CDECL(bool) ParseCoordinateEx(LPCSTR coordinate, LPINT target, bool /* canBeRelative */ = true, bool canBeNegative = true) {
+    LPSTR endPtr;
     int i = strtol(coordinate, &endPtr, 0);
 
     if (*coordinate == '\0' || *endPtr != '\0' || (!canBeNegative && i < 0)) {
@@ -46,8 +46,8 @@ EXPORT_CDECL(bool) ParseCoordinateEx(LPCSTR coordinate, int * target, bool /* ca
 /// <param name="canBeRelative">Ttrue if the length can be relative to a monitor.</param>
 /// <param name="canBeNegative">True if the length can be negative.</param>
 /// <returns>True if szLength is a valid length.</return>
-EXPORT_CDECL(bool) ParseLength(LPCSTR length, int * target, bool /* canBeRelative */ = true, bool canBeNegative = false) {
-    char * endPtr;
+EXPORT_CDECL(bool) ParseLength(LPCSTR length, LPINT target, bool /* canBeRelative */ = true, bool canBeNegative = false) {
+    LPSTR endPtr;
     int i = strtol(length, &endPtr, 0);
 
     if (*length == '\0' || *endPtr != '\0' || (!canBeNegative && i < 0)) {
@@ -64,16 +64,16 @@ EXPORT_CDECL(bool) ParseLength(LPCSTR length, int * target, bool /* canBeRelativ
 /// Reads a prefixed integer value from an RC file
 /// </summary>
 EXPORT_CDECL(int) GetPrefixedRCInt(LPCSTR prefix, LPCSTR option, int default) {
-    char szOptionName[MAX_LINE_LENGTH];
-    StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", prefix, option);
-    return LiteStep::GetRCInt(szOptionName, default);
+    char optionName[MAX_LINE_LENGTH];
+    StringCchPrintf(optionName, MAX_LINE_LENGTH, "%s%s", prefix, option);
+    return LiteStep::GetRCInt(optionName, default);
 }
 
 
 /// <summary>
 /// Parses a monitor definition
 /// </summary>
-EXPORT_CDECL(bool) ParseMonitor(LPCSTR monitor, UINT * target) {
+EXPORT_CDECL(bool) ParseMonitor(LPCSTR monitor, LPUINT target) {
     if (_stricmp("primary", monitor) == 0) *target = 0;
     else if (_stricmp("secondary", monitor) == 0) *target = 1;
     else if (_stricmp("tertiary", monitor) == 0) *target = 2;
@@ -87,7 +87,7 @@ EXPORT_CDECL(bool) ParseMonitor(LPCSTR monitor, UINT * target) {
     else if (_stricmp("duodenary", monitor) == 0) *target = 11;
     else if (_stricmp("all", monitor) == 0) *target = 0xFFFFFFFF;
     else {
-        char * endPtr;
+        LPSTR endPtr;
         UINT u = strtoul(monitor, &endPtr, 0);
 
         if (*monitor == '\0' || *endPtr != '\0') {
@@ -158,10 +158,10 @@ int _GetParameters(LPCSTR source, UCHAR maxParams, LPSTR dests[], size_t cchDest
 }
 
 
-int _GetColorDefParams(LPCSTR source, UCHAR maxParams, int* out) {
+int _GetColorDefParams(LPCSTR source, UCHAR maxParams, LPINT out) {
     char val1[8], val2[8], val3[8], val4[8];
     LPSTR params[] = { val1, val2, val3, val4 };
-    char * endPtr;
+    LPSTR endPtr;
 
     int numParams = _GetParameters(source, maxParams, params, 8);
     
@@ -177,10 +177,10 @@ int _GetColorDefParams(LPCSTR source, UCHAR maxParams, int* out) {
 }
 
 
-bool _GetColorAndAmount(LPCSTR source, ARGB* color, long* amount) {
+bool _GetColorAndAmount(LPCSTR source, LPARGB color, LPLONG amount) {
     char val1[MAX_LINE_LENGTH], val2[MAX_LINE_LENGTH];
     LPSTR params[] = { val1, val2 };
-    char * endPtr;
+    LPSTR endPtr;
 
     if (_GetParameters(source, 2, params, MAX_LINE_LENGTH) != 2)
         return false;
@@ -197,15 +197,15 @@ bool _GetColorAndAmount(LPCSTR source, ARGB* color, long* amount) {
 /// <summary>
 /// Parses a user specified color.
 /// </summary>
-EXPORT_CDECL(bool) ParseColor(LPCSTR color, ARGB* target) {
+EXPORT_CDECL(bool) ParseColor(LPCSTR color, LPARGB target) {
     // Useful information
     size_t length;
     StringCchLength(color, MAX_LINE_LENGTH, &length);
 
     if (color[0] == '#') {
         // Try to parse the input as a hex string
-        char * endPtr;
-        ARGB colorValue = strtoul(color+1, &endPtr, 16);
+        LPSTR endPtr;
+        ARGB colorValue = strtoul(color + 1, &endPtr, 16);
         if (*endPtr != '\0')
             return false;
         

@@ -340,6 +340,9 @@ void ParsedText::Parse(LPCWSTR text) {
                 
                 pos = ++searchPos;
                 mode = 0;
+                numArgs = 0;
+                arguments = nullptr;
+                argumentStart = nullptr;
             }
             break;
         }
