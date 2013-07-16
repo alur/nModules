@@ -72,7 +72,7 @@ private:
     int tileHeight;
 
     // Positioning
-    POINT PointFromPositionID(int id);
+    POINTF PointFromPositionID(int id);
     std::stack<int> mEmptySpots;
     int mNextPositionID;
 

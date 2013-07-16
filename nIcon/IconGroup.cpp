@@ -184,24 +184,24 @@ void IconGroup::RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID) {
 }
 
 
-POINT IconGroup::PointFromPositionID(int id)
+POINTF IconGroup::PointFromPositionID(int id)
 {
-    POINT pt;
+    POINTF pt;
 
-    int iconsPerRow = (this->window->GetDrawingSettings()->width - layoutSettings.padding.left - layoutSettings.padding.right) / (tileWidth + layoutSettings.columnSpacing);
+    int iconsPerRow = max(1, (this->window->GetDrawingSettings()->width - layoutSettings.padding.left - layoutSettings.padding.right) / (tileWidth + layoutSettings.columnSpacing));
 
     int row = id / iconsPerRow;
     int column = id % iconsPerRow;
 
-    pt.x = layoutSettings.padding.left + column * (tileWidth + layoutSettings.columnSpacing);
-    pt.y = layoutSettings.padding.top + row * (tileHeight + layoutSettings.rowSpacing);
+    pt.x = (FLOAT)layoutSettings.padding.left + column * (tileWidth + layoutSettings.columnSpacing);
+    pt.y = (FLOAT)layoutSettings.padding.top + row * (tileHeight + layoutSettings.rowSpacing);
 
     return pt;
 }
 
 
 void IconGroup::PositionIcon(PCITEMID_CHILD /* pidl */, D2D1_RECT_F* position) {
-    POINT pos = PointFromPositionID(mNextPositionID++);
+    POINTF pos = PointFromPositionID(mNextPositionID++);
 
     position->bottom = pos.y + tileHeight;
     position->left = pos.x;
