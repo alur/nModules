@@ -11,6 +11,7 @@
 #include "../nShared/Macros.h"
 #include "IconTile.hpp"
 #include "../nShared/LSModule.hpp"
+#include <Thumbcache.h>
 
 
 IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder, int width, int height) : Drawable(parent, "Icon") {
@@ -189,7 +190,9 @@ void IconTile::Rename(PCITEMID_CHILD newItem) {
 /// Sets the icon of this item.
 /// </summary>
 void IconTile::SetIcon() {
+    IExtractImage *extractImage = nullptr;
     IExtractIconW *extractIcon = nullptr;
+    IThumbnailProvider *thumbnailProvider = nullptr;
     HICON icon = nullptr;
     WCHAR iconFile[MAX_PATH];
     int iconIndex = 0;
@@ -204,31 +207,75 @@ void IconTile::SetIcon() {
     pos.left = (drawingSettings->width - (float)mIconSize)/2;
     pos.right = pos.left + mIconSize;
 
-    // Get the IExtractIcon interface for this item.
-    hr = mShellFolder->GetUIObjectOf(nullptr, 1, (LPCITEMIDLIST *)&mItem, IID_IExtractIconW, nullptr, reinterpret_cast<LPVOID*>(&extractIcon));
 
-    // Get the location of the file containing the appropriate icon, and the index of the icon.
+    // First, lets try IThumbnailProvider
+    hr = mShellFolder->GetUIObjectOf(nullptr, 1, (LPCITEMIDLIST *)&mItem, IID_IThumbnailProvider, nullptr, reinterpret_cast<LPVOID*>(&thumbnailProvider));
     if (SUCCEEDED(hr)) {
-        hr = extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);
+        HBITMAP hBMP;
+        WTS_ALPHATYPE alphaType;
+
+        hr = thumbnailProvider->GetThumbnail(mIconSize, &hBMP, &alphaType);
+
+        if (SUCCEEDED(hr)) {
+            this->window->AddOverlay(pos, hBMP);
+        }
+
+        // Let go of the interface.
+        SAFERELEASE(thumbnailProvider);
+    }
+    
+    // If that fails, lets try IExtractImage
+    if (hr != S_OK) {
+        hr = mShellFolder->GetUIObjectOf(nullptr, 1, (LPCITEMIDLIST *)&mItem, IID_IExtractImage, nullptr, reinterpret_cast<LPVOID*>(&extractImage));
+
+        if (SUCCEEDED(hr)) {
+            HBITMAP hBMP;
+            WCHAR location[MAX_PATH];
+            SIZE size = { mIconSize, mIconSize };
+            DWORD flags = 0;
+
+            hr = extractImage->GetLocation(location, _countof(location), nullptr, &size, 0, &flags);
+        
+            if (SUCCEEDED(hr)) {
+                hr = extractImage->Extract(&hBMP);
+            }
+
+            if (SUCCEEDED(hr)) {
+                this->window->AddOverlay(pos, hBMP);
+            }
+
+            // Let go of the interface.
+            SAFERELEASE(extractImage);
+        }
     }
 
-    // Extract the icon.
-    if (SUCCEEDED(hr)) {
-        hr = extractIcon->Extract(iconFile, iconIndex, &icon, nullptr, MAKELONG(64, 0));
-    }
+    // Finally, fall back to IExtractIcon
+    if (hr != S_OK) {
+        hr = mShellFolder->GetUIObjectOf(nullptr, 1, (LPCITEMIDLIST *)&mItem, IID_IExtractIconW, nullptr, reinterpret_cast<LPVOID*>(&extractIcon));
 
-    // If the extraction failed, fall back to a 32x32 icon.
-    if (hr == S_FALSE) {
-        hr = extractIcon->Extract(iconFile, iconIndex, &icon, nullptr, MAKELONG(32, 0));
-    }
+        // Get the location of the file containing the appropriate icon, and the index of the icon.
+        if (SUCCEEDED(hr)) {
+            hr = extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);
+        }
 
-    // Add it as an overlay.
-    if (hr == S_OK) {
-        mIconOverlay = this->window->AddOverlay(pos, icon);
-    }
+        // Extract the icon.
+        if (SUCCEEDED(hr)) {
+            hr = extractIcon->Extract(iconFile, iconIndex, &icon, nullptr, MAKELONG(mIconSize, 0));
+        }
 
-    // Let go of the interface.
-    SAFERELEASE(extractIcon);
+        // If the extraction failed, fall back to a 32x32 icon.
+        if (hr == S_FALSE) {
+            hr = extractIcon->Extract(iconFile, iconIndex, &icon, nullptr, MAKELONG(32, 0));
+        }
+
+        // Add it as an overlay.
+        if (hr == S_OK) {
+            mIconOverlay = this->window->AddOverlay(pos, icon);
+        }
+
+        // Let go of the interface.
+        SAFERELEASE(extractIcon);
+    }
 }
 
 
