@@ -12,6 +12,7 @@
 #include "IconTile.hpp"
 #include "../nShared/LSModule.hpp"
 #include <Thumbcache.h>
+#include <CommonControls.h>
 
 
 IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder, int width, int height) : Drawable(parent, "Icon") {
@@ -260,7 +261,16 @@ void IconTile::SetIcon() {
 
         // Extract the icon.
         if (SUCCEEDED(hr)) {
-            hr = extractIcon->Extract(iconFile, iconIndex, &icon, nullptr, MAKELONG(mIconSize, 0));
+            if (wcscmp(iconFile, L"*") == 0) { // * always leads to bogus icons (32x32) :/
+                IImageList *imageList;
+                SHGetImageList(mIconSize > 48 ? SHIL_JUMBO : (mIconSize > 32 ? SHIL_EXTRALARGE : (mIconSize > 16 ? SHIL_LARGE : SHIL_SMALL)),
+                    IID_IImageList, reinterpret_cast<LPVOID*>(&imageList));
+                hr = imageList->GetIcon(iconIndex, ILD_TRANSPARENT, &icon);
+                SAFERELEASE(imageList);
+            }
+            else {
+                hr = extractIcon->Extract(iconFile, iconIndex, &icon, nullptr, MAKELONG(mIconSize, 0));
+            }
         }
 
         // If the extraction failed, fall back to a 32x32 icon.
