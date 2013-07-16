@@ -10,7 +10,7 @@
 #include <d2d1.h>
 
 // Color of the format AARRGGBB.
-typedef DWORD ARGB;
+typedef DWORD ARGB, *LPARGB;
 
 //
 typedef struct {

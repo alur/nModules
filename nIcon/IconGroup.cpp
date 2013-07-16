@@ -49,6 +49,10 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     LayoutSettings layoutDefaults;
     layoutDefaults.columnSpacing = 20;
     layoutDefaults.rowSpacing = 20;
+    layoutDefaults.padding.left = 5;
+    layoutDefaults.padding.top = 5;
+    layoutDefaults.padding.right = 5;
+    layoutDefaults.padding.bottom = 5;
     layoutDefaults.startPosition = LayoutSettings::StartPosition::TopLeft;
     layoutDefaults.primaryDirection = LayoutSettings::Direction::Horizontal;
     layoutSettings.Load(this->settings, &layoutDefaults);
