@@ -936,7 +936,7 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
 
     // Position the window and/or set the backarea.
     if (!this->parent) {
-        SetWindowPos(this->window, 0, x, y, width, height, SWP_NOZORDER);
+        SetWindowPos(this->window, 0, x, y, width, height, SWP_NOZORDER | SWP_NOACTIVATE);
         this->drawingArea = D2D1::RectF(0, 0, (float)width, (float)height);
         if (this->renderTarget) {
             D2D1_SIZE_U size = D2D1::SizeU(width, height);
@@ -968,9 +968,9 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
 /// <summary>
 /// Shows the window.
 /// </summary>
-void DrawableWindow::Show() {
+void DrawableWindow::Show(int nCmdShow) {
     if (!this->parent) {
-        ShowWindow(this->window, SW_SHOWNOACTIVATE);
+        ShowWindow(this->window, nCmdShow);
     }
     this->visible = true;
 }

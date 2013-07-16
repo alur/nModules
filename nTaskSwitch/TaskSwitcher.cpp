@@ -13,24 +13,24 @@
 #include <Shlwapi.h>
 
 
-static UINT (* DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = NULL;
-static HWND desktopWindow = NULL;
+static UINT (* DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = nullptr;
+static HWND desktopWindow = nullptr;
 
 
 TaskSwitcher::TaskSwitcher() : Drawable("nTaskSwitch") {
-    if (DwmpActivateLivePreview == NULL) {
+    if (DwmpActivateLivePreview == nullptr) {
         DwmpActivateLivePreview = (UINT (*)(UINT, HWND, HWND, UINT))GetProcAddress(GetModuleHandle("DWMAPI.DLL"), (LPCSTR)0x71);
     }
-    if (desktopWindow == NULL) {
-        desktopWindow = FindWindowW(L"DesktopBackgroundClass", NULL);
+    if (desktopWindow == nullptr) {
+        desktopWindow = FindWindowW(L"DesktopBackgroundClass", nullptr);
     }
 
-    this->hoveredThumbnail = NULL;
+    this->hoveredThumbnail = nullptr;
     this->peekTimer = 0;
 
     LoadSettings();
     
-    SetParent(this->window->GetWindowHandle(), NULL);
+    SetParent(this->window->GetWindowHandle(), nullptr);
     SetWindowLongPtr(this->window->GetWindowHandle(), GWL_EXSTYLE, WS_EX_TOOLWINDOW | WS_EX_COMPOSITED);
     SetWindowPos(this->window->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 }
@@ -162,7 +162,7 @@ void TaskSwitcher::AddWindow(HWND window) {
 
 
 void TaskSwitcher::Show(int delta) {
-    this->hoveredThumbnail = NULL;
+    this->hoveredThumbnail = nullptr;
     this->selectedWindow = 0;
     this->peeking = false;
 
@@ -182,11 +182,11 @@ void TaskSwitcher::Show(int delta) {
         this->window->GetDrawingSettings()->width, 
         height);
 
-    for (vector<TaskThumbnail*>::iterator iter = this->shownWindows.begin(); iter != this->shownWindows.end(); ++iter) {
-        (*iter)->UpdateIconPosition();
+    this->window->Show(SW_SHOWNORMAL);
+    
+    for (auto &thumbnail : this->shownWindows) {
+        thumbnail->UpdateIconPosition();
     }
-
-    this->window->Show();
 
     this->peekTimer = this->window->SetCallbackTimer(this->peekDelay, this);
     

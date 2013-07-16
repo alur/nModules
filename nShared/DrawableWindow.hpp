@@ -138,7 +138,7 @@ public:
     void SetTextOffsets(float left, float top, float right, float bottom);
 
     // Shows this window.
-    void Show();
+    void Show(int nCmdShow = SW_SHOWNOACTIVATE);
 
     void AddDropRegion();
 

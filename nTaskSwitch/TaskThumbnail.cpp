@@ -133,8 +133,11 @@ void TaskThumbnail::UpdateIconPosition() {
     TRACE("UpdateIconPosition: %x, %x", this, this->iconOverlayWindow);
     RECT r;
     this->window->GetScreenRect(&r);
-    this->window->SetPosition(r.left, r.top, 100, 100);
-    //this->iconOverlayWindow->SetPosition(r.left, r.top, 32, 32);
+    //this->window->SetPosition(r.left, r.top, 100, 100);
+    this->iconOverlayWindow->SetPosition(r.left, r.top, 32, 32);
+
+    SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOP,
+        0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 }
 
 
