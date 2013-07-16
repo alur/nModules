@@ -211,7 +211,7 @@ void IconTile::SetIcon() {
     // First, lets try IThumbnailProvider
     hr = mShellFolder->GetUIObjectOf(nullptr, 1, (LPCITEMIDLIST *)&mItem, IID_IThumbnailProvider, nullptr, reinterpret_cast<LPVOID*>(&thumbnailProvider));
     if (SUCCEEDED(hr)) {
-        HBITMAP hBMP;
+        HBITMAP hBMP = nullptr;
         WTS_ALPHATYPE alphaType;
 
         hr = thumbnailProvider->GetThumbnail(mIconSize, &hBMP, &alphaType);
@@ -229,7 +229,7 @@ void IconTile::SetIcon() {
         hr = mShellFolder->GetUIObjectOf(nullptr, 1, (LPCITEMIDLIST *)&mItem, IID_IExtractImage, nullptr, reinterpret_cast<LPVOID*>(&extractImage));
 
         if (SUCCEEDED(hr)) {
-            HBITMAP hBMP;
+            HBITMAP hBMP = nullptr;
             WCHAR location[MAX_PATH];
             SIZE size = { mIconSize, mIconSize };
             DWORD flags = 0;
