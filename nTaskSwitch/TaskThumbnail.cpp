@@ -122,6 +122,7 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
         r.bottom - 32 - verticalOffset - this->thumbnailMargins.bottom + 4, 32, 32);
 
     SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+    SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 
     UpdateIcon();
 }

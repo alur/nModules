@@ -596,6 +596,15 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
             this->monitorInfo->Update();
         }
         return 0;
+
+    case WM_WINDOWPOSCHANGING:
+        {
+            if (this->drawingSettings->alwaysOnTop) {
+                LPWINDOWPOS windowPos = LPWINDOWPOS(lParam);
+                windowPos->hwndInsertAfter = HWND_TOPMOST;
+            }
+        }
+        return 0;
     }
 
     // Forward registered user messages.
@@ -656,8 +665,9 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings
 
     // AlwaysOnTop... TODO::Fix this!
     if (!this->parent && this->drawingSettings->alwaysOnTop) {
-        SetParent(this->window, NULL);
-        SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+        SetParent(this->window, nullptr);
+        SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+        SetWindowPos(this->window, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
     }
     
     // Set the text.
@@ -980,6 +990,9 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
 void DrawableWindow::Show(int nCmdShow) {
     if (!this->parent) {
         ShowWindow(this->window, nCmdShow);
+        if (this->drawingSettings->alwaysOnTop) {
+            SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_ASYNCWINDOWPOS | SWP_NOSIZE | SWP_NOMOVE);
+        }
     }
     this->visible = true;
 }
