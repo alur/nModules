@@ -153,9 +153,11 @@
   <ItemGroup>
     <ClInclude Include="EnumArray.hpp" />
     <ClInclude Include="Iterator.hpp" />
+    <ClInclude Include="StopWatch.hpp" />
     <ClInclude Include="StringUtils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="StopWatch.cpp" />
     <ClCompile Include="StringUtils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

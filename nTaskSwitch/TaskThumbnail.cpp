@@ -11,7 +11,7 @@
 #include <strsafe.h>
 #include <Shldisp.h>
 #include "TaskSwitcher.hpp"
-
+#include "../Utilities/StopWatch.hpp"
 
 static HWND desktopWindow = NULL;
 static UINT (* DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = NULL;
@@ -123,18 +123,14 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
 
     SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 
-    TRACE("INIT: %x, %x", this, this->iconOverlayWindow);
-
     UpdateIcon();
 }
 
 
 void TaskThumbnail::UpdateIconPosition() {
-    TRACE("UpdateIconPosition: %x, %x", this, this->iconOverlayWindow);
     RECT r;
     this->window->GetScreenRect(&r);
-    //this->window->SetPosition(r.left, r.top, 100, 100);
-    this->iconOverlayWindow->SetPosition(r.left, r.top, 32, 32);
+    this->iconOverlayWindow->SetPosition(r.right - 32, r.bottom - 32, 32, 32);
 
     SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOP,
         0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
@@ -142,7 +138,6 @@ void TaskThumbnail::UpdateIconPosition() {
 
 
 TaskThumbnail::~TaskThumbnail() {
-    TRACE("~TaskThumbnail: %x, %x", this, this->iconOverlayWindow);
     delete this->iconOverlayWindow;
     DwmUnregisterThumbnail(this->thumbnail);
 }

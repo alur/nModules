@@ -36,6 +36,9 @@ private:
     void PositionIcon(PCITEMID_CHILD pidl, D2D1_RECT_F* position);
     IconTile* FindIcon(PCITEMID_CHILD pidl);
 
+    //
+    void LoadSettings();
+
 private:
     //
     LayoutSettings mLayoutSettings;
@@ -50,6 +53,9 @@ private:
 
     // All icons currently part of this group.
     std::list<IconTile*> mIcons;
+
+    // Items which should not be shown on the desktop
+    std::list<std::wstring> mHiddenItems;
 
     // Return value of the latest SHChangeNofityRegister call.
     ULONG mChangeNotifyUID;

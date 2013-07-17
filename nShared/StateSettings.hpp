@@ -29,6 +29,9 @@ public:
     // The settings to use for the outline brush.
     BrushSettings outlineBrush;
 
+    // The settings to use for the text's dropshadow brush.
+    BrushSettings textDropShadowBrush;
+
     // The x corner radius. Default: 0
     float cornerRadiusX;
 

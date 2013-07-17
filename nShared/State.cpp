@@ -28,6 +28,7 @@ State::State(Settings* settings, int defaultPriority, LPCWSTR* text) {
     this->text = text;
     this->textBrush = new Brush();
     this->textFormat = NULL;
+    this->textShadowBrush = new Brush();
 }
 
 
@@ -39,6 +40,7 @@ State::~State() {
     SAFEDELETE(this->backBrush);
     SAFEDELETE(this->outlineBrush);
     SAFEDELETE(this->textBrush);
+    SAFEDELETE(this->textShadowBrush);
 }
 
 
@@ -56,6 +58,7 @@ void State::UpdatePosition(D2D1_RECT_F position) {
     this->backBrush->UpdatePosition(position);
     this->outlineBrush->UpdatePosition(position);
     this->textBrush->UpdatePosition(position);
+    this->textShadowBrush->UpdatePosition(position);
 
     this->drawingArea.rect = this->backBrush->brushPosition;
 }
@@ -70,8 +73,10 @@ void State::Load(StateSettings* defaultSettings) {
     this->backBrush->Load(&this->drawingSettings->backgroundBrush);
     this->outlineBrush->Load(&this->drawingSettings->outlineBrush);
     this->textBrush->Load(&this->drawingSettings->textBrush);
+    this->textShadowBrush->Load(&this->drawingSettings->textDropShadowBrush);
 
-    CreateTextFormat();
+    CreateTextFormat(this->textFormat, false);
+    CreateTextFormat(this->textDropFormat, true);
 }
 
 
@@ -79,6 +84,7 @@ void State::DiscardDeviceResources() {
     backBrush->Discard();
     outlineBrush->Discard();
     textBrush->Discard();
+    textShadowBrush->Discard();
 }
 
 
@@ -89,6 +95,11 @@ void State::Paint(ID2D1RenderTarget* renderTarget) {
     if (this->outlineBrush->brush) {
         renderTarget->DrawRoundedRectangle(this->drawingArea, this->outlineBrush->brush, this->drawingSettings->outlineWidth);
     }
+    /*if (this->textShadowBrush->brush) {
+        renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, this->textRotationOrigin));
+        renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textFormat, this->textArea, this->textShadowBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+        renderTarget->SetTransform(Matrix3x2F::Identity());
+    }*/
     if (this->textBrush->brush) {
         renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, this->textRotationOrigin));
         renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textFormat, this->textArea, this->textBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
@@ -101,6 +112,7 @@ HRESULT State::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
     backBrush->ReCreate(renderTarget);
     outlineBrush->ReCreate(renderTarget);
     textBrush->ReCreate(renderTarget);
+    textShadowBrush->ReCreate(renderTarget);
 
     this->drawingArea.rect = this->backBrush->brushPosition;
     return S_OK;
@@ -136,7 +148,7 @@ void State::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
 /// <param name="drawingSettings">The settings to create the textformat with.</param>
 /// <param name="textFormat">Out. The textformat.</param>
 /// <returns>S_OK</returns>
-HRESULT State::CreateTextFormat() {
+HRESULT State::CreateTextFormat(IDWriteTextFormat *&textFormat, bool dropFormat) {
     // Font weight
     DWRITE_FONT_WEIGHT fontWeight;
     if (_stricmp(drawingSettings->fontWeight, "Thin") == 0)
@@ -172,6 +184,8 @@ HRESULT State::CreateTextFormat() {
     else
         fontWeight = DWRITE_FONT_WEIGHT_NORMAL;
 
+    if (dropFormat) fontWeight = DWRITE_FONT_WEIGHT(min(950, fontWeight + 300));
+
     // Font style
     DWRITE_FONT_STYLE fontStyle;
     if (_stricmp(drawingSettings->fontStyle, "Oblique") == 0)
@@ -204,34 +218,36 @@ HRESULT State::CreateTextFormat() {
     else
         fontStretch = DWRITE_FONT_STRETCH_NORMAL;
 
+    if (dropFormat) fontStretch = DWRITE_FONT_STRETCH(min(9, fontStretch + 2));
+
     // Create the text format
-    IDWriteFactory *pDWFactory = NULL;
+    IDWriteFactory *pDWFactory = nullptr;
     Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&pDWFactory));
     pDWFactory->CreateTextFormat(
         drawingSettings->font,
-        NULL,
+        nullptr,
         fontWeight,
         fontStyle,
         fontStretch,
-        drawingSettings->fontSize,
+        dropFormat ? drawingSettings->fontSize + 2 : drawingSettings->fontSize,
         L"en-US",
-        &this->textFormat);
+        &textFormat);
 
     // Set the horizontal text alignment
     if (_stricmp(drawingSettings->textAlign, "Center") == 0)
-        this->textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+        textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     else if (_stricmp(drawingSettings->textAlign, "Right") == 0)
-        this->textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
+        textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
     else
-        this->textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+        textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 
     // Set the vertical text alignment
     if (_stricmp(drawingSettings->textVerticalAlign, "Middle") == 0)
-        this->textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+        textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
     else if (_stricmp(drawingSettings->textVerticalAlign, "Bottom") == 0)
-        this->textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+        textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
     else
-        this->textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+        textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
     // Set the trimming method
     DWRITE_TRIMMING trimmingOptions;
@@ -244,13 +260,13 @@ HRESULT State::CreateTextFormat() {
     else
         trimmingOptions.granularity = DWRITE_TRIMMING_GRANULARITY_CHARACTER;
 
-    this->textFormat->SetTrimming(&trimmingOptions, NULL);
+    textFormat->SetTrimming(&trimmingOptions, nullptr);
 
     // Set word wrapping
-    this->textFormat->SetWordWrapping(drawingSettings->wordWrap ? DWRITE_WORD_WRAPPING_WRAP : DWRITE_WORD_WRAPPING_NO_WRAP);
+    textFormat->SetWordWrapping(drawingSettings->wordWrap ? DWRITE_WORD_WRAPPING_WRAP : DWRITE_WORD_WRAPPING_NO_WRAP);
 
     // Set reading direction
-    this->textFormat->SetReadingDirection(drawingSettings->rightToLeft ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
+    textFormat->SetReadingDirection(drawingSettings->rightToLeft ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
 
     return S_OK;
 }

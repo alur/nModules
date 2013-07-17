@@ -39,7 +39,7 @@ public:
 
 private:
     // Creates the text format for this state.
-    HRESULT CreateTextFormat();
+    HRESULT CreateTextFormat(IDWriteTextFormat *&textFormat, bool dropFormat);
 
     // Creates 
     HRESULT CreateBrush(BrushSettings* settings, ID2D1Brush* brush);
@@ -53,6 +53,9 @@ private:
     // The brush we are currently painting the text with.
     Brush* textBrush;
 
+    // The brush we are currently painting the text with.
+    Brush* textShadowBrush;
+
     // The brush to paint the outline with.
     Brush* outlineBrush;
 
@@ -61,6 +64,7 @@ private:
 
     // Defines how the text is formatted.
     IDWriteTextFormat* textFormat;
+    IDWriteTextFormat* textDropFormat;
 
     // Points to the windows text.
     LPCWSTR* text;

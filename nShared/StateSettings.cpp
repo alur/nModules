@@ -35,6 +35,7 @@ StateSettings::StateSettings() {
 
     this->backgroundBrush.color = 0xFF000000;
     this->textBrush.color = 0xFFFFFFFF;
+    this->textDropShadowBrush.color = 0x00000000;
 }
 
 
@@ -81,4 +82,8 @@ void StateSettings::Load(Settings* settings, StateSettings* defaults) {
     Settings* textSettings = settings->CreateChild("Font");
     this->textBrush.Load(textSettings, &defaults->textBrush);
     delete textSettings;
+
+    Settings* dropSettings = settings->CreateChild("TextDropShadow");
+    this->textDropShadowBrush.Load(dropSettings, &defaults->textDropShadowBrush);
+    delete dropSettings;
 }

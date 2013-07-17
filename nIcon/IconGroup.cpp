@@ -21,10 +21,10 @@
 /// Constructor
 /// </summary>
 IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
-    WCHAR path[MAX_PATH];
-
     // Initalize all variables.
     this->mChangeNotifyUID = 0;
+
+    LoadSettings();
 
     DrawableSettings defaults;
     defaults.width = 500;
@@ -33,31 +33,6 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     StateSettings defaultState;
     defaultState.backgroundBrush.color = 0x00000000;
 
-    this->settings->GetString("Folder", path, sizeof(path), "Desktop");
-    
-    // Icon settings
-    Settings *iconSettings = this->settings->CreateChild("Icon");
-    int iconSize = iconSettings->GetInt("Size", 48);
-    delete iconSettings;
-
-    // Tile settings
-    Settings *tileSettings = this->settings->CreateChild("Tile");
-    mTileHeight = tileSettings->GetInt("Height", iconSize + 20);
-    mTileWidth = tileSettings->GetInt("Width", iconSize + 20);
-    delete tileSettings;
-
-    //
-    LayoutSettings layoutDefaults;
-    layoutDefaults.mColumnSpacing = 10;
-    layoutDefaults.mRowSpacing = 10;
-    layoutDefaults.mPadding.left = 5;
-    layoutDefaults.mPadding.top = 5;
-    layoutDefaults.mPadding.right = 5;
-    layoutDefaults.mPadding.bottom = 5;
-    layoutDefaults.mStartPosition = LayoutSettings::StartPosition::TopLeft;
-    layoutDefaults.mPrimaryDirection = LayoutSettings::Direction::Horizontal;
-    mLayoutSettings.Load(this->settings, &layoutDefaults);
-
     mNextPositionID = 0;
 
     this->window->Initialize(&defaults, &defaultState);
@@ -65,7 +40,9 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     this->window->Show();
 
     mChangeNotifyMsg = this->window->RegisterUserMessage(this);
-
+    
+    WCHAR path[MAX_PATH];
+    this->settings->GetString("Folder", path, sizeof(path), "Desktop");
     SetFolder(path);
 }
 
@@ -89,6 +66,40 @@ IconGroup::~IconGroup() {
 
     SAFERELEASE(mWorkingFolder);
     SAFERELEASE(mRootFolder);
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+void IconGroup::LoadSettings() {
+    // Icon settings
+    Settings *iconSettings = this->settings->CreateChild("Icon");
+    int iconSize = iconSettings->GetInt("Size", 48);
+    delete iconSettings;
+
+    // Tile settings
+    Settings *tileSettings = this->settings->CreateChild("Tile");
+    mTileHeight = tileSettings->GetInt("Height", iconSize + 20);
+    mTileWidth = tileSettings->GetInt("Width", iconSize + 20);
+    delete tileSettings;
+
+    //
+    LayoutSettings layoutDefaults;
+    layoutDefaults.mColumnSpacing = 10;
+    layoutDefaults.mRowSpacing = 10;
+    layoutDefaults.mPadding.left = 5;
+    layoutDefaults.mPadding.top = 5;
+    layoutDefaults.mPadding.right = 5;
+    layoutDefaults.mPadding.bottom = 5;
+    layoutDefaults.mStartPosition = LayoutSettings::StartPosition::TopLeft;
+    layoutDefaults.mPrimaryDirection = LayoutSettings::Direction::Horizontal;
+    mLayoutSettings.Load(this->settings, &layoutDefaults);
+
+    //
+    char setting[64];
+    StringCchPrintf(setting, 64, "*%sHide", settings->prefix);
+
 }
 
 
@@ -152,6 +163,13 @@ void IconGroup::AddIcon(PCITEMID_CHILD pidl, bool noRedraw) {
 
     D2D1_RECT_F pos;
     PositionIcon(pidl, &pos);
+
+    WCHAR buffer[MAX_PATH];
+    GetDisplayNameOf(pidl, SHGDN_FORPARSING, buffer, _countof(buffer));
+    for (auto hidden : mHiddenItems) {
+        if (_wcsicmp(hidden.c_str(), buffer) == 0) return;
+    }
+
     IconTile* icon = new IconTile(this, pidl, mWorkingFolder, mTileWidth, mTileHeight);
     icon->SetPosition((int)pos.left, (int)pos.top, noRedraw);
     mIcons.push_back(icon);
