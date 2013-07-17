@@ -43,8 +43,11 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
     this->isFlashing = false;
 
     // Reset the system menu for the window
-    GetSystemMenu(this->watchedWindow, TRUE);
     this->menu = GetSystemMenu(this->watchedWindow, FALSE);
+    if (!IsMenu(this->menu)) {
+        GetSystemMenu(this->watchedWindow, TRUE);
+        this->menu = GetSystemMenu(this->watchedWindow, FALSE);
+    }
 }
 
 
@@ -169,8 +172,8 @@ void TaskButton::ShowMenu() {
     EnableMenuItem(this->menu, SC_MOVE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWMAXIMIZED ? MF_ENABLED : MF_GRAYED));
 
     // let application modify menu
-    PostMessage(this->watchedWindow, WM_INITMENUPOPUP, (WPARAM)this->menu, MAKELPARAM(0, TRUE));
     PostMessage(this->watchedWindow, WM_INITMENU, (WPARAM)this->menu, 0);
+    PostMessage(this->watchedWindow, WM_INITMENUPOPUP, (WPARAM)this->menu, MAKELPARAM(0, TRUE));
     
     POINT pt;
     GetCursorPos(&pt);
