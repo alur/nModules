@@ -666,8 +666,8 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings
     // AlwaysOnTop... TODO::Fix this!
     if (!this->parent && this->drawingSettings->alwaysOnTop) {
         SetParent(this->window, nullptr);
-        SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-        SetWindowPos(this->window, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+        SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+        SetWindowPos(this->window, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
     }
     
     // Set the text.
@@ -991,7 +991,7 @@ void DrawableWindow::Show(int nCmdShow) {
     if (!this->parent) {
         ShowWindow(this->window, nCmdShow);
         if (this->drawingSettings->alwaysOnTop) {
-            SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_ASYNCWINDOWPOS | SWP_NOSIZE | SWP_NOMOVE);
+            SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
         }
     }
     this->visible = true;
