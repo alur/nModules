@@ -22,6 +22,9 @@ public:
     LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID);
     HRESULT GetDisplayName(SHGDNF flags, LPWSTR buf, UINT cchBuf);
 
+    //
+    PCITEMID_CHILD GetItem();
+
 public:
     //
     int GetPositionID();

@@ -394,6 +394,48 @@ void IconGroup::SelectAll() {
 
 
 /// <summary>
+/// Brings up the context menu for the currently selected icons.
+/// </summary>
+void IconGroup::ContextMenu() {
+    IContextMenu *contextMenu;
+    HMENU menu;
+    std::vector<LPCITEMIDLIST> items;
+
+    for (IconTile *tile : mIcons) {
+        if (tile->IsSelected()) {
+            items.push_back(tile->GetItem());
+        }
+    }
+
+    if (items.empty()) {
+        return;
+    }
+
+    mWorkingFolder->GetUIObjectOf(nullptr, items.size(), &items[0], IID_IContextMenu, nullptr, reinterpret_cast<LPVOID*>(&contextMenu));
+
+    menu = CreatePopupMenu();
+    contextMenu->QueryContextMenu(menu, 0, 0, 0, CMF_NORMAL);
+
+    POINT pt;
+    GetCursorPos(&pt);
+
+    int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, this->window->GetWindowHandle(), nullptr);
+    if (command != 0) {
+        CMINVOKECOMMANDINFO info = { 0 };
+        char verb[MAX_LINE_LENGTH];
+        contextMenu->GetCommandString(command, GCS_VERBA, nullptr, verb, sizeof(verb));
+        info.cbSize = sizeof(info);
+        info.hwnd = nullptr;
+        info.lpVerb = verb;
+        contextMenu->InvokeCommand(&info);
+    }
+
+    DestroyMenu(menu);
+    contextMenu->Release();
+}
+
+
+/// <summary>
 /// Attempts to paste the contents of the clipboard to the desktop
 /// </summary>
 void IconGroup::DoPaste() {

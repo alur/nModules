@@ -27,6 +27,7 @@ public:
     
     void SelectAll();
     void DeselectAll();
+    void ContextMenu();
 
 private:
     //

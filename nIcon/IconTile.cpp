@@ -117,36 +117,22 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
 
     case WM_RBUTTONDOWN:
         {
-            IContextMenu *contextMenu;
-            HMENU menu;
-
-            mShellFolder->GetUIObjectOf(nullptr, 1, (LPCITEMIDLIST *)&mItem, IID_IContextMenu, nullptr, reinterpret_cast<LPVOID*>(&contextMenu));
-
-            menu = CreatePopupMenu();
-            contextMenu->QueryContextMenu(menu, 0, 0, 0, CMF_NORMAL);
-
-            POINT pt;
-            GetCursorPos(&pt);
-
-            int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, this->window->GetWindowHandle(), nullptr);
-            if (command != 0) {
-                CMINVOKECOMMANDINFO info = { 0 };
-                char verb[MAX_LINE_LENGTH];
-                contextMenu->GetCommandString(command, GCS_VERBA, nullptr, verb, sizeof(verb));
-                info.cbSize = sizeof(info);
-                info.hwnd = nullptr;
-                info.lpVerb = verb;
-                contextMenu->InvokeCommand(&info);
+            if (GetKeyState(VK_CONTROL) >= 0) {
+                ((IconGroup*)this->parent)->DeselectAll();
             }
-
-            DestroyMenu(menu);
-            contextMenu->Release();
+            this->window->ActivateState(mSelectedState);
+            ((IconGroup*)this->parent)->ContextMenu();
         }
         return 0;
 
     default:
         return DefWindowProc(wnd, msg, wParam, lParam);
     }
+}
+
+
+PCITEMID_CHILD IconTile::GetItem() {
+    return mItem;
 }
 
 
