@@ -38,6 +38,13 @@ public:
     // Shows the right-click menu for the icon.
     void ShowContextMenu();
 
+    //
+    bool IsSelected();
+
+    //
+    void Select(bool repaint = true);
+    void Deselect(bool repaint = true);
+
 private:
     // Sets the icon.
     void SetIcon();
@@ -56,7 +63,7 @@ private:
     int mIconSize;
 
     // 
-    DrawableWindow::STATE mHoverState, mSelectedState, mFocusedState;
+    DrawableWindow::STATE mHoverState, mSelectedState, mFocusedState, mGhostedState;
 
     //
     DrawableWindow::OVERLAY mIconOverlay;

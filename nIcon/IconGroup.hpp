@@ -25,6 +25,9 @@ public:
     LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID);
     void SetFolder(LPWSTR path);
     
+    void SelectAll();
+    void DeselectAll();
+
 private:
     //
     HRESULT GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR buf, UINT cchBuf);

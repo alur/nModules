@@ -51,10 +51,10 @@ public:
     PAINTER AddPostPainter(IPainter* painter);
 
     // Adds a new state.
-    STATE AddState(LPCSTR prefix, int defaultPriority, StateSettings* defaultSettings = NULL);
+    STATE AddState(LPCSTR prefix, int defaultPriority, StateSettings* defaultSettings = nullptr);
 
     // Marks a particular state as active.
-    void ActivateState(STATE state);
+    void ActivateState(STATE state, bool repaint = true);
 
     // Stops a timer.
     void ClearCallbackTimer(UINT_PTR);
@@ -63,7 +63,7 @@ public:
     void ClearOverlays();
 
     // Clears the active flag of a particular state.
-    void ClearState(STATE state);
+    void ClearState(STATE state, bool repaint = true);
 
     // Creates a new child window.
     DrawableWindow* CreateChild(Settings* childSettings, MessageHandler* msgHandler);
@@ -93,7 +93,7 @@ public:
     void Hide();
 
     // Initializes the DrawableWindow.
-    void Initialize(DrawableSettings* defaultSettings = NULL, StateSettings* baseStateDefaults = NULL);
+    void Initialize(DrawableSettings* defaultSettings = nullptr, StateSettings* baseStateDefaults = nullptr);
 
     // Returns whether or not this window is visible.
     bool IsVisible();
@@ -108,7 +108,7 @@ public:
     void ReleaseUserMessage(UINT message);
 
     // Forces this window to redraw.
-    void Repaint(LPRECT region = NULL);
+    void Repaint(LPRECT region = nullptr);
 
     // Resizes the window.
     void Resize(int width, int height);

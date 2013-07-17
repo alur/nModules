@@ -10,6 +10,7 @@
 #include <Shlwapi.h>
 #include "../nShared/Macros.h"
 #include "IconTile.hpp"
+#include "IconGroup.hpp"
 #include "../nShared/LSModule.hpp"
 #include <Thumbcache.h>
 #include <CommonControls.h>
@@ -107,7 +108,10 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
 
     case WM_LBUTTONDOWN:
         {
-            this->window->ToggleState(mSelectedState);
+            if (GetKeyState(VK_CONTROL) >= 0) {
+                ((IconGroup*)this->parent)->DeselectAll();
+            }
+            this->window->ActivateState(mSelectedState);
         }
         return 0;
 
@@ -143,6 +147,21 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
     default:
         return DefWindowProc(wnd, msg, wParam, lParam);
     }
+}
+
+
+void IconTile::Select(bool repaint) {
+    this->window->ActivateState(mSelectedState, repaint);
+}
+
+
+void IconTile::Deselect(bool repaint) {
+    this->window->ClearState(mSelectedState, repaint);
+}
+
+
+bool IconTile::IsSelected() {
+    return (*mSelectedState)->active;
 }
 
 

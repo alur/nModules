@@ -344,6 +344,28 @@ HRESULT IconGroup::GetFolderPath(LPWSTR buf, UINT cchBuf) {
 
 
 /// <summary>
+/// Deselects all items.
+/// </summary>
+void IconGroup::DeselectAll() {
+    for (IconTile *tile : mIcons) {
+        tile->Deselect(false);
+    }
+    this->window->Repaint();
+}
+
+
+/// <summary>
+/// Deselects all items.
+/// </summary>
+void IconGroup::SelectAll() {
+    for (IconTile *tile : mIcons) {
+        tile->Select(false);
+    }
+    this->window->Repaint();
+}
+
+
+/// <summary>
 /// Attempts to paste the contents of the clipboard to the desktop
 /// </summary>
 void IconGroup::DoPaste() {
@@ -464,6 +486,14 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
             {
                 switch (wParam)
                 {
+                case 'A':
+                    {
+                        if (GetKeyState(VK_CONTROL) < 0) {
+                            SelectAll();
+                        }
+                    }
+                    break;
+
                 case 'V':
                     {
                         if (GetKeyState(VK_CONTROL) < 0) {
@@ -472,6 +502,14 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
                     }
                     break;
                 }
+            }
+            break;
+
+        case WM_LBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+        case WM_MBUTTONDOWN:
+            {
+                DeselectAll();
             }
             break;
         }

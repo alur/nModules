@@ -286,11 +286,13 @@ DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, int defaultPriorit
 /// Actives a certain state.
 /// </summary>
 /// <param name="state">The state to activate.</param>
-void DrawableWindow::ActivateState(DrawableWindow::STATE state) {
+void DrawableWindow::ActivateState(DrawableWindow::STATE state, bool repaint) {
     (*state)->active = true;
     if (this->activeState == this->states.end() || (*this->activeState)->priority < (*state)->priority) {
         this->activeState = state;
-        Repaint();
+        if (repaint) {
+            Repaint();
+        }
     }
 }
 
@@ -350,13 +352,15 @@ void DrawableWindow::ClearOverlays() {
 /// Clears a certain state.
 /// </summary>
 /// <param name="state">The state to clear.</param>
-void DrawableWindow::ClearState(STATE state) {
+void DrawableWindow::ClearState(STATE state, bool repaint) {
     (*state)->active = false;
     if (state == this->activeState) {
         // We just cleared the active state, find the highest priority next active state.
         for (state++; state != this->states.end() && !(*state)->active; ++state);
         this->activeState = state;
-        Repaint();
+        if (repaint) {
+            Repaint();
+        }
     }
 }
 
