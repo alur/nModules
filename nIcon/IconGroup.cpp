@@ -114,6 +114,9 @@ void IconGroup::LoadSettings() {
 }
 
 
+/// <summary>
+/// 
+/// </summary>
 void IconGroup::AddNameFilter(LPCWSTR name) {
     if (_wcsicmp(name, L".computer") == 0) {
         mHiddenItems.push_back(L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
@@ -221,6 +224,9 @@ void IconGroup::AddIcon(PCITEMID_CHILD pidl, bool noRedraw) {
 }
 
 
+/// <summary>
+/// 
+/// </summary>
 void IconGroup::RemoveIcon(PCITEMID_CHILD pidl) {
     mIcons.remove_if([pidl, this] (IconTile *icon) -> bool {
         if (icon->CompareID(pidl) == 0) {
@@ -234,6 +240,9 @@ void IconGroup::RemoveIcon(PCITEMID_CHILD pidl) {
 }
 
 
+/// <summary>
+/// 
+/// </summary>
 void IconGroup::UpdateIcon(PCITEMID_CHILD pidl) {
     auto icon = FindIcon(pidl);
     if (icon != nullptr) {
@@ -242,6 +251,9 @@ void IconGroup::UpdateIcon(PCITEMID_CHILD pidl) {
 }
 
 
+/// <summary>
+/// 
+/// </summary>
 void IconGroup::RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID) {
     auto icon = FindIcon(oldID);
     if (icon != nullptr) {
@@ -250,6 +262,9 @@ void IconGroup::RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID) {
 }
 
 
+/// <summary>
+/// 
+/// </summary>
 int IconGroup::GetIconPosition(PCITEMID_CHILD /* pidl */) {
     if (!mEmptySpots.empty()) {
         int id = *mEmptySpots.begin();
@@ -260,6 +275,9 @@ int IconGroup::GetIconPosition(PCITEMID_CHILD /* pidl */) {
 }
 
 
+/// <summary>
+/// 
+/// </summary>
 IconTile* IconGroup::FindIcon(PCITEMID_CHILD pidl) {
     for (auto icon : mIcons) {
         if (icon->CompareID(pidl) == 0) {
@@ -270,13 +288,15 @@ IconTile* IconGroup::FindIcon(PCITEMID_CHILD pidl) {
 }
 
 
+/// <summary>
+/// 
+/// </summary>
 void IconGroup::UpdateAllIcons() {
     for (auto icon : mIcons) {
         icon->UpdateIcon(false);
     }
     this->window->Repaint();
 }
-
 
 
 /// <summary>
@@ -293,6 +313,85 @@ HRESULT IconGroup::GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR bu
     }
 
     return hr;
+}
+
+
+/// <summary>
+/// Retrives the parsing path for the current folder.
+/// </summary>
+HRESULT IconGroup::GetFolderPath(LPWSTR buf, UINT cchBuf) {
+    IPersistFolder2 *ipsf2;
+    LPITEMIDLIST curFolder;
+    STRRET curFolderName;
+    HRESULT hr;
+
+    if (SUCCEEDED(hr = mWorkingFolder->QueryInterface(IID_IPersistFolder2, (LPVOID*) &ipsf2))) {
+        hr = ipsf2->GetCurFolder(&curFolder);
+
+        if (SUCCEEDED(hr)) {
+            hr = mRootFolder->GetDisplayNameOf(curFolder, SHGDN_FORPARSING, &curFolderName);
+        }
+        
+        if (SUCCEEDED(hr)) {
+            hr = StrRetToBufW(&curFolderName, curFolder, buf, cchBuf);
+        }
+
+        ipsf2->Release();
+    }
+
+    return hr;
+}
+
+
+/// <summary>
+/// Attempts to paste the contents of the clipboard to the desktop
+/// </summary>
+void IconGroup::DoPaste() {
+    if (IsClipboardFormatAvailable(CF_HDROP)) {
+        if (OpenClipboard(this->window->GetWindowHandle())) {
+            LPDROPFILES data = LPDROPFILES(GetClipboardData(CF_HDROP));
+            bool move = false;
+            WCHAR target[MAX_PATH];
+
+            // Check if the file should be moved rather than copied.
+            UINT cfDropEffect = RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
+            if (IsClipboardFormatAvailable(cfDropEffect)) {
+                move = (*(DWORD*)GetClipboardData(cfDropEffect) & DROPEFFECT_MOVE) == DROPEFFECT_MOVE;
+            }
+
+            GetFolderPath(target, _countof(target));
+
+            // TODO::Handle data->fWide == 0
+            SHFILEOPSTRUCTW shFileOp;
+            ZeroMemory(&shFileOp, sizeof(shFileOp));
+            shFileOp.wFunc = move ? FO_MOVE : FO_COPY;
+            shFileOp.hwnd = this->window->GetWindowHandle();
+            shFileOp.pFrom = LPCWSTR((BYTE*)data + data->pFiles);
+            shFileOp.pTo = target;
+            shFileOp.fFlags = FOF_NOCONFIRMMKDIR;
+
+            SHFileOperationW(&shFileOp);
+            if (move && !shFileOp.fAnyOperationsAborted) {
+                EmptyClipboard();
+            }
+
+            CloseClipboard();
+        }
+    }
+    else if (IsClipboardFormatAvailable(CF_TEXT)) {
+    }
+    else if (IsClipboardFormatAvailable(CF_BITMAP)) {
+    }
+    else if (IsClipboardFormatAvailable(CF_WAVE)) {
+    }
+}
+
+
+/// <summary>
+/// Attempts to paste the contents of the clipboard to the desktop
+/// </summary>
+void IconGroup::DoCopy(bool cut) {
+    
 }
 
 
@@ -359,6 +458,24 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
         return 0;
     }
     else {
+        switch (message)
+        {
+        case WM_KEYDOWN:
+            {
+                switch (wParam)
+                {
+                case 'V':
+                    {
+                        if (GetKeyState(VK_CONTROL) < 0) {
+                            DoPaste();
+                        }
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+
         this->eventHandler->HandleMessage(window, message, wParam, lParam); 
         return DefWindowProc(window, message, wParam, lParam);
     }

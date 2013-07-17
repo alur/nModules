@@ -498,12 +498,12 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
     if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) {
         int xPos = GET_X_LPARAM(lParam); 
         int yPos = GET_Y_LPARAM(lParam);
-        MessageHandler* handler = NULL;
+        MessageHandler *handler = nullptr;
 
-        for (list<DrawableWindow*>::const_iterator iter = this->children.begin(); iter != this->children.end(); ++iter) {
-            D2D1_RECT_F* pos = &(*iter)->drawingArea;
-            if (xPos >= pos->left && xPos <= pos->right && yPos >= pos->top && yPos <= pos->bottom) {
-                handler = *iter;
+        for (DrawableWindow *child : this->children) {
+            D2D1_RECT_F pos = child->drawingArea;
+            if (xPos >= pos.left && xPos <= pos.right && yPos >= pos.top && yPos <= pos.bottom) {
+                handler = child;
                 break;
             }
         }
@@ -514,14 +514,14 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
                 TrackMouseEvent(&this->trackMouseStruct);
             }
             if (handler != activeChild) {
-                if (activeChild != NULL) {
-                    activeChild->HandleMessage(window, WM_MOUSELEAVE, NULL, NULL, this);
+                if (activeChild != nullptr) {
+                    activeChild->HandleMessage(window, WM_MOUSELEAVE, 0, 0, this);
                 }
                 activeChild = (DrawableWindow*)handler;
             }
         }
 
-        if (handler == NULL) {
+        if (handler == nullptr) {
             handler = this->msgHandler;
         }
 
@@ -529,14 +529,21 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         return handler->HandleMessage(window, msg, wParam, lParam, this);
     }
 
+    // Forward keyboard messages to the active child
+    if (msg >= WM_KEYFIRST && msg <= WM_KEYLAST) {
+        if (activeChild != nullptr) {
+            activeChild->HandleMessage(window, msg, wParam, lParam, this);
+        }
+    }
+
     // Handle DrawableWindow messages.
     switch (msg) {
     case WM_MOUSELEAVE:
         {
             isTrackingMouse = false;
-            if (activeChild != NULL) {
-                activeChild->HandleMessage(window, WM_MOUSELEAVE, NULL, NULL, this);
-                activeChild = NULL;
+            if (activeChild != nullptr) {
+                activeChild->HandleMessage(window, WM_MOUSELEAVE, 0, 0, this);
+                activeChild = nullptr;
             }
         }
         break;

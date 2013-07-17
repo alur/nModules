@@ -28,6 +28,7 @@ public:
 private:
     //
     HRESULT GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR buf, UINT cchBuf);
+    HRESULT GetFolderPath(LPWSTR buf, UINT cchBuf);
     void AddIcon(PCITEMID_CHILD pidl, bool noRedraw = false);
     void RemoveIcon(PCITEMID_CHILD pidl);
     void UpdateIcon(PCITEMID_CHILD pidl);
@@ -69,4 +70,9 @@ private:
 
     // IShellFolder for the root of the file system.
     IShellFolder2* mRootFolder;
+
+    // Copy & Paste
+private:
+    void DoPaste();
+    void DoCopy(bool cut);
 };

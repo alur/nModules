@@ -153,6 +153,7 @@ public:
     void UpdateText();
 
     // IUnknown
+public:
     ULONG WINAPI AddRef();
     HRESULT WINAPI QueryInterface(REFIID riid, void **ppvObject);
     ULONG WINAPI Release();
