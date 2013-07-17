@@ -49,7 +49,7 @@ private:
     int mNextPositionID;
 
     // All icons currently part of this group.
-    std::vector<IconTile*> mIcons;
+    std::list<IconTile*> mIcons;
 
     // Return value of the latest SHChangeNofityRegister call.
     ULONG mChangeNotifyUID;

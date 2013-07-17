@@ -159,7 +159,7 @@ void IconGroup::AddIcon(PCITEMID_CHILD pidl, bool noRedraw) {
 
 
 void IconGroup::RemoveIcon(PCITEMID_CHILD pidl) {
-    std::remove_if(mIcons.begin(), mIcons.end(), [pidl] (IconTile *icon) -> bool {
+    mIcons.remove_if([pidl] (IconTile *icon) -> bool {
         if (icon->CompareID(pidl) == 0) {
             delete icon;
             return true;
