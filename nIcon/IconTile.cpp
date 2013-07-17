@@ -117,7 +117,7 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
 
     case WM_RBUTTONDOWN:
         {
-            if (GetKeyState(VK_CONTROL) >= 0) {
+            if (GetKeyState(VK_CONTROL) >= 0 && !IsSelected()) {
                 ((IconGroup*)this->parent)->DeselectAll();
             }
             this->window->ActivateState(mSelectedState);

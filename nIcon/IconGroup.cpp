@@ -411,23 +411,27 @@ void IconGroup::ContextMenu() {
         return;
     }
 
-    mWorkingFolder->GetUIObjectOf(nullptr, items.size(), &items[0], IID_IContextMenu, nullptr, reinterpret_cast<LPVOID*>(&contextMenu));
+    mWorkingFolder->GetUIObjectOf(nullptr, UINT(items.size()), &items[0], IID_IContextMenu, nullptr, reinterpret_cast<LPVOID*>(&contextMenu));
 
     menu = CreatePopupMenu();
     contextMenu->QueryContextMenu(menu, 0, 0, 0, CMF_NORMAL);
 
     POINT pt;
     GetCursorPos(&pt);
-
+    HRESULT hr;
     int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, this->window->GetWindowHandle(), nullptr);
     if (command != 0) {
-        CMINVOKECOMMANDINFO info = { 0 };
-        char verb[MAX_LINE_LENGTH];
-        contextMenu->GetCommandString(command, GCS_VERBA, nullptr, verb, sizeof(verb));
+        CHAR verb[MAX_LINE_LENGTH];
+        contextMenu->GetCommandString(command, GCS_VERBA, nullptr, LPSTR(verb), _countof(verb));
+
+        // TODO::Figure out why InvokeCommand fails if i go for unicode.
+        CMINVOKECOMMANDINFOEX info;
+        ZeroMemory(&info, sizeof(info));
         info.cbSize = sizeof(info);
-        info.hwnd = nullptr;
+        //info.fMask = CMIC_MASK_UNICODE;
+        info.hwnd = this->window->GetWindowHandle();
         info.lpVerb = verb;
-        contextMenu->InvokeCommand(&info);
+        hr = contextMenu->InvokeCommand(LPCMINVOKECOMMANDINFO(&info));
     }
 
     DestroyMenu(menu);
@@ -530,6 +534,20 @@ void IconGroup::DeleteSelectedFiles() {
     shFileOp.fFlags = FOF_ALLOWUNDO | FOF_WANTNUKEWARNING;
 
     SHFileOperationW(&shFileOp);*/
+}
+
+
+/// <summary>
+/// Opens the selected files.
+/// </summary>
+void IconGroup::OpenSelectedFiles() {
+    for (IconTile *tile : mIcons) {
+        if (tile->IsSelected()) {
+            WCHAR command[MAX_LINE_LENGTH];
+            tile->GetDisplayName(SHGDN_FORPARSING, command, MAX_LINE_LENGTH);
+            ShellExecuteW(nullptr, nullptr, command, nullptr, nullptr, SW_SHOW);
+        }
+    }
 }
 
 
@@ -637,6 +655,12 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
                 case VK_DELETE:
                     {
                         DeleteSelectedFiles();
+                    }
+                    break;
+
+                case VK_RETURN:
+                    {
+                        OpenSelectedFiles();
                     }
                     break;
 

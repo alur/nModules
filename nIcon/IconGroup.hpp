@@ -80,4 +80,5 @@ private:
     void DoPaste();
     void DoCopy(bool cut);
     void DeleteSelectedFiles();
+    void OpenSelectedFiles();
 };
