@@ -223,6 +223,22 @@ void IconTile::SetIcon() {
         hr = thumbnailProvider->GetThumbnail(mIconSize, &hBMP, &alphaType);
 
         if (SUCCEEDED(hr)) {
+            BITMAP bmp;
+            GetObjectW(hBMP, sizeof(BITMAP), &bmp);
+
+            if (bmp.bmWidth > bmp.bmHeight) {
+                float scale = float(bmp.bmHeight) / float(bmp.bmWidth);
+
+                pos.top = mIconSize*(1 - scale)/2;
+                pos.bottom = mIconSize*(1 + scale)/2;
+            }
+            else if (bmp.bmWidth < bmp.bmHeight) {
+                float scale = float(bmp.bmWidth) / float(bmp.bmHeight);
+
+                pos.left = mIconSize*(1 - scale)/2;
+                pos.right = mIconSize*(1 + scale)/2;
+            }
+
             this->window->AddOverlay(pos, hBMP);
         }
 
