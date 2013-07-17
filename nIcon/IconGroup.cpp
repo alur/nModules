@@ -10,6 +10,7 @@
 #include <strsafe.h>
 #include <Shlwapi.h>
 #include <algorithm>
+#include <functional>
 #include "IconGroup.hpp"
 #include "../nShared/Macros.h"
 #include "../nShared/Debugging.h"
@@ -96,10 +97,52 @@ void IconGroup::LoadSettings() {
     layoutDefaults.mPrimaryDirection = LayoutSettings::Direction::Horizontal;
     mLayoutSettings.Load(this->settings, &layoutDefaults);
 
-    //
-    char setting[64];
-    StringCchPrintf(setting, 64, "*%sHide", settings->prefix);
+    if (!settings->GetBool("DontHideDesktopSystemIcons", false)) {
+        AddNameFilter(L".controlPanel");
+        AddNameFilter(L".libraries");
+        AddNameFilter(L".network");
+        AddNameFilter(L".homegroup");
+        AddNameFilter(L".user");
+    }
 
+    //
+    char buffer[64];
+    StringCchPrintfA(buffer, 64, "*%sHide", settings->prefix);
+    LiteStep::IterateOverLinesW(buffer, [this] (LPCWSTR line) -> void {
+        LiteStep::IterateOverTokens(line, std::bind(&IconGroup::AddNameFilter, this, std::placeholders::_1));
+    });
+}
+
+
+void IconGroup::AddNameFilter(LPCWSTR name) {
+    if (_wcsicmp(name, L".computer") == 0) {
+        mHiddenItems.push_back(L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
+    }
+    else if (_wcsicmp(name, L".recycleBin") == 0) {
+        mHiddenItems.push_back(L"::{645FF040-5081-101B-9F08-00AA002F954E}");
+    }
+    else if (_wcsicmp(name, L".controlPanel") == 0) {
+        mHiddenItems.push_back(L"::{26EE0668-A00A-44D7-9371-BEB064C98683}");
+        mHiddenItems.push_back(L"::{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}");
+    }
+    else if (_wcsicmp(name, L".libraries") == 0) {
+        mHiddenItems.push_back(L"::{031E4825-7B94-4DC3-B131-E946B44C8DD5}");
+    }
+    else if (_wcsicmp(name, L".network") == 0) {
+        mHiddenItems.push_back(L"::{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}");
+    }
+    else if (_wcsicmp(name, L".homegroup") == 0) {
+        mHiddenItems.push_back(L"::{B4FB3F98-C1EA-428D-A78A-D1F5659CBA93}");
+    }
+    else if (_wcsicmp(name, L".user") == 0) {
+        LPWSTR path;
+        SHGetKnownFolderPath(FOLDERID_Profile, 0, nullptr, &path);
+        mHiddenItems.push_back(path);
+        CoTaskMemFree(path);
+    }
+    else {
+        mHiddenItems.push_back(name);
+    }
 }
 
 
@@ -161,14 +204,16 @@ void IconGroup::AddIcon(PCITEMID_CHILD pidl, bool noRedraw) {
     // Don't add existing icons
     if (FindIcon(pidl) != nullptr) return;
 
-    D2D1_RECT_F pos;
-    PositionIcon(pidl, &pos);
-
-    WCHAR buffer[MAX_PATH];
+    // Check if the icon should be supressed
+    WCHAR buffer[MAX_PATH], buffer2[MAX_PATH];
     GetDisplayNameOf(pidl, SHGDN_FORPARSING, buffer, _countof(buffer));
+    GetDisplayNameOf(pidl, SHGDN_NORMAL, buffer2, _countof(buffer2));
     for (auto hidden : mHiddenItems) {
         if (_wcsicmp(hidden.c_str(), buffer) == 0) return;
     }
+
+    D2D1_RECT_F pos;
+    PositionIcon(pidl, &pos);
 
     IconTile* icon = new IconTile(this, pidl, mWorkingFolder, mTileWidth, mTileHeight);
     icon->SetPosition((int)pos.left, (int)pos.top, noRedraw);

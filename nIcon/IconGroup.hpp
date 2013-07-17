@@ -37,6 +37,9 @@ private:
     IconTile* FindIcon(PCITEMID_CHILD pidl);
 
     //
+    void AddNameFilter(LPCWSTR name);
+
+    //
     void LoadSettings();
 
 private:
