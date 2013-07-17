@@ -33,7 +33,7 @@ private:
     void UpdateIcon(PCITEMID_CHILD pidl);
     void UpdateAllIcons();
     void RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID);
-    void PositionIcon(PCITEMID_CHILD pidl, D2D1_RECT_F* position);
+    int GetIconPosition(PCITEMID_CHILD /* pidl */);
     IconTile* FindIcon(PCITEMID_CHILD pidl);
 
     //

@@ -22,7 +22,7 @@ LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
 const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
 //
-TaskSwitcher* g_TaskSwitcher;
+TaskSwitcher *gTaskSwitcher;
 
 //
 #define HOTKEY_ALTTAB 1
@@ -47,7 +47,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     RegisterHotKey(gLSModule.GetMessageWindow(), HOTKEY_ALTTAB, MOD_ALT, VK_TAB);
     RegisterHotKey(gLSModule.GetMessageWindow(), HOTKEY_SHIFTALTTAB, MOD_ALT | MOD_SHIFT, VK_TAB);
 
-    g_TaskSwitcher = new TaskSwitcher();
+    gTaskSwitcher = new TaskSwitcher();
 
     return 0;
 }
@@ -57,7 +57,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
-    delete g_TaskSwitcher;
+    delete gTaskSwitcher;
 
     UnregisterHotKey(gLSModule.GetMessageWindow(), HOTKEY_ALTTAB);
     UnregisterHotKey(gLSModule.GetMessageWindow(), HOTKEY_SHIFTALTTAB);
@@ -97,13 +97,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
             switch (wParam) {
             case HOTKEY_ALTTAB:
                 {
-                    g_TaskSwitcher->HandleAltTab();
+                    gTaskSwitcher->HandleAltTab();
                 }
                 break;
 
             case HOTKEY_SHIFTALTTAB:
                 {
-                    g_TaskSwitcher->HandleAltShiftTab();
+                    gTaskSwitcher->HandleAltShiftTab();
                 }
                 break;
             }

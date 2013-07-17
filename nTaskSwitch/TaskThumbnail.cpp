@@ -13,18 +13,18 @@
 #include "TaskSwitcher.hpp"
 #include "../Utilities/StopWatch.hpp"
 
-static HWND desktopWindow = NULL;
-static UINT (* DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = NULL;
+static HWND desktopWindow = nullptr;
+static UINT (*DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = nullptr;
 
 extern LSModule gLSModule;
 
 
 TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, int width, int height) : Drawable(parent, "Task") {
-    if (DwmpActivateLivePreview == NULL) {
-        DwmpActivateLivePreview = (UINT (*)(UINT, HWND, HWND, UINT))GetProcAddress(GetModuleHandle("DWMAPI.DLL"), (LPCSTR)0x71);
+    if (DwmpActivateLivePreview == nullptr) {
+        DwmpActivateLivePreview = (UINT (*)(UINT, HWND, HWND, UINT))GetProcAddress(GetModuleHandleW(L"DWMAPI.DLL"), (LPCSTR)0x71);
     }
-    if (desktopWindow == NULL) {
-        desktopWindow = FindWindowW(L"DesktopBackgroundClass", NULL);
+    if (desktopWindow == nullptr) {
+        desktopWindow = FindWindowW(L"DesktopBackgroundClass", nullptr);
     }
 
     DrawableSettings defaults;
@@ -145,7 +145,7 @@ TaskThumbnail::~TaskThumbnail() {
 
 void TaskThumbnail::Activate() {
     if (this->targetWindow == desktopWindow) {
-        LiteStep::LSExecute(NULL, "!MinimizeWindows", SW_NORMAL);
+        LiteStep::LSExecute(nullptr, "!MinimizeWindows", SW_NORMAL);
     }
     else {
         WINDOWPLACEMENT wp;
@@ -205,7 +205,7 @@ LRESULT WINAPI TaskThumbnail::HandleMessage(HWND window, UINT message, WPARAM wP
         return 0;
     }
 
-    return DefWindowProc(window, message, wParam, lParam);
+    return DefWindowProcW(window, message, wParam, lParam);
 }
 
 
@@ -227,10 +227,10 @@ void TaskThumbnail::SetIcon(HICON icon) {
 void TaskThumbnail::UpdateIcon() {
     if (this->targetWindow != desktopWindow) {
         this->requestedIcon = ICON_BIG;
-        SendMessageCallback(this->targetWindow, WM_GETICON, ICON_BIG, NULL, UpdateIconCallback, (ULONG_PTR)this);
+        SendMessageCallbackW(this->targetWindow, WM_GETICON, ICON_BIG, NULL, UpdateIconCallback, (ULONG_PTR)this);
     }
     else {
-        HICON icon = ExtractIcon(gLSModule.GetInstance(), "shell32.dll", 34);
+        HICON icon = ExtractIconW(gLSModule.GetInstance(), L"shell32.dll", 34);
 
         if (icon) {
             SetIcon(icon);
@@ -249,30 +249,30 @@ void CALLBACK TaskThumbnail::UpdateIconCallback(HWND hWnd, UINT uMsg, ULONG_PTR 
         TaskThumbnail* taskThumbnail = (TaskThumbnail*)dwData;
 
         // If we got an icon back, use it.
-        if (lResult != NULL) {
+        if (lResult != 0) {
             taskThumbnail->SetIcon((HICON)lResult);
         }
         else switch (taskThumbnail->requestedIcon) {
         case ICON_BIG:
             {
                 taskThumbnail->requestedIcon = ICON_SMALL;
-                SendMessageCallback(hWnd, WM_GETICON, ICON_SMALL, NULL, UpdateIconCallback, dwData);
+                SendMessageCallbackW(hWnd, WM_GETICON, ICON_SMALL, 0, UpdateIconCallback, dwData);
             }
             break;
 
         case ICON_SMALL:
             {
                 taskThumbnail->requestedIcon = ICON_SMALL2;
-                SendMessageCallback(hWnd, WM_GETICON, ICON_SMALL2, NULL, UpdateIconCallback, dwData);
+                SendMessageCallbackW(hWnd, WM_GETICON, ICON_SMALL2, 0, UpdateIconCallback, dwData);
             }
             break;
 
         case ICON_SMALL2:
             {
                 HICON hIcon;
-                hIcon = (HICON)GetClassLongPtr(hWnd, GCLP_HICON);
+                hIcon = (HICON)GetClassLongPtrW(hWnd, GCLP_HICON);
                 if (!hIcon) {
-                    hIcon = (HICON)GetClassLongPtr(hWnd, GCLP_HICONSM);
+                    hIcon = (HICON)GetClassLongPtrW(hWnd, GCLP_HICONSM);
                 }
                 taskThumbnail->SetIcon(hIcon);
             }

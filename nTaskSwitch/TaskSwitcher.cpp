@@ -13,13 +13,13 @@
 #include <Shlwapi.h>
 
 
-static UINT (* DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = nullptr;
+static UINT (*DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = nullptr;
 static HWND desktopWindow = nullptr;
 
 
 TaskSwitcher::TaskSwitcher() : Drawable("nTaskSwitch") {
     if (DwmpActivateLivePreview == nullptr) {
-        DwmpActivateLivePreview = (UINT (*)(UINT, HWND, HWND, UINT))GetProcAddress(GetModuleHandle("DWMAPI.DLL"), (LPCSTR)0x71);
+        DwmpActivateLivePreview = (UINT (*)(UINT, HWND, HWND, UINT))GetProcAddress(GetModuleHandleW(L"DWMAPI.DLL"), (LPCSTR)0x71);
     }
     if (desktopWindow == nullptr) {
         desktopWindow = FindWindowW(L"DesktopBackgroundClass", nullptr);
@@ -31,7 +31,7 @@ TaskSwitcher::TaskSwitcher() : Drawable("nTaskSwitch") {
     LoadSettings();
     
     SetParent(this->window->GetWindowHandle(), nullptr);
-    SetWindowLongPtr(this->window->GetWindowHandle(), GWL_EXSTYLE, WS_EX_TOOLWINDOW | WS_EX_COMPOSITED);
+    SetWindowLongPtrW(this->window->GetWindowHandle(), GWL_EXSTYLE, WS_EX_TOOLWINDOW | WS_EX_COMPOSITED);
     SetWindowPos(this->window->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 }
 
@@ -58,8 +58,8 @@ void TaskSwitcher::LoadSettings() {
     StateSettings stateDefaults;
     stateDefaults.backgroundBrush.color = 0xDD000000;
     stateDefaults.fontSize = 16;
-    StringCchCopy(stateDefaults.fontWeight, sizeof(stateDefaults.fontWeight), "Light");
-    StringCchCopy(stateDefaults.textAlign, sizeof(stateDefaults.textAlign), "Center");
+    StringCchCopyA(stateDefaults.fontWeight, sizeof(stateDefaults.fontWeight), "Light");
+    StringCchCopyA(stateDefaults.textAlign, sizeof(stateDefaults.textAlign), "Center");
     stateDefaults.textBrush.color = 0xFFFFFFFF;
     stateDefaults.textOffsetTop = 10;
     BOOL b;
@@ -101,10 +101,10 @@ LRESULT WINAPI TaskSwitcher::HandleMessage(HWND window, UINT message, WPARAM wPa
         return 0;
     }
     else if (message == WM_MOUSEMOVE || message == WM_MOUSELEAVE) {
-        HoveringOverTask(NULL);
+        HoveringOverTask(nullptr);
     }
 
-    return DefWindowProc(window, message, wParam, lParam);
+    return DefWindowProcW(window, message, wParam, lParam);
 }
 
 
@@ -145,7 +145,7 @@ void TaskSwitcher::Hide() {
         this->shownWindows.clear(); 
     }
 
-    DwmpActivateLivePreview(0, NULL, NULL, 1);
+    DwmpActivateLivePreview(0, nullptr, nullptr, 1);
 }
 
 
@@ -168,7 +168,7 @@ void TaskSwitcher::Show(int delta) {
 
     SetActiveWindow(this->window->GetWindowHandle());
     SetForegroundWindow(this->window->GetWindowHandle());
-    EnumDesktopWindows(NULL, LoadWindowsCallback, (LPARAM)this);
+    EnumDesktopWindows(nullptr, LoadWindowsCallback, (LPARAM)this);
 
     if (desktopWindow) {
         AddWindow(desktopWindow);
@@ -217,14 +217,14 @@ bool TaskSwitcher::IsTaskbarWindow(HWND hWnd) {
     if (!IsWindowVisible(hWnd))
         return false;
 
-    LONG_PTR exStyle = GetWindowLongPtr(hWnd, GWL_EXSTYLE);
+    LONG_PTR exStyle = GetWindowLongPtrW(hWnd, GWL_EXSTYLE);
 
     // Windows with the WS_EX_APPWINDOW style should always be shown
     if ((exStyle & WS_EX_APPWINDOW) == WS_EX_APPWINDOW)
         return true;
-    else if (GetParent(hWnd) != NULL) // Windows with parents should not be shown
+    else if (GetParent(hWnd) != nullptr) // Windows with parents should not be shown
         return false;
-    else if (::GetWindow(hWnd, GW_OWNER) != NULL) // Windows with owners should not be shown
+    else if (::GetWindow(hWnd, GW_OWNER) != nullptr) // Windows with owners should not be shown
         return false;
     else if ((exStyle & WS_EX_TOOLWINDOW) == WS_EX_TOOLWINDOW) // Tool windows should not be shown on the taskbar
         return false;
@@ -251,7 +251,7 @@ void TaskSwitcher::UpdateActiveWindow(int delta) {
             }
 
             this->shownWindows[this->selectedWindow]->Select();
-            this->hoveredThumbnail = NULL;
+            this->hoveredThumbnail = nullptr;
         }
 
         HWND targetWindow = this->hoveredThumbnail ? this->hoveredThumbnail->targetWindow : this->shownWindows[this->selectedWindow]->targetWindow;
@@ -281,7 +281,7 @@ void TaskSwitcher::Preview(HWND window) {
         }
     }
     else if (this->peekTimer != 0) {
-        SetTimer(this->window->GetWindowHandle(), this->peekTimer, this->peekDelay, NULL);
+        SetTimer(this->window->GetWindowHandle(), this->peekTimer, this->peekDelay, nullptr);
     }
 }
 

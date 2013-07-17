@@ -18,11 +18,14 @@ public:
 
 public:
     HRESULT CompareID(PCITEMID_CHILD id);
-    void SetPosition(int x, int y, bool noRedraw = false);
+    void SetPosition(int id, int x, int y, bool noRedraw = false);
     LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID);
     HRESULT GetDisplayName(SHGDNF flags, LPWSTR buf, UINT cchBuf);
 
 public:
+    //
+    int GetPositionID();
+
     // Hides this icon.
     void Hide();
 
@@ -45,6 +48,9 @@ private:
 
     // The PID of this icon.
     PITEMID_CHILD mItem;
+
+    //
+    int mPositionID;
 
     //
     int mIconSize;

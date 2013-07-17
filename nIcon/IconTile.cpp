@@ -18,6 +18,7 @@
 IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder, int width, int height) : Drawable(parent, "Icon") {
     WCHAR name[MAX_PATH];
 
+    mPositionID = 0;
     mShellFolder = shellFolder;
     mItem = (PITEMID_CHILD)malloc(item->mkid.cb + 2);
     memcpy(mItem, item, item->mkid.cb + 2);
@@ -100,7 +101,7 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
         {
             WCHAR command[MAX_LINE_LENGTH];
             GetDisplayName(SHGDN_FORPARSING, command, MAX_LINE_LENGTH);
-            ShellExecuteW(NULL, NULL, command, NULL, NULL, SW_SHOW);
+            ShellExecuteW(nullptr, nullptr, command, nullptr, nullptr, SW_SHOW);
         }
         return 0;
 
@@ -112,10 +113,10 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
 
     case WM_RBUTTONDOWN:
         {
-            IContextMenu* contextMenu;
+            IContextMenu *contextMenu;
             HMENU menu;
 
-            mShellFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&mItem, IID_IContextMenu, NULL, reinterpret_cast<LPVOID*>(&contextMenu));
+            mShellFolder->GetUIObjectOf(nullptr, 1, (LPCITEMIDLIST *)&mItem, IID_IContextMenu, nullptr, reinterpret_cast<LPVOID*>(&contextMenu));
 
             menu = CreatePopupMenu();
             contextMenu->QueryContextMenu(menu, 0, 0, 0, CMF_NORMAL);
@@ -123,13 +124,13 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
             POINT pt;
             GetCursorPos(&pt);
 
-            int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, this->window->GetWindowHandle(), NULL);
+            int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, this->window->GetWindowHandle(), nullptr);
             if (command != 0) {
                 CMINVOKECOMMANDINFO info = { 0 };
                 char verb[MAX_LINE_LENGTH];
-                contextMenu->GetCommandString(command, GCS_VERBA, NULL, verb, sizeof(verb));
+                contextMenu->GetCommandString(command, GCS_VERBA, nullptr, verb, sizeof(verb));
                 info.cbSize = sizeof(info);
-                info.hwnd = NULL;
+                info.hwnd = nullptr;
                 info.lpVerb = verb;
                 contextMenu->InvokeCommand(&info);
             }
@@ -142,11 +143,16 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
     default:
         return DefWindowProc(wnd, msg, wParam, lParam);
     }
-
 }
 
 
-void IconTile::SetPosition(int x, int y, bool noRedraw) {
+int IconTile::GetPositionID() {
+    return mPositionID;
+}
+
+
+void IconTile::SetPosition(int id, int x, int y, bool noRedraw) {
+    mPositionID = id;
     this->window->Move(x, y);
     if (!noRedraw) {
         this->window->Repaint();
@@ -207,7 +213,6 @@ void IconTile::SetIcon() {
     pos.bottom = pos.top + mIconSize;
     pos.left = (drawingSettings->width - (float)mIconSize)/2;
     pos.right = pos.left + mIconSize;
-
 
     // First, lets try IThumbnailProvider
     hr = mShellFolder->GetUIObjectOf(nullptr, 1, (LPCITEMIDLIST *)&mItem, IID_IThumbnailProvider, nullptr, reinterpret_cast<LPVOID*>(&thumbnailProvider));

@@ -211,19 +211,20 @@ void IconGroup::AddIcon(PCITEMID_CHILD pidl, bool noRedraw) {
     for (auto hidden : mHiddenItems) {
         if (_wcsicmp(hidden.c_str(), buffer) == 0) return;
     }
+    
+    int iconPosition = GetIconPosition(pidl);
+    RECT pos = mLayoutSettings.RectFromID(iconPosition, mTileWidth, mTileHeight, this->window->GetDrawingSettings()->width, this->window->GetDrawingSettings()->height);
 
-    D2D1_RECT_F pos;
-    PositionIcon(pidl, &pos);
-
-    IconTile* icon = new IconTile(this, pidl, mWorkingFolder, mTileWidth, mTileHeight);
-    icon->SetPosition((int)pos.left, (int)pos.top, noRedraw);
+    IconTile *icon = new IconTile(this, pidl, mWorkingFolder, mTileWidth, mTileHeight);
+    icon->SetPosition(iconPosition, (int)pos.left, (int)pos.top, noRedraw);
     mIcons.push_back(icon);
 }
 
 
 void IconGroup::RemoveIcon(PCITEMID_CHILD pidl) {
-    mIcons.remove_if([pidl] (IconTile *icon) -> bool {
+    mIcons.remove_if([pidl, this] (IconTile *icon) -> bool {
         if (icon->CompareID(pidl) == 0) {
+            mEmptySpots.insert(icon->GetPositionID());
             delete icon;
             return true;
         }
@@ -249,9 +250,13 @@ void IconGroup::RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID) {
 }
 
 
-void IconGroup::PositionIcon(PCITEMID_CHILD /* pidl */, D2D1_RECT_F *position) {
-    RECT r = mLayoutSettings.RectFromID(mNextPositionID++, mTileWidth, mTileHeight, this->window->GetDrawingSettings()->width, this->window->GetDrawingSettings()->height);
-    *position = D2D1::RectF(FLOAT(r.left), FLOAT(r.top), FLOAT(r.right), FLOAT(r.bottom));
+int IconGroup::GetIconPosition(PCITEMID_CHILD /* pidl */) {
+    if (!mEmptySpots.empty()) {
+        int id = *mEmptySpots.begin();
+        mEmptySpots.erase(mEmptySpots.begin());
+        return id;
+    }
+    return mNextPositionID++;
 }
 
 
