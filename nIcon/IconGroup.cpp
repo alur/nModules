@@ -18,6 +18,34 @@
 #include "../nShared/PIDL.h"
 
 
+struct DoubleNullStrCollection {
+    DoubleNullStrCollection() {
+        cchSize = 2;
+        str = decltype(str)(calloc(cchSize, sizeof(str[0])));
+    }
+
+    ~DoubleNullStrCollection() {
+        free(str);
+    }
+
+    size_t GetSTRSize() {
+        return sizeof(str[0])*cchSize;
+    }
+
+    void AddStr(LPCWSTR str) {
+        size_t cchStrLen = wcslen(str) + 1;
+        this->str = LPWSTR(realloc(this->str, sizeof(WCHAR)*(cchSize + cchStrLen)));
+        memcpy(&this->str[cchSize-2], str, (cchStrLen)*sizeof(WCHAR));
+        cchSize += cchStrLen;
+        this->str[cchSize-2] = L'\0';
+        this->str[cchSize-1] = L'\0';
+    }
+
+    size_t cchSize;
+    LPWSTR str;
+};
+
+
 /// <summary>
 /// Constructor
 /// </summary>
@@ -289,7 +317,7 @@ IconTile* IconGroup::FindIcon(PCITEMID_CHILD pidl) {
 
 
 /// <summary>
-/// 
+/// Updates all icons.
 /// </summary>
 void IconGroup::UpdateAllIcons() {
     for (auto icon : mIcons) {
@@ -410,15 +438,61 @@ void IconGroup::DoPaste() {
 
 
 /// <summary>
-/// Attempts to paste the contents of the clipboard to the desktop
+/// Attempts to paste the contents of the clipboard to the desktop.
 /// </summary>
 void IconGroup::DoCopy(bool cut) {
-    
+    // Generate a double-null terminated list of files to copy.
+    DoubleNullStrCollection files;
+    WCHAR buffer[MAX_PATH];
+    for (IconTile *tile : mIcons) {
+        if (tile->IsSelected()) {
+            tile->GetDisplayName(SHGDN_FORPARSING, buffer, _countof(buffer));
+            files.AddStr(buffer);
+        }
+    }
+
+    // Put the list in global memory.
+    DROPFILES dropObj = { sizeof(DROPFILES), { 0, 0 }, 0, 1 };
+    HGLOBAL clipData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(dropObj) + files.GetSTRSize());
+    LPBYTE data = (LPBYTE)GlobalLock(clipData);
+    memcpy(data, &dropObj, sizeof(dropObj));
+    memcpy(data + sizeof(dropObj), files.str, files.GetSTRSize());
+    GlobalUnlock(clipData);
+
+    // Specify whether the files are cut or copied.
+    HGLOBAL dropEffect = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(DWORD));
+    PDWORD dropData = (PDWORD)GlobalLock(dropEffect);
+    *dropData = cut ? DROPEFFECT_MOVE : DROPEFFECT_COPY;
+    GlobalUnlock(dropEffect);
+
+    // Put it all in the clipboard.
+    if (OpenClipboard(this->window->GetWindowHandle())) {
+        EmptyClipboard();
+        SetClipboardData(CF_HDROP, clipData);
+        SetClipboardData(RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT), dropEffect);
+        CloseClipboard();
+    }
 }
 
 
 /// <summary>
-/// 
+/// Deletes all selected files.
+/// </summary>
+void IconGroup::DeleteSelectedFiles() {
+    /*SHFILEOPSTRUCTW shFileOp;
+    ZeroMemory(&shFileOp, sizeof(shFileOp));
+    shFileOp.wFunc = FO_DELETE;
+    shFileOp.hwnd = this->window->GetWindowHandle();
+    shFileOp.pFrom = LPCWSTR((BYTE*)data + data->pFiles);
+    shFileOp.pTo = nullptr;
+    shFileOp.fFlags = FOF_ALLOWUNDO | FOF_WANTNUKEWARNING;
+
+    SHFileOperationW(&shFileOp);*/
+}
+
+
+/// <summary>
+/// Handles window messages.
 /// </summary>
 LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
     if (message == mChangeNotifyMsg) {
@@ -494,11 +568,39 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
                     }
                     break;
 
+                case 'C':
+                    {
+                        if (GetKeyState(VK_CONTROL) < 0) {
+                            DoCopy(false);
+                        }
+                    }
+                    break;
+
                 case 'V':
                     {
                         if (GetKeyState(VK_CONTROL) < 0) {
                             DoPaste();
                         }
+                    }
+                    break;
+
+                case 'X':
+                    {
+                        if (GetKeyState(VK_CONTROL) < 0) {
+                            DoCopy(true);
+                        }
+                    }
+                    break;
+
+                case VK_DELETE:
+                    {
+                        DeleteSelectedFiles();
+                    }
+                    break;
+
+                case VK_F2:
+                    {
+
                     }
                     break;
                 }
