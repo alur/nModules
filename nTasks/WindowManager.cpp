@@ -31,6 +31,11 @@ extern map<LPCSTR, Taskbar*> g_Taskbars;
 
 extern LSModule gLSModule;
 
+//
+const UINT gWMMessages[] = { LM_WINDOWCREATED, LM_WINDOWACTIVATED, LM_WINDOWDESTROYED,
+    LM_LANGUAGE, LM_REDRAW, LM_GETMINRECT, LM_WINDOWREPLACED, LM_WINDOWREPLACING,
+    LM_MONITORCHANGED, 0 };
+
 namespace WindowManager {
     UINT __stdcall ThreadAddExisting(LPVOID);
     BOOL CALLBACK ThreadAddExistingCallback(HWND, LPARAM);
@@ -71,6 +76,8 @@ void WindowManager::Start() {
     if (!IsWindows8OrGreater()) {
         SetTimer(gLSModule.GetMessageWindow(), TIMER_CHECKMONITOR, 250, nullptr);
     }
+
+    SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)gLSModule.GetMessageWindow(), (LPARAM)gWMMessages);
 }
 
 
@@ -83,9 +90,10 @@ void WindowManager::Stop() {
     assert(isStarted);
 
     // Clean up
+    SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)gLSModule.GetMessageWindow(), (LPARAM)gWMMessages);
     KillTimer(gLSModule.GetMessageWindow(), TIMER_CHECKMONITOR);
     delete g_pMonitorInfo;
-    activeWindow = NULL;
+    activeWindow = nullptr;
     windowMap.clear();
     isStarted = false;
 }

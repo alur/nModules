@@ -19,9 +19,7 @@ using std::map;
 LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
-const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_WINDOWCREATED, LM_WINDOWACTIVATED,
-    LM_WINDOWDESTROYED, LM_LANGUAGE, LM_REDRAW, LM_GETMINRECT, LM_WINDOWREPLACED,
-    LM_WINDOWREPLACING, LM_MONITORCHANGED, 0 };
+const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
 // All the labels we currently have loaded
 map<LPCSTR, Taskbar*> g_Taskbars;
