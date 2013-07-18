@@ -52,6 +52,7 @@ public:
     //
     void Select(bool repaint = true);
     void Deselect(bool repaint = true);
+    bool IsInRect(D2D1_RECT_F rect);
 
 private:
     // Sets the icon.

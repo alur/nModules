@@ -460,6 +460,14 @@ MonitorInfo* DrawableWindow::GetMonitorInformation() {
 
 
 /// <summary>
+///
+/// </summary>
+D2D1_RECT_F DrawableWindow::GetDrawingRect() {
+    return this->drawingArea;
+}
+
+
+/// <summary>
 /// Gets the screen position of the window.
 /// </summary>
 /// <param name="rect">Out. The screen position of this window will be placed in this rect.</param>

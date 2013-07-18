@@ -83,6 +83,9 @@ public:
     // Gets the "desired" size for a given width and height.
     void GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size);
 
+    // Returns the position of this window, relative to its top-level parent.
+    D2D1_RECT_F GetDrawingRect();
+
     // Returns the screen-coordinate position of this window.
     void GetScreenRect(LPRECT rect);
 

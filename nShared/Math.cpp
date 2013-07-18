@@ -6,6 +6,7 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include <Windows.h>
+
 #include "Math.h"
 
 
@@ -22,6 +23,14 @@ int Math::RectArea(LPRECT rect) {
 /// </summary>
 int Math::RectIntersectArea(LPRECT rect1, LPRECT rect2) {
     return max(0, min(rect1->right, rect2->right) - max(rect1->left, rect2->left))*max(0, min(rect1->bottom, rect2->bottom) - max(rect1->top, rect2->top));
+}
+
+
+/// <summary>
+/// Returns the size of the overlapping area between the two rectangles.
+/// </summary>
+float Math::RectIntersectArea(D2D1_RECT_F &rect1, D2D1_RECT_F &rect2) {
+    return max(0, min(rect1.right, rect2.right) - max(rect1.left, rect2.left))*max(0, min(rect1.bottom, rect2.bottom) - max(rect1.top, rect2.top));
 }
 
 

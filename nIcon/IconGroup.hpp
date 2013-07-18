@@ -83,6 +83,7 @@ private:
     // Copy & Paste
 private:
     void DoPaste();
+    void DoUndo();
     void DoCopy(bool cut);
     void DeleteSelectedFiles();
     void OpenSelectedFiles();

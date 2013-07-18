@@ -446,6 +446,13 @@ void IconGroup::ContextMenu() {
 
 
 /// <summary>
+/// Attempts to undo the last file operation.
+/// </summary>
+void IconGroup::DoUndo() {
+}
+
+
+/// <summary>
 /// Attempts to paste the contents of the clipboard to the desktop
 /// </summary>
 void IconGroup::DoPaste() {
@@ -471,8 +478,8 @@ void IconGroup::DoPaste() {
             shFileOp.pFrom = LPCWSTR((BYTE*)data + data->pFiles);
             shFileOp.pTo = target;
             shFileOp.fFlags = FOF_NOCONFIRMMKDIR;
-
             SHFileOperationW(&shFileOp);
+
             if (move && !shFileOp.fAnyOperationsAborted) {
                 EmptyClipboard();
             }
@@ -492,6 +499,7 @@ void IconGroup::DoPaste() {
 /// <summary>
 /// Attempts to paste the contents of the clipboard to the desktop.
 /// </summary>
+/// <param name="cut">True to cut, false to copy.</param>
 void IconGroup::DoCopy(bool cut) {
     // Generate a double-null terminated list of files to copy.
     DoubleNullStrCollection files;
@@ -560,7 +568,7 @@ void IconGroup::DeleteSelectedFiles() {
     shFileOp.hwnd = nullptr;
     shFileOp.pFrom = files.str;
     shFileOp.pTo = nullptr;
-    shFileOp.fFlags = FOF_ALLOWUNDO;
+    shFileOp.fFlags = FOF_ALLOWUNDO | FOF_WANTNUKEWARNING;
     SHFileOperationW(&shFileOp);
 }
 
@@ -629,12 +637,24 @@ void IconGroup::EndRectangleSelection(D2D1_POINT_2U point) {
 /// 
 /// </summary>
 void IconGroup::MoveRectangleSelection(D2D1_POINT_2U point) {
-    mSelectionRectagle.SetRect(D2D1::RectF(
+    D2D1_RECT_F rect = D2D1::RectF(
         float(min(mRectangleStart.x, point.x)),
         float(min(mRectangleStart.y, point.y)),
         float(max(mRectangleStart.x, point.x)),
         float(max(mRectangleStart.y, point.y))
-        ));
+    );
+
+    mSelectionRectagle.SetRect(rect);
+
+    for (IconTile *tile : mIcons) {
+        if (tile->IsInRect(rect)) {
+            tile->Select(false);
+        }
+        else {
+            tile->Deselect(false);
+        }
+    }
+
     mSelectionRectagle.Show();
     this->window->Repaint();
 }
@@ -763,6 +783,14 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
                     {
                         if (GetKeyState(VK_CONTROL) < 0) {
                             DoCopy(true);
+                        }
+                    }
+                    break;
+
+                case 'Z':
+                    {
+                        if (GetKeyState(VK_CONTROL) < 0) {
+                            DoUndo();
                         }
                     }
                     break;

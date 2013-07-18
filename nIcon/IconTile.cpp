@@ -14,6 +14,7 @@
 #include "../nShared/LSModule.hpp"
 #include <Thumbcache.h>
 #include <CommonControls.h>
+#include "../nShared/Math.h"
 
 
 IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder, int width, int height) : Drawable(parent, "Icon") {
@@ -138,6 +139,11 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
 
 PCITEMID_CHILD IconTile::GetItem() {
     return mItem;
+}
+
+
+bool IconTile::IsInRect(D2D1_RECT_F rect) {
+    return Math::RectIntersectArea(rect, this->window->GetDrawingRect()) > 0;
 }
 
 
