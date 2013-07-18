@@ -628,6 +628,23 @@ void IconGroup::StartRectangleSelection(D2D1_POINT_2U point) {
 void IconGroup::EndRectangleSelection(D2D1_POINT_2U point) {
     mInRectangleSelection = false;
     mSelectionRectagle.Hide();
+
+    D2D1_RECT_F rect = D2D1::RectF(
+        float(min(mRectangleStart.x, point.x)),
+        float(min(mRectangleStart.y, point.y)),
+        float(max(mRectangleStart.x, point.x)),
+        float(max(mRectangleStart.y, point.y))
+    );
+
+    for (IconTile *tile : mIcons) {
+        if (tile->IsInRect(rect)) {
+            tile->Select(false);
+        }
+        else {
+            tile->Deselect(false);
+        }
+    }
+
     this->window->EnableMouseForwarding();
     this->window->Repaint();
 }
