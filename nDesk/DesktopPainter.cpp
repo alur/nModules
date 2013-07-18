@@ -13,6 +13,7 @@
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/Factories.h"
 #include "../nShared/Macros.h"
+#include "../Utilities/StopWatch.hpp"
 #include "../nCoreCom/Core.h"
 #include "ClickHandler.hpp"
 #include <d2d1.h>
@@ -30,9 +31,9 @@ using namespace D2D1;
 /// </summary>
 DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, "nDesk", g_pClickHandler) {
     // Initalize
-    m_pWallpaperBrush = NULL;
-    m_pOldWallpaperBrush = NULL;
-    m_TransitionEffect = NULL;
+    m_pWallpaperBrush = nullptr;
+    m_pOldWallpaperBrush = nullptr;
+    m_TransitionEffect = nullptr;
     m_bInvalidateAllOnUpdate = false;
     this->transitionStartTime = 0;
     this->transitionEndTime = 0;
@@ -116,7 +117,7 @@ void DesktopPainter::SetTransitionType(TransitionType transitionType) {
     m_TransitionType = transitionType;
 
     // If we are in the middle of a transition, let the current effect cleanup
-    if (m_pOldWallpaperBrush != NULL) {
+    if (m_pOldWallpaperBrush != nullptr) {
         m_TransitionEffect->End();
     }
 
@@ -130,11 +131,11 @@ void DesktopPainter::SetTransitionType(TransitionType transitionType) {
 
     if (m_TransitionEffect) {
         m_TransitionEffect->Initialize(&m_TransitionSettings);
-        if (m_pOldWallpaperBrush != NULL) {
+        if (m_pOldWallpaperBrush != nullptr) {
             m_TransitionEffect->Start(m_pOldWallpaperBrush, m_pWallpaperBrush);
         }
     }
-    else if (m_pOldWallpaperBrush != NULL) {
+    else if (m_pOldWallpaperBrush != nullptr) {
         SAFERELEASE(m_pOldWallpaperBrush);
         Redraw();
     }
@@ -179,7 +180,7 @@ TransitionEffect* DesktopPainter::TransitionEffectFromType(TransitionType transi
     case SQUARES_COUNTERCLOCKWISE_IN: return new GridEffect(GridEffect::GridType::COUNTERCLOCKWISE, GridEffect::GridStyle::SHOW_NEW);
     case SQUARES_COUNTERCLOCKWISE_OUT:return new GridEffect(GridEffect::GridType::COUNTERCLOCKWISE, GridEffect::GridStyle::HIDE_OLD);
 
-    default: return NULL;
+    default: return nullptr;
     }
 }
 
@@ -251,15 +252,16 @@ void DesktopPainter::CalculateSizeDepdenentStuff() {
 /// <param name="bNoTransition">If true, there will be no transition.</param>
 void DesktopPainter::UpdateWallpaper(bool bNoTransition) {
     // If we are currently doing a transition, end it.
-    if (m_pOldWallpaperBrush != NULL) {
-        TransitionEnd();
+    if (m_pOldWallpaperBrush != nullptr) {
+        m_TransitionEffect->End();
+        SAFERELEASE(m_pOldWallpaperBrush)
     }
 
     m_pOldWallpaperBrush = m_pWallpaperBrush;
     CreateWallpaperBrush(&m_pWallpaperBrush);
 
     // If we are going to do a transition animation
-    if (!bNoTransition && m_pOldWallpaperBrush != NULL && m_TransitionType != NONE) {
+    if (!bNoTransition && m_pOldWallpaperBrush != nullptr && m_TransitionType != NONE) {
         TransitionStart();
     }
     else {
@@ -274,7 +276,7 @@ void DesktopPainter::UpdateWallpaper(bool bNoTransition) {
 /// Causes the whole desktop window to be redrawn
 /// </summary>
 void DesktopPainter::Redraw() {
-    InvalidateRect(m_bInvalidateAllOnUpdate ? NULL : m_hWnd, NULL, true);
+    InvalidateRect(m_bInvalidateAllOnUpdate ? nullptr : m_hWnd, nullptr, true);
     UpdateWindow(m_hWnd);
 }
 
@@ -295,6 +297,12 @@ void DesktopPainter::TransitionStart() {
     this->transitionEndTime = this->transitionStartTime + this->m_TransitionSettings.iTime;
     m_TransitionEffect->Start(m_pOldWallpaperBrush, m_pWallpaperBrush);
 
+    while (m_pOldWallpaperBrush != nullptr) {
+        this->renderTarget->BeginDraw();
+        PaintComposite();
+        PaintChildren();
+        this->renderTarget->EndDraw();
+    }
     Redraw();
 }
 
