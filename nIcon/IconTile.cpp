@@ -25,6 +25,8 @@ IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFo
     memcpy(mItem, item, item->mkid.cb + 2);
 
     mIconSize = this->settings->GetInt("Size", 48);
+    mGhostOpacity = settings->GetFloat("GhostOpacity", 0.6f);
+    mGhosted = false;
 
     DrawableSettings defaults;
     defaults.width = width;
@@ -110,8 +112,11 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
         {
             if (GetKeyState(VK_CONTROL) >= 0) {
                 ((IconGroup*)this->parent)->DeselectAll();
+                this->window->ActivateState(mSelectedState);
             }
-            this->window->ActivateState(mSelectedState);
+            else {
+                this->window->ToggleState(mSelectedState);
+            }
         }
         return 0;
 
@@ -199,6 +204,32 @@ void IconTile::Rename(PCITEMID_CHILD newItem) {
 
 
 /// <summary>
+/// Enabled ghots mode -- i.e. when the tile is "cut"
+/// </summary>
+bool IconTile::IsGhosted() {
+    return mGhosted;
+}
+
+
+/// <summary>
+/// Enabled ghots mode -- i.e. when the tile is "cut"
+/// </summary>
+void IconTile::SetGhost() {
+    (*mIconOverlay)->GetBrush()->SetOpacity(mGhostOpacity);
+    mGhosted = true;
+}
+
+
+/// <summary>
+/// Enabled ghots mode -- i.e. when the tile is "cut"
+/// </summary>
+void IconTile::ClearGhost() {
+    (*mIconOverlay)->GetBrush()->SetOpacity(1.0f);
+    mGhosted = false;
+}
+
+
+/// <summary>
 /// Sets the icon of this item.
 /// </summary>
 void IconTile::SetIcon() {
@@ -244,7 +275,7 @@ void IconTile::SetIcon() {
                 pos.right = mIconSize*(1 + scale)/2;
             }
 
-            this->window->AddOverlay(pos, hBMP);
+            mIconOverlay = this->window->AddOverlay(pos, hBMP);
         }
 
         // Let go of the interface.
@@ -268,7 +299,7 @@ void IconTile::SetIcon() {
             }
 
             if (SUCCEEDED(hr)) {
-                this->window->AddOverlay(pos, hBMP);
+                mIconOverlay = this->window->AddOverlay(pos, hBMP);
             }
 
             // Let go of the interface.

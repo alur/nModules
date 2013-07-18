@@ -28,6 +28,8 @@ public:
     void SelectAll();
     void DeselectAll();
     void ContextMenu();
+    void HandleClipboardChange();
+    void ClearAllGhosting(bool repaint);
 
 private:
     //
@@ -74,6 +76,9 @@ private:
 
     // IShellFolder for the root of the file system.
     IShellFolder2* mRootFolder;
+
+    //
+    bool mClipBoardCutFiles;
 
     // Copy & Paste
 private:

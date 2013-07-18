@@ -20,6 +20,7 @@ public:
 
     void UpdatePosition(D2D1_RECT_F parentPosition);
     void SetSource(IWICBitmapSource* source);
+    ID2D1BitmapBrush *GetBrush();
 
 private:
     D2D1_RECT_F position;

@@ -124,3 +124,8 @@ void Overlay::SetSource(IWICBitmapSource* source) {
     this->source = source;
     ReCreateDeviceResources(this->renderTarget);
 }
+
+
+ID2D1BitmapBrush *Overlay::GetBrush() {
+    return brush;
+}

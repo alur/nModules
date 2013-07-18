@@ -53,6 +53,8 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     // Initalize all variables.
     this->mChangeNotifyUID = 0;
 
+    mClipBoardCutFiles = false;
+
     LoadSettings();
 
     DrawableSettings defaults;
@@ -490,9 +492,15 @@ void IconGroup::DoCopy(bool cut) {
     // Generate a double-null terminated list of files to copy.
     DoubleNullStrCollection files;
     WCHAR buffer[MAX_PATH];
+    
+    ClearAllGhosting(!cut);
+
     for (IconTile *tile : mIcons) {
         if (tile->IsSelected()) {
             tile->GetDisplayName(SHGDN_FORPARSING, buffer, _countof(buffer));
+            if (cut) {
+                tile->SetGhost();
+            }
             files.AddStr(buffer);
         }
     }
@@ -517,6 +525,12 @@ void IconGroup::DoCopy(bool cut) {
         SetClipboardData(CF_HDROP, clipData);
         SetClipboardData(RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT), dropEffect);
         CloseClipboard();
+    }
+
+    //
+    if (cut) {
+        mClipBoardCutFiles = true;
+        this->window->Repaint();
     }
 }
 
@@ -558,6 +572,50 @@ void IconGroup::OpenSelectedFiles() {
             ShellExecuteW(nullptr, nullptr, command, nullptr, nullptr, SW_SHOW);
         }
     }
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+void IconGroup::ClearAllGhosting(bool repaint) {
+    if (mClipBoardCutFiles) {
+        mClipBoardCutFiles = false;
+        for (IconTile *tile : mIcons) {
+            if (tile->IsGhosted()) {
+                tile->ClearGhost();
+            }
+        }
+        if (repaint) {
+            this->window->Repaint();
+        }
+    }
+}
+
+
+/// <summary>
+/// Handles changes to the clipboard.
+/// </summary>
+void IconGroup::HandleClipboardChange() {
+    ClearAllGhosting(true);
+    /*
+    if (IsClipboardFormatAvailable(CF_HDROP)) {
+        if (OpenClipboard(this->window->GetWindowHandle())) {
+            CloseClipboard();
+        }
+        else if (mClipBoardCutFiles) {
+
+        }
+    }
+    else if (mClipBoardCutFiles) {
+        mClipBoardCutFiles = false;
+        for (auto tile : mIcons) {
+            if (tile->IsGhosted()) {
+                tile->ClearGhost();
+            }
+        }
+    }
+    */
 }
 
 
@@ -677,6 +735,22 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
                 case VK_F2:
                     {
 
+                    }
+                    break;
+                    
+                case VK_F5:
+                    {
+                        // Refresh
+                    }
+                    break;
+                    
+                case VK_F6:
+                    {
+                        for (IconTile *tile : mIcons) {
+                            if (tile->IsSelected()) {
+                                tile->SetGhost();
+                            }
+                        }
                     }
                     break;
                 }

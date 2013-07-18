@@ -17,11 +17,13 @@
 const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
 // All current icon groups
-map<string, IconGroup*> gIconGroups;
+static map<string, IconGroup*> gIconGroups;
 
 // The LiteStep module class
 LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
 
+// The next window in the clipboard viewer chain
+static HWND nextClipboardViewer;
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
@@ -34,6 +36,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION))) {
         return 1;
     }
+
+    nextClipboardViewer = SetClipboardViewer(gLSModule.GetMessageWindow());
 
     OleInitialize(nullptr);
 
@@ -77,6 +81,25 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case WM_DESTROY:
         {
             SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
+            ChangeClipboardChain(window, nextClipboardViewer);
+        }
+        return 0;
+
+    case WM_DRAWCLIPBOARD:
+        {
+            for (auto group : gIconGroups) {
+                group.second->HandleClipboardChange();
+            }
+            SendMessage(nextClipboardViewer, message, wParam, lParam);
+        }
+        return 0;
+
+    case WM_CHANGECBCHAIN:
+        {
+            if (HWND(wParam) == nextClipboardViewer)
+                nextClipboardViewer = (HWND)lParam;
+            else if (nextClipboardViewer != nullptr)
+                SendMessage(nextClipboardViewer, message, wParam, lParam);
         }
         return 0;
 

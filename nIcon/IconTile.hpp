@@ -45,6 +45,11 @@ public:
     bool IsSelected();
 
     //
+    bool IsGhosted();
+    void SetGhost();
+    void ClearGhost();
+
+    //
     void Select(bool repaint = true);
     void Deselect(bool repaint = true);
 
@@ -65,8 +70,12 @@ private:
     //
     int mIconSize;
 
+    //
+    float mGhostOpacity;
+    bool mGhosted;
+
     // 
-    DrawableWindow::STATE mHoverState, mSelectedState, mFocusedState, mGhostedState;
+    DrawableWindow::STATE mHoverState, mSelectedState, mFocusedState;
 
     //
     DrawableWindow::OVERLAY mIconOverlay;
