@@ -66,7 +66,13 @@ public:
     void ClearState(STATE state, bool repaint = true);
 
     // Creates a new child window.
-    DrawableWindow* CreateChild(Settings* childSettings, MessageHandler* msgHandler);
+    DrawableWindow *CreateChild(Settings* childSettings, MessageHandler* msgHandler);
+
+    // Disables forwarding of mouse events to children.
+    void DisableMouseForwarding();
+
+    // Enables forwarding of mouse events to children.
+    void EnableMouseForwarding();
 
     // Returns the current drawing settings.
     DrawableSettings* GetDrawingSettings();
@@ -192,6 +198,7 @@ private:
     // Called by IParsedText objects when we should update the text.
     static void TextChangeHandler(LPVOID drawable);
 
+private:
     //
     void Animate();
 
@@ -204,6 +211,7 @@ private:
     // Removes the specified child.
     void RemoveChild(DrawableWindow* child);
 
+private:
     // The child window the mouse is currently over.
     DrawableWindow* activeChild;
 
@@ -296,4 +304,7 @@ private:
 
     // The text we are currently drawing
     LPCWSTR text;
+
+    // True if this window should handle all mouse events itself, rather than forwarding them to its children.
+    bool mDontForwardMouse;
 };

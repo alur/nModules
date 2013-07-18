@@ -54,6 +54,7 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     this->mChangeNotifyUID = 0;
 
     mClipBoardCutFiles = false;
+    mInRectangleSelection = false;
 
     LoadSettings();
 
@@ -64,10 +65,13 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     StateSettings defaultState;
     defaultState.backgroundBrush.color = 0x00000000;
 
+    mSelectionRectagle.Init(this->settings);
+
     mNextPositionID = 0;
 
     this->window->Initialize(&defaults, &defaultState);
     this->window->AddDropRegion();
+    this->window->AddPostPainter(&mSelectionRectagle);
     this->window->Show();
 
     mChangeNotifyMsg = this->window->RegisterUserMessage(this);
@@ -576,6 +580,13 @@ void IconGroup::OpenSelectedFiles() {
 
 
 /// <summary>
+/// Renames the selected files.
+/// </summary>
+void IconGroup::RenameSelectedFiles() {
+}
+
+
+/// <summary>
 /// 
 /// </summary>
 void IconGroup::ClearAllGhosting(bool repaint) {
@@ -590,6 +601,42 @@ void IconGroup::ClearAllGhosting(bool repaint) {
             this->window->Repaint();
         }
     }
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+void IconGroup::StartRectangleSelection(D2D1_POINT_2U point) {
+    mRectangleStart = point;
+    mInRectangleSelection = true;
+    this->window->DisableMouseForwarding();
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+void IconGroup::EndRectangleSelection(D2D1_POINT_2U point) {
+    mInRectangleSelection = false;
+    mSelectionRectagle.Hide();
+    this->window->EnableMouseForwarding();
+    this->window->Repaint();
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+void IconGroup::MoveRectangleSelection(D2D1_POINT_2U point) {
+    mSelectionRectagle.SetRect(D2D1::RectF(
+        float(min(mRectangleStart.x, point.x)),
+        float(min(mRectangleStart.y, point.y)),
+        float(max(mRectangleStart.x, point.x)),
+        float(max(mRectangleStart.y, point.y))
+        ));
+    mSelectionRectagle.Show();
+    this->window->Repaint();
 }
 
 
@@ -734,13 +781,13 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
 
                 case VK_F2:
                     {
-
+                        RenameSelectedFiles();
                     }
                     break;
                     
                 case VK_F5:
                     {
-                        // Refresh
+                        UpdateAllIcons();
                     }
                     break;
                     
@@ -757,11 +804,37 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
             }
             break;
 
+            
+
         case WM_LBUTTONDOWN:
         case WM_RBUTTONDOWN:
-        case WM_MBUTTONDOWN:
             {
-                DeselectAll();
+                if (!mInRectangleSelection) {
+                    StartRectangleSelection(D2D1::Point2U(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+                }
+                else {
+                    EndRectangleSelection(D2D1::Point2U(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+                }
+            }
+            break;
+
+        case WM_MOUSEMOVE:
+            {
+                if (mInRectangleSelection) {
+                    MoveRectangleSelection(D2D1::Point2U(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+                }
+            }
+            break;
+
+        case WM_LBUTTONUP:
+        case WM_RBUTTONUP:
+            {
+                if (mInRectangleSelection) {
+                    EndRectangleSelection(D2D1::Point2U(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+                }
+                else if (GetKeyState(VK_CONTROL) >= 0) {
+                    DeselectAll();
+                }
             }
             break;
         }

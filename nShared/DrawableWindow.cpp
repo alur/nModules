@@ -43,7 +43,7 @@ void DrawableWindow::TextChangeHandler(LPVOID drawable) {
 /// <param name="msgHandler">The default message handler for this window.</param>
 DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHandler) {
     this->monitorInfo = new MonitorInfo();
-    this->parent = NULL;
+    this->parent = nullptr;
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
     this->userMsgIDs = new UIDGenerator<UINT>(WM_USER);
     this->window = window;
@@ -57,8 +57,8 @@ DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHa
     // Configure the mouse tracking struct
     ZeroMemory(&this->trackMouseStruct, sizeof(TRACKMOUSEEVENT));
     this->trackMouseStruct.cbSize = sizeof(TRACKMOUSEEVENT);
-    this->trackMouseStruct.hwndTrack = NULL;
-    this->trackMouseStruct.dwFlags = NULL;
+    this->trackMouseStruct.hwndTrack = nullptr;
+    this->trackMouseStruct.dwFlags = 0;
     this->trackMouseStruct.dwHoverTime = 200;
 }
 
@@ -73,7 +73,7 @@ DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHa
 /// <param name="msgHandler">The default message handler for this window.</param>
 DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) {
     this->monitorInfo = new MonitorInfo();
-    this->parent = NULL;
+    this->parent = nullptr;
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
     this->userMsgIDs = new UIDGenerator<UINT>(WM_USER);
 
@@ -108,8 +108,8 @@ DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE 
 DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler) {
     this->monitorInfo = parent->monitorInfo;
     this->parent = parent;
-    this->timerIDs = NULL;
-    this->userMsgIDs = NULL;
+    this->timerIDs = nullptr;
+    this->userMsgIDs = nullptr;
     this->window = parent->window;
 
     ConstructorCommon(settings, msgHandler);
@@ -122,18 +122,19 @@ DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, Messa
 /// <param name="settings">The settings to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
 void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHandler) {
-    this->activeChild = NULL;
+    this->activeChild = nullptr;
     this->animating = false;
     ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
     this->drawingSettings = new DrawableSettings();
     this->initialized = false;
     this->isTrackingMouse = false;
     this->msgHandler = msgHandler;
-    this->parsedText = NULL;
-    this->renderTarget = NULL;
+    this->parsedText = nullptr;
+    this->renderTarget = nullptr;
     this->settings = new Settings(settings);
-    this->text = NULL;
+    this->text = nullptr;
     this->visible = false;
+    mDontForwardMouse = false;
 
     // Create the base state
     State* state = new State(new Settings(settings), 0, &this->text);
@@ -192,8 +193,8 @@ DrawableWindow::~DrawableWindow() {
 /// <param name="icon">The icon to use as an overlay.</param>
 /// <returns>An object which can be used to modify/remove this overlay.</returns>
 DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
-    IWICBitmap* source = NULL;
-    IWICImagingFactory* factory = NULL;
+    IWICBitmap *source = nullptr;
+    IWICImagingFactory *factory = nullptr;
 
     Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
 
@@ -210,13 +211,13 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON i
 /// <param name="bitmap">The bitmap to use as an overlay.</param>
 /// <returns>An object which can be used to modify/remove this overlay.</returns>
 DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap) {
-    IWICBitmap* source = NULL;
-    IWICImagingFactory* factory = NULL;
+    IWICBitmap *source = nullptr;
+    IWICImagingFactory *factory = nullptr;
     
     Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
 
     // Generate a WIC bitmap and call the overloaded AddOverlay function
-    factory->CreateBitmapFromHBITMAP(bitmap, NULL, WICBitmapUseAlpha, &source);
+    factory->CreateBitmapFromHBITMAP(bitmap, nullptr, WICBitmapUseAlpha, &source);
     return AddOverlay(position, source);
 }
 
@@ -414,6 +415,22 @@ void DrawableWindow::DiscardDeviceResources() {
 
 
 /// <summary>
+/// Disables forwarding of mouse events to children.
+/// </summary>
+void DrawableWindow::DisableMouseForwarding() {
+    mDontForwardMouse = true;
+}
+
+
+/// <summary>
+/// Enables forwarding of mouse events to children.
+/// </summary>
+void DrawableWindow::EnableMouseForwarding() {
+    mDontForwardMouse = false;
+}
+
+
+/// <summary>
 /// Gets the "Desired" size of the window, given the specified constraints.
 /// </summary>
 /// <param name="maxWidth">Out. The maximum width to return.</param>
@@ -499,7 +516,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
     UNREFERENCED_PARAMETER(extra);
 
     // Forward mouse messages to the lowest level child window which the mouse is over.
-    if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) {
+    if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST && !mDontForwardMouse) {
         int xPos = GET_X_LPARAM(lParam); 
         int yPos = GET_Y_LPARAM(lParam);
         MessageHandler *handler = nullptr;

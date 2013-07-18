@@ -10,14 +10,14 @@
 #include "../nShared/Drawable.hpp"
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/Settings.hpp"
-#include "IIconEventHandler.hpp"
 #include "IconTile.hpp"
+#include "SelectionRectangle.hpp"
 #include "../nShared/LayoutSettings.hpp"
 #include <ShlObj.h>
 #include <set>
 
 
-class IconGroup : public IIconEventHandler, public Drawable {
+class IconGroup : public Drawable {
 public:
     explicit IconGroup(LPCSTR prefix);
     virtual ~IconGroup();
@@ -86,4 +86,14 @@ private:
     void DoCopy(bool cut);
     void DeleteSelectedFiles();
     void OpenSelectedFiles();
+    void RenameSelectedFiles();
+
+    // Rectangle selection
+private:
+    void StartRectangleSelection(D2D1_POINT_2U point);
+    void EndRectangleSelection(D2D1_POINT_2U point);
+    void MoveRectangleSelection(D2D1_POINT_2U point);
+    D2D1_POINT_2U mRectangleStart;
+    bool mInRectangleSelection;
+    SelectionRectangle mSelectionRectagle;
 };

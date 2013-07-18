@@ -15,13 +15,13 @@ public:
     virtual ~Brush();
 
     // Loads brush settings.
-    void Load(BrushSettings* settings);
+    void Load(BrushSettings *settings);
 
     // Updates the brush to the new position of the window.
     void UpdatePosition(D2D1_RECT_F position);
 
     // The brush.
-    ID2D1Brush* brush;
+    ID2D1Brush *brush;
 
     //
     D2D1_RECT_F brushPosition;
@@ -30,7 +30,7 @@ public:
     void Discard();
 
     // Recreates the brush.
-    HRESULT ReCreate(ID2D1RenderTarget* renderTarget);
+    HRESULT ReCreate(ID2D1RenderTarget *renderTarget);
 
 private:
     // The type of brush this is.
