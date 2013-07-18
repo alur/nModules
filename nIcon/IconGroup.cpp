@@ -619,6 +619,7 @@ void IconGroup::StartRectangleSelection(D2D1_POINT_2U point) {
     mRectangleStart = point;
     mInRectangleSelection = true;
     this->window->DisableMouseForwarding();
+    this->window->SetMouseCapture();
 }
 
 
@@ -628,6 +629,7 @@ void IconGroup::StartRectangleSelection(D2D1_POINT_2U point) {
 void IconGroup::EndRectangleSelection(D2D1_POINT_2U point) {
     mInRectangleSelection = false;
     mSelectionRectagle.Hide();
+    this->window->ReleaseMouseCapture();
 
     D2D1_RECT_F rect = D2D1::RectF(
         float(min(mRectangleStart.x, point.x)),

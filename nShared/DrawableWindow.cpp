@@ -135,6 +135,7 @@ void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHa
     this->text = nullptr;
     this->visible = false;
     mDontForwardMouse = false;
+    mCaptureHandler = nullptr;
 
     // Create the base state
     State* state = new State(new Settings(settings), 0, &this->text);
@@ -529,25 +530,30 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         int yPos = GET_Y_LPARAM(lParam);
         MessageHandler *handler = nullptr;
 
-        for (DrawableWindow *child : this->children) {
-            D2D1_RECT_F pos = child->drawingArea;
-            if (xPos >= pos.left && xPos <= pos.right && yPos >= pos.top && yPos <= pos.bottom) {
-                handler = child;
-                break;
+        if (mCaptureHandler == nullptr) {
+            for (DrawableWindow *child : this->children) {
+                D2D1_RECT_F pos = child->drawingArea;
+                if (xPos >= pos.left && xPos <= pos.right && yPos >= pos.top && yPos <= pos.bottom) {
+                    handler = child;
+                    break;
+                }
+            }
+
+            if (msg == WM_MOUSEMOVE) {
+                if (!this->parent && !isTrackingMouse) {
+                    isTrackingMouse = true;
+                    TrackMouseEvent(&this->trackMouseStruct);
+                }
+                if (handler != activeChild) {
+                    if (activeChild != nullptr) {
+                        activeChild->HandleMessage(window, WM_MOUSELEAVE, 0, 0, this);
+                    }
+                    activeChild = (DrawableWindow*)handler;
+                }
             }
         }
-
-        if (msg == WM_MOUSEMOVE) {
-            if (!this->parent && !isTrackingMouse) {
-                isTrackingMouse = true;
-                TrackMouseEvent(&this->trackMouseStruct);
-            }
-            if (handler != activeChild) {
-                if (activeChild != nullptr) {
-                    activeChild->HandleMessage(window, WM_MOUSELEAVE, 0, 0, this);
-                }
-                activeChild = (DrawableWindow*)handler;
-            }
+        else {
+            handler = mCaptureHandler;
         }
 
         if (handler == nullptr) {
@@ -886,6 +892,20 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
 
 
 /// <summary>
+/// Releases a SetMouseCapture
+/// </summary>
+void DrawableWindow::ReleaseMouseCapture() {
+    if (this->parent == nullptr) {
+        ReleaseCapture();
+        this->mCaptureHandler = nullptr;
+    }
+    else {
+        this->parent->ReleaseMouseCapture();
+    }
+}
+
+
+/// <summary>
 /// Removes the specified child.
 /// </summary>
 /// <param name="child">The child to remove.</param>
@@ -962,6 +982,20 @@ UINT_PTR DrawableWindow::SetCallbackTimer(UINT elapse, MessageHandler* msgHandle
     }
     else {
         return this->parent->SetCallbackTimer(elapse, msgHandler);
+    }
+}
+
+
+/// <summary>
+/// Redirects input to the selected message handler, regardless of where the mouse is.
+/// </summary>
+void DrawableWindow::SetMouseCapture(MessageHandler *captureHandler) {
+    if (this->parent == nullptr) {
+        SetCapture(this->window);
+        this->mCaptureHandler = captureHandler;
+    }
+    else {
+        this->parent->SetMouseCapture(captureHandler == nullptr ? this : captureHandler);
     }
 }
 

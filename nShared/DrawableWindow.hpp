@@ -110,6 +110,9 @@ public:
     // Moves this window.
     void Move(int x, int y);
 
+    // Stops capturing mouse input.
+    void ReleaseMouseCapture();
+
     // Registers a user message
     UINT RegisterUserMessage(MessageHandler* msgHandler);
 
@@ -129,7 +132,10 @@ public:
     UINT_PTR SetCallbackTimer(UINT elapse, MessageHandler* msgHandler);
 
     // Sets the message handler for this window.
-    void SetMessageHandler(MessageHandler* msgHandler);
+    void SetMessageHandler(MessageHandler *msgHandler);
+
+    // Captures mouse input.
+    void SetMouseCapture(MessageHandler *captureHandler = nullptr);
 
     // Sets the paragraph alignment of this drawablewindow.
     void SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT alignment);
@@ -310,4 +316,7 @@ private:
 
     // True if this window should handle all mouse events itself, rather than forwarding them to its children.
     bool mDontForwardMouse;
+
+    // If we are capturing mouse input, the message handler which will receieve it.
+    MessageHandler *mCaptureHandler;
 };
