@@ -525,15 +525,25 @@ void IconGroup::DoCopy(bool cut) {
 /// Deletes all selected files.
 /// </summary>
 void IconGroup::DeleteSelectedFiles() {
-    /*SHFILEOPSTRUCTW shFileOp;
+    // Generate a double-null terminated list of files to copy.
+    DoubleNullStrCollection files;
+    WCHAR buffer[MAX_PATH];
+    for (IconTile *tile : mIcons) {
+        if (tile->IsSelected()) {
+            tile->GetDisplayName(SHGDN_FORPARSING, buffer, _countof(buffer));
+            files.AddStr(buffer);
+        }
+    }
+
+    // Delete the files.
+    SHFILEOPSTRUCTW shFileOp;
     ZeroMemory(&shFileOp, sizeof(shFileOp));
     shFileOp.wFunc = FO_DELETE;
-    shFileOp.hwnd = this->window->GetWindowHandle();
-    shFileOp.pFrom = LPCWSTR((BYTE*)data + data->pFiles);
+    shFileOp.hwnd = nullptr;
+    shFileOp.pFrom = files.str;
     shFileOp.pTo = nullptr;
-    shFileOp.fFlags = FOF_ALLOWUNDO | FOF_WANTNUKEWARNING;
-
-    SHFileOperationW(&shFileOp);*/
+    shFileOp.fFlags = FOF_ALLOWUNDO;
+    SHFileOperationW(&shFileOp);
 }
 
 
