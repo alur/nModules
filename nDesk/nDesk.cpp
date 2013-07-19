@@ -63,6 +63,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
 
     SetParent(g_pDesktopPainter->GetWindow(), GetDesktopWindow());
     SetWindowLongPtr(g_pDesktopPainter->GetWindow(), GWL_STYLE, GetWindowLongPtr(g_pDesktopPainter->GetWindow(), GWL_STYLE) | WS_CHILD);
+
+    // We can't have this set to MAGIC_DWORD, because monitor-specific module hiding will remove the desktop wallpaper.
     SetWindowLongPtr(g_pDesktopPainter->GetWindow(), GWLP_USERDATA, LONG_PTR(-1));
     SetWindowPos(g_pDesktopPainter->GetWindow(), HWND_BOTTOM, g_pMonitorInfo->m_virtualDesktop.rect.left,
         g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.width,
