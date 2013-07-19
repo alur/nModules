@@ -57,6 +57,10 @@ DrawableWindow::DrawableWindow(Settings* settings, MessageHandler* msgHandler) {
     mDontForwardMouse = false;
     mCaptureHandler = nullptr;
     mIsChild = false;
+    this->timerIDs = nullptr;
+    this->userMsgIDs = nullptr;
+    this->monitorInfo = nullptr;
+    this->window = nullptr;
 
     // Create the base state
     State* state = new State(new Settings(settings), 0, &this->text);
@@ -86,6 +90,27 @@ DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHa
     this->trackMouseStruct.hwndTrack = nullptr;
     this->trackMouseStruct.dwFlags = 0;
     this->trackMouseStruct.dwHoverTime = 200;
+}
+
+
+/// <summary>
+/// Constructor used to create a window with a "Parent" setting.
+/// </summary>
+/// <param name="parent">The name of the parent's window.</param>
+/// <param name="settings">The settings to use.</param>
+/// <param name="msgHandler">The default message handler for this window.</param>
+DrawableWindow::DrawableWindow(LPCSTR parent, Settings *settings, MessageHandler *msgHandler) : DrawableWindow(settings, msgHandler) {
+    StringCchCopy(mParentName, _countof(mParentName), parent);
+    mParent = nCore::System::FindRegisteredWindow(mParentName);
+    mIsChild = true;
+    if (mParent) {
+        mParent->children.push_back(this);
+        this->monitorInfo = mParent->monitorInfo;
+        this->window = mParent->window;
+    }
+    else {
+        nCore::System::AddWindowRegistrationListener(mParentName, this);
+    }
 }
 
 
@@ -133,8 +158,6 @@ DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, Messa
     this->monitorInfo = parent->monitorInfo;
     mParent = parent;
     mIsChild = true;
-    this->timerIDs = nullptr;
-    this->userMsgIDs = nullptr;
     this->window = parent->window;
 }
 
@@ -147,6 +170,9 @@ DrawableWindow::~DrawableWindow() {
 
     if (mParent) {
         mParent->RemoveChild(this);
+    }
+    else if (mIsChild) {
+        nCore::System::RemoveWindowRegistrationListener(mParentName, this);
     }
 
     // Register with the core
@@ -795,6 +821,10 @@ void DrawableWindow::PaintOverlays() {
 void DrawableWindow::ParentLeft() {
     mParent = nullptr;
     this->window = nullptr;
+    this->monitorInfo = nullptr;
+    if (*mParentName != '\0') {
+        nCore::System::AddWindowRegistrationListener(mParentName, this);
+    }
 }
 
 
@@ -1023,6 +1053,19 @@ void DrawableWindow::SetPosition(RECT rect) {
 
 
 /// <summary>
+/// Updates variables which are dependent on the parent window.
+/// </summary>
+void DrawableWindow::UpdateParentVariables() {
+    this->monitorInfo = mParent->monitorInfo;
+    this->window = mParent->window;
+
+    for (DrawableWindow *child : this->children) {
+        child->UpdateParentVariables();
+    }
+}
+
+
+/// <summary>
 /// Specifies a new parent for this child.
 /// </summary>
 void DrawableWindow::SetParent(DrawableWindow *newParent) {
@@ -1030,9 +1073,13 @@ void DrawableWindow::SetParent(DrawableWindow *newParent) {
     
     mParent = newParent;
     mParent->children.push_back(this);
+
+    UpdateParentVariables();
+
     SetPosition(this->drawingSettings->x, this->drawingSettings->y,
         this->drawingSettings->width, this->drawingSettings->height);
     ReCreateDeviceResources();
+    Repaint();
 }
 
 

@@ -23,9 +23,9 @@ Drawable::Drawable(LPCSTR prefix) {
     
     char parentPrefix[64];
     this->settings->GetString("Parent", parentPrefix, sizeof(parentPrefix), "");
-    DrawableWindow* parentWindow = (DrawableWindow*)nCore::System::FindRegisteredWindow(parentPrefix);
-    if (parentWindow) {
-        this->window = parentWindow->CreateChild(this->settings, this);
+
+    if (*parentPrefix != '\0') {
+        this->window = new DrawableWindow(parentPrefix, this->settings, this);
     }
     else {
         this->window = gLSModule.CreateDrawableWindow(this->settings, this);

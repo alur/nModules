@@ -163,6 +163,7 @@ public:
 
     // Specifies a new parent for this child.
     void SetParent(DrawableWindow *newParent);
+    void UpdateParentVariables();
 
     // Sets the position of this drawablewindow, relative to its parent.
     void SetPosition(RECT rect);
@@ -333,6 +334,9 @@ private:
 
     // The text we are currently drawing.
     LPCWSTR text;
+
+    //
+    char mParentName[64];
 
     // True if this is a child window.
     bool mIsChild;

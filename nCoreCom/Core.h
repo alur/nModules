@@ -13,6 +13,7 @@
 #include "../nCore/IParsedText.hpp"
 
 typedef DWORD ARGB;
+class DrawableWindow;
 
 #define INIT_FUNC(var,type,name) var = (type)GetProcAddress(hCoreInstance,name); if (var == NULL) return E_NOTIMPL;
 
@@ -57,6 +58,8 @@ namespace nCore {
         //
         void RegisterWindow(LPCSTR prefix, LPVOID window);
         void UnRegisterWindow(LPCSTR prefix);
-        LPVOID FindRegisteredWindow(LPCSTR prefix);
+        DrawableWindow *FindRegisteredWindow(LPCSTR prefix);
+        void AddWindowRegistrationListener(LPCSTR prefix, DrawableWindow *listener);
+        void RemoveWindowRegistrationListener(LPCSTR prefix, DrawableWindow *listener);
     }
 }

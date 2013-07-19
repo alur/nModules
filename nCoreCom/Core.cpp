@@ -9,10 +9,10 @@
 #include "Core.h"
 
 // Set to true when the core is succesfully initalized.
-bool initialized = false;
+static bool initialized = false;
 
 // Pointers to the functions in the core.
-VERSION (__stdcall * _pGetVersion)();
+static VERSION (__stdcall * _pGetVersion)();
 
 
 /// <summary>

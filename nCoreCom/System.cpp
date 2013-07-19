@@ -8,13 +8,15 @@
 #include <Windows.h>
 #include "Core.h"
 
-IParsedText* (__cdecl * _pParseText)(LPCWSTR);
-BOOL (__cdecl * _pRegisterDynamicTextFunction)(LPCWSTR, UCHAR, FORMATTINGPROC, bool);
-BOOL (__cdecl * _pUnRegisterDynamicTextFunction)(LPCWSTR, UCHAR);
-BOOL (__cdecl * _pDynamicTextChangeNotification)(LPCWSTR, UCHAR);
-void (__cdecl * _pRegisterWindow)(LPCSTR, LPVOID);
-void (__cdecl * _pUnRegisterWindow)(LPCSTR);
-LPVOID (__cdecl * _pFindRegisteredWindow)(LPCSTR);
+static IParsedText* (__cdecl * _pParseText)(LPCWSTR);
+static BOOL (__cdecl * _pRegisterDynamicTextFunction)(LPCWSTR, UCHAR, FORMATTINGPROC, bool);
+static BOOL (__cdecl * _pUnRegisterDynamicTextFunction)(LPCWSTR, UCHAR);
+static BOOL (__cdecl * _pDynamicTextChangeNotification)(LPCWSTR, UCHAR);
+static void (__cdecl * _pRegisterWindow)(LPCSTR, LPVOID);
+static void (__cdecl * _pUnRegisterWindow)(LPCSTR);
+static DrawableWindow* (__cdecl * _pFindRegisteredWindow)(LPCSTR);
+static void (__cdecl * _pAddWindowRegistrationListener)(LPCSTR, DrawableWindow*);
+static void (__cdecl * _pRemoveWindowRegistrationListener)(LPCSTR, DrawableWindow*);
 
 
 /// <summary>
@@ -22,15 +24,17 @@ LPVOID (__cdecl * _pFindRegisteredWindow)(LPCSTR);
 /// </summary>
 /// <returns>True if the core is succefully initalized.</returns>
 HRESULT nCore::System::_Init(HMODULE hCoreInstance) {
-    INIT_FUNC(_pParseText,IParsedText* (__cdecl *)(LPCWSTR),"ParseText");
+    INIT_FUNC(_pParseText,IParsedText* (__cdecl *)(LPCWSTR), "ParseText");
     INIT_FUNC(_pRegisterDynamicTextFunction, BOOL (__cdecl *)(LPCWSTR, UCHAR, FORMATTINGPROC, bool), "RegisterDynamicTextFunction");
     INIT_FUNC(_pUnRegisterDynamicTextFunction, BOOL (__cdecl *)(LPCWSTR, UCHAR), "UnRegisterDynamicTextFunction");
     INIT_FUNC(_pDynamicTextChangeNotification, BOOL (__cdecl *)(LPCWSTR, UCHAR), "DynamicTextChangeNotification");
 
     INIT_FUNC(_pRegisterWindow, void (__cdecl *)(LPCSTR, LPVOID), "RegisterWindow");
     INIT_FUNC(_pUnRegisterWindow, void (__cdecl *)(LPCSTR), "UnRegisterWindow");
-    INIT_FUNC(_pFindRegisteredWindow, LPVOID (__cdecl *)(LPCSTR), "FindRegisteredWindow");
-    
+    INIT_FUNC(_pFindRegisteredWindow, DrawableWindow* (__cdecl *)(LPCSTR), "FindRegisteredWindow");
+    INIT_FUNC(_pAddWindowRegistrationListener, void (__cdecl *)(LPCSTR, DrawableWindow*), "AddWindowRegistrationListener");
+    INIT_FUNC(_pRemoveWindowRegistrationListener, void (__cdecl *)(LPCSTR, DrawableWindow*), "RemoveWindowRegistrationListener");
+
     return S_OK;
 }
 
@@ -65,6 +69,16 @@ void nCore::System::UnRegisterWindow(LPCSTR prefix) {
 }
 
 
-LPVOID nCore::System::FindRegisteredWindow(LPCSTR prefix) {
+DrawableWindow *nCore::System::FindRegisteredWindow(LPCSTR prefix) {
     return _pFindRegisteredWindow(prefix);
+}
+
+
+void nCore::System::AddWindowRegistrationListener(LPCSTR prefix, DrawableWindow *listener) {
+    _pAddWindowRegistrationListener(prefix, listener);
+}
+
+
+void nCore::System::RemoveWindowRegistrationListener(LPCSTR prefix, DrawableWindow *listener) {
+    _pRemoveWindowRegistrationListener(prefix, listener);
 }

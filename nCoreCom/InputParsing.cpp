@@ -9,19 +9,19 @@
 #include "Core.h"
 
 // Pointers to the functions in the core.
-bool (__cdecl * _pParseColor)(LPCSTR, ARGB*);
-bool (__cdecl * _pParseCoordinate)(LPCSTR, int *, bool, bool);
-bool (__cdecl * _pParseLength)(LPCSTR, int *, bool, bool);
-bool (__cdecl * _pParseMonitor)(LPCSTR, UINT *);
-bool (__cdecl * _pParseBool)(LPCSTR);
-int (__cdecl * _pGetPrefixedRCInt)(LPCSTR, LPCSTR, int);
-float (__cdecl * _pGetPrefixedRCFloat)(LPCSTR, LPCSTR, float);
-double (__cdecl * _pGetPrefixedRCDouble)(LPCSTR, LPCSTR, double);
-ARGB (__cdecl * _pGetPrefixedRCColor)(LPCSTR, LPCSTR, int);
-bool (__cdecl * _pGetPrefixedRCBool)(LPCSTR, LPCSTR, bool);
-bool (__cdecl * _pGetPrefixedRCString)(LPCSTR, LPCSTR, LPSTR, LPCSTR, UINT);
-bool (__cdecl * _pGetPrefixedRCWString)(LPCSTR, LPCSTR, LPWSTR, LPCSTR, UINT);
-UINT (__cdecl * _pGetPrefixedRCMonitor)(LPCSTR, LPCSTR, UINT);
+static bool (__cdecl * _pParseColor)(LPCSTR, ARGB*);
+static bool (__cdecl * _pParseCoordinate)(LPCSTR, int *, bool, bool);
+static bool (__cdecl * _pParseLength)(LPCSTR, int *, bool, bool);
+static bool (__cdecl * _pParseMonitor)(LPCSTR, UINT *);
+static bool (__cdecl * _pParseBool)(LPCSTR);
+static int (__cdecl * _pGetPrefixedRCInt)(LPCSTR, LPCSTR, int);
+static float (__cdecl * _pGetPrefixedRCFloat)(LPCSTR, LPCSTR, float);
+static double (__cdecl * _pGetPrefixedRCDouble)(LPCSTR, LPCSTR, double);
+static ARGB (__cdecl * _pGetPrefixedRCColor)(LPCSTR, LPCSTR, int);
+static bool (__cdecl * _pGetPrefixedRCBool)(LPCSTR, LPCSTR, bool);
+static bool (__cdecl * _pGetPrefixedRCString)(LPCSTR, LPCSTR, LPSTR, LPCSTR, UINT);
+static bool (__cdecl * _pGetPrefixedRCWString)(LPCSTR, LPCSTR, LPWSTR, LPCSTR, UINT);
+static UINT (__cdecl * _pGetPrefixedRCMonitor)(LPCSTR, LPCSTR, UINT);
 
 
 /// <summary>
