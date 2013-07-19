@@ -333,8 +333,7 @@ void DrawableWindow::ClearCallbackTimer(UINT_PTR timer) {
         this->timers.erase(timer);
         this->timerIDs->ReleaseID(timer);
     }
-    else {
-        assert(mParent != nullptr);
+    else if(mParent) {
         mParent->ClearCallbackTimer(timer);
     }
 }
@@ -673,8 +672,8 @@ void DrawableWindow::Hide() {
         ShowWindow(this->window, SW_HIDE);
     }
     else {
-        assert(mParent != nullptr);
-        mParent->Repaint();
+        RECT r = { (LONG)drawingArea.left, (LONG)drawingArea.top, (LONG)drawingArea.right, (LONG)drawingArea.bottom };
+        mParent->Repaint(&r);
     }
 }
 
@@ -705,7 +704,7 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings
 
     // AlwaysOnTop... TODO::Fix this!
     if (!mIsChild && this->drawingSettings->alwaysOnTop) {
-        SetParent(this->window, nullptr);
+        ::SetParent(this->window, nullptr);
         SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
         SetWindowPos(this->window, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
     }
@@ -868,7 +867,9 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
             }
         }
         else {
-            assert(mParent != nullptr);
+            if (!mParent) {
+                return S_FALSE;
+            }
             this->renderTarget = mParent->renderTarget;
         }
 
@@ -908,8 +909,7 @@ void DrawableWindow::ReleaseMouseCapture() {
         ReleaseCapture();
         this->mCaptureHandler = nullptr;
     }
-    else {
-        assert(mParent);
+    else if(mParent) {
         mParent->ReleaseMouseCapture();
     }
 }
@@ -1007,8 +1007,7 @@ void DrawableWindow::SetMouseCapture(MessageHandler *captureHandler) {
         SetCapture(this->window);
         this->mCaptureHandler = captureHandler;
     }
-    else {
-        assert(mParent != nullptr);
+    else if (mParent) { // Just ignore this request if we are a child without a parent.
         mParent->SetMouseCapture(captureHandler == nullptr ? this : captureHandler);
     }
 }
@@ -1020,6 +1019,20 @@ void DrawableWindow::SetMouseCapture(MessageHandler *captureHandler) {
 /// <param name="rect">The new position of the window.</param>
 void DrawableWindow::SetPosition(RECT rect) {
     SetPosition(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+}
+
+
+/// <summary>
+/// Specifies a new parent for this child.
+/// </summary>
+void DrawableWindow::SetParent(DrawableWindow *newParent) {
+    assert(mParent == nullptr);
+    
+    mParent = newParent;
+    mParent->children.push_back(this);
+    SetPosition(this->drawingSettings->x, this->drawingSettings->y,
+        this->drawingSettings->width, this->drawingSettings->height);
+    ReCreateDeviceResources();
 }
 
 
@@ -1046,8 +1059,7 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
             this->renderTarget->Resize(size);
         }
     }
-    else {
-        assert(mParent != nullptr);
+    else if(mParent) {
         this->drawingArea = D2D1::RectF(
             mParent->drawingArea.left + x,
             mParent->drawingArea.top + y,

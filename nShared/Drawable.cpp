@@ -32,7 +32,7 @@ Drawable::Drawable(LPCSTR prefix) {
     }
 
     this->eventHandler = new EventHandler(this->settings);
-    this->parent = NULL;
+    this->parent = nullptr;
     this->initialized = true;
 }
 
@@ -45,7 +45,7 @@ Drawable::Drawable(LPCSTR prefix, Settings* parentSettings) {
     this->settings = parentSettings->CreateChild(prefix);
     this->window = gLSModule.CreateDrawableWindow(this->settings, this);
     this->eventHandler = new EventHandler(this->settings);
-    this->parent = NULL;
+    this->parent = nullptr;
     this->initialized = true;
 }
 
@@ -77,7 +77,7 @@ Drawable::~Drawable() {
 /// <summary>
 /// Retrives this drawables window.
 /// </summary>
-DrawableWindow* Drawable::GetWindow() {
+DrawableWindow *Drawable::GetWindow() {
     return this->window;
 }
 

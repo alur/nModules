@@ -66,7 +66,7 @@ TaskButton::~TaskButton() {
 /// </summary>
 void TaskButton::SetIcon(HICON icon) {
     this->window->ClearOverlays();
-    if (icon != NULL) {
+    if (icon != nullptr) {
         D2D1_RECT_F f = { (float)this->iconSettings->GetInt("X", 0), (float)this->iconSettings->GetInt("Y", 0),
             (float)this->iconSettings->GetInt("Width", 32) + (float)this->iconSettings->GetInt("X", 0),
             (float)this->iconSettings->GetInt("Height", 32)+ (float)this->iconSettings->GetInt("Y", 0) };
@@ -232,10 +232,6 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
             if (!this->mouseIsOver) {
                 this->mouseIsOver = true;
 
-                RECT r;
-                this->window->GetScreenRect(&r);
-                ((Taskbar*)this->parent)->ShowThumbnail(this->watchedWindow, &r);
-
                 if ((*this->stateActive)->active) {
                     this->window->ActivateState(this->stateActiveHover);
                 }
@@ -245,6 +241,10 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                 }
 
                 this->window->ActivateState(this->stateHover);
+
+                RECT r;
+                this->window->GetScreenRect(&r);
+                ((Taskbar*)this->parent)->ShowThumbnail(this->watchedWindow, &r);
             }
         }
         return 0;

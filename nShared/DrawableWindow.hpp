@@ -42,6 +42,9 @@ public:
     // Constructor used for top-level windows.
     explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings *settings, MessageHandler *msgHandler);
 
+    // Constructor used to create a window with a "Parent" setting.
+    explicit DrawableWindow(LPCSTR parent, Settings *settings, MessageHandler *msgHandler);
+
     // Destructor
     virtual ~DrawableWindow();
 
@@ -157,6 +160,9 @@ public:
 
     // Sets the paragraph alignment of this drawablewindow.
     void SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT alignment);
+
+    // Specifies a new parent for this child.
+    void SetParent(DrawableWindow *newParent);
 
     // Sets the position of this drawablewindow, relative to its parent.
     void SetPosition(RECT rect);

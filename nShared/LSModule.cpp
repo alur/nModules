@@ -91,6 +91,8 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
     this->parent = parent;
     this->instance = instance;
 
+    CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
     // Register the messageHandler window class
     StringCchPrintf(className, sizeof(className), "LS%sMessageHandler", this->moduleName);
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
@@ -139,6 +141,9 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
 void LSModule::DeInitalize() {
     // Let go of any factories we allocated.
     Factories::Release();
+
+    //
+    CoUninitialize();
 }
 
 
