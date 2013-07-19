@@ -36,21 +36,47 @@ void DrawableWindow::TextChangeHandler(LPVOID drawable) {
 
 
 /// <summary>
+/// Common constructor. Called by the other constructors to initalize common settings.
+/// </summary>
+/// <param name="settings">The settings to use.</param>
+/// <param name="msgHandler">The default message handler for this window.</param>
+DrawableWindow::DrawableWindow(Settings* settings, MessageHandler* msgHandler) {
+    this->activeChild = nullptr;
+    this->animating = false;
+    ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
+    this->drawingSettings = new DrawableSettings();
+    this->initialized = false;
+    this->isTrackingMouse = false;
+    this->msgHandler = msgHandler;
+    this->parsedText = nullptr;
+    mParent = nullptr;
+    this->renderTarget = nullptr;
+    this->settings = new Settings(settings);
+    this->text = nullptr;
+    this->visible = false;
+    mDontForwardMouse = false;
+    mCaptureHandler = nullptr;
+    mIsChild = false;
+
+    // Create the base state
+    State* state = new State(new Settings(settings), 0, &this->text);
+    state->active = true;
+    this->activeState = this->baseState = this->states.insert(this->states.begin(), state);
+}
+
+
+/// <summary>
 /// Constructor used to create a DrawableWindow for a pre-existing window. Used by nDesk.
 /// </summary>
 /// <param name="window">The window to draw to.</param>
 /// <param name="prefix">The settings prefix to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
-DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHandler) {
+DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHandler) : DrawableWindow(&Settings(prefix), msgHandler) {
     this->monitorInfo = new MonitorInfo();
-    this->parent = nullptr;
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
     this->userMsgIDs = new UIDGenerator<UINT>(WM_USER);
     this->window = window;
 
-    Settings* settings = new Settings(prefix);
-    ConstructorCommon(settings, msgHandler);
-    SAFEDELETE(settings);
     this->initialized = true;
     this->visible = true;
 
@@ -71,14 +97,12 @@ DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHa
 /// <param name="instance">Used for creating the window.</param>
 /// <param name="settings">The settings to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
-DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) {
+DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) : DrawableWindow(settings, msgHandler) {
     this->monitorInfo = new MonitorInfo();
-    this->parent = nullptr;
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
     this->userMsgIDs = new UIDGenerator<UINT>(WM_USER);
 
-    ConstructorCommon(settings, msgHandler);
-
+    // Create the window
     this->window = MessageHandler::CreateMessageWindowEx(WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_COMPOSITED,
         windowClass, settings->prefix, WS_POPUP, 0, 0, 0, 0, NULL, NULL, instance, this);
     SetWindowPos(this->window, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
@@ -105,42 +129,13 @@ DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE 
 /// <param name="parent">The parent of this window.</param>
 /// <param name="settings">The settings to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
-DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler) {
+DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler) : DrawableWindow(settings, msgHandler) {
     this->monitorInfo = parent->monitorInfo;
-    this->parent = parent;
+    mParent = parent;
+    mIsChild = true;
     this->timerIDs = nullptr;
     this->userMsgIDs = nullptr;
     this->window = parent->window;
-
-    ConstructorCommon(settings, msgHandler);
-}
-
-
-/// <summary>
-/// Called by the constructors, initializes variables.
-/// </summary>
-/// <param name="settings">The settings to use.</param>
-/// <param name="msgHandler">The default message handler for this window.</param>
-void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHandler) {
-    this->activeChild = nullptr;
-    this->animating = false;
-    ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
-    this->drawingSettings = new DrawableSettings();
-    this->initialized = false;
-    this->isTrackingMouse = false;
-    this->msgHandler = msgHandler;
-    this->parsedText = nullptr;
-    this->renderTarget = nullptr;
-    this->settings = new Settings(settings);
-    this->text = nullptr;
-    this->visible = false;
-    mDontForwardMouse = false;
-    mCaptureHandler = nullptr;
-
-    // Create the base state
-    State* state = new State(new Settings(settings), 0, &this->text);
-    state->active = true;
-    this->activeState = this->baseState = this->states.insert(this->states.begin(), state);
 }
 
 
@@ -150,8 +145,8 @@ void DrawableWindow::ConstructorCommon(Settings* settings, MessageHandler* msgHa
 DrawableWindow::~DrawableWindow() {
     this->initialized = false;
 
-    if (this->parent) {
-        this->parent->RemoveChild(this);
+    if (mParent) {
+        mParent->RemoveChild(this);
     }
 
     // Register with the core
@@ -159,7 +154,7 @@ DrawableWindow::~DrawableWindow() {
         nCore::System::UnRegisterWindow(settings->prefix);
     }
 
-    if (!this->parent && this->window) {
+    if (!mIsChild && this->window) {
         DestroyWindow(this->window);
     }
 
@@ -176,7 +171,12 @@ DrawableWindow::~DrawableWindow() {
     // Delete all overlays
     ClearOverlays();
 
-    if (!this->parent) {
+    // Let the children know that we are vanishing
+    for (DrawableWindow *child : this->children) {
+        child->ParentLeft();
+    }
+
+    if (!mIsChild) {
         SAFERELEASE(this->renderTarget);
         SAFEDELETE(this->monitorInfo);
     }
@@ -328,13 +328,14 @@ void DrawableWindow::Animate() {
 /// </summary>
 /// <param name="timer">The ID of the timer to clear.</param>
 void DrawableWindow::ClearCallbackTimer(UINT_PTR timer) {
-    if (!this->parent) {
+    if (!mIsChild) {
         KillTimer(this->window, timer);
         this->timers.erase(timer);
         this->timerIDs->ReleaseID(timer);
     }
     else {
-        this->parent->ClearCallbackTimer(timer);
+        assert(mParent != nullptr);
+        mParent->ClearCallbackTimer(timer);
     }
 }
 
@@ -343,8 +344,8 @@ void DrawableWindow::ClearCallbackTimer(UINT_PTR timer) {
 /// Removes all overlays from the window.
 /// </summary>
 void DrawableWindow::ClearOverlays() {
-    for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
-        delete *overlay;
+    for (Overlay *overlay : this->overlays) {
+        delete overlay;
     }
     this->overlays.clear();
 }
@@ -384,33 +385,29 @@ DrawableWindow* DrawableWindow::CreateChild(Settings* childSettings, MessageHand
 /// Discards all device dependent resources.
 /// </summary>
 void DrawableWindow::DiscardDeviceResources() {
-    if (!this->parent) {
+    if (!mIsChild) {
         SAFERELEASE(this->renderTarget);
     }
     else {
-        this->renderTarget = NULL;
+        this->renderTarget = nullptr;
     }
     
-    for (PAINTER painter = this->prePainters.begin(); painter != this->prePainters.end(); ++painter) {
-        (*painter)->DiscardDeviceResources();
+    for (IPainter *painter : this->prePainters) {
+        painter->DiscardDeviceResources();
     }
-    
-    
-    for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
-        (*overlay)->DiscardDeviceResources();
+    for (Overlay *overlay : this->overlays) {
+        overlay->DiscardDeviceResources();
     }
-
-    for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
-        (*state)->DiscardDeviceResources();
+    for (State *state : this->states) {
+        state->DiscardDeviceResources();
     }
-
-    for (PAINTER painter = this->postPainters.begin(); painter != this->postPainters.end(); ++painter) {
-        (*painter)->DiscardDeviceResources();
+    for (IPainter *painter : this->postPainters) {
+        painter->DiscardDeviceResources();
     }
 
     // Discard resources for all children as well.
-    for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
-        (*child)->DiscardDeviceResources();
+    for (DrawableWindow *child : this->children) {
+        child->DiscardDeviceResources();
     }
 }
 
@@ -540,7 +537,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
             }
 
             if (msg == WM_MOUSEMOVE) {
-                if (!this->parent && !isTrackingMouse) {
+                if (!mIsChild && !isTrackingMouse) {
                     isTrackingMouse = true;
                     TrackMouseEvent(&this->trackMouseStruct);
                 }
@@ -672,11 +669,12 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
 /// </summary>
 void DrawableWindow::Hide() {
     this->visible = false;
-    if (!this->parent) {
+    if (!mIsChild) {
         ShowWindow(this->window, SW_HIDE);
     }
     else {
-        this->parent->Repaint();
+        assert(mParent != nullptr);
+        mParent->Repaint();
     }
 }
 
@@ -706,7 +704,7 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings
     ReCreateDeviceResources();
 
     // AlwaysOnTop... TODO::Fix this!
-    if (!this->parent && this->drawingSettings->alwaysOnTop) {
+    if (!mIsChild && this->drawingSettings->alwaysOnTop) {
         SetParent(this->window, nullptr);
         SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
         SetWindowPos(this->window, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
@@ -724,8 +722,8 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings
 /// </summary>
 /// <returns>True if this window and all its ancestors are visible.</returns>
 bool DrawableWindow::IsVisible() {
-    if (this->parent) {
-        return this->visible && this->parent->IsVisible();
+    if (mParent) {
+        return this->visible && mParent->IsVisible();
     }
     return this->visible;
 }
@@ -776,8 +774,8 @@ void DrawableWindow::Paint() {
 /// Paints all child windows.
 /// </summary>
 void DrawableWindow::PaintChildren() {
-    for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
-        (*child)->Paint();
+    for (DrawableWindow *child : this->children) {
+        child->Paint();
     }
 }
 
@@ -786,9 +784,18 @@ void DrawableWindow::PaintChildren() {
 /// Paints all overlays.
 /// </summary>
 void DrawableWindow::PaintOverlays() {
-    for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
-        (*overlay)->Paint(this->renderTarget);
+    for (Overlay *overlay : this->overlays) {
+        overlay->Paint(this->renderTarget);
     }
+}
+
+
+/// <summary>
+/// Called by the parent when it is passing away.
+/// </summary>
+void DrawableWindow::ParentLeft() {
+    mParent = nullptr;
+    this->window = nullptr;
 }
 
 
@@ -798,13 +805,14 @@ void DrawableWindow::PaintOverlays() {
 /// <param name="msgHandler">The handler which will receive the message.</param>
 /// <returns>The assigned message ID.</returns>
 UINT DrawableWindow::RegisterUserMessage(MessageHandler* msgHandler) {
-    if (!this->parent) {
+    if (!mIsChild) {
         UINT ret = this->userMsgIDs->GetNewID();
         this->userMessages.insert(std::pair<UINT, MessageHandler*>(ret, msgHandler));
         return ret;
     }
     else {
-        return this->parent->RegisterUserMessage(msgHandler);
+        assert(mParent != nullptr);
+        return mParent->RegisterUserMessage(msgHandler);
     }
 }
 
@@ -814,12 +822,12 @@ UINT DrawableWindow::RegisterUserMessage(MessageHandler* msgHandler) {
 /// </summary>
 /// <param name="message">The ID of the message to release.</param>
 void DrawableWindow::ReleaseUserMessage(UINT message) {
-    if (!this->parent) {
+    if (!mIsChild) {
         this->userMessages.erase(message);
         this->userMsgIDs->ReleaseID(message);
     }
-    else {
-        this->parent->ReleaseUserMessage(message);
+    else if (mParent) {
+        mParent->ReleaseUserMessage(message);
     }
 }
 
@@ -842,8 +850,8 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
     HRESULT hr = S_OK;
 
     if (!this->renderTarget) {
-        if (!this->parent) {
-            ID2D1Factory *pD2DFactory = NULL;
+        if (!mIsChild) {
+            ID2D1Factory *pD2DFactory = nullptr;
             hr = Factories::GetD2DFactory(reinterpret_cast<LPVOID*>(&pD2DFactory));
 
             // Create the render target
@@ -860,7 +868,8 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
             }
         }
         else {
-            this->renderTarget = this->parent->renderTarget;
+            assert(mParent != nullptr);
+            this->renderTarget = mParent->renderTarget;
         }
 
         if (SUCCEEDED(hr)) {
@@ -895,12 +904,13 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
 /// Releases a SetMouseCapture
 /// </summary>
 void DrawableWindow::ReleaseMouseCapture() {
-    if (this->parent == nullptr) {
+    if (!mIsChild) {
         ReleaseCapture();
         this->mCaptureHandler = nullptr;
     }
     else {
-        this->parent->ReleaseMouseCapture();
+        assert(mParent);
+        mParent->ReleaseMouseCapture();
     }
 }
 
@@ -909,10 +919,10 @@ void DrawableWindow::ReleaseMouseCapture() {
 /// Removes the specified child.
 /// </summary>
 /// <param name="child">The child to remove.</param>
-void DrawableWindow::RemoveChild(DrawableWindow* child) {
+void DrawableWindow::RemoveChild(DrawableWindow *child) {
     this->children.remove(child);
     if (child == this->activeChild) {
-        this->activeChild = NULL;
+        this->activeChild = nullptr;
     }
 }
 
@@ -923,13 +933,15 @@ void DrawableWindow::RemoveChild(DrawableWindow* child) {
 /// <param name="region">The area of the window to repaint. If NULL, the whole window is repainted.</param>
 void DrawableWindow::Repaint(LPRECT region) {
     if (this->initialized && this->visible) {
-        if (this->parent) {
-            if (region) {
-                this->parent->Repaint(region);
-            }
-            else {
-                RECT r = { (int)drawingArea.left, (int)drawingArea.top, (int)drawingArea.right, (int)drawingArea.bottom };
-                this->parent->Repaint(&r);
+        if (mIsChild) {
+            if (mParent != nullptr) {
+                if (region != nullptr) {
+                    mParent->Repaint(region);
+                }
+                else {
+                    RECT r = { (LONG)drawingArea.left, (LONG)drawingArea.top, (LONG)drawingArea.right, (LONG)drawingArea.bottom };
+                    mParent->Repaint(&r);
+                }
             }
         }
         else {
@@ -975,13 +987,14 @@ void DrawableWindow::SetAnimation(int x, int y, int width, int height, int durat
 /// <param name="msgHandler">The handler WM_TIMER messags with this ID are sent to.</param>
 /// <returns>The assigned timer ID.</returns>
 UINT_PTR DrawableWindow::SetCallbackTimer(UINT elapse, MessageHandler* msgHandler) {
-    if (!this->parent) {
+    if (!mIsChild) {
         UINT_PTR ret = SetTimer(this->window, this->timerIDs->GetNewID(), elapse, NULL);
         this->timers.insert(std::pair<UINT_PTR, MessageHandler*>(ret, msgHandler));
         return ret;
     }
     else {
-        return this->parent->SetCallbackTimer(elapse, msgHandler);
+        assert(mParent != nullptr);
+        return mParent->SetCallbackTimer(elapse, msgHandler);
     }
 }
 
@@ -990,12 +1003,13 @@ UINT_PTR DrawableWindow::SetCallbackTimer(UINT elapse, MessageHandler* msgHandle
 /// Redirects input to the selected message handler, regardless of where the mouse is.
 /// </summary>
 void DrawableWindow::SetMouseCapture(MessageHandler *captureHandler) {
-    if (this->parent == nullptr) {
+    if (!mIsChild) {
         SetCapture(this->window);
         this->mCaptureHandler = captureHandler;
     }
     else {
-        this->parent->SetMouseCapture(captureHandler == nullptr ? this : captureHandler);
+        assert(mParent != nullptr);
+        mParent->SetMouseCapture(captureHandler == nullptr ? this : captureHandler);
     }
 }
 
@@ -1024,7 +1038,7 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     this->drawingSettings->height = height;
 
     // Position the window and/or set the backarea.
-    if (!this->parent) {
+    if (!mIsChild) {
         SetWindowPos(this->window, 0, x, y, width, height, SWP_NOZORDER | SWP_NOACTIVATE);
         this->drawingArea = D2D1::RectF(0, 0, (float)width, (float)height);
         if (this->renderTarget) {
@@ -1033,11 +1047,12 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
         }
     }
     else {
+        assert(mParent != nullptr);
         this->drawingArea = D2D1::RectF(
-            this->parent->drawingArea.left + x,
-            this->parent->drawingArea.top + y,
-            this->parent->drawingArea.left + x + width,
-            this->parent->drawingArea.top + y + height
+            mParent->drawingArea.left + x,
+            mParent->drawingArea.top + y,
+            mParent->drawingArea.left + x + width,
+            mParent->drawingArea.top + y + height
         );
     }
 
@@ -1058,7 +1073,7 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
 /// Shows the window.
 /// </summary>
 void DrawableWindow::Show(int nCmdShow) {
-    if (!this->parent) {
+    if (!mIsChild) {
         ShowWindow(this->window, nCmdShow);
         if (this->drawingSettings->alwaysOnTop) {
             SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);

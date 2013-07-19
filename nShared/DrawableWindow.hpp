@@ -30,28 +30,46 @@ using std::map;
 
 
 class DrawableWindow : MessageHandler, IDropTarget {
+    // typedefs
 public:
     typedef list<State*>::iterator STATE;
     typedef list<Overlay*>::iterator OVERLAY;
     typedef list<IPainter*>::iterator PAINTER;
 
+
+    // Constructors & Destructor
+public:
     // Constructor used for top-level windows.
-    explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler);
+    explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings *settings, MessageHandler *msgHandler);
 
     // Destructor
     virtual ~DrawableWindow();
 
+protected:
+    // Used by nDesk.
+    DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHandler);
+
+private:
+    // Used to initalize common settings before the other constructors run.
+    explicit DrawableWindow(Settings *settings, MessageHandler *msgHandler);
+
+    // Constructor used by CreateChild to create a child window.
+    explicit DrawableWindow(DrawableWindow *parent, Settings *settings, MessageHandler *msgHandler);
+
+
+    // 
+public:
     // Adds an overlay.
     OVERLAY AddOverlay(D2D1_RECT_F position, HBITMAP image);
     OVERLAY AddOverlay(D2D1_RECT_F position, HICON icon);
-    OVERLAY AddOverlay(D2D1_RECT_F position, IWICBitmapSource* source);
+    OVERLAY AddOverlay(D2D1_RECT_F position, IWICBitmapSource *source);
 
     // Adds custom painters
-    PAINTER AddPrePainter(IPainter* painter);
-    PAINTER AddPostPainter(IPainter* painter);
+    PAINTER AddPrePainter(IPainter *painter);
+    PAINTER AddPostPainter(IPainter *painter);
 
     // Adds a new state.
-    STATE AddState(LPCSTR prefix, int defaultPriority, StateSettings* defaultSettings = nullptr);
+    STATE AddState(LPCSTR prefix, int defaultPriority, StateSettings *defaultSettings = nullptr);
 
     // Marks a particular state as active.
     void ActivateState(STATE state, bool repaint = true);
@@ -66,7 +84,7 @@ public:
     void ClearState(STATE state, bool repaint = true);
 
     // Creates a new child window.
-    DrawableWindow *CreateChild(Settings* childSettings, MessageHandler* msgHandler);
+    DrawableWindow *CreateChild(Settings *childSettings, MessageHandler *msgHandler);
 
     // Disables forwarding of mouse events to children.
     void DisableMouseForwarding();
@@ -75,10 +93,10 @@ public:
     void EnableMouseForwarding();
 
     // Returns the current drawing settings.
-    DrawableSettings* GetDrawingSettings();
+    DrawableSettings *GetDrawingSettings();
 
     // Returns a MonitorInfo class which will be kept up-to-date for the duration of this windows lifetime.
-    MonitorInfo* GetMonitorInformation();
+    MonitorInfo *GetMonitorInformation();
 
     // Gets the "desired" size for a given width and height.
     void GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size);
@@ -167,11 +185,13 @@ public:
     // Forcibly updates the text.
     void UpdateText();
 
+
     // IUnknown
 public:
     ULONG WINAPI AddRef();
     HRESULT WINAPI QueryInterface(REFIID riid, void **ppvObject);
     ULONG WINAPI Release();
+
 
     // IDropTarget
 public:
@@ -182,9 +202,6 @@ public:
 
 
 protected:
-    // Used by nDesk.
-    DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler* msgHandler);
-
     // Paints this window.
     void Paint();
 
@@ -211,14 +228,11 @@ private:
     //
     void Animate();
 
-    // Called by the constructors, intializes variables.
-    void ConstructorCommon(Settings* settings, MessageHandler* msgHandler);
-
-    // Constructor used by CreateChild to create a child window.
-    explicit DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler);
-
     // Removes the specified child.
     void RemoveChild(DrawableWindow* child);
+
+    //
+    void ParentLeft();
 
 private:
     // The child window the mouse is currently over.
@@ -273,7 +287,7 @@ private:
     list<Overlay*> overlays;
 
     // The DrawableWindow which is this windows parent.
-    DrawableWindow* parent;
+    DrawableWindow *mParent;
 
     // The current text of this window.
     IParsedText* parsedText;
@@ -311,8 +325,11 @@ private:
     // The HWND we are rendering to.
     HWND window;
 
-    // The text we are currently drawing
+    // The text we are currently drawing.
     LPCWSTR text;
+
+    // True if this is a child window.
+    bool mIsChild;
 
     // True if this window should handle all mouse events itself, rather than forwarding them to its children.
     bool mDontForwardMouse;

@@ -847,11 +847,18 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
                         }
                     }
                     break;
+
+                case VK_UP:
+                case VK_DOWN:
+                case VK_LEFT:
+                case VK_RIGHT:
+                    {
+
+                    }
+                    break;
                 }
             }
             break;
-
-            
 
         case WM_LBUTTONDOWN:
         case WM_RBUTTONDOWN:
