@@ -397,13 +397,13 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
     DWORD dwSize, dwType;
 
     // D2D/WIC interfaces
-    ID2D1Bitmap *pBitmap = NULL;
-    ID2D1BitmapRenderTarget* pBitmapRender = NULL;
-    IWICImagingFactory *pWICFactory = NULL;
-    IWICBitmapDecoder *pDecoder = NULL;
-    IWICBitmapFrameDecode *pSource = NULL;
-    IWICFormatConverter *pConverter = NULL;
-    IWICBitmapScaler *pScaler = NULL;
+    ID2D1Bitmap *pBitmap = nullptr;
+    ID2D1BitmapRenderTarget* pBitmapRender = nullptr;
+    IWICImagingFactory *pWICFactory = nullptr;
+    IWICBitmapDecoder *pDecoder = nullptr;
+    IWICBitmapFrameDecode *pSource = nullptr;
+    IWICFormatConverter *pConverter = nullptr;
+    IWICBitmapScaler *pScaler = nullptr;
 
     // Get the path to the wallpaper
     dwSize = sizeof(wszWallpaperPath); dwType = REG_SZ;
@@ -431,7 +431,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
 
     // Load the desktop background
     Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&pWICFactory));
-    if (SUCCEEDED(hr = pWICFactory->CreateDecoderFromFilename(wszWallpaperPath, NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder))) {
+    if (SUCCEEDED(hr = pWICFactory->CreateDecoderFromFilename(wszWallpaperPath, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder))) {
         // Get the first frame of the wallpaper
         pDecoder->GetFrame(0, &pSource);
 
@@ -442,7 +442,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
         if (bTileWallpaper) { // Tile
             // Convert it to a D2D1 bitmap
             pWICFactory->CreateFormatConverter(&pConverter);
-            pConverter->Initialize(pSource, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut);
+            pConverter->Initialize(pSource, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.f, WICBitmapPaletteTypeMedianCut);
             renderTarget->CreateBitmapFromWicBitmap(pConverter, 0, &pBitmap);
 
             // The x/y points where we should start tiling the image
@@ -513,7 +513,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
 
             // Convert it to a D2D1 bitmap
             pWICFactory->CreateFormatConverter(&pConverter);
-            pConverter->Initialize(pScaler, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut);
+            pConverter->Initialize(pScaler, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.f, WICBitmapPaletteTypeMedianCut);
             renderTarget->CreateBitmapFromWicBitmap(pConverter, 0, &pBitmap);
 
             if (iWallpaperStyle == 22) {

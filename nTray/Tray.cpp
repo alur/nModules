@@ -165,6 +165,16 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM
         }
         return 0;
 
+    case DrawableWindow::WM_TOPPARENTLOST:
+        {
+        }
+        return 0;
+
+    case DrawableWindow::WM_NEWTOPPARENT:
+        {
+        }
+        return 0;
+
     default:
         {
             if (message == this->balloonClickedMessage) {
