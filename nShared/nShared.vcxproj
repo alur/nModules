@@ -93,6 +93,19 @@
   <ItemGroup>
     <None Include=".\Macros.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\nCoreCom\nCoreCom.vcxproj">
+      <Project>{66f96ff8-fec5-455a-beac-3975db89a772}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Utilities\Utilities.vcxproj">
+      <Project>{84b7f148-7fdd-4d3d-bc0d-5901f9db7e4c}</Project>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>
   </PropertyGroup>
@@ -171,8 +184,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;Utilities.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
@@ -190,8 +203,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;Utilities.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -218,9 +231,9 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;Utilities.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -247,8 +260,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;Utilities.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>

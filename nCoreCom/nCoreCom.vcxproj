@@ -179,6 +179,11 @@
     <ClCompile Include="InputParsing.cpp" />
     <ClCompile Include="System.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Utilities\Utilities.vcxproj">
+      <Project>{84b7f148-7fdd-4d3d-bc0d-5901f9db7e4c}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -96,8 +96,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>nShared.lib;nCoreCom.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,8 +109,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>nShared.lib;nCoreCom.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -135,8 +133,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>nShared.lib;nCoreCom.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -160,8 +157,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(OutputPath);$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>nShared.lib;nCoreCom.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -179,6 +175,14 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include=".\nIcon.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\nCoreCom\nCoreCom.vcxproj">
+      <Project>{66f96ff8-fec5-455a-beac-3975db89a772}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\nShared\nShared.vcxproj">
+      <Project>{91b4220f-6589-4739-bca7-3ff9f83fce04}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
