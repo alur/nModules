@@ -64,9 +64,6 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
 
     SetParent(g_pDesktopPainter->GetWindow(), GetDesktopWindow());
     SetWindowLongPtr(g_pDesktopPainter->GetWindow(), GWL_STYLE, GetWindowLongPtr(g_pDesktopPainter->GetWindow(), GWL_STYLE) | WS_CHILD);
-
-    // We can't have this set to MAGIC_DWORD, because monitor-specific module hiding will remove the desktop wallpaper.
-    SetWindowLongPtr(g_pDesktopPainter->GetWindow(), GWLP_USERDATA, LONG_PTR(-1));
     SetWindowPos(g_pDesktopPainter->GetWindow(), HWND_BOTTOM, g_pMonitorInfo->m_virtualDesktop.rect.left,
         g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.width,
         g_pMonitorInfo->m_virtualDesktop.height, SWP_NOACTIVATE | SWP_NOSENDCHANGING);
@@ -186,10 +183,15 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case WM_WINDOWPOSCHANGING:
         {
             // Keep the hWnd at the bottom of the window stack
-            WINDOWPOS *c = (WINDOWPOS*)lParam;
+            LPWINDOWPOS c = LPWINDOWPOS(lParam);
             c->hwnd = window;
             c->hwndInsertAfter = HWND_BOTTOM;
-            c->flags |= SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOMOVE;
+            c->flags &= ~SWP_HIDEWINDOW;
+            c->flags |= SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOMOVE | SWP_SHOWWINDOW;
+            c->x = g_pMonitorInfo->m_virtualDesktop.rect.left;
+            c->y = g_pMonitorInfo->m_virtualDesktop.rect.top;
+            c->cx = g_pMonitorInfo->m_virtualDesktop.width;
+            c->cy = g_pMonitorInfo->m_virtualDesktop.height;
         }
         return 0;
 
