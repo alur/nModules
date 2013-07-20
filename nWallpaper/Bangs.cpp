@@ -29,9 +29,39 @@ namespace Bangs {
             char file[MAX_PATH];
             LPSTR bufs[] = { file };
 
-            LiteStep::CommandTokenize(args, bufs, 1, nullptr);
+            LiteStep::CommandTokenize(args, bufs, _countof(bufs), nullptr);
 
             SHSetValueA(HKEY_CURRENT_USER, "Control Panel\\Desktop", "Wallpaper", REG_SZ, file, (DWORD)strlen(args));
+            SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
+        }),
+        BangItem("!SetWallpaperStyle", [] (HWND, LPCSTR args) {
+            char style[MAX_PATH];
+            LPSTR bufs[] = { style };
+
+            LiteStep::CommandTokenize(args, bufs, _countof(bufs), nullptr);
+
+            LPCSTR value = nullptr;
+
+            if (_stricmp(style, "Center") == 0) {
+                value = "0";
+            }
+            else if (_stricmp(style, "Stretch") == 0) {
+                value = "2";
+            }
+            else if (_stricmp(style, "Fit") == 0) {
+                value = "6";
+            }
+            else if (_stricmp(style, "Fill") == 0) {
+                value = "10";
+            }
+            else if (_stricmp(style, "Span") == 0) {
+                value = "22";
+            }
+            else {
+                return;
+            }
+
+            SHSetValueA(HKEY_CURRENT_USER, "Control Panel\\Desktop", "WallpaperStyle", REG_SZ, value, (DWORD)strlen(value));
             SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
         })
     };
