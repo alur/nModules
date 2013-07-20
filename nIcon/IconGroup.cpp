@@ -18,6 +18,12 @@
 #include "../nShared/PIDL.h"
 
 
+#define CHANGE_SOURCES SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery
+#define CHANGE_EVENTS SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR \
+        | SHCNE_RMDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM \
+        | SHCNE_UPDATEDIR | SHCNE_UPDATEIMAGE | SHCNE_ASSOCCHANGED
+
+
 struct DoubleNullStrCollection {
     DoubleNullStrCollection() {
         cchSize = 2;
@@ -221,9 +227,8 @@ void IconGroup::SetFolder(LPWSTR folder) {
     SHChangeNotifyEntry watchEntries[] = { idList, FALSE };
     mChangeNotifyUID = SHChangeNotifyRegister(
         this->window->GetWindowHandle(),
-        SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
-        SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM
-        | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM | SHCNE_UPDATEDIR | SHCNE_UPDATEIMAGE | SHCNE_ASSOCCHANGED,
+        CHANGE_SOURCES,
+        CHANGE_EVENTS,
         mChangeNotifyMsg,
         1,
         watchEntries);
@@ -888,6 +893,44 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
                 }
                 else if (GetKeyState(VK_CONTROL) >= 0) {
                     DeselectAll();
+                }
+            }
+            break;
+
+        case DrawableWindow::WM_TOPPARENTLOST:
+            {
+                mChangeNotifyMsg = 0;
+                if (mChangeNotifyUID != 0) {
+                    SHChangeNotifyDeregister(mChangeNotifyUID);
+                    mChangeNotifyUID = 0;
+                }
+            }
+            break;
+
+        case DrawableWindow::WM_NEWTOPPARENT:
+            {
+                IPersistFolder2 *ipsf2;
+                LPITEMIDLIST curFolder;
+                HRESULT hr;
+
+                mChangeNotifyMsg = this->window->RegisterUserMessage(this);
+
+                if (SUCCEEDED(hr = mWorkingFolder->QueryInterface(IID_IPersistFolder2, (LPVOID*) &ipsf2))) {
+                    if (SUCCEEDED(hr = ipsf2->GetCurFolder(&curFolder))) {
+                        // (Re)Register for change notifications
+                        SHChangeNotifyEntry watchEntries[] = { curFolder, FALSE };
+                        mChangeNotifyUID = SHChangeNotifyRegister(
+                            window,
+                            CHANGE_SOURCES,
+                            CHANGE_EVENTS,
+                            mChangeNotifyMsg,
+                            1,
+                            watchEntries);
+
+                        // Let go fo the PIDLists
+                        CoTaskMemFree(curFolder);
+                    }
+                    ipsf2->Release();
                 }
             }
             break;

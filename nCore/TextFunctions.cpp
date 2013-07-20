@@ -18,11 +18,11 @@ void TextFunctions::_Register() {
     RegisterDynamicTextFunction(L"Time", 1, Time, true);
     RegisterDynamicTextFunction(L"br", 0, Br, false);
 
-    RegisterDynamicTextFunction(L"WindowTitle", 1, [] (LPCWSTR /* name */, UCHAR numArgs, LPWSTR* args, LPWSTR dest, size_t cchDest) -> BOOL {
+    RegisterDynamicTextFunction(L"WindowTitle", 1, [] (LPCWSTR /* name */, UCHAR /* numArgs */, LPWSTR* args, LPWSTR dest, size_t cchDest) -> BOOL {
         HWND window = FindWindowW(args[0], nullptr);
         LPWSTR end = wcschr(dest, L'\0');
         if (window) {
-            GetWindowTextW(window, end, cchDest - (end - dest));
+            GetWindowTextW(window, end, int(cchDest - (end - dest)));
             return true;
         }
         return false;

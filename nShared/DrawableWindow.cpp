@@ -51,7 +51,7 @@ DrawableWindow::DrawableWindow(Settings* settings, MessageHandler* msgHandler) {
     this->parsedText = nullptr;
     mParent = nullptr;
     this->renderTarget = nullptr;
-    this->settings = new Settings(settings);
+    this->settings = settings;
     this->text = nullptr;
     this->visible = false;
     mDontForwardMouse = false;
@@ -75,10 +75,10 @@ DrawableWindow::DrawableWindow(Settings* settings, MessageHandler* msgHandler) {
 /// <param name="window">The window to draw to.</param>
 /// <param name="prefix">The settings prefix to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
-DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHandler) : DrawableWindow(&Settings(prefix), msgHandler) {
+DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHandler) : DrawableWindow(new Settings(prefix), msgHandler) {
     this->monitorInfo = new MonitorInfo();
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
-    this->userMsgIDs = new UIDGenerator<UINT>(WM_USER);
+    this->userMsgIDs = new UIDGenerator<UINT>(WM_FIRSTREGISTERED);
     this->window = window;
 
     this->initialized = true;
@@ -99,7 +99,7 @@ DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHa
 /// <param name="parent">The name of the parent's window.</param>
 /// <param name="settings">The settings to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
-DrawableWindow::DrawableWindow(LPCSTR parent, Settings *settings, MessageHandler *msgHandler) : DrawableWindow(settings, msgHandler) {
+DrawableWindow::DrawableWindow(LPCSTR parent, Settings *settings, MessageHandler *msgHandler) : DrawableWindow(new Settings(settings), msgHandler) {
     StringCchCopy(mParentName, _countof(mParentName), parent);
     mParent = nCore::System::FindRegisteredWindow(mParentName);
     mIsChild = true;
@@ -122,7 +122,7 @@ DrawableWindow::DrawableWindow(LPCSTR parent, Settings *settings, MessageHandler
 /// <param name="instance">Used for creating the window.</param>
 /// <param name="settings">The settings to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
-DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) : DrawableWindow(settings, msgHandler) {
+DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) : DrawableWindow(new Settings(settings), msgHandler) {
     this->monitorInfo = new MonitorInfo();
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
     this->userMsgIDs = new UIDGenerator<UINT>(WM_USER);
@@ -154,7 +154,7 @@ DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE 
 /// <param name="parent">The parent of this window.</param>
 /// <param name="settings">The settings to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
-DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler) : DrawableWindow(settings, msgHandler) {
+DrawableWindow::DrawableWindow(DrawableWindow* parent, Settings* settings, MessageHandler* msgHandler) : DrawableWindow(new Settings(settings), msgHandler) {
     this->monitorInfo = parent->monitorInfo;
     mParent = parent;
     mIsChild = true;
@@ -728,11 +728,10 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings
     // Create D2D resources.
     ReCreateDeviceResources();
 
-    // AlwaysOnTop... TODO::Fix this!
+    // AlwaysOnTop
     if (!mIsChild && this->drawingSettings->alwaysOnTop) {
         ::SetParent(this->window, nullptr);
         SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
-        SetWindowPos(this->window, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
     }
     
     // Set the text.
@@ -820,8 +819,9 @@ void DrawableWindow::PaintOverlays() {
 /// </summary>
 void DrawableWindow::ParentLeft() {
     mParent = nullptr;
-    this->window = nullptr;
-    this->monitorInfo = nullptr;
+    UpdateParentVariables();
+    SendToAll(nullptr, WM_TOPPARENTLOST, 0, 0, this);
+    
     if (*mParentName != '\0') {
         nCore::System::AddWindowRegistrationListener(mParentName, this);
     }
@@ -1052,12 +1052,26 @@ void DrawableWindow::SetPosition(RECT rect) {
 }
 
 
+void DrawableWindow::SendToAll(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID data) {
+    this->msgHandler->HandleMessage(window, msg, wParam, lParam, data);
+    for (DrawableWindow *child : this->children) {
+        child->SendToAll(window, msg, wParam, lParam, data);
+    }
+}
+
+
 /// <summary>
 /// Updates variables which are dependent on the parent window.
 /// </summary>
 void DrawableWindow::UpdateParentVariables() {
-    this->monitorInfo = mParent->monitorInfo;
-    this->window = mParent->window;
+    if (mParent) {
+        this->monitorInfo = mParent->monitorInfo;
+        this->window = mParent->window;
+    }
+    else {
+        this->monitorInfo = nullptr;
+        this->window = nullptr;
+    }
 
     for (DrawableWindow *child : this->children) {
         child->UpdateParentVariables();
@@ -1075,6 +1089,7 @@ void DrawableWindow::SetParent(DrawableWindow *newParent) {
     mParent->children.push_back(this);
 
     UpdateParentVariables();
+    SendToAll(this->window, WM_NEWTOPPARENT, 0, 0, this);
 
     SetPosition(this->drawingSettings->x, this->drawingSettings->y,
         this->drawingSettings->width, this->drawingSettings->height);

@@ -36,6 +36,24 @@ public:
     typedef list<Overlay*>::iterator OVERLAY;
     typedef list<IPainter*>::iterator PAINTER;
 
+    // enums
+public:
+    // Reserved window messages.
+    enum ReservedMessages {
+        // Sent when the top-level parent has gone away. At this point, all
+        // calls to RegisterUserMessage and SetCallbackTimer are invalidated.
+        WM_TOPPARENTLOST = WM_USER,
+
+        // Sent when the top-level parent has gone away. At this point, all 
+        // calls to RegisterUserMessage and SetCallbackTimer are invalidated.
+        // However, the receiver can now feel free to re-register with either
+        // of those functions.
+        WM_NEWTOPPARENT,
+
+        // The first message aviailable for registration.
+        WM_FIRSTREGISTERED
+    };
+
 
     // Constructors & Destructor
 public:
@@ -50,7 +68,7 @@ public:
 
 protected:
     // Used by nDesk.
-    DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHandler);
+    explicit DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHandler);
 
 private:
     // Used to initalize common settings before the other constructors run.
@@ -58,7 +76,6 @@ private:
 
     // Constructor used by CreateChild to create a child window.
     explicit DrawableWindow(DrawableWindow *parent, Settings *settings, MessageHandler *msgHandler);
-
 
     // 
 public:
@@ -163,7 +180,6 @@ public:
 
     // Specifies a new parent for this child.
     void SetParent(DrawableWindow *newParent);
-    void UpdateParentVariables();
 
     // Sets the position of this drawablewindow, relative to its parent.
     void SetPosition(RECT rect);
@@ -231,6 +247,9 @@ private:
     // Called by IParsedText objects when we should update the text.
     static void TextChangeHandler(LPVOID drawable);
 
+    // Sends a message to every child window, all the way down the tree.
+    void SendToAll(HWND, UINT, WPARAM, LPARAM, LPVOID);
+
 private:
     //
     void Animate();
@@ -240,6 +259,7 @@ private:
 
     //
     void ParentLeft();
+    void UpdateParentVariables();
 
 private:
     // The child window the mouse is currently over.
