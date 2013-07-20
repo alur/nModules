@@ -554,10 +554,12 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
 
         if (mCaptureHandler == nullptr) {
             for (DrawableWindow *child : this->children) {
-                D2D1_RECT_F pos = child->drawingArea;
-                if (xPos >= pos.left && xPos <= pos.right && yPos >= pos.top && yPos <= pos.bottom) {
-                    handler = child;
-                    break;
+                if (!child->drawingSettings->clickThrough) {
+                    D2D1_RECT_F pos = child->drawingArea;
+                    if (xPos >= pos.left && xPos <= pos.right && yPos >= pos.top && yPos <= pos.bottom) {
+                        handler = child;
+                        break;
+                    }
                 }
             }
 

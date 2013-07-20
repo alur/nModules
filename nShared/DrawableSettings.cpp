@@ -17,6 +17,7 @@
 DrawableSettings::DrawableSettings() {
     this->alwaysOnTop = false;
     this->blurBehind = false;
+    this->clickThrough = false;
     this->evaluateText = false;
     this->height = 100;
     this->hidden = false;
@@ -47,6 +48,7 @@ void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
 
     this->alwaysOnTop = settings->GetBool("AlwaysOnTop", defaults->alwaysOnTop);
     this->blurBehind = settings->GetBool("BlurBehind", defaults->blurBehind);
+    this->clickThrough = settings->GetBool("ClickThrough", defaults->clickThrough);
     this->evaluateText = defaults->evaluateText;
     this->height = settings->GetInt("Height", defaults->height);
     this->hidden = settings->GetBool("Hidden", defaults->hidden);

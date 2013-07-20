@@ -25,6 +25,9 @@ public:
     // True if the window background should be blured. Default: false
     bool blurBehind;
 
+    // True in order to let the
+    bool clickThrough;
+
     // True to evaluate text strings. Not read from RC files. Default: false
     bool evaluateText;
 
