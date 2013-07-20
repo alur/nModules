@@ -384,6 +384,9 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 /// Creates a brush of the current wallpaper.
 /// </summary>
 HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
+    //
+    HRESULT hr = S_OK;
+
     // Information about the wallpaper
     WCHAR wszWallpaperPath[MAX_PATH];
     int iWallpaperStyle;
@@ -428,7 +431,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
 
     // Load the desktop background
     Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&pWICFactory));
-    if (SUCCEEDED(pWICFactory->CreateDecoderFromFilename(wszWallpaperPath, NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder))) {
+    if (SUCCEEDED(hr = pWICFactory->CreateDecoderFromFilename(wszWallpaperPath, NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder))) {
         // Get the first frame of the wallpaper
         pDecoder->GetFrame(0, &pSource);
 

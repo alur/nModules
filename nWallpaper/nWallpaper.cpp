@@ -11,6 +11,7 @@
 #include <map>
 #include <strsafe.h>
 #include "Version.h"
+#include "Bangs.h"
 
 using std::map;
 
@@ -36,6 +37,9 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     // Load settings
     LoadSettings();
 
+    //
+    Bangs::_Register();
+
     return 0;
 }
 
@@ -44,6 +48,9 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
+    //
+    Bangs::_Unregister();
+
     gLSModule.DeInitalize();
 }
 

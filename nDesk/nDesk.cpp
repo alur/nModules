@@ -19,6 +19,7 @@
 #include <dwmapi.h>
 #include "../nShared/Color.h"
 #include "Version.h"
+#include <ShObjIdl.h>
 
 
 // The messages we want from the core
@@ -82,6 +83,29 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     // Reset the work area for all monitors
     WorkArea::ResetWorkAreas(g_pMonitorInfo);
     WorkArea::LoadSettings(g_pMonitorInfo);
+
+    /*const CLSID CLSID_Test = {0xff609cc7, 0xd34d, 0x4049, {0xa1, 0xaa, 0x22, 0x93, 0x51, 0x7f, 0xfc, 0xc6}};
+    IExecuteCommand *iec;
+    IObjectWithSelection *iows;
+    IShellItem *ishi;
+    IShellItemArray *ishia;
+
+    HRESULT hr = CoCreateInstance(CLSID_Test, nullptr, CLSCTX_INPROC_SERVER, IID_IExecuteCommand, (LPVOID*)&iec);
+
+    if (SUCCEEDED(hr)) {
+        hr = iec->QueryInterface(IID_IObjectWithSelection, (LPVOID*)&iows);
+
+        hr = SHCreateItemFromParsingName(L"C:\\Users\\Erik\\Dropbox\\Wallpapers\\24545.jpg", nullptr, IID_IShellItem, (LPVOID*)&ishi);
+
+        hr = SHCreateShellItemArrayFromShellItem(ishi, IID_IShellItemArray, (LPVOID*)&ishia);
+
+        hr = iec->SetDirectory(L"C:\\Users\\Erik\\Dropbox\\Wallpapers");
+        hr = iows->SetSelection(ishia);
+
+        hr = iec->Execute();
+        
+        iec->Release();
+    }*/
 
     // Used to generate the table for: http://portfolio.alurcard2.net/#!/wiki/Named%20Colors
     /*/
