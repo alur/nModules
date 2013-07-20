@@ -61,14 +61,20 @@ void State::UpdatePosition(D2D1_RECT_F position) {
     this->textShadowBrush->UpdatePosition(position);
 
     this->drawingArea.rect = this->backBrush->brushPosition;
+
+    this->outlineArea = this->drawingArea;
+    this->outlineArea.rect.left += this->drawingSettings->outlineWidth / 2;
+    this->outlineArea.rect.right -= this->drawingSettings->outlineWidth / 2;
+    this->outlineArea.rect.top += this->drawingSettings->outlineWidth / 2;
+    this->outlineArea.rect.bottom -= this->drawingSettings->outlineWidth / 2;
 }
 
 
 void State::Load(StateSettings* defaultSettings) {
     this->drawingSettings->Load(this->settings, defaultSettings);
 
-    this->drawingArea.radiusX = this->drawingSettings->cornerRadiusX;
-    this->drawingArea.radiusY = this->drawingSettings->cornerRadiusY;
+    this->drawingArea.radiusX = this->outlineArea.radiusX = this->drawingSettings->cornerRadiusX;
+    this->drawingArea.radiusY = this->outlineArea.radiusY = this->drawingSettings->cornerRadiusY;
 
     this->backBrush->Load(&this->drawingSettings->backgroundBrush);
     this->outlineBrush->Load(&this->drawingSettings->outlineBrush);
@@ -93,7 +99,7 @@ void State::Paint(ID2D1RenderTarget* renderTarget) {
         renderTarget->FillRoundedRectangle(this->drawingArea, this->backBrush->brush);
     }
     if (this->outlineBrush->brush) {
-        renderTarget->DrawRoundedRectangle(this->drawingArea, this->outlineBrush->brush, this->drawingSettings->outlineWidth);
+        renderTarget->DrawRoundedRectangle(this->outlineArea, this->outlineBrush->brush, this->drawingSettings->outlineWidth);
     }
     /*if (this->textShadowBrush->brush) {
         renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, this->textRotationOrigin));
@@ -115,6 +121,11 @@ HRESULT State::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
     textShadowBrush->ReCreate(renderTarget);
 
     this->drawingArea.rect = this->backBrush->brushPosition;
+    this->outlineArea = this->drawingArea;
+    this->outlineArea.rect.left += this->drawingSettings->outlineWidth / 2;
+    this->outlineArea.rect.right -= this->drawingSettings->outlineWidth / 2;
+    this->outlineArea.rect.top += this->drawingSettings->outlineWidth / 2;
+    this->outlineArea.rect.bottom -= this->drawingSettings->outlineWidth / 2;
     return S_OK;
 }
 

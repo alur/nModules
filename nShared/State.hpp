@@ -71,6 +71,9 @@ private:
 
     // The area we draw in.
     D2D1_ROUNDED_RECT drawingArea;
+    
+    // The area we draw the outline in.
+    D2D1_ROUNDED_RECT outlineArea;
 
     // The point we rotate text around.
     D2D1_POINT_2F textRotationOrigin;
