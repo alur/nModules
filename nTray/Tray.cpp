@@ -44,12 +44,14 @@ Tray::Tray(LPCSTR name) : Drawable(name) {
 /// </summary>
 Tray::~Tray() {
     // Remove all icons
-    for (vector<TrayIcon*>::const_iterator iter = this->icons.begin(); iter != this->icons.end(); iter++) {
-        delete *iter;
+    for (TrayIcon *icon : this->icons) {
+        delete icon;
     }
     this->icons.clear();
 
-    this->window->ReleaseUserMessage(this->balloonClickedMessage);
+    if (this->balloonClickedMessage != 0) {
+        this->window->ReleaseUserMessage(this->balloonClickedMessage);
+    }
 
     SAFEDELETE(this->tooltip);
     SAFEDELETE(this->balloon);
@@ -266,7 +268,7 @@ void Tray::ShowNextBalloon() {
     // If we are not accepting notifications at this time, we should wait.
     if (state != 0 && state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME) {
         if (this->balloonTimer == 0) {
-            this->balloonTimer = this->window->RegisterUserMessage(this);
+            this->balloonTimer = this->window->SetCallbackTimer(this->balloonTime, this);
         }
         return;
     }

@@ -841,9 +841,12 @@ UINT DrawableWindow::RegisterUserMessage(MessageHandler* msgHandler) {
         this->userMessages.insert(std::pair<UINT, MessageHandler*>(ret, msgHandler));
         return ret;
     }
-    else {
-        assert(mParent != nullptr);
+    else if (mParent) {
         return mParent->RegisterUserMessage(msgHandler);
+    }
+    else {
+        TRACE("RegisterUserMessage failed!");
+        return 0;
     }
 }
 
@@ -1024,9 +1027,12 @@ UINT_PTR DrawableWindow::SetCallbackTimer(UINT elapse, MessageHandler* msgHandle
         this->timers.insert(std::pair<UINT_PTR, MessageHandler*>(ret, msgHandler));
         return ret;
     }
-    else {
-        assert(mParent != nullptr);
+    else if (mParent) {
         return mParent->SetCallbackTimer(elapse, msgHandler);
+    }
+    else {
+        TRACE("SetCallbackTimer failed!");
+        return 0;
     }
 }
 
