@@ -48,6 +48,9 @@ private:
     int flashInterval;
     UINT_PTR flashTimer;
 
+    //
+    bool mNoIcons;
+
     DrawableWindow::STATE stateHover, stateActive, stateFlashing, stateActiveHover, stateFlashingHover;
 
     DrawableWindow::OVERLAY iconOverlay;

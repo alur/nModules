@@ -65,6 +65,10 @@ TaskButton::~TaskButton() {
 /// Sets the icon of this button.
 /// </summary>
 void TaskButton::SetIcon(HICON icon) {
+    if (mNoIcons) {
+        return;
+    }
+
     this->window->ClearOverlays();
     if (icon != nullptr) {
         D2D1_RECT_F f = { (float)this->iconSettings->GetInt("X", 0), (float)this->iconSettings->GetInt("Y", 0),
@@ -91,6 +95,7 @@ void TaskButton::SetText(LPCWSTR title) {
 void TaskButton::LoadSettings(bool /* bIsRefresh */) {
     this->useFlashing = this->settings->GetBool("UseFlashing", true);
     this->flashInterval = this->settings->GetInt("FlashInterval", 500);
+    mNoIcons = this->settings->GetBool("NoIcons", false);
 }
 
 
