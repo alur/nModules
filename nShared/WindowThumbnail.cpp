@@ -8,6 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include "WindowThumbnail.hpp"
 #include <dwmapi.h>
+#include "../nShared/Math.h"
 
 
 WindowThumbnail::WindowThumbnail(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings) {
@@ -55,6 +56,10 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
                 height = int(scale*sourceSize.cy) + this->offset.top + this->offset.bottom;
                 x = position->left + (position->right - position->left - width)/2;
                 y = this->position == BOTTOM ? position->bottom + this->distanceFromButton : position->top - height - this->distanceFromButton;
+
+                // Ensure that the entire preview is on the same monitor as the button.
+                MonitorInfo::Monitor monitor = this->window->GetMonitorInformation()->m_monitors[this->window->GetMonitorInformation()->MonitorFromRECT(position)];
+                x = clamp(monitor.rect.left, x, monitor.rect.right - width);
             }
             break;
 
@@ -68,6 +73,10 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
                 height = int(scale*sourceSize.cy) + this->offset.top + this->offset.bottom;
                 y = position->top;
                 x = this->position == LEFT ? position->left - width - this->distanceFromButton : position->right + this->distanceFromButton;
+
+                // Ensure that the entire preview is on the same monitor as the button.
+                MonitorInfo::Monitor monitor = this->window->GetMonitorInformation()->m_monitors[this->window->GetMonitorInformation()->MonitorFromRECT(position)];
+                y = clamp(monitor.rect.top, y, monitor.rect.bottom - height);
             }
             break;
         }
