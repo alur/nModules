@@ -31,7 +31,7 @@ public:
     void CloseChild(bool closing = false);
 
     // Called by items, children, or the owner.
-    void Close();
+    virtual void Close();
 
     //
     LPCSTR GetBang();

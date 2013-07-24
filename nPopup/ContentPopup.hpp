@@ -34,8 +34,8 @@ public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
 protected:
-    void PreShow();
-    void PostClose();
+    void PreShow() override;
+    void PostClose() override;
 
 private:
     //

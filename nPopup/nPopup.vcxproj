@@ -170,6 +170,7 @@
     <ClInclude Include="Popup.hpp" />
     <ClInclude Include="PopupItem.hpp" />
     <ClInclude Include="SeparatorItem.hpp" />
+    <ClInclude Include="SuicidalContentPopup.hpp" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +184,7 @@
     <ClCompile Include="Popup.cpp" />
     <ClCompile Include="PopupItem.cpp" />
     <ClCompile Include="SeparatorItem.cpp" />
+    <ClCompile Include="SuicidalContentPopup.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nPopup.rc" />

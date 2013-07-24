@@ -5,6 +5,7 @@
 
 // General Constants
 #define MAX_LINE_LENGTH 4096
+#define MAX_RCCOMMAND 64
 #define MAGIC_DWORD     0x49474541
 
 // LM_RELOADMODULE/LM_UNLOADMODULE

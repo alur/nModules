@@ -21,6 +21,7 @@
 #include "FolderPopup.hpp"
 #include "nPopup.h"
 #include "Version.h"
+#include "SuicidalContentPopup.hpp"
 
 
 // The LSModule class
@@ -56,10 +57,11 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
 /// Called by the core when this module is about to be unloaded.
 /// </summary>
 void quitModule(HINSTANCE /* hDllInstance */) {
-    for (vector<Popup*>::const_iterator iter = rootPopups.begin(); iter != rootPopups.end(); iter++) {
-        LiteStep::RemoveBangCommand((*iter)->GetBang());
-        delete *iter;
+    for (Popup *popup : rootPopups) {
+        LiteStep::RemoveBangCommand(popup->GetBang());
+        delete popup;
     }
+    LiteStep::RemoveBangCommand(TEXT("!PopupDynamicFolder"));
     gLSModule.DeInitalize();
 }
 
@@ -98,7 +100,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// Called when a popup bang is executed.
 /// </summary>
 void __cdecl HandlePopupBang(HWND /* owner */, LPCSTR bang, LPCSTR /* args */) {
-    for (vector<Popup*>::const_iterator iter = rootPopups.begin(); iter != rootPopups.end(); iter++) {
+    for (vector<Popup*>::const_iterator iter = rootPopups.begin(); iter != rootPopups.end(); ++iter) {
         if (_stricmp(bang, (*iter)->GetBang()) == 0) {
             Popup* popup = *iter;
             popup->Show();
@@ -150,6 +152,28 @@ void LoadPopups() {
             AddPopup(popup);
         }
     }
+
+    // Add bang for handling dynamic popups
+    LiteStep::AddBangCommand("!PopupDynamicFolder", [] (HWND, LPCTSTR args) -> void {
+        TCHAR path[MAX_PATH], title[MAX_PATH], prefix[MAX_RCCOMMAND];
+        LPTSTR buffers[] = { path, prefix, title };
+
+        int nArgs = LiteStep::CommandTokenize(args, buffers, _countof(buffers), nullptr);
+
+        switch (nArgs)
+        {
+        case 1:
+            // TODO::Extract the name of the folder and use it as the title.
+            return (new SuicidalContentPopup(path, "", "nPopup"))->Show();
+
+        case 2:
+            // TODO::Extract the name of the folder and use it as the title.
+            return (new SuicidalContentPopup(path, "", prefix))->Show();
+
+        case 3:
+            return (new SuicidalContentPopup(path, title, prefix))->Show();
+        }
+    });
 
     LiteStep::LCClose(f);
 }
