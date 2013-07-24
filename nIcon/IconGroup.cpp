@@ -76,7 +76,7 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     mNextPositionID = 0;
 
     this->window->Initialize(&defaults, &defaultState);
-    this->window->AddDropRegion();
+    //this->window->AddDropRegion();
     this->window->AddPostPainter(&mSelectionRectagle);
     this->window->Show();
 

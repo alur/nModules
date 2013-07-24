@@ -29,11 +29,6 @@ Tooltip::Tooltip(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, par
 
     this->maxHeight = settings->GetInt("MaxHeight", 100);
     this->maxWidth = settings->GetInt("MaxWidth", 300);
-
-    // Not working...
-    SetParent(this->window->GetWindowHandle(), NULL);
-    SetWindowPos(this->window->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-    SetWindowPos(this->window->GetWindowHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 }
 
 
@@ -45,16 +40,14 @@ void Tooltip::Show(LPCWSTR text, LPRECT position) {
     this->window->SetText(text);
     this->window->SizeToText(this->maxWidth, this->maxHeight);
 
-    int x = position->left + (position->right - position->left)/2;
-    int y = position->top;
-
     // Show it centerd on x, 5 px above, while forcing it to stay on the virtual desktop
     MonitorInfo* monInfo = this->window->GetMonitorInformation();
     this->window->Move(
-        min(max(monInfo->m_virtualDesktop.rect.left, x - this->window->GetDrawingSettings()->width/2),
+        min(max(monInfo->m_virtualDesktop.rect.left, position->left + (position->right - position->left)/2 - this->window->GetDrawingSettings()->width/2),
             monInfo->m_virtualDesktop.rect.right - this->window->GetDrawingSettings()->width),
-        min(max(monInfo->m_virtualDesktop.rect.top, y - this->window->GetDrawingSettings()->height - 5),
+        min(max(monInfo->m_virtualDesktop.rect.top, position->top - this->window->GetDrawingSettings()->height - 5),
             monInfo->m_virtualDesktop.rect.bottom - this->window->GetDrawingSettings()->height));
+
     this->window->Show();
 }
 

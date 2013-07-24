@@ -84,7 +84,7 @@ public:
     // The trimming setting. None, Character, Word. Default: Character
     char textTrimmingGranularity[16];
 
-    // The vertical alignment of the text. Bottom, Middle, Top. Default: 0
+    // The vertical alignment of the text. Bottom, Middle, Top. Default: Top
     char textVerticalAlign[8];
 
     // Wordwrap. Default: False

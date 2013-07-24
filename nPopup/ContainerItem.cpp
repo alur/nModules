@@ -43,7 +43,7 @@ LRESULT ContainerItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
     switch (msg) {
     case WM_MOUSEMOVE:
         {
-            if (!(*this->hoverState)->active) {
+            if (!this->hoverState->active) {
                 this->window->ActivateState(this->hoverState);
                 ((Popup*)this->parent)->CloseChild();
             }

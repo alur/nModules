@@ -206,7 +206,7 @@ bool CoverArt::SetCoverFromTag(LPCWSTR filePath) {
                 hr = decoder->GetFrame(0, &source);
             }
             if (SUCCEEDED(hr)) {
-                (*mCoverArt)->SetSource(source);
+                mCoverArt->SetSource(source);
             }
 
             SAFERELEASE(decoder);
@@ -289,7 +289,7 @@ bool CoverArt::SetCoverFromFolder(LPCWSTR filePath) {
                 hr = decoder->GetFrame(0, &source);
             }
             if (SUCCEEDED(hr)) {
-                (*mCoverArt)->SetSource(source);
+                mCoverArt->SetSource(source);
             }
 
             SAFERELEASE(decoder);
@@ -321,10 +321,10 @@ void CoverArt::SetDefaultCover() {
         hr = decoder->GetFrame(0, &source);
     }
     if (SUCCEEDED(hr)) {
-        (*mCoverArt)->SetSource(source);
+        mCoverArt->SetSource(source);
     }
     else {
-        (*mCoverArt)->SetSource(nullptr);
+        mCoverArt->SetSource(nullptr);
     }
 
     SAFERELEASE(decoder);

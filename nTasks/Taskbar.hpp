@@ -49,7 +49,7 @@ private:
     LPCSTR name;
 
     // Settings which define how to organize the buttons
-    LayoutSettings* layoutSettings;
+    LayoutSettings mLayoutSettings;
 
     // The taskbar buttons
     map<HWND, TaskButton*> buttons;

@@ -28,15 +28,21 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
     //
     StateSettings stateDefaults;
     stateDefaults.backgroundBrush.color = 0x00000000;
+    stateDefaults.textOffsetLeft = 36;
+    StringCchCopy(stateDefaults.textVerticalAlign, _countof(stateDefaults.textVerticalAlign), "Middle");
 
     this->window->Initialize(nullptr, &stateDefaults);
 
     // Add states to the window
-    this->stateFlashingHover = this->window->AddState("FlashingHover", 150); 
-    this->stateActiveHover = this->window->AddState("ActiveHover", 125);
-    this->stateHover = this->window->AddState("Hover", 100);
-    this->stateActive = this->window->AddState("Active", 75);
-    this->stateFlashing = this->window->AddState("Flashing", 50);
+    mStates[State::Minmized] = this->window->AddState("Minmized", 25, &stateDefaults);
+    mStates[State::Flashing] = this->window->AddState("Flashing", 50, &stateDefaults);
+    mStates[State::MinimizedFlashing] = this->window->AddState("MinimizedFlashing", 75, &stateDefaults, &mStates[State::Flashing]);
+    mStates[State::Active] = this->window->AddState("Active", 100, &stateDefaults);
+    mStates[State::Hover] = this->window->AddState("Hover", 125, &stateDefaults);
+    mStates[State::MinimizedHover] = this->window->AddState("MinimizedHover", 150, &stateDefaults, &mStates[State::Minmized]);
+    mStates[State::ActiveHover] = this->window->AddState("ActiveHover", 175, &stateDefaults, &mStates[State::Active]);
+    mStates[State::FlashingHover] = this->window->AddState("FlashingHover", 200, &stateDefaults, &mStates[State::Flashing]);
+    mStates[State::MinimizedFlashingHover] = this->window->AddState("MinimizedFlashingHover", 225, &stateDefaults, &mStates[State::FlashingHover]);
 
     // Initalize variables
     this->mouseIsOver = false;
@@ -71,9 +77,9 @@ void TaskButton::SetIcon(HICON icon) {
 
     this->window->ClearOverlays();
     if (icon != nullptr) {
-        D2D1_RECT_F f = { (float)this->iconSettings->GetInt("X", 0), (float)this->iconSettings->GetInt("Y", 0),
-            (float)this->iconSettings->GetInt("Width", 32) + (float)this->iconSettings->GetInt("X", 0),
-            (float)this->iconSettings->GetInt("Height", 32)+ (float)this->iconSettings->GetInt("Y", 0) };
+        D2D1_RECT_F f = { (float)this->iconSettings->GetInt("X", 2), (float)this->iconSettings->GetInt("Y", 2),
+            (float)this->iconSettings->GetInt("Width", 32) + (float)this->iconSettings->GetInt("X", 2),
+            (float)this->iconSettings->GetInt("Height", 32)+ (float)this->iconSettings->GetInt("Y", 2) };
         this->iconOverlay = this->window->AddOverlay(f, icon);
         this->window->Repaint();
     }
@@ -111,14 +117,14 @@ void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
 /// Activates this button.
 /// </summary>
 void TaskButton::Activate() {
-    if ((*this->stateHover)->active) {
-        this->window->ActivateState(this->stateActiveHover);
+    if (mStates[State::Hover]->active) {
+        this->window->ActivateState(mStates[State::ActiveHover]);
     }
-    this->window->ActivateState(this->stateActive);
+    this->window->ActivateState(mStates[State::Active]);
 
     if (this->isFlashing) {
-        this->window->ClearState(this->stateFlashing);
-        this->window->ClearState(this->stateFlashingHover);
+        this->window->ClearState(mStates[State::Flashing]);
+        this->window->ClearState(mStates[State::FlashingHover]);
         this->flashOn = false;
         this->window->ClearCallbackTimer(this->flashTimer);
         this->isFlashing = false;
@@ -130,8 +136,8 @@ void TaskButton::Activate() {
 /// Deactivates this button.
 /// </summary>
 void TaskButton::Deactivate() {
-    this->window->ClearState(this->stateActive);
-    this->window->ClearState(this->stateActiveHover);
+    this->window->ClearState(mStates[State::Active]);
+    this->window->ClearState(mStates[State::ActiveHover]);
 }
 
 
@@ -142,10 +148,10 @@ void TaskButton::Flash() {
     if (!this->isFlashing) {
         this->isFlashing = true;
         this->flashOn = true;
-        if ((*this->stateHover)->active) {
-            this->window->ActivateState(this->stateFlashingHover);
+        if (mStates[State::Hover]->active) {
+            this->window->ActivateState(mStates[State::FlashingHover]);
         }
-        this->window->ActivateState(this->stateFlashing);
+        this->window->ActivateState(mStates[State::Flashing]);
         this->flashTimer = this->window->SetCallbackTimer(this->flashInterval, this);
     }
 }
@@ -200,8 +206,6 @@ void TaskButton::GetMinRect(LPPOINTS lpPoints) {
     lpPoints[0].y = (short)r.top;
     lpPoints[1].x = (short)r.right;
     lpPoints[1].y = (short)r.bottom;
-
-    TRACEW(L"GetMinRect() %d %d %d %d -- %s", r.left, r.top, r.right, r.bottom, this->window->GetDrawingSettings()->text);
 }
 
 
@@ -217,6 +221,7 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
             }
             else if (IsIconic(this->watchedWindow)) {
                 ShowWindow(this->watchedWindow, SW_RESTORE);
+                SetForegroundWindow(this->watchedWindow);
             }
             else {
                 SetForegroundWindow(this->watchedWindow);
@@ -237,15 +242,15 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
             if (!this->mouseIsOver) {
                 this->mouseIsOver = true;
 
-                if ((*this->stateActive)->active) {
-                    this->window->ActivateState(this->stateActiveHover);
+                if (mStates[State::Active]->active) {
+                    this->window->ActivateState(mStates[State::ActiveHover]);
                 }
 
-                if ((*this->stateFlashing)->active) {
-                    this->window->ActivateState(this->stateFlashingHover);
+                if (mStates[State::Flashing]->active) {
+                    this->window->ActivateState(mStates[State::FlashingHover]);
                 }
 
-                this->window->ActivateState(this->stateHover);
+                this->window->ActivateState(mStates[State::Hover]);
 
                 RECT r;
                 this->window->GetScreenRect(&r);
@@ -257,9 +262,9 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
     case WM_MOUSELEAVE:
         {
             this->mouseIsOver = false;
-            this->window->ClearState(this->stateHover);
-            this->window->ClearState(this->stateActiveHover);
-            this->window->ClearState(this->stateFlashingHover);
+            this->window->ClearState(mStates[State::Hover]);
+            this->window->ClearState(mStates[State::ActiveHover]);
+            this->window->ClearState(mStates[State::FlashingHover]);
             ((Taskbar*)this->parent)->HideThumbnail();
         }
         return 0;
@@ -270,14 +275,14 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                 if (this->isFlashing) {
                     this->flashOn = !this->flashOn;
                     if (this->flashOn) {
-                        if ((*this->stateHover)->active) {
-                            this->window->ActivateState(this->stateFlashingHover);
+                        if (mStates[State::Hover]->active) {
+                            this->window->ActivateState(mStates[State::FlashingHover]);
                         }
-                        this->window->ActivateState(this->stateFlashing);
+                        this->window->ActivateState(mStates[State::Flashing]);
                     }
                     else {
-                        this->window->ClearState(this->stateFlashing);
-                        this->window->ClearState(this->stateFlashingHover);
+                        this->window->ClearState(mStates[State::Flashing]);
+                        this->window->ClearState(mStates[State::FlashingHover]);
                     }
                 }
                 else {

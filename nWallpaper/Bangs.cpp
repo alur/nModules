@@ -23,15 +23,41 @@ namespace Bangs {
         LiteStep::BANGCOMMANDPROC handler;
     };
 
+    LPCSTR StyleValueFromName(LPCSTR name) {
+        if (_stricmp(name, "Center") == 0) {
+            return "0";
+        }
+        else if (_stricmp(name, "Stretch") == 0) {
+            return "2";
+        }
+        else if (_stricmp(name, "Fit") == 0) {
+            return "6";
+        }
+        else if (_stricmp(name, "Fill") == 0) {
+            return "10";
+        }
+        else if (_stricmp(name, "Span") == 0) {
+            return "22";
+        }
+        return nullptr;
+    }
+
     BangItem bangMap[] = {
         // Skips to the previous track
         BangItem("!SetWallpaper", [] (HWND, LPCSTR args) {
-            char file[MAX_PATH];
-            LPSTR bufs[] = { file };
+            char token1[MAX_PATH], token2[MAX_PATH];
+            LPSTR bufs[] = { token1, token2 };
 
-            LiteStep::CommandTokenize(args, bufs, _countof(bufs), nullptr);
+            LiteStep::CommandTokenize(args, bufs, 1, nullptr);
 
-            SHSetValueA(HKEY_CURRENT_USER, "Control Panel\\Desktop", "Wallpaper", REG_SZ, file, (DWORD)strlen(args));
+            // Check if the first token is a valid style.
+            LPCSTR styleValue = StyleValueFromName(token1);
+
+            if (styleValue == nullptr) {
+                // Assume that the first token is the wallpaper file
+            }
+
+            SHSetValueA(HKEY_CURRENT_USER, "Control Panel\\Desktop", "Wallpaper", REG_SZ, token1, (DWORD)strlen(args));
             SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
         }),
         BangItem("!SetWallpaperStyle", [] (HWND, LPCSTR args) {
@@ -40,29 +66,12 @@ namespace Bangs {
 
             LiteStep::CommandTokenize(args, bufs, _countof(bufs), nullptr);
 
-            LPCSTR value = nullptr;
+            LPCSTR value = StyleValueFromName(style);
 
-            if (_stricmp(style, "Center") == 0) {
-                value = "0";
+            if (value) {
+                SHSetValueA(HKEY_CURRENT_USER, "Control Panel\\Desktop", "WallpaperStyle", REG_SZ, value, (DWORD)strlen(value));
+                SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
             }
-            else if (_stricmp(style, "Stretch") == 0) {
-                value = "2";
-            }
-            else if (_stricmp(style, "Fit") == 0) {
-                value = "6";
-            }
-            else if (_stricmp(style, "Fill") == 0) {
-                value = "10";
-            }
-            else if (_stricmp(style, "Span") == 0) {
-                value = "22";
-            }
-            else {
-                return;
-            }
-
-            SHSetValueA(HKEY_CURRENT_USER, "Control Panel\\Desktop", "WallpaperStyle", REG_SZ, value, (DWORD)strlen(value));
-            SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
         })
     };
     

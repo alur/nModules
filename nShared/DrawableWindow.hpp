@@ -22,6 +22,7 @@
 #include "../nCore/IParsedText.hpp"
 #include "IPainter.hpp"
 #include "BrushSettings.hpp"
+#include "../Utilities/PointerIterator.hpp"
 
 
 using std::vector;
@@ -32,9 +33,9 @@ using std::map;
 class DrawableWindow : MessageHandler, IDropTarget {
     // typedefs
 public:
-    typedef list<State*>::iterator STATE;
-    typedef list<Overlay*>::iterator OVERLAY;
-    typedef list<IPainter*>::iterator PAINTER;
+    typedef PointerIterator<list<State*>::iterator, State> STATE;
+    typedef PointerIterator<list<Overlay*>::iterator, Overlay> OVERLAY;
+    typedef PointerIterator<list<IPainter*>::iterator, IPainter> PAINTER;
 
     // enums
 public:
@@ -89,7 +90,7 @@ public:
     PAINTER AddPostPainter(IPainter *painter);
 
     // Adds a new state.
-    STATE AddState(LPCSTR prefix, int defaultPriority, StateSettings *defaultSettings = nullptr);
+    STATE AddState(LPCSTR prefix, int defaultPriority, StateSettings *defaultSettings = nullptr, DrawableWindow::STATE *stateGroup = nullptr);
 
     // Marks a particular state as active.
     void ActivateState(STATE state, bool repaint = true);
@@ -196,8 +197,6 @@ public:
 
     // Shows this window.
     void Show(int nCmdShow = SW_SHOWNOACTIVATE);
-
-    void AddDropRegion();
 
     // Sizes the window to fit the text.
     void SizeToText(int maxWidth, int maxHeight, int minWidth = 0, int minHeight = 0);
@@ -366,4 +365,17 @@ private:
 
     // If we are capturing mouse input, the message handler which will receieve it.
     MessageHandler *mCaptureHandler;
+
+public:
+    // Registers a part of this window as a drop-region
+    void AddDropRegion(LPRECT region, IDropTarget *handler);
+    void RemoveDropRegion(LPRECT region, IDropTarget *handler);
+
+private:
+    struct DropRegion {
+        RECT rect;
+        IDropTarget *handler;
+    };
+
+    std::list<DropRegion> mDropRegions;
 };

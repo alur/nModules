@@ -158,7 +158,7 @@ void IconTile::Deselect(bool repaint) {
 
 
 bool IconTile::IsSelected() {
-    return (*mSelectedState)->active;
+    return mSelectedState->active;
 }
 
 
@@ -221,7 +221,7 @@ bool IconTile::IsGhosted() {
 /// Enabled ghots mode -- i.e. when the tile is "cut"
 /// </summary>
 void IconTile::SetGhost() {
-    (*mIconOverlay)->GetBrush()->SetOpacity(mGhostOpacity);
+    mIconOverlay->GetBrush()->SetOpacity(mGhostOpacity);
     mGhosted = true;
 }
 
@@ -230,7 +230,7 @@ void IconTile::SetGhost() {
 /// Enabled ghots mode -- i.e. when the tile is "cut"
 /// </summary>
 void IconTile::ClearGhost() {
-    (*mIconOverlay)->GetBrush()->SetOpacity(1.0f);
+    mIconOverlay->GetBrush()->SetOpacity(1.0f);
     mGhosted = false;
 }
 

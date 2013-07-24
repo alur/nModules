@@ -78,7 +78,7 @@ private:
     int iconSize;
 
     // Defines how the tray icons should be layed out.
-    LayoutSettings* layoutSettings;
+    LayoutSettings mLayoutSettings;
 
     // The tooltip to show.
     Tooltip* tooltip;

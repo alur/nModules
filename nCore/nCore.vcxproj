@@ -84,7 +84,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
     <OutDir>C:\LiteStep64\debug\modules\</OutDir>
-    <TargetName>$(ProjectName)-1.0</TargetName>
+    <TargetName>$(ProjectName)-0.4</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

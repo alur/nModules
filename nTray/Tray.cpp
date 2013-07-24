@@ -23,7 +23,6 @@ Tray::Tray(LPCSTR name) : Drawable(name) {
     this->balloonClickedMessage = this->window->RegisterUserMessage(this);
     this->tooltip = new Tooltip("Tooltip", this->settings);
     this->balloon = new Balloon("Balloon", this->settings, this->balloonClickedMessage, this);
-    this->layoutSettings = new LayoutSettings();
 
     this->window->Initialize();
     this->window->Show();
@@ -55,7 +54,6 @@ Tray::~Tray() {
 
     SAFEDELETE(this->tooltip);
     SAFEDELETE(this->balloon);
-    SAFEDELETE(this->layoutSettings);
 
     DestroyIcon(this->infoIcon);
     DestroyIcon(this->warningIcon);
@@ -67,8 +65,8 @@ Tray::~Tray() {
 /// Loads settings from LiteStep's RC files.
 /// </summary>
 void Tray::LoadSettings(bool /* IsRefresh */) {
-    LayoutSettings* layoutDefaults = new LayoutSettings();
-    this->layoutSettings->Load(this->settings, layoutDefaults);
+    LayoutSettings layoutDefaults;
+    mLayoutSettings.Load(this->settings, &layoutDefaults);
 
     Settings* iconSettings = this->settings->CreateChild("Icon");
     this->iconSize = iconSettings->GetInt("Size", 16);
@@ -136,7 +134,7 @@ void Tray::Relayout() {
     DrawableSettings *drawingSettings = this->window->GetDrawingSettings();
 
     for (auto icon : this->icons) {
-        icon->Reposition(this->layoutSettings->RectFromID(i++, this->iconSize, this->iconSize, drawingSettings->width, drawingSettings->height));
+        icon->Reposition(mLayoutSettings.RectFromID(i++, this->iconSize, this->iconSize, drawingSettings->width, drawingSettings->height));
     }
 }
 

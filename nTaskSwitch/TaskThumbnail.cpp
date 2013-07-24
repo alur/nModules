@@ -165,7 +165,7 @@ void TaskThumbnail::Activate() {
 
 
 void TaskThumbnail::Select() {
-    if ((*this->stateHover)->active) {
+    if (this->stateHover->active) {
         this->window->ActivateState(this->stateSelectedHover);
     }
     this->window->ActivateState(this->stateSelected);
@@ -184,7 +184,7 @@ LRESULT WINAPI TaskThumbnail::HandleMessage(HWND window, UINT message, WPARAM wP
     switch (message) {
     case WM_MOUSEMOVE:
         {
-            if ((*this->stateSelected)->active) {
+            if (this->stateSelected->active) {
                 this->window->ActivateState(this->stateSelectedHover);
             }
             this->window->ActivateState(this->stateHover);

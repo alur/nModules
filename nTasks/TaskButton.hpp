@@ -9,8 +9,23 @@
 
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/Drawable.hpp"
+#include "../Utilities/EnumArray.hpp"
 
 class TaskButton : public Drawable {
+private:
+    enum class State {
+        Active = 0,
+        ActiveHover,
+        Flashing,
+        FlashingHover,
+        Hover,
+        Minmized,
+        MinimizedHover,
+        MinimizedFlashing,
+        MinimizedFlashingHover,
+        Count
+    };
+
 public:
     explicit TaskButton(Drawable* parent, HWND hWnd);
     virtual ~TaskButton();
@@ -51,7 +66,7 @@ private:
     //
     bool mNoIcons;
 
-    DrawableWindow::STATE stateHover, stateActive, stateFlashing, stateActiveHover, stateFlashingHover;
+    EnumArray<DrawableWindow::STATE, State> mStates;
 
     DrawableWindow::OVERLAY iconOverlay;
 };

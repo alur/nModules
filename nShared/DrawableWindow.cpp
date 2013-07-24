@@ -189,8 +189,8 @@ DrawableWindow::~DrawableWindow() {
     DiscardDeviceResources();
 
     // Delete all states
-    for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
-        delete *state;
+    for (auto state : this->states) {
+        delete state;
     }
     this->states.clear();
 
@@ -257,7 +257,7 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP
 /// <returns>An object which can be used to modify/remove this overlay.</returns>
 DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmapSource* source) {
     OVERLAY overlayOut = this->overlays.insert(this->overlays.end(), new Overlay(position, this->drawingArea, source));
-    (*overlayOut)->ReCreateDeviceResources(this->renderTarget);
+    overlayOut->ReCreateDeviceResources(this->renderTarget);
 
     return overlayOut;
 }
@@ -270,7 +270,7 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBit
 /// <returns>An object which can be used to modify/remove this painter.</returns>
 DrawableWindow::PAINTER DrawableWindow::AddPostPainter(IPainter* painter) {
     PAINTER ret = this->postPainters.insert(this->postPainters.end(), painter);
-    (*ret)->ReCreateDeviceResources(this->renderTarget);
+    ret->ReCreateDeviceResources(this->renderTarget);
 
     return ret;
 }
@@ -283,7 +283,7 @@ DrawableWindow::PAINTER DrawableWindow::AddPostPainter(IPainter* painter) {
 /// <returns>An object which can be used to modify/remove this painter.</returns>
 DrawableWindow::PAINTER DrawableWindow::AddPrePainter(IPainter* painter) {
     PAINTER ret = this->prePainters.insert(this->prePainters.end(), painter);
-    (*ret)->ReCreateDeviceResources(this->renderTarget);
+    ret->ReCreateDeviceResources(this->renderTarget);
 
     return ret;
 }
@@ -296,17 +296,17 @@ DrawableWindow::PAINTER DrawableWindow::AddPrePainter(IPainter* painter) {
 /// <param name="defaultSettings">The default settings for this state.</param>
 /// <param name="defaultPriority">The default priority for this state. Higher priority states take precedence over lower priority states.</param>
 /// <returns>An object which can be used to activate/clear this state.</returns>
-DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, int defaultPriority, StateSettings* defaultSettings) {
-    State* state = new State((*this->baseState)->settings->CreateChild(prefix), defaultPriority, &this->text);
-    state->settings->AppendGroup((*this->baseState)->settings);
+DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, int defaultPriority, StateSettings* defaultSettings, DrawableWindow::STATE *stateGroup) {
+    State* state = new State(this->baseState->settings->CreateChild(prefix), defaultPriority, &this->text);
+    state->settings->AppendGroup(stateGroup ? (*stateGroup)->settings : this->baseState->settings);
     state->Load(defaultSettings);
     state->UpdatePosition(this->drawingArea);
     state->ReCreateDeviceResources(this->renderTarget);
 
     // Insert the state based on its priority.
     STATE iter;
-    for (iter = this->states.begin(); iter != this->states.end() && (*iter)->priority > state->priority; ++iter);
-    return this->states.insert(iter, state);
+    for (iter = this->states.begin(); iter != this->states.end() && iter->priority > state->priority; ++iter);
+    return this->states.insert(iter.mIter, state);
 }
 
 
@@ -315,8 +315,8 @@ DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, int defaultPriorit
 /// </summary>
 /// <param name="state">The state to activate.</param>
 void DrawableWindow::ActivateState(DrawableWindow::STATE state, bool repaint) {
-    (*state)->active = true;
-    if (this->activeState == this->states.end() || (*this->activeState)->priority < (*state)->priority) {
+    state->active = true;
+    if (this->activeState == this->states.end() || this->activeState->priority < state->priority) {
         this->activeState = state;
         if (repaint) {
             Repaint();
@@ -381,10 +381,10 @@ void DrawableWindow::ClearOverlays() {
 /// </summary>
 /// <param name="state">The state to clear.</param>
 void DrawableWindow::ClearState(STATE state, bool repaint) {
-    (*state)->active = false;
+    state->active = false;
     if (state == this->activeState) {
         // We just cleared the active state, find the highest priority next active state.
-        for (state++; state != this->states.end() && !(*state)->active; ++state);
+        for (state++; state != this->states.end() && !state->active; ++state);
         this->activeState = state;
         if (repaint) {
             Repaint();
@@ -399,7 +399,7 @@ void DrawableWindow::ClearState(STATE state, bool repaint) {
 /// <param name="childSettings">The settings the child window should use.</param>
 /// <param name="msgHandler">The default message handler for the child window.</param>
 /// <returns>The child window.</returns>
-DrawableWindow* DrawableWindow::CreateChild(Settings* childSettings, MessageHandler* msgHandler) {
+DrawableWindow *DrawableWindow::CreateChild(Settings* childSettings, MessageHandler* msgHandler) {
     DrawableWindow* child = new DrawableWindow(this, childSettings, msgHandler);
     children.push_back(child);
     return child;
@@ -460,7 +460,7 @@ void DrawableWindow::EnableMouseForwarding() {
 /// <param name="maxHeight">Out. The maximum height to return.</param>
 /// <param name="size">Out. The desired size will be placed in this SIZE.</param>
 void DrawableWindow::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
-    (*this->baseState)->GetDesiredSize(maxWidth, maxHeight, size);
+    this->baseState->GetDesiredSize(maxWidth, maxHeight, size);
 }
 
 
@@ -716,7 +716,7 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings
     this->drawingSettings->Load(this->settings, defaultSettings);
 
     // Load the base state
-    (*this->baseState)->Load(baseStateDefaults);
+    this->baseState->Load(baseStateDefaults);
 
     // Register with the core.
     if (this->drawingSettings->registerWithCore) {
@@ -773,11 +773,11 @@ void DrawableWindow::Paint() {
         this->renderTarget->PushAxisAlignedClip(this->drawingArea, D2D1_ANTIALIAS_MODE_ALIASED);
 
         // Paint the active state.
-        (*this->activeState)->Paint(this->renderTarget);
+        this->activeState->Paint(this->renderTarget);
         
         // Pre painters.
-        for (PAINTER painter = this->prePainters.begin(); painter != this->prePainters.end(); ++painter) {
-            (*painter)->Paint(this->renderTarget);
+        for (IPainter *painter : this->prePainters) {
+            painter->Paint(this->renderTarget);
         }
 
         // Paint all overlays.
@@ -787,8 +787,8 @@ void DrawableWindow::Paint() {
         PaintChildren();
 
         // Post painters.
-        for (PAINTER painter = this->postPainters.begin(); painter != this->postPainters.end(); ++painter) {
-            (*painter)->Paint(this->renderTarget);
+        for (IPainter *painter : this->postPainters) {
+            painter->Paint(this->renderTarget);
         }
         
         this->renderTarget->PopAxisAlignedClip();
@@ -909,20 +909,20 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
         }
 
         if (SUCCEEDED(hr)) {
-            for (PAINTER painter = this->prePainters.begin(); painter != this->prePainters.end(); ++painter) {
-                (*painter)->ReCreateDeviceResources(this->renderTarget);
+            for (IPainter *painter : this->prePainters) {
+                painter->ReCreateDeviceResources(this->renderTarget);
             }
 
-            for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
-                (*state)->ReCreateDeviceResources(this->renderTarget);
+            for (State *state : this->states) {
+                state->ReCreateDeviceResources(this->renderTarget);
             }
 
-            for (OVERLAY overlay = this->overlays.begin(); overlay != this->overlays.end(); ++overlay) {
-                (*overlay)->ReCreateDeviceResources(this->renderTarget);
+            for (Overlay *overlay : this->overlays) {
+                overlay->ReCreateDeviceResources(this->renderTarget);
             }
     
-            for (PAINTER painter = this->postPainters.begin(); painter != this->postPainters.end(); ++painter) {
-                (*painter)->ReCreateDeviceResources(this->renderTarget);
+            for (IPainter *painter : this->postPainters) {
+                painter->ReCreateDeviceResources(this->renderTarget);
             }
 
             // Recreate resources for all children as well.
@@ -1139,14 +1139,14 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     }
 
     // Update all paintables.
-    for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
-        (*state)->UpdatePosition(this->drawingArea);
+    for (State *state : this->states) {
+        state->UpdatePosition(this->drawingArea);
     }
-    for (OVERLAY overlay = overlays.begin(); overlay != overlays.end(); ++overlay) {
-        (*overlay)->UpdatePosition(this->drawingArea);
+    for (Overlay *overlay : this->overlays) {
+        overlay->UpdatePosition(this->drawingArea);
     }
-    for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
-        (*child)->Move((*child)->drawingSettings->x, (*child)->drawingSettings->y);
+    for (DrawableWindow *child : this->children) {
+        child->Move(child->drawingSettings->x, child->drawingSettings->y);
     }
 }
 
@@ -1162,11 +1162,6 @@ void DrawableWindow::Show(int nCmdShow) {
         }
     }
     this->visible = true;
-}
-
-
-void DrawableWindow::AddDropRegion() {
-    RegisterDragDrop(GetWindowHandle(), (IDropTarget*)this);
 }
 
 
@@ -1211,8 +1206,8 @@ void DrawableWindow::SetText(LPCWSTR text) {
 /// <param name="right">The text offset from the right.</param>
 /// <param name="bottom">The text offset from the bottom.</param>
 void DrawableWindow::SetTextOffsets(float left, float top, float right, float bottom) {
-    for (STATE state = this->states.begin(); state != this->states.end(); ++state) {
-        (*state)->SetTextOffsets(left, top, right, bottom);
+    for (State *state : this->states) {
+        state->SetTextOffsets(left, top, right, bottom);
     }
 }
 
@@ -1222,7 +1217,7 @@ void DrawableWindow::SetTextOffsets(float left, float top, float right, float bo
 /// </summary>
 /// <param name="state">The state to toggle</param>
 void DrawableWindow::ToggleState(STATE state) {
-    if ((*state)->active) {
+    if (state->active) {
         ClearState(state);
     }
     else {
