@@ -33,6 +33,7 @@ TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings
     this->version = 0;
     this->guid = GUID_NULL;
     this->flags = 0;
+    this->tip[0] = L'\0';
 
     // Create the drawable window
     this->settings = parentSettings->CreateChild("Icon");
@@ -96,9 +97,14 @@ void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
     if ((pNID->uFlags & NIF_TIP) == NIF_TIP) {
         MultiByteToWideChar(CP_ACP, 0, pNID->szTip, -1, this->tip, TRAY_MAX_TIP_LENGTH);
         if (this->showingTip) {
-            RECT r;
-            this->window->GetScreenRect(&r);
-            ((Tray*)this->parent)->ShowTip(this->tip, &r);
+            if (this->tip[0] != L'\0') {
+                RECT r;
+                this->window->GetScreenRect(&r);
+                ((Tray*)this->parent)->ShowTip(this->tip, &r);
+            }
+            else {
+                ((Tray*)this->parent)->HideTip();
+            }
         }
     }
 
@@ -109,7 +115,7 @@ void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
 
     // TODO::NIF_STATE
 
-    if ((pNID->uFlags & NIF_INFO ) == NIF_INFO) {
+    if ((pNID->uFlags & NIF_INFO) == NIF_INFO) {
         WCHAR info[TRAY_MAX_INFO_LENGTH], infoTitle[TRAY_MAX_INFOTITLE_LENGTH];
 
         // uTimeout is only valid on 2000 and XP, so we can safely ignore it.
@@ -202,10 +208,12 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam,
                 PostMessage(gLSModule.GetMessageWindow(), LM_SYSTRAY, NIM_DELETE, (LPARAM)&lsNID);
                 return 0;
             }
-            RECT r;
             this->showingTip = true;
-            this->window->GetScreenRect(&r);
-            ((Tray*)this->parent)->ShowTip(this->tip, &r);
+            if (this->tip[0] != L'\0') {
+                RECT r;
+                this->window->GetScreenRect(&r);
+                ((Tray*)this->parent)->ShowTip(this->tip, &r);
+            }
         }
 
         if (message == WM_RBUTTONDOWN || message == WM_LBUTTONDOWN) {
