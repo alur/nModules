@@ -14,6 +14,7 @@
 #include "../nShared/LayoutSettings.hpp"
 #include "../nShared/Tooltip.hpp"
 #include "../nShared/Balloon.hpp"
+#include <strsafe.h>
 
 using std::map;
 
@@ -50,17 +51,47 @@ private:
     // Hides the current balloon, and possible shows the next balloon.
     void ShowNextBalloon();
 
+    // Returns true if we should display the given icon.
+    bool WantIcon(LiteStep::LPLSNOTIFYICONDATA NID);
+
+private:
     // All data required to display a balloon.
-    typedef struct {
+    struct BalloonData {
         TrayIcon* icon;
         LPCWSTR infoTitle;
         LPCWSTR info;
         DWORD infoFlags;
         HICON balloonIcon;
-    } BalloonData;
+    };
 
+    // All data required to determine whether to show or hide a particular icon.
+    struct IconID {
+        IconID(GUID guid) {
+            type = Type::GUID;
+            this->guid = guid;
+        }
+        IconID(LPCWSTR process) {
+            type = Type::Process;
+            StringCchCopyW(this->process, _countof(this->process), process);
+        }
+
+        enum class Type {
+            GUID,
+            Process
+        } type;
+
+        union {
+            GUID guid;
+            WCHAR process[MAX_PATH];
+        };
+    };
+
+private:
     // Balloons queued up to be displayed.
     list<BalloonData> queuedBalloons;
+
+    //
+    list<IconID> mHiddenIconIDs;
 
     // Loads .rc settings for this tray.
     void LoadSettings(bool isRefresh = false);

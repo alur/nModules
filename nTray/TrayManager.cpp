@@ -9,6 +9,9 @@
 #include "Tray.hpp"
 #include "TrayManager.h"
 #include "../nShared/Debugging.h"
+#include "../Utilities/Process.h"
+#include <strsafe.h>
+#include <Shlwapi.h>
 
 
 // The various trays
@@ -268,4 +271,40 @@ void TrayManager::InitCompleted() {
     for (auto &tray : g_Trays) {
         tray.second->InitCompleted();
     }
+}
+
+
+/// <summary>
+/// Lists identifying information about all tray icons
+/// <summary>
+void TrayManager::ListIconIDS() {
+    WCHAR iconIDs[32768];
+    iconIDs[0] = L'\0';
+    for (LPTRAYICONDATA trayIconData : g_currentIcons) {
+        WCHAR buffer[MAX_PATH];
+
+        if (SUCCEEDED(GetProcessName(trayIconData->hwnd, false, buffer, _countof(buffer)))) {
+            StringCchCatW(iconIDs, _countof(iconIDs), L"Process Name: \t");
+            StringCchCatW(iconIDs, _countof(iconIDs), buffer);
+        }
+
+        if (GetClassNameW(trayIconData->hwnd, buffer, _countof(buffer)) != 0) {
+            StringCchCatW(iconIDs, _countof(iconIDs), L"\nWindow Class: \t");
+            StringCchCatW(iconIDs, _countof(iconIDs), buffer);
+        }
+
+        if (GetWindowTextW(trayIconData->hwnd, buffer, _countof(buffer)) != 0) {
+            StringCchCatW(iconIDs, _countof(iconIDs), L"\nWindow Text: \t");
+            StringCchCatW(iconIDs, _countof(iconIDs), buffer);
+        }
+
+        if (trayIconData->guidItem != GUID_NULL) {
+            StringFromGUID2(trayIconData->guidItem, buffer, _countof(buffer));
+            StringCchCatW(iconIDs, _countof(iconIDs), L"\nGUID: \t\t");
+            StringCchCatW(iconIDs, _countof(iconIDs), buffer);
+        }
+
+        StringCchCatW(iconIDs, _countof(iconIDs), L"\n------------------------------------------------------------------------\n");
+    }
+    MessageBoxW(nullptr, iconIDs, L"List of tray icons", MB_OK | MB_ICONINFORMATION);
 }

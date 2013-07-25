@@ -38,6 +38,8 @@ namespace TrayManager {
     void SetFocus(LiteStep::LPLSNOTIFYICONDATA pNID);
     void SetVersion(LiteStep::LPLSNOTIFYICONDATA pNID);
 
+    void ListIconIDS();
+
     void InitCompleted();
     
     LRESULT ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

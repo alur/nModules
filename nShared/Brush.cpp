@@ -18,14 +18,15 @@
 
 Brush::Brush() {
     this->brushType = SolidColor;
-    this->brush = NULL;
-    this->gradientStops = NULL;
+    this->brush = nullptr;
+    this->gradientStops = nullptr;
     this->gradientStopCount = 0;
 }
 
 
 Brush::~Brush() {
     Discard();
+    SAFEFREE(this->gradientStops);
 }
 
 
@@ -114,7 +115,6 @@ void Brush::LoadGradientStops() {
 //
 void Brush::Discard() {
     SAFERELEASE(this->brush);
-    SAFEFREE(this->gradientStops);
 }
 
 

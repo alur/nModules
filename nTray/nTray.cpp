@@ -56,6 +56,11 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     // Let the core know that we want the system tray icons
     g_hWndTrayNotify = (HWND)SendMessage(LiteStep::GetLitestepWnd(), LM_SYSTRAYREADY, NULL, NULL);
 
+    // Register a bang for printing tray info
+    LiteStep::AddBangCommand(TEXT("!nTrayListIconIDs"), [] (HWND, LPCTSTR) -> void {
+        TrayManager::ListIconIDS();
+    });
+
     return 0;
 }
 
@@ -64,6 +69,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
 /// Called by the core when this module is about to be unloaded.
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
+    LiteStep::RemoveBangCommand(TEXT("!nTrayListIconIDs"));
+
     // Remove all trays
     for (auto &tray : g_Trays) {
         delete tray.second;

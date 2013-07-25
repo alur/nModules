@@ -10,6 +10,9 @@
 #include "../nShared/LSModule.hpp"
 #include "Tray.hpp"
 #include "TrayIcon.hpp"
+#include "../Utilities/Process.h"
+#include "../nShared/Debugging.h"
+#include "../Utilities/GUID.h"
 
 
 extern HWND g_hWndTrayNotify;
@@ -76,6 +79,20 @@ void Tray::LoadSettings(bool /* IsRefresh */) {
     this->balloonTime = this->settings->GetInt("BalloonTime", 7000);
     this->noNotificationSounds = this->settings->GetBool("NoNotificationSounds", false);
     this->settings->GetString("NotificationSound", this->notificationSound, 128, "Notification.Default");
+
+    char keyName[MAX_RCCOMMAND];
+    StringCchPrintfA(keyName, _countof(keyName), "*%sHide", this->settings->prefix);
+
+    LiteStep::IterateOverLinesW(keyName, [this] (LPCWSTR line) -> void {
+        // Try to parse it as a GUID, if that fails assume it's a process.
+        GUID guid;
+        if (GUIDFromStringW(line, &guid) != FALSE) {
+            mHiddenIconIDs.push_back(IconID(guid));
+        }
+        else {
+            mHiddenIconIDs.push_back(IconID(line));
+        }
+    });
 }
 
 
@@ -83,14 +100,55 @@ void Tray::LoadSettings(bool /* IsRefresh */) {
 /// Adds the specified icon to this tray.
 /// </summary>
 TrayIcon* Tray::AddIcon(LiteStep::LPLSNOTIFYICONDATA NID) {
-    TrayIcon* icon = new TrayIcon(this, NID, this->settings);
-    this->icons.push_back(icon);
-    Relayout();
-    icon->Show();
-    if (!g_InitPhase) {
-        this->window->Repaint();
+    if (WantIcon(NID)) {
+        TrayIcon* icon = new TrayIcon(this, NID, this->settings);
+        this->icons.push_back(icon);
+        Relayout();
+        icon->Show();
+        if (!g_InitPhase) {
+            this->window->Repaint();
+        }
+        return icon;
     }
-    return icon;
+    return nullptr;
+}
+
+
+/// <summary>
+/// Adds the specified icon to this tray.
+/// </summary>
+bool Tray::WantIcon(LiteStep::LPLSNOTIFYICONDATA NID) {
+    // We could block/accept based on 4 things.
+    // 1. Process name
+    // 2. GUID -- if specified
+    // 3. Window Class
+    // 4. Window Text
+
+    // 1. Process name
+    WCHAR processName[MAX_PATH];
+    GetProcessName(NID->hWnd, false, processName, _countof(processName));
+    
+    for (IconID &iconID : mHiddenIconIDs) {
+        switch (iconID.type) {
+        case IconID::Type::GUID:
+            {
+                if ((NID->uFlags & NIF_GUID) == NIF_GUID && NID->guidItem == iconID.guid) {
+                    return false;
+                }
+            }
+            break;
+
+        case IconID::Type::Process:
+            {
+                if (_wcsicmp(processName, iconID.process) == 0) {
+                    return false;
+                }
+            }
+            break;
+        }
+    }
+
+    return true;
 }
 
 

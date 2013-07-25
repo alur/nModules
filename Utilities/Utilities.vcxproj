@@ -152,12 +152,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EnumArray.hpp" />
+    <ClInclude Include="GUID.h" />
     <ClInclude Include="Iterator.hpp" />
     <ClInclude Include="PointerIterator.hpp" />
+    <ClInclude Include="Process.h" />
     <ClInclude Include="StopWatch.hpp" />
     <ClInclude Include="StringUtils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GUID.cpp" />
+    <ClCompile Include="Process.cpp" />
     <ClCompile Include="StopWatch.cpp" />
     <ClCompile Include="StringUtils.cpp" />
   </ItemGroup>
