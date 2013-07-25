@@ -34,7 +34,7 @@ Tray::Tray(LPCSTR name) : Drawable(name) {
     this->infoIcon = LoadIcon(NULL, IDI_INFORMATION);
     this->warningIcon = LoadIcon(NULL, IDI_WARNING);
     this->errorIcon = LoadIcon(NULL, IDI_ERROR);
-    this->activeBalloonIcon = NULL;
+    this->activeBalloonIcon = nullptr;
 }
 
 

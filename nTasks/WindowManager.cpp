@@ -214,6 +214,19 @@ void WindowManager::SetActive(HWND hWnd) {
 
 
 /// <summary>
+/// Marks the specified window as minimized.
+/// </summary>
+void WindowManager::MarkAsMinimized(HWND hWnd) {
+    WNDMAPCITER iter = windowMap.find(hWnd);
+    if (iter != windowMap.end()) {
+        for (TaskButton *button : iter->second.buttons) {
+            button->SetMinmizedState(true);
+        }
+    }
+}
+
+
+/// <summary>
 /// Removes the specified window from all taskbars.
 /// </summary>
 void WindowManager::RemoveWindow(HWND hWnd) {
@@ -316,6 +329,14 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         // A window is being minimized or restored, the system needs the coordinates of
         // the taskbutton for the window animation.
     case LM_GETMINRECT:
+        {
+            WINDOWPLACEMENT wp;
+            GetWindowPlacement((HWND)wParam, &wp);
+            if (wp.showCmd == SW_SHOWMINIMIZED || wp.showCmd == SW_SHOWMINNOACTIVE) {
+                // The window is being minimized, might as well give the button a hint.
+                MarkAsMinimized((HWND)wParam);
+            }
+        }
         return GetMinRect((HWND)wParam, (LPPOINTS)lParam);
 
         // The active input language has changed

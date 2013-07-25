@@ -19,7 +19,7 @@ private:
         Flashing,
         FlashingHover,
         Hover,
-        Minmized,
+        Minimized,
         MinimizedHover,
         MinimizedFlashing,
         MinimizedFlashingHover,
@@ -45,10 +45,17 @@ public:
 
     void LoadSettings(bool = false);
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
+    
+    void SetMinmizedState(bool value);
+
+private:
+    void SetFlashingState(bool value);
+    void SetActiveState(bool value);
+    void SetHoverState(bool value);
 
 private:
     // Settings for painting the icon in the button.
-    Settings* iconSettings;
+    Settings *iconSettings;
 
     // The window related to this button.
     HWND watchedWindow;

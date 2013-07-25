@@ -26,6 +26,7 @@ namespace WindowManager {
     void Stop();
     bool IsTaskbarWindow(HWND hWnd);
     void SetActive(HWND hWnd);
+    void MarkAsMinimized(HWND hWnd);
     LRESULT ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     void AddWindow(HWND hWnd);
     void RemoveWindow(HWND hWnd);

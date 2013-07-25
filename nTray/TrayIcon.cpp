@@ -25,8 +25,8 @@ TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings
     // Init
     this->callbackID = 0;
     this->callbackMessage = 0xFFFFFFFF;
-    this->callbackWindow = NULL;
-    this->icon = NULL;
+    this->callbackWindow = nullptr;
+    this->icon = nullptr;
     this->iconSize = 0;
     this->showingTip =  false;
     this->showTip = false;
@@ -39,7 +39,7 @@ TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings
 
     StateSettings defaultStateSettings;
     defaultStateSettings.backgroundBrush.color = 0x00000000;
-    this->window->Initialize(NULL, &defaultStateSettings);
+    this->window->Initialize(nullptr, &defaultStateSettings);
     this->showingTip = false;
 
     //
@@ -94,12 +94,12 @@ void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
         SetIcon(pNID->hIcon);
     }
     if ((pNID->uFlags & NIF_TIP) == NIF_TIP) {
-        MultiByteToWideChar(CP_ACP, NULL, pNID->szTip, -1, this->tip, TRAY_MAX_TIP_LENGTH);
-        /*if (this->showingTip) {
+        MultiByteToWideChar(CP_ACP, 0, pNID->szTip, -1, this->tip, TRAY_MAX_TIP_LENGTH);
+        if (this->showingTip) {
             RECT r;
             this->window->GetScreenRect(&r);
             ((Tray*)this->parent)->ShowTip(this->tip, &r);
-        }*/
+        }
     }
 
     if ((this->flags & NIF_GUID) != NIF_GUID && (pNID->uFlags & NIF_GUID) == NIF_GUID) {
@@ -113,8 +113,8 @@ void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
         WCHAR info[TRAY_MAX_INFO_LENGTH], infoTitle[TRAY_MAX_INFOTITLE_LENGTH];
 
         // uTimeout is only valid on 2000 and XP, so we can safely ignore it.
-        MultiByteToWideChar(CP_ACP, NULL, pNID->szInfo, -1, info, TRAY_MAX_INFO_LENGTH);
-        MultiByteToWideChar(CP_ACP, NULL, pNID->szInfoTitle, -1, infoTitle, TRAY_MAX_INFOTITLE_LENGTH);
+        MultiByteToWideChar(CP_ACP, 0, pNID->szInfo, -1, info, TRAY_MAX_INFO_LENGTH);
+        MultiByteToWideChar(CP_ACP, 0, pNID->szInfoTitle, -1, infoTitle, TRAY_MAX_INFOTITLE_LENGTH);
 
         ((Tray*)this->parent)->EnqueueBalloon(this, infoTitle, info, pNID->dwInfoFlags, pNID->hBalloonIcon, (pNID->uFlags & NIF_REALTIME) == NIF_REALTIME);
     }
