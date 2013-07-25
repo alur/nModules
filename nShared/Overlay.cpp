@@ -93,6 +93,7 @@ HRESULT Overlay::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
 
 void Overlay::DiscardDeviceResources() {
     SAFERELEASE(this->brush);
+    this->renderTarget = nullptr;
 }
 
 
