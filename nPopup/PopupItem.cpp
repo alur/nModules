@@ -75,9 +75,9 @@ bool PopupItem::ParseDotIcon(LPCSTR dotIcon) {
 
 void PopupItem::AddIcon(HICON icon) {
     D2D1_RECT_F f;
-    f.top = this->iconSettings->GetFloat("X", 2.0f);
+    f.top = this->iconSettings->GetFloat("Y", 2.0f);
     f.bottom = f.top + this->iconSettings->GetFloat("Size", 16.0f);
-    f.left = this->iconSettings->GetFloat("Y", 2.0f);
+    f.left = this->iconSettings->GetFloat("X", 2.0f);
     f.right = f.left + this->iconSettings->GetFloat("Size", 16.0f);
     this->iconOverlay = this->window->AddOverlay(f, icon);
 }
