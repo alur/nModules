@@ -8,4 +8,3 @@
 #pragma once
 
 void LoadSettings();
-Drawable* FindDrawable(LPCSTR prefix);

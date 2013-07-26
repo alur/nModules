@@ -7,6 +7,8 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include <string>
+
 namespace WindowManager {
     /// <summary>
     /// Holds all information about a particular top level window.
@@ -18,7 +20,7 @@ namespace WindowManager {
     } WindowInformation;
 
     // Some helpful typedefs
-    typedef map<LPCSTR, Taskbar*>::const_iterator TASKBARCITER;
+    typedef map<std::string, Taskbar*>::const_iterator TASKBARCITER;
     typedef map<HWND, WindowInformation>::const_iterator WNDMAPCITER;
     typedef map<HWND, WindowInformation>::iterator WNDMAPITER;
 

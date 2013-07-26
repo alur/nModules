@@ -11,6 +11,7 @@
 #include "../nShared/ErrorHandler.h"
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/Versioning.h"
+#include "../nShared/DrawableWindowBangs.h"
 #include "TextFunctions.h"
 #include "ParsedText.hpp"
 #include "Version.h"
@@ -28,6 +29,9 @@ LPCSTR g_szMsgHandler = "LSnCore";
 
 // When the [time] text function should send out change notifications.
 UINT_PTR timeTimer;
+
+// 
+EXPORT_CDECL(DrawableWindow*) FindRegisteredWindow(LPCSTR prefix);
 
 
 /// <summary>
@@ -50,6 +54,11 @@ int initModuleEx(HWND /* parent */, HINSTANCE instance, LPCSTR /* path */) {
     TextFunctions::_Register();
     timeTimer = SetTimer(g_hwndMsgHandler, 1, 1000, nullptr);
 
+    // Register window bangs
+    DrawableWindowBangs::_Register("n", [] (LPCSTR prefix) -> DrawableWindow* {
+        return FindRegisteredWindow(prefix);
+    });
+
     return 0;
 }
 
@@ -58,6 +67,8 @@ int initModuleEx(HWND /* parent */, HINSTANCE instance, LPCSTR /* path */) {
 /// Called by the core when this module is about to be unloaded.
 /// </summary>
 void quitModule(HINSTANCE hDllInstance) {
+    DrawableWindowBangs::_UnRegister("n");
+
     // Deinitalize
     if (g_hwndMsgHandler) {
         KillTimer(g_hwndMsgHandler, timeTimer);

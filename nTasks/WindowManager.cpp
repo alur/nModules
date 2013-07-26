@@ -27,7 +27,7 @@ using std::pair;
 
 
 // All current taskbars
-extern map<LPCSTR, Taskbar*> g_Taskbars;
+extern map<string, Taskbar*> g_Taskbars;
 
 extern LSModule gLSModule;
 

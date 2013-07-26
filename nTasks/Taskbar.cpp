@@ -16,8 +16,6 @@
 /// Constructor
 /// </summary>
 Taskbar::Taskbar(LPCSTR name) : Drawable(name) {
-    this->name = name;
-
     this->thumbnail = new WindowThumbnail("Thumbnail", this->settings);
 
     LoadSettings();
@@ -49,7 +47,6 @@ Taskbar::~Taskbar() {
     this->buttons.clear();
 
     SAFEDELETE(this->thumbnail);
-    free((void *)name);
 }
 
 

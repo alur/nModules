@@ -45,9 +45,6 @@ private:
     // Removes a task from this taskbar
     void RemoveTask(map<HWND, TaskButton*>::iterator iter);
 
-    // The name of this taskbar
-    LPCSTR name;
-
     // Settings which define how to organize the buttons
     LayoutSettings mLayoutSettings;
 

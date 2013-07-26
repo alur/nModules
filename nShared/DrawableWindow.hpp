@@ -149,6 +149,9 @@ public:
     // Initializes the DrawableWindow.
     void Initialize(DrawableSettings* defaultSettings = nullptr, StateSettings* baseStateDefaults = nullptr);
 
+    //
+    bool IsChild();
+
     // Returns whether or not this window is visible.
     bool IsVisible();
 
@@ -170,11 +173,17 @@ public:
     // Resizes the window.
     void Resize(int width, int height);
 
+    //
+    void SetAlwaysOnTop(bool value);
+
     // Performs an animation.
     void SetAnimation(int x, int y, int width, int height, int duration, Easing::EasingType easing);
 
     // Registers a timer
     UINT_PTR SetCallbackTimer(UINT elapse, MessageHandler* msgHandler);
+
+    //
+    void SetClickThrough(bool value);
 
     // Sets the message handler for this window.
     void SetMessageHandler(MessageHandler *msgHandler);

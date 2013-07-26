@@ -70,6 +70,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
 /// Called by the core when this module is about to be unloaded.
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
+    //
     LiteStep::RemoveBangCommand(TEXT("!nTrayListIconIDs"));
 
     // Remove all trays

@@ -25,7 +25,7 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="Debugging.h" />
     <ClInclude Include="Drawable.hpp" />
-    <ClInclude Include="DrawableBangs.h" />
+    <ClInclude Include="DrawableWindowBangs.h" />
     <ClInclude Include="DrawableSettings.hpp" />
     <ClInclude Include="FileIterator.hpp" />
     <ClInclude Include="ImageBrush.hpp" />
@@ -35,6 +35,7 @@
     <ClInclude Include="RelativeValue.hpp" />
     <ClInclude Include="SolidColorBrush.hpp" />
     <ClInclude Include="State.hpp" />
+    <ClInclude Include="StateBangs.h" />
     <ClInclude Include="StateSettings.hpp" />
     <ClInclude Include="DrawableWindow.hpp" />
     <ClInclude Include="Easing.h" />
@@ -62,7 +63,7 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Debugging.cpp" />
     <ClCompile Include="Drawable.cpp" />
-    <ClCompile Include="DrawableBangs.cpp" />
+    <ClCompile Include="DrawableWindowBangs.cpp" />
     <ClCompile Include="DrawableSettings.cpp" />
     <ClCompile Include="DrawableWindowDropTarget.cpp" />
     <ClCompile Include="DrawableWindowUnknown.cpp" />

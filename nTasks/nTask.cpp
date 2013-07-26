@@ -13,6 +13,7 @@
 #include "Constants.h"
 #include "Version.h"
 
+
 using std::map;
 
 // The LSModule class
@@ -23,7 +24,7 @@ const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
     LM_FULLSCREENDEACTIVATED, 0 };
 
 // All the labels we currently have loaded
-map<LPCSTR, Taskbar*> g_Taskbars;
+map<string, Taskbar*> g_Taskbars;
 
 
 /// <summary>
@@ -56,8 +57,8 @@ void quitModule(HINSTANCE /* hDllInstance */) {
     WindowManager::Stop();
 
     // Remove all taskbars
-    for (map<LPCSTR, Taskbar*>::const_iterator iter = g_Taskbars.begin(); iter != g_Taskbars.end(); iter++) {
-        delete iter->second;
+    for (auto iter : g_Taskbars) {
+        delete iter.second;
     }
     g_Taskbars.clear();
 
@@ -151,15 +152,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// Reads through the .rc files and creates Taskbars.
 /// </summary>
 void LoadSettings() {
-    char szLine[MAX_LINE_LENGTH], szLabel[256];
+    char szLine[MAX_LINE_LENGTH], szLabel[MAX_RCCOMMAND];
     LPSTR szTokens[] = { szLabel };
     LPVOID f = LiteStep::LCOpen(NULL);
-    LPSTR name;
 
     while (LiteStep::LCReadNextConfig(f, "*nTaskbar", szLine, sizeof(szLine))) {
         LiteStep::LCTokenize(szLine+strlen("*nTaskbar")+1, szTokens, 1, NULL);
-        name = _strdup(szLabel);
-        g_Taskbars.insert(g_Taskbars.begin(), std::pair<LPCSTR, Taskbar*>(name, new Taskbar(name)));
+        g_Taskbars.insert(g_Taskbars.begin(), std::pair<string, Taskbar*>(szLabel, new Taskbar(szLabel)));
     }
     LiteStep::LCClose(f);
 }

@@ -458,10 +458,12 @@ void DrawableWindow::EnableMouseForwarding() {
 /// Should be called when a fullscreen window has 
 /// </summary>
 void DrawableWindow::FullscreenActivated(HMONITOR monitor, HWND fullscreenWindow) {
-    if (!mIsChild && this->drawingSettings->alwaysOnTop && IsVisible()) {
+    if (!mIsChild && IsVisible()) {
         if (MonitorFromWindow(this->window, MONITOR_DEFAULTTONULL) == monitor) {
             mCoveredByFullscreen = true;
-            SetWindowPos(this->window, fullscreenWindow, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+            if (this->drawingSettings->alwaysOnTop) {
+                SetWindowPos(this->window, fullscreenWindow, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+            }
         }
     }
 }
@@ -778,6 +780,15 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings
 /// Check if this window is currently visible.
 /// </summary>
 /// <returns>True if this window and all its ancestors are visible.</returns>
+bool DrawableWindow::IsChild() {
+    return mIsChild;
+}
+
+
+/// <summary>
+/// Check if this window is currently visible.
+/// </summary>
+/// <returns>True if this window and all its ancestors are visible.</returns>
 bool DrawableWindow::IsVisible() {
     if (mParent) {
         return this->visible && mParent->IsVisible();
@@ -1019,6 +1030,23 @@ void DrawableWindow::Repaint(LPRECT region) {
 
 
 /// <summary>
+/// Modifies the AlwaysOnTop setting
+/// </summary>
+void DrawableWindow::SetAlwaysOnTop(bool value) {
+    bool oldValue = this->drawingSettings->alwaysOnTop;
+    this->drawingSettings->alwaysOnTop = true;
+    if (!mIsChild && !mCoveredByFullscreen) {
+        if (value) {
+            SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+        }
+        else if (oldValue) {
+            SetWindowPos(this->window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+        }
+    }
+}
+
+
+/// <summary>
 /// Starts a new animation, or updates the parameters of the current one.
 /// </summary>
 /// <param name="x">The x coordinate to animate to.</param>
@@ -1065,6 +1093,14 @@ UINT_PTR DrawableWindow::SetCallbackTimer(UINT elapse, MessageHandler* msgHandle
         TRACE("SetCallbackTimer failed!");
         return 0;
     }
+}
+
+
+/// <summary>
+/// Modifies the ClickThrough setting
+/// </summary>
+void DrawableWindow::SetClickThrough(bool value) {
+    this->drawingSettings->clickThrough = value;
 }
 
 
