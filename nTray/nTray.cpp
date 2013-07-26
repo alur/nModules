@@ -21,7 +21,8 @@ using std::string;
 #define TIMER_INIT_COMPLETED 1
 
 // The messages we want from the core
-const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, LM_SYSTRAYINFOEVENT, 0 };
+const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, LM_SYSTRAYINFOEVENT,
+    LM_FULLSCREENACTIVATED, LM_FULLSCREENDEACTIVATED, 0 };
 
 // Handle to the tray notify window
 HWND g_hWndTrayNotify;
@@ -107,6 +108,22 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_REFRESH:
         {
+        }
+        return 0;
+
+    case LM_FULLSCREENACTIVATED:
+        {
+            for (auto &tray : g_Trays) {
+                tray.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+            }
+        }
+        return 0;
+
+    case LM_FULLSCREENDEACTIVATED:
+        {
+            for (auto &tray : g_Trays) {
+                tray.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+            }
         }
         return 0;
 

@@ -21,7 +21,8 @@ using std::map;
 LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
-UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
+UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
+    LM_FULLSCREENDEACTIVATED, 0 };
 
 //
 UINT WinampSongChangeMsg = 0;
@@ -93,6 +94,22 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case WM_DESTROY:
         {
             SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
+        }
+        return 0;
+
+    case LM_FULLSCREENACTIVATED:
+        {
+            for (auto &coverart : g_CoverArt) {
+                coverart.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+            }
+        }
+        return 0;
+
+    case LM_FULLSCREENDEACTIVATED:
+        {
+            for (auto &coverart : g_CoverArt) {
+                coverart.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+            }
         }
         return 0;
 

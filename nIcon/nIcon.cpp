@@ -14,7 +14,8 @@
 
 
 // The messages we want from the core
-const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
+const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
+    LM_FULLSCREENDEACTIVATED, 0 };
 
 // All current icon groups
 static map<string, IconGroup*> gIconGroups;
@@ -100,6 +101,22 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
                 nextClipboardViewer = (HWND)lParam;
             else if (nextClipboardViewer != nullptr)
                 SendMessage(nextClipboardViewer, message, wParam, lParam);
+        }
+        return 0;
+
+    case LM_FULLSCREENACTIVATED:
+        {
+            for (auto group : gIconGroups) {
+                group.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+            }
+        }
+        return 0;
+
+    case LM_FULLSCREENDEACTIVATED:
+        {
+            for (auto group : gIconGroups) {
+                group.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+            }
         }
         return 0;
 

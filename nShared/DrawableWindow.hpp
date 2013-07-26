@@ -113,6 +113,12 @@ public:
     // Enables forwarding of mouse events to children.
     void EnableMouseForwarding();
 
+    //
+    void FullscreenActivated(HMONITOR, HWND);
+
+    //
+    void FullscreenDeactivated(HMONITOR);
+
     // Returns the current drawing settings.
     DrawableSettings *GetDrawingSettings();
 
@@ -365,6 +371,9 @@ private:
 
     // If we are capturing mouse input, the message handler which will receieve it.
     MessageHandler *mCaptureHandler;
+
+    //
+    bool mCoveredByFullscreen;
 
 public:
     // Registers a part of this window as a drop-region

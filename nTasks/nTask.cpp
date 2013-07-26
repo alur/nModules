@@ -19,7 +19,8 @@ using std::map;
 LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
-const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
+const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
+    LM_FULLSCREENDEACTIVATED, 0 };
 
 // All the labels we currently have loaded
 map<LPCSTR, Taskbar*> g_Taskbars;
@@ -106,7 +107,25 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         }
         break;
 
+    case LM_FULLSCREENACTIVATED:
+        {
+            for (auto &taskbar : g_Taskbars) {
+                taskbar.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+            }
+        }
+        return 0;
+
+    case LM_FULLSCREENDEACTIVATED:
+        {
+            for (auto &taskbar : g_Taskbars) {
+                taskbar.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+            }
+        }
+        return 0;
+
     case LM_REFRESH:
+        {
+        }
         return 0;
 
     case LM_GETMINRECT:
@@ -120,6 +139,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case LM_MONITORCHANGED:
     case WM_DISPLAYCHANGE:
     case WM_ADDED_EXISTING:
+        {
+        }
         return WindowManager::ShellMessage(window, message, wParam, lParam);
     }
     return DefWindowProc(window, message, wParam, lParam);

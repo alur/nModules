@@ -5,7 +5,7 @@
 
 // General Constants
 #define MAX_LINE_LENGTH 4096
-#define MAX_RCCOMMAND 64
+#define MAX_RCCOMMAND   64
 #define MAGIC_DWORD     0x49474541
 
 // LM_RELOADMODULE/LM_UNLOADMODULE
@@ -112,6 +112,8 @@ typedef struct _SYSTRAYINFOEVENT {
 #define LM_WINDOWREPLACED        9513  // Core   -> Module
 #define LM_WINDOWREPLACING       9514  // Core   -> Module
 #define LM_MONITORCHANGED        9516  // Core   -> Module
+#define LM_FULLSCREENACTIVATED   32768 // Core   -> Module
+#define LM_FULLSCREENDEACTIVATED 32769 // Core   -> Module
 
 // Callback Function Pointers
 typedef VOID (__cdecl * BANGCOMMANDPROC)(HWND hwndOwner, LPCSTR pszArgs);
@@ -120,6 +122,7 @@ typedef BOOL (__stdcall * ENUMBANGSPROC)(LPCSTR pszBangCommandName, LPARAM lPara
 typedef BOOL (__stdcall * ENUMMODULESPROC)(LPCSTR pszPath, DWORD fdwFlags, LPARAM lParam);
 typedef BOOL (__stdcall * ENUMREVIDSPROC)(LPCSTR pszRevID, LPARAM lParam);
 typedef BOOL (__stdcall * ENUMBANGSV2PROC)(HINSTANCE hinstModule, LPCSTR pszBangCommandName, LPARAM lParam);
+typedef BOOL (__stdcall * LSENUMPERFORMANCEPROC)(LPCSTR pszPath, DWORD dwLoadTime, LPARAM lParam);
 
 // Functions
 #define EXTERN_CDECL(type) EXTERN_C DECLSPEC_IMPORT type __cdecl

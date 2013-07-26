@@ -61,6 +61,7 @@ DrawableWindow::DrawableWindow(Settings* settings, MessageHandler* msgHandler) {
     this->userMsgIDs = nullptr;
     this->monitorInfo = nullptr;
     this->window = nullptr;
+    mCoveredByFullscreen = false;
 
     // Create the base state
     State* state = new State(new Settings(settings), 0, &this->text);
@@ -454,6 +455,34 @@ void DrawableWindow::EnableMouseForwarding() {
 
 
 /// <summary>
+/// Should be called when a fullscreen window has 
+/// </summary>
+void DrawableWindow::FullscreenActivated(HMONITOR monitor, HWND fullscreenWindow) {
+    if (!mIsChild && this->drawingSettings->alwaysOnTop && IsVisible()) {
+        if (MonitorFromWindow(this->window, MONITOR_DEFAULTTONULL) == monitor) {
+            mCoveredByFullscreen = true;
+            SetWindowPos(this->window, fullscreenWindow, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+        }
+    }
+}
+
+
+/// <summary>
+/// Enables forwarding of mouse events to children.
+/// </summary>
+void DrawableWindow::FullscreenDeactivated(HMONITOR monitor) {
+    if (!mIsChild && mCoveredByFullscreen) {
+        if (MonitorFromWindow(this->window, MONITOR_DEFAULTTONULL) == monitor) {
+            mCoveredByFullscreen = false;
+            if (this->drawingSettings->alwaysOnTop) {
+                SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+            }
+        }
+    }
+}
+
+
+/// <summary>
 /// Gets the "Desired" size of the window, given the specified constraints.
 /// </summary>
 /// <param name="maxWidth">Out. The maximum width to return.</param>
@@ -667,7 +696,9 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         {
             if (this->drawingSettings->alwaysOnTop) {
                 LPWINDOWPOS windowPos = LPWINDOWPOS(lParam);
-                windowPos->hwndInsertAfter = HWND_TOPMOST;
+                if (!mCoveredByFullscreen) {
+                    windowPos->hwndInsertAfter = HWND_TOPMOST;
+                }
             }
         }
         return 0;
