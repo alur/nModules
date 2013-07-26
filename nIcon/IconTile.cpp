@@ -349,6 +349,10 @@ void IconTile::SetIcon() {
         // Let go of the interface.
         SAFERELEASE(extractIcon);
     }
+
+    if (hr != S_OK) {
+        mIconOverlay = this->window->AddOverlay(pos, LoadIcon(nullptr, IDI_ERROR));
+    }
 }
 
 
