@@ -299,8 +299,9 @@ void DesktopPainter::TransitionStart() {
 
     while (m_pOldWallpaperBrush != nullptr) {
         this->renderTarget->BeginDraw();
+        bool inAnimation = true;
         PaintComposite();
-        PaintChildren();
+        PaintChildren(inAnimation);
         this->renderTarget->EndDraw();
     }
     Redraw();
@@ -344,6 +345,8 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
     case WM_PAINT:
         {
+            bool inAnimation = false;
+
             if (SUCCEEDED(ReCreateDeviceResources())) {
                 this->renderTarget->BeginDraw();
 
@@ -354,8 +357,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                 else {
                     Paint();
                 }
-
-                PaintChildren();
+                PaintChildren(inAnimation);
 
                 // If EndDraw fails we need to recreate all device-dependent resources
                 if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET) {
@@ -365,7 +367,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
             ValidateRect(hWnd, NULL);
 
-            if (this->m_pOldWallpaperBrush != NULL) {
+            if (this->m_pOldWallpaperBrush != NULL || inAnimation) {
                 Redraw();
             }
         }

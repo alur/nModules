@@ -8,6 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "nCore.h"
+#include "../nCoreCom/Core.h"
 #include "../nShared/ErrorHandler.h"
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/Versioning.h"
@@ -53,6 +54,9 @@ int initModuleEx(HWND /* parent */, HINSTANCE instance, LPCSTR /* path */) {
     g_pMonitorInfo = new MonitorInfo();
     TextFunctions::_Register();
     timeTimer = SetTimer(g_hwndMsgHandler, 1, 1000, nullptr);
+
+    // We need to be connected to the core for some of the functions in nShared to work... xD
+    nCore::Connect(MakeVersion(MODULE_VERSION));
 
     // Register window bangs
     DrawableWindowBangs::_Register("n", [] (LPCSTR prefix) -> DrawableWindow* {

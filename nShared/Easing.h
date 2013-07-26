@@ -6,17 +6,19 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
+#include <Windows.h>
 
 namespace Easing {
-    enum EasingType {
-        LINEAR,
-        SQUARED,
-        CUBIC,
-        QUADRATIC,
-        BOUNCE,
-        ELASTIC,
-        SINE
+    enum class Type {
+        Linear,
+        Squared,
+        Cubic,
+        Quadractic,
+        Bounce,
+        Elastic,
+        Sine
     };
 
-    float Transform(float progress, EasingType easingType);
+    float Transform(float progress, Type easingType);
+    Type EasingFromString(LPCSTR str);
 }

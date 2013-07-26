@@ -21,6 +21,7 @@
 #include "Color.h"
 #include "MessageHandler.hpp"
 #include "../Utilities/StringUtils.h"
+#include "Math.h"
 
 
 using namespace D2D1;
@@ -330,9 +331,9 @@ void DrawableWindow::ActivateState(DrawableWindow::STATE state, bool repaint) {
 /// Performs an animation step.
 /// </summary>
 void DrawableWindow::Animate() {
-    float progress = Easing::Transform(min(1.0f,
-        float(GetTickCount() - this->animationStartTime)/(this->animationEndTime - this->animationStartTime)),
-        this->animationEasing);
+    float progress = Easing::Transform(clamp(0.0f, mAnimationClock.GetTime()/mAnimationDuration, 1.0f), this->animationEasing);
+
+    TRACE("%.4f", progress);
 
     if (progress >= 1.0f) {
         this->animating = false;
@@ -344,9 +345,7 @@ void DrawableWindow::Animate() {
     step.right = this->animationStart.right + long(progress*(this->animationTarget.right - this->animationStart.right));
     step.bottom = this->animationStart.bottom + long(progress*(this->animationTarget.bottom - this->animationStart.bottom));
 
-    SetPosition(step.left, step.top, step.right - step.left, step.bottom - step.top);
-
-    Repaint();
+    SetPosition(step);
 }
 
 
@@ -645,10 +644,11 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
 
     case WM_PAINT:
         {
+            bool inAnimation = false;
             if (SUCCEEDED(ReCreateDeviceResources())) {
                 this->renderTarget->BeginDraw();
                 this->renderTarget->Clear();
-                Paint();
+                Paint(inAnimation);
 
                 // If EndDraw fails we need to recreate all device-dependent resources
                 if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET) {
@@ -661,8 +661,8 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
 
             ValidateRect(this->window, NULL);
 
-            if (this->animating) {
-                Animate();
+            if (inAnimation) {
+                Repaint();
             }
         }
         return 0;
@@ -810,7 +810,7 @@ void DrawableWindow::Move(int x, int y) {
 /// <summary>
 /// Removes the specified child.
 /// </summary>
-void DrawableWindow::Paint() {
+void DrawableWindow::Paint(bool &inAnimation) {
     if (this->visible) {
         this->renderTarget->PushAxisAlignedClip(this->drawingArea, D2D1_ANTIALIAS_MODE_ALIASED);
 
@@ -826,11 +826,16 @@ void DrawableWindow::Paint() {
         PaintOverlays();
 
         // Paint all children.
-        PaintChildren();
+        PaintChildren(inAnimation);
 
         // Post painters.
         for (IPainter *painter : this->postPainters) {
             painter->Paint(this->renderTarget);
+        }
+        
+        inAnimation |= this->animating;
+        if (this->animating) {
+            Animate();
         }
         
         this->renderTarget->PopAxisAlignedClip();
@@ -841,9 +846,9 @@ void DrawableWindow::Paint() {
 /// <summary>
 /// Paints all child windows.
 /// </summary>
-void DrawableWindow::PaintChildren() {
+void DrawableWindow::PaintChildren(bool &inAnimation) {
     for (DrawableWindow *child : this->children) {
-        child->Paint();
+        child->Paint(inAnimation);
     }
 }
 
@@ -1055,7 +1060,7 @@ void DrawableWindow::SetAlwaysOnTop(bool value) {
 /// <param name="height">The height to animate to.</param>
 /// <param name="duration">The number of milliseconds to complete the animation in.</param>
 /// <param name="easing">The easing to use.</param>
-void DrawableWindow::SetAnimation(int x, int y, int width, int height, int duration, Easing::EasingType easing) {
+void DrawableWindow::SetAnimation(int x, int y, int width, int height, int duration, Easing::Type easing) {
     RECT target = { x, y, x + width, y + height };
     this->animationTarget = target;
     this->animationStart.top = this->drawingSettings->y;
@@ -1064,9 +1069,8 @@ void DrawableWindow::SetAnimation(int x, int y, int width, int height, int durat
     this->animationStart.right = this->drawingSettings->x + this->drawingSettings->width;
     this->animationEasing = easing;
 
-    // TODO::Not too fond of using GetTickCount.
-    this->animationStartTime = GetTickCount();
-    this->animationEndTime = this->animationStartTime + duration;
+    mAnimationClock.Clock();
+    mAnimationDuration = duration / 1000.0f;
 
     this->animating = true;
 
@@ -1127,6 +1131,9 @@ void DrawableWindow::SetPosition(RECT rect) {
 }
 
 
+/// <summary>
+/// Send the specified message to all children, all the way down the tree.
+/// </summary>
 void DrawableWindow::SendToAll(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID data) {
     this->msgHandler->HandleMessage(window, msg, wParam, lParam, data);
     for (DrawableWindow *child : this->children) {

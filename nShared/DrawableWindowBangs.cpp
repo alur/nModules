@@ -86,15 +86,34 @@ void DrawableWindowBangs::Show(HWND, LPCSTR args) {
 /// Shows the window.
 /// </summary>
 void DrawableWindowBangs::Move(HWND, LPCSTR args) {
-    TCHAR prefix[MAX_RCCOMMAND], xstr[MAX_RCCOMMAND], ystr[MAX_RCCOMMAND];
-    LPTSTR tokens [] = { prefix, xstr, ystr };
+    TCHAR prefix[MAX_RCCOMMAND], xstr[MAX_RCCOMMAND], ystr[MAX_RCCOMMAND],
+        durationstr[MAX_RCCOMMAND], easingstr[MAX_RCCOMMAND];
+    LPTSTR tokens [] = { prefix, xstr, ystr, durationstr, easingstr };
 
-    if (LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr) == 3) {
+    using namespace nCore::InputParsing;
+
+    int numTokens = LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr);
+
+    if (numTokens == 3 || numTokens == 4 || numTokens == 5) {
         DrawableWindow* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
-            drawable->Move(atoi(xstr), atoi(ystr));
-            if (drawable->IsChild()) {
-                drawable->Repaint();
+            int x = 0, y = 0;
+
+            if (ParseCoordinate(xstr, &x) && ParseCoordinate(ystr, &y)) {
+                if (numTokens == 3) {
+                    drawable->Move(x, y);
+                    if (drawable->IsChild()) {
+                        drawable->Repaint();
+                    }
+                }
+                else {
+                    int duration = 0;
+                    if (nCore::InputParsing::ParseCoordinate(durationstr, &duration)) {
+                        drawable->SetAnimation(x, y, drawable->GetDrawingSettings()->width, 
+                            drawable->GetDrawingSettings()->height, duration,
+                            numTokens == 4 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
+                    }
+                }
             }
         }
     }
@@ -105,15 +124,34 @@ void DrawableWindowBangs::Move(HWND, LPCSTR args) {
 /// Shows the window.
 /// </summary>
 void DrawableWindowBangs::Size(HWND, LPCSTR args) {
-    TCHAR prefix[MAX_RCCOMMAND], width[MAX_RCCOMMAND], height[MAX_RCCOMMAND];
-    LPTSTR tokens [] = { prefix, width, height };
+    TCHAR prefix[MAX_RCCOMMAND], widthstr[MAX_RCCOMMAND], heightstr[MAX_RCCOMMAND],
+        durationstr[MAX_RCCOMMAND], easingstr[MAX_RCCOMMAND];
+    LPTSTR tokens [] = { prefix, widthstr, heightstr, durationstr, easingstr };
 
-    if (LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr) == 3) {
+    using namespace nCore::InputParsing;
+
+    int numTokens = LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr);
+
+    if (numTokens == 3 || numTokens == 4 || numTokens == 5) {
         DrawableWindow* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
-            drawable->Resize(atoi(width), atoi(height));
-            if (drawable->IsChild()) {
-                drawable->Repaint();
+            int width = 0, height = 0;
+
+            if (ParseLength(widthstr, &width) && ParseLength(heightstr, &height)) {
+                if (numTokens == 3) {
+                    drawable->Resize(width, height);
+                    if (drawable->IsChild()) {
+                        drawable->Repaint();
+                    }
+                }
+                else {
+                    int duration = 0;
+                    if (nCore::InputParsing::ParseCoordinate(durationstr, &duration)) {
+                        drawable->SetAnimation(drawable->GetDrawingSettings()->x, 
+                            drawable->GetDrawingSettings()->y, width, height, duration,
+                            numTokens == 4 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
+                    }
+                }
             }
         }
     }
@@ -125,14 +163,35 @@ void DrawableWindowBangs::Size(HWND, LPCSTR args) {
 /// </summary>
 void DrawableWindowBangs::Position(HWND, LPCSTR args) {
     TCHAR prefix[MAX_RCCOMMAND], xstr[MAX_RCCOMMAND], ystr[MAX_RCCOMMAND],
-        width[MAX_RCCOMMAND], height[MAX_RCCOMMAND];
-    LPTSTR tokens [] = { prefix, xstr, ystr, width, height };
+        widthstr[MAX_RCCOMMAND], heightstr[MAX_RCCOMMAND],
+        durationstr[MAX_RCCOMMAND], easingstr[MAX_RCCOMMAND];
+    LPTSTR tokens [] = { prefix, xstr, ystr, widthstr, heightstr, durationstr, easingstr };
 
-    if (LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr) == 5) {
+    using namespace nCore::InputParsing;
+
+    int numTokens = LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr);
+
+    if (numTokens == 5 || numTokens == 6 || numTokens == 7) {
         DrawableWindow* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
-            drawable->SetPosition(atoi(xstr), atoi(ystr), atoi(width), atoi(height));
-            drawable->Repaint();
+            int width = 0, height = 0, x = 0, y = 0;
+
+            if (ParseLength(widthstr, &width) && ParseLength(heightstr, &height)
+                && ParseCoordinate(xstr, &x) && ParseCoordinate(ystr, &y)) {
+                if (numTokens == 5) {
+                    drawable->SetPosition(x, y, width, height);
+                    if (drawable->IsChild()) {
+                        drawable->Repaint();
+                    }
+                }
+                else {
+                    int duration = 0;
+                    if (nCore::InputParsing::ParseCoordinate(durationstr, &duration)) {
+                        drawable->SetAnimation(x, y, width, height, duration,
+                            numTokens == 6 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
+                    }
+                }
+            }
         }
     }
 }

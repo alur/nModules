@@ -14,15 +14,15 @@
 /// </summary>
 /// <param name="progress>How far the actual progress has gone. 0 <= progress <= 1.</param>
 /// <returns>The transformed progress. Transform(0, x) == 0, Transform(1, x) == 1.</returns>
-float Easing::Transform(float progress, EasingType easingType) {
+float Easing::Transform(float progress, Type easingType) {
     switch (easingType) {
-    case LINEAR:
+    case Type::Linear:
         return progress;
-    case CUBIC:
+    case Type::Cubic:
         return progress*progress*progress;
-    case SINE:
+    case Type::Sine:
         return (float)sin(1.57079632679*progress);
-    case BOUNCE:
+    case Type::Bounce:
         {
             //if (progress < 0.6) return progress*progress/0.36f;
             //if (progress < 0.8) return pow(progress-0.6, 2)
@@ -30,4 +30,15 @@ float Easing::Transform(float progress, EasingType easingType) {
     default:
         return progress;
     }
+}
+
+
+/// <summary>
+/// Parses a string into an easing.
+/// </summary>
+Easing::Type Easing::EasingFromString(LPCSTR str) {
+    if (_stricmp(str, "Cubic")) return Type::Cubic;
+    if (_stricmp(str, "Sine")) return Type::Sine;
+    if (_stricmp(str, "Bounce")) return Type::Bounce;
+    return Type::Linear;
 }

@@ -39,7 +39,7 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
     mStates[State::MinimizedFlashing] = this->window->AddState("MinimizedFlashing", 75, &stateDefaults, &mStates[State::Flashing]);
     mStates[State::Active] = this->window->AddState("Active", 100, &stateDefaults);
     mStates[State::Hover] = this->window->AddState("Hover", 125, &stateDefaults);
-    mStates[State::MinimizedHover] = this->window->AddState("MinimizedHover", 150, &stateDefaults, &mStates[State::Minimized]);
+    mStates[State::MinimizedHover] = this->window->AddState("MinimizedHover", 150, &stateDefaults, &mStates[State::Hover]);
     mStates[State::ActiveHover] = this->window->AddState("ActiveHover", 175, &stateDefaults, &mStates[State::Active]);
     mStates[State::FlashingHover] = this->window->AddState("FlashingHover", 200, &stateDefaults, &mStates[State::Flashing]);
     mStates[State::MinimizedFlashingHover] = this->window->AddState("MinimizedFlashingHover", 225, &stateDefaults, &mStates[State::FlashingHover]);

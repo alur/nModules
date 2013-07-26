@@ -23,6 +23,7 @@
 #include "IPainter.hpp"
 #include "BrushSettings.hpp"
 #include "../Utilities/PointerIterator.hpp"
+#include "../Utilities/StopWatch.hpp"
 
 
 using std::vector;
@@ -177,7 +178,7 @@ public:
     void SetAlwaysOnTop(bool value);
 
     // Performs an animation.
-    void SetAnimation(int x, int y, int width, int height, int duration, Easing::EasingType easing);
+    void SetAnimation(int x, int y, int width, int height, int duration, Easing::Type easing);
 
     // Registers a timer
     UINT_PTR SetCallbackTimer(UINT elapse, MessageHandler* msgHandler);
@@ -240,13 +241,13 @@ public:
 
 protected:
     // Paints this window.
-    void Paint();
+    void Paint(bool &inAnimation);
 
     // Paints all overlays.
     void PaintOverlays();
 
     // Paints all children.
-    void PaintChildren();
+    void PaintChildren(bool &inAnimation);
 
     // The render target to draw to.
     ID2D1HwndRenderTarget* renderTarget;
@@ -286,16 +287,16 @@ private:
     bool animating;
 
     // The easing we are using for the current animation.
-    Easing::EasingType animationEasing;
+    Easing::Type animationEasing;
 
-    // The time when the animation should end.
-    DWORD animationEndTime;
+    // How long, in seconds, the animation should last.
+    float mAnimationDuration;
 
     // If we are currently doing an animation, the position at the start of the animation.
     RECT animationStart;
 
     // If we are currently doing an animation, how far along we are.
-    DWORD animationStartTime;
+    StopWatch mAnimationClock;
 
     // If we are currently doing an animation, the position target of the animation.
     RECT animationTarget;
