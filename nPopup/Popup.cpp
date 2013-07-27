@@ -104,6 +104,8 @@ void Popup::OpenChild(Popup* child, LPRECT position, PopupItem* childItem) {
         this->openChild = child;
         this->childItem = childItem;
         this->openChild->expandLeft = this->expandLeft;
+        position->top -= this->padding.top;
+        position->bottom -= this->padding.top;
         position->left -= this->padding.left;
         position->right += this->padding.right;
         this->openChild->Show(position, this);

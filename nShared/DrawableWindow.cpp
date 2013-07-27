@@ -333,8 +333,6 @@ void DrawableWindow::ActivateState(DrawableWindow::STATE state, bool repaint) {
 void DrawableWindow::Animate() {
     float progress = Easing::Transform(clamp(0.0f, mAnimationClock.GetTime()/mAnimationDuration, 1.0f), this->animationEasing);
 
-    TRACE("%.4f", progress);
-
     if (progress >= 1.0f) {
         this->animating = false;
     }

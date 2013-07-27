@@ -81,8 +81,7 @@ void State::Load(StateSettings* defaultSettings) {
     this->textBrush->Load(&this->drawingSettings->textBrush);
     this->textShadowBrush->Load(&this->drawingSettings->textDropShadowBrush);
 
-    CreateTextFormat(this->textFormat, false);
-    CreateTextFormat(this->textDropFormat, true);
+    CreateTextFormat(this->textFormat);
 }
 
 
@@ -103,7 +102,7 @@ void State::Paint(ID2D1RenderTarget* renderTarget) {
     }
     /*if (this->textShadowBrush->brush) {
         renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, this->textRotationOrigin));
-        renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textFormat, this->textArea, this->textShadowBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+        renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textDropFormat, this->textArea, this->textShadowBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         renderTarget->SetTransform(Matrix3x2F::Identity());
     }*/
     if (this->textBrush->brush) {
@@ -159,7 +158,7 @@ void State::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
 /// <param name="drawingSettings">The settings to create the textformat with.</param>
 /// <param name="textFormat">Out. The textformat.</param>
 /// <returns>S_OK</returns>
-HRESULT State::CreateTextFormat(IDWriteTextFormat *&textFormat, bool dropFormat) {
+HRESULT State::CreateTextFormat(IDWriteTextFormat *&textFormat) {
     // Font weight
     DWRITE_FONT_WEIGHT fontWeight;
     if (_stricmp(drawingSettings->fontWeight, "Thin") == 0)
@@ -195,8 +194,6 @@ HRESULT State::CreateTextFormat(IDWriteTextFormat *&textFormat, bool dropFormat)
     else
         fontWeight = DWRITE_FONT_WEIGHT_NORMAL;
 
-    if (dropFormat) fontWeight = DWRITE_FONT_WEIGHT(min(950, fontWeight + 300));
-
     // Font style
     DWRITE_FONT_STYLE fontStyle;
     if (_stricmp(drawingSettings->fontStyle, "Oblique") == 0)
@@ -229,8 +226,6 @@ HRESULT State::CreateTextFormat(IDWriteTextFormat *&textFormat, bool dropFormat)
     else
         fontStretch = DWRITE_FONT_STRETCH_NORMAL;
 
-    if (dropFormat) fontStretch = DWRITE_FONT_STRETCH(min(9, fontStretch + 2));
-
     // Create the text format
     IDWriteFactory *pDWFactory = nullptr;
     Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&pDWFactory));
@@ -240,7 +235,7 @@ HRESULT State::CreateTextFormat(IDWriteTextFormat *&textFormat, bool dropFormat)
         fontWeight,
         fontStyle,
         fontStretch,
-        dropFormat ? drawingSettings->fontSize + 2 : drawingSettings->fontSize,
+        drawingSettings->fontSize,
         L"en-US",
         &textFormat);
 
