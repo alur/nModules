@@ -6,7 +6,8 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include <Windows.h>
-
+#include <assert.h>
+#include <algorithm>
 #include "Math.h"
 
 
@@ -47,4 +48,47 @@ int Math::RectUnionArea(LPRECT rect1, LPRECT rect2) {
 /// </summary>
 int Math::RectNonOverlappArea(LPRECT rect1, LPRECT rect2) {
     return RectArea(rect1) + RectArea(rect2) - 2*RectIntersectArea(rect1, rect2);
+}
+
+
+/// <summary>
+/// Performs a linear interpolation from a to b, with the specified weight
+/// </summary>
+float Math::Lerp(float a, float b, float weight) {
+    return a*weight + b*(1.0f - weight);
+}
+
+
+/// <summary>
+/// Performs a linear interpolation from a to b, where the number line wraps around
+/// from maxValue to minValue. e.g. when interpolating degrees.
+/// </summary>
+float Math::WrappingLerp(float a, float b, float weight, float minValue, float maxValue) {
+    // Assume that a and b are both within [minValue, maxValue].
+    assert(a >= minValue && a <= maxValue && b >= minValue && b <= maxValue);
+
+    // Ensure that a <= b, to simplify life
+    if (a > b) {
+        std::swap(a, b);
+        weight = 1.0f - weight;
+    }
+
+    //
+    float length = maxValue - minValue;
+    float delta = b - a;
+    float result;
+
+    if (2 * delta > length) {
+        result = Lerp(a + length, b, weight);
+    }
+    else {
+        result = Lerp(a, b, weight);
+    }
+
+    // This could probably be converted to a mathematical expression.
+    // Assuming W is in the [0, 1] range (which is not necesarily true), 
+    // this would only happen when 2*delta > length.
+    while (result > maxValue) result -= length;
+
+    return result;
 }

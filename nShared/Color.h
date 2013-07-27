@@ -68,12 +68,15 @@ namespace Color {
     // Converts D2D_COLOR_F to ARGB
     ARGB D2DToARGB(D2D_COLOR_F d2d);
 
+    //
+    ARGB Mix(ARGB color1, ARGB color2, float weight);
+
     // Holds a known color
-    typedef struct {
+    typedef struct KnownColor {
         LPCSTR name;
         ARGB color;
-    } KnownColor;
+    } *LPKNOWNCOLOR;
 
     // Returns the null-terminated list of known colors
-    KnownColor* GetKnownColors();
+    LPKNOWNCOLOR GetKnownColors();
 }

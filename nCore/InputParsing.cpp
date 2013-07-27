@@ -440,7 +440,23 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, LPARGB target) {
         return true;
     }
     else if (_IsFunctionOf(color, "Mix")) { // Mix(color1, color2, weight) -- Mixes color1 and color2.
-        // TODO::Implement this
+        char val1[MAX_LINE_LENGTH], val2[MAX_LINE_LENGTH], val3[MAX_LINE_LENGTH];
+        LPSTR params[] = { val1, val2, val3 };
+        LPSTR endPtr;
+
+        ARGB color1, color2;
+
+        if (_GetParameters(color, 3, params, MAX_LINE_LENGTH) != 3)
+            return false;
+
+        float weight = clamp(0.0f, strtof(val3, &endPtr), 1.0f);
+
+        if (*endPtr != '\0' || !ParseColor(val1, &color1) || !ParseColor(val2, &color2))
+            return false;
+
+        *target = Color::Mix(color1, color2, weight);
+
+        return true;
     }
     else if (_stricmp(color, "DWMColor") == 0) {
         BOOL b;

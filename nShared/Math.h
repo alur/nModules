@@ -19,4 +19,6 @@ namespace Math {
 
     float RectIntersectArea(D2D1_RECT_F rect1, D2D1_RECT_F rect2);
 
+    float Lerp(float a, float b, float weight);
+    float WrappingLerp(float a, float b, float weight, float minValue, float maxValue);
 }

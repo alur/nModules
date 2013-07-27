@@ -9,6 +9,7 @@
 
 #include "Color.h"
 #include <math.h>
+#include "Math.h"
 
 namespace Color {
 
@@ -117,7 +118,7 @@ ARGB Color::D2DToARGB(D2D_COLOR_F d2d) {
 /// <summary>
 /// Returns the list of known colors.
 /// </summary>
-Color::KnownColor* Color::GetKnownColors() {
+Color::LPKNOWNCOLOR Color::GetKnownColors() {
     return Color::knownColors;
 }
 
@@ -288,4 +289,17 @@ AHSV Color::ARGBToAHSV(ARGB color) {
     ret.saturation = UCHAR(COLOR_MAX_SATURATION*C/M);
 
     return ret;
+}
+
+
+ARGB Color::Mix(ARGB color1, ARGB color2, float weight) {
+    AHSL HSLcolor1 = Color::ARGBToAHSL(color1);
+    AHSL HSLcolor2 = Color::ARGBToAHSL(color2);
+    AHSL mix;
+    mix.alpha = int(Math::Lerp(float(HSLcolor1.alpha), float(HSLcolor2.alpha), weight) + 0.5f);
+    mix.lightness = Math::Lerp(HSLcolor1.lightness, HSLcolor2.lightness, weight);
+    mix.saturation = Math::Lerp(HSLcolor1.saturation, HSLcolor2.saturation, weight);
+    mix.hue = int(Math::WrappingLerp(float(HSLcolor1.hue), float(HSLcolor2.hue), weight, 0, COLOR_MAX_HUE));
+
+    return Color::AHSLToARGB(mix);
 }
