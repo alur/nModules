@@ -103,7 +103,7 @@ EXPORT_CDECL(bool) ParseMonitor(LPCSTR monitor, LPUINT target) {
 /// <summary>
 /// Utility function used by ParseColor
 /// </summary>
-inline bool _IsFunctionOf(LPCSTR source, LPCSTR name) {
+static inline bool _IsFunctionOf(LPCSTR source, LPCSTR name) {
     return _strnicmp(name, source, strlen(name)) == 0 && source[strlen(name)] == '(' &&  source[strlen(source)-1] == ')';
 }
 
@@ -112,7 +112,7 @@ inline bool _IsFunctionOf(LPCSTR source, LPCSTR name) {
 /// Grabs the first maxParams parameters from the function contained in the given string.
 /// </summary>
 /// <returns>The number of parameters actually retrived.</returns>
-int _GetParameters(LPCSTR source, UCHAR maxParams, LPSTR dests[], size_t cchDest) {
+static int _GetParameters(LPCSTR source, UCHAR maxParams, LPSTR dests[], size_t cchDest) {
     // *(),
     int currentParam = 0;
     int parenDepth = 0;
@@ -158,7 +158,7 @@ int _GetParameters(LPCSTR source, UCHAR maxParams, LPSTR dests[], size_t cchDest
 }
 
 
-int _GetColorDefParams(LPCSTR source, UCHAR maxParams, LPINT out) {
+static int _GetColorDefParams(LPCSTR source, UCHAR maxParams, LPINT out) {
     char val1[8], val2[8], val3[8], val4[8];
     LPSTR params[] = { val1, val2, val3, val4 };
     LPSTR endPtr;
@@ -177,7 +177,7 @@ int _GetColorDefParams(LPCSTR source, UCHAR maxParams, LPINT out) {
 }
 
 
-bool _GetColorAndAmount(LPCSTR source, LPARGB color, LPLONG amount) {
+static bool _GetColorAndAmount(LPCSTR source, LPARGB color, LPLONG amount) {
     char val1[MAX_LINE_LENGTH], val2[MAX_LINE_LENGTH];
     LPSTR params[] = { val1, val2 };
     LPSTR endPtr;
@@ -201,6 +201,11 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, LPARGB target) {
     // Useful information
     size_t length;
     StringCchLength(color, MAX_LINE_LENGTH, &length);
+
+    // This happens a lot
+    if (*color == L'\0') {
+        return false;
+    }
 
     if (color[0] == '#') {
         // Try to parse the input as a hex string
@@ -449,7 +454,8 @@ EXPORT_CDECL(bool) ParseColor(LPCSTR color, LPARGB target) {
         if (_GetParameters(color, 3, params, MAX_LINE_LENGTH) != 3)
             return false;
 
-        float weight = clamp(0.0f, strtof(val3, &endPtr), 1.0f);
+        // strtof does not seem to set endptr properly
+        float weight = (float)strtod(val3, &endPtr);
 
         if (*endPtr != '\0' || !ParseColor(val1, &color1) || !ParseColor(val2, &color2))
             return false;
