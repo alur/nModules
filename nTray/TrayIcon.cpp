@@ -80,6 +80,7 @@ void TrayIcon::Show() {
 void TrayIcon::HandleAdd(LiteStep::LPLSNOTIFYICONDATA pNID) {
     this->callbackWindow = pNID->hWnd;
     this->callbackID = pNID->uID;
+    GetWindowThreadProcessId(pNID->hWnd, &mProcessID);
     HandleModify(pNID);
 }
 
@@ -220,12 +221,21 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam,
             ((Tray*)this->parent)->HideTip();
         }
 
-        SendCallback(message, wParam, lParam);
-        if (message == WM_RBUTTONUP) {
-            SendCallback(WM_CONTEXTMENU, wParam, lParam);
+        AllowSetForegroundWindow(mProcessID);
+
+        if (this->version >= 4) {
+            if (message == WM_RBUTTONUP) {
+                SendCallback(WM_CONTEXTMENU, wParam, lParam);
+            }
+            else if (message == WM_LBUTTONUP) {
+                SendCallback(NIN_SELECT, wParam, lParam);
+            }
+            else {
+                SendCallback(message, wParam, lParam);
+            }
         }
-        else if (message == WM_LBUTTONUP) {
-            SendCallback(NIN_SELECT, wParam, lParam);
+        else {
+            SendCallback(message, wParam, lParam);
         }
     }
     else if (message == WM_MOUSELEAVE) {

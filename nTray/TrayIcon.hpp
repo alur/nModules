@@ -48,4 +48,5 @@ private:
     UINT callbackMessage;
     GUID guid;
     DWORD flags;
+    DWORD mProcessID;
 };
