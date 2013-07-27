@@ -32,6 +32,8 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     this->expandLeft = settings->GetBool("ExpandLeft", false);
     this->confineToMonitor = settings->GetBool("ConfineToMonitor", false);
     this->confineToWorkArea = settings->GetBool("ConfineToWorkArea", false);
+    mChildOffsetX = settings->GetInt("ChildOffsetX", 0);
+    mChildOffsetY = settings->GetInt("ChildOffsetY", 0);
     settings->GetOffsetRect("PaddingLeft", "PaddingTop", "PaddingRight", "PaddingBottom", &this->padding, 5, 5, 5, 5);
 
     DrawableSettings defaultSettings;
@@ -104,10 +106,10 @@ void Popup::OpenChild(Popup* child, LPRECT position, PopupItem* childItem) {
         this->openChild = child;
         this->childItem = childItem;
         this->openChild->expandLeft = this->expandLeft;
-        position->top -= this->padding.top;
+        position->top -= this->padding.top + mChildOffsetY;
         position->bottom -= this->padding.top;
-        position->left -= this->padding.left;
-        position->right += this->padding.right;
+        position->left -= this->padding.left + mChildOffsetX;
+        position->right += this->padding.right + mChildOffsetX;
         this->openChild->Show(position, this);
     }
 }

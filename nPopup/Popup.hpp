@@ -92,4 +92,7 @@ private:
 
     //
     bool confineToMonitor;
+
+    int mChildOffsetX;
+    int mChildOffsetY;
 };
