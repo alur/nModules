@@ -136,6 +136,7 @@ static int _GetParameters(LPCSTR source, UCHAR maxParams, LPSTR dests[], size_t 
             if (parenDepth == 0)
             {
                 StringCchCopyN(dests[currentParam++], cchDest, paramStart, pos - paramStart);
+                while (*(pos + 1) == ' ' || *(pos + 1) == '\t') ++pos;
                 paramStart = pos + 1;
             }
             break;
