@@ -67,15 +67,16 @@ static struct BangItem {
     LPCTSTR name;
     LiteStep::BANGCOMMANDPROC proc;
 } BangMap [] = {
-    BangItem(TEXT("SetBrushType"),            [] (HWND, LPCTSTR args) -> void {
+    /*(BangItem(TEXT("SetBrushType"),            [] (HWND, LPCTSTR args) -> void {
         DrawableWindow *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
+            brush->SetType(BrushSetings::ParseType(arg));
             window->Repaint();
         }
-    }),
+    }),*/
     BangItem(TEXT("SetColor"),                [] (HWND, LPCTSTR args) -> void {
         DrawableWindow *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
@@ -89,7 +90,7 @@ static struct BangItem {
             }
         }
     }),
-    BangItem(TEXT("SetAlpha"),                [] (HWND, LPCTSTR args) -> void {
+    /*BangItem(TEXT("SetAlpha"),                [] (HWND, LPCTSTR args) -> void {
         DrawableWindow *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -160,7 +161,7 @@ static struct BangItem {
             LiteStep::GetToken(args, arg, nullptr, 0);
             window->Repaint();
         }
-    }),
+    }),*/
     BangItem(TEXT("SetImage"),                [] (HWND, LPCTSTR args) -> void {
         DrawableWindow *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
@@ -171,16 +172,17 @@ static struct BangItem {
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetImageRotation"),        [] (HWND, LPCTSTR args) -> void {
+    /*BangItem(TEXT("SetImageRotation"),        [] (HWND, LPCTSTR args) -> void {
         DrawableWindow *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
+            brush->SetImageRotation(strtof(arg, nullptr));
             window->Repaint();
         }
-    }),
-    BangItem(TEXT("SetImageScalingMode"),     [] (HWND, LPCTSTR args) -> void {
+    }),*/
+    /*BangItem(TEXT("SetImageScalingMode"),     [] (HWND, LPCTSTR args) -> void {
         DrawableWindow *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -197,7 +199,7 @@ static struct BangItem {
             LiteStep::GetToken(args, arg, nullptr, 0);
             window->Repaint();
         }
-    })
+    })*/
 };
 
 
