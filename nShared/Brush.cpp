@@ -296,7 +296,10 @@ void Brush::SetImage(ID2D1RenderTarget* renderTarget, LPCSTR path) {
     free(this->brushSettings->image);
     this->brushSettings->image = _strdup(path);
     if (this->brushType == Image && renderTarget) {
-        if (SUCCEEDED(LoadImageFile(renderTarget, path, &this->brush))) {
+        ID2D1Brush *tempBrush;
+        if (SUCCEEDED(LoadImageFile(renderTarget, path, &tempBrush))) {
+            SAFERELEASE(this->brush);
+            this->brush = tempBrush;
             this->brush->SetOpacity(this->brushSettings->imageOpacity);
             ScaleImage();
         }
