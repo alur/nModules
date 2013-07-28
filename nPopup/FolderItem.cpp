@@ -40,7 +40,7 @@ void nPopup::FolderItem::Init(LPCSTR title, Popup* popup) {
     StateSettings defaultState;
     defaultState.backgroundBrush.color = 0xAA00FFFF;
     defaultState.textBrush.color = 0xFF000000;
-    StringCchCopy(defaultState.textVerticalAlign, sizeof(defaultState.textVerticalAlign), "Middle");
+    defaultState.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
     defaultState.textOffsetLeft = 20;
     defaultState.textOffsetRight = 5;
 

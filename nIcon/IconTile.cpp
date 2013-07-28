@@ -36,9 +36,9 @@ IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFo
 
     StateSettings baseStateDefaults;
     baseStateDefaults.backgroundBrush.color = 0;
-    baseStateDefaults.wordWrap = true;
+    baseStateDefaults.wordWrapping = DWRITE_WORD_WRAPPING_WRAP;
     baseStateDefaults.textOffsetTop = (float)mIconSize;
-    StringCchCopy(baseStateDefaults.textAlign, sizeof(baseStateDefaults.textAlign), "Center");
+    baseStateDefaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
 
     this->window->Initialize(&defaults, &baseStateDefaults);
     this->window->SetText(name);

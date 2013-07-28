@@ -29,7 +29,7 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
     StateSettings stateDefaults;
     stateDefaults.backgroundBrush.color = 0x00000000;
     stateDefaults.textOffsetLeft = 36;
-    StringCchCopy(stateDefaults.textVerticalAlign, _countof(stateDefaults.textVerticalAlign), "Middle");
+    stateDefaults.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
 
     this->window->Initialize(nullptr, &stateDefaults);
 

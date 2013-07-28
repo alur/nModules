@@ -23,7 +23,7 @@ Tooltip::Tooltip(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, par
     defaultState.textOffsetRight = 2;
     defaultState.textOffsetLeft = 2;
     defaultState.outlineBrush.color = 0xFF000000;
-    defaultState.outlineWidth = 1.5f;
+    defaultState.outlineWidth = 0.75f;
 
     this->window->Initialize(&defaults, &defaultState);
 

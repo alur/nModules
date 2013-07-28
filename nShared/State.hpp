@@ -13,7 +13,7 @@
 
 class State : IPainter {
 public:
-    explicit State(Settings* settings, int defaultPriority, LPCWSTR* text);
+    explicit State(LPCSTR stateName, Settings *settings, int defaultPriority, LPCWSTR *text);
     virtual ~State();
 
     void Load(StateSettings* defaultSettings);
@@ -26,13 +26,30 @@ public:
     void DiscardDeviceResources();
     void Paint(ID2D1RenderTarget* renderTarget);
     HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
+
+public:
+    void SetCornerRadiusX(float radius);
+    void SetCornerRadiusY(float radius);
+    void SetOutlineWidth(float width);
+
     void SetTextOffsets(float left, float top, float right, float bottom);
 
+    void SetReadingDirection(DWRITE_READING_DIRECTION direction);
+    void SetTextAlignment(DWRITE_TEXT_ALIGNMENT alignment);
+    void SetTextRotation(float rotation);
+    void SetTextTrimmingGranuality(DWRITE_TRIMMING_GRANULARITY granularity);
+    void SetTextVerticalAlign(DWRITE_PARAGRAPH_ALIGNMENT alignment);
+    void SetWordWrapping(DWRITE_WORD_WRAPPING wrapping);
+
+public:
     // The priority of this state.
     int priority;
 
     // Whether or not this state is currently active.
     bool active;
+
+    // The name of this state.
+    LPCSTR mName;
 
     // Settings.
     Settings* settings;
@@ -67,6 +84,9 @@ private:
 
     // Points to the windows text.
     LPCWSTR* text;
+
+    //
+    LPCSTR stateName;
 
     // The area we draw in.
     D2D1_ROUNDED_RECT drawingArea;

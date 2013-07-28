@@ -27,7 +27,7 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     defaultState.textOffsetLeft = 40;
     defaultState.outlineBrush.color = 0xAA000000;
     defaultState.outlineWidth = 1.5f;
-    defaultState.wordWrap = true;
+    defaultState.wordWrapping = DWRITE_WORD_WRAPPING_WRAP;
     defaultState.cornerRadiusX = 4.0f;
     defaultState.cornerRadiusY = 4.0f;
 
@@ -46,7 +46,7 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     StateSettings titleBaseStateDefaults;
     titleBaseStateDefaults.textBrush.color = 0xFF000000;
     titleBaseStateDefaults.backgroundBrush.color = 0;
-    StringCchCopy(titleBaseStateDefaults.fontWeight, sizeof(titleBaseStateDefaults.fontWeight), "Bold");
+    titleBaseStateDefaults.fontWeight = DWRITE_FONT_WEIGHT_BOLD;
 
     this->titleWindow->Initialize(&titleDefaults, &titleBaseStateDefaults);
     this->titleWindow->Show();
@@ -58,18 +58,18 @@ Balloon::Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, M
     closeBtnDefaults->width = 16;
     closeBtnDefaults->height = 16;
 
-    StateSettings* closeBtnBaseStateDefaults = new StateSettings();
-    closeBtnBaseStateDefaults->backgroundBrush.color = 0xAA77AACC;
-    closeBtnBaseStateDefaults->textBrush.color = 0xFF000000;
-    closeBtnBaseStateDefaults->outlineBrush.color = 0xFF000000;
-    closeBtnBaseStateDefaults->outlineWidth = 1.0f;
-    closeBtnBaseStateDefaults->cornerRadiusX = 2.0f;
-    closeBtnBaseStateDefaults->cornerRadiusY = 2.0f;
-    StringCchCopy(closeBtnBaseStateDefaults->fontWeight, sizeof(closeBtnBaseStateDefaults->fontWeight), "Bold");
-    StringCchCopy(closeBtnBaseStateDefaults->textAlign, sizeof(closeBtnBaseStateDefaults->textAlign), "Center");
-    StringCchCopy(closeBtnBaseStateDefaults->textVerticalAlign, sizeof(closeBtnBaseStateDefaults->textVerticalAlign), "Middle");
+    StateSettings closeBtnBaseStateDefaults;
+    closeBtnBaseStateDefaults.backgroundBrush.color = 0xAA77AACC;
+    closeBtnBaseStateDefaults.textBrush.color = 0xFF000000;
+    closeBtnBaseStateDefaults.outlineBrush.color = 0xFF000000;
+    closeBtnBaseStateDefaults.outlineWidth = 1.0f;
+    closeBtnBaseStateDefaults.cornerRadiusX = 2.0f;
+    closeBtnBaseStateDefaults.cornerRadiusY = 2.0f;
+    closeBtnBaseStateDefaults.fontWeight = DWRITE_FONT_WEIGHT_BOLD;
+    closeBtnBaseStateDefaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
+    closeBtnBaseStateDefaults.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
 
-    this->closeBtnWindow->Initialize(closeBtnDefaults, closeBtnBaseStateDefaults);
+    this->closeBtnWindow->Initialize(closeBtnDefaults, &closeBtnBaseStateDefaults);
     this->closeBtnWindow->SetText(L"X");
     this->closeBtnWindow->Show();
 

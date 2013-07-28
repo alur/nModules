@@ -134,6 +134,12 @@
     <ClInclude Include="DrawableWindowBangs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IStateOwner.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IBrushOwner.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MonitorInfo.cpp">
@@ -233,6 +239,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DrawableWindowBangs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StateBangs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

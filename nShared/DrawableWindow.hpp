@@ -138,6 +138,9 @@ public:
     // Returns the handle to the top-level window in this window stack.
     HWND GetWindowHandle();
 
+    //
+    State *GetState(LPCSTR stateName);
+
     // Retrives the "parsed" text.
     LPCWSTR GetText();
 

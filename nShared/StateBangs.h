@@ -1,31 +1,16 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  StateBangs.h
- *  The nModules Project
- *
- *  Bangs for states.
- *   
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//--------------------------------------------------------------------------------------
+// StateBangs.h
+// The nModules Project
+//
+// Bangs for states
+//
+//--------------------------------------------------------------------------------------
 #pragma once
 
-#include "Drawable.hpp"
+#include "DrawableWindow.hpp"
+#include <functional>
 
 namespace StateBangs {
-    void _Register(LPCSTR prefix, DrawableWindow::STATE (*stateFinder)(LPCSTR, LPCSTR));
-    void _UnRegister(LPCSTR prefix);
-
-    // 
-    void Hide(HWND, LPCSTR);
-    void Show(HWND, LPCSTR);
-    void Move(HWND, LPCSTR);
-    void Size(HWND, LPCSTR);
-    void Position(HWND, LPCSTR);
-    void SetAlwaysOnTop(HWND, LPCSTR);
-    void SetClickThrough(HWND, LPCSTR);
-    void SetParent(HWND, LPCSTR);
-    void SetText(HWND, LPCSTR);
-
-    struct BangItem {
-        LPCSTR name;
-        LiteStep::BANGCOMMANDPROC command;
-    };
+    void _Register(LPCTSTR prefix, std::function<DrawableWindow* (LPCTSTR)> windowFinder);
+    void _UnRegister(LPCTSTR prefix);
 }

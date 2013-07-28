@@ -58,8 +58,8 @@ void TaskSwitcher::LoadSettings() {
     StateSettings stateDefaults;
     stateDefaults.backgroundBrush.color = 0xDD000000;
     stateDefaults.fontSize = 16;
-    StringCchCopyA(stateDefaults.fontWeight, sizeof(stateDefaults.fontWeight), "Light");
-    StringCchCopyA(stateDefaults.textAlign, sizeof(stateDefaults.textAlign), "Center");
+    stateDefaults.fontWeight = DWRITE_FONT_WEIGHT_LIGHT;
+    stateDefaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
     stateDefaults.textBrush.color = 0xFFFFFFFF;
     stateDefaults.textOffsetTop = 10;
     BOOL b;

@@ -13,6 +13,7 @@
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/Versioning.h"
 #include "../nShared/DrawableWindowBangs.h"
+#include "../nShared/StateBangs.h"
 #include "TextFunctions.h"
 #include "ParsedText.hpp"
 #include "Version.h"
@@ -59,9 +60,8 @@ int initModuleEx(HWND /* parent */, HINSTANCE instance, LPCSTR /* path */) {
     nCore::Connect(MakeVersion(MODULE_VERSION));
 
     // Register window bangs
-    DrawableWindowBangs::_Register("n", [] (LPCSTR prefix) -> DrawableWindow* {
-        return FindRegisteredWindow(prefix);
-    });
+    DrawableWindowBangs::_Register("n", FindRegisteredWindow);
+    StateBangs::_Register("n", FindRegisteredWindow);
 
     return 0;
 }
@@ -72,6 +72,7 @@ int initModuleEx(HWND /* parent */, HINSTANCE instance, LPCSTR /* path */) {
 /// </summary>
 void quitModule(HINSTANCE hDllInstance) {
     DrawableWindowBangs::_UnRegister("n");
+    StateBangs::_UnRegister("n");
 
     // Deinitalize
     if (g_hwndMsgHandler) {

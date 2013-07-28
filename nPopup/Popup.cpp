@@ -45,8 +45,8 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     defaultState.backgroundBrush.color = 0x440000FF;
     defaultState.textRotation = -45.0f;
     defaultState.fontSize = 32.0f;
-    StringCchCopy(defaultState.textAlign, sizeof(defaultState.textAlign), "Center");
-    StringCchCopy(defaultState.textVerticalAlign, sizeof(defaultState.textVerticalAlign), "Middle");
+    defaultState.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
+    defaultState.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
 
     this->window->Initialize(&defaultSettings, &defaultState);
     this->window->SetText(buf);

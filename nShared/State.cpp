@@ -18,7 +18,7 @@
 using namespace D2D1;
 
 
-State::State(Settings* settings, int defaultPriority, LPCWSTR* text) {
+State::State(LPCSTR stateName, Settings* settings, int defaultPriority, LPCWSTR* text) {
     this->active = false;
     this->backBrush = new Brush();
     this->drawingSettings = new StateSettings();
@@ -27,13 +27,15 @@ State::State(Settings* settings, int defaultPriority, LPCWSTR* text) {
     this->settings = settings;
     this->text = text;
     this->textBrush = new Brush();
-    this->textFormat = NULL;
+    this->textFormat = nullptr;
     this->textShadowBrush = new Brush();
+    mName = _strdup(stateName);
 }
 
 
 State::~State() {
     DiscardDeviceResources();
+    free(const_cast<LPSTR>(mName));
     SAFEDELETE(this->settings);
     SAFEDELETE(this->drawingSettings);
     SAFERELEASE(this->textFormat);
@@ -97,7 +99,7 @@ void State::Paint(ID2D1RenderTarget* renderTarget) {
     if (this->backBrush->brush) {
         renderTarget->FillRoundedRectangle(this->drawingArea, this->backBrush->brush);
     }
-    if (this->outlineBrush->brush) {
+    if (this->outlineBrush->brush && this->drawingSettings->outlineWidth != 0) {
         renderTarget->DrawRoundedRectangle(this->outlineArea, this->outlineBrush->brush, this->drawingSettings->outlineWidth);
     }
     /*if (this->textShadowBrush->brush) {
@@ -105,7 +107,7 @@ void State::Paint(ID2D1RenderTarget* renderTarget) {
         renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textDropFormat, this->textArea, this->textShadowBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         renderTarget->SetTransform(Matrix3x2F::Identity());
     }*/
-    if (this->textBrush->brush) {
+    if (this->textBrush->brush && **this->text != L'\0') {
         renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, this->textRotationOrigin));
         renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textFormat, this->textArea, this->textBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         renderTarget->SetTransform(Matrix3x2F::Identity());
@@ -159,120 +161,30 @@ void State::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size) {
 /// <param name="textFormat">Out. The textformat.</param>
 /// <returns>S_OK</returns>
 HRESULT State::CreateTextFormat(IDWriteTextFormat *&textFormat) {
-    // Font weight
-    DWRITE_FONT_WEIGHT fontWeight;
-    if (_stricmp(drawingSettings->fontWeight, "Thin") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_THIN;
-    else if (_stricmp(drawingSettings->fontWeight, "Extra Light") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_EXTRA_LIGHT;
-    else if (_stricmp(drawingSettings->fontWeight, "Ultra Light") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_ULTRA_LIGHT;
-    else if (_stricmp(drawingSettings->fontWeight, "Light") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_LIGHT;
-    else if (_stricmp(drawingSettings->fontWeight, "Semi Light") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_SEMI_LIGHT;
-    else if (_stricmp(drawingSettings->fontWeight, "Regular") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_REGULAR;
-    else if (_stricmp(drawingSettings->fontWeight, "Medium") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_MEDIUM;
-    else if (_stricmp(drawingSettings->fontWeight, "Semi Bold") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_SEMI_BOLD;
-    else if (_stricmp(drawingSettings->fontWeight, "Bold") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_BOLD;
-    else if (_stricmp(drawingSettings->fontWeight, "Extra Bold") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_EXTRA_BOLD;
-    else if (_stricmp(drawingSettings->fontWeight, "Ultra Bold") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_ULTRA_BOLD;
-    else if (_stricmp(drawingSettings->fontWeight, "Black") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_BLACK;
-    else if (_stricmp(drawingSettings->fontWeight, "Heavy") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_HEAVY;
-    else if (_stricmp(drawingSettings->fontWeight, "Extra Black") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_EXTRA_BLACK;
-    else if (_stricmp(drawingSettings->fontWeight, "Ultra Black") == 0)
-        fontWeight = DWRITE_FONT_WEIGHT_ULTRA_BLACK;
-    else
-        fontWeight = DWRITE_FONT_WEIGHT_NORMAL;
-
-    // Font style
-    DWRITE_FONT_STYLE fontStyle;
-    if (_stricmp(drawingSettings->fontStyle, "Oblique") == 0)
-        fontStyle = DWRITE_FONT_STYLE_OBLIQUE;
-    else if (_stricmp(drawingSettings->fontStyle, "Italic") == 0)
-        fontStyle = DWRITE_FONT_STYLE_ITALIC;
-    else
-        fontStyle = DWRITE_FONT_STYLE_NORMAL;
-
-    // Font stretch
-    DWRITE_FONT_STRETCH fontStretch;
-    if (_stricmp(drawingSettings->fontStretch, "Ultra Condensed") == 0)
-        fontStretch = DWRITE_FONT_STRETCH_ULTRA_CONDENSED;
-    else if (_stricmp(drawingSettings->fontStretch, "Extra Condensed") == 0)
-        fontStretch = DWRITE_FONT_STRETCH_EXTRA_CONDENSED;
-    else if (_stricmp(drawingSettings->fontStretch, "Condensed") == 0)
-        fontStretch = DWRITE_FONT_STRETCH_CONDENSED;
-    else if (_stricmp(drawingSettings->fontStretch, "Semi Condensed") == 0)
-        fontStretch = DWRITE_FONT_STRETCH_SEMI_CONDENSED;
-    else if (_stricmp(drawingSettings->fontStretch, "Medium") == 0)
-        fontStretch = DWRITE_FONT_STRETCH_MEDIUM;
-    else if (_stricmp(drawingSettings->fontStretch, "Semi Expanded") == 0)
-        fontStretch = DWRITE_FONT_STRETCH_SEMI_EXPANDED;
-    else if (_stricmp(drawingSettings->fontStretch, "Expanded") == 0)
-        fontStretch = DWRITE_FONT_STRETCH_EXPANDED;
-    else if (_stricmp(drawingSettings->fontStretch, "Extra Expanded") == 0)
-        fontStretch = DWRITE_FONT_STRETCH_EXTRA_EXPANDED;
-    else if (_stricmp(drawingSettings->fontStretch, "Ultra Expanded") == 0)
-        fontStretch = DWRITE_FONT_STRETCH_ULTRA_EXPANDED;
-    else
-        fontStretch = DWRITE_FONT_STRETCH_NORMAL;
-
     // Create the text format
     IDWriteFactory *pDWFactory = nullptr;
     Factories::GetDWriteFactory(reinterpret_cast<LPVOID*>(&pDWFactory));
     pDWFactory->CreateTextFormat(
         drawingSettings->font,
         nullptr,
-        fontWeight,
-        fontStyle,
-        fontStretch,
+        drawingSettings->fontWeight,
+        drawingSettings->fontStyle,
+        drawingSettings->fontStretch,
         drawingSettings->fontSize,
         L"en-US",
         &textFormat);
 
-    // Set the horizontal text alignment
-    if (_stricmp(drawingSettings->textAlign, "Center") == 0)
-        textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-    else if (_stricmp(drawingSettings->textAlign, "Right") == 0)
-        textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
-    else
-        textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-
-    // Set the vertical text alignment
-    if (_stricmp(drawingSettings->textVerticalAlign, "Middle") == 0)
-        textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-    else if (_stricmp(drawingSettings->textVerticalAlign, "Bottom") == 0)
-        textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
-    else
-        textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+    textFormat->SetTextAlignment(drawingSettings->textAlign);
+    textFormat->SetParagraphAlignment(drawingSettings->textVerticalAlign);
+    textFormat->SetWordWrapping(drawingSettings->wordWrapping);
+    textFormat->SetReadingDirection(drawingSettings->readingDirection);
 
     // Set the trimming method
     DWRITE_TRIMMING trimmingOptions;
     trimmingOptions.delimiter = 0;
     trimmingOptions.delimiterCount = 0;
-    if (_stricmp(drawingSettings->textTrimmingGranularity, "None") == 0)
-        trimmingOptions.granularity = DWRITE_TRIMMING_GRANULARITY_NONE;
-    else if (_stricmp(drawingSettings->textVerticalAlign, "Word") == 0)
-        trimmingOptions.granularity = DWRITE_TRIMMING_GRANULARITY_WORD;
-    else
-        trimmingOptions.granularity = DWRITE_TRIMMING_GRANULARITY_CHARACTER;
-
+    trimmingOptions.granularity = drawingSettings->textTrimmingGranularity;
     textFormat->SetTrimming(&trimmingOptions, nullptr);
-
-    // Set word wrapping
-    textFormat->SetWordWrapping(drawingSettings->wordWrap ? DWRITE_WORD_WRAPPING_WRAP : DWRITE_WORD_WRAPPING_NO_WRAP);
-
-    // Set reading direction
-    textFormat->SetReadingDirection(drawingSettings->rightToLeft ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
 
     return S_OK;
 }
@@ -297,4 +209,53 @@ void State::SetTextOffsets(float left, float top, float right, float bottom) {
     this->textArea.top += this->drawingSettings->textOffsetTop;
     this->textArea.left += this->drawingSettings->textOffsetLeft;
     this->textArea.right -= this->drawingSettings->textOffsetRight;
+}
+
+
+void State::SetCornerRadiusX(float radius) {
+    this->drawingArea.radiusX = this->outlineArea.radiusX = radius;
+}
+
+
+void State::SetCornerRadiusY(float radius) {
+    this->drawingArea.radiusY = this->outlineArea.radiusY = radius;
+}
+
+
+void State::SetOutlineWidth(float width) {
+    this->drawingSettings->outlineWidth = width;
+}
+
+
+void State::SetReadingDirection(DWRITE_READING_DIRECTION direction) {
+    this->textFormat->SetReadingDirection(direction);
+}
+
+
+void State::SetTextAlignment(DWRITE_TEXT_ALIGNMENT alignment) {
+    this->textFormat->SetTextAlignment(alignment);
+}
+
+
+void State::SetTextRotation(float rotation) {
+    this->drawingSettings->textRotation = rotation;
+}
+
+
+void State::SetTextTrimmingGranuality(DWRITE_TRIMMING_GRANULARITY granularity) {
+    DWRITE_TRIMMING options;
+    IDWriteInlineObject *trimmingSign;
+    this->textFormat->GetTrimming(&options, &trimmingSign);
+    options.granularity = granularity;
+    this->textFormat->SetTrimming(&options, trimmingSign);
+}
+
+
+void State::SetTextVerticalAlign(DWRITE_PARAGRAPH_ALIGNMENT alignment) {
+    this->textFormat->SetParagraphAlignment(alignment);
+}
+
+
+void State::SetWordWrapping(DWRITE_WORD_WRAPPING wrapping) {
+    this->textFormat->SetWordWrapping(wrapping);
 }

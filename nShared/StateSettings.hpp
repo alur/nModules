@@ -15,11 +15,20 @@
 class StateSettings {
 public:
     explicit StateSettings();
-    virtual ~StateSettings();
 
     // Loads the actual settings.
     void Load(Settings* settings, StateSettings* defaults);
     
+    static DWRITE_FONT_STRETCH ParseFontStretch(LPCSTR string);
+    static DWRITE_FONT_STYLE ParseFontStyle(LPCSTR fontStyle);
+    static DWRITE_FONT_WEIGHT ParseFontWeight(LPCSTR fontWeight);
+    static DWRITE_TEXT_ALIGNMENT ParseTextAlignment(LPCSTR textAlignment);
+    static DWRITE_PARAGRAPH_ALIGNMENT ParseParagraphAlignment(LPCSTR paragraphAlignment);
+    static DWRITE_TRIMMING_GRANULARITY ParseTrimmingGranularity(LPCSTR trimmingGranularity);
+    static DWRITE_READING_DIRECTION ParseReadingDirection(LPCSTR readingDirection);
+    static DWRITE_WORD_WRAPPING ParseWordWrapping(LPCSTR wordWrapping);
+
+public:
     // The settings to use for the background brush.
     BrushSettings backgroundBrush;
     
@@ -47,24 +56,24 @@ public:
     // The default font stretch. Ultra Condensed, Extra Condensed, Condensed, 
     // Semi Condensed, Normal, Medium, Semi Expanded, Expanded, Extra Expanded,
     // Ultra Expanded. Default: Normal
-    char fontStretch[16];
+    DWRITE_FONT_STRETCH fontStretch;
 
     // The default font style. Normal, Oblique, Italic. Default: Normal
-    char fontStyle[8];
+    DWRITE_FONT_STYLE fontStyle;
 
     // The default font weight. Thin, Extra Light, Ultra Light, Light,
     // Semi Light, Normal, Regular, Medium, Semi Bold, Bold, Extra Bold, 
     // Ultra Bold, Black, Heavy, Extra Black, Ultra Black. Default: Normal
-    char fontWeight[16];
+    DWRITE_FONT_WEIGHT fontWeight;
 
     // The width of the outline. Default: 0
     float outlineWidth;
 
-    // Right-to-Left. Default: False
-    bool rightToLeft;
+    //
+    DWRITE_READING_DIRECTION readingDirection;
 
     // The horizontal alignment of the text. Left, Center, Right. Default: Left
-    char textAlign[8];
+    DWRITE_TEXT_ALIGNMENT textAlign;
 
     // Text offset from the bottom. Default: 0
     float textOffsetBottom;
@@ -82,11 +91,11 @@ public:
     float textRotation;
 
     // The trimming setting. None, Character, Word. Default: Character
-    char textTrimmingGranularity[16];
+    DWRITE_TRIMMING_GRANULARITY textTrimmingGranularity;
 
     // The vertical alignment of the text. Bottom, Middle, Top. Default: Top
-    char textVerticalAlign[8];
+    DWRITE_PARAGRAPH_ALIGNMENT textVerticalAlign;
 
-    // Wordwrap. Default: False
-    bool wordWrap;
+    // 
+    DWRITE_WORD_WRAPPING wordWrapping;
 };

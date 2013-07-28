@@ -65,7 +65,7 @@ DrawableWindow::DrawableWindow(Settings* settings, MessageHandler* msgHandler) {
     mCoveredByFullscreen = false;
 
     // Create the base state
-    State* state = new State(new Settings(settings), 0, &this->text);
+    State* state = new State("", new Settings(settings), 0, &this->text);
     state->active = true;
     this->activeState = this->baseState = this->states.insert(this->states.begin(), state);
 }
@@ -299,7 +299,7 @@ DrawableWindow::PAINTER DrawableWindow::AddPrePainter(IPainter* painter) {
 /// <param name="defaultPriority">The default priority for this state. Higher priority states take precedence over lower priority states.</param>
 /// <returns>An object which can be used to activate/clear this state.</returns>
 DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, int defaultPriority, StateSettings* defaultSettings, DrawableWindow::STATE *stateGroup) {
-    State* state = new State(this->baseState->settings->CreateChild(prefix), defaultPriority, &this->text);
+    State* state = new State(prefix, this->baseState->settings->CreateChild(prefix), defaultPriority, &this->text);
     state->settings->AppendGroup(stateGroup ? (*stateGroup)->settings : this->baseState->settings);
     state->Load(defaultSettings);
     state->UpdatePosition(this->drawingArea);
@@ -547,6 +547,19 @@ LPCWSTR DrawableWindow::GetText() {
 /// <returns>the window handle.</returns>
 HWND DrawableWindow::GetWindowHandle() {
     return this->window;
+}
+
+
+/// <summary>
+/// Returns the specified state, if it exists.
+/// </summary>
+State *DrawableWindow::GetState(LPCSTR stateName) {
+    for (State *state : this->states) {
+        if (_stricmp(state->mName, stateName) == 0) {
+            return state;
+        }
+    }
+    return nullptr;
 }
 
 

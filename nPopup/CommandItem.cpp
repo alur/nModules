@@ -43,7 +43,7 @@ void CommandItem::Init(LPCSTR title, LPCSTR command) {
     StateSettings defaultState;
     defaultState.backgroundBrush.color = 0xAAFFFF00;
     defaultState.textBrush.color = 0xFF000000;
-    StringCchCopy(defaultState.textVerticalAlign, sizeof(defaultState.textVerticalAlign), "Middle");
+    defaultState.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
     defaultState.textOffsetLeft = 20;
     defaultState.textOffsetRight = 5;
 
