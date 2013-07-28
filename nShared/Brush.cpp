@@ -292,6 +292,16 @@ HRESULT Brush::LoadImageFile(ID2D1RenderTarget *renderTarget, LPCSTR image, ID2D
 }
 
 
+void Brush::SetColor(ARGB color) {
+    this->brushSettings->color = color;
+    if (this->brushType == BrushType::SolidColor) {
+        if (this->brush) {
+            ((ID2D1SolidColorBrush*) this->brush)->SetColor(Color::ARGBToD2D(color));
+        }
+    }
+}
+
+
 void Brush::SetImage(ID2D1RenderTarget* renderTarget, LPCSTR path) {
     free(this->brushSettings->image);
     this->brushSettings->image = _strdup(path);

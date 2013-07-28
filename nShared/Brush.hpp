@@ -35,6 +35,7 @@ public:
     HRESULT LoadImageFile(ID2D1RenderTarget *renderTarget, LPCSTR image, ID2D1Brush **brush);
 
 public:
+    void SetColor(ARGB color); 
     void SetImage(ID2D1RenderTarget *renderTarget, LPCSTR path); 
 
 private:

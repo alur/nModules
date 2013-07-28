@@ -82,7 +82,11 @@ static struct BangItem {
         if (brush) {
             char arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            window->Repaint();
+            ARGB color;
+            if (nCore::InputParsing::ParseColor(arg, &color)) {
+                brush->SetColor(color);
+                window->Repaint();
+            }
         }
     }),
     BangItem(TEXT("SetAlpha"),                [] (HWND, LPCTSTR args) -> void {
