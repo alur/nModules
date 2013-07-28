@@ -20,4 +20,4 @@
 #define CORE_VERSION 0, 4, 0, 0
 
 // String version of the MODULE_VERSION
-#define MODULE_VERSION_STR "0, 4, 0, 0"
+#define MODULE_VERSION_STR "0.4"
