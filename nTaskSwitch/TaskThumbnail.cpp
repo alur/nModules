@@ -97,13 +97,13 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
     //
     StateSettings selectedDefaults(stateDefaults);
     selectedDefaults.outlineBrush.color = 0xFFFFFFFF;
-    selectedDefaults.outlineWidth = 5;
+    selectedDefaults.outlineWidth = 2.5f;
     this->stateSelected = this->window->AddState("Selected", 150, &selectedDefaults);
 
     //
     StateSettings selectedHoverDefaults(hoverDefaults);
     selectedHoverDefaults.outlineBrush.color = 0xFFFFFFFF;
-    selectedHoverDefaults.outlineWidth = 5;
+    selectedHoverDefaults.outlineWidth = 2.5f;
     this->stateSelectedHover = this->window->AddState("SelectedHover", 200, &selectedHoverDefaults);
 
     //

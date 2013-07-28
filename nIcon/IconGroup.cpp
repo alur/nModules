@@ -78,6 +78,7 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     this->window->Initialize(&defaults, &defaultState);
     //this->window->AddDropRegion();
     this->window->AddPostPainter(&mSelectionRectagle);
+    // TODO::Add the selection rectangle as a brush owner
     this->window->Show();
 
     mChangeNotifyMsg = this->window->RegisterUserMessage(this);

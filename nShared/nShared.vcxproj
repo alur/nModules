@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Balloon.hpp" />
     <ClInclude Include="Brush.hpp" />
+    <ClInclude Include="BrushBangs.h" />
     <ClInclude Include="BrushSettings.hpp" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Debugging.h" />
@@ -30,7 +31,6 @@
     <ClInclude Include="FileIterator.hpp" />
     <ClInclude Include="IBrushOwner.hpp" />
     <ClInclude Include="ImageBrush.hpp" />
-    <ClInclude Include="IStateOwner.hpp" />
     <ClInclude Include="LinearGradientBrush.hpp" />
     <ClInclude Include="Overlay.hpp" />
     <ClInclude Include="RadialGradientBrush.hpp" />
@@ -61,6 +61,7 @@
   <ItemGroup>
     <ClCompile Include="Balloon.cpp" />
     <ClCompile Include="Brush.cpp" />
+    <ClCompile Include="BrushBangs.cpp" />
     <ClCompile Include="BrushSettings.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Debugging.cpp" />

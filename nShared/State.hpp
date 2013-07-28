@@ -10,8 +10,9 @@
 #include "StateSettings.hpp"
 #include "Brush.hpp"
 #include "IPainter.hpp"
+#include "IBrushOwner.hpp"
 
-class State : IPainter {
+class State : public IPainter, public IBrushOwner {
 public:
     explicit State(LPCSTR stateName, Settings *settings, int defaultPriority, LPCWSTR *text);
     virtual ~State();
@@ -23,9 +24,15 @@ public:
     // Gets the "desired" size for a given width and height.
     void GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size);
 
-    void DiscardDeviceResources();
-    void Paint(ID2D1RenderTarget* renderTarget);
-    HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
+    // IPainter
+public:
+    void DiscardDeviceResources() override;
+    void Paint(ID2D1RenderTarget* renderTarget) override;
+    HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) override;
+
+    // IBrushOwner
+public:
+    Brush *GetBrush(LPCSTR name) override;
 
 public:
     void SetCornerRadiusX(float radius);

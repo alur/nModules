@@ -24,6 +24,7 @@
 #include "BrushSettings.hpp"
 #include "../Utilities/PointerIterator.hpp"
 #include "../Utilities/StopWatch.hpp"
+#include "IBrushOwner.hpp"
 
 
 using std::vector;
@@ -81,6 +82,8 @@ private:
 
     // 
 public:
+    void AddBrushOwner(IBrushOwner *owner, LPCSTR name);
+
     // Adds an overlay.
     OVERLAY AddOverlay(D2D1_RECT_F position, HBITMAP image);
     OVERLAY AddOverlay(D2D1_RECT_F position, HICON icon);
@@ -120,6 +123,9 @@ public:
     //
     void FullscreenDeactivated(HMONITOR);
 
+    //
+    IBrushOwner *GetBrushOwner(LPCSTR name);
+
     // Returns the current drawing settings.
     DrawableSettings *GetDrawingSettings();
 
@@ -131,6 +137,9 @@ public:
 
     // Returns the position of this window, relative to its top-level parent.
     D2D1_RECT_F GetDrawingRect();
+
+    //
+    ID2D1RenderTarget *GetRenderTarget();
 
     // Returns the screen-coordinate position of this window.
     void GetScreenRect(LPRECT rect);
@@ -387,6 +396,9 @@ private:
 
     //
     bool mCoveredByFullscreen;
+
+    //
+    std::map<std::string, IBrushOwner*> mBrushOwners;
 
 public:
     // Registers a part of this window as a drop-region

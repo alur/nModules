@@ -68,6 +68,7 @@ DrawableWindow::DrawableWindow(Settings* settings, MessageHandler* msgHandler) {
     State* state = new State("", new Settings(settings), 0, &this->text);
     state->active = true;
     this->activeState = this->baseState = this->states.insert(this->states.begin(), state);
+    mBrushOwners[""] = (IBrushOwner*)state;
 }
 
 
@@ -216,6 +217,14 @@ DrawableWindow::~DrawableWindow() {
 
 
 /// <summary>
+/// Adds a brush owner.
+/// </summary>
+void DrawableWindow::AddBrushOwner(IBrushOwner *owner, LPCSTR name) {
+    mBrushOwners[name] = owner;
+}
+
+
+/// <summary>
 /// Adds an overlay icon.
 /// </summary>
 /// <param name="position">Where to place the overlay, relative to the parent.</param>
@@ -304,6 +313,7 @@ DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, int defaultPriorit
     state->Load(defaultSettings);
     state->UpdatePosition(this->drawingArea);
     state->ReCreateDeviceResources(this->renderTarget);
+    mBrushOwners[prefix] = (IBrushOwner*)state;
 
     // Insert the state based on its priority.
     STATE iter;
@@ -336,6 +346,8 @@ void DrawableWindow::Animate() {
     if (progress >= 1.0f) {
         this->animating = false;
     }
+
+    TRACE("%.4f", progress);
 
     RECT step;
     step.left = this->animationStart.left + long(progress*(this->animationTarget.left - this->animationStart.left));
@@ -481,6 +493,11 @@ void DrawableWindow::FullscreenDeactivated(HMONITOR monitor) {
 }
 
 
+IBrushOwner *DrawableWindow::GetBrushOwner(LPCSTR name) {
+    return mBrushOwners[name];
+}
+
+
 /// <summary>
 /// Gets the "Desired" size of the window, given the specified constraints.
 /// </summary>
@@ -515,6 +532,11 @@ MonitorInfo* DrawableWindow::GetMonitorInformation() {
 /// </summary>
 D2D1_RECT_F DrawableWindow::GetDrawingRect() {
     return this->drawingArea;
+}
+
+
+ID2D1RenderTarget *DrawableWindow::GetRenderTarget() {
+    return this->renderTarget;
 }
 
 

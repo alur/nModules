@@ -259,3 +259,18 @@ void State::SetTextVerticalAlign(DWRITE_PARAGRAPH_ALIGNMENT alignment) {
 void State::SetWordWrapping(DWRITE_WORD_WRAPPING wrapping) {
     this->textFormat->SetWordWrapping(wrapping);
 }
+
+
+Brush* State::GetBrush(LPCSTR brushName) {
+    if (*brushName == '\0') {
+        return this->backBrush;
+    }
+    else if (_stricmp(brushName, "Text") == 0) {
+        return this->textBrush;
+    }
+    else if (_stricmp(brushName, "Outline") == 0) {
+        return this->outlineBrush;
+    }
+
+    return nullptr;
+}

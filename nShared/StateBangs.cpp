@@ -75,13 +75,22 @@ static struct BangItem {
             window->Repaint();
         }
     }),
-    /*BangItem(TEXT("SetFontSize"),                [] (HWND, LPCTSTR args) -> void {
+    /*BangItem(TEXT("SetFont"),                    [] (HWND, LPCTSTR args) -> void {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             char arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            //state->SetFontSize(atoi(arg));
+            //state->SetFont(arg);
+        }
+    }),
+    BangItem(TEXT("SetFontSize"),                [] (HWND, LPCTSTR args) -> void {
+        DrawableWindow *window = nullptr;
+        State *state = FindState(&args, 1, window);
+        if (state) {
+            char arg[MAX_RCCOMMAND];
+            LiteStep::GetToken(args, arg, nullptr, 0);
+            //state->SetFontSize(strtof(arg, nullptr));
         }
     }),
     BangItem(TEXT("SetFontStretch"),             [] (HWND, LPCTSTR args) -> void {
@@ -90,7 +99,7 @@ static struct BangItem {
         if (state) {
             char arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            //state->SetFontStretch(atoi(arg));
+            //state->SetFontStretch(StateSettings::ParseFontStretch(arg));
         }
     }),
     BangItem(TEXT("SetFontStyle"),               [] (HWND, LPCTSTR args) -> void {
@@ -99,16 +108,16 @@ static struct BangItem {
         if (state) {
             char arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            //state->SetFontStyle(atoi(arg));
+            //state->SetFontStyle(StateSettings::ParseFontStyle(arg));
         }
     }),
-    BangItem(TEXT("SetFont"),                    [] (HWND, LPCTSTR args) -> void {
+    BangItem(TEXT("SetFontWeight"),              [] (HWND, LPCTSTR args) -> void {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             char arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            //state->SetOutlineWidth(atoi(arg));
+            //state->SetFontWeight(StateSettings::ParseFontWeight(arg));
         }
     }),*/
     BangItem(TEXT("SetReadingDirection"),        [] (HWND, LPCTSTR args) -> void {

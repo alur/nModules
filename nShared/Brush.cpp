@@ -5,8 +5,6 @@
 *  A general brush.
 *  
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma once
-
 #include "Brush.hpp"
 #include "Color.h"
 #include "Factories.h"
@@ -14,6 +12,7 @@
 #include "Macros.h"
 #include <wincodec.h>
 #include "../nCoreCom/Core.h"
+#include <strsafe.h>
 
 
 Brush::Brush() {
@@ -157,38 +156,8 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
 
         case Image:
             {
-                IWICImagingFactory* factory = NULL;
-                IWICBitmap* wicBitmap = NULL;
-                IWICFormatConverter* converter = NULL;
-                ID2D1Bitmap* bitmap = NULL;
-                Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
-        
-                HBITMAP hBitmap = LiteStep::LoadLSImage(this->brushSettings->image, NULL);
-                if (hBitmap) {
-                    hr = factory->CreateFormatConverter(&converter);
-                    if (SUCCEEDED(hr)) {
-                        hr = factory->CreateBitmapFromHBITMAP(hBitmap, NULL, WICBitmapUseAlpha, &wicBitmap);
-                    }
-                    if (SUCCEEDED(hr)) {
-                        hr = converter->Initialize(wicBitmap, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut);
-                    }
-                    if (SUCCEEDED(hr)) {
-                        hr = renderTarget->CreateBitmapFromWicBitmap(converter, NULL, &bitmap);
-                    }
-                    if (SUCCEEDED(hr)) {
-                        hr = renderTarget->CreateBitmapBrush(bitmap, reinterpret_cast<ID2D1BitmapBrush**>(&this->brush));
-                    }
-                    if (SUCCEEDED(hr)) {
-                        this->brush->SetOpacity(this->brushSettings->imageOpacity);
-                    }
-
-                    DeleteObject(hBitmap);
-                    SAFERELEASE(wicBitmap);
-                    SAFERELEASE(bitmap);
-                    SAFERELEASE(converter);
-                }
-                else {
-                    hr = E_FAIL;
+                if (SUCCEEDED(hr = LoadImageFile(renderTarget, this->brushSettings->image, &this->brush))) {
+                    this->brush->SetOpacity(this->brushSettings->imageOpacity);
                 }
             }
             break;
@@ -284,6 +253,52 @@ void Brush::UpdatePosition(D2D1_RECT_F position) {
         }
         else {
             this->brush->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
+        }
+    }
+}
+
+
+HRESULT Brush::LoadImageFile(ID2D1RenderTarget *renderTarget, LPCSTR image, ID2D1Brush **brush) {
+    IWICImagingFactory* factory = NULL;
+    IWICBitmap* wicBitmap = NULL;
+    IWICFormatConverter* converter = NULL;
+    ID2D1Bitmap* bitmap = NULL;
+    Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
+    HRESULT hr = E_FAIL;
+        
+    HBITMAP hBitmap = LiteStep::LoadLSImage(image, NULL);
+    if (hBitmap) {
+        hr = factory->CreateFormatConverter(&converter);
+        if (SUCCEEDED(hr)) {
+            hr = factory->CreateBitmapFromHBITMAP(hBitmap, NULL, WICBitmapUseAlpha, &wicBitmap);
+        }
+        if (SUCCEEDED(hr)) {
+            hr = converter->Initialize(wicBitmap, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut);
+        }
+        if (SUCCEEDED(hr)) {
+            hr = renderTarget->CreateBitmapFromWicBitmap(converter, NULL, &bitmap);
+        }
+        if (SUCCEEDED(hr)) {
+            hr = renderTarget->CreateBitmapBrush(bitmap, reinterpret_cast<ID2D1BitmapBrush**>(brush));
+        }
+
+        DeleteObject(hBitmap);
+        SAFERELEASE(wicBitmap);
+        SAFERELEASE(bitmap);
+        SAFERELEASE(converter);
+    }
+
+    return hr;
+}
+
+
+void Brush::SetImage(ID2D1RenderTarget* renderTarget, LPCSTR path) {
+    free(this->brushSettings->image);
+    this->brushSettings->image = _strdup(path);
+    if (this->brushType == Image && renderTarget) {
+        if (SUCCEEDED(LoadImageFile(renderTarget, path, &this->brush))) {
+            this->brush->SetOpacity(this->brushSettings->imageOpacity);
+            ScaleImage();
         }
     }
 }
