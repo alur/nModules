@@ -55,6 +55,7 @@
     <ClInclude Include="Settings.hpp" />
     <ClInclude Include="Tooltip.hpp" />
     <ClInclude Include="UIDGenerator.hpp" />
+    <ClInclude Include="Version.h" />
     <ClInclude Include="Versioning.h" />
     <ClInclude Include="WindowThumbnail.hpp" />
   </ItemGroup>

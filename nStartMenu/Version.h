@@ -7,6 +7,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "../nShared/Version.h"
+
 // The name of the module
 #define MODULE_NAME "nStartMenu"
 
@@ -14,10 +16,10 @@
 #define MODULE_AUTHOR "alur"
 
 // The version of this module
-#define MODULE_VERSION 0, 4, 0, 0
+#define MODULE_VERSION SHARED_VERSION
 
 // The minimum core version required
-#define CORE_VERSION 0, 4, 0, 0
+#define CORE_VERSION SHARED_CORE_VERSION
 
 // String version of the MODULE_VERSION
-#define MODULE_VERSION_STR "0, 4, 0, 0"
+#define MODULE_VERSION_STR SHARED_VERSION_STR

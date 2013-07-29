@@ -19,6 +19,8 @@ public:
     // Loads the actual settings.
     void Load(Settings* settings, DrawableSettings* defaults);
 
+    D2D1_TEXT_ANTIALIAS_MODE ParseAntiAliasMode(LPCSTR mode);
+
     // True if the window should be topmost. Default: false
     bool alwaysOnTop;
 
@@ -42,6 +44,9 @@ public:
 
     // The text to display. Default: "" (blank)
     LPWSTR text;
+
+    // How to anti-alias the text.
+    D2D1_TEXT_ANTIALIAS_MODE textAntiAliasMode;
 
     // The width of the window. Default: 100
     int width;

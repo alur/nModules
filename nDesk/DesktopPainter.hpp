@@ -92,6 +92,9 @@ private:
     ID2D1BitmapBrush* m_pWallpaperBrush;
     ID2D1BitmapBrush* m_pOldWallpaperBrush;
 
+    //
+    bool mDontRenderWallpaper;
+
     // The type of transition we should use
     TransitionType m_TransitionType;
 

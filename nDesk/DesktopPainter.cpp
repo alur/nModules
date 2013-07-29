@@ -35,6 +35,7 @@ DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, "nDesk", g_pCli
     m_pOldWallpaperBrush = nullptr;
     m_TransitionEffect = nullptr;
     m_bInvalidateAllOnUpdate = false;
+    mDontRenderWallpaper = LiteStep::GetRCBool("nDeskDontRenderWallpaper", TRUE) != FALSE;
     this->transitionStartTime = 0;
     this->transitionEndTime = 0;
     ZeroMemory(&m_TransitionSettings, sizeof(TransitionEffect::TransitionSettings));
@@ -251,21 +252,23 @@ void DesktopPainter::CalculateSizeDepdenentStuff() {
 /// </summary>
 /// <param name="bNoTransition">If true, there will be no transition.</param>
 void DesktopPainter::UpdateWallpaper(bool bNoTransition) {
-    // If we are currently doing a transition, end it.
-    if (m_pOldWallpaperBrush != nullptr) {
-        m_TransitionEffect->End();
-        SAFERELEASE(m_pOldWallpaperBrush)
-    }
+    if (!mDontRenderWallpaper) {
+        // If we are currently doing a transition, end it.
+        if (m_pOldWallpaperBrush != nullptr) {
+            m_TransitionEffect->End();
+            SAFERELEASE(m_pOldWallpaperBrush)
+        }
 
-    m_pOldWallpaperBrush = m_pWallpaperBrush;
-    CreateWallpaperBrush(&m_pWallpaperBrush);
+        m_pOldWallpaperBrush = m_pWallpaperBrush;
+        CreateWallpaperBrush(&m_pWallpaperBrush);
 
-    // If we are going to do a transition animation
-    if (!bNoTransition && m_pOldWallpaperBrush != nullptr && m_TransitionType != NONE) {
-        TransitionStart();
-    }
-    else {
-        SAFERELEASE(m_pOldWallpaperBrush)
+        // If we are going to do a transition animation
+        if (!bNoTransition && m_pOldWallpaperBrush != nullptr && m_TransitionType != NONE) {
+            TransitionStart();
+        }
+        else {
+            SAFERELEASE(m_pOldWallpaperBrush)
+        }
     }
 
     Redraw();
@@ -345,17 +348,19 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
     case WM_PAINT:
         {
-            bool inAnimation = false;
+            if (!mDontRenderWallpaper) {
+                bool inAnimation = false;
 
-            if (SUCCEEDED(ReCreateDeviceResources())) {
-                this->renderTarget->BeginDraw();
+                if (SUCCEEDED(ReCreateDeviceResources())) {
+                    this->renderTarget->BeginDraw();
 
-                // m_pOldWallpaperBrush being non zero indicates that we are in the middle of a transition
-                if (this->m_pOldWallpaperBrush != NULL) {
-                    PaintComposite();
-                }
-                else {
-                    Paint();
+                    // m_pOldWallpaperBrush being non zero indicates that we are in the middle of a transition
+                    if (this->m_pOldWallpaperBrush != NULL) {
+                        PaintComposite();
+                    }
+                    else {
+                        Paint();
+                    }
                 }
                 PaintChildren(inAnimation);
 
@@ -363,12 +368,15 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                 if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET) {
                     DiscardDeviceResources();
                 }
+
+                ValidateRect(hWnd, NULL);
+
+                if (this->m_pOldWallpaperBrush != NULL || inAnimation) {
+                    Redraw();
+                }
             }
-
-            ValidateRect(hWnd, NULL);
-
-            if (this->m_pOldWallpaperBrush != NULL || inAnimation) {
-                Redraw();
+            else {
+                ValidateRect(hWnd, NULL);
             }
         }
         return 0;

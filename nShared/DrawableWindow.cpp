@@ -979,6 +979,9 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
                     HwndRenderTargetProperties(this->window, size),
                     &this->renderTarget
                 );
+                if (SUCCEEDED(hr)) {
+                    this->renderTarget->SetTextAntialiasMode(this->drawingSettings->textAntiAliasMode);
+                }
             }
         }
         else {

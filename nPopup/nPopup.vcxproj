@@ -71,7 +71,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>C:\LiteStep64\debug\modules\</OutDir>
     <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
-    <TargetName>$(ProjectName)-0.4</TargetName>
+    <TargetName>$(ProjectName)-0.5</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
