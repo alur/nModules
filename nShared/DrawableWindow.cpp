@@ -128,7 +128,7 @@ DrawableWindow::DrawableWindow(LPCSTR parent, Settings *settings, MessageHandler
 DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) : DrawableWindow(new Settings(settings), msgHandler) {
     this->monitorInfo = new MonitorInfo();
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
-    this->userMsgIDs = new UIDGenerator<UINT>(WM_USER);
+    this->userMsgIDs = new UIDGenerator<UINT>(WM_FIRSTREGISTERED);
 
     // Create the window
     this->window = MessageHandler::CreateMessageWindowEx(WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_COMPOSITED,
