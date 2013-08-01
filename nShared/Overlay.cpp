@@ -17,11 +17,12 @@
 using namespace D2D1;
 
 
-Overlay::Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmapSource* source) {
+Overlay::Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmapSource* source, int zOrder) {
     this->position = position;
     this->source = source;
-    this->brush = NULL;
-    this->renderTarget = NULL;
+    this->brush = nullptr;
+    this->renderTarget = nullptr;
+    this->zOrder = zOrder;
     UpdatePosition(parentPosition);
 }
 
@@ -129,4 +130,9 @@ void Overlay::SetSource(IWICBitmapSource* source) {
 
 ID2D1BitmapBrush *Overlay::GetBrush() {
     return brush;
+}
+
+
+int Overlay::GetZOrder() {
+    return this->zOrder;
 }

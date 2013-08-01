@@ -97,16 +97,16 @@ static std::map<DWRITE_TRIMMING_GRANULARITY, LPCSTR> trimmingGranularityMap = {
 };
 
 static std::map<DWRITE_FONT_STRETCH, LPCSTR> fontStretchMap = {
-    { DWRITE_FONT_STRETCH_NORMAL,           "Normal"           },
-    { DWRITE_FONT_STRETCH_ULTRA_CONDENSED,  "Ultra Condensed"  },
-    { DWRITE_FONT_STRETCH_EXTRA_CONDENSED,  "Extra Condensed"  },
-    { DWRITE_FONT_STRETCH_CONDENSED,        "Condensed"        },
-    { DWRITE_FONT_STRETCH_SEMI_CONDENSED,   "Semi Condensed"   },
-    { DWRITE_FONT_STRETCH_MEDIUM,           "Medium"           },
-    { DWRITE_FONT_STRETCH_SEMI_EXPANDED,    "Semi Expanded"    },
-    { DWRITE_FONT_STRETCH_EXPANDED,         "Expanded"         },
-    { DWRITE_FONT_STRETCH_EXTRA_EXPANDED,   "Extra Expanded"   },
-    { DWRITE_FONT_STRETCH_ULTRA_EXPANDED,   "Ultra Expanded"   }
+    { DWRITE_FONT_STRETCH_NORMAL,           "Normal"          },
+    { DWRITE_FONT_STRETCH_ULTRA_CONDENSED,  "Ultra Condensed" },
+    { DWRITE_FONT_STRETCH_EXTRA_CONDENSED,  "Extra Condensed" },
+    { DWRITE_FONT_STRETCH_CONDENSED,        "Condensed"       },
+    { DWRITE_FONT_STRETCH_SEMI_CONDENSED,   "Semi Condensed"  },
+    { DWRITE_FONT_STRETCH_MEDIUM,           "Medium"          },
+    { DWRITE_FONT_STRETCH_SEMI_EXPANDED,    "Semi Expanded"   },
+    { DWRITE_FONT_STRETCH_EXPANDED,         "Expanded"        },
+    { DWRITE_FONT_STRETCH_EXTRA_EXPANDED,   "Extra Expanded"  },
+    { DWRITE_FONT_STRETCH_ULTRA_EXPANDED,   "Ultra Expanded"  }
 };
 
 static std::map<DWRITE_FONT_WEIGHT, LPCSTR> fontWeightMap = {

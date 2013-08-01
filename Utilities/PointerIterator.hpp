@@ -12,10 +12,12 @@ class PointerIterator {
 public:
     PointerIterator()
     {
+        mValid = false;
     }
 
     PointerIterator(IteratorType iter) : mIter(iter)
     {
+        mValid = true;
     }
 
     ItemType* operator->()
@@ -60,5 +62,18 @@ public:
         return *this;
     }
 
+    PointerIterator & operator--()
+    {
+        --mIter;
+        return *this;
+    }
+
+    PointerIterator operator--(int)
+    {
+        mIter--;
+        return *this;
+    }
+
     IteratorType mIter;
+    bool mValid;
 };

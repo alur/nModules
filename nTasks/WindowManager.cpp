@@ -32,9 +32,27 @@ extern map<string, Taskbar*> g_Taskbars;
 extern LSModule gLSModule;
 
 //
-const UINT gWMMessages[] = { LM_WINDOWCREATED, LM_WINDOWACTIVATED, LM_WINDOWDESTROYED,
-    LM_LANGUAGE, LM_REDRAW, LM_GETMINRECT, LM_WINDOWREPLACED, LM_WINDOWREPLACING,
-    LM_MONITORCHANGED, 0 };
+const UINT gWMMessages[] = {
+    // Standard HSHELL
+    LM_WINDOWCREATED, LM_WINDOWACTIVATED, LM_WINDOWDESTROYED, LM_LANGUAGE,
+    LM_REDRAW, LM_GETMINRECT, LM_WINDOWREPLACED, LM_WINDOWREPLACING, LM_MONITORCHANGED, 
+
+    // Progress bar
+    LM_TASKSETPROGRESSSTATE, LM_TASKSETPROGRESSVALUE, LM_TASKMARKASACTIVE, 
+
+    // MDI
+    LM_TASKREGISTERTAB, LM_TASKUNREGISTERTAB, LM_TASKSETACTIVETAB, LM_TASKSETTABORDER, LM_TASKSETTABPROPERTIES,
+
+    // Overlay
+    LM_TASKSETOVERLAYICON, LM_TASKSETOVERLAYICONDESC,
+
+    // Thumbnail
+    LM_TASKSETTHUMBNAILTOOLTIP, LM_TASKSETTHUMBNAILCLIP,
+
+    // Buttons
+    LM_TASKADDBUTTONS, LM_TASKUPDATEBUTTONS, LM_TASKSETIMAGELIST,
+    
+    0 };
 
 namespace WindowManager {
     UINT __stdcall ThreadAddExisting(LPVOID);
@@ -391,6 +409,12 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             UpdateWindowMonitors();
             return 0;
         }
+
+    case LM_TASKSETOVERLAYICON:
+        {
+            SetOverlayIcon((HWND) wParam, (HICON) lParam);
+        }
+        return 0;
         
         // 
     case WM_ADDED_EXISTING:
@@ -525,4 +549,18 @@ BOOL CALLBACK WindowManager::ThreadAddExistingCallback(HWND window, LPARAM) {
         PostMessage(gLSModule.GetMessageWindow(), LM_WINDOWCREATED, (WPARAM)window, NULL);
     }
     return TRUE;
+}
+
+
+///
+///
+///
+void WindowManager::SetOverlayIcon(HWND hWnd, HICON hIcon) {
+    WNDMAPITER iter = windowMap.find(hWnd);
+    if (iter != windowMap.end()) {
+        iter->second.hOverlayIcon = hIcon;
+        for (TaskButton *button : iter->second.buttons) {
+            button->SetOverlayIcon(hIcon);
+        }
+    }
 }

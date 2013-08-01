@@ -36,6 +36,7 @@ public:
     void Deactivate();
 
     void SetIcon(HICON hIcon);
+    void SetOverlayIcon(HICON hOverlayIcon);
     void SetText(LPCWSTR pszTitle);
     void Flash();
 
@@ -75,5 +76,5 @@ private:
 
     EnumArray<DrawableWindow::STATE, State> mStates;
 
-    DrawableWindow::OVERLAY iconOverlay;
+    DrawableWindow::OVERLAY icon, iconOverlay;
 };

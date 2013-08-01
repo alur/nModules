@@ -82,12 +82,30 @@ void TaskButton::SetIcon(HICON icon) {
         return;
     }
 
-    this->window->ClearOverlays();
+    this->window->RemoveOverlay(this->icon);
+    this->icon.mValid = false;
     if (icon != nullptr) {
         D2D1_RECT_F f = { (float)this->iconSettings->GetInt("X", 2), (float)this->iconSettings->GetInt("Y", 2),
             (float)this->iconSettings->GetInt("Width", 32) + (float)this->iconSettings->GetInt("X", 2),
             (float)this->iconSettings->GetInt("Height", 32)+ (float)this->iconSettings->GetInt("Y", 2) };
-        this->iconOverlay = this->window->AddOverlay(f, icon);
+        this->icon = this->window->AddOverlay(f, icon, 10);
+        this->window->Repaint();
+    }
+}
+
+
+void TaskButton::SetOverlayIcon(HICON overlayIcon) {
+    if (mNoIcons) {
+        return;
+    }
+    
+    this->window->RemoveOverlay(this->iconOverlay);
+    this->iconOverlay.mValid = false;
+    if (overlayIcon != nullptr) {
+        D2D1_RECT_F f = { (float)this->iconSettings->GetInt("X", 2), (float)this->iconSettings->GetInt("Y", 2),
+            (float)this->iconSettings->GetInt("Width", 32) + (float)this->iconSettings->GetInt("X", 2),
+            (float)this->iconSettings->GetInt("Height", 32)+ (float)this->iconSettings->GetInt("Y", 2) };
+        this->iconOverlay = this->window->AddOverlay(f, overlayIcon, 20);
         this->window->Repaint();
     }
 }

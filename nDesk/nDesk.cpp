@@ -54,7 +54,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     // Initialize
     g_pMonitorInfo = new MonitorInfo();
     g_pClickHandler = new ClickHandler();
-    g_pDesktopPainter = nullptr; // Initalized on WM_CREATE
+    g_pDesktopPainter = nullptr; // Initialized on WM_CREATE
     
     if (!gLSModule.Initialize(parent, instance, &wc, nullptr)) {
         delete g_pMonitorInfo;

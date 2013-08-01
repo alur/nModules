@@ -2,6 +2,7 @@
 #define LSSDK_LSAPI_H
 
 #include <windows.h>
+#include <ShlObj.h>
 
 // General Constants
 #define MAX_LINE_LENGTH 4096
@@ -86,34 +87,59 @@ typedef struct _SYSTRAYINFOEVENT {
 } SYSTRAYINFOEVENT, *LPSYSTRAYINFOEVENT;
 
 // Messages
-#define LM_SAVEDATA              8892  // Module -> Core
-#define LM_RESTOREDATA           8893  // Module -> Core
-#define LM_SYSTRAY               9214  // Core   -> Module
-#define LM_SYSTRAYREADY          9215  // Module -> Core
-#define LM_SYSTRAYINFOEVENT      9216  // Core   -> Module
-#define LM_REGISTERMESSAGE       9263  // Module -> Core
-#define LM_UNREGISTERMESSAGE     9264  // Module -> Core
-#define LM_GETREVID              9265  // Core   -> Module
-#define LM_UNLOADMODULE          9266  // Module -> Core
-#define LM_RELOADMODULE          9267  // Module -> Core
-#define LM_REGISTERHOOKMESSAGE   9268  // Module -> Core
-#define LM_UNREGISTERHOOKMESSAGE 9269  // Module -> Core
-#define LM_REFRESH               9305  // Core   -> Module
-#define LM_WINDOWCREATED         9501  // Core   -> Module
-#define LM_WINDOWDESTROYED       9502  // Core   -> Module
-#define LM_ACTIVATESHELLWINDOW   9503  // Core   -> Module
-#define LM_WINDOWACTIVATED       9504  // Core   -> Module
-#define LM_GETMINRECT            9505  // Core   -> Module
-#define LM_REDRAW                9506  // Core   -> Module
-#define LM_TASKMAN               9507  // Core   -> Module
-#define LM_LANGUAGE              9508  // Core   -> Module
-#define LM_ACCESSIBILITYSTATE    9511  // Core   -> Module
-#define LM_APPCOMMAND            9512  // Core   -> Module
-#define LM_WINDOWREPLACED        9513  // Core   -> Module
-#define LM_WINDOWREPLACING       9514  // Core   -> Module
-#define LM_MONITORCHANGED        9516  // Core   -> Module
-#define LM_FULLSCREENACTIVATED   32768 // Core   -> Module
-#define LM_FULLSCREENDEACTIVATED 32769 // Core   -> Module
+#define LM_SAVEDATA                8892  // Module -> Core
+#define LM_RESTOREDATA             8893  // Module -> Core
+#define LM_SYSTRAY                 9214  // Core   -> Module
+#define LM_SYSTRAYREADY            9215  // Module -> Core
+#define LM_SYSTRAYINFOEVENT        9216  // Core   -> Module
+#define LM_REGISTERMESSAGE         9263  // Module -> Core
+#define LM_UNREGISTERMESSAGE       9264  // Module -> Core
+#define LM_GETREVID                9265  // Core   -> Module
+#define LM_UNLOADMODULE            9266  // Module -> Core
+#define LM_RELOADMODULE            9267  // Module -> Core
+#define LM_REGISTERHOOKMESSAGE     9268  // Module -> Core
+#define LM_UNREGISTERHOOKMESSAGE   9269  // Module -> Core
+#define LM_REFRESH                 9305  // Core   -> Module
+#define LM_WINDOWCREATED           9501  // Core   -> Module
+#define LM_WINDOWDESTROYED         9502  // Core   -> Module
+#define LM_ACTIVATESHELLWINDOW     9503  // Core   -> Module
+#define LM_WINDOWACTIVATED         9504  // Core   -> Module
+#define LM_GETMINRECT              9505  // Core   -> Module
+#define LM_REDRAW                  9506  // Core   -> Module
+#define LM_TASKMAN                 9507  // Core   -> Module
+#define LM_LANGUAGE                9508  // Core   -> Module
+#define LM_ACCESSIBILITYSTATE      9511  // Core   -> Module
+#define LM_APPCOMMAND              9512  // Core   -> Module
+#define LM_WINDOWREPLACED          9513  // Core   -> Module
+#define LM_WINDOWREPLACING         9514  // Core   -> Module
+#define LM_MONITORCHANGED          9516  // Core   -> Module
+#define LM_FULLSCREENACTIVATED     32768 // Core   -> Module
+#define LM_FULLSCREENDEACTIVATED   32769 // Core   -> Module
+#define LM_TASKSETPROGRESSSTATE    33024 // Core   -> Module
+#define LM_TASKSETPROGRESSVALUE    33025 // Core   -> Module
+#define LM_TASKMARKASACTIVE        33026 // Core   -> Module
+#define LM_TASKREGISTERTAB         33027 // Core   -> Module
+#define LM_TASKUNREGISTERTAB       33028 // Core   -> Module
+#define LM_TASKSETACTIVETAB        33029 // Core   -> Module
+#define LM_TASKSETTABORDER         33030 // Core   -> Module
+#define LM_TASKSETTABPROPERTIES    33031 // Core   -> Module
+#define LM_TASKSETOVERLAYICON      33032 // Core   -> Module
+#define LM_TASKSETOVERLAYICONDESC  33033 // Core   -> Module
+#define LM_TASKSETTHUMBNAILTOOLTIP 33034 // Core   -> Module
+#define LM_TASKSETTHUMBNAILCLIP    33035 // Core   -> Module
+#define LM_TASKADDBUTTONS          33036 // Core   -> Module
+#define LM_TASKUPDATEBUTTONS       33037 // Core   -> Module
+#define LM_TASKSETIMAGELIST        33038 // Core   -> Module
+
+// Min and max progress values sent by LM_TASKSETPROGRESSVALUE
+#define TASKSETPROGRESSVALUE_MIN  0
+#define TASKSETPROGRESSVALUE_MAX  0xFFFE
+
+// Sent by LM_TASKADDBUTTONS and LM_TASKUPDATEBUTTONS
+typedef struct THUMBBUTTONLIST {
+    UINT cButtons;
+    LPTHUMBBUTTON pButton;
+} *LPTHUMBBUTTONLIST;
 
 // Callback Function Pointers
 typedef VOID (__cdecl * BANGCOMMANDPROC)(HWND hwndOwner, LPCSTR pszArgs);

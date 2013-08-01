@@ -85,9 +85,9 @@ public:
     void AddBrushOwner(IBrushOwner *owner, LPCSTR name);
 
     // Adds an overlay.
-    OVERLAY AddOverlay(D2D1_RECT_F position, HBITMAP image);
-    OVERLAY AddOverlay(D2D1_RECT_F position, HICON icon);
-    OVERLAY AddOverlay(D2D1_RECT_F position, IWICBitmapSource *source);
+    OVERLAY AddOverlay(D2D1_RECT_F position, HBITMAP image, int zOrder = 5);
+    OVERLAY AddOverlay(D2D1_RECT_F position, HICON icon, int zOrder = 5);
+    OVERLAY AddOverlay(D2D1_RECT_F position, IWICBitmapSource *source, int zOrder = 5);
 
     // Adds custom painters
     PAINTER AddPrePainter(IPainter *painter);
@@ -179,6 +179,9 @@ public:
 
     // Unregisters a user message
     void ReleaseUserMessage(UINT message);
+
+    // Removes the specified overlay
+    void RemoveOverlay(OVERLAY overlay);
 
     // Forces this window to redraw.
     void Repaint(LPRECT region = nullptr);

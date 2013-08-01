@@ -17,6 +17,7 @@ namespace WindowManager {
         UINT uMonitor;
         vector<TaskButton*> buttons;
         HICON hIcon;
+        HICON hOverlayIcon;
     } WindowInformation;
 
     // Some helpful typedefs
@@ -40,4 +41,5 @@ namespace WindowManager {
     void UpdateWindow(HWND hWnd, LPARAM data);
     void UpdateWindowMonitors();
     void AddExisting();
+    void SetOverlayIcon(HWND hWnd,  HICON hIcon);
 }

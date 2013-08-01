@@ -230,7 +230,7 @@ void DrawableWindow::AddBrushOwner(IBrushOwner *owner, LPCSTR name) {
 /// <param name="position">Where to place the overlay, relative to the parent.</param>
 /// <param name="icon">The icon to use as an overlay.</param>
 /// <returns>An object which can be used to modify/remove this overlay.</returns>
-DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon) {
+DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON icon, int zOrder) {
     IWICBitmap *source = nullptr;
     IWICImagingFactory *factory = nullptr;
 
@@ -238,7 +238,7 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON i
 
     // Generate a WIC bitmap and call the overloaded AddOverlay function
     factory->CreateBitmapFromHICON(icon, &source);
-    return AddOverlay(position, source);
+    return AddOverlay(position, source, zOrder);
 }
 
 
@@ -248,7 +248,7 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HICON i
 /// <param name="position">Where to place the overlay, relative to the parent.</param>
 /// <param name="bitmap">The bitmap to use as an overlay.</param>
 /// <returns>An object which can be used to modify/remove this overlay.</returns>
-DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap) {
+DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap, int zOrder) {
     IWICBitmap *source = nullptr;
     IWICImagingFactory *factory = nullptr;
     
@@ -256,7 +256,7 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP
 
     // Generate a WIC bitmap and call the overloaded AddOverlay function
     factory->CreateBitmapFromHBITMAP(bitmap, nullptr, WICBitmapUseAlpha, &source);
-    return AddOverlay(position, source);
+    return AddOverlay(position, source, zOrder);
 }
 
 
@@ -266,11 +266,13 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, HBITMAP
 /// <param name="position">Where to place the overlay, relative to the parent.</param>
 /// <param name="source">The bitmap to use as an overlay.</param>
 /// <returns>An object which can be used to modify/remove this overlay.</returns>
-DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmapSource* source) {
-    OVERLAY overlayOut = this->overlays.insert(this->overlays.end(), new Overlay(position, this->drawingArea, source));
-    overlayOut->ReCreateDeviceResources(this->renderTarget);
+DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBitmapSource* source, int zOrder) {
+    Overlay *overlay = new Overlay(position, this->drawingArea, source, zOrder);
+    overlay->ReCreateDeviceResources(this->renderTarget);
 
-    return overlayOut;
+    OVERLAY iter;
+    for (iter = this->overlays.begin(); iter != this->overlays.end() && iter->GetZOrder() < overlay->GetZOrder(); ++iter);
+    return this->overlays.insert(iter.mIter, overlay);
 }
 
 
@@ -1009,8 +1011,8 @@ HRESULT DrawableWindow::ReCreateDeviceResources() {
             }
 
             // Recreate resources for all children as well.
-            for (list<DrawableWindow*>::const_iterator child = this->children.begin(); child != this->children.end(); ++child) {
-                (*child)->ReCreateDeviceResources();
+            for (DrawableWindow *child : this->children) {
+                child->ReCreateDeviceResources();
             }
         }
     }
@@ -1041,6 +1043,18 @@ void DrawableWindow::RemoveChild(DrawableWindow *child) {
     this->children.remove(child);
     if (child == this->activeChild) {
         this->activeChild = nullptr;
+    }
+}
+
+
+/// <summary>
+/// Removes the specified overlay.
+/// </summary>
+/// <param name="overlay">The overlay to remove.</param>
+void DrawableWindow::RemoveOverlay(OVERLAY overlay) {
+    if (overlay.mValid) {
+        delete *overlay.mIter;
+        this->overlays.erase(overlay.mIter);
     }
 }
 

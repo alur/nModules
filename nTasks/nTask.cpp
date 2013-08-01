@@ -140,6 +140,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case LM_MONITORCHANGED:
     case WM_DISPLAYCHANGE:
     case WM_ADDED_EXISTING:
+    case LM_TASKSETOVERLAYICON:
         {
         }
         return WindowManager::ShellMessage(window, message, wParam, lParam);

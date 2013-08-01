@@ -13,6 +13,7 @@
 #include <wincodec.h>
 #include "../nCoreCom/Core.h"
 #include <strsafe.h>
+#include "../Utilities/StringUtils.h"
 
 
 Brush::Brush() {
@@ -303,8 +304,8 @@ void Brush::SetColor(ARGB color) {
 
 
 void Brush::SetImage(ID2D1RenderTarget* renderTarget, LPCSTR path) {
-    free(this->brushSettings->image);
-    this->brushSettings->image = _strdup(path);
+    this->brushSettings->image = StringUtils::ReallocOverwrite(this->brushSettings->image, path);
+
     if (this->brushType == Image && renderTarget) {
         ID2D1Brush *tempBrush;
         if (SUCCEEDED(LoadImageFile(renderTarget, path, &tempBrush))) {
