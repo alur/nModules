@@ -85,10 +85,7 @@ void TaskButton::SetIcon(HICON icon) {
     this->window->RemoveOverlay(this->icon);
     this->icon.mValid = false;
     if (icon != nullptr) {
-        D2D1_RECT_F f = { (float)this->iconSettings->GetInt("X", 2), (float)this->iconSettings->GetInt("Y", 2),
-            (float)this->iconSettings->GetInt("Width", 32) + (float)this->iconSettings->GetInt("X", 2),
-            (float)this->iconSettings->GetInt("Height", 32)+ (float)this->iconSettings->GetInt("Y", 2) };
-        this->icon = this->window->AddOverlay(f, icon, 10);
+        this->icon = this->window->AddOverlay(mIconRect, icon, 10);
         this->window->Repaint();
     }
 }
@@ -102,10 +99,7 @@ void TaskButton::SetOverlayIcon(HICON overlayIcon) {
     this->window->RemoveOverlay(this->iconOverlay);
     this->iconOverlay.mValid = false;
     if (overlayIcon != nullptr) {
-        D2D1_RECT_F f = { (float)this->iconSettings->GetInt("X", 2), (float)this->iconSettings->GetInt("Y", 2),
-            (float)this->iconSettings->GetInt("Width", 32) + (float)this->iconSettings->GetInt("X", 2),
-            (float)this->iconSettings->GetInt("Height", 32)+ (float)this->iconSettings->GetInt("Y", 2) };
-        this->iconOverlay = this->window->AddOverlay(f, overlayIcon, 20);
+        this->iconOverlay = this->window->AddOverlay(mIconRect, overlayIcon, 20);
         this->window->Repaint();
     }
 }
@@ -127,6 +121,10 @@ void TaskButton::LoadSettings(bool /* bIsRefresh */) {
     this->useFlashing = this->settings->GetBool("UseFlashing", true);
     this->flashInterval = this->settings->GetInt("FlashInterval", 500);
     mNoIcons = this->settings->GetBool("NoIcons", false);
+    float iconSize = this->iconSettings->GetFloat("size", 32);
+    float iconX = this->iconSettings->GetFloat("X", 2);
+    float iconY = this->iconSettings->GetFloat("Y", 2);
+    mIconRect = D2D1::RectF(iconX, iconY, iconX + iconSize, iconY + iconSize);
 }
 
 

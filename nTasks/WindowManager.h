@@ -14,10 +14,23 @@ namespace WindowManager {
     /// Holds all information about a particular top level window.
     /// </summary>
     typedef struct WindowInformation {
+        // The monitor this window is currently on
         UINT uMonitor;
+
+        // Pointers to the buttons that represent this window
         vector<TaskButton*> buttons;
+
+        // The main icon of the window
         HICON hIcon;
+
+        // Any overlay icon
         HICON hOverlayIcon;
+
+        // The progress state of the window
+        TBPFLAG progressState;
+
+        // If the progress is determinate, how far along we are
+        USHORT progress;
     } WindowInformation;
 
     // Some helpful typedefs

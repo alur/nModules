@@ -411,9 +411,13 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         }
 
     case LM_TASKSETOVERLAYICON:
-        {
-            SetOverlayIcon((HWND) wParam, (HICON) lParam);
-        }
+        SetOverlayIcon((HWND) wParam, (HICON) lParam);
+        return 0;
+
+    case LM_TASKSETPROGRESSSTATE:
+        return 0;
+
+    case LM_TASKSETPROGRESSVALUE:
         return 0;
         
         // 
