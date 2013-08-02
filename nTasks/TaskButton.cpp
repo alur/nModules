@@ -19,11 +19,10 @@
 /// </summary>
 TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, "Button") {
     //
+    this->iconSettings = this->settings->CreateChild("Icon");
     LoadSettings();
 
     this->watchedWindow = watchedWindow;
-
-    this->iconSettings = this->settings->CreateChild("Icon");
 
     //
     StateSettings stateDefaults;
@@ -84,6 +83,10 @@ void TaskButton::SetIcon(HICON icon) {
 
     this->window->RemoveOverlay(this->icon);
     this->icon.mValid = false;
+    
+    if (icon == nullptr) {
+        icon = LoadIcon(NULL, IDI_APPLICATION);
+    }
     if (icon != nullptr) {
         this->icon = this->window->AddOverlay(mIconRect, icon, 10);
         this->window->Repaint();
@@ -99,7 +102,7 @@ void TaskButton::SetOverlayIcon(HICON overlayIcon) {
     this->window->RemoveOverlay(this->iconOverlay);
     this->iconOverlay.mValid = false;
     if (overlayIcon != nullptr) {
-        this->iconOverlay = this->window->AddOverlay(mIconRect, overlayIcon, 20);
+        this->iconOverlay = this->window->AddOverlay(mOverlayIconRect, overlayIcon, 20);
         this->window->Repaint();
     }
 }
@@ -121,10 +124,21 @@ void TaskButton::LoadSettings(bool /* bIsRefresh */) {
     this->useFlashing = this->settings->GetBool("UseFlashing", true);
     this->flashInterval = this->settings->GetInt("FlashInterval", 500);
     mNoIcons = this->settings->GetBool("NoIcons", false);
-    float iconSize = this->iconSettings->GetFloat("size", 32);
+
+    float iconSize = this->iconSettings->GetFloat("Size", 32);
     float iconX = this->iconSettings->GetFloat("X", 2);
     float iconY = this->iconSettings->GetFloat("Y", 2);
     mIconRect = D2D1::RectF(iconX, iconY, iconX + iconSize, iconY + iconSize);
+
+    float overlayIconSize = this->iconSettings->GetFloat("OverlaySize", 16);
+    float overlayIconOffsetX = this->iconSettings->GetFloat("OverlayOffsetX", 2);
+    float overlayIconOffsetY = this->iconSettings->GetFloat("OverlayOffsetY", 2);
+
+    mOverlayIconRect = D2D1::RectF(
+        iconX + iconSize - overlayIconSize + overlayIconOffsetX,
+        iconY + iconSize - overlayIconSize + overlayIconOffsetY,
+        iconX + iconSize + overlayIconOffsetX,
+        iconY + iconSize + overlayIconOffsetY);
 }
 
 

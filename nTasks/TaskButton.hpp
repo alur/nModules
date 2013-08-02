@@ -74,6 +74,7 @@ private:
     //
     bool mNoIcons;
     D2D1_RECT_F mIconRect;
+    D2D1_RECT_F mOverlayIconRect;
 
     EnumArray<DrawableWindow::STATE, State> mStates;
 
