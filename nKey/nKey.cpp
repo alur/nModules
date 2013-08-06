@@ -138,7 +138,7 @@ void LoadVKeyTable() {
                 if (szCode[0] != '\0' && *endPtr == '\0') {
                     // Store the name in the heap
                     size_t size = _tcslen(szName)+1;
-                    LPTSTR pszHeap = (LPTSTR)malloc(size);
+                    LPTSTR pszHeap = (LPTSTR)malloc(size*sizeof(wchar_t));
                     _tcscpy_s(pszHeap, size, szName);
 
                     // Insert it into the map
@@ -217,7 +217,7 @@ bool AddHotkey(UINT mods, UINT key, LPCTSTR pszCommand) {
 
     // Store the command in the heap
     size_t size = _tcslen(pszCommand)+1;
-    LPTSTR pszCommandHeap = (LPTSTR)malloc(size);
+    LPTSTR pszCommandHeap = (LPTSTR)malloc(size*sizeof(wchar_t));
     _tcscpy_s(pszCommandHeap, size, pszCommand);
 
     // Add the hotkey definition
