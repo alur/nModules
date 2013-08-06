@@ -20,8 +20,10 @@
 /// <param name="module">A handle to the DLL module.</param>
 /// <param name="reasonForCall">The reason code that indicates why the DLL entry-point function is being called.</param>
 /// <returns>TRUE on success, FALSE on failure.</returns>
-BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */) {
-    if (reasonForCall == DLL_PROCESS_ATTACH) {
+BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */)
+{
+    if (reasonForCall == DLL_PROCESS_ATTACH)
+    {
         DisableThreadLibraryCalls((HINSTANCE)module);
     }
     return TRUE;
@@ -34,13 +36,14 @@ BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */)
 /// <param name="moduleName">The name of this module, used for handling LM_GETREVID and window classes.</param>
 /// <param name="author">Name of the author(s), used for handling LM_GETREVID.</param>
 /// <param name="version">The version of the module, used for handling LM_GETREVID.</param>
-LSModule::LSModule(LPCSTR moduleName, LPCSTR author, VERSION version) {
-    this->author = _strdup(author);
+LSModule::LSModule(LPCTSTR moduleName, LPCTSTR author, VERSION version)
+{
+    this->author = _tcsdup(author);
     this->drawableClass = 0;
     this->instance = instance;
     this->messageHandler = nullptr;
     this->messageHandlerClass = 0;
-    this->moduleName = _strdup(moduleName);
+    this->moduleName = _tcsdup(moduleName);
     this->parent = parent;
     this->version = version;
 
@@ -51,20 +54,24 @@ LSModule::LSModule(LPCSTR moduleName, LPCSTR author, VERSION version) {
 /// <summary>
 /// Destructor. Frees allocated resources.
 /// </summary>
-LSModule::~LSModule() {
+LSModule::~LSModule()
+{
     // Destroy the message handler.
-    if (this->messageHandler != nullptr) {
+    if (this->messageHandler != nullptr)
+    {
         DestroyWindow(this->messageHandler);
         this->messageHandler = nullptr;
     }
 
     // Unregister window classes.
-    if (this->messageHandlerClass != 0) {
-        UnregisterClass((LPCSTR)this->messageHandlerClass, this->instance);
+    if (this->messageHandlerClass != 0)
+    {
+        UnregisterClass((LPCTSTR)this->messageHandlerClass, this->instance);
         this->messageHandlerClass = 0;
     }
-    if (this->drawableClass != 0) {
-        UnregisterClass((LPCSTR)this->drawableClass, this->instance);
+    if (this->drawableClass != 0)
+    {
+        UnregisterClass((LPCTSTR)this->drawableClass, this->instance);
         this->drawableClass = 0;
     }
 
@@ -84,9 +91,10 @@ LSModule::~LSModule() {
 /// <param name="instance">The instance of this module.</param>
 /// <param name="customMessageClass">Custom window class to use for the message handler.</param>
 /// <param name="customDrawableClass">Custom window class to use for the drawable window.</param>
-bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMessageClass, PWNDCLASSEX customDrawableClass) {
+bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMessageClass, PWNDCLASSEX customDrawableClass)
+{
     WNDCLASSEX wc;
-    char className[MAX_PATH];
+    TCHAR className[MAX_PATH];
 
     this->parent = parent;
     this->instance = instance;
@@ -94,7 +102,7 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
     CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
     // Register the messageHandler window class
-    StringCchPrintf(className, sizeof(className), "LS%sMessageHandler", this->moduleName);
+    StringCchPrintf(className, _countof(className), _T("LS%sMessageHandler"), this->moduleName);
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.hInstance = this->instance;
@@ -110,22 +118,24 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
         MessageHandler::FixWindowClass(customDrawableClass);
     }
 
-    if ((this->messageHandlerClass = RegisterClassEx(customMessageClass == NULL ? &wc : customMessageClass)) == 0) {
+    if ((this->messageHandlerClass = RegisterClassEx(customMessageClass == NULL ? &wc : customMessageClass)) == 0)
+    {
         return false;
     }
 
     // Register the drawable window class
-    StringCchPrintf(className, sizeof(className), "LS%sDrawable", this->moduleName);
+    StringCchPrintf(className, _countof(className), _T("LS%sDrawable"), this->moduleName);
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.style |= CS_DBLCLKS;
 
-    if ((this->drawableClass = RegisterClassEx(customDrawableClass == NULL ? &wc : customDrawableClass)) == 0) {
+    if ((this->drawableClass = RegisterClassEx(customDrawableClass == NULL ? &wc : customDrawableClass)) == 0)
+    {
         return false;
     }
 
     // Create the main window.
     if ((this->messageHandler = MessageHandler::CreateMessageWindowEx(WS_EX_TOOLWINDOW | WS_EX_COMPOSITED,
-        (LPCSTR)this->messageHandlerClass, "", WS_POPUP, 0, 0, 0, 0, this->parent, NULL, this->instance, this)) == NULL)
+        (LPCTSTR)this->messageHandlerClass, _T(""), WS_POPUP, 0, 0, 0, 0, this->parent, NULL, this->instance, this)) == NULL)
     {
         return false;
     }
@@ -138,7 +148,8 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
 /// <summary>
 /// Deinitalizes
 /// </summary>
-void LSModule::DeInitalize() {
+void LSModule::DeInitalize()
+{
     // Let go of any factories we allocated.
     Factories::Release();
 
@@ -151,8 +162,10 @@ void LSModule::DeInitalize() {
 /// Tries to connect to nCore.
 /// </summary>
 /// <param name="minimumCoreVersion">The minimum core version which is acceptable.</param>
-bool LSModule::ConnectToCore(VERSION minimumCoreVersion) {
-    switch (nCore::Connect(minimumCoreVersion)) {
+bool LSModule::ConnectToCore(VERSION minimumCoreVersion)
+{
+    switch (nCore::Connect(minimumCoreVersion))
+    {
     case S_OK:
         break;
     default:
@@ -168,17 +181,20 @@ bool LSModule::ConnectToCore(VERSION minimumCoreVersion) {
 /// Creates a top-level drawable window.
 /// </summary>
 /// <param name="settings">The settings structure to use.</param>
-DrawableWindow* LSModule::CreateDrawableWindow(Settings* settings, MessageHandler* msgHandler) {
-    return new DrawableWindow(this->parent, (LPCSTR)this->drawableClass, this->instance, settings, msgHandler);
+DrawableWindow* LSModule::CreateDrawableWindow(Settings* settings, MessageHandler* msgHandler)
+{
+    return new DrawableWindow(this->parent, (LPCTSTR)this->drawableClass, this->instance, settings, msgHandler);
 }
 
 
-HWND LSModule::GetMessageWindow() {
+HWND LSModule::GetMessageWindow()
+{
     return this->messageHandler;
 }
 
 
-HINSTANCE LSModule::GetInstance() {
+HINSTANCE LSModule::GetInstance()
+{
     return this->instance;
 }
 
@@ -186,17 +202,19 @@ HINSTANCE LSModule::GetInstance() {
 /// <summary>
 /// Intercepts LiteStep messages before the module can get to them.
 /// </summary>
-LRESULT WINAPI LSModule::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
-    switch (message) {
+LRESULT WINAPI LSModule::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID)
+{
+    switch (message)
+    {
     case LM_GETREVID:
         {
             size_t length;
             LSModule* lsModule = (LSModule*)GetWindowLongPtr(window, 0);
-            StringCchPrintf((LPSTR)lParam, 64, "%s: ", lsModule->moduleName);
-			length = strlen((LPSTR)lParam);
-            GetVersionString(lsModule->version, (LPSTR)lParam + length, 64 - length, false);
+            StringCchPrintf((LPTSTR)lParam, 64, _T("%s: "), lsModule->moduleName);
+			length = _tcslen((LPTSTR)lParam);
+            GetVersionString(lsModule->version, (LPTSTR)lParam + length, 64 - length, false);
             
-            if (SUCCEEDED(StringCchLength((LPSTR)lParam, 64, &length))) {
+            if (SUCCEEDED(StringCchLength((LPTSTR)lParam, 64, &length))) {
                 return length;
             }
 

@@ -34,7 +34,7 @@ namespace WindowManager {
     } WindowInformation;
 
     // Some helpful typedefs
-    typedef map<std::string, Taskbar*>::const_iterator TASKBARCITER;
+    typedef map<std::tstring, Taskbar*>::const_iterator TASKBARCITER;
     typedef map<HWND, WindowInformation>::const_iterator WNDMAPCITER;
     typedef map<HWND, WindowInformation>::iterator WNDMAPITER;
 

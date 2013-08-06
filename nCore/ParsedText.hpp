@@ -23,7 +23,8 @@ EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
 EXPORT_CDECL(BOOL) DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs);
 
 // All data used for a dynamic text function.
-typedef struct {
+struct FormatterData
+{
     // Callback function, or NULL if this function is not registered at this point.
     FORMATTINGPROC proc;
 
@@ -32,13 +33,14 @@ typedef struct {
     
     // All IParsedText objects which currently use this function.
     set<IParsedText*> users;
-} FormatterData;
+};
 
 // The map type used to store the dynamic text functions.
 typedef map<pair<wstring, UCHAR>, FormatterData> FUNCMAP;
 
 
-class ParsedText : public IParsedText {
+class ParsedText : public IParsedText
+{
 public:
     explicit ParsedText(LPCWSTR text);
     virtual ~ParsedText();
@@ -51,17 +53,19 @@ public:
     void DataChanged();
 
 private:
-    enum TokenType {
+    enum TokenType
+    {
         TEXT,
         EXPRESSION
     };
 
-    typedef struct {
+    struct Token
+    {
         TokenType type;
         FUNCMAP::iterator proc;
         LPCWSTR text;
         LPWSTR* args;
-    } Token;
+    };
 
     // Parses text and pushes its tokens onto the end of the string.
     void Parse(LPCWSTR text);

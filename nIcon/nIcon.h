@@ -9,4 +9,4 @@
 
 void LoadSettings();
 void Refresh();
-void CreateGroup(LPCSTR groupName);
+void CreateGroup(LPCTSTR groupName);

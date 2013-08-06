@@ -14,7 +14,7 @@
 
 class State : public IPainter, public IBrushOwner {
 public:
-    explicit State(LPCSTR stateName, Settings *settings, int defaultPriority, LPCWSTR *text);
+    explicit State(LPCTSTR stateName, Settings *settings, int defaultPriority, LPCWSTR *text);
     virtual ~State();
 
     void Load(StateSettings* defaultSettings);
@@ -32,7 +32,7 @@ public:
 
     // IBrushOwner
 public:
-    Brush *GetBrush(LPCSTR name) override;
+    Brush *GetBrush(LPCTSTR name) override;
 
 public:
     void SetCornerRadiusX(float radius);
@@ -56,7 +56,7 @@ public:
     bool active;
 
     // The name of this state.
-    LPCSTR mName;
+    LPCTSTR mName;
 
     // Settings.
     Settings* settings;

@@ -16,23 +16,23 @@
 using std::map;
 
 // The LSModule class
-LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
+LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
 UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
     LM_FULLSCREENDEACTIVATED, 0 };
 
 // All the top-level labels we currently have loaded
-map<string, Label*> g_TopLevelLabels;
+map<tstring, Label*> g_TopLevelLabels;
 
 // All the labels we currently have loaded. Labels add and remove themselfs from this list.
-map<string, Label*> g_AllLabels;
+map<tstring, Label*> g_AllLabels;
 
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
+EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */) {
     if (!gLSModule.Initialize(parent, instance)) {
         return 1;
     }
@@ -112,14 +112,10 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// <summary>
 /// Reads through the .rc files and creates labels.
 /// </summary>
-void LoadSettings() {
-    char szLine[MAX_LINE_LENGTH], szLabel[256];
-    LPSTR szTokens[] = { szLabel };
-    LPVOID f = LiteStep::LCOpen(NULL);
-
-    while (LiteStep::LCReadNextConfig(f, "*nLabel", szLine, sizeof(szLine))) {
-        LiteStep::LCTokenize(szLine+strlen("*nLabel")+1, szTokens, 1, NULL);
-        g_TopLevelLabels.insert(g_TopLevelLabels.begin(), std::pair<string, Label*>(string(szLabel), new Label(szLabel)));
-    }
-    LiteStep::LCClose(f);
+void LoadSettings()
+{
+    LiteStep::IterateOverLineTokens(_T("*nLabel"), [] (LPCTSTR token) -> void
+    {
+        g_TopLevelLabels.insert(g_TopLevelLabels.begin(), std::pair<tstring, Label*>(token, new Label(token)));
+    });
 }

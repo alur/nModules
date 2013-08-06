@@ -9,7 +9,8 @@
 
 #define GWLP_MESSAGEHANDLER 0
 
-class MessageHandler {
+class MessageHandler
+{
 public:
     // Fixes up values.
     static void FixWindowClass(LPWNDCLASSEX ex);
@@ -22,7 +23,7 @@ public:
     virtual LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID extra) = 0;
 
     // True if this object is ready to receive messages.
-    bool initialized;
+    bool mInitialized;
 
 private:
     // Forwards messages to the appropriate msghandler. 
@@ -30,5 +31,4 @@ private:
 
     // Forwards messages to the appropriate msghandler. 
     static LRESULT WINAPI WindowProcedureInit(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
-
 };

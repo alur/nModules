@@ -11,15 +11,14 @@
 #include "../nShared/LSModule.hpp"
 #include "Taskbar.hpp"
 #include "TaskButton.hpp"
-#include "../nShared/Debugging.h"
 
 
 /// <summary>
 /// Constructor
 /// </summary>
-TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, "Button") {
+TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, _T("Button")) {
     //
-    this->iconSettings = this->settings->CreateChild("Icon");
+    this->iconSettings = mSettings->CreateChild(_T("Icon"));
     LoadSettings();
 
     this->watchedWindow = watchedWindow;
@@ -30,18 +29,18 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
     stateDefaults.textOffsetLeft = 36;
     stateDefaults.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
 
-    this->window->Initialize(nullptr, &stateDefaults);
+    mWindow->Initialize(nullptr, &stateDefaults);
 
     // Add states to the window
-    mStates[State::Minimized] = this->window->AddState("Minimized", 25, &stateDefaults);
-    mStates[State::Flashing] = this->window->AddState("Flashing", 50, &stateDefaults);
-    mStates[State::MinimizedFlashing] = this->window->AddState("MinimizedFlashing", 75, &stateDefaults, &mStates[State::Flashing]);
-    mStates[State::Active] = this->window->AddState("Active", 100, &stateDefaults);
-    mStates[State::Hover] = this->window->AddState("Hover", 125, &stateDefaults);
-    mStates[State::MinimizedHover] = this->window->AddState("MinimizedHover", 150, &stateDefaults, &mStates[State::Hover]);
-    mStates[State::ActiveHover] = this->window->AddState("ActiveHover", 175, &stateDefaults, &mStates[State::Active]);
-    mStates[State::FlashingHover] = this->window->AddState("FlashingHover", 200, &stateDefaults, &mStates[State::Flashing]);
-    mStates[State::MinimizedFlashingHover] = this->window->AddState("MinimizedFlashingHover", 225, &stateDefaults, &mStates[State::FlashingHover]);
+    mStates[State::Minimized] = mWindow->AddState(_T("Minimized"), 25, &stateDefaults);
+    mStates[State::Flashing] = mWindow->AddState(_T("Flashing"), 50, &stateDefaults);
+    mStates[State::MinimizedFlashing] = mWindow->AddState(_T("MinimizedFlashing"), 75, &stateDefaults, &mStates[State::Flashing]);
+    mStates[State::Active] = mWindow->AddState(_T("Active"), 100, &stateDefaults);
+    mStates[State::Hover] = mWindow->AddState(_T("Hover"), 125, &stateDefaults);
+    mStates[State::MinimizedHover] = mWindow->AddState(_T("MinimizedHover"), 150, &stateDefaults, &mStates[State::Hover]);
+    mStates[State::ActiveHover] = mWindow->AddState(_T("ActiveHover"), 175, &stateDefaults, &mStates[State::Active]);
+    mStates[State::FlashingHover] = mWindow->AddState(_T("FlashingHover"), 200, &stateDefaults, &mStates[State::Flashing]);
+    mStates[State::MinimizedFlashingHover] = mWindow->AddState(_T("MinimizedFlashingHover"), 225, &stateDefaults, &mStates[State::FlashingHover]);
 
     // Initalize variables
     this->mouseIsOver = false;
@@ -68,7 +67,7 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
 /// </summary>
 TaskButton::~TaskButton() {
     if (this->isFlashing) {
-        this->window->ClearCallbackTimer(this->flashTimer);
+        mWindow->ClearCallbackTimer(this->flashTimer);
     }
 }
 
@@ -81,15 +80,15 @@ void TaskButton::SetIcon(HICON icon) {
         return;
     }
 
-    this->window->RemoveOverlay(this->icon);
+    mWindow->RemoveOverlay(this->icon);
     this->icon.mValid = false;
     
     if (icon == nullptr) {
         icon = LoadIcon(NULL, IDI_APPLICATION);
     }
     if (icon != nullptr) {
-        this->icon = this->window->AddOverlay(mIconRect, icon, 10);
-        this->window->Repaint();
+        this->icon = mWindow->AddOverlay(mIconRect, icon, 10);
+        mWindow->Repaint();
     }
 }
 
@@ -99,11 +98,11 @@ void TaskButton::SetOverlayIcon(HICON overlayIcon) {
         return;
     }
     
-    this->window->RemoveOverlay(this->iconOverlay);
+    mWindow->RemoveOverlay(this->iconOverlay);
     this->iconOverlay.mValid = false;
     if (overlayIcon != nullptr) {
-        this->iconOverlay = this->window->AddOverlay(mOverlayIconRect, overlayIcon, 20);
-        this->window->Repaint();
+        this->iconOverlay = mWindow->AddOverlay(mOverlayIconRect, overlayIcon, 20);
+        mWindow->Repaint();
     }
 }
 
@@ -112,8 +111,8 @@ void TaskButton::SetOverlayIcon(HICON overlayIcon) {
 /// Sets the text of this button.
 /// </summary>
 void TaskButton::SetText(LPCWSTR title) {
-    this->window->SetText(title);
-    this->window->Repaint();
+    mWindow->SetText(title);
+    mWindow->Repaint();
 }
 
 
@@ -121,18 +120,18 @@ void TaskButton::SetText(LPCWSTR title) {
 /// Loads RC settings for task buttons.
 /// </summary>
 void TaskButton::LoadSettings(bool /* bIsRefresh */) {
-    this->useFlashing = this->settings->GetBool("UseFlashing", true);
-    this->flashInterval = this->settings->GetInt("FlashInterval", 500);
-    mNoIcons = this->settings->GetBool("NoIcons", false);
+    this->useFlashing = mSettings->GetBool(_T("UseFlashing"), true);
+    this->flashInterval = mSettings->GetInt(_T("FlashInterval"), 500);
+    mNoIcons = mSettings->GetBool(_T("NoIcons"), false);
 
-    float iconSize = this->iconSettings->GetFloat("Size", 32);
-    float iconX = this->iconSettings->GetFloat("X", 2);
-    float iconY = this->iconSettings->GetFloat("Y", 2);
+    float iconSize = this->iconSettings->GetFloat(_T("Size"), 32);
+    float iconX = this->iconSettings->GetFloat(_T("X"), 2);
+    float iconY = this->iconSettings->GetFloat(_T("Y"), 2);
     mIconRect = D2D1::RectF(iconX, iconY, iconX + iconSize, iconY + iconSize);
 
-    float overlayIconSize = this->iconSettings->GetFloat("OverlaySize", 16);
-    float overlayIconOffsetX = this->iconSettings->GetFloat("OverlayOffsetX", 2);
-    float overlayIconOffsetY = this->iconSettings->GetFloat("OverlayOffsetY", 2);
+    float overlayIconSize = this->iconSettings->GetFloat(_T("OverlaySize"), 16);
+    float overlayIconOffsetX = this->iconSettings->GetFloat(_T("OverlayOffsetX"), 1);
+    float overlayIconOffsetY = this->iconSettings->GetFloat(_T("OverlayOffsetY"), 1);
 
     mOverlayIconRect = D2D1::RectF(
         iconX + iconSize - overlayIconSize + overlayIconOffsetX,
@@ -146,7 +145,7 @@ void TaskButton::LoadSettings(bool /* bIsRefresh */) {
 /// Moves and resizes the taaskbutton.
 /// </summary>
 void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
-    this->window->SetPosition(x, y, width, height);
+    mWindow->SetPosition(x, y, width, height);
 }
 
 
@@ -163,7 +162,7 @@ void TaskButton::Activate() {
     if (this->isFlashing) {
         SetFlashingState(false);
         this->flashOn = false;
-        this->window->ClearCallbackTimer(this->flashTimer);
+        mWindow->ClearCallbackTimer(this->flashTimer);
         this->isFlashing = false;
     }
 }
@@ -175,21 +174,21 @@ void TaskButton::Activate() {
 void TaskButton::SetFlashingState(bool value) {
     if (value) {
         if (mStates[State::Hover]->active && mStates[State::Minimized]->active) {
-            this->window->ActivateState(mStates[State::MinimizedFlashingHover]);
+            mWindow->ActivateState(mStates[State::MinimizedFlashingHover]);
         }
         if (mStates[State::Minimized]->active) {
-            this->window->ActivateState(mStates[State::MinimizedFlashing]);
+            mWindow->ActivateState(mStates[State::MinimizedFlashing]);
         }
         if (mStates[State::Hover]->active) {
-            this->window->ActivateState(mStates[State::FlashingHover]);
+            mWindow->ActivateState(mStates[State::FlashingHover]);
         }
-        this->window->ActivateState(mStates[State::Flashing]);
+        mWindow->ActivateState(mStates[State::Flashing]);
     }
     else {
-        this->window->ClearState(mStates[State::Flashing]);
-        this->window->ClearState(mStates[State::MinimizedFlashing]);
-        this->window->ClearState(mStates[State::FlashingHover]);
-        this->window->ClearState(mStates[State::MinimizedFlashingHover]);
+        mWindow->ClearState(mStates[State::Flashing]);
+        mWindow->ClearState(mStates[State::MinimizedFlashing]);
+        mWindow->ClearState(mStates[State::FlashingHover]);
+        mWindow->ClearState(mStates[State::MinimizedFlashingHover]);
     }
 }
 
@@ -200,13 +199,13 @@ void TaskButton::SetFlashingState(bool value) {
 void TaskButton::SetActiveState(bool value) {
     if (value) {
         if (mStates[State::Hover]->active) {
-            this->window->ActivateState(mStates[State::ActiveHover]);
+            mWindow->ActivateState(mStates[State::ActiveHover]);
         }
-        this->window->ActivateState(mStates[State::Active]);
+        mWindow->ActivateState(mStates[State::Active]);
     }
     else {
-        this->window->ClearState(mStates[State::Active]);
-        this->window->ClearState(mStates[State::ActiveHover]);
+        mWindow->ClearState(mStates[State::Active]);
+        mWindow->ClearState(mStates[State::ActiveHover]);
     }
 }
 
@@ -217,21 +216,21 @@ void TaskButton::SetActiveState(bool value) {
 void TaskButton::SetHoverState(bool value) {
     if (value) {
         if (mStates[State::Minimized]->active && mStates[State::Flashing]->active) {
-            this->window->ActivateState(mStates[State::MinimizedFlashingHover]);
+            mWindow->ActivateState(mStates[State::MinimizedFlashingHover]);
         }
         if (mStates[State::Flashing]->active) {
-            this->window->ActivateState(mStates[State::FlashingHover]);
+            mWindow->ActivateState(mStates[State::FlashingHover]);
         }
         if (mStates[State::Minimized]->active) {
-            this->window->ActivateState(mStates[State::MinimizedHover]);
+            mWindow->ActivateState(mStates[State::MinimizedHover]);
         }
-        this->window->ActivateState(mStates[State::Hover]);
+        mWindow->ActivateState(mStates[State::Hover]);
     }
     else {
-        this->window->ClearState(mStates[State::Hover]);
-        this->window->ClearState(mStates[State::MinimizedHover]);
-        this->window->ClearState(mStates[State::FlashingHover]);
-        this->window->ClearState(mStates[State::MinimizedFlashingHover]);
+        mWindow->ClearState(mStates[State::Hover]);
+        mWindow->ClearState(mStates[State::MinimizedHover]);
+        mWindow->ClearState(mStates[State::FlashingHover]);
+        mWindow->ClearState(mStates[State::MinimizedFlashingHover]);
     }
 }
 
@@ -242,21 +241,21 @@ void TaskButton::SetHoverState(bool value) {
 void TaskButton::SetMinmizedState(bool value) {
     if (value) {
         if (mStates[State::Hover]->active && mStates[State::Flashing]->active) {
-            this->window->ActivateState(mStates[State::MinimizedFlashingHover]);
+            mWindow->ActivateState(mStates[State::MinimizedFlashingHover]);
         }
         if (mStates[State::Hover]->active) {
-            this->window->ActivateState(mStates[State::MinimizedHover]);
+            mWindow->ActivateState(mStates[State::MinimizedHover]);
         }
         if (mStates[State::Flashing]->active) {
-            this->window->ActivateState(mStates[State::MinimizedFlashing]);
+            mWindow->ActivateState(mStates[State::MinimizedFlashing]);
         }
-        this->window->ActivateState(mStates[State::Minimized]);
+        mWindow->ActivateState(mStates[State::Minimized]);
     }
     else {
-        this->window->ClearState(mStates[State::Minimized]);
-        this->window->ClearState(mStates[State::MinimizedFlashing]);
-        this->window->ClearState(mStates[State::MinimizedHover]);
-        this->window->ClearState(mStates[State::MinimizedFlashingHover]);
+        mWindow->ClearState(mStates[State::Minimized]);
+        mWindow->ClearState(mStates[State::MinimizedFlashing]);
+        mWindow->ClearState(mStates[State::MinimizedHover]);
+        mWindow->ClearState(mStates[State::MinimizedFlashingHover]);
     }
 }
 
@@ -277,7 +276,7 @@ void TaskButton::Flash() {
         this->isFlashing = true;
         this->flashOn = true;
         SetFlashingState(true);
-        this->flashTimer = this->window->SetCallbackTimer(this->flashInterval, this);
+        this->flashTimer = mWindow->SetCallbackTimer(this->flashInterval, this);
     }
 }
 
@@ -286,7 +285,7 @@ void TaskButton::Flash() {
 /// Shows this button.
 /// </summary>
 void TaskButton::Show() {
-    this->window->Show();
+    mWindow->Show();
 }
 
 
@@ -314,7 +313,7 @@ void TaskButton::ShowMenu() {
     POINT pt;
     GetCursorPos(&pt);
     
-    int command = TrackPopupMenu(this->menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, this->window->GetWindowHandle(), NULL);
+    int command = TrackPopupMenu(this->menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, mWindow->GetWindowHandle(), NULL);
     if (command != 0) {
         PostMessage(this->watchedWindow, WM_SYSCOMMAND, (WPARAM)command, MAKELPARAM(pt.x, pt.y));
     }
@@ -326,7 +325,7 @@ void TaskButton::ShowMenu() {
 /// </summary>
 void TaskButton::GetMinRect(LPPOINTS lpPoints) {
     RECT r;
-    this->window->GetScreenRect(&r);
+    mWindow->GetScreenRect(&r);
     lpPoints[0].x = (short)r.left;
     lpPoints[0].y = (short)r.top;
     lpPoints[1].x = (short)r.right;
@@ -351,7 +350,7 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
             else {
                 SetForegroundWindow(this->watchedWindow);
             }
-            ((Taskbar*)this->parent)->HideThumbnail();
+            ((Taskbar*)mParent)->HideThumbnail();
         }
         return 0;
 
@@ -369,8 +368,8 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                 SetHoverState(true);
 
                 RECT r;
-                this->window->GetScreenRect(&r);
-                ((Taskbar*)this->parent)->ShowThumbnail(this->watchedWindow, &r);
+                mWindow->GetScreenRect(&r);
+                ((Taskbar*)mParent)->ShowThumbnail(this->watchedWindow, &r);
             }
         }
         return 0;
@@ -379,7 +378,7 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
         {
             this->mouseIsOver = false;
             SetHoverState(false);
-            ((Taskbar*)this->parent)->HideThumbnail();
+            ((Taskbar*)mParent)->HideThumbnail();
         }
         return 0;
 
@@ -391,7 +390,7 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                     SetFlashingState(this->flashOn);
                 }
                 else {
-                    this->window->ClearCallbackTimer(this->flashTimer);
+                    mWindow->ClearCallbackTimer(this->flashTimer);
                 }
             }
         }

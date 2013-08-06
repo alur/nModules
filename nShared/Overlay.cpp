@@ -6,10 +6,8 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "LiteStep.h"
-#include "Debugging.h"
 #include "Overlay.hpp"
 #include "Factories.h"
-#include "Macros.h"
 #include <d2d1.h>
 #include <Wincodec.h>
 

@@ -12,33 +12,30 @@
 #include "Popup.hpp"
 
 
-CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, LPCSTR customIcon) : PopupItem(parent, "Item") {
+CommandItem::CommandItem(Drawable* parent, LPCTSTR title, LPCTSTR command, LPCTSTR customIcon) : PopupItem(parent, L"Item") {
     Init(title, command);
     ParseDotIcon(customIcon);
-    this->window->Show();
+    mWindow->Show();
 }
 
 
-CommandItem::CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, HICON icon) : PopupItem(parent, "Item") {
+CommandItem::CommandItem(Drawable* parent, LPCTSTR title, LPCTSTR command, HICON icon) : PopupItem(parent, L"Item") {
     Init(title, command);
     if (icon != NULL) {
         AddIcon(icon);
     }
-    this->window->Show();
+    mWindow->Show();
 }
 
 
-void CommandItem::Init(LPCSTR title, LPCSTR command) {
-    WCHAR titleWide[MAX_LINE_LENGTH];
-
-    this->title = _strdup(title);
-    this->command = _strdup(command);
+void CommandItem::Init(LPCTSTR title, LPCTSTR command) {
+    this->title = _tcsdup(title);
+    this->command = _tcsdup(command);
     this->itemType = PopupItemType::COMMAND;
 
     DrawableSettings defaults;
     defaults.width = 190;
     defaults.height = 20;
-    MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, titleWide, MAX_LINE_LENGTH);
 
     StateSettings defaultState;
     defaultState.backgroundBrush.color = 0xAAFFFF00;
@@ -47,10 +44,10 @@ void CommandItem::Init(LPCSTR title, LPCSTR command) {
     defaultState.textOffsetLeft = 20;
     defaultState.textOffsetRight = 5;
 
-    this->window->Initialize(&defaults, &defaultState);
-    this->window->SetText(titleWide);
+    mWindow->Initialize(&defaults, &defaultState);
+    mWindow->SetText(title);
 
-    this->hoverState = this->window->AddState("Hover", 100, &defaultState);
+    this->hoverState = mWindow->AddState(L"Hover", 100, &defaultState);
 }
 
 
@@ -62,7 +59,7 @@ CommandItem::~CommandItem() {
 
 int CommandItem::GetDesiredWidth(int maxWidth) {
     SIZE s;
-    this->window->GetDesiredSize(maxWidth, this->window->GetDrawingSettings()->height, &s);
+    mWindow->GetDesiredSize(maxWidth, mWindow->GetDrawingSettings()->height, &s);
     return s.cx;
 }
 
@@ -72,20 +69,20 @@ LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM 
     case WM_LBUTTONDOWN:
         {
             LiteStep::LSExecute(NULL, this->command, SW_SHOW);
-            ((Popup*)this->parent)->Close();
+            ((Popup*)mParent)->Close();
         }
         return 0;
 
     case WM_MOUSEMOVE:
         {
-            this->window->ActivateState(this->hoverState);
-            ((Popup*)this->parent)->CloseChild();
+            mWindow->ActivateState(this->hoverState);
+            ((Popup*)mParent)->CloseChild();
         }
         return 0;
 
     case WM_MOUSELEAVE:
         {
-            this->window->ClearState(this->hoverState);
+            mWindow->ClearState(this->hoverState);
         }
         return 0;
     }

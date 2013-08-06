@@ -21,8 +21,8 @@ public:
     void HandleMessage(HWND, UINT, WPARAM, LPARAM);
     void Refresh();
 
-    void AddHandler(LPCSTR);
-    void RemoveHandlers(LPCSTR);
+    void AddHandler(LPCTSTR);
+    void RemoveHandlers(LPCTSTR);
 
 private:
     enum EventType {
@@ -40,7 +40,7 @@ private:
         EventType type;
         WORD mods; // Modifier keys
         RECT area; // Region of the virtual screen where this event is valid
-        char action[MAX_LINE_LENGTH]; // Action to fire when this event occurs
+        TCHAR action[MAX_LINE_LENGTH]; // Action to fire when this event occurs
     } ClickData;
 
     vector<ClickData> m_clickHandlers;
@@ -48,9 +48,9 @@ private:
     Settings* settings;
 
     void LoadSettings(bool = false);
-    ClickData ParseLine(LPCSTR);
-    EventType TypeFromString(LPCSTR str);
-    WORD ModsFromString(LPSTR str);
+    ClickData ParseLine(LPCTSTR);
+    EventType TypeFromString(LPCTSTR str);
+    WORD ModsFromString(LPTSTR str);
     bool Matches(ClickData a, ClickData b);
 
     bool mouseOver;

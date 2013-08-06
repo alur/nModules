@@ -5,7 +5,6 @@
 *   
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "GridEffect.hpp"
-#include "../../nShared/Debugging.h"
 #include <ctime>
 #include <math.h>
 
@@ -13,12 +12,13 @@
 /// <summary>
 /// Constructor
 /// </summary>
-GridEffect::GridEffect(GridType fadeType, GridStyle gridStyle) {
+GridEffect::GridEffect(GridType fadeType, GridStyle gridStyle)
+{
     m_gridType = fadeType;
     m_gridStyle = gridStyle;
     srand((unsigned)time(NULL));
-    m_StartTimes = NULL;
-    m_Squares = NULL;
+    m_StartTimes = nullptr;
+    m_Squares = nullptr;
     m_iSquaresY = 0;
     m_iSquaresX = 0;
     m_iSquares = 0;

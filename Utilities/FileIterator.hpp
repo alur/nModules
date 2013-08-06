@@ -2,34 +2,36 @@
  *  FilterIterator.hpp
  *  The nModules Project
  *
- *  
+ *  Allows you to iterate over all files matching a certain pattern.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-class FileIterator {
+class FileIterator
+{
 public:
-    class Iterator {
+    class Iterator
+    {
     public:
         explicit Iterator();
         explicit Iterator(FileIterator*);
 
     public:
         bool operator!=(const Iterator&) const;
-        const WIN32_FIND_DATAW &operator*() const;
+        const WIN32_FIND_DATA &operator*() const;
         Iterator operator++();
 
     private:
-        bool isEnd;
-        FileIterator *fileIter;
+        bool mIsEnd;
+        FileIterator *mFileIter;
     };
 
 public:
-    explicit FileIterator(LPCWSTR path);
+    explicit FileIterator(LPCTSTR path);
     virtual ~FileIterator();
 
 public:
-    const WIN32_FIND_DATAW &GetFileData() const;
+    const WIN32_FIND_DATA &GetFileData() const;
     void NextFile();
 
 public:
@@ -37,6 +39,6 @@ public:
     Iterator end();
 
 private:
-    HANDLE findFileHandle;
-    WIN32_FIND_DATAW findFileData;
+    HANDLE mFindFileHandle;
+    WIN32_FIND_DATA mFindFileData;
 };

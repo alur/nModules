@@ -10,6 +10,6 @@
 void LoadSettings();
 void LoadHotKeys();
 void LoadVKeyTable();
-bool AddHotkey(UINT mods, UINT key, LPCSTR pszCommand);
-UINT ParseMods(LPCSTR szMods);
-UINT ParseKey(LPCSTR szKey);
+bool AddHotkey(UINT mods, UINT key, LPCTSTR pszCommand);
+UINT ParseMods(LPCTSTR szMods);
+UINT ParseKey(LPCTSTR szKey);

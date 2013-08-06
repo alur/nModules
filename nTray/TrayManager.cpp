@@ -8,14 +8,13 @@
 #include "../nShared/LiteStep.h"
 #include "Tray.hpp"
 #include "TrayManager.h"
-#include "../nShared/Debugging.h"
 #include "../Utilities/Process.h"
-#include <strsafe.h>
 #include <Shlwapi.h>
+#include <shellapi.h>
 
 
 // The various trays
-extern map<string, Tray*> g_Trays;
+extern map<std::tstring, Tray*> g_Trays;
 
 
 namespace TrayManager {

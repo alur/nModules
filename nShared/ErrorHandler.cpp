@@ -5,19 +5,19 @@
  *  Functions for dealing with errors.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../nShared/LiteStep.h"
-#include <strsafe.h>
+#include "LiteStep.h"
 #include "ErrorHandler.h"
 
 // The current global error level.
 static ErrorHandler::Level gErrorLevel = ErrorHandler::Level::Warning;
-TCHAR gModuleName[64] = TEXT("");
+static TCHAR gModuleName[64] = TEXT("");
 
 
 /// <summary>
 /// Initializes error handling.
 /// </summary>
-void ErrorHandler::Initialize(LPCTSTR moduleName) {
+void ErrorHandler::Initialize(LPCTSTR moduleName)
+{
     StringCchCopy(gModuleName, _countof(gModuleName), moduleName);
 }
 
@@ -25,7 +25,8 @@ void ErrorHandler::Initialize(LPCTSTR moduleName) {
 /// <summary>
 /// Sets the global error level.
 /// </summary>
-void ErrorHandler::SetLevel(Level level) {
+void ErrorHandler::SetLevel(Level level)
+{
     gErrorLevel = level;
 }
 
@@ -35,7 +36,8 @@ void ErrorHandler::SetLevel(Level level) {
 /// </summary>
 /// <param name="level>The error level</param>
 /// <param name="format>The message to print</param>
-void ErrorHandler::Error(Level level, LPCTSTR format, ...) {
+void ErrorHandler::Error(Level level, LPCTSTR format, ...)
+{
     TCHAR message[MAX_LINE_LENGTH];
     va_list argList;
 
@@ -43,8 +45,10 @@ void ErrorHandler::Error(Level level, LPCTSTR format, ...) {
     StringCchVPrintf(message, MAX_LINE_LENGTH, format, argList);
     va_end(argList);
 
-    if (gErrorLevel >= level) {
-        switch (level) {
+    if (gErrorLevel >= level)
+    {
+        switch (level)
+        {
         case Level::Critical:
             MessageBox(nullptr, message, TEXT("Critical"), MB_OK | MB_ICONERROR);
             break;

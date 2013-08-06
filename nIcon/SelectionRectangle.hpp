@@ -7,6 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "../Utilities/Common.h"
 #include "../nShared/IPainter.hpp"
 #include "../nShared/Brush.hpp"
 

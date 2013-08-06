@@ -7,15 +7,18 @@
 //--------------------------------------------------------------------------------------
 #include "BrushBangs.h"
 #include "LiteStep.h"
-#include <strsafe.h>
 #include "../nCoreCom/Core.h"
 
+// Used to map window name -> window
+static std::function<DrawableWindow* (LPCTSTR)> windowFinder;
 
-static std::function<DrawableWindow* (LPCSTR)> windowFinder;
 
-
-static Brush *FindBrush(LPCTSTR *args, int numArgs, DrawableWindow *&window) {
-    char buffer[MAX_RCCOMMAND];
+/// <summary>
+/// Retrieves the brush and owning window
+/// </summary>
+static Brush *FindBrush(LPCTSTR *args, int numArgs, DrawableWindow *&window)
+{
+    TCHAR buffer[MAX_RCCOMMAND];
     int numTokens = LiteStep::CommandTokenize(*args, nullptr, 0, nullptr);
 
     // Order of precedence
@@ -23,33 +26,43 @@ static Brush *FindBrush(LPCTSTR *args, int numArgs, DrawableWindow *&window) {
     // window brushowner
     // window brushowner brush
     // window brush
-    if (numTokens == numArgs + 1 || numTokens == numArgs + 2 || numTokens == numArgs + 3) {
+    if (numTokens == numArgs + 1 || numTokens == numArgs + 2 || numTokens == numArgs + 3)
+    {
         LiteStep::GetToken(*args, buffer, args, 0);
         window = windowFinder(buffer);
-        if (window) {
-            if (numTokens == numArgs + 2 || numTokens == numArgs + 3) {
+        if (window)
+        {
+            if (numTokens == numArgs + 2 || numTokens == numArgs + 3)
+            {
                 LiteStep::GetToken(*args, buffer, args, 0);
                 IBrushOwner *owner = window->GetBrushOwner(buffer);
-                if (owner) {
-                    if (numTokens == numArgs + 3) { // window brushowner brush
+                if (owner)
+                {
+                    if (numTokens == numArgs + 3) // window brushowner brush
+                    { 
                         LiteStep::GetToken(*args, buffer, args, 0);
                         return owner->GetBrush(buffer);
                     }
-                    else { // window brushowner
-                        return owner->GetBrush("");
+                    else // window brushowner
+                    { 
+                        return owner->GetBrush(_T(""));
                     }
                 }
-                else if (numTokens == numArgs + 2) { // Window Brush
-                    owner = window->GetBrushOwner("");
-                    if (owner) {
+                else if (numTokens == numArgs + 2) // Window Brush
+                { 
+                    owner = window->GetBrushOwner(_T(""));
+                    if (owner)
+                    {
                         return owner->GetBrush(buffer);
                     }
                 }
             }
-            else { // Window
-                IBrushOwner *owner = window->GetBrushOwner("");
-                if (owner) {
-                    return owner->GetBrush("");
+            else // Window
+            { 
+                IBrushOwner *owner = window->GetBrushOwner(_T(""));
+                if (owner)
+                {
+                    return owner->GetBrush(_T(""));
                 }
             }
         }
@@ -58,36 +71,41 @@ static Brush *FindBrush(LPCTSTR *args, int numArgs, DrawableWindow *&window) {
     return nullptr;
 }
 
-static struct BangItem {
-    BangItem(LPCTSTR name, LiteStep::BANGCOMMANDPROC proc) {
+
+static struct BangItem
+{
+    BangItem(LPCTSTR name, LiteStep::BANGCOMMANDPROC proc)
+    {
         this->name = name;
         this->proc = proc;
     }
 
     LPCTSTR name;
     LiteStep::BANGCOMMANDPROC proc;
-} BangMap [] = {
-    /*(BangItem(TEXT("SetBrushType"),            [] (HWND, LPCTSTR args) -> void {
+} BangMap [] =
+{
+    /*(BangItem(TEXT("SetBrushType"),            [] (HWND, LPCTSTR args) -> void
+    {
         DrawableWindow *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
-        if (brush) {
+        if (brush)
+        {
             char arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
             brush->SetType(BrushSetings::ParseType(arg));
             window->Repaint();
         }
     }),*/
-    BangItem(TEXT("SetColor"),                [] (HWND, LPCTSTR args) -> void {
+    BangItem(TEXT("SetColor"),                [] (HWND, LPCTSTR args) -> void
+    {
         DrawableWindow *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
-        if (brush) {
-            char arg[MAX_RCCOMMAND];
+        if (brush)
+        {
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            ARGB color;
-            if (nCore::InputParsing::ParseColor(arg, &color)) {
-                brush->SetColor(color);
-                window->Repaint();
-            }
+            brush->SetColor(LiteStep::ParseColor(arg, brush->GetBrushSettings()->color));
+            window->Repaint();
         }
     }),
     /*BangItem(TEXT("SetAlpha"),                [] (HWND, LPCTSTR args) -> void {
@@ -162,11 +180,13 @@ static struct BangItem {
             window->Repaint();
         }
     }),*/
-    BangItem(TEXT("SetImage"),                [] (HWND, LPCTSTR args) -> void {
+    BangItem(TEXT("SetImage"),                [] (HWND, LPCTSTR args) -> void
+    {
         DrawableWindow *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
-        if (brush) {
-            char arg[MAX_RCCOMMAND];
+        if (brush)
+        {
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
             brush->SetImage(window->GetRenderTarget(), arg);
             window->Repaint();
@@ -206,10 +226,12 @@ static struct BangItem {
 /// <summary>
 /// Registers bangs.
 /// </summary>
-void BrushBangs::_Register(LPCTSTR prefix, std::function<DrawableWindow* (LPCSTR)> windowFinder) {
+void BrushBangs::Register(LPCTSTR prefix, std::function<DrawableWindow* (LPCTSTR)> windowFinder)
+{
     TCHAR bangName[64];
     ::windowFinder = windowFinder;
-    for (BangItem item : BangMap) {
+    for (BangItem item : BangMap)
+    {
         StringCchPrintf(bangName, _countof(bangName), TEXT("!%s%s"), prefix, item.name);
         LiteStep::AddBangCommand(bangName, item.proc);
     }
@@ -219,9 +241,11 @@ void BrushBangs::_Register(LPCTSTR prefix, std::function<DrawableWindow* (LPCSTR
 /// <summary>
 /// Unregisters bangs.
 /// </summary>
-void BrushBangs::_UnRegister(LPCTSTR prefix) {
+void BrushBangs::UnRegister(LPCTSTR prefix)
+{
     TCHAR bangName[64];
-    for (BangItem item : BangMap) {
+    for (BangItem item : BangMap)
+    {
         StringCchPrintf(bangName, _countof(bangName), TEXT("!%s%s"), prefix, item.name);
         LiteStep::RemoveBangCommand(bangName);
     }

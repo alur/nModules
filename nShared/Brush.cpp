@@ -5,15 +5,15 @@
 *  A general brush.
 *  
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#include "../Utilities/Common.h"
 #include "Brush.hpp"
 #include "Color.h"
 #include "Factories.h"
 #include "LiteStep.h"
-#include "Macros.h"
 #include <wincodec.h>
 #include "../nCoreCom/Core.h"
-#include <strsafe.h>
 #include "../Utilities/StringUtils.h"
+#include <algorithm>
 
 
 Brush::Brush() {
@@ -33,16 +33,16 @@ Brush::~Brush() {
 void Brush::Load(BrushSettings* settings) {
     this->brushSettings = settings;
 
-    if (_stricmp(this->brushSettings->brushType, "Image") == 0) {
+    if (_tcsicmp(this->brushSettings->brushType, _T("Image")) == 0) {
         this->brushType = Image;
     }
-    else if (_stricmp(this->brushSettings->brushType, "LinearGradient") == 0) {
+    else if (_tcsicmp(this->brushSettings->brushType, _T("LinearGradient")) == 0) {
         this->brushType = LinearGradient;
         this->gradientStart = D2D1::Point2F(this->brushSettings->gradientStartX, this->brushSettings->gradientStartY);
         this->gradientEnd = D2D1::Point2F(this->brushSettings->gradientEndX, this->brushSettings->gradientEndY);
         LoadGradientStops();
     }
-    else if (_stricmp(this->brushSettings->brushType, "RadialGradient") == 0) {
+    else if (_tcsicmp(this->brushSettings->brushType, _T("RadialGradient")) == 0) {
         this->brushType = RadialGradient;
         this->gradientCenter = D2D1::Point2F(this->brushSettings->gradientCenterX, this->brushSettings->gradientCenterY);
         this->gradientOriginOffset = D2D1::Point2F(this->brushSettings->gradientOriginOffsetX, this->brushSettings->gradientOriginOffsetY);
@@ -52,36 +52,36 @@ void Brush::Load(BrushSettings* settings) {
         this->brushType = SolidColor;
     }
 
-    if (_stricmp(this->brushSettings->imageScalingMode, "Tile") == 0) {
+    if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Tile")) == 0) {
         this->scalingMode = Tile;
     }
-    else if (_stricmp(this->brushSettings->imageScalingMode, "Fit") == 0) {
+    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Fit")) == 0) {
         this->scalingMode = Fit;
     }
-    else if (_stricmp(this->brushSettings->imageScalingMode, "Fill") == 0) {
+    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Fill")) == 0) {
         this->scalingMode = Fill;
     }
-    else if (_stricmp(this->brushSettings->imageScalingMode, "Stretch") == 0) {
+    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Stretch")) == 0) {
         this->scalingMode = Stretch;
     }
     else {
         this->scalingMode = Center;
     }
 
-    if (_stricmp(this->brushSettings->tilingModeX, "Mirror") == 0) {
+    if (_tcsicmp(this->brushSettings->tilingModeX, _T("Mirror")) == 0) {
         this->tileModeX = D2D1_EXTEND_MODE_MIRROR;
     }
-    else if (_stricmp(this->brushSettings->tilingModeX, "Clamp") == 0) {
+    else if (_tcsicmp(this->brushSettings->tilingModeX, _T("Clamp")) == 0) {
         this->tileModeX = D2D1_EXTEND_MODE_CLAMP;
     }
     else {
         this->tileModeX = D2D1_EXTEND_MODE_WRAP;
     }
 
-    if (_stricmp(this->brushSettings->tilingModeY, "Mirror") == 0) {
+    if (_tcsicmp(this->brushSettings->tilingModeY, _T("Mirror")) == 0) {
         this->tileModeY = D2D1_EXTEND_MODE_MIRROR;
     }
-    else if (_stricmp(this->brushSettings->tilingModeY, "Clamp") == 0) {
+    else if (_tcsicmp(this->brushSettings->tilingModeY, _T("Clamp")) == 0) {
         this->tileModeY = D2D1_EXTEND_MODE_CLAMP;
     }
     else {
@@ -91,19 +91,17 @@ void Brush::Load(BrushSettings* settings) {
 
 
 void Brush::LoadGradientStops() {
-    char colorToken[MAX_LINE_LENGTH], stopToken[MAX_LINE_LENGTH];
-    LPCSTR colorPointer = this->brushSettings->gradientColors, stopPointer = this->brushSettings->gradientStops;
+    TCHAR colorToken[MAX_LINE_LENGTH], stopToken[MAX_LINE_LENGTH];
+    LPCTSTR colorPointer = this->brushSettings->gradientColors, stopPointer = this->brushSettings->gradientStops;
 
     using namespace LiteStep;
-    using namespace nCore::InputParsing;
 
     while (GetToken(colorPointer, colorToken, &colorPointer, FALSE) != FALSE && GetToken(stopPointer, stopToken, &stopPointer, FALSE) != FALSE) {
-        ARGB color;
         float stop;
-        char* endPtr;
+        LPTSTR endPtr;
 
-        ParseColor(colorToken, &color);
-        stop = (float)strtod(stopToken, &endPtr);
+        ARGB color = ParseColor(colorToken, 0xFF000000);
+        stop = (float)_tcstod(stopToken, &endPtr);
 
         this->gradientStops = (D2D1_GRADIENT_STOP*)realloc(this->gradientStops, ++this->gradientStopCount*sizeof(D2D1_GRADIENT_STOP));
         this->gradientStops[this->gradientStopCount-1].color = Color::ARGBToD2D(color);
@@ -180,6 +178,8 @@ void Brush::ScaleImage() {
     bitmap->Release();
 
     using namespace D2D1;
+    using std::min;
+    using std::max;
 
     D2D1_POINT_2F centerPoint = Point2F(
         this->position.left + (this->position.right - this->position.left)/2.0f,
@@ -259,7 +259,7 @@ void Brush::UpdatePosition(D2D1_RECT_F position) {
 }
 
 
-HRESULT Brush::LoadImageFile(ID2D1RenderTarget *renderTarget, LPCSTR image, ID2D1Brush **brush) {
+HRESULT Brush::LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2D1Brush **brush) {
     IWICImagingFactory* factory = NULL;
     IWICBitmap* wicBitmap = NULL;
     IWICFormatConverter* converter = NULL;
@@ -303,7 +303,8 @@ void Brush::SetColor(ARGB color) {
 }
 
 
-void Brush::SetImage(ID2D1RenderTarget* renderTarget, LPCSTR path) {
+void Brush::SetImage(ID2D1RenderTarget* renderTarget, LPCTSTR path)
+{
     this->brushSettings->image = StringUtils::ReallocOverwrite(this->brushSettings->image, path);
 
     if (this->brushType == Image && renderTarget) {
@@ -315,4 +316,10 @@ void Brush::SetImage(ID2D1RenderTarget* renderTarget, LPCSTR path) {
             ScaleImage();
         }
     }
+}
+
+
+BrushSettings *Brush::GetBrushSettings()
+{
+    return brushSettings;
 }

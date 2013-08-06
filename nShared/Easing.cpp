@@ -7,6 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "Easing.h"
 #include <cmath>
+#include <tchar.h>
 
 
 /// <summary>
@@ -14,8 +15,10 @@
 /// </summary>
 /// <param name="progress>How far the actual progress has gone. 0 <= progress <= 1.</param>
 /// <returns>The transformed progress. Transform(0, x) == 0, Transform(1, x) == 1.</returns>
-float Easing::Transform(float progress, Type easingType) {
-    switch (easingType) {
+float Easing::Transform(float progress, Type easingType)
+{
+    switch (easingType)
+    {
     case Type::Linear:
         return progress;
     case Type::Cubic:
@@ -36,9 +39,10 @@ float Easing::Transform(float progress, Type easingType) {
 /// <summary>
 /// Parses a string into an easing.
 /// </summary>
-Easing::Type Easing::EasingFromString(LPCSTR str) {
-    if (_stricmp(str, "Cubic")) return Type::Cubic;
-    if (_stricmp(str, "Sine")) return Type::Sine;
-    if (_stricmp(str, "Bounce")) return Type::Bounce;
+Easing::Type Easing::EasingFromString(LPCTSTR str)
+{
+    if (_tcsicmp(str, _T("Cubic"))) return Type::Cubic;
+    if (_tcsicmp(str, _T("Sine"))) return Type::Sine;
+    if (_tcsicmp(str, _T("Bounce"))) return Type::Bounce;
     return Type::Linear;
 }

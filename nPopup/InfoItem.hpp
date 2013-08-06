@@ -11,14 +11,14 @@
 
 class InfoItem : public PopupItem {
 public:
-    explicit InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon = NULL);
+    explicit InfoItem(Drawable* parent, LPCTSTR title, LPCTSTR customIcon = nullptr);
     virtual ~InfoItem();
     
     int GetDesiredWidth(int maxWidth);
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
 private:
-    LPCSTR title;
+    LPCTSTR title;
 
     DrawableWindow::STATE hoverState;
 };

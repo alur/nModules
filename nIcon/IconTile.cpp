@@ -8,16 +8,16 @@
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include <Shlwapi.h>
-#include "../nShared/Macros.h"
+#include <shellapi.h>
 #include "IconTile.hpp"
 #include "IconGroup.hpp"
 #include "../nShared/LSModule.hpp"
 #include <Thumbcache.h>
 #include <CommonControls.h>
-#include "../nShared/Math.h"
+#include "../Utilities/Math.h"
 
 
-IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder, int width, int height) : Drawable(parent, "Icon") {
+IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder, int width, int height) : Drawable(parent, L"Icon") {
     WCHAR name[MAX_PATH];
 
     mPositionID = 0;
@@ -25,8 +25,8 @@ IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFo
     mItem = (PITEMID_CHILD)malloc(item->mkid.cb + 2);
     memcpy(mItem, item, item->mkid.cb + 2);
 
-    mIconSize = this->settings->GetInt("Size", 48);
-    mGhostOpacity = settings->GetFloat("GhostOpacity", 0.6f);
+    mIconSize = mSettings->GetInt(L"Size", 48);
+    mGhostOpacity = mSettings->GetFloat(L"GhostOpacity", 0.6f);
     mGhosted = false;
 
     DrawableSettings defaults;
@@ -40,36 +40,36 @@ IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFo
     baseStateDefaults.textOffsetTop = (float)mIconSize;
     baseStateDefaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
 
-    this->window->Initialize(&defaults, &baseStateDefaults);
-    this->window->SetText(name);
+    mWindow->Initialize(&defaults, &baseStateDefaults);
+    mWindow->SetText(name);
 
     SetIcon();
 
-    this->window->Resize(width, height);
+    mWindow->Resize(width, height);
 
-    //this->window->SizeToText(64, 300, 64);
+    //mWindow->SizeToText(64, 300, 64);
 
     StateSettings hoverDefaults(baseStateDefaults);
     hoverDefaults.backgroundBrush.color = 0xAA87CEEB;
     hoverDefaults.outlineBrush.color = 0x99FFFFFF;
     hoverDefaults.outlineWidth = 1.5f;
-    mHoverState = this->window->AddState("Hover", 100, &hoverDefaults);
+    mHoverState = mWindow->AddState(L"Hover", 100, &hoverDefaults);
 
     StateSettings selectedDefaults(hoverDefaults);
     selectedDefaults.backgroundBrush.color = 0xCC87CEEB;
     selectedDefaults.outlineBrush.color = 0xCCFFFFFF;
     selectedDefaults.outlineWidth = 1.5f;
-    mSelectedState = this->window->AddState("Selected", 150, &selectedDefaults);
+    mSelectedState = mWindow->AddState(L"Selected", 150, &selectedDefaults);
 
     StateSettings focusedDefaults(hoverDefaults);
     focusedDefaults.backgroundBrush.color = 0xAA87CEEB;
     focusedDefaults.outlineBrush.color = 0x99FFFFFF;
     focusedDefaults.outlineWidth = 1.5f;
-    mFocusedState = this->window->AddState("Focused", 200, &focusedDefaults);
+    mFocusedState = mWindow->AddState(L"Focused", 200, &focusedDefaults);
     
     mMouseOver = false;
 
-    this->window->Show();
+    mWindow->Show();
 }
 
 
@@ -89,7 +89,7 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
         {
             if (!mMouseOver) {
                 mMouseOver = true;
-                this->window->ActivateState(mHoverState);
+                mWindow->ActivateState(mHoverState);
             }
         }
         return 0;
@@ -97,7 +97,7 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
     case WM_MOUSELEAVE:
         {
             mMouseOver = false;
-            this->window->ClearState(mHoverState);
+            mWindow->ClearState(mHoverState);
         }
         return 0;
 
@@ -112,11 +112,11 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
     case WM_LBUTTONDOWN:
         {
             if (GetKeyState(VK_CONTROL) >= 0) {
-                ((IconGroup*)this->parent)->DeselectAll();
-                this->window->ActivateState(mSelectedState);
+                ((IconGroup*)mParent)->DeselectAll();
+                mWindow->ActivateState(mSelectedState);
             }
             else {
-                this->window->ToggleState(mSelectedState);
+                mWindow->ToggleState(mSelectedState);
             }
         }
         return 0;
@@ -124,10 +124,10 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
     case WM_RBUTTONDOWN:
         {
             if (GetKeyState(VK_CONTROL) >= 0 && !IsSelected()) {
-                ((IconGroup*)this->parent)->DeselectAll();
+                ((IconGroup*)mParent)->DeselectAll();
             }
-            this->window->ActivateState(mSelectedState);
-            ((IconGroup*)this->parent)->ContextMenu();
+            mWindow->ActivateState(mSelectedState);
+            ((IconGroup*)mParent)->ContextMenu();
         }
         return 0;
 
@@ -143,17 +143,17 @@ PCITEMID_CHILD IconTile::GetItem() {
 
 
 bool IconTile::IsInRect(D2D1_RECT_F rect) {
-    return Math::RectIntersectArea(rect, this->window->GetDrawingRect()) > 0;
+    return Math::RectIntersectArea(rect, mWindow->GetDrawingRect()) > 0;
 }
 
 
 void IconTile::Select(bool repaint) {
-    this->window->ActivateState(mSelectedState, repaint);
+    mWindow->ActivateState(mSelectedState, repaint);
 }
 
 
 void IconTile::Deselect(bool repaint) {
-    this->window->ClearState(mSelectedState, repaint);
+    mWindow->ClearState(mSelectedState, repaint);
 }
 
 
@@ -169,15 +169,15 @@ int IconTile::GetPositionID() {
 
 void IconTile::SetPosition(int id, int x, int y, bool noRedraw) {
     mPositionID = id;
-    this->window->Move(x, y);
+    mWindow->Move(x, y);
     if (!noRedraw) {
-        this->window->Repaint();
+        mWindow->Repaint();
     }
 }
 
 
 void IconTile::Hide() {
-    this->window->Hide();
+    mWindow->Hide();
 }
 
 
@@ -186,10 +186,10 @@ void IconTile::Hide() {
 /// </summary>
 /// <param name="repaint">Repaints the icon.</param>
 void IconTile::UpdateIcon(bool repaint) {
-    this->window->ClearOverlays();
+    mWindow->ClearOverlays();
     SetIcon();
     if (repaint) {
-        this->window->Repaint();
+        mWindow->Repaint();
     }
 }
 
@@ -204,8 +204,8 @@ void IconTile::Rename(PCITEMID_CHILD newItem) {
     
     WCHAR newName[MAX_PATH];
     GetDisplayName(SHGDN_NORMAL, newName, MAX_PATH);
-    this->window->SetText(newName);
-    this->window->Repaint();
+    mWindow->SetText(newName);
+    mWindow->Repaint();
 }
 
 
@@ -249,7 +249,7 @@ void IconTile::SetIcon() {
     D2D1_RECT_F pos;
     HRESULT hr;
 
-    DrawableSettings *drawingSettings = this->window->GetDrawingSettings();
+    DrawableSettings *drawingSettings = mWindow->GetDrawingSettings();
 
     pos.top = 0;
     pos.bottom = pos.top + mIconSize;
@@ -281,7 +281,7 @@ void IconTile::SetIcon() {
                 pos.right = mIconSize*(1 + scale)/2;
             }
 
-            mIconOverlay = this->window->AddOverlay(pos, hBMP);
+            mIconOverlay = mWindow->AddOverlay(pos, hBMP);
         }
 
         // Let go of the interface.
@@ -305,7 +305,7 @@ void IconTile::SetIcon() {
             }
 
             if (SUCCEEDED(hr)) {
-                mIconOverlay = this->window->AddOverlay(pos, hBMP);
+                mIconOverlay = mWindow->AddOverlay(pos, hBMP);
             }
 
             // Let go of the interface.
@@ -343,7 +343,7 @@ void IconTile::SetIcon() {
 
         // Add it as an overlay.
         if (hr == S_OK) {
-            mIconOverlay = this->window->AddOverlay(pos, icon);
+            mIconOverlay = mWindow->AddOverlay(pos, icon);
         }
 
         // Let go of the interface.
@@ -351,7 +351,7 @@ void IconTile::SetIcon() {
     }
 
     if (hr != S_OK) {
-        mIconOverlay = this->window->AddOverlay(pos, LoadIcon(nullptr, IDI_ERROR));
+        mIconOverlay = mWindow->AddOverlay(pos, LoadIcon(nullptr, IDI_ERROR));
     }
 }
 

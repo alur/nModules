@@ -22,7 +22,7 @@ namespace TrayManager {
     } TRAYICONDATA, *LPTRAYICONDATA;
 
     typedef vector<LPTRAYICONDATA>::iterator TRAYICONDATAITER;
-    typedef map<string, Tray*>::const_iterator TRAYSCITER;
+    typedef map<std::tstring, Tray*>::const_iterator TRAYSCITER;
 
     void Stop();
     void GetScreenRect(TRAYICONDATAITER icon, LPRECT rect);

@@ -8,19 +8,21 @@
 #pragma once
 
 #include <vector>
+#include "../Utilities/Common.h"
 
 using std::vector;
 
 class MonitorInfo {
 public:
-    typedef struct Monitor {
+    struct Monitor
+    {
         RECT rect;
         RECT workArea;
         int width;
         int height;
         int workAreaWidth;
         int workAreaHeight;
-    } Monitor;
+    };
 
     explicit MonitorInfo();
     virtual ~MonitorInfo();

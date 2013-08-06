@@ -7,7 +7,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-namespace TextFunctions {
+namespace TextFunctions
+{
     void _Register();
     void _UnRegister();
     void _Update();

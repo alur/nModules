@@ -9,11 +9,11 @@
 
 #include "Drawable.hpp"
 #include "DrawableWindow.hpp"
-#include "Tooltip.hpp"
 
-class Balloon : public Drawable {
+class Balloon : public Drawable
+{
 public:
-    explicit Balloon(LPCSTR prefix, Settings* parentSettings, UINT clickedMessage, MessageHandler* callbackHandler);
+    explicit Balloon(LPCTSTR prefix, Settings* parentSettings, UINT clickedMessage, MessageHandler* callbackHandler);
     virtual ~Balloon();
 
     void Show(LPCWSTR title, LPCWSTR text, HICON icon, LPSIZE iconSize, LPRECT targetPosition);
@@ -23,12 +23,12 @@ public:
     LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow);
 
 private:
-    UINT clickedMessage;
-    MessageHandler* callbackHandler;
+    UINT mClickedMessage;
+    MessageHandler* mCallbackHandler;
 
-    DrawableWindow* titleWindow;
-    DrawableWindow* closeBtnWindow;
+    DrawableWindow* mTitleWindow;
+    DrawableWindow* mCloseBtnWindow;
 
-    Settings* titleSettings;
-    Settings* closeBtnSettings;
+    Settings* mTitleSettings;
+    Settings* mCloseBtnSettings;
 };

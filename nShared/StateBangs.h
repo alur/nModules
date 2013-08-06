@@ -10,7 +10,8 @@
 #include "DrawableWindow.hpp"
 #include <functional>
 
-namespace StateBangs {
-    void _Register(LPCTSTR prefix, std::function<DrawableWindow* (LPCTSTR)> windowFinder);
-    void _UnRegister(LPCTSTR prefix);
+namespace StateBangs
+{
+    void Register(LPCTSTR prefix, std::function<DrawableWindow* (LPCTSTR)> windowFinder);
+    void UnRegister(LPCTSTR prefix);
 }

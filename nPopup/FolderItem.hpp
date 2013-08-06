@@ -13,8 +13,8 @@
 namespace nPopup {
     class FolderItem : public PopupItem {
     public:
-        explicit FolderItem(Drawable* parent, LPCSTR title, Popup* popup, LPCSTR customIcon = NULL);
-        explicit FolderItem(Drawable* parent, LPCSTR title, Popup* popup, HICON customIcon);
+        explicit FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, LPCTSTR customIcon = nullptr);
+        explicit FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, HICON customIcon);
         virtual ~FolderItem();
 
         LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
@@ -24,10 +24,10 @@ namespace nPopup {
         Popup* GetPopup();
 
     private:
-        void Init(LPCSTR title, Popup* popup);
+        void Init(LPCTSTR title, Popup* popup);
 
         Popup* popup;
-        LPCSTR title;
+        LPCTSTR title;
 
         DrawableWindow::STATE hoverState;
         DrawableWindow::STATE openState;

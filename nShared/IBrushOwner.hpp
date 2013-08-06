@@ -9,7 +9,8 @@
 
 #include "Brush.hpp"
 
-class IBrushOwner {
+class IBrushOwner
+{
 public:
-    virtual Brush *GetBrush(LPCSTR name) = 0;
+    virtual Brush *GetBrush(LPCTSTR name) = 0;
 };

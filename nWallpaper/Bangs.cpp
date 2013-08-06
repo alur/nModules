@@ -7,70 +7,82 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "Bangs.h"
-#include <strsafe.h>
 #include <Shlwapi.h>
 #include "../nCoreCom/Core.h"
 
 
-namespace Bangs {
-    struct BangItem {
-        BangItem(LPCSTR name, LiteStep::BANGCOMMANDPROC handler) {
+namespace Bangs
+{
+    struct BangItem
+    {
+        BangItem(LPCTSTR name, LiteStep::BANGCOMMANDPROC handler)
+        {
             this->name = name;
             this->handler = handler;
         }
 
-        LPCSTR name;
+        LPCTSTR name;
         LiteStep::BANGCOMMANDPROC handler;
     };
 
-    LPCSTR StyleValueFromName(LPCSTR name) {
-        if (_stricmp(name, "Center") == 0) {
-            return "0";
+    LPCTSTR StyleValueFromName(LPCTSTR name)
+    {
+        if (_tcsicmp(name, _T("Center")) == 0)
+        {
+            return _T("0");
         }
-        else if (_stricmp(name, "Stretch") == 0) {
-            return "2";
+        else if (_tcsicmp(name, _T("Stretch")) == 0)
+        {
+            return _T("2");
         }
-        else if (_stricmp(name, "Fit") == 0) {
-            return "6";
+        else if (_tcsicmp(name, _T("Fit")) == 0)
+        {
+            return _T("6");
         }
-        else if (_stricmp(name, "Fill") == 0) {
-            return "10";
+        else if (_tcsicmp(name, _T("Fill")) == 0)
+        {
+            return _T("10");
         }
-        else if (_stricmp(name, "Span") == 0) {
-            return "22";
+        else if (_tcsicmp(name, _T("Span")) == 0)
+        {
+            return _T("22");
         }
         return nullptr;
     }
 
     BangItem bangMap[] = {
         // Skips to the previous track
-        BangItem("!SetWallpaper", [] (HWND, LPCSTR args) {
-            char token1[MAX_PATH], token2[MAX_PATH];
-            LPSTR bufs[] = { token1, token2 };
+        BangItem(_T("!SetWallpaper"), [] (HWND, LPCTSTR args)
+        {
+            TCHAR token1[MAX_PATH], token2[MAX_PATH];
+            LPTSTR bufs[] = { token1, token2 };
 
             LiteStep::CommandTokenize(args, bufs, 1, nullptr);
 
             // Check if the first token is a valid style.
-            LPCSTR styleValue = StyleValueFromName(token1);
+            LPCTSTR styleValue = StyleValueFromName(token1);
 
-            if (styleValue == nullptr) {
+            if (styleValue == nullptr)
+            {
                 // Assume that the first token is the wallpaper file
             }
 
-            SHSetValueA(HKEY_CURRENT_USER, "Control Panel\\Desktop", "Wallpaper", REG_SZ, token1, (DWORD)strlen(args));
-            SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
+            SHSetValue(HKEY_CURRENT_USER, _T("Control Panel\\Desktop"), _T("Wallpaper"), REG_SZ, token1, (DWORD)_tcslen(args));
+            SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
         }),
-        BangItem("!SetWallpaperStyle", [] (HWND, LPCSTR args) {
-            char style[MAX_PATH];
-            LPSTR bufs[] = { style };
+        BangItem(_T("!SetWallpaperStyle"), [] (HWND, LPCTSTR args)
+        {
+            TCHAR style[MAX_PATH];
+            LPTSTR bufs[] = { style };
 
             LiteStep::CommandTokenize(args, bufs, _countof(bufs), nullptr);
 
-            LPCSTR value = StyleValueFromName(style);
+            LPCTSTR value = StyleValueFromName(style);
 
-            if (value) {
-                SHSetValueA(HKEY_CURRENT_USER, "Control Panel\\Desktop", "WallpaperStyle", REG_SZ, value, (DWORD)strlen(value));
-                SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
+            if (value)
+            {
+                SHSetValue(HKEY_CURRENT_USER, _T("Control Panel\\Desktop"), _T("WallpaperStyle"), REG_SZ, value, (DWORD)_tcslen(value));
+                SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
             }
         })
     };
@@ -79,8 +91,10 @@ namespace Bangs {
     /// <summary>
     /// Registers bangs.
     /// </summary>
-    void _Register() {
-        for (BangItem &bangItem : bangMap) {
+    void _Register()
+    {
+        for (BangItem &bangItem : bangMap)
+        {
             LiteStep::AddBangCommand(bangItem.name, bangItem.handler);
         }
     }
@@ -89,8 +103,10 @@ namespace Bangs {
     /// <summary>
     /// Unregisters bangs.
     /// </summary>
-    void _Unregister() {
-        for (BangItem &bangItem : bangMap) {
+    void _Unregister()
+    {
+        for (BangItem &bangItem : bangMap)
+        {
             LiteStep::RemoveBangCommand(bangItem.name);
         }
     }

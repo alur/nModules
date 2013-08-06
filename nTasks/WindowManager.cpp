@@ -11,7 +11,6 @@
 #include "Taskbar.hpp"
 #include "WindowManager.h"
 #include "../nShared/MonitorInfo.hpp"
-#include "../nShared/Debugging.h"
 #include "../nShared/LSModule.hpp"
 #include <map>
 #include <vector>
@@ -27,7 +26,7 @@ using std::pair;
 
 
 // All current taskbars
-extern map<string, Taskbar*> g_Taskbars;
+extern map<tstring, Taskbar*> gTaskbars;
 
 extern LSModule gLSModule;
 
@@ -140,7 +139,7 @@ void WindowManager::AddWindow(HWND hWnd) {
         }
 
         // Add it to any taskbar that wants it
-        for (TASKBARCITER taskbar = g_Taskbars.begin(); taskbar != g_Taskbars.end(); ++taskbar) {
+        for (TASKBARCITER taskbar = gTaskbars.begin(); taskbar != gTaskbars.end(); ++taskbar) {
             TaskButton* taskButton = taskbar->second->AddTask(hWnd, wndInfo.uMonitor, initalizing);
 
             // If the taskbar created a button for this window
@@ -174,7 +173,7 @@ void WindowManager::MonitorChanged(HWND hWnd, UINT monitor) {
         iter->second.uMonitor = monitor;
         GetWindowTextW(hWnd, szTitle, sizeof(szTitle)/sizeof(WCHAR));
 
-        for (TASKBARCITER iter2 = g_Taskbars.begin(); iter2 != g_Taskbars.end(); iter2++) {
+        for (TASKBARCITER iter2 = gTaskbars.begin(); iter2 != gTaskbars.end(); iter2++) {
             if (iter2->second->MonitorChanged(hWnd, monitor, &pOut)) {
                 if (pOut != NULL) {
                     iter->second.buttons.push_back(pOut);
@@ -254,7 +253,7 @@ void WindowManager::RemoveWindow(HWND hWnd) {
     WNDMAPITER iter = windowMap.find(hWnd);
     if (iter != windowMap.end()) {
         // Remove all buttons
-        for (TASKBARCITER iter2 = g_Taskbars.begin(); iter2 != g_Taskbars.end(); iter2++) {
+        for (TASKBARCITER iter2 = gTaskbars.begin(); iter2 != gTaskbars.end(); iter2++) {
             iter2->second->RemoveTask(hWnd);
         }
 
@@ -425,7 +424,7 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         {
             // Relayout all taskbars.
             initalizing = false;
-            for (TASKBARCITER taskbar = g_Taskbars.begin(); taskbar != g_Taskbars.end(); ++taskbar) {
+            for (TASKBARCITER taskbar = gTaskbars.begin(); taskbar != gTaskbars.end(); ++taskbar) {
                 taskbar->second->Relayout();
             }
         }

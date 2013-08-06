@@ -6,7 +6,7 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "UIDGenerator.hpp"
-#include "../nShared/LiteStep.h"
+#include "Common.h"
 
 
 /// <summary>

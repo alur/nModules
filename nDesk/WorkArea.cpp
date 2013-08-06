@@ -16,36 +16,41 @@
 /// </summary>
 /// <param name="mInfo"></param>
 /// <param name="pszLine"></param>
-void WorkArea::ParseLine(MonitorInfo *mInfo, LPCSTR pszLine) {
-    char szMonitor[16], szLeft[16], szTop[16], szRight[16], szBottom[16];
-    LPSTR szTokens[] = { szMonitor, szLeft, szTop, szRight, szBottom };
+void WorkArea::ParseLine(MonitorInfo *mInfo, LPCTSTR pszLine)
+{
+    TCHAR szMonitor[16], szLeft[16], szTop[16], szRight[16], szBottom[16];
+    LPTSTR szTokens[] = { szMonitor, szLeft, szTop, szRight, szBottom };
     int left, top, right, bottom;
-    UINT monitor;
 
-    using namespace nCore::InputParsing;
+    using namespace LiteStep;
 
     // Parse the input string
-    if (LiteStep::LCTokenize(pszLine, szTokens, 5, nullptr) == 5) {
-        if (ParseCoordinate(szLeft, &left) && ParseCoordinate(szTop, &top) && ParseCoordinate(szRight, &right) && ParseCoordinate(szBottom, &bottom)) {
-            if (_stricmp("all", szMonitor) == 0) {
-                for (auto &monitor : mInfo->m_monitors) {
+    if (LiteStep::LCTokenize(pszLine, szTokens, 5, nullptr) == 5)
+    {
+        if (ParseCoordinate(szLeft, &left) && ParseCoordinate(szTop, &top) && ParseCoordinate(szRight, &right) && ParseCoordinate(szBottom, &bottom))
+        {
+            UINT monitor = ParseMonitor(szMonitor, UINT(-2));
+
+            if (monitor == UINT(-1))
+            {
+                for (auto &monitor : mInfo->m_monitors)
+                {
                     RECT r = { monitor.rect.left + left, monitor.rect.top + top, monitor.rect.right - right, monitor.rect.bottom - bottom };
                     SystemParametersInfoW(SPI_SETWORKAREA, 1, &r, 0);
                 }
                 return;
             }
-            else if (ParseMonitor(szMonitor, &monitor)) {
-                if (monitor < mInfo->m_monitors.size()) {
-                    RECT mRect = mInfo->m_monitors[monitor].rect;
-                    RECT r = { mRect.left + left, mRect.top + top, mRect.right - right, mRect.bottom - bottom };
-                    SystemParametersInfoW(SPI_SETWORKAREA, 1, &r, 0);
-                }
+            else if (monitor < mInfo->m_monitors.size())
+            {
+                RECT mRect = mInfo->m_monitors[monitor].rect;
+                RECT r = { mRect.left + left, mRect.top + top, mRect.right - right, mRect.bottom - bottom };
+                SystemParametersInfoW(SPI_SETWORKAREA, 1, &r, 0);
                 return;
             }
         }
     }
 
-    ErrorHandler::Error(ErrorHandler::Level::Warning, "%s\nIs not a valid workarea declaration!", pszLine);
+    ErrorHandler::Error(ErrorHandler::Level::Warning, L"%s\nIs not a valid workarea declaration!", pszLine);
 }
 
 
@@ -54,7 +59,7 @@ void WorkArea::ParseLine(MonitorInfo *mInfo, LPCSTR pszLine) {
 /// </summary>
 /// <param name="mInfo">A current MonitorInfo.</param>
 void WorkArea::LoadSettings(MonitorInfo *mInfo, bool /* isRefresh */) {
-    LiteStep::IterateOverLines("*nDeskWorkArea", [mInfo] (LPCSTR line) {
+    LiteStep::IterateOverLines(L"*nDeskWorkArea", [mInfo] (LPCTSTR line) {
         ParseLine(mInfo, line);
     });
 

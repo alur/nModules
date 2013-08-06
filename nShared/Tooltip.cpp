@@ -7,9 +7,10 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "Tooltip.hpp"
+#include <algorithm>
 
 
-Tooltip::Tooltip(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings) {
+Tooltip::Tooltip(LPCTSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings) {
     DrawableSettings defaults;
     defaults.width = 150;
     defaults.height = 40;
@@ -25,10 +26,10 @@ Tooltip::Tooltip(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, par
     defaultState.outlineBrush.color = 0xFF000000;
     defaultState.outlineWidth = 0.75f;
 
-    this->window->Initialize(&defaults, &defaultState);
+    mWindow->Initialize(&defaults, &defaultState);
 
-    this->maxHeight = settings->GetInt("MaxHeight", 100);
-    this->maxWidth = settings->GetInt("MaxWidth", 300);
+    this->maxHeight = mSettings->GetInt(_T("MaxHeight"), 100);
+    this->maxWidth = mSettings->GetInt(_T("MaxWidth"), 300);
 }
 
 
@@ -37,23 +38,23 @@ Tooltip::~Tooltip() {
 
 
 void Tooltip::Show(LPCWSTR text, LPRECT position) {
-    this->window->SetText(text);
-    this->window->SizeToText(this->maxWidth, this->maxHeight);
+    mWindow->SetText(text);
+    mWindow->SizeToText(this->maxWidth, this->maxHeight);
 
     // Show it centerd on x, 5 px above, while forcing it to stay on the virtual desktop
-    MonitorInfo* monInfo = this->window->GetMonitorInformation();
-    this->window->Move(
-        min(max(monInfo->m_virtualDesktop.rect.left, position->left + (position->right - position->left)/2 - this->window->GetDrawingSettings()->width/2),
-            monInfo->m_virtualDesktop.rect.right - this->window->GetDrawingSettings()->width),
-        min(max(monInfo->m_virtualDesktop.rect.top, position->top - this->window->GetDrawingSettings()->height - 5),
-            monInfo->m_virtualDesktop.rect.bottom - this->window->GetDrawingSettings()->height));
+    MonitorInfo* monInfo = mWindow->GetMonitorInformation();
+    mWindow->Move(
+        std::min(std::max(monInfo->m_virtualDesktop.rect.left, position->left + (position->right - position->left)/2 - mWindow->GetDrawingSettings()->width/2),
+            monInfo->m_virtualDesktop.rect.right - mWindow->GetDrawingSettings()->width),
+        std::min(std::max(monInfo->m_virtualDesktop.rect.top, position->top - mWindow->GetDrawingSettings()->height - 5),
+            monInfo->m_virtualDesktop.rect.bottom - mWindow->GetDrawingSettings()->height));
 
-    this->window->Show();
+    mWindow->Show();
 }
 
 
 void Tooltip::Hide() {
-    this->window->Hide();
+    mWindow->Hide();
 }
 
 

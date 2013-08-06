@@ -16,9 +16,10 @@
 using std::wstring;
 using std::list;
 
-class CoverArt : public Drawable {
+class CoverArt : public Drawable
+{
 public:
-    explicit CoverArt(LPCSTR name);
+    explicit CoverArt(LPCTSTR name);
     virtual ~CoverArt();
 
 private:

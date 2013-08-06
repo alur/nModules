@@ -7,10 +7,9 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "FolderPopup.hpp"
-#include "../nShared/Debugging.h"
 
 
-FolderPopup::FolderPopup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Popup(title, bang, prefix) {
+FolderPopup::FolderPopup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Popup(title, bang, prefix) {
 
 }
 

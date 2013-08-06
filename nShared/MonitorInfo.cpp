@@ -7,7 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "MonitorInfo.hpp"
-#include "Math.h"
+#include "../Utilities/Math.h"
 
 // Callback for EnumDisplayMonitors
 BOOL CALLBACK EnumMonitorsCallback(HMONITOR, HDC, LPRECT, LPARAM);

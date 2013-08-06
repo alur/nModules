@@ -7,8 +7,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "Macros.h"
-#include "Versioning.h"
+#include "../Utilities/Common.h"
+#include "../Utilities/Versioning.h"
 #include <map>
 #include <string>
 #include "Drawable.hpp"
@@ -25,7 +25,7 @@ EXPORT_CDECL(void) quitModule(HINSTANCE instance);
 
 class LSModule : public MessageHandler {
 public:
-    explicit LSModule(LPCSTR moduleName, LPCSTR author, VERSION version);
+    explicit LSModule(LPCTSTR moduleName, LPCTSTR author, VERSION version);
     virtual ~LSModule();
 
     // Registers window classes and creates the message handler window.
@@ -58,10 +58,10 @@ private:
     ATOM drawableClass;
 
     // The name of this module.
-    LPCSTR moduleName;
+    LPCTSTR moduleName;
 
     // The author of this module.
-    LPCSTR author;
+    LPCTSTR author;
 
     // The version of this module.
     VERSION version;

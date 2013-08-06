@@ -12,16 +12,23 @@
 // Color of the format AARRGGBB.
 typedef DWORD ARGB, *LPARGB;
 
-//
-typedef struct {
+// Alpha, Hue, Saturation, Lightness
+typedef struct AHSL
+{
     int alpha;
     int hue;
     float saturation;
-    union {
-        float lightness;
-        float value;
-    };
-} AHSL, AHSV;
+    float lightness;
+} *LPAHSL;
+
+// Alpha, Hue, Saturation, Value
+typedef struct AHSV
+{
+    int alpha;
+    int hue;
+    float saturation;
+    float value;
+} *LPAHSV;
 
 // HSL/HSV max hue
 #define COLOR_MAX_HUE 359
@@ -36,44 +43,30 @@ typedef struct {
 #define COLOR_MAX_VALUE 100
 
 namespace Color {
-    // Converts red, green, blue values to ARGB.
+    // Conversion functions
     ARGB RGBToARGB(int red, int green, int blue);
-
-    // Converts ARGB values to an ARGB.
     ARGB ARGBToARGB(int alpha, int red, int green, int blue);
     ARGB ARGBfToARGB(int alpha, float red, float green, float blue);
-
-    //
     ARGB HSLToARGB(int hue, float saturation, float lightness);
-
-    //
     ARGB AHSLToARGB(int alpha, int hue, float saturation, float lightness);
     ARGB AHSLToARGB(AHSL color);
-
-    //
     ARGB HSVToARGB(int hue, int saturation, int value);
-
-    // 
     ARGB AHSVToARGB(int alpha, int hue, int saturation, int value);
-
-    //
     AHSL ARGBToAHSL(ARGB color);
-
-    //
     AHSV ARGBToAHSV(ARGB color);
-
-    // Converts ARGB to D2D_COLOR_F
     D2D_COLOR_F ARGBToD2D(ARGB argb);
-
-    // Converts D2D_COLOR_F to ARGB
     ARGB D2DToARGB(D2D_COLOR_F d2d);
 
-    //
+    // Color functions
     ARGB Mix(ARGB color1, ARGB color2, float weight);
 
+    // Parsing
+    ARGB Parse(LPCTSTR colorString, ARGB defaultValue);
+
     // Holds a known color
-    typedef struct KnownColor {
-        LPCSTR name;
+    typedef struct KnownColor
+    {
+        LPCTSTR name;
         ARGB color;
     } *LPKNOWNCOLOR;
 

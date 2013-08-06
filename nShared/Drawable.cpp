@@ -17,49 +17,52 @@ extern LSModule gLSModule;
 /// <summary>
 /// Creates a new top-level drawable.
 /// </summary>
-Drawable::Drawable(LPCSTR prefix) {
-    this->initialized = false;
-    this->settings = new Settings(prefix);
+Drawable::Drawable(LPCTSTR prefix)
+{
+    mInitialized = false;
+    mSettings = new Settings(prefix);
     
-    char parentPrefix[64];
-    this->settings->GetString("Parent", parentPrefix, sizeof(parentPrefix), "");
+    TCHAR parentPrefix[MAX_RCCOMMAND];
+    mSettings->GetString(_T("Parent"), parentPrefix, _countof(parentPrefix), _T(""));
 
-    if (*parentPrefix != '\0') {
-        this->window = new DrawableWindow(parentPrefix, this->settings, this);
+    if (*parentPrefix != _T('\0'))
+    {
+        mWindow = new DrawableWindow(parentPrefix, mSettings, this);
     }
-    else {
-        this->window = gLSModule.CreateDrawableWindow(this->settings, this);
+    else
+    {
+        mWindow = gLSModule.CreateDrawableWindow(mSettings, this);
     }
 
-    this->eventHandler = new EventHandler(this->settings);
-    this->parent = nullptr;
-    this->initialized = true;
+    mEventHandler = new EventHandler(mSettings);
+    mParent = nullptr;
+    mInitialized = true;
 }
 
 
 /// <summary>
 /// Creates a new top-level drawable, derived from the specified settings.
 /// </summary>
-Drawable::Drawable(LPCSTR prefix, Settings* parentSettings) {
-    this->initialized = false;
-    this->settings = parentSettings->CreateChild(prefix);
-    this->window = gLSModule.CreateDrawableWindow(this->settings, this);
-    this->eventHandler = new EventHandler(this->settings);
-    this->parent = nullptr;
-    this->initialized = true;
+Drawable::Drawable(LPCTSTR prefix, Settings* parentSettings) {
+    mInitialized = false;
+    mSettings = parentSettings->CreateChild(prefix);
+    mWindow = gLSModule.CreateDrawableWindow(mSettings, this);
+    mEventHandler = new EventHandler(mSettings);
+    mParent = nullptr;
+    mInitialized = true;
 }
 
 
 /// <summary>
 /// Creates a new child drawable.
 /// </summary>
-Drawable::Drawable(Drawable* parent, LPCSTR prefix, bool independent) {
-    this->initialized = false;
-    this->settings = independent ? new Settings(prefix) : parent->settings->CreateChild(prefix);
-    this->window = parent->window->CreateChild(this->settings, this);
-    this->eventHandler = new EventHandler(this->settings);
-    this->parent = parent;
-    this->initialized = true;
+Drawable::Drawable(Drawable* parent, LPCTSTR prefix, bool independent) {
+    mInitialized = false;
+    mSettings = independent ? new Settings(prefix) : parent->mSettings->CreateChild(prefix);
+    mWindow = parent->mWindow->CreateChild(mSettings, this);
+    mEventHandler = new EventHandler(mSettings);
+    mParent = parent;
+    mInitialized = true;
 }
 
 
@@ -67,10 +70,10 @@ Drawable::Drawable(Drawable* parent, LPCSTR prefix, bool independent) {
 /// Lets go of all drawable member variables.
 /// </summary>
 Drawable::~Drawable() {
-    this->initialized = false;
-    SAFEDELETE(this->window);
-    SAFEDELETE(this->settings);
-    SAFEDELETE(this->eventHandler);
+    mInitialized = false;
+    SAFEDELETE(mWindow);
+    SAFEDELETE(mSettings);
+    SAFEDELETE(mEventHandler);
 }
 
 
@@ -78,7 +81,7 @@ Drawable::~Drawable() {
 /// Retrives this drawables window.
 /// </summary>
 DrawableWindow *Drawable::GetWindow() {
-    return this->window;
+    return mWindow;
 }
 
 
@@ -86,5 +89,5 @@ DrawableWindow *Drawable::GetWindow() {
 /// Retrives this drawables event handler.
 /// </summary>
 EventHandler* Drawable::GetEventHandler() {
-    return this->eventHandler;
+    return mEventHandler;
 }

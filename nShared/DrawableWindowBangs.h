@@ -9,27 +9,28 @@
 
 #include "DrawableWindow.hpp"
 
-namespace DrawableWindowBangs {
-    void _Register(LPCSTR prefix, DrawableWindow* (*drawableFinder)(LPCSTR));
-    void _UnRegister(LPCSTR prefix);
+namespace DrawableWindowBangs
+{
+    void Register(LPCTSTR prefix, DrawableWindow* (*drawableFinder)(LPCTSTR));
+    void UnRegister(LPCTSTR prefix);
 
     // Clickevent related
-    void On(HWND, LPCSTR);
-    void Off(HWND, LPCSTR);
+    void On(HWND, LPCTSTR);
+    void Off(HWND, LPCTSTR);
 
     // 
-    void Hide(HWND, LPCSTR);
-    void Show(HWND, LPCSTR);
-    void Move(HWND, LPCSTR);
-    void Size(HWND, LPCSTR);
-    void Position(HWND, LPCSTR);
-    void SetAlwaysOnTop(HWND, LPCSTR);
-    void SetClickThrough(HWND, LPCSTR);
-    void SetParent(HWND, LPCSTR);
-    void SetText(HWND, LPCSTR);
+    void Hide(HWND, LPCTSTR);
+    void Show(HWND, LPCTSTR);
+    void Move(HWND, LPCTSTR);
+    void Size(HWND, LPCTSTR);
+    void Position(HWND, LPCTSTR);
+    void SetAlwaysOnTop(HWND, LPCTSTR);
+    void SetClickThrough(HWND, LPCTSTR);
+    void SetParent(HWND, LPCTSTR);
+    void SetText(HWND, LPCTSTR);
 
     struct BangItem {
-        LPCSTR name;
+        LPCTSTR name;
         LiteStep::BANGCOMMANDPROC command;
     };
 }

@@ -6,11 +6,8 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
-#include "../nShared/Macros.h"
 #include "ParsedText.hpp"
 #include <regex>
-#include <strsafe.h>
-#include "../nShared/Debugging.h"
 #include "../Utilities/StringUtils.h"
 
 
@@ -23,9 +20,11 @@ FUNCMAP functionMap;
 /// </summary>
 /// <param name="name">The name of the funtion to find.</param>
 /// <param name="numArgs">The number of arguments in the function to find.</param>
-FUNCMAP::iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
+FUNCMAP::iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs)
+{
     FUNCMAP::iterator ret = functionMap.find(FUNCMAP::key_type(name, numArgs));
-    if (ret == functionMap.end()) {
+    if (ret == functionMap.end())
+    {
         FormatterData d;
         d.dynamic = true;
         d.proc = nullptr;
@@ -42,7 +41,8 @@ FUNCMAP::iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
 /// <param name="numArgs">The number of arguments in the function to register.</param>
 /// <param name="formatter">The evaluator for this function.</param>
 /// <param name="dynamic">True if the value this function returns may change over time.</param.
-EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic) {
+EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic)
+{
     FUNCMAP::iterator iter = FindDynamicTextFunction(name, numArgs);
     iter->second.proc = formatter;
     iter->second.dynamic = dynamic;
@@ -55,7 +55,8 @@ EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORM
 /// </summary>
 /// <param name="name">The name of the funtion to unregister.</param>
 /// <param name="numArgs">The number of arguments in the function to unregister.</param>
-EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
+EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs)
+{
     RegisterDynamicTextFunction(name, numArgs, nullptr, true);
     DynamicTextChangeNotification(name, numArgs);
     return FALSE;
@@ -67,10 +68,12 @@ EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
 /// </summary>
 /// <param name="name">The name of the funtion which changed.</param>
 /// <param name="numArgs">The number of arguments in the function which changed.</param>
-EXPORT_CDECL(BOOL) DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs) {
+EXPORT_CDECL(BOOL) DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs)
+{
     FUNCMAP::iterator iter = FindDynamicTextFunction(name, numArgs);
-    for (set<IParsedText*>::iterator user = iter->second.users.begin(); user != iter->second.users.end(); ++user) {
-        ((ParsedText*)*user)->DataChanged();
+    for (IParsedText *user: iter->second.users)
+    {
+        ((ParsedText*)user)->DataChanged();
     }
     return FALSE;
 }
@@ -80,7 +83,8 @@ EXPORT_CDECL(BOOL) DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs) {
 /// Returns a ParsedText object based on the specified text.
 /// </summary>
 /// <param name="text">The text to parse.</param>
-EXPORT_CDECL(IParsedText*) ParseText(LPCWSTR text) {
+EXPORT_CDECL(IParsedText*) ParseText(LPCWSTR text)
+{
     return new ParsedText(text);
 }
 
@@ -89,7 +93,8 @@ EXPORT_CDECL(IParsedText*) ParseText(LPCWSTR text) {
 /// Creates a new ParsedText object based on the specified text.
 /// </summary>
 /// <param name="text">The text to parse.</param>
-ParsedText::ParsedText(LPCWSTR text) {
+ParsedText::ParsedText(LPCWSTR text)
+{
     Parse(text);
     changeHandler = nullptr;
     data = nullptr;
@@ -99,14 +104,19 @@ ParsedText::ParsedText(LPCWSTR text) {
 /// <summary>
 /// Destructor.
 /// </summary>
-ParsedText::~ParsedText() {
-    for (list<Token>::iterator token = this->tokens.begin(); token != this->tokens.end(); ++token) {
-        if (token->type == EXPRESSION) {
+ParsedText::~ParsedText()
+{
+    for (list<Token>::iterator token = this->tokens.begin(); token != this->tokens.end(); ++token)
+    {
+        if (token->type == EXPRESSION)
+        {
             token->proc->second.users.erase(this);
-            for (int i = 0; i < token->proc->first.second; ++i) {
+            for (int i = 0; i < token->proc->first.second; ++i)
+            {
                 free(token->args[i]);
             }
-            if (token->args) {
+            if (token->args)
+            {
                 free(token->args);
             }
             free((LPVOID)token->text);
@@ -119,7 +129,8 @@ ParsedText::~ParsedText() {
 /// <summary>
 /// Specifies a function to be called when this ParsedText has changed.
 /// </summary>
-void ParsedText::SetChangeHandler(void (*handler)(LPVOID), LPVOID data) {
+void ParsedText::SetChangeHandler(void (*handler)(LPVOID), LPVOID data)
+{
     this->data = data;
     this->changeHandler = handler;
 }
@@ -128,9 +139,12 @@ void ParsedText::SetChangeHandler(void (*handler)(LPVOID), LPVOID data) {
 /// <summary>
 /// Returns true if the value of this parsedtext may change over time.
 /// </summary>
-bool ParsedText::IsDynamic() {
-    for (auto &token : this->tokens) {
-        if (token.type == EXPRESSION && token.proc->second.dynamic) {
+bool ParsedText::IsDynamic()
+{
+    for (auto &token : this->tokens)
+    {
+        if (token.type == EXPRESSION && token.proc->second.dynamic)
+        {
             return true;
         }
     }
@@ -143,23 +157,32 @@ bool ParsedText::IsDynamic() {
 /// </summary>
 /// <param name="dest">Output</param>
 /// <param name="cchDest"># of characters in dest</param>
-bool ParsedText::Evaluate(LPWSTR dest, size_t cchDest) {
-    dest[0] = '\0';
+bool ParsedText::Evaluate(LPWSTR dest, size_t cchDest)
+{
+    dest[0] = L'\0';
 
-    for (list<Token>::iterator token = this->tokens.begin(); token != this->tokens.end(); ++token) {
-        switch (token->type) {
+    for (list<Token>::iterator token = this->tokens.begin(); token != this->tokens.end(); ++token)
+    {
+        switch (token->type)
+        {
         case TEXT:
-            StringCchCatW(dest, cchDest, token->text);
+            {
+                StringCchCatW(dest, cchDest, token->text);
+            }
             break;
 
         case EXPRESSION:
-            if (token->proc->second.proc != nullptr) {
-                token->proc->second.proc(L"", (UCHAR)token->proc->first.second, token->args, dest, cchDest); 
-            }
-            else {
-                StringCchCatW(dest, cchDest, L"[");
-                StringCchCatW(dest, cchDest, token->text);
-                StringCchCatW(dest, cchDest, L"]");
+            {
+                if (token->proc->second.proc != nullptr)
+                {
+                    token->proc->second.proc(L"", (UCHAR)token->proc->first.second, token->args, dest, cchDest); 
+                }
+                else
+                {
+                    StringCchCatW(dest, cchDest, L"[");
+                    StringCchCatW(dest, cchDest, token->text);
+                    StringCchCatW(dest, cchDest, L"]");
+                }
             }
             break;
         }
@@ -172,14 +195,16 @@ bool ParsedText::Evaluate(LPWSTR dest, size_t cchDest) {
 /// <summary>
 /// Pushes a token onto the end.
 /// </summary>
-void ParsedText::AddToken(TokenType type, FUNCMAP::iterator proc, LPCWSTR str, LPWSTR* args) {
+void ParsedText::AddToken(TokenType type, FUNCMAP::iterator proc, LPCWSTR str, LPWSTR* args)
+{
     Token t;
     t.type = type;
     t.proc = proc;
     t.text = str;
     t.args = args;
     tokens.push_back(t);
-    if (type == EXPRESSION) {
+    if (type == EXPRESSION)
+    {
         proc->second.users.insert(this);
     }
 }
@@ -188,8 +213,10 @@ void ParsedText::AddToken(TokenType type, FUNCMAP::iterator proc, LPCWSTR str, L
 /// <summary>
 /// Calls the changehandler for this object.
 /// </summary>
-void ParsedText::DataChanged() {
-    if (this->changeHandler) {
+void ParsedText::DataChanged()
+{
+    if (this->changeHandler)
+    {
         this->changeHandler(this->data);
     }
 }
@@ -199,7 +226,8 @@ void ParsedText::DataChanged() {
 /// Parses text and pushes its tokens onto the end.
 /// </summary>
 /// <param name="text">The text to parse.</param>
-void ParsedText::Parse(LPCWSTR text) {
+void ParsedText::Parse(LPCWSTR text)
+{
     // An expression starts with a [, and ends with the first ] which is not enclosed within quotes.
 
     // Where the begining of the current text segment is.
@@ -231,12 +259,15 @@ void ParsedText::Parse(LPCWSTR text) {
     //
     LPCWSTR searchPos = text;
 
-    while (searchPos != nullptr && *searchPos != L'\0') {
-        switch (mode) {
+    while (searchPos != nullptr && *searchPos != L'\0')
+    {
+        switch (mode)
+        {
         case 0: // Searching for the begining of the next expression.
             {
                 searchPos = wcswcs(searchPos, L"[");
-                if (searchPos != nullptr) {
+                if (searchPos != nullptr)
+                {
                     expressionStart = searchPos;
                     ++searchPos;
                     mode = 1;
@@ -246,21 +277,26 @@ void ParsedText::Parse(LPCWSTR text) {
 
         case 1: // Reads the function name.
             {
-                if (*++searchPos == L']') {
+                if (*++searchPos == L']')
+                {
                     functionName = StringUtils::PartialDup(expressionStart + 1, searchPos - expressionStart - 1);
                     mode = 10;
                 }
-                else if (*searchPos == L'(') {
-                    if (*++searchPos == L'\'') {
+                else if (*searchPos == L'(')
+                {
+                    if (*++searchPos == L'\'')
+                    {
                         argumentStart = searchPos;
                         functionName = StringUtils::PartialDup(expressionStart + 1, searchPos - expressionStart - 2);
                         mode = 2;
                     }
-                    else {
+                    else
+                    {
                         mode = 9;
                     }
                 }
-                else if (!iswalnum(*searchPos)) {
+                else if (!iswalnum(*searchPos))
+                {
                     mode = 9;
                 }
             }
@@ -269,12 +305,14 @@ void ParsedText::Parse(LPCWSTR text) {
         case 2: // Reads arguments
             {
                 searchPos = wcswcs(++searchPos, L"'");
-                if (searchPos != nullptr) {
+                if (searchPos != nullptr)
+                {
                     ++numArgs;
                     arguments = (LPWSTR*)realloc(arguments, numArgs*sizeof(LPWSTR));
                     arguments[numArgs-1] = StringUtils::PartialDup(argumentStart + 1, searchPos - argumentStart - 1);
 
-                    if (*++searchPos == L',') {
+                    if (*++searchPos == L',')
+                    {
                         // We REQUIRE a space after the ,
                         if (*++searchPos == L' ' && *++searchPos == L'\'') {
                             argumentStart = searchPos;
@@ -284,22 +322,27 @@ void ParsedText::Parse(LPCWSTR text) {
                             mode = 9;
                         }
                     }
-                    else if (*searchPos == L')') {
+                    else if (*searchPos == L')')
+                    {
                         // The next character needs to be a ]
-                        if (*++searchPos == L']') {
+                        if (*++searchPos == L']')
+                        {
                             mode = 10;
                         }
-                        else {
+                        else
+                        {
                             // Terminating ) not followed by ]
                             mode = 9;
                         }
                     }
-                    else {
+                    else
+                    {
                         // Terminating ' not followed by , or )
                         mode = 9;
                     }
                 }
-                else {
+                else
+                {
                     // Missing terminating '
                     mode = 9;
                 }
@@ -310,12 +353,15 @@ void ParsedText::Parse(LPCWSTR text) {
             {
                 expressionStart = nullptr;
                 argumentStart = nullptr;
-                if (functionName) {
+                if (functionName)
+                {
                     free(functionName);
                     functionName = nullptr;
                 }
-                if (arguments) {
-                    for (int i = 0; i < numArgs; ++i) {
+                if (arguments)
+                {
+                    for (int i = 0; i < numArgs; ++i)
+                    {
                         free(arguments[i]);
                     }
                     free(arguments);
@@ -349,7 +395,8 @@ void ParsedText::Parse(LPCWSTR text) {
     }
 
     // If there is anything left in the string, it is a text segment.
-    if (*pos != '\0') {
+    if (*pos != L'\0')
+    {
         AddToken(TEXT, functionMap.end(), _wcsdup(pos), nullptr);
     }
 }
@@ -358,6 +405,7 @@ void ParsedText::Parse(LPCWSTR text) {
 /// <summary>
 /// Deletes this object.
 /// </summary>
-void ParsedText::Release() {
+void ParsedText::Release()
+{
     delete this;
 }

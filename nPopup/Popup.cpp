@@ -7,18 +7,16 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
-#include "../nShared/Debugging.h"
 #include "Popup.hpp"
 #include "../nShared/LSModule.hpp"
 #include "../nShared/MonitorInfo.hpp"
 #include "FolderItem.hpp"
+#include "../Utilities/Math.h"
 
 
-Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
-    WCHAR buf[MAX_LINE_LENGTH];
-
+Popup::Popup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Drawable(prefix) {
     if (bang != NULL) {
-        this->bang = _strdup(bang);
+        this->bang = _tcsdup(bang);
     }
     else {
         this->bang = NULL;
@@ -26,20 +24,19 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     this->openChild = NULL;
     this->owner = NULL;
 
-    this->itemSpacing = settings->GetInt("ItemSpacing", 2);
-    this->maxWidth = settings->GetInt("MaxWidth", 300);
-    this->noIcons = settings->GetBool("NoIcons", false);
-    this->expandLeft = settings->GetBool("ExpandLeft", false);
-    this->confineToMonitor = settings->GetBool("ConfineToMonitor", false);
-    this->confineToWorkArea = settings->GetBool("ConfineToWorkArea", false);
-    mChildOffsetX = settings->GetInt("ChildOffsetX", 0);
-    mChildOffsetY = settings->GetInt("ChildOffsetY", 0);
-    settings->GetOffsetRect("PaddingLeft", "PaddingTop", "PaddingRight", "PaddingBottom", &this->padding, 5, 5, 5, 5);
+    this->itemSpacing = mSettings->GetInt(_T("ItemSpacing"), 2);
+    this->maxWidth = mSettings->GetInt(_T("MaxWidth"), 300);
+    this->noIcons = mSettings->GetBool(_T("NoIcons"), false);
+    this->expandLeft = mSettings->GetBool(_T("ExpandLeft"), false);
+    this->confineToMonitor = mSettings->GetBool(_T("ConfineToMonitor"), false);
+    this->confineToWorkArea = mSettings->GetBool(_T("ConfineToWorkArea"), false);
+    mChildOffsetX = mSettings->GetInt(_T("ChildOffsetX"), 0);
+    mChildOffsetY = mSettings->GetInt(_T("ChildOffsetY"), 0);
+    this->padding = mSettings->GetOffsetRect(_T("Padding"), 5, 5, 5, 5);
 
     DrawableSettings defaultSettings;
     defaultSettings.alwaysOnTop = true;
     defaultSettings.width = 200;
-    MultiByteToWideChar(CP_ACP, 0, title, (int)strlen(title)+1, buf, MAX_LINE_LENGTH);
 
     StateSettings defaultState;
     defaultState.backgroundBrush.color = 0x440000FF;
@@ -48,11 +45,11 @@ Popup::Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix) : Drawable(prefix) {
     defaultState.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
     defaultState.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
 
-    this->window->Initialize(&defaultSettings, &defaultState);
-    this->window->SetText(buf);
+    mWindow->Initialize(&defaultSettings, &defaultState);
+    mWindow->SetText(title);
 
-    SetParent(this->window->GetWindowHandle(), NULL);
-    SetWindowLongPtr(this->window->GetWindowHandle(), GWL_EXSTYLE, GetWindowLongPtr(this->window->GetWindowHandle(), GWL_EXSTYLE) & ~WS_EX_NOACTIVATE);
+    SetParent(mWindow->GetWindowHandle(), NULL);
+    SetWindowLongPtr(mWindow->GetWindowHandle(), GWL_EXSTYLE, GetWindowLongPtr(mWindow->GetWindowHandle(), GWL_EXSTYLE) & ~WS_EX_NOACTIVATE);
     this->sized = false;
     this->mouseOver = false;
     this->childItem = NULL;
@@ -73,9 +70,9 @@ Popup::~Popup() {
 void Popup::AddItem(PopupItem* item) {
     this->items.push_back(item);
     this->sized = false;
-    if (this->window->IsVisible()) {
+    if (mWindow->IsVisible()) {
         Size();
-        this->window->Repaint();
+        mWindow->Repaint();
     }
 }
 
@@ -87,8 +84,8 @@ void Popup::RemoveItem(PopupItem* /* item */) {
 void Popup::CloseChild(bool closing) {
     if (this->openChild != NULL) {
         if (!closing) {
-            SetFocus(this->window->GetWindowHandle());
-            SetActiveWindow(this->window->GetWindowHandle());
+            SetFocus(mWindow->GetWindowHandle());
+            SetActiveWindow(mWindow->GetWindowHandle());
         }
 
         this->openChild->owner = NULL;
@@ -115,13 +112,13 @@ void Popup::OpenChild(Popup* child, LPRECT position, PopupItem* childItem) {
 }
 
 
-LPCSTR Popup::GetBang() {
+LPCTSTR Popup::GetBang() {
     return this->bang;
 }
 
 
 bool Popup::CheckFocus(HWND newActive, __int8 direction) {
-    if (this->window->GetWindowHandle() == newActive || this->mouseOver)
+    if (mWindow->GetWindowHandle() == newActive || this->mouseOver)
         return true;
     return direction & 1 && this->owner && this->owner->CheckFocus(newActive, 1)
         || direction & 2 && this->openChild && this->openChild->CheckFocus(newActive, 2);
@@ -129,8 +126,8 @@ bool Popup::CheckFocus(HWND newActive, __int8 direction) {
 
 
 void Popup::Close() {
-    this->window->Hide();
-    this->expandLeft = settings->GetBool("ExpandLeft", false);
+    mWindow->Hide();
+    this->expandLeft = mSettings->GetBool(L"ExpandLeft", false);
     CloseChild(true);
     PostClose();
     this->mouseOver = false;
@@ -162,7 +159,7 @@ void Popup::Show(int x, int y) {
 
 void Popup::Size() {
     // Work out the desired item 
-    int itemWidth = settings->GetInt("Width", 200) - this->padding.left - this->padding.right;
+    int itemWidth = mSettings->GetInt(_T("Width"), 200) - this->padding.left - this->padding.right;
     int maxItemWidth = this->maxWidth - this->padding.left - this->padding.right;
     int height = this->padding.top;
     int width;
@@ -173,7 +170,7 @@ void Popup::Size() {
     }
     width = itemWidth + this->padding.left + this->padding.right;
     height += this->padding.bottom - this->itemSpacing;
-    MonitorInfo* monInfo = this->window->GetMonitorInformation();
+    MonitorInfo* monInfo = mWindow->GetMonitorInformation();
 
     // We've excceeded the max height, split the popup into columns.
     if (height > monInfo->m_virtualDesktop.height) {
@@ -205,17 +202,17 @@ void Popup::Size() {
     }
 
     // Size the main window
-    this->window->Resize(width, height);
+    mWindow->Resize(width, height);
     this->sized = true;
 }
 
 
 void Popup::Show(LPRECT position, Popup* owner) {
     this->owner = owner;
-    SetParent(this->window->GetWindowHandle(), NULL);
+    SetParent(mWindow->GetWindowHandle(), NULL);
     PreShow();
 
-    MonitorInfo* monInfo = this->window->GetMonitorInformation();
+    MonitorInfo* monInfo = mWindow->GetMonitorInformation();
 
     if (!this->sized) {
         Size();
@@ -237,7 +234,7 @@ void Popup::Show(LPRECT position, Popup* owner) {
 
 
     if (this->expandLeft) {
-        x = position->left - this->window->GetDrawingSettings()->width;
+        x = position->left - mWindow->GetDrawingSettings()->width;
         if (x < limits.left) {
             this->expandLeft = false;
             x = this->owner ? position->right : limits.left;
@@ -245,27 +242,27 @@ void Popup::Show(LPRECT position, Popup* owner) {
     }
     else {
         x = position->right;
-        if (x > limits.right - this->window->GetDrawingSettings()->width) {
+        if (x > limits.right - mWindow->GetDrawingSettings()->width) {
             this->expandLeft = true;
-            x = (this->owner ? position->left : limits.right) - this->window->GetDrawingSettings()->width;
+            x = (this->owner ? position->left : limits.right) - mWindow->GetDrawingSettings()->width;
         }
     }
 
-    y = max(limits.top, min(limits.bottom - this->window->GetDrawingSettings()->height, position->top));
+    y = max(limits.top, min(limits.bottom - mWindow->GetDrawingSettings()->height, position->top));
 
-    this->window->Move(x, y);
+    mWindow->Move(x, y);
 
-    this->window->Show();
-    SetWindowPos(this->window->GetWindowHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-    SetFocus(this->window->GetWindowHandle());
-    SetActiveWindow(this->window->GetWindowHandle());
+    mWindow->Show();
+    SetWindowPos(mWindow->GetWindowHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    SetFocus(mWindow->GetWindowHandle());
+    SetActiveWindow(mWindow->GetWindowHandle());
 }
 
 
 LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
     switch (msg) {
     case WM_ACTIVATE:
-        if (LOWORD(wParam) == WA_INACTIVE && this->window->IsVisible()) {
+        if (LOWORD(wParam) == WA_INACTIVE && mWindow->IsVisible()) {
             if (!CheckFocus((HWND)lParam, 3)) {
                 Close();
             }

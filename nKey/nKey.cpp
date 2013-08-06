@@ -20,16 +20,16 @@ using std::map;
 UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
 // All hotkey mappings
-map<int, LPCSTR> g_hotKeys;
+map<int, LPCTSTR> g_hotKeys;
 
 // Definitions loaded from vk104.txt
-map<LPCSTR, UINT> g_vkCodes;
+map<LPCTSTR, UINT> g_vkCodes;
 
 // Used for assigning hotkeys.
 int g_id = 0;
 
 // The LiteStep module class
-LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
+LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 //
 HWND g_window;
@@ -38,7 +38,7 @@ HWND g_window;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
+int initModuleEx(HWND parent, HINSTANCE instance, LPCTSTR /* path */) {
     // Initialize    
     if (!gLSModule.Initialize(parent, instance)) {
         return 1;
@@ -58,13 +58,13 @@ void quitModule(HINSTANCE /* instance */) {
     // Remove all hotkeys
     for (auto hotkey : g_hotKeys) {
         UnregisterHotKey(g_window, hotkey.first);
-        free(const_cast<LPSTR>(hotkey.second));
+        free(const_cast<LPTSTR>(hotkey.second));
     }
     g_hotKeys.clear();
 
     // Clear g_vkCodes
     for (auto code : g_vkCodes) {
-        free(const_cast<LPSTR>(code.first));
+        free(const_cast<LPTSTR>(code.first));
     }
     g_vkCodes.clear();
 }
@@ -99,7 +99,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case WM_HOTKEY:
         {
-            map<int, LPCSTR>::iterator iter = g_hotKeys.find((int)wParam);
+            map<int, LPCTSTR>::iterator iter = g_hotKeys.find((int)wParam);
             if (iter != g_hotKeys.end()) {
                 LiteStep::LSExecute(window, iter->second, 0);
             }
@@ -124,25 +124,25 @@ void LoadSettings() {
 /// </summary>
 void LoadVKeyTable() {
     FILE * file;
-    char path[MAX_PATH], line[256], szName[256], szCode[64];
-    LPSTR tokens[] = { szName, szCode };
-    char * endPtr;
+    TCHAR path[MAX_PATH], line[256], szName[256], szCode[64];
+    LPTSTR tokens[] = { szName, szCode };
+    TCHAR * endPtr;
     UINT u;
 
-    LiteStep::GetRCLine("nKeyVKTable", path, sizeof(path), "");
-    if (fopen_s(&file, path, "r") == 0) {
-        while (fgets(line, sizeof(line), file) != nullptr) {
+    LiteStep::GetRCLine(_T("nKeyVKTable"), path, _countof(path), _T(""));
+    if (_tfopen_s(&file, path, _T("r")) == 0) {
+        while (_fgetts(line, sizeof(line), file) != nullptr) {
             if (LiteStep::LCTokenize(line, tokens, 2, nullptr) == 2) {
-                u = strtoul(szCode, &endPtr, 0);
+                u = _tcstoul(szCode, &endPtr, 0);
 
                 if (szCode[0] != '\0' && *endPtr == '\0') {
                     // Store the name in the heap
-                    size_t size = strlen(szName)+1;
-                    LPSTR pszHeap = (LPSTR)malloc(size);
-                    strcpy_s(pszHeap, size, szName);
+                    size_t size = _tcslen(szName)+1;
+                    LPTSTR pszHeap = (LPTSTR)malloc(size);
+                    _tcscpy_s(pszHeap, size, szName);
 
                     // Insert it into the map
-                    g_vkCodes.insert(g_vkCodes.begin(), std::pair<LPCSTR, UINT>(pszHeap, u));
+                    g_vkCodes.insert(g_vkCodes.begin(), std::pair<LPCTSTR, UINT>(pszHeap, u));
                 }
             }
         }
@@ -159,14 +159,14 @@ void LoadVKeyTable() {
 /// Reads through the .rc files and load *HotKeys
 /// </summary>
 void LoadHotKeys() {
-    char szLine[MAX_LINE_LENGTH], szMods[128], szKey[128], szCommand[MAX_LINE_LENGTH];
-    LPSTR szTokens[] = {szMods, szKey};
+    TCHAR szLine[MAX_LINE_LENGTH], szMods[128], szKey[128], szCommand[MAX_LINE_LENGTH];
+    LPTSTR szTokens[] = { szMods, szKey };
     LPVOID f = LiteStep::LCOpen(NULL);
 
-    while (LiteStep::LCReadNextConfig(f, "*HotKey", szLine, sizeof(szLine))) {
+    while (LiteStep::LCReadNextConfig(f, L"*HotKey", szLine, _countof(szLine))) {
         LiteStep::LCTokenize(szLine+strlen("*HotKey")+1, szTokens, 2, szCommand);
         // ParseMods expects szMods to be all lowercase.
-        _strlwr_s(szMods, sizeof(szMods));
+        _tcslwr_s(szMods, _countof(szMods));
         AddHotkey(ParseMods(szMods), ParseKey(szKey), szCommand);
     }
 
@@ -177,12 +177,12 @@ void LoadHotKeys() {
 /// <summary>
 /// String -> Mod code
 /// </summary>
-UINT ParseMods(LPCSTR szMods) {
+UINT ParseMods(LPCTSTR szMods) {
     UINT mods = 0;
-    if (strstr(szMods, "win") != NULL) mods |= MOD_WIN;
-    if (strstr(szMods, "alt") != NULL) mods |= MOD_ALT;
-    if (strstr(szMods, "ctrl") != NULL) mods |= MOD_CONTROL;
-    if (strstr(szMods, "shift") != NULL) mods |= MOD_SHIFT;
+    if (_tcsstr(szMods, _T("win")) != NULL) mods |= MOD_WIN;
+    if (_tcsstr(szMods, _T("alt")) != NULL) mods |= MOD_ALT;
+    if (_tcsstr(szMods, _T("ctrl")) != NULL) mods |= MOD_CONTROL;
+    if (_tcsstr(szMods, _T("shift")) != NULL) mods |= MOD_SHIFT;
     return mods;
 }
 
@@ -190,15 +190,15 @@ UINT ParseMods(LPCSTR szMods) {
 /// <summary>
 /// String -> Virtual Key Code
 /// </summary>
-UINT ParseKey(LPCSTR szKey) {
+UINT ParseKey(LPCTSTR szKey) {
     // If the key is a single character, find that key.
-    if (strlen(szKey) == 1) {
+    if (_tcslen(szKey) == 1) {
         return VkKeyScan(szKey[0]) & 0xFF;
     }
     else {
         // Check if it's in our table
-        for (map<LPCSTR, UINT>::const_iterator iter = g_vkCodes.begin(); iter != g_vkCodes.end(); iter++) {
-            if (strcmp(iter->first, szKey) == 0) {
+        for (map<LPCTSTR, UINT>::const_iterator iter = g_vkCodes.begin(); iter != g_vkCodes.end(); iter++) {
+            if (_tcscmp(iter->first, szKey) == 0) {
                 return iter->second;
             }
         }
@@ -211,17 +211,17 @@ UINT ParseKey(LPCSTR szKey) {
 /// <summary>
 /// Adds a hotkey.
 /// </summary>
-bool AddHotkey(UINT mods, UINT key, LPCSTR pszCommand) {
+bool AddHotkey(UINT mods, UINT key, LPCTSTR pszCommand) {
     // Invalid mods or key
     if (mods == -1 || key == -1) return false;
 
     // Store the command in the heap
-    size_t size = strlen(pszCommand)+1;
-    LPSTR pszCommandHeap = (LPSTR)malloc(size);
-    strcpy_s(pszCommandHeap, size, pszCommand);
+    size_t size = _tcslen(pszCommand)+1;
+    LPTSTR pszCommandHeap = (LPTSTR)malloc(size);
+    _tcscpy_s(pszCommandHeap, size, pszCommand);
 
     // Add the hotkey definition
-    map<int, LPCSTR>::iterator it = g_hotKeys.insert(g_hotKeys.begin(), std::pair<int, LPCSTR>(g_id, pszCommandHeap));
+    map<int, LPCTSTR>::iterator it = g_hotKeys.insert(g_hotKeys.begin(), std::pair<int, LPCTSTR>(g_id, pszCommandHeap));
 
     // Register the hotkey
     if (RegisterHotKey(g_window, g_id, mods, key) == FALSE) {

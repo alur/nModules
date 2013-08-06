@@ -10,7 +10,8 @@
 // Function which parses dynamic text functions.
 typedef BOOL (__cdecl * FORMATTINGPROC)(LPCWSTR name, UCHAR numArgs, LPWSTR* args, LPWSTR dest, size_t cchDest);
 
-class IParsedText {
+class IParsedText
+{
 public:
     // Evaluates this parsed text with current data.
     virtual bool Evaluate(LPWSTR dest, size_t cchDest) = 0;

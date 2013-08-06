@@ -5,15 +5,13 @@
  *  Handles clicks on the desktop.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <algorithm>
-#include <functional>
-#include <strsafe.h>
-#include <Windows.h>
-#include <Windowsx.h>
-
 #include "../nCoreCom/Core.h"
 #include "../nShared/LiteStep.h"
 #include "../nShared/MonitorInfo.hpp"
+
+#include <algorithm>
+#include <functional>
+#include <Windowsx.h>
 
 #include "ClickHandler.hpp"
 
@@ -107,7 +105,7 @@ void ClickHandler::Refresh() {
 /// Loads click settings.
 /// </summary>
 void ClickHandler::LoadSettings(bool /* bIsRefresh */) {
-    LiteStep::IterateOverLines("*nDeskOn", [this] (LPCSTR line) -> void {
+    LiteStep::IterateOverLines(_T("*nDeskOn"), [this] (LPCTSTR line) -> void {
         AddHandler(line);
     });
 }
@@ -116,14 +114,14 @@ void ClickHandler::LoadSettings(bool /* bIsRefresh */) {
 /// <summary>
 /// Parses a click line.
 /// </summary>
-ClickHandler::ClickData ClickHandler::ParseLine(LPCSTR szLine) {
+ClickHandler::ClickData ClickHandler::ParseLine(LPCTSTR szLine) {
     // !nDeskOn <type> <mods> <action>
     // !nDeskOn <type> <mods> <left> <top> <right> <bottom> <action>
-    char szToken[MAX_LINE_LENGTH];
-    LPCSTR pszNext = szLine;
+    TCHAR szToken[MAX_LINE_LENGTH];
+    LPCTSTR pszNext = szLine;
     ClickData cData;
 
-    using nCore::InputParsing::ParseCoordinate;
+    using namespace LiteStep;
 
     // Type
     LiteStep::GetToken(pszNext, szToken, &pszNext, false);
@@ -134,7 +132,7 @@ ClickHandler::ClickData ClickHandler::ParseLine(LPCSTR szLine) {
     cData.mods = ModsFromString(szToken);
 
     // Guess that the rest is an action for now
-    StringCchCopyA(cData.action, sizeof(cData.action), pszNext);
+    StringCchCopy(cData.action, sizeof(cData.action), pszNext);
     cData.area = g_pMonitorInfo->m_virtualDesktop.rect;
 
     // Check if we have 4 valid coordinates followed by some action
@@ -162,7 +160,7 @@ ClickHandler::ClickData ClickHandler::ParseLine(LPCSTR szLine) {
     cData.area.bottom = top + height;
 
     // Then the rest is the action
-    StringCchCopyA(cData.action, sizeof(cData.action), pszNext);
+    StringCchCopy(cData.action, sizeof(cData.action), pszNext);
 
     return cData;
 }
@@ -171,7 +169,7 @@ ClickHandler::ClickData ClickHandler::ParseLine(LPCSTR szLine) {
 /// <summary>
 /// Parses a click line.
 /// </summary>
-void ClickHandler::AddHandler(LPCSTR szLine) {
+void ClickHandler::AddHandler(LPCTSTR szLine) {
     ClickData cData = ParseLine(szLine);
     if (cData.type == UNKNOWN) {
         // TODO::Throw an error
@@ -185,7 +183,7 @@ void ClickHandler::AddHandler(LPCSTR szLine) {
 /// <summary>
 /// Removes any handlers matching the spcified criterias.
 /// </summary>
-void ClickHandler::RemoveHandlers(LPCSTR szLine) {
+void ClickHandler::RemoveHandlers(LPCTSTR szLine) {
     std::remove_if(m_clickHandlers.begin(), m_clickHandlers.end(), std::bind(&ClickHandler::Matches, this, ParseLine(szLine), std::placeholders::_1));
 }
 
@@ -206,31 +204,31 @@ bool ClickHandler::Matches(ClickData a, ClickData b) {
 /// <summary>
 /// Gets the clicktype from a user input string.
 /// </summary>
-ClickHandler::ClickType ClickHandler::TypeFromString(LPCSTR str) {
-    if (_stricmp(str, "WheelUp") == 0) return WHEELUP;
-    if (_stricmp(str, "WheelDown") == 0) return WHEELDOWN;
-    if (_stricmp(str, "WheelRight") == 0) return WHEELRIGHT;
-    if (_stricmp(str, "WheelLeft") == 0) return WHEELLEFT;
+ClickHandler::ClickType ClickHandler::TypeFromString(LPCTSTR str) {
+    if (_tcsicmp(str, _T("WheelUp")) == 0) return WHEELUP;
+    if (_tcsicmp(str, _T("WheelDown")) == 0) return WHEELDOWN;
+    if (_tcsicmp(str, _T("WheelRight")) == 0) return WHEELRIGHT;
+    if (_tcsicmp(str, _T("WheelLeft")) == 0) return WHEELLEFT;
 
-    if (_stricmp(str, "LeftClickDown") == 0) return LEFTDOWN;
-    if (_stricmp(str, "LeftClickUp") == 0) return LEFTUP;
-    if (_stricmp(str, "LeftDoubleClick") == 0) return LEFTDOUBLE;
+    if (_tcsicmp(str, _T("LeftClickDown")) == 0) return LEFTDOWN;
+    if (_tcsicmp(str, _T("LeftClickUp")) == 0) return LEFTUP;
+    if (_tcsicmp(str, _T("LeftDoubleClick")) == 0) return LEFTDOUBLE;
 
-    if (_stricmp(str, "MiddleClickDown") == 0) return MIDDLEDOWN;
-    if (_stricmp(str, "MiddleClickUp") == 0) return MIDDLEUP;
-    if (_stricmp(str, "MiddleDoubleClick") == 0) return MIDDLEDOUBLE;
+    if (_tcsicmp(str, _T("MiddleClickDown")) == 0) return MIDDLEDOWN;
+    if (_tcsicmp(str, _T("MiddleClickUp")) == 0) return MIDDLEUP;
+    if (_tcsicmp(str, _T("MiddleDoubleClick")) == 0) return MIDDLEDOUBLE;
 
-    if (_stricmp(str, "RightClickDown") == 0) return RIGHTDOWN;
-    if (_stricmp(str, "RightClickUp") == 0) return RIGHTUP;
-    if (_stricmp(str, "RightDoubleClick") == 0) return RIGHTDOUBLE;
+    if (_tcsicmp(str, _T("RightClickDown")) == 0) return RIGHTDOWN;
+    if (_tcsicmp(str, _T("RightClickUp")) == 0) return RIGHTUP;
+    if (_tcsicmp(str, _T("RightDoubleClick")) == 0) return RIGHTDOUBLE;
 
-    if (_stricmp(str, "X1ClickDown") == 0) return X1DOWN;
-    if (_stricmp(str, "X1ClickUp") == 0) return X1UP;
-    if (_stricmp(str, "X1DoubleClick") == 0) return X1DOUBLE;
+    if (_tcsicmp(str, _T("X1ClickDown")) == 0) return X1DOWN;
+    if (_tcsicmp(str, _T("X1ClickUp")) == 0) return X1UP;
+    if (_tcsicmp(str, _T("X1DoubleClick")) == 0) return X1DOUBLE;
 
-    if (_stricmp(str, "X2ClickDown") == 0) return X2DOWN;
-    if (_stricmp(str, "X2ClickUp") == 0) return X2UP;
-    if (_stricmp(str, "X2DoubleClick") == 0) return X2DOUBLE;
+    if (_tcsicmp(str, _T("X2ClickDown")) == 0) return X2DOWN;
+    if (_tcsicmp(str, _T("X2ClickUp")) == 0) return X2UP;
+    if (_tcsicmp(str, _T("X2DoubleClick")) == 0) return X2DOUBLE;
 
     return UNKNOWN;
 }
@@ -239,20 +237,20 @@ ClickHandler::ClickType ClickHandler::TypeFromString(LPCSTR str) {
 /// <summary>
 /// Gets the mod value from a string.
 /// </summary>
-WORD ClickHandler::ModsFromString(LPSTR str) {
+WORD ClickHandler::ModsFromString(LPTSTR str) {
     WORD ret = 0x0000;
 
-    char * context;
-    LPSTR tok = strtok_s(str, "+", &context);
+    LPTSTR context;
+    LPTSTR tok = _tcstok_s(str, _T("+"), &context);
     while (tok != NULL) {
-        if (_stricmp(tok, "ctrl") == 0) ret |= MK_CONTROL;
-        else if (_stricmp(tok, "mouseleft") == 0) ret |= MK_LBUTTON;
-        else if (_stricmp(tok, "mousemiddle") == 0) ret |= MK_MBUTTON;
-        else if (_stricmp(tok, "mouseright") == 0) ret |= MK_RBUTTON;
-        else if (_stricmp(tok, "shift") == 0) ret |= MK_SHIFT;
-        else if (_stricmp(tok, "mousex1") == 0) ret |= MK_XBUTTON1;
-        else if (_stricmp(tok, "mousex2") == 0) ret |= MK_XBUTTON2;
-        tok = strtok_s(NULL, "+", &context);
+        if (_tcsicmp(tok, _T("ctrl")) == 0) ret |= MK_CONTROL;
+        else if (_tcsicmp(tok, _T("mouseleft")) == 0) ret |= MK_LBUTTON;
+        else if (_tcsicmp(tok, _T("mousemiddle")) == 0) ret |= MK_MBUTTON;
+        else if (_tcsicmp(tok, _T("mouseright")) == 0) ret |= MK_RBUTTON;
+        else if (_tcsicmp(tok, _T("shift")) == 0) ret |= MK_SHIFT;
+        else if (_tcsicmp(tok, _T("mousex1")) == 0) ret |= MK_XBUTTON1;
+        else if (_tcsicmp(tok, _T("mousex2")) == 0) ret |= MK_XBUTTON2;
+        tok = _tcstok_s(NULL, _T("+"), &context);
     }
 
     return ret;

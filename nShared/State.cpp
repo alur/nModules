@@ -6,10 +6,8 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "LiteStep.h"
-#include "Debugging.h"
 #include "State.hpp"
 #include "Factories.h"
-#include "Macros.h"
 #include <d2d1.h>
 #include <Wincodec.h>
 #include "Color.h"
@@ -18,24 +16,24 @@
 using namespace D2D1;
 
 
-State::State(LPCSTR stateName, Settings* settings, int defaultPriority, LPCWSTR* text) {
+State::State(LPCTSTR stateName, Settings* settings, int defaultPriority, LPCWSTR* text) {
     this->active = false;
     this->backBrush = new Brush();
     this->drawingSettings = new StateSettings();
     this->outlineBrush = new Brush();
-    this->priority = settings->GetInt("Priority", defaultPriority);
+    this->priority = settings->GetInt(_T("Priority"), defaultPriority);
     this->settings = settings;
     this->text = text;
     this->textBrush = new Brush();
     this->textFormat = nullptr;
     this->textShadowBrush = new Brush();
-    mName = _strdup(stateName);
+    mName = _tcsdup(stateName);
 }
 
 
 State::~State() {
     DiscardDeviceResources();
-    free(const_cast<LPSTR>(mName));
+    free(const_cast<LPTSTR>(mName));
     SAFEDELETE(this->settings);
     SAFEDELETE(this->drawingSettings);
     SAFERELEASE(this->textFormat);
@@ -261,14 +259,15 @@ void State::SetWordWrapping(DWRITE_WORD_WRAPPING wrapping) {
 }
 
 
-Brush* State::GetBrush(LPCSTR brushName) {
-    if (*brushName == '\0') {
+Brush* State::GetBrush(LPCTSTR brushName)
+{
+    if (*brushName == _T('\0')) {
         return this->backBrush;
     }
-    else if (_stricmp(brushName, "Text") == 0) {
+    else if (_tcsicmp(brushName, _T("Text")) == 0) {
         return this->textBrush;
     }
-    else if (_stricmp(brushName, "Outline") == 0) {
+    else if (_tcsicmp(brushName, _T("Outline")) == 0) {
         return this->outlineBrush;
     }
 

@@ -18,7 +18,7 @@ const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
     LM_FULLSCREENDEACTIVATED, 0 };
 
 // All current icon groups
-static map<string, IconGroup*> gIconGroups;
+static map<wstring, IconGroup*> gIconGroups;
 
 // The LiteStep module class
 LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
@@ -134,8 +134,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// Reads through the .rc files and creates labels.
 /// </summary>
 void LoadSettings() {
-    LiteStep::IterateOverLines("*nIcon", [] (LPCSTR line) -> void {
-        LiteStep::IterateOverTokens(line, [] (LPCSTR token) -> void {
+    LiteStep::IterateOverLines(L"*nIcon", [] (LPCTSTR line) -> void {
+        LiteStep::IterateOverTokens(line, [] (LPCTSTR token) -> void {
             CreateGroup(token);
         });
     });
@@ -154,7 +154,7 @@ void Refresh() {
 /// Creates a new group with the specified name.
 /// </summary>
 /// <param name="groupName">The name of the group to create.</param>
-void CreateGroup(LPCSTR groupName) {
+void CreateGroup(LPCTSTR groupName) {
     if (gIconGroups.find(groupName) == gIconGroups.end()) {
         gIconGroups[groupName] = new IconGroup(groupName);
     }

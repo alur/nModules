@@ -8,11 +8,15 @@
 #include "../nShared/LiteStep.h"
 #include "WindowThumbnail.hpp"
 #include <dwmapi.h>
-#include "../nShared/Math.h"
+#include <algorithm>
+#include "../Utilities/Math.h"
+
+using std::min;
+using std::max;
 
 
-WindowThumbnail::WindowThumbnail(LPCSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings) {
-    this->thumbnailHandle = NULL;
+WindowThumbnail::WindowThumbnail(LPCTSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings) {
+    this->thumbnailHandle = nullptr;
 
     LoadSettings();
 }
@@ -28,11 +32,11 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
 
     this->hwnd = hwnd;
 
-    if (this->thumbnailHandle != NULL) {
+    if (this->thumbnailHandle != nullptr) {
         DwmUnregisterThumbnail(this->thumbnailHandle);
     }
 
-    hr = DwmRegisterThumbnail(this->window->GetWindowHandle(), hwnd, &this->thumbnailHandle);
+    hr = DwmRegisterThumbnail(mWindow->GetWindowHandle(), hwnd, &this->thumbnailHandle);
     
     if (SUCCEEDED(hr)) {
         hr = DwmQueryThumbnailSourceSize(this->thumbnailHandle, &sourceSize);
@@ -55,8 +59,8 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
                 y = this->position == BOTTOM ? position->bottom + this->distanceFromButton : position->top - height - this->distanceFromButton;
 
                 // Ensure that the entire preview is on the same monitor as the button.
-                MonitorInfo::Monitor monitor = this->window->GetMonitorInformation()->m_monitors[this->window->GetMonitorInformation()->MonitorFromRECT(position)];
-                x = clamp(monitor.rect.left, x, monitor.rect.right - width);
+                MonitorInfo::Monitor monitor = mWindow->GetMonitorInformation()->m_monitors[mWindow->GetMonitorInformation()->MonitorFromRECT(position)];
+                x = CLAMP(monitor.rect.left, (long)x, monitor.rect.right - width);
             }
             break;
 
@@ -72,31 +76,31 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
                 x = this->position == LEFT ? position->left - width - this->distanceFromButton : position->right + this->distanceFromButton;
 
                 // Ensure that the entire preview is on the same monitor as the button.
-                MonitorInfo::Monitor monitor = this->window->GetMonitorInformation()->m_monitors[this->window->GetMonitorInformation()->MonitorFromRECT(position)];
-                y = clamp(monitor.rect.top, y, monitor.rect.bottom - height);
+                MonitorInfo::Monitor monitor = mWindow->GetMonitorInformation()->m_monitors[mWindow->GetMonitorInformation()->MonitorFromRECT(position)];
+                y = CLAMP(monitor.rect.top, (long)y, monitor.rect.bottom - height);
             }
             break;
         }
 
         switch (this->position) {
             case TOP:
-                this->window->SetPosition(position->left, position->top - 1, position->right - position->left, 1);
+                mWindow->SetPosition(position->left, position->top - 1, position->right - position->left, 1);
                 break;
 
             case BOTTOM:
-                this->window->SetPosition(position->left, position->bottom, position->right - position->left, 1);
+                mWindow->SetPosition(position->left, position->bottom, position->right - position->left, 1);
                 break;
 
             case LEFT:
-                this->window->SetPosition(position->left, position->bottom, 1, position->bottom - position->top);
+                mWindow->SetPosition(position->left, position->bottom, 1, position->bottom - position->top);
                 break;
 
             case RIGHT:
-                this->window->SetPosition(position->right, position->bottom, 1, position->bottom - position->top);
+                mWindow->SetPosition(position->right, position->bottom, 1, position->bottom - position->top);
                 break;
         }
-        this->window->SetPosition(x, y, width, height);
-        //this->window->SetAnimation(x, y, width, height, 200, Easing::Type::Sine);
+        mWindow->SetPosition(x, y, width, height);
+        //mWindow->SetAnimation(x, y, width, height, 200, Easing::Type::Sine);
 
         DWM_THUMBNAIL_PROPERTIES properties;
         properties.dwFlags = DWM_TNP_VISIBLE | DWM_TNP_SOURCECLIENTAREAONLY | DWM_TNP_OPACITY;
@@ -108,7 +112,7 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
     }
 
     if (SUCCEEDED(hr)) {
-        this->window->Show();
+        mWindow->Show();
     }
 }
 
@@ -117,7 +121,7 @@ void WindowThumbnail::Hide() {
     DwmUnregisterThumbnail(this->thumbnailHandle);
     this->thumbnailHandle = NULL;
     this->hwnd = NULL;
-    this->window->Hide();
+    mWindow->Hide();
 }
 
 
@@ -137,29 +141,29 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
     defaultState.outlineBrush.color = 0xAAFFFFFF;
     defaultState.outlineWidth = 2.0f;
 
-    this->window->Initialize(&defaults,  &defaultState);
+    mWindow->Initialize(&defaults,  &defaultState);
 
-    char szBuf[32];
+    TCHAR szBuf[32];
 
-    this->distanceFromButton = settings->GetInt("DistanceFromButton", 2);
-    this->maxHeight = settings->GetInt("MaxHeight", 300);
-    this->maxWidth = settings->GetInt("MaxWidth", 300);
-    this->settings->GetOffsetRect("OffsetLeft", "OffsetTop", "OffsetRight", "OffsetBottom", &this->offset, 5, 5, 5, 5);
-    this->settings->GetString("Position", szBuf, sizeof(szBuf), "Top"); 
-    if (_stricmp(szBuf, "Left") == 0) {
+    this->distanceFromButton = mSettings->GetInt(_T("DistanceFromButton"), 2);
+    this->maxHeight = mSettings->GetInt(_T("MaxHeight"), 300);
+    this->maxWidth = mSettings->GetInt(_T("MaxWidth"), 300);
+    this->offset = mSettings->GetOffsetRect(_T("Offset"), 5, 5, 5, 5);
+    mSettings->GetString(_T("Position"), szBuf, sizeof(szBuf), _T("Top")); 
+    if (_tcsicmp(szBuf, _T("Left")) == 0) {
         this->position = LEFT;
     }
-    else if (_stricmp(szBuf, "Right") == 0) {
+    else if (_tcsicmp(szBuf, _T("Right")) == 0) {
         this->position = RIGHT;
     }
-    else if (_stricmp(szBuf, "Bottom") == 0) {
+    else if (_tcsicmp(szBuf, _T("Bottom")) == 0) {
         this->position = BOTTOM;
     }
     else {
         this->position = TOP;
     }
-    this->sizeToButton = settings->GetBool("SizeToButton", true);
-    this->thumbnailOpacity = settings->GetInt("ThumbnailOpacity", 255);
+    this->sizeToButton = mSettings->GetBool(_T("SizeToButton"), true);
+    this->thumbnailOpacity = mSettings->GetInt(_T("ThumbnailOpacity"), 255);
 }
 
 

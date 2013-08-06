@@ -6,16 +6,15 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "Popup.hpp"
-#include "../nShared/Macros.h"
 #include "../nShared/LSModule.hpp"
-#include "../nShared/Debugging.h"
+#include <shellapi.h>
 
 
 extern LSModule gLSModule;
 
 
-PopupItem::PopupItem(Drawable* parent, LPCSTR prefix, bool independent) : Drawable(parent, prefix, independent) {
-    this->iconSettings = this->settings->CreateChild("Icon");
+PopupItem::PopupItem(Drawable* parent, LPCTSTR prefix, bool independent) : Drawable(parent, prefix, independent) {
+    this->iconSettings = mSettings->CreateChild(L"Icon");
     this->itemType = PopupItemType::SEPARATOR;
 }
 
@@ -26,36 +25,36 @@ PopupItem::~PopupItem() {
 
 
 void PopupItem::Position(int x, int y) {
-    this->window->Move(x, y);
+    mWindow->Move(x, y);
 }
 
 
 int PopupItem::GetHeight() {
-    return this->window->GetDrawingSettings()->height;
+    return mWindow->GetDrawingSettings()->height;
 }
 
 
 void PopupItem::SetWidth(int width) {
-    this->window->Resize(width, this->window->GetDrawingSettings()->height);
+    mWindow->Resize(width, mWindow->GetDrawingSettings()->height);
 }
 
 
 bool PopupItem::CheckMerge(LPCWSTR name) {
-    return this->itemType == PopupItemType::FOLDER && _wcsicmp(name, this->window->GetText()) == 0;
+    return this->itemType == PopupItemType::FOLDER && _wcsicmp(name, mWindow->GetText()) == 0;
 }
 
 
-bool PopupItem::ParseDotIcon(LPCSTR dotIcon) {
-    if (dotIcon == NULL || ((Popup*)this->parent)->noIcons) {
+bool PopupItem::ParseDotIcon(LPCTSTR dotIcon) {
+    if (dotIcon == NULL || ((Popup*)mParent)->noIcons) {
         return false;
     }
 
     // TODO::May cause problems with paths which include a comma.
-    LPSTR index = (LPSTR)strrchr(dotIcon, ',');
+    LPTSTR index = (LPTSTR)_tcsrchr(dotIcon, L',');
     int nIndex;
     if (index != NULL) {
         index++[0] = NULL;
-        nIndex = atoi(index);
+        nIndex = _ttoi(index);
     }
     else {
         nIndex = 0;
@@ -75,16 +74,16 @@ bool PopupItem::ParseDotIcon(LPCSTR dotIcon) {
 
 void PopupItem::AddIcon(HICON icon) {
     D2D1_RECT_F f;
-    f.top = this->iconSettings->GetFloat("Y", 2.0f);
-    f.bottom = f.top + this->iconSettings->GetFloat("Size", 16.0f);
-    f.left = this->iconSettings->GetFloat("X", 2.0f);
-    f.right = f.left + this->iconSettings->GetFloat("Size", 16.0f);
-    this->iconOverlay = this->window->AddOverlay(f, icon);
+    f.top = this->iconSettings->GetFloat(_T("Y"), 2.0f);
+    f.bottom = f.top + this->iconSettings->GetFloat(_T("Size"), 16.0f);
+    f.left = this->iconSettings->GetFloat(_T("X"), 2.0f);
+    f.right = f.left + this->iconSettings->GetFloat(_T("Size"), 16.0f);
+    this->iconOverlay = mWindow->AddOverlay(f, icon);
 }
 
 
 bool PopupItem::CompareTo(PopupItem* b) {
-    return this->itemType > b->itemType || this->itemType == b->itemType && _wcsicmp(this->window->GetText(), b->window->GetText()) < 0;
+    return this->itemType > b->itemType || this->itemType == b->itemType && _wcsicmp(mWindow->GetText(), b->mWindow->GetText()) < 0;
 }
 
 
@@ -95,7 +94,7 @@ void PopupItem::SetIcon(IExtractIconW* extractIcon) {
     UINT flags;
     HRESULT hr;
 
-    if (!((Popup*)this->parent)->noIcons) {
+    if (!((Popup*)mParent)->noIcons) {
 
         // Get the location of the file containing the appropriate icon, and the index of the icon.
         hr = extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);

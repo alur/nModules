@@ -7,9 +7,10 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-namespace Factories {
-    HRESULT GetDWriteFactory(LPVOID* ppFactory);
-    HRESULT GetD2DFactory(LPVOID* ppFactory);
-    HRESULT GetWICFactory(LPVOID* ppFactory);
+namespace Factories
+{
+    HRESULT GetDWriteFactory(LPVOID *factory);
+    HRESULT GetD2DFactory(LPVOID *factory);
+    HRESULT GetWICFactory(LPVOID *factory);
     void Release();
 }

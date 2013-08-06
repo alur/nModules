@@ -32,11 +32,12 @@ public:
     // Recreates the brush.
     HRESULT ReCreate(ID2D1RenderTarget *renderTarget);
 
-    HRESULT LoadImageFile(ID2D1RenderTarget *renderTarget, LPCSTR image, ID2D1Brush **brush);
+    HRESULT LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2D1Brush **brush);
 
 public:
     void SetColor(ARGB color); 
-    void SetImage(ID2D1RenderTarget *renderTarget, LPCSTR path); 
+    void SetImage(ID2D1RenderTarget *renderTarget, LPCTSTR path); 
+    BrushSettings *GetBrushSettings();
 
 private:
     // The type of brush this is.

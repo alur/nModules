@@ -19,14 +19,14 @@ public:
     // Loads the actual settings.
     void Load(Settings* settings, StateSettings* defaults);
     
-    static DWRITE_FONT_STRETCH ParseFontStretch(LPCSTR string);
-    static DWRITE_FONT_STYLE ParseFontStyle(LPCSTR fontStyle);
-    static DWRITE_FONT_WEIGHT ParseFontWeight(LPCSTR fontWeight);
-    static DWRITE_TEXT_ALIGNMENT ParseTextAlignment(LPCSTR textAlignment);
-    static DWRITE_PARAGRAPH_ALIGNMENT ParseParagraphAlignment(LPCSTR paragraphAlignment);
-    static DWRITE_TRIMMING_GRANULARITY ParseTrimmingGranularity(LPCSTR trimmingGranularity);
-    static DWRITE_READING_DIRECTION ParseReadingDirection(LPCSTR readingDirection);
-    static DWRITE_WORD_WRAPPING ParseWordWrapping(LPCSTR wordWrapping);
+    static DWRITE_FONT_STRETCH ParseFontStretch(LPCTSTR string);
+    static DWRITE_FONT_STYLE ParseFontStyle(LPCTSTR fontStyle);
+    static DWRITE_FONT_WEIGHT ParseFontWeight(LPCTSTR fontWeight);
+    static DWRITE_TEXT_ALIGNMENT ParseTextAlignment(LPCTSTR textAlignment);
+    static DWRITE_PARAGRAPH_ALIGNMENT ParseParagraphAlignment(LPCTSTR paragraphAlignment);
+    static DWRITE_TRIMMING_GRANULARITY ParseTrimmingGranularity(LPCTSTR trimmingGranularity);
+    static DWRITE_READING_DIRECTION ParseReadingDirection(LPCTSTR readingDirection);
+    static DWRITE_WORD_WRAPPING ParseWordWrapping(LPCTSTR wordWrapping);
 
 public:
     // The settings to use for the background brush.

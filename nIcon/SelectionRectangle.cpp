@@ -6,7 +6,6 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "SelectionRectangle.hpp"
-#include "../nShared/Macros.h"
 
 
 /// <summary>
@@ -59,11 +58,11 @@ HRESULT SelectionRectangle::ReCreateDeviceResources(ID2D1RenderTarget *renderTar
 ///
 /// </summary>
 void SelectionRectangle::Init(Settings *parentSettings) {
-    Settings *settings = parentSettings->CreateChild("SelectionRectangle");
-    Settings *outlineSettings = parentSettings->CreateChild("Outline");
-    mRect.radiusX = settings->GetFloat("CornerRadiusX", 0.0f);
-    mRect.radiusY = settings->GetFloat("CornerRadiusY", 0.0f);
-    mOutlineWidth = outlineSettings->GetFloat("Width",  0.5f);
+    Settings *settings = parentSettings->CreateChild(_T("SelectionRectangle"));
+    Settings *outlineSettings = parentSettings->CreateChild(_T("Outline"));
+    mRect.radiusX = settings->GetFloat(_T("CornerRadiusX"), 0.0f);
+    mRect.radiusY = settings->GetFloat(_T("CornerRadiusY"), 0.0f);
+    mOutlineWidth = outlineSettings->GetFloat(_T("Width"),  0.5f);
 
     BrushSettings backDefaults;
     backDefaults.color = 0x887777EE;

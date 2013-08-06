@@ -8,49 +8,47 @@
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
 #include "ContentPopup.hpp"
-#include "../nShared/Debugging.h"
 #include "CommandItem.hpp"
 #include "FolderItem.hpp"
 #include <Shlwapi.h>
 #include <algorithm>
-#include "../nShared/PIDL.h"
 
 
-ContentPopup::ContentPopup(ContentSource source, LPCSTR title, LPCSTR bang, LPCSTR prefix) : Popup(title, bang, prefix) {
+ContentPopup::ContentPopup(ContentSource source, LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Popup(title, bang, prefix) {
     this->loaded = false;
     this->dynamic = true;
     this->source = source;
 }
 
 
-ContentPopup::ContentPopup(LPCSTR path, bool dynamic, LPCSTR title, LPCSTR bang, LPCSTR prefix) : Popup(title, bang, prefix) {
+ContentPopup::ContentPopup(LPCTSTR path, bool dynamic, LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Popup(title, bang, prefix) {
     this->loaded = false;
     this->dynamic = dynamic;
     this->source = ContentSource::PATH;
 
-    char processedPath[MAX_PATH], originalPath[MAX_PATH];
-    LPCSTR splitter, end = strchr(path, '\0');
+    TCHAR processedPath[MAX_PATH], originalPath[MAX_PATH];
+    LPCTSTR splitter, end = _tcschr(path, L'\0');
     do {
-        splitter = strchr(path, '|');
-        StringCchCopyNA(originalPath, MAX_PATH, path, (splitter != nullptr ? splitter : end) - path);
+        splitter = _tcschr(path, L'|');
+        StringCchCopyN(originalPath, MAX_PATH, path, (splitter != nullptr ? splitter : end) - path);
         PathCanonicalize(processedPath, originalPath);
         PathRemoveBackslash(processedPath);
 
-        this->paths.push_back(_strdup(processedPath));
+        this->paths.push_back(_tcsdup(processedPath));
         path = ++splitter;
-    } while (splitter != (LPCSTR)0x1);
+    } while (splitter != (LPCTSTR)sizeof(TCHAR));
 }
 
 
 ContentPopup::~ContentPopup() {
     for (WATCHFOLDERMAP::const_iterator iter = this->watchedFolders.begin(); iter != this->watchedFolders.end(); ++iter) {
         iter->second.second->Release();
-        this->window->ReleaseUserMessage(iter->first);
+        mWindow->ReleaseUserMessage(iter->first);
         SHChangeNotifyDeregister(iter->second.first);
     }
     this->watchedFolders.clear();
 
-    for (list<LPCSTR>::const_iterator iter = this->paths.begin(); iter != this->paths.end(); ++iter) {
+    for (list<LPCTSTR>::const_iterator iter = this->paths.begin(); iter != this->paths.end(); ++iter) {
         free((LPVOID)*iter);
     }
     this->paths.clear();
@@ -70,7 +68,7 @@ void ContentPopup::PostClose() {
     if (this->dynamic) {
         for (WATCHFOLDERMAP::const_iterator iter = this->watchedFolders.begin(); iter != this->watchedFolders.end(); ++iter) {
             iter->second.second->Release();
-            this->window->ReleaseUserMessage(iter->first);
+            mWindow->ReleaseUserMessage(iter->first);
             SHChangeNotifyDeregister(iter->second.first);
         }
         this->watchedFolders.clear();
@@ -85,12 +83,12 @@ void ContentPopup::PostClose() {
 }
 
 
-void ContentPopup::AddPath(LPCSTR path) {
-    char processedPath[MAX_PATH];
+void ContentPopup::AddPath(LPCTSTR path) {
+    TCHAR processedPath[MAX_PATH];
 
     PathCanonicalize(processedPath, path);
     PathRemoveBackslash(processedPath);
-    this->paths.push_back(_strdup(processedPath));
+    this->paths.push_back(_tcsdup(processedPath));
 
     if (this->loaded) {
         LoadPath(processedPath);
@@ -118,7 +116,7 @@ void ContentPopup::LoadContent() {
         break;
     
     case PATH:
-        for (list<LPCSTR>::const_iterator iter = paths.begin(); iter != paths.end(); ++iter) {
+        for (list<LPCTSTR>::const_iterator iter = paths.begin(); iter != paths.end(); ++iter) {
             LoadPath(*iter);
         }
         break;
@@ -167,16 +165,13 @@ void ContentPopup::LoadShellFolder(GUID folder, bool dontExpandFolders) {
 }
 
 
-void ContentPopup::LoadPath(LPCSTR path) {
+void ContentPopup::LoadPath(LPCTSTR path) {
     PIDLIST_ABSOLUTE idList = NULL;
     IShellFolder *targetFolder, *rootFolder;
-    WCHAR widePath[MAX_PATH];
-
-    MultiByteToWideChar(CP_ACP, NULL, path, -1, widePath, MAX_PATH);
 
     // Get the root IShellFolder
     SHGetDesktopFolder(reinterpret_cast<IShellFolder**>(&rootFolder));
-    rootFolder->ParseDisplayName(NULL, NULL, widePath, NULL, &idList, NULL);
+    rootFolder->ParseDisplayName(NULL, NULL, (LPTSTR)path, NULL, &idList, NULL);
     rootFolder->BindToObject(idList, NULL, IID_IShellFolder, reinterpret_cast<LPVOID*>(&targetFolder));
     rootFolder->Release();
     
@@ -207,9 +202,9 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
 
         // Register for change notifications
         SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
-        UINT message = this->window->RegisterUserMessage(this);
+        UINT message = mWindow->RegisterUserMessage(this);
         ULONG shnrUID = SHChangeNotifyRegister(
-            this->window->GetWindowHandle(),
+            mWindow->GetWindowHandle(),
             SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
             SHCNE_CREATE | SHCNE_DELETE | SHCNE_ATTRIBUTES | SHCNE_MKDIR | SHCNE_RMDIR | SHCNE_RENAMEITEM | SHCNE_RENAMEFOLDER | SHCNE_UPDATEITEM,
             message,
@@ -223,10 +218,10 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
 
 void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE itemID, bool dontExpandFolders) {
     STRRET ret;
-    LPSTR name, command;
+    LPTSTR name, command;
     IExtractIconW* extractIcon;
     SFGAOF attributes;
-    char quotedCommand[MAX_LINE_LENGTH];
+    TCHAR quotedCommand[MAX_LINE_LENGTH];
     bool openable;
     HRESULT hr;
     PopupItem* item; 
@@ -243,20 +238,17 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
             openable = SUCCEEDED(hr) && !dontExpandFolders && (((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE));
 
             if (openable) {
-                WCHAR wideName[MAX_PATH];
-                MultiByteToWideChar(CP_ACP, NULL, name, -1, wideName, MAX_PATH);
-                
-                for (iter = this->items.begin(); iter != this->items.end() && !(*iter)->CheckMerge(wideName); ++iter);
+                for (iter = this->items.begin(); iter != this->items.end() && !(*iter)->CheckMerge(name); ++iter);
                 if (iter != this->items.end()) {
                     item = NULL;
                     ((ContentPopup*)((nPopup::FolderItem*)*iter)->GetPopup())->AddPath(command);
                 }
                 else {
-                    item = new nPopup::FolderItem(this, name, new ContentPopup(command, this->dynamic, name, NULL, this->settings->prefix));
+                    item = new nPopup::FolderItem(this, name, new ContentPopup(command, this->dynamic, name, NULL, mSettings->GetPrefix()));
                 }
             }
             else {
-                StringCchPrintf(quotedCommand, sizeof(quotedCommand), "\"%s\"", command);
+                StringCchPrintf(quotedCommand, sizeof(quotedCommand), L"\"%s\"", command);
                 item = new CommandItem(this, name, quotedCommand);
             }
 
@@ -294,7 +286,7 @@ LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wPa
                 case SHCNE_CREATE:
                 case SHCNE_MKDIR:
                     {
-                        LoadSingleItem(folder->second.second, (PIDLIST_RELATIVE)PIDL::GetLastPIDLItem(idList[0]), false);
+                        LoadSingleItem(folder->second.second, (PIDLIST_RELATIVE)ILFindLastID(idList[0]), false);
                         std::sort(this->items.begin(), this->items.end(), [] (PopupItem* a, PopupItem* b) { return a->CompareTo(b); });
                     }
                     break;

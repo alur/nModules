@@ -11,7 +11,7 @@
 
 class ContainerItem : public PopupItem {
 public:
-    explicit ContainerItem(Drawable* parent, LPCSTR prefix);
+    explicit ContainerItem(Drawable* parent, LPCTSTR prefix);
     virtual ~ContainerItem();
     
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);

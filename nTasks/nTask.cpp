@@ -7,30 +7,31 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "../nShared/LSModule.hpp"
+#include "Constants.h"
 #include "nTask.h"
 #include "Taskbar.hpp"
-#include "WindowManager.h"
-#include "Constants.h"
+#include "TestWindow.hpp"
 #include "Version.h"
+#include "WindowManager.h"
 
 
 using std::map;
 
 // The LSModule class
-LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
+LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
 const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
     LM_FULLSCREENDEACTIVATED, 0 };
 
-// All the labels we currently have loaded
-map<string, Taskbar*> g_Taskbars;
+// All the taskbars we currently have loaded
+map<tstring, Taskbar*> gTaskbars;
 
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
+EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */) {
     if (!gLSModule.Initialize(parent, instance)) {
         return 1;
     }
@@ -45,6 +46,11 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     // Start the window manager
     WindowManager::Start();
 
+    // Register a bang command for creating our test window
+    LiteStep::AddBangCommand(_T("!nTaskTestWindow"), [] (HWND, LPCTSTR) -> void {
+        TestWindow::CreateTestWindow();
+    });
+
     return 0;
 }
 
@@ -53,14 +59,16 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
 /// Called by the core when this module is about to be unloaded.
 /// </summary>
 void quitModule(HINSTANCE /* hDllInstance */) {
+    LiteStep::RemoveBangCommand(_T("!nTaskTestWindow"));
+
     // Stop the window manager
     WindowManager::Stop();
 
     // Remove all taskbars
-    for (auto iter : g_Taskbars) {
+    for (auto iter : gTaskbars) {
         delete iter.second;
     }
-    g_Taskbars.clear();
+    gTaskbars.clear();
 
     gLSModule.DeInitalize();
 }
@@ -110,7 +118,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_FULLSCREENACTIVATED:
         {
-            for (auto &taskbar : g_Taskbars) {
+            for (auto &taskbar : gTaskbars) {
                 taskbar.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
             }
         }
@@ -118,7 +126,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_FULLSCREENDEACTIVATED:
         {
-            for (auto &taskbar : g_Taskbars) {
+            for (auto &taskbar : gTaskbars) {
                 taskbar.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
             }
         }
@@ -166,14 +174,10 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// <summary>
 /// Reads through the .rc files and creates Taskbars.
 /// </summary>
-void LoadSettings() {
-    char szLine[MAX_LINE_LENGTH], szLabel[MAX_RCCOMMAND];
-    LPSTR szTokens[] = { szLabel };
-    LPVOID f = LiteStep::LCOpen(NULL);
-
-    while (LiteStep::LCReadNextConfig(f, "*nTaskbar", szLine, sizeof(szLine))) {
-        LiteStep::LCTokenize(szLine+strlen("*nTaskbar")+1, szTokens, 1, NULL);
-        g_Taskbars.insert(g_Taskbars.begin(), std::pair<string, Taskbar*>(szLabel, new Taskbar(szLabel)));
-    }
-    LiteStep::LCClose(f);
+void LoadSettings()
+{
+    LiteStep::IterateOverLineTokens(_T("*nTaskbar"), [] (LPCTSTR token) -> void
+    {
+        gTaskbars.insert(gTaskbars.begin(), std::pair<tstring, Taskbar*>(token, new Taskbar(token)));
+    });
 }

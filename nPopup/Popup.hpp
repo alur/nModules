@@ -17,7 +17,7 @@ using std::vector;
 
 class Popup : public Drawable {
 public:
-    explicit Popup(LPCSTR title, LPCSTR bang, LPCSTR prefix);
+    explicit Popup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix);
     virtual ~Popup();
 
     void AddItem(PopupItem* item);
@@ -34,7 +34,7 @@ public:
     virtual void Close();
 
     //
-    LPCSTR GetBang();
+    LPCTSTR GetBang();
 
     //
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
@@ -70,7 +70,7 @@ private:
     RECT padding;
 
     //
-    LPCSTR bang;
+    LPCTSTR bang;
 
     // True if the popup is already sized properly.
     bool sized;

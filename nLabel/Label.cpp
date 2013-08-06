@@ -8,18 +8,16 @@
 #include "../nShared/LiteStep.h"
 #include "../nShared/LSModule.hpp"
 #include "Label.hpp"
-#include "../nShared/Macros.h"
-#include <strsafe.h>
 
-extern map<string, Label*> g_AllLabels;
+extern map<wstring, Label*> g_AllLabels;
 
 
-Label::Label(LPCSTR name) : Drawable(name) {
+Label::Label(LPCTSTR name) : Drawable(name) {
     Initalize();
 }
 
 
-Label::Label(LPCSTR name, Drawable* parent) : Drawable(parent, name, true) {
+Label::Label(LPCTSTR name, Drawable* parent) : Drawable(parent, name, true) {
     Initalize();
 }
 
@@ -36,46 +34,41 @@ Label::~Label() {
 
 
 void Label::Initalize() {
-    this->allLabelsIter = g_AllLabels.insert(g_AllLabels.begin(), pair<string, Label*>(string(this->settings->prefix), this));
+    this->allLabelsIter = g_AllLabels.insert(g_AllLabels.begin(), pair<wstring, Label*>(wstring(mSettings->GetPrefix()), this));
     
     DrawableSettings defaults;
     defaults.evaluateText = true;
     defaults.registerWithCore = true;
 
-    this->window->Initialize(&defaults);
+    mWindow->Initialize(&defaults);
 
     LoadSettings();
 
-    this->stateHover = this->window->AddState("Hover", 100);
-    if (!this->window->GetDrawingSettings()->hidden) {
-        this->window->Show();
+    this->stateHover = mWindow->AddState(L"Hover", 100);
+    if (!mWindow->GetDrawingSettings()->hidden) {
+        mWindow->Show();
     }
 }
 
 
 void Label::LoadSettings(bool /* isRefresh */) {
-    // Load overlays.
-    char line[MAX_LINE_LENGTH], prefix[256], label[256];
-    LPSTR tokens[] = { label };
-    LPVOID f = LiteStep::LCOpen(NULL);
+    TCHAR prefix[MAX_RCCOMMAND];
+    StringCchPrintf(prefix, _countof(prefix), _T("*%sOverlayLabel"), mSettings->GetPrefix());
 
-    StringCchPrintf(prefix, sizeof(prefix), "*%sOverlayLabel", this->settings->prefix);
-
-    while (LiteStep::LCReadNextConfig(f, prefix, line, sizeof(line))) {
-        LiteStep::LCTokenize(line+strlen(prefix)+1, tokens, 1, NULL);
-        this->overlays.push_back(new Label(label, this));
-    }
-    LiteStep::LCClose(f);
+    LiteStep::IterateOverLineTokens(prefix, [this] (LPCTSTR token) -> void
+    {
+        this->overlays.push_back(new Label(token, this));
+    });
 }
 
 
 LRESULT WINAPI Label::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LPVOID) {
     if (uMsg == WM_MOUSEMOVE) {
-        this->window->ActivateState(this->stateHover);
+        mWindow->ActivateState(this->stateHover);
     }
     else if (uMsg == WM_MOUSELEAVE) {
-        this->window->ClearState(this->stateHover);
+        mWindow->ClearState(this->stateHover);
     }
-    this->eventHandler->HandleMessage(hWnd, uMsg, wParam, lParam);
+    mEventHandler->HandleMessage(hWnd, uMsg, wParam, lParam);
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

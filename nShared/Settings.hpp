@@ -7,69 +7,68 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "LiteStep.h"
 #include <d2d1.h>
+#include <memory>
 
+class Settings;
+typedef Settings *LPSettings;
+typedef const Settings *LPCSettings;
 
-typedef DWORD ARGB;
-
-
-class Settings {
+class Settings
+{
 public:
-    explicit Settings(LPCSTR prefix);
-
-    // Makes a deep copy of the specified settings.
-    explicit Settings(Settings* settings);
-
-    virtual ~Settings();
-
-    Settings* CreateChild(LPCSTR prefix);
-
-    Settings* GetGroup();
-
-    void AppendGroup(Settings* group);
-
-    ARGB GetColor(LPCSTR key, ARGB defValue);
-    D2D_COLOR_F GetColor(LPCSTR key, D2D_COLOR_F defValue);
-    void SetColor(LPCSTR key, ARGB colorValue);
-    void SetColor(LPCSTR key, D2D_COLOR_F colorValue);
-    
-    bool GetString(LPCSTR key, LPSTR pszDest, UINT cchDest, LPCSTR pszDefault);
-    bool GetString(LPCSTR key, LPWSTR pszwDest, UINT cchDest, LPCSTR pszDefault);
-    bool GetString(LPCSTR key, LPWSTR pszwDest, UINT cchDest, LPCWSTR pszDefault);
-    void SetString(LPCSTR key, LPCSTR pszValue);
-    
-    int GetInt(LPCSTR key, int iDefault);
-    void SetInt(LPCSTR key, int iValue);
-    
-    float GetFloat(LPCSTR key, float fDefault);
-    void SetFloat(LPCSTR key, float fValue);
-    
-    double GetDouble(LPCSTR key, double dDefault);
-    void SetDouble(LPCSTR key, double dValue);
-
-    bool GetBool(LPCSTR key, bool defaultValue);
-    void SetBool(LPCSTR key, bool value);
-    
-    UINT GetMonitor(LPCSTR key, UINT defaultValue);
-    void SetMonitor(LPCSTR key, UINT value);
-    
-    void GetRectFromXYWH(LPCSTR pszX, LPCSTR pszY, LPCSTR pszW, LPCSTR pszH, LPRECT pDest, LPRECT pDefault);
-    void GetRectFromXYWH(LPCSTR pszX, LPCSTR pszY, LPCSTR pszW, LPCSTR pszH, LPRECT pDest, int defX, int defY, int defW, int defH);
-    void SetXYWHFromRect(LPCSTR pszX, LPCSTR pszY, LPCSTR pszW, LPCSTR pszH, LPRECT pValue);
-    
-    void GetOffsetRect(LPCSTR pszLeft, LPCSTR pszTop, LPCSTR pszRight, LPCSTR pszBottom, LPRECT pDest, LPRECT pDefault);
-    void GetOffsetRect(LPCSTR pszLeft, LPCSTR pszTop, LPCSTR pszRight, LPCSTR pszBottom, LPRECT pDest, int defLeft, int defTop, int defRight, int defBottom);
-    void SetOfsetRect(LPCSTR pszLeft, LPCSTR pszTop, LPCSTR pszRight, LPCSTR pszBottom, LPRECT pValue);
-
-    // The fully specified prefix to read settings from the RC files with.
-    LPCSTR prefix;
+    explicit Settings(LPCTSTR prefix);
+    explicit Settings(LPSettings settings);
     
 private:
-	explicit Settings(LPCSTR pszPrefix, LPCSTR pszPrev[]);
+	explicit Settings(LPCTSTR prefix, LPCTSTR prefixTrail[]);
 
+public:
+    LPSettings CreateChild(LPCTSTR prefix) const;
+    void AppendGroup(LPSettings group);
+    LPCTSTR GetPrefix() const;
+    
+private:
     // Creates the Settings* for this settings group.
-	Settings* GreateGroup(LPCSTR pszPrev[]);
+	LPSettings GreateGroup(LPCTSTR prefixTrail[]);
 
-    //
-    Settings* group;
+    // Basic getters and setters
+public:
+    bool GetBool(LPCTSTR key, bool defaultValue) const;
+    void SetBool(LPCTSTR key, bool value) const;
+    ARGB GetColor(LPCTSTR key, ARGB defaultValue) const;
+    void SetColor(LPCTSTR key, ARGB value) const;
+    double GetDouble(LPCTSTR key, double defaultValue) const;
+    void SetDouble(LPCTSTR key, double value) const;
+    float GetFloat(LPCTSTR key, float defaultValue) const;
+    void SetFloat(LPCTSTR key, float value) const;
+    int GetInt(LPCTSTR key, int defaultValue) const;
+    void SetInt(LPCTSTR key, int value) const;
+    __int64 GetInt64(LPCTSTR key, __int64 defaultValue) const;
+    void SetInt64(LPCTSTR key, __int64 value) const;
+    bool GetLine(LPCTSTR key, LPTSTR buffer, UINT cchBuffer, LPCTSTR defaultValue) const;
+    UINT GetMonitor(LPCTSTR key, UINT defaultValue) const;
+    void SetMonitor(LPCTSTR key, UINT value) const;
+    bool GetString(LPCTSTR key, LPTSTR buffer, UINT cchBuffer, LPCTSTR defaultValue) const;
+    void SetString(LPCTSTR key, LPCTSTR value) const;
+    
+    // More advanced getters and setters
+public:
+    RECT GetRect(LPCTSTR key, LPRECT defaultValue) const;
+    RECT GetRect(LPCTSTR key, LONG defX, LONG defY, LONG defWidth, LONG defHeight) const;
+    void SetRect(LPCTSTR key, LPRECT value) const;
+    
+    RECT GetOffsetRect(LPCTSTR key, LPRECT defaultValue) const;
+    RECT GetOffsetRect(LPCTSTR key, LONG defLeft, LONG defTop, LONG defRight, LONG defBottom) const;
+    void SetOffsetRect(LPCTSTR key, LPRECT value) const;
+
+    void IterateOverStars(LPCTSTR key, std::function<void (LPCTSTR token)> callback) const;
+    
+private:
+    // The fully specified prefix to read settings from the RC files with.
+    TCHAR mPrefix[MAX_RCCOMMAND];
+
+    // Where to get settings from if they are not specified for our own prefix.
+    std::unique_ptr<Settings> mGroup;
 };

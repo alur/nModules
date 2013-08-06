@@ -26,8 +26,8 @@ public:
         PROGRAMS
     };
 
-    explicit ContentPopup(ContentSource source, LPCSTR title, LPCSTR bang, LPCSTR prefix);
-    explicit ContentPopup(LPCSTR path, bool dynamic, LPCSTR title, LPCSTR bang, LPCSTR prefix);
+    explicit ContentPopup(ContentSource source, LPCTSTR title, LPCTSTR bang, LPCTSTR prefix);
+    explicit ContentPopup(LPCTSTR path, bool dynamic, LPCTSTR title, LPCTSTR bang, LPCTSTR prefix);
     virtual ~ContentPopup();
 
     //
@@ -39,7 +39,7 @@ protected:
 
 private:
     //
-    void AddPath(LPCSTR path);
+    void AddPath(LPCTSTR path);
 
     //
     void LoadContent();
@@ -48,7 +48,7 @@ private:
     void LoadShellFolder(GUID folder, bool dontExpandFolders = false);
 
     //
-    void LoadPath(LPCSTR path);
+    void LoadPath(LPCTSTR path);
 
     //
     void LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE idList, bool dontExpandFolders);
@@ -63,7 +63,7 @@ private:
     bool loaded;
 
     // If the source is a folder, the path to it.
-    list<LPCSTR> paths;
+    list<LPCTSTR> paths;
 
     // What to retrive the popup contents from.
     ContentSource source;

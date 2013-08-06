@@ -7,6 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "../Utilities/Common.h"
 #include "DrawableSettings.hpp"
 #include "StateSettings.hpp"
 #include "State.hpp"
@@ -16,7 +17,7 @@
 #include <vector>
 #include <list>
 #include <map>
-#include "UIDGenerator.hpp"
+#include "../Utilities/UIDGenerator.hpp"
 #include "MonitorInfo.hpp"
 #include "Easing.h"
 #include "../nCore/IParsedText.hpp"
@@ -61,17 +62,17 @@ public:
     // Constructors & Destructor
 public:
     // Constructor used for top-level windows.
-    explicit DrawableWindow(HWND parent, LPCSTR windowClass, HINSTANCE instance, Settings *settings, MessageHandler *msgHandler);
+    explicit DrawableWindow(HWND parent, LPCTSTR windowClass, HINSTANCE instance, Settings *settings, MessageHandler *msgHandler);
 
     // Constructor used to create a window with a "Parent" setting.
-    explicit DrawableWindow(LPCSTR parent, Settings *settings, MessageHandler *msgHandler);
+    explicit DrawableWindow(LPCTSTR parent, Settings *settings, MessageHandler *msgHandler);
 
     // Destructor
     virtual ~DrawableWindow();
 
 protected:
     // Used by nDesk.
-    explicit DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHandler);
+    explicit DrawableWindow(HWND window, LPCTSTR prefix, MessageHandler *msgHandler);
 
 private:
     // Used to initalize common settings before the other constructors run.
@@ -82,7 +83,7 @@ private:
 
     // 
 public:
-    void AddBrushOwner(IBrushOwner *owner, LPCSTR name);
+    void AddBrushOwner(IBrushOwner *owner, LPCTSTR name);
 
     // Adds an overlay.
     OVERLAY AddOverlay(D2D1_RECT_F position, HBITMAP image, int zOrder = 5);
@@ -94,7 +95,7 @@ public:
     PAINTER AddPostPainter(IPainter *painter);
 
     // Adds a new state.
-    STATE AddState(LPCSTR prefix, int defaultPriority, StateSettings *defaultSettings = nullptr, DrawableWindow::STATE *stateGroup = nullptr);
+    STATE AddState(LPCTSTR prefix, int defaultPriority, StateSettings *defaultSettings = nullptr, DrawableWindow::STATE *stateGroup = nullptr);
 
     // Marks a particular state as active.
     void ActivateState(STATE state, bool repaint = true);
@@ -124,7 +125,7 @@ public:
     void FullscreenDeactivated(HMONITOR);
 
     //
-    IBrushOwner *GetBrushOwner(LPCSTR name);
+    IBrushOwner *GetBrushOwner(LPCTSTR name);
 
     // Returns the current drawing settings.
     DrawableSettings *GetDrawingSettings();
@@ -148,7 +149,7 @@ public:
     HWND GetWindowHandle();
 
     //
-    State *GetState(LPCSTR stateName);
+    State *GetState(LPCTSTR stateName);
 
     // Retrives the "parsed" text.
     LPCWSTR GetText();
@@ -386,7 +387,7 @@ private:
     LPCWSTR text;
 
     //
-    char mParentName[64];
+    TCHAR mParentName[64];
 
     // True if this is a child window.
     bool mIsChild;
@@ -401,7 +402,7 @@ private:
     bool mCoveredByFullscreen;
 
     //
-    std::map<std::string, IBrushOwner*> mBrushOwners;
+    std::map<std::tstring, IBrushOwner*> mBrushOwners;
 
 public:
     // Registers a part of this window as a drop-region

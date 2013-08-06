@@ -5,23 +5,41 @@
  *  Manages RC settings with a certain prefix.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../nShared/LiteStep.h"
-#include <strsafe.h>
+#include "LiteStep.h"
 #include "Settings.hpp"
 #include "ErrorHandler.h"
-#include "../nCoreCom/Core.h"
-#include "../nShared/Macros.h"
 
-using namespace nCore::InputParsing;
+using std::unique_ptr;
+using std::function;
+using namespace LiteStep;
 
 
 /// <summary>
 /// Initalizes a new Settings class.
 /// </summary>
 /// <param name="prefix">The RC prefix to use.</param>
-Settings::Settings(LPCSTR prefix) {
-    this->prefix = _strdup(prefix);
-    this->group = GreateGroup(NULL);
+Settings::Settings(LPCTSTR prefix)
+{
+    StringCchCopy(mPrefix, _countof(mPrefix), prefix);
+    mGroup = unique_ptr<Settings>(GreateGroup(nullptr));
+}
+
+
+/// <summary>
+/// Creates a deep copy of the specified group.
+/// </summary>
+/// <param name="settings">The settings to copy.</param>
+Settings::Settings(LPSettings settings)
+{
+    StringCchCopy(mPrefix, _countof(mPrefix), settings->mPrefix);
+    if (settings->mGroup != nullptr)
+    {
+        mGroup = unique_ptr<Settings>(new (std::nothrow) Settings(settings->mGroup.get()));
+    }
+    else
+    {
+        mGroup = nullptr;
+    }
 }
 
 
@@ -29,38 +47,11 @@ Settings::Settings(LPCSTR prefix) {
 /// Initalizes a new Settings class, due to the precense of a Group setting in another class.
 /// </summary>
 /// <param name="prefix">The RC prefix to use.</param>
-/// <param name="previous">A list of previous group names.</param>
-Settings::Settings(LPCSTR prefix, LPCSTR previous[]) {
-    this->prefix = _strdup(prefix);
-    this->group = GreateGroup(previous);
-}
-
-
-/// <summary>
-/// Creates a deep copy of the specified group.
-/// </summary>
-Settings::Settings(Settings* settings) {
-    this->prefix = _strdup(settings->prefix);
-    if (settings->group != NULL) {
-        this->group = new Settings(settings->group);
-    }
-    else {
-        this->group = NULL;
-    }
-}
-
-
-Settings* Settings::GetGroup() {
-    return this->group;
-}
-
-
-/// <summary>
-/// Deallocates resources used by the Settings class.
-/// </summary>
-Settings::~Settings() {
-    free((LPVOID)this->prefix);
-    SAFEDELETE(this->group);
+/// <param name="prefixTrail">A list of previous group names.</param>
+Settings::Settings(LPCTSTR prefix, LPCTSTR prefixTrail[])
+{
+    StringCchCopy(mPrefix, _countof(mPrefix), prefix);
+    mGroup = unique_ptr<Settings>(GreateGroup(prefixTrail));
 }
 
 
@@ -68,21 +59,27 @@ Settings::~Settings() {
 /// Creates a child of this Settings*. If you have a Settings with the prefix of Label, and you want
 /// a related setting LabelIcon, you should call ->GetChild("Icon").
 /// </summary>
-Settings* Settings::CreateChild(LPCSTR prefix) {
-    Settings *head, *thisTail, *newTail;
-    CHAR newPrefix[MAX_LINE_LENGTH];
+LPSettings Settings::CreateChild(LPCTSTR prefix) const
+{
+    LPSettings head, newTail;
+    LPCSettings thisTail;
+    TCHAR newPrefix[MAX_RCCOMMAND];
     
-    StringCchPrintf(newPrefix, sizeof(newPrefix), "%s%s", this->prefix, prefix);
+    StringCchPrintf(newPrefix, _countof(newPrefix), _T("%s%s"), mPrefix, prefix);
     head = new Settings(newPrefix);
     thisTail = this;
     newTail = head;
-    while (thisTail->group != NULL) {
-        thisTail = thisTail->group;
-        StringCchPrintf(newPrefix, sizeof(newPrefix), "%s%s", thisTail->prefix, prefix);        
-        while (newTail->group != NULL) {
-            newTail = newTail->group;
+
+    while (thisTail->mGroup != nullptr)
+    {
+        thisTail = thisTail->mGroup.get();
+        StringCchPrintf(newPrefix, _countof(newPrefix), _T("%s%s"), thisTail->mPrefix, prefix);        
+        while (newTail->mGroup != nullptr)
+        {
+            newTail = newTail->mGroup.get();
         }
-        newTail->group = new Settings(newPrefix);
+
+        newTail->mGroup = unique_ptr<Settings>(new Settings(newPrefix));
     }
 
     return head;
@@ -90,363 +87,421 @@ Settings* Settings::CreateChild(LPCSTR prefix) {
 
 
 /// <summary>
+/// Appends the specified prefix to the end of the group list. Essentially, lets these
+/// settings fall back to that group as a default.
+/// </summary>
+void Settings::AppendGroup(LPSettings group)
+{
+    LPSettings tail;
+    for (tail = this; tail->mGroup != nullptr; tail = tail->mGroup.get());
+    tail->mGroup = unique_ptr<Settings>(new (std::nothrow) Settings(group));
+}
+
+
+/// <summary>
+/// Returns the fully qualified prefix used to read settings.
+/// </summary>
+LPCTSTR Settings::GetPrefix() const
+{
+    return mPrefix;
+}
+
+
+/// <summary>
 /// Gets the value we should use for m_pGroup.
 /// </summary>
-/// <param name="pszPrev">A list of previous group names.</param>
+/// <param name="prefixTrail">A list of previous group names.</param>
 /// <returns>The value we should use for m_pGroup.</returns>
-Settings* Settings::GreateGroup(LPCSTR pszPrev[]) {
-    char szBuf[MAX_LINE_LENGTH];
-    GetPrefixedRCString(this->prefix, "Group", szBuf, "", sizeof(szBuf));
+Settings* Settings::GreateGroup(LPCTSTR prefixTrail[])
+{
+    TCHAR group[MAX_LINE_LENGTH];
+    GetPrefixedRCString(mPrefix, _T("Group"), group, _T(""), _countof(group));
     
     // If there is no group
-    if (szBuf[0] == '\0') {
+    if (group[0] == _T('\0'))
+    {
         // We need to free pszPrev at this point.
-        if (pszPrev != NULL) {
-            free((LPVOID)pszPrev);
+        if (prefixTrail != nullptr)
+        {
+            free((LPVOID)prefixTrail);
         }
         
-        return NULL;
+        return nullptr;
     }
     
     // Avoid circular definitions
     int i = 0;
-    if (pszPrev != NULL) {
-        for (; pszPrev[i] != NULL; i++) {
-            if (strcmp(pszPrev[i], szBuf) == 0) {
+    if (prefixTrail != nullptr)
+    {
+        for (; prefixTrail[i] != nullptr; ++i)
+        {
+            if (_tcsicmp(prefixTrail[i], group) == 0)
+            {
                 // We found a circle :/
                 
                 // Show an error message
-                char szMsg[MAX_LINE_LENGTH];
-                StringCchCopy(szMsg, sizeof(szMsg), "Circular group definition!\n");
+                TCHAR message[MAX_LINE_LENGTH];
+                StringCchCopy(message, _countof(message), _T("Circular group definition!\n"));
                 
                 // A -> B -> C -> ... -> C
-                for (int j = 0; pszPrev[j] != NULL; j++) {
-                    StringCchCat(szMsg, sizeof(szMsg), pszPrev[j]);
-                    StringCchCat(szMsg, sizeof(szMsg), " -> ");
+                for (int j = 0; prefixTrail[j] != NULL; j++)
+                {
+                    StringCchCat(message, _countof(message), prefixTrail[j]);
+                    StringCchCat(message, _countof(message), _T(" -> "));
                 }
-                StringCchCat(szMsg, sizeof(szMsg), szBuf);
+                StringCchCat(message, _countof(message), group);
                 
-                ErrorHandler::Error(ErrorHandler::Level::Critical, szMsg);
+                ErrorHandler::Error(ErrorHandler::Level::Critical, message);
                 
                 // And break out of the chain
-                free((LPVOID)pszPrev);
-                return NULL;
+                free((LPVOID)prefixTrail);
+                return nullptr;
             }
         }
     }
     
     // Allocate space for storing the prefix of this setting
-    pszPrev = (LPCSTR*)realloc(pszPrev, (i+2)*sizeof(LPCSTR));
-    pszPrev[i] = this->prefix;
-    pszPrev[i+1] = NULL;
+    prefixTrail = (LPCTSTR*)realloc(prefixTrail, (i+2)*sizeof(LPCTSTR));
+    prefixTrail[i] = mPrefix;
+    prefixTrail[i+1] = nullptr;
 
-    return new Settings(szBuf, pszPrev);
+    return new Settings(group, prefixTrail);
 }
 
 
 /// <summary>
-/// Appends the specified prefix to the end of the group list. Essentially, lets these
-/// settings fall back to that group as a default.
+/// Gets a boolean from a prefixed RC value.
 /// </summary>
-void Settings::AppendGroup(Settings* group) {
-    Settings* tail;
-    for (tail = this; tail->group != NULL; tail = tail->group);
-    tail->group = new Settings(group);
-}
-
-
-/// <summary>
-/// Get's a color from a prefixed RC value.
-/// </summary>
-/// <param name="pszSetting">The RC setting to parse.</param>
-/// <param name="defColor">The default color to use, if the setting is invalid or unspecified.</param>
-/// <returns>The color.</returns>
-ARGB Settings::GetColor(LPCSTR pszSetting, ARGB defColor) {
-    return GetPrefixedRCColor(this->prefix, pszSetting, this->group != NULL ? this->group->GetColor(pszSetting, defColor) : defColor);
-}
-
-
-/// <summary>
-/// Set's a prefixed RC value to a particular color.
-/// </summary>
-/// <param name="pszSetting">The RC setting.</param>
-/// <param name="colorValue">The value to set the setting to.</param>
-void Settings::SetColor(LPCSTR pszSetting, ARGB colorValue) {
-    char szString[32];
-    StringCchPrintf(szString, sizeof(szString), "%x", colorValue);
-    SetString(pszSetting, szString);
-}
-
-
-/// <summary>
-/// Get's a string from a prefixed RC value.
-/// </summary>
-/// <param name="pszSetting">The RC setting.</param>
-/// <param name="pszDest">Where the string should be read to.</param>
-/// <param name="cchDest">The maximum number of characters to write to pszDest.</param>
-/// <param name="pszDefault">The default string, used if the RC value is unspecified.</param>
-/// <returns>False if the length of the RC value is > cchDest. True otherwise.</returns>
-bool Settings::GetString(LPCSTR pszSetting, LPSTR pszDest, UINT cchDest, LPCSTR pszDefault) {
-    if (this->group != NULL) {
-        this->group->GetString(pszSetting, pszDest, cchDest, pszDefault);
-        return GetPrefixedRCString(this->prefix, pszSetting, pszDest, pszDest, cchDest);
-    }
-    return GetPrefixedRCString(this->prefix, pszSetting, pszDest, pszDefault, cchDest);
-}
-
-
-/// <summary>
-/// Get's a string from a prefixed RC value.
-/// </summary>
-/// <param name="pszSetting">The RC setting.</param>
-/// <param name="pszwDest">Where the string should be read to.</param>
-/// <param name="cchDest">The maximum number of characters to write to pszDest.</param>
-/// <param name="pszDefault">The default string, used if the RC value is unspecified.</param>
-/// <returns>False if the length of the RC value is > cchDest. True otherwise.</returns>
-bool Settings::GetString(LPCSTR pszSetting, LPWSTR pszwDest, UINT cchDest, LPCSTR pszDefault) {
-    bool ret = true;
-    if (this->group != NULL) {
-        LPSTR def = (LPSTR)malloc(cchDest);
-        ret &= this->group->GetString(pszSetting, def, cchDest, pszDefault);
-        ret &= GetPrefixedRCWString(this->prefix, pszSetting, pszwDest, def, cchDest);
-        free((LPVOID)def);
-        return ret;
-    }
-    return GetPrefixedRCWString(this->prefix, pszSetting, pszwDest, pszDefault, cchDest);
-}
-
-
-/// <summary>
-/// Get's a string from a prefixed RC value.
-/// </summary>
-/// <param name="pszSetting">The RC setting.</param>
-/// <param name="pszwDest">Where the string should be read to.</param>
-/// <param name="cchDest">The maximum number of characters to write to pszDest.</param>
-/// <param name="pszDefault">The default string, used if the RC value is unspecified.</param>
-/// <returns>False if the length of the RC value is > cchDest. True otherwise.</returns>
-bool Settings::GetString(LPCSTR pszSetting, LPWSTR pszwDest, UINT cchDest, LPCWSTR pszDefault) {
-    size_t size = wcslen(pszDefault);
-    LPSTR multiByte = (LPSTR)malloc(size+1);
-    size_t numConverted;
-    bool ret;
-
-    if (wcstombs_s(&numConverted, multiByte, size+1, pszDefault, size) == 0) {
-        ret = GetString(pszSetting, pszwDest, cchDest, multiByte);
-    }
-    else {
-        ret = GetString(pszSetting, pszwDest, cchDest, "");
-    }
-
-    free(multiByte);
-
-    return ret;
-}
-
-
-/// <summary>
-/// Set's a prefixed RC value to a particular string.
-/// </summary>
-/// <param name="pszSetting">The RC setting.</param>
-/// <param name="pszValue">The value to set the setting to.</param>
-void Settings::SetString(LPCSTR pszSetting, LPCSTR pszValue) {
-    char szOptionName[MAX_LINE_LENGTH];
-    StringCchPrintf(szOptionName, MAX_LINE_LENGTH, "%s%s", this->prefix, pszSetting);
-    LiteStep::LSSetVariable(szOptionName, pszValue);
-}
-
-
-/// <summary>
-/// Get's an integer from a prefixed RC value.
-/// </summary>
-/// <param name="pszSetting">The RC setting to parse.</param>
-/// <param name="iDefault">The default value to use, if the setting is invalid or unspecified.</param>
-/// <returns>The integer.</returns>
-int Settings::GetInt(LPCSTR pszSetting, int iDefault) {
-    return GetPrefixedRCInt(this->prefix, pszSetting, this->group != NULL ? this->group->GetInt(pszSetting, iDefault) : iDefault);
-}
-
-
-/// <summary>
-/// Set's a prefixed RC value to a particular integer.
-/// </summary>
-/// <param name="pszSetting">The RC setting.</param>
-/// <param name="iValue">The value to set the setting to.</param>
-void Settings::SetInt(LPCSTR pszSetting, int iValue) {
-    char szString[10];
-    _itoa_s(iValue, szString, sizeof(szString), 10);
-    SetString(pszSetting, szString);
-}
-
-
-/// <summary>
-/// Get's a float from a prefixed RC value.
-/// </summary>
-/// <param name="pszSetting">The RC setting to parse.</param>
-/// <param name="fDefault">The default value to use, if the setting is invalid or unspecified.</param>
-/// <returns>The float.</returns>
-float Settings::GetFloat(LPCSTR pszSetting, float fDefault) {
-    return GetPrefixedRCFloat(this->prefix, pszSetting, this->group != NULL ? this->group->GetFloat(pszSetting, fDefault) : fDefault);
-}
-
-
-/// <summary>
-/// Set's a prefixed RC value to a particular float.
-/// </summary>
-/// <param name="pszSetting">The RC setting.</param>
-/// <param name="fValue">The value to set the setting to.</param>
-void Settings::SetFloat(LPCSTR pszSetting, float fValue) {
-    char szString[32];
-    StringCchPrintf(szString, sizeof(szString), "%.30f", fValue);
-    SetString(pszSetting, szString);
-}
-
-
-/// <summary>
-/// Get's a double from a prefixed RC value.
-/// </summary>
-/// <param name="pszSetting">The RC setting to parse.</param>
-/// <param name="dDefault">The default value to use, if the setting is invalid or unspecified.</param>
-/// <returns>The double.</returns>
-double Settings::GetDouble(LPCSTR pszSetting, double dDefault) {
-    return GetPrefixedRCDouble(this->prefix, pszSetting, this->group != NULL ? this->group->GetDouble(pszSetting, dDefault) : dDefault);
-}
-
-
-/// <summary>
-/// Set's a prefixed RC value to a particular double.
-/// </summary>
-/// <param name="pszSetting">The RC setting.</param>
-/// <param name="dValue">The value to set the setting to.</param>
-void Settings::SetDouble(LPCSTR pszSetting, double dValue) {
-    char szString[32];
-    StringCchPrintf(szString, sizeof(szString), "%.30f", dValue);
-    SetString(pszSetting, szString);
-}
-
-
-/// <summary>
-/// Get's a boolean from a prefixed RC value.
-/// </summary>
-/// <param name="pszSetting">The RC setting to parse.</param>
-/// <param name="bDefault">The default value to use, if the setting is invalid or unspecified.</param>
+/// <param name="key">The RC setting to parse.</param>
+/// <param name="defaultValue">The default value to use, if the setting is invalid or unspecified.</param>
 /// <returns>The boolean.</returns>
-bool Settings::GetBool(LPCSTR pszSetting, bool bDefault) {
-    return GetPrefixedRCBool(this->prefix, pszSetting, this->group != NULL ? this->group->GetBool(pszSetting, bDefault) : bDefault);
+bool Settings::GetBool(LPCTSTR key, bool defaultValue) const
+{
+    return GetPrefixedRCBool(mPrefix, key, mGroup != nullptr ? mGroup->GetBool(key, defaultValue) : defaultValue);
 }
 
 
 /// <summary>
 /// Set's a prefixed RC value to a particular boolean.
 /// </summary>
+/// <param name="key">The RC setting.</param>
+/// <param name="value">The value to set the setting to.</param>
+void Settings::SetBool(LPCTSTR key, bool value) const
+{
+    SetString(key, value ? _T("True") : _T("False"));
+}
+
+
+/// <summary>
+/// Gets a color from a prefixed RC value.
+/// </summary>
+/// <param name="key">The RC setting to retrive.</param>
+/// <param name="defaultValue">The default color to use, if the setting is invalid or unspecified.</param>
+/// <returns>The color.</returns>
+ARGB Settings::GetColor(LPCTSTR key, ARGB defaultValue) const
+{
+    return GetPrefixedRCColor(mPrefix, key, mGroup != nullptr ? mGroup->GetColor(key, defaultValue) : defaultValue);
+}
+
+
+/// <summary>
+/// Sets a prefixed RC value to a particular color.
+/// </summary>
+/// <param name="key">The RC setting to set.</param>
+/// <param name="value">The value to set the setting to.</param>
+void Settings::SetColor(LPCTSTR key, ARGB value) const
+{
+    TCHAR valueString[32];
+    StringCchPrintf(valueString, _countof(valueString), _T("#%x"), value);
+    SetString(key, valueString);
+}
+
+
+/// <summary>
+/// Gets a double from a prefixed RC value.
+/// </summary>
+/// <param name="key">The RC setting to parse.</param>
+/// <param name="defaultValue">The default value to use, if the setting is invalid or unspecified.</param>
+/// <returns>The double.</returns>
+double Settings::GetDouble(LPCTSTR key, double defaultValue) const
+{
+    return GetPrefixedRCDouble(mPrefix, key, mGroup != nullptr ? mGroup->GetDouble(key, defaultValue) : defaultValue);
+}
+
+
+/// <summary>
+/// Sets a prefixed RC value to a particular double.
+/// </summary>
 /// <param name="pszSetting">The RC setting.</param>
-/// <param name="bValue">The value to set the setting to.</param>
-void Settings::SetBool(LPCSTR pszSetting, bool bValue) {
-    SetString(pszSetting, bValue ? "True" : "False");
+/// <param name="value">The value to set the setting to.</param>
+void Settings::SetDouble(LPCTSTR key, double value) const
+{
+    TCHAR valueString[32];
+    StringCchPrintf(valueString, _countof(valueString), _T("%.20f"), value);
+    SetString(key, valueString);
+}
+
+
+/// <summary>
+/// Gets a float from a prefixed RC value.
+/// </summary>
+/// <param name="key">The RC setting to parse.</param>
+/// <param name="defaultValue">The default value to use, if the setting is invalid or unspecified.</param>
+/// <returns>The float.</returns>
+float Settings::GetFloat(LPCTSTR key, float defaultValue) const
+{
+    return GetPrefixedRCFloat(mPrefix, key, mGroup != nullptr ? mGroup->GetFloat(key, defaultValue) : defaultValue);
+}
+
+
+/// <summary>
+/// Sets a prefixed RC value to a particular float.
+/// </summary>
+/// <param name="key">The RC setting.</param>
+/// <param name="value">The value to set the setting to.</param>
+void Settings::SetFloat(LPCTSTR key, float value) const
+{
+    TCHAR valueString[32];
+    StringCchPrintf(valueString, _countof(valueString), _T("%.10f"), value);
+    SetString(key, valueString);
+}
+
+
+/// <summary>
+/// Gets an integer from a prefixed RC value.
+/// </summary>
+/// <param name="key">The RC setting to parse.</param>
+/// <param name="defaultValue">The default value to use, if the setting is invalid or unspecified.</param>
+/// <returns>The float.</returns>
+int Settings::GetInt(LPCTSTR key, int defaultValue) const
+{
+    return GetPrefixedRCInt(mPrefix, key, mGroup != nullptr ? mGroup->GetInt(key, defaultValue) : defaultValue);
+}
+
+
+/// <summary>
+/// Sets a prefixed RC value to a particular integer.
+/// </summary>
+/// <param name="key">The RC setting.</param>
+/// <param name="value">The value to set the setting to.</param>
+void Settings::SetInt(LPCTSTR key, int value) const
+{
+    TCHAR valueString[32];
+    StringCchPrintf(valueString, _countof(valueString), _T("%d"), value);
+    SetString(key, valueString);
+}
+
+
+/// <summary>
+/// Gets a 64-bit integer from a prefixed RC value.
+/// </summary>
+/// <param name="key">The RC setting to parse.</param>
+/// <param name="defaultValue">The default value to use, if the setting is invalid or unspecified.</param>
+/// <returns>The float.</returns>
+__int64 Settings::GetInt64(LPCTSTR key, __int64 defaultValue) const
+{
+    return GetPrefixedRCInt64(mPrefix, key, mGroup != nullptr ? mGroup->GetInt64(key, defaultValue) : defaultValue);
+}
+
+
+/// <summary>
+/// Sets a prefixed RC value to a particular integer.
+/// </summary>
+/// <param name="key">The RC setting.</param>
+/// <param name="value">The value to set the setting to.</param>
+void Settings::SetInt64(LPCTSTR key, __int64 value) const
+{
+    TCHAR valueString[32];
+    StringCchPrintf(valueString, _countof(valueString), _T("%lld"), value);
+    SetString(key, valueString);
 }
 
 
 /// <summary>
 /// Get's a Monitor from a prefixed RC value.
 /// </summary>
-/// <param name="pszSetting">The RC setting to parse.</param>
-/// <param name="uDefault">The default value to use, if the setting is invalid or unspecified.</param>
+/// <param name="key">The RC setting to parse.</param>
+/// <param name="defaultValue">The default value to use, if the setting is invalid or unspecified.</param>
 /// <returns>The monitor.</returns>
-UINT Settings::GetMonitor(LPCSTR pszSetting, UINT uDefault) {
-    return GetPrefixedRCMonitor(this->prefix, pszSetting, this->group != NULL ? this->group->GetMonitor(pszSetting, uDefault) : uDefault);
+UINT Settings::GetMonitor(LPCTSTR key, UINT defaultValue) const
+{
+    return GetPrefixedRCMonitor(mPrefix, key, mGroup != nullptr ? mGroup->GetMonitor(key, defaultValue) : defaultValue);
 }
 
 
 /// <summary>
 /// Set's a prefixed RC value to a particular monitor.
 /// </summary>
+/// <param name="key">The RC setting.</param>
+/// <param name="value">The value to set the setting to.</param>
+void Settings::SetMonitor(LPCTSTR key, UINT value) const
+{
+    TCHAR valueString[10];
+    StringCchPrintf(valueString, _countof(valueString), _T("%u"), value);
+    SetString(key, valueString);
+}
+
+
+/// <summary>
+/// Gets a string from a prefixed RC value.
+/// </summary>
+/// <param name="key">The RC setting.</param>
+/// <param name="buffer">Where the string should be read to.</param>
+/// <param name="cchBuffer">The maximum number of characters to write to buffer.</param>
+/// <param name="defaultValue">The default string, used if the RC value is unspecified.</param>
+/// <returns>False if the length of the RC value is > cchDest. True otherwise.</returns>
+bool Settings::GetString(LPCTSTR key, LPTSTR buffer, UINT cchBuffer, LPCTSTR defaultValue) const
+{
+    if (mGroup != nullptr)
+    {
+        TCHAR propagatedDefault[MAX_LINE_LENGTH];
+        mGroup->GetString(key, propagatedDefault, _countof(propagatedDefault), defaultValue);
+        return GetPrefixedRCString(mPrefix, key, buffer, propagatedDefault, cchBuffer);
+    }
+    return GetPrefixedRCString(mPrefix, key, buffer, defaultValue, cchBuffer);
+}
+
+
+/// <summary>
+/// Sets a prefixed RC value to a particular string.
+/// </summary>
 /// <param name="pszSetting">The RC setting.</param>
-/// <param name="uValue">The value to set the setting to.</param>
-void Settings::SetMonitor(LPCSTR pszSetting, UINT uValue) {
-    char szString[10];
-    StringCchPrintf(szString, sizeof(szString), "%u", uValue);
-    SetString(pszSetting, szString);
+/// <param name="pszValue">The value to set the setting to.</param>
+void Settings::SetString(LPCTSTR key, LPCTSTR value) const
+{
+    TCHAR keyName[MAX_LINE_LENGTH];
+    StringCchPrintf(keyName, _countof(keyName), _T("%s%s"), mPrefix, key);
+    LSSetVariable(keyName, value);
 }
 
 
 /// <summary>
 /// Reads an X, Y, Width, Height series of settings into a RECT.
 /// </summary>
-/// <param name="pszX">The key for the X value.</param>
-/// <param name="pszY">The key for the Y value.</param>
-/// <param name="pszW">The key for the width value.</param>
-/// <param name="pszH">The key for the height value.</param>
-/// <param name="pDest">The destination RECT.</param>
-/// <param name="pDefault">The default x/y/width/height, if not specified.</param>
-void Settings::GetRectFromXYWH(LPCSTR pszX, LPCSTR pszY, LPCSTR pszW, LPCSTR pszH, LPRECT pDest, LPRECT pDefault) {
-	GetRectFromXYWH(pszX, pszY, pszW, pszH, pDest, pDefault->left, pDefault->top, pDefault->right - pDefault->left, pDefault->bottom - pDefault->top);
+/// <param name="key">The key to read.</param>
+/// <param name="defaultValue">The default x/y/width/height, if not specified.</param>
+RECT Settings::GetRect(LPCTSTR key, LPRECT defaultValue) const
+{
+    return GetRect(key, defaultValue->left, defaultValue->top, defaultValue->right - defaultValue->left, defaultValue->bottom - defaultValue->top);
 }
 
 
 /// <summary>
 /// Reads an X, Y, Width, Height series of settings into a RECT.
 /// </summary>
-/// <param name="pszX">The key for the X value.</param>
-/// <param name="pszY">The key for the Y value.</param>
-/// <param name="pszW">The key for the width value.</param>
-/// <param name="pszH">The key for the height value.</param>
-/// <param name="pDest">The destination RECT.</param>
+/// <param name="key">The key to read.</param>
 /// <param name="defX">The default X value, if not specified.</param>
 /// <param name="defY">The default Y value, if not specified.</param>
 /// <param name="defW">The default width, if not specified.</param>
 /// <param name="defH">The default height, if not specified.</param>
-void Settings::GetRectFromXYWH(LPCSTR pszX, LPCSTR pszY, LPCSTR pszW, LPCSTR pszH, LPRECT pDest, int defX, int defY, int defW, int defH) {
-	pDest->left = GetInt(pszX, defX);
-	pDest->top = GetInt(pszY, defY);
-	pDest->right = pDest->left + GetInt(pszW, defW);
-	pDest->bottom = pDest->top + GetInt(pszH, defH);
+RECT Settings::GetRect(LPCTSTR key, LONG defX, LONG defY, LONG defWidth, LONG defHeight) const
+{
+    TCHAR xKey[MAX_RCCOMMAND], yKey[MAX_RCCOMMAND], widthKey[MAX_RCCOMMAND], heightKey[MAX_RCCOMMAND];
+    StringCchPrintf(xKey, _countof(xKey), _T("%sX"), key);
+    StringCchPrintf(yKey, _countof(yKey), _T("%sY"), key);
+    StringCchPrintf(widthKey, _countof(widthKey), _T("%sWidth"), key);
+    StringCchPrintf(heightKey, _countof(heightKey), _T("%sHeight"), key);
+    
+    RECT rect;
+    rect.left = GetInt(xKey, defX);
+    rect.top = GetInt(yKey, defY);
+    rect.right = rect.left + GetInt(widthKey, defWidth);
+    rect.bottom = rect.top + GetInt(heightKey, defHeight);
+
+    return rect;
 }
 
 
 /// <summary>
 /// Sets an X, Y, Width, Height series of settings from a RECT.
 /// </summary>
-/// <param name="pszX">The key for the X value.</param>
-/// <param name="pszY">The key for the Y value.</param>
-/// <param name="pszW">The key for the width value.</param>
-/// <param name="pszH">The key for the height value.</param>
-/// <param name="pValue">The source RECT.</param>
-void Settings::SetXYWHFromRect(LPCSTR pszX, LPCSTR pszY, LPCSTR pszW, LPCSTR pszH, LPRECT pValue) {
-	SetInt(pszX, pValue->left);
-	SetInt(pszY, pValue->top);
-	SetInt(pszW, pValue->right - pValue->left);
-	SetInt(pszH, pValue->bottom - pValue->top);
+/// <param name="key">The key to set.</param>
+/// <param name="value">The source RECT.</param>
+void Settings::SetRect(LPCTSTR key, LPRECT value) const
+{
+    TCHAR xKey[MAX_RCCOMMAND], yKey[MAX_RCCOMMAND], widthKey[MAX_RCCOMMAND], heightKey[MAX_RCCOMMAND];
+    StringCchPrintf(xKey, _countof(xKey), _T("%sX"), key);
+    StringCchPrintf(yKey, _countof(yKey), _T("%sY"), key);
+    StringCchPrintf(widthKey, _countof(widthKey), _T("%sWidth"), key);
+    StringCchPrintf(heightKey, _countof(heightKey), _T("%sHeight"), key);
+
+	SetInt(xKey, value->left);
+	SetInt(yKey, value->top);
+	SetInt(widthKey, value->right - value->left);
+	SetInt(heightKey, value->bottom - value->top);
 }
 
 
 /// <summary>
 /// Reads a series of values into a RECT structure.
 /// </summary>
-/// <param name="pszLeft">The key for the left value.</param>
-/// <param name="pszTop">The key for the top value.</param>
-/// <param name="pszRight">The key for the right value.</param>
-/// <param name="pszBottom">The key for the bottom value.</param>
-/// <param name="pDest">The destination RECT.</param>
-/// <param name="pDefault">The default values.</param>
-void Settings::GetOffsetRect(LPCSTR pszLeft, LPCSTR pszTop, LPCSTR pszRight, LPCSTR pszBottom, LPRECT pDest, LPRECT pDefault) {
-	GetOffsetRect(pszLeft, pszTop, pszRight, pszBottom, pDest, pDefault->left, pDefault->top, pDefault->right, pDefault->bottom);
+/// <param name="key">The key to read.</param>
+/// <param name="defaultValue">The default value.</param>
+RECT Settings::GetOffsetRect(LPCTSTR key, LPRECT defaultValue) const
+{
+    return GetOffsetRect(key, defaultValue->left, defaultValue->top, defaultValue->right, defaultValue->bottom);
 }
 
 
 /// <summary>
 /// Reads a series of values into a RECT structure.
 /// </summary>
-/// <param name="pszLeft">The key for the left value.</param>
-/// <param name="pszTop">The key for the top value.</param>
-/// <param name="pszRight">The key for the right value.</param>
-/// <param name="pszBottom">The key for the bottom value.</param>
-/// <param name="pDest">The destination RECT.</param>
+/// <param name="key">The key to read.</param>
 /// <param name="defLeft">The default left value, if not specified.</param>
 /// <param name="defTop">The default top value, if not specified.</param>
 /// <param name="defRight">The default right, if not specified.</param>
 /// <param name="defBottom">The default bottom, if not specified.</param>
-void Settings::GetOffsetRect(LPCSTR pszLeft, LPCSTR pszTop, LPCSTR pszRight, LPCSTR pszBottom, LPRECT pDest, int defLeft, int defTop, int defRight, int defBottom) {
-	pDest->left = GetInt(pszLeft, defLeft);
-	pDest->top = GetInt(pszTop, defTop);
-	pDest->right = GetInt(pszRight, defRight);
-	pDest->bottom = GetInt(pszBottom, defBottom);
+RECT Settings::GetOffsetRect(LPCTSTR key, LONG defLeft, LONG defTop, LONG defRight, LONG defBottom) const
+{
+    TCHAR leftKey[MAX_RCCOMMAND], topKey[MAX_RCCOMMAND], rightKey[MAX_RCCOMMAND], bottomKey[MAX_RCCOMMAND];
+    StringCchPrintf(leftKey, _countof(leftKey), _T("%sLeft"), key);
+    StringCchPrintf(topKey, _countof(topKey), _T("%sTop"), key);
+    StringCchPrintf(rightKey, _countof(rightKey), _T("%sRight"), key);
+    StringCchPrintf(bottomKey, _countof(bottomKey), _T("%sBottom"), key);
+
+    RECT rect;
+    rect.left = GetInt(leftKey, defLeft);
+    rect.top = GetInt(topKey, defTop);
+    rect.right = GetInt(rightKey, defRight);
+    rect.bottom = GetInt(bottomKey, defBottom);
+
+    return rect;
+}
+
+
+/// <summary>
+/// Sets a Left, Top, Right, Bottom series of settings from a RECT.
+/// </summary>
+/// <param name="key">The key to set.</param>
+/// <param name="value">The source RECT.</param>
+void Settings::SetOffsetRect(LPCTSTR key, LPRECT value) const
+{
+    TCHAR leftKey[MAX_RCCOMMAND], topKey[MAX_RCCOMMAND], rightKey[MAX_RCCOMMAND], bottomKey[MAX_RCCOMMAND];
+    StringCchPrintf(leftKey, _countof(leftKey), _T("%sLeft"), key);
+    StringCchPrintf(topKey, _countof(topKey), _T("%sTop"), key);
+    StringCchPrintf(rightKey, _countof(rightKey), _T("%sRight"), key);
+    StringCchPrintf(bottomKey, _countof(bottomKey), _T("%sBottom"), key);
+
+	SetInt(leftKey, value->left);
+	SetInt(topKey, value->top);
+	SetInt(rightKey, value->right);
+	SetInt(bottomKey, value->bottom);
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="key"></param>
+void Settings::IterateOverStars(LPCTSTR key, function<void (LPCTSTR token)> callback) const
+{
+    TCHAR keyPrefix[MAX_RCCOMMAND];
+
+    LPCSettings settings = this;
+    while (settings != nullptr)
+    {
+        StringCchPrintf(keyPrefix, _countof(keyPrefix), _T("*%s%s"), settings->mPrefix, key);
+        IterateOverLines(keyPrefix, callback);
+        settings = settings->mGroup.get();
+    }
 }

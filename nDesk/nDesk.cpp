@@ -10,7 +10,6 @@
 #include "../nCoreCom/Core.h"
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/LSModule.hpp"
-#include "../nShared/Debugging.h"
 #include "DesktopPainter.hpp"
 #include "ClickHandler.hpp"
 #include "WorkArea.h"
@@ -31,18 +30,18 @@ MonitorInfo *g_pMonitorInfo;
 ClickHandler *g_pClickHandler;
 
 // The LSModule class
-LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
+LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
+EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */) {
     WNDCLASSEX wc;
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.hInstance = instance;
-    wc.lpszClassName = "DesktopBackgroundClass";
+    wc.lpszClassName = _T("DesktopBackgroundClass");
     wc.hIconSm = 0;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.style = CS_DBLCLKS;

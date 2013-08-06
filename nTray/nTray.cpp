@@ -28,10 +28,10 @@ const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, LM_SYSTRAYINFO
 HWND g_hWndTrayNotify;
 
 // All the trays we currently have loaded
-map<string, Tray*> g_Trays;
+map<tstring, Tray*> g_Trays;
 
 // The LiteStep module class
-LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
+LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 // True for the first 100ms of nTrays life. Speeds up loading.
 bool g_InitPhase;
@@ -155,13 +155,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// Reads through the .rc files and creates trays.
 /// </summary>
 void LoadSettings() {
-    char szLine[MAX_LINE_LENGTH], name[256];
-    LPSTR szTokens[] = { name };
-    LPVOID f = LiteStep::LCOpen(NULL);
-
-    while (LiteStep::LCReadNextConfig(f, "*nTray", szLine, sizeof(szLine))) {
-        LiteStep::LCTokenize(szLine+strlen("*nTray")+1, szTokens, 1, NULL);
-        g_Trays.insert(g_Trays.begin(), std::pair<string, Tray*>(string(name), new Tray(name)));
-    }
-    LiteStep::LCClose(f);
+    LiteStep::IterateOverLineTokens(_T("*nTray"), [] (LPCTSTR name) -> void
+    {
+        g_Trays.insert(g_Trays.begin(), std::pair<tstring, Tray*>(name, new Tray(name)));
+    });
 }

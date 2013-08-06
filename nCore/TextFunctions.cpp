@@ -6,22 +6,24 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
-#include "../nShared/Macros.h"
 #include "TextFunctions.h"
 #include "ParsedText.hpp"
 #include <strsafe.h>
 #include <ctime>
 
 
-void TextFunctions::_Register() {
+void TextFunctions::_Register()
+{
     RegisterDynamicTextFunction(L"Time", 0, Time, true);
     RegisterDynamicTextFunction(L"Time", 1, Time, true);
     RegisterDynamicTextFunction(L"br", 0, Br, false);
 
-    RegisterDynamicTextFunction(L"WindowTitle", 1, [] (LPCWSTR /* name */, UCHAR /* numArgs */, LPWSTR* args, LPWSTR dest, size_t cchDest) -> BOOL {
+    RegisterDynamicTextFunction(L"WindowTitle", 1, [] (LPCWSTR /* name */, UCHAR /* numArgs */, LPWSTR* args, LPWSTR dest, size_t cchDest) -> BOOL
+    {
         HWND window = FindWindowW(args[0], nullptr);
         LPWSTR end = wcschr(dest, L'\0');
-        if (window) {
+        if (window)
+        {
             GetWindowTextW(window, end, int(cchDest - (end - dest)));
             return true;
         }
@@ -30,7 +32,8 @@ void TextFunctions::_Register() {
 }
 
 
-void TextFunctions::_Unregister() {
+void TextFunctions::_Unregister()
+{
     UnRegisterDynamicTextFunction(L"Time", 0);
     UnRegisterDynamicTextFunction(L"Time", 1);
     UnRegisterDynamicTextFunction(L"br", 0);
@@ -38,7 +41,8 @@ void TextFunctions::_Unregister() {
 }
 
 
-TEXTFUNCTION(TextFunctions::Time) {
+TEXTFUNCTION(TextFunctions::Time)
+{
     WCHAR date[1024];
     time_t t = time(0);
     struct tm now;
@@ -50,6 +54,7 @@ TEXTFUNCTION(TextFunctions::Time) {
 }
 
 
-TEXTFUNCTION(TextFunctions::Br) {
+TEXTFUNCTION(TextFunctions::Br)
+{
     return SUCCEEDED(StringCchCatW(dest, cchDest, L"\n"));
 }

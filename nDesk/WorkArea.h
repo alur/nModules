@@ -12,5 +12,5 @@
 namespace WorkArea {
     void LoadSettings(MonitorInfo *, bool = false);
     void ResetWorkAreas(MonitorInfo *);
-    void ParseLine(MonitorInfo *, LPCSTR);
+    void ParseLine(MonitorInfo *, LPCTSTR);
 }

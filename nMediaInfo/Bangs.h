@@ -7,7 +7,8 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-namespace Bangs {
+namespace Bangs
+{
     void _Register();
     void _Unregister();
 }

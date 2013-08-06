@@ -11,7 +11,7 @@
 #include "../nShared/LSModule.hpp"
 
 
-SeparatorItem::SeparatorItem(Drawable* parent) : PopupItem(parent, "SeparatorItem") {
+SeparatorItem::SeparatorItem(Drawable* parent) : PopupItem(parent, L"SeparatorItem") {
     DrawableSettings defaults;
     defaults.width = 190;
     defaults.height = 5;
@@ -20,11 +20,11 @@ SeparatorItem::SeparatorItem(Drawable* parent) : PopupItem(parent, "SeparatorIte
     defaultState.backgroundBrush.color = 0xAA000000;
     defaultState.textBrush.color = 0xFF000000;
 
-    this->window->Initialize(&defaults, &defaultState);
+    mWindow->Initialize(&defaults, &defaultState);
 
-    this->hoverState = this->window->AddState("Hover", 100, &defaultState);
+    this->hoverState = mWindow->AddState(L"Hover", 100, &defaultState);
 
-    this->window->Show();
+    mWindow->Show();
 }
 
 

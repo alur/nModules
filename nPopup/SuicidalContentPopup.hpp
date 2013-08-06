@@ -11,7 +11,7 @@
 
 class SuicidalContentPopup : public ContentPopup {
 public:
-    explicit SuicidalContentPopup(LPCSTR path, LPCSTR title, LPCSTR prefix);
+    explicit SuicidalContentPopup(LPCTSTR path, LPCTSTR title, LPCTSTR prefix);
 
 public:
     void Close() override;

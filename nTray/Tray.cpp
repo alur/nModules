@@ -6,13 +6,13 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
-#include <strsafe.h>
 #include "../nShared/LSModule.hpp"
 #include "Tray.hpp"
 #include "TrayIcon.hpp"
 #include "../Utilities/Process.h"
-#include "../nShared/Debugging.h"
 #include "../Utilities/GUID.h"
+#include <shellapi.h>
+#include <Mmsystem.h>
 
 
 extern HWND g_hWndTrayNotify;
@@ -22,13 +22,13 @@ extern bool g_InitPhase;
 /// <summary>
 /// Constructor
 /// </summary>
-Tray::Tray(LPCSTR name) : Drawable(name) {
-    this->balloonClickedMessage = this->window->RegisterUserMessage(this);
-    this->tooltip = new Tooltip("Tooltip", this->settings);
-    this->balloon = new Balloon("Balloon", this->settings, this->balloonClickedMessage, this);
+Tray::Tray(LPCTSTR name) : Drawable(name) {
+    this->balloonClickedMessage = mWindow->RegisterUserMessage(this);
+    this->tooltip = new Tooltip(L"Tooltip", mSettings);
+    this->balloon = new Balloon(L"Balloon", mSettings, this->balloonClickedMessage, this);
 
-    this->window->Initialize();
-    this->window->Show();
+    mWindow->Initialize();
+    mWindow->Show();
 
     this->balloonTimer = 0;
 
@@ -52,7 +52,7 @@ Tray::~Tray() {
     this->icons.clear();
 
     if (this->balloonClickedMessage != 0) {
-        this->window->ReleaseUserMessage(this->balloonClickedMessage);
+        mWindow->ReleaseUserMessage(this->balloonClickedMessage);
     }
 
     SAFEDELETE(this->tooltip);
@@ -69,21 +69,21 @@ Tray::~Tray() {
 /// </summary>
 void Tray::LoadSettings(bool /* IsRefresh */) {
     LayoutSettings layoutDefaults;
-    mLayoutSettings.Load(this->settings, &layoutDefaults);
+    mLayoutSettings.Load(mSettings, &layoutDefaults);
 
-    Settings* iconSettings = this->settings->CreateChild("Icon");
-    this->iconSize = iconSettings->GetInt("Size", 16);
+    Settings* iconSettings = mSettings->CreateChild(_T("Icon"));
+    this->iconSize = iconSettings->GetInt(_T("Size"), 16);
     delete iconSettings;
 
-    this->hideBalloons = this->settings->GetBool("HideBalloons", false);
-    this->balloonTime = this->settings->GetInt("BalloonTime", 7000);
-    this->noNotificationSounds = this->settings->GetBool("NoNotificationSounds", false);
-    this->settings->GetString("NotificationSound", this->notificationSound, 128, "Notification.Default");
+    this->hideBalloons = mSettings->GetBool(_T("HideBalloons"), false);
+    this->balloonTime = mSettings->GetInt(_T("BalloonTime"), 7000);
+    this->noNotificationSounds = mSettings->GetBool(_T("NoNotificationSounds"), false);
+    mSettings->GetString(_T("NotificationSound"), this->notificationSound, 128, _T("Notification.Default"));
 
-    char keyName[MAX_RCCOMMAND];
-    StringCchPrintfA(keyName, _countof(keyName), "*%sHide", this->settings->prefix);
+    TCHAR keyName[MAX_RCCOMMAND];
+    StringCchPrintf(keyName, _countof(keyName), L"*%sHide", mSettings->GetPrefix());
 
-    LiteStep::IterateOverLinesW(keyName, [this] (LPCWSTR line) -> void {
+    LiteStep::IterateOverLines(keyName, [this] (LPCWSTR line) -> void {
         // Try to parse it as a GUID, if that fails assume it's a process.
         GUID guid;
         if (GUIDFromStringW(line, &guid) != FALSE) {
@@ -101,12 +101,12 @@ void Tray::LoadSettings(bool /* IsRefresh */) {
 /// </summary>
 TrayIcon* Tray::AddIcon(LiteStep::LPLSNOTIFYICONDATA NID) {
     if (WantIcon(NID)) {
-        TrayIcon* icon = new TrayIcon(this, NID, this->settings);
+        TrayIcon* icon = new TrayIcon(this, NID, mSettings);
         this->icons.push_back(icon);
         Relayout();
         icon->Show();
         if (!g_InitPhase) {
-            this->window->Repaint();
+            mWindow->Repaint();
         }
         return icon;
     }
@@ -179,7 +179,7 @@ void Tray::RemoveIcon(TrayIcon* pIcon) {
         delete pIcon;
 
         Relayout();
-        this->window->Repaint();
+        mWindow->Repaint();
     }
 }
 
@@ -189,7 +189,7 @@ void Tray::RemoveIcon(TrayIcon* pIcon) {
 /// </summary>
 void Tray::Relayout() {
     int i = 0;
-    DrawableSettings *drawingSettings = this->window->GetDrawingSettings();
+    DrawableSettings *drawingSettings = mWindow->GetDrawingSettings();
 
     for (auto icon : this->icons) {
         icon->Reposition(mLayoutSettings.RectFromID(i++, this->iconSize, this->iconSize, drawingSettings->width, drawingSettings->height));
@@ -201,13 +201,13 @@ void Tray::Relayout() {
 /// Handles window events for the tray.
 /// </summary>
 LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
-    this->eventHandler->HandleMessage(wnd, message, wParam, lParam);
+    mEventHandler->HandleMessage(wnd, message, wParam, lParam);
     switch (message) {
     case WM_MOUSEMOVE:
         {
             if (IsWindow(g_hWndTrayNotify)) {
                 RECT r;
-                this->window->GetScreenRect(&r);
+                mWindow->GetScreenRect(&r);
                 MoveWindow(g_hWndTrayNotify, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
             }
         }
@@ -250,7 +250,7 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM
 /// Called when the init phase has ended.
 /// <summary>
 void Tray::InitCompleted() {
-    this->window->Repaint();
+    mWindow->Repaint();
 }
 
 
@@ -283,7 +283,7 @@ void Tray::EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD
         return;
     }
 
-    if (!this->window->IsVisible()) {
+    if (!mWindow->IsVisible()) {
         return;
     }
 
@@ -307,7 +307,7 @@ void Tray::EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD
 /// <summary>
 void Tray::DismissBalloon(UINT message) {
     // Reset the timer.
-    SetTimer(this->window->GetWindowHandle(), this->balloonTimer, this->balloonTime, NULL);
+    SetTimer(mWindow->GetWindowHandle(), this->balloonTimer, this->balloonTime, NULL);
 
     this->balloon->Hide();
     this->activeBalloonIcon->SendCallback(message, NULL, NULL);
@@ -334,7 +334,7 @@ void Tray::ShowNextBalloon() {
     // If we are not accepting notifications at this time, we should wait.
     if (state != 0 && state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME) {
         if (this->balloonTimer == 0) {
-            this->balloonTimer = this->window->SetCallbackTimer(this->balloonTime, this);
+            this->balloonTimer = mWindow->SetCallbackTimer(this->balloonTime, this);
         }
         return;
     }
@@ -345,7 +345,7 @@ void Tray::ShowNextBalloon() {
     do {
         // If there are no more balloons
         if (this->queuedBalloons.empty()) {
-            this->window->ClearCallbackTimer(this->balloonTimer);
+            mWindow->ClearCallbackTimer(this->balloonTimer);
             this->balloonTimer = 0;
 
             return;
@@ -384,7 +384,7 @@ void Tray::ShowNextBalloon() {
     }
     
     if (this->balloonTimer == 0) {
-        this->balloonTimer = this->window->SetCallbackTimer(this->balloonTime, this);
+        this->balloonTimer = mWindow->SetCallbackTimer(this->balloonTime, this);
 
         if ((d.infoFlags & NIIF_NOSOUND) != NIIF_NOSOUND && !this->noNotificationSounds) {
             PlaySoundW(this->notificationSound, NULL, SND_ALIAS | SND_ASYNC | SND_SYSTEM | SND_NODEFAULT);

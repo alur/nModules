@@ -39,17 +39,17 @@ DrawableSettings::~DrawableSettings() {
 }
 
 
-static std::map<D2D1_TEXT_ANTIALIAS_MODE, LPCSTR> textAntiAliasModeMap = {
-    { D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE, "ClearType" },
-    { D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE, "GrayScale" },
-    { D2D1_TEXT_ANTIALIAS_MODE_ALIASED,   "Aliased"   }
+static std::map<D2D1_TEXT_ANTIALIAS_MODE, LPCTSTR> textAntiAliasModeMap = {
+    { D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE, _T("ClearType") },
+    { D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE, _T("GrayScale") },
+    { D2D1_TEXT_ANTIALIAS_MODE_ALIASED,   _T("Aliased")   }
 };
 
 
 template <typename T>
-static T GetValue(LPCSTR string, std::map<T, LPCSTR> map, T defValue) {
+static T GetValue(LPCTSTR string, std::map<T, LPCTSTR> map, T defValue) {
     for (auto &x : map) {
-        if (_stricmp(string, x.second) == 0) {
+        if (_tcsicmp(string, x.second) == 0) {
             return x.first;
         }
     }
@@ -58,13 +58,13 @@ static T GetValue(LPCSTR string, std::map<T, LPCSTR> map, T defValue) {
 
 
 template <typename T>
-static LPCSTR GetName(T value, std::map<T, LPCSTR> map) {
+static LPCTSTR GetName(T value, std::map<T, LPCTSTR> map) {
     for (auto &x : map) {
         if (x.first == value) {
             return x.second;
         }
     }
-    return "";
+    return _T("");
 }
 
 
@@ -73,28 +73,27 @@ static LPCSTR GetName(T value, std::map<T, LPCSTR> map) {
 /// </summary>
 void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
     WCHAR buf[MAX_LINE_LENGTH];
-    CHAR buf2[MAX_LINE_LENGTH];
     if (!defaults) {
         defaults = this;
     }
 
-    this->alwaysOnTop = settings->GetBool("AlwaysOnTop", defaults->alwaysOnTop);
-    this->blurBehind = settings->GetBool("BlurBehind", defaults->blurBehind);
-    this->clickThrough = settings->GetBool("ClickThrough", defaults->clickThrough);
+    this->alwaysOnTop = settings->GetBool(_T("AlwaysOnTop"), defaults->alwaysOnTop);
+    this->blurBehind = settings->GetBool(_T("BlurBehind"), defaults->blurBehind);
+    this->clickThrough = settings->GetBool(_T("ClickThrough"), defaults->clickThrough);
     this->evaluateText = defaults->evaluateText;
-    this->height = settings->GetInt("Height", defaults->height);
-    this->hidden = settings->GetBool("Hidden", defaults->hidden);
+    this->height = settings->GetInt(_T("Height"), defaults->height);
+    this->hidden = settings->GetBool(_T("Hidden"), defaults->hidden);
     this->registerWithCore = defaults->registerWithCore;
-    settings->GetString("Text", buf, _countof(buf), defaults->text);
+    settings->GetString(_T("Text"), buf, _countof(buf), defaults->text);
     this->text = StringUtils::ReallocOverwrite(this->text, buf);
-    settings->GetString("TextAntiAliasMode", buf2, _countof(buf2), GetName(defaults->textAntiAliasMode, textAntiAliasModeMap));
-    this->textAntiAliasMode = ParseAntiAliasMode(buf2);
-    this->width = settings->GetInt("Width", defaults->width);
-    this->x = settings->GetInt("X", defaults->x);
-    this->y = settings->GetInt("Y", defaults->y);
+    settings->GetString(_T("TextAntiAliasMode"), buf, _countof(buf), GetName(defaults->textAntiAliasMode, textAntiAliasModeMap));
+    this->textAntiAliasMode = ParseAntiAliasMode(buf);
+    this->width = settings->GetInt(_T("Width"), defaults->width);
+    this->x = settings->GetInt(_T("X"), defaults->x);
+    this->y = settings->GetInt(_T("Y"), defaults->y);
 }
 
 
-D2D1_TEXT_ANTIALIAS_MODE DrawableSettings::ParseAntiAliasMode(LPCSTR str) {
+D2D1_TEXT_ANTIALIAS_MODE DrawableSettings::ParseAntiAliasMode(LPCTSTR str) {
     return GetValue(str, textAntiAliasModeMap, D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE);
 }

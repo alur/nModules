@@ -10,7 +10,7 @@
 #include "SuicidalContentPopup.hpp"
 
 
-SuicidalContentPopup::SuicidalContentPopup(LPCSTR path, LPCSTR title, LPCSTR prefix) : ContentPopup(path, true, title, "", prefix)
+SuicidalContentPopup::SuicidalContentPopup(LPCTSTR path, LPCTSTR title, LPCTSTR prefix) : ContentPopup(path, true, title, L"", prefix)
 {
 }
 

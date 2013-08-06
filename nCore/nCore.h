@@ -7,12 +7,12 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "../nShared/Macros.h"
-#include "../nShared/Versioning.h"
+#include "../Utilities/Macros.h"
+#include "../Utilities/Versioning.h"
 
 bool CreateMainWindow(HINSTANCE);
 LRESULT WINAPI MainProc(HWND, UINT, WPARAM, LPARAM);
 
 EXPORT_CDECL(VERSION) GetCoreVersion();
-EXPORT_CDECL(int) initModuleEx(HWND, HINSTANCE, LPCSTR);
+EXPORT_CDECL(int) initModuleW(HWND, HINSTANCE, LPCWSTR);
 EXPORT_CDECL(void) quitModule(HINSTANCE);

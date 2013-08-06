@@ -1,259 +1,110 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Source Files\Drawables">
-      <UniqueIdentifier>{a2f9eb73-1324-4b9b-841d-7bec2a54fd4d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Drawables">
-      <UniqueIdentifier>{12944f3b-db83-4b62-8719-0347689a275c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Brushes">
+    <Filter Include="Brushes">
       <UniqueIdentifier>{31715971-4ffc-42dc-8d01-df45be900325}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Utilities">
-      <UniqueIdentifier>{d4d1a08f-ca84-4186-912a-28f7d6be7a3f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Utilities">
-      <UniqueIdentifier>{b2ebf9e7-4511-421b-9291-c3ea01dd0d17}</UniqueIdentifier>
+    <Filter Include="Drawables">
+      <UniqueIdentifier>{12944f3b-db83-4b62-8719-0347689a275c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MonitorInfo.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Versioning.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DrawableWindow.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Factories.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Debugging.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Settings.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DrawableSettings.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Color.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LSModule.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LayoutSettings.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Drawable.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MessageHandler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EventHandler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UIDGenerator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PIDL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LiteStep.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Easing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IPainter.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BrushSettings.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StateSettings.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="State.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Overlay.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Brush.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RelativeValue.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Balloon.hpp">
-      <Filter>Header Files\Drawables</Filter>
+      <Filter>Drawables</Filter>
     </ClInclude>
     <ClInclude Include="Tooltip.hpp">
-      <Filter>Header Files\Drawables</Filter>
+      <Filter>Drawables</Filter>
     </ClInclude>
     <ClInclude Include="WindowThumbnail.hpp">
-      <Filter>Header Files\Drawables</Filter>
+      <Filter>Drawables</Filter>
     </ClInclude>
-    <ClInclude Include="ImageBrush.hpp">
-      <Filter>Header Files\Brushes</Filter>
+    <ClInclude Include="BrushBangs.h" />
+    <ClInclude Include="BrushSettings.hpp" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="Easing.h" />
+    <ClInclude Include="ErrorHandler.h" />
+    <ClInclude Include="EventHandler.hpp" />
+    <ClInclude Include="Factories.h" />
+    <ClInclude Include="IBrushOwner.hpp" />
+    <ClInclude Include="IPainter.hpp" />
+    <ClInclude Include="LayoutSettings.hpp" />
+    <ClInclude Include="LiteStep.h" />
+    <ClInclude Include="LSModule.hpp" />
+    <ClInclude Include="MessageHandler.hpp" />
+    <ClInclude Include="MonitorInfo.hpp" />
+    <ClInclude Include="Overlay.hpp" />
+    <ClInclude Include="Settings.hpp" />
+    <ClInclude Include="State.hpp" />
+    <ClInclude Include="StateBangs.h" />
+    <ClInclude Include="StateSettings.hpp" />
+    <ClInclude Include="Version.h" />
+    <ClInclude Include="Coordinate.hpp" />
+    <ClInclude Include="Length.hpp" />
+    <ClInclude Include="Brush.hpp">
+      <Filter>Brushes</Filter>
     </ClInclude>
-    <ClInclude Include="RadialGradientBrush.hpp">
-      <Filter>Header Files\Brushes</Filter>
+    <ClInclude Include="Drawable.hpp">
+      <Filter>Drawables</Filter>
     </ClInclude>
-    <ClInclude Include="LinearGradientBrush.hpp">
-      <Filter>Header Files\Brushes</Filter>
+    <ClInclude Include="DrawableSettings.hpp">
+      <Filter>Drawables</Filter>
     </ClInclude>
-    <ClInclude Include="SolidColorBrush.hpp">
-      <Filter>Header Files\Brushes</Filter>
-    </ClInclude>
-    <ClInclude Include="FileIterator.hpp">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="ErrorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StateBangs.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="DrawableWindow.hpp">
+      <Filter>Drawables</Filter>
     </ClInclude>
     <ClInclude Include="DrawableWindowBangs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IBrushOwner.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BrushBangs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Version.h">
-      <Filter>Header Files</Filter>
+      <Filter>Drawables</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MonitorInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Versioning.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DrawableWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Math.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Factories.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Debugging.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Settings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DrawableSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Color.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LSModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LayoutSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MessageHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Drawable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EventHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UIDGenerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PIDL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LiteStep.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Easing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BrushSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="State.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StateSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Overlay.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Brush.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RelativeValue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClCompile Include="BrushBangs.cpp" />
+    <ClCompile Include="BrushSettings.cpp" />
+    <ClCompile Include="Color.cpp" />
+    <ClCompile Include="Easing.cpp" />
+    <ClCompile Include="ErrorHandler.cpp" />
+    <ClCompile Include="EventHandler.cpp" />
+    <ClCompile Include="Factories.cpp" />
+    <ClCompile Include="LayoutSettings.cpp" />
+    <ClCompile Include="LiteStep.cpp" />
+    <ClCompile Include="LSModule.cpp" />
+    <ClCompile Include="MessageHandler.cpp" />
+    <ClCompile Include="MonitorInfo.cpp" />
+    <ClCompile Include="Overlay.cpp" />
+    <ClCompile Include="Settings.cpp" />
+    <ClCompile Include="State.cpp" />
+    <ClCompile Include="StateBangs.cpp" />
+    <ClCompile Include="StateSettings.cpp" />
     <ClCompile Include="WindowThumbnail.cpp">
-      <Filter>Source Files\Drawables</Filter>
+      <Filter>Drawables</Filter>
     </ClCompile>
     <ClCompile Include="Balloon.cpp">
-      <Filter>Source Files\Drawables</Filter>
+      <Filter>Drawables</Filter>
     </ClCompile>
     <ClCompile Include="Tooltip.cpp">
-      <Filter>Source Files\Drawables</Filter>
+      <Filter>Drawables</Filter>
     </ClCompile>
-    <ClCompile Include="FileIterator.cpp">
-      <Filter>Source Files\Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="FileIteratorIterator.cpp">
-      <Filter>Source Files\Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="DrawableWindowDropTarget.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Coordinate.cpp" />
+    <ClCompile Include="Length.cpp" />
+    <ClCompile Include="Brush.cpp">
+      <Filter>Brushes</Filter>
     </ClCompile>
     <ClCompile Include="DrawableWindowUnknown.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Drawables</Filter>
     </ClCompile>
-    <ClCompile Include="ErrorHandler.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Drawable.cpp">
+      <Filter>Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawableSettings.cpp">
+      <Filter>Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawableWindow.cpp">
+      <Filter>Drawables</Filter>
     </ClCompile>
     <ClCompile Include="DrawableWindowBangs.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Drawables</Filter>
     </ClCompile>
-    <ClCompile Include="StateBangs.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="DrawableWindowDropTarget.cpp">
+      <Filter>Drawables</Filter>
     </ClCompile>
-    <ClCompile Include="BrushBangs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include=".\Macros.h">
-      <Filter>Header Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

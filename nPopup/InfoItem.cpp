@@ -11,17 +11,14 @@
 #include "../nShared/LSModule.hpp"
 
 
-InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupItem(parent, "InfoItem") {
-    WCHAR titleWide[MAX_LINE_LENGTH];
-
-    this->title = _strdup(title);
+InfoItem::InfoItem(Drawable* parent, LPCTSTR title, LPCTSTR customIcon) : PopupItem(parent, L"InfoItem") {
+    this->title = _tcsdup(title);
     this->itemType = PopupItemType::INFO;
 
     DrawableSettings defaults;
     defaults.width = 190;
     defaults.height = 20;
     defaults.evaluateText = true;
-    MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, titleWide, MAX_LINE_LENGTH);
 
     StateSettings defaultState;
     defaultState.backgroundBrush.color = 0xAAFF00FF;
@@ -30,14 +27,14 @@ InfoItem::InfoItem(Drawable* parent, LPCSTR title, LPCSTR customIcon) : PopupIte
     defaultState.textOffsetLeft = 20;
     defaultState.textOffsetRight = 5;
 
-    this->window->Initialize(&defaults, &defaultState);
-    this->window->SetText(titleWide);
+    mWindow->Initialize(&defaults, &defaultState);
+    mWindow->SetText(title);
 
     ParseDotIcon(customIcon);
 
-    this->hoverState = this->window->AddState("Hover", 100, &defaultState);
+    this->hoverState = mWindow->AddState(L"Hover", 100, &defaultState);
 
-    this->window->Show();
+    mWindow->Show();
 }
 
 
@@ -48,7 +45,7 @@ InfoItem::~InfoItem() {
 
 int InfoItem::GetDesiredWidth(int maxWidth) {
     SIZE s;
-    this->window->GetDesiredSize(maxWidth, this->window->GetDrawingSettings()->height, &s);
+    mWindow->GetDesiredSize(maxWidth, mWindow->GetDrawingSettings()->height, &s);
     return s.cx;
 }
 
@@ -57,13 +54,13 @@ LRESULT InfoItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lPa
     switch (msg) {
     case WM_MOUSEMOVE:
         {
-            this->window->ActivateState(this->hoverState);
+            mWindow->ActivateState(this->hoverState);
         }
         return 0;
 
     case WM_MOUSELEAVE:
         {
-            this->window->ClearState(this->hoverState);
+            mWindow->ClearState(this->hoverState);
         }
         return 0;
     }

@@ -12,8 +12,8 @@
 
 class Label : public Drawable {
 public:
-    explicit Label(LPCSTR name);
-    explicit Label(LPCSTR name, Drawable* parent);
+    explicit Label(LPCTSTR name);
+    explicit Label(LPCTSTR name, Drawable* parent);
     virtual ~Label();
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
@@ -23,5 +23,5 @@ private:
 
     DrawableWindow::STATE stateHover;
     list<Drawable*> overlays;
-    map<string, Label*>::iterator allLabelsIter;
+    map<wstring, Label*>::iterator allLabelsIter;
 };

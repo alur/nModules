@@ -11,31 +11,28 @@
 #include "../nShared/LSModule.hpp"
 
 
-nPopup::FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, LPCSTR customIcon) : PopupItem(parent, "FolderItem") {
+nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, LPCTSTR customIcon) : PopupItem(parent, L"FolderItem") {
     Init(title, popup);
     ParseDotIcon(customIcon);
-    this->window->Show();
+    mWindow->Show();
 }
 
 
-nPopup::FolderItem::FolderItem(Drawable* parent, LPCSTR title, Popup* popup, HICON icon) : PopupItem(parent, "FolderItem") {
+nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, HICON icon) : PopupItem(parent, L"FolderItem") {
     Init(title, popup);
     AddIcon(icon);
-    this->window->Show();
+    mWindow->Show();
 }
 
 
-void nPopup::FolderItem::Init(LPCSTR title, Popup* popup) {
-    WCHAR titleWide[MAX_LINE_LENGTH];
-
-    this->title = _strdup(title);
+void nPopup::FolderItem::Init(LPCTSTR title, Popup* popup) {
+    this->title = _tcsdup(title);
     this->popup = popup;
     this->itemType = PopupItemType::FOLDER;
 
     DrawableSettings defaults;
     defaults.width = 190;
     defaults.height = 20;
-    MultiByteToWideChar(CP_ACP, 0, this->title, (int)strlen(this->title)+1, titleWide, MAX_LINE_LENGTH);
 
     StateSettings defaultState;
     defaultState.backgroundBrush.color = 0xAA00FFFF;
@@ -44,11 +41,11 @@ void nPopup::FolderItem::Init(LPCSTR title, Popup* popup) {
     defaultState.textOffsetLeft = 20;
     defaultState.textOffsetRight = 5;
 
-    this->window->Initialize(&defaults, &defaultState);
-    this->window->SetText(titleWide);
+    mWindow->Initialize(&defaults, &defaultState);
+    mWindow->SetText(title);
 
-    this->hoverState = this->window->AddState("Hover", 100, &defaultState);
-    this->openState = this->window->AddState("Open", 80, &defaultState);
+    this->hoverState = mWindow->AddState(L"Hover", 100, &defaultState);
+    this->openState = mWindow->AddState(L"Open", 80, &defaultState);
 }
 
 
@@ -62,7 +59,7 @@ nPopup::FolderItem::~FolderItem() {
 
 int nPopup::FolderItem::GetDesiredWidth(int maxWidth) {
     SIZE s;
-    this->window->GetDesiredSize(maxWidth, this->window->GetDrawingSettings()->height, &s);
+    mWindow->GetDesiredSize(maxWidth, mWindow->GetDrawingSettings()->height, &s);
     return s.cx;
 }
 
@@ -71,19 +68,19 @@ LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, 
     switch (msg) {
     case WM_MOUSEMOVE:
         {
-            this->window->ActivateState(this->hoverState);
+            mWindow->ActivateState(this->hoverState);
             if (this->popup != NULL) {
                 RECT r;
-                this->window->GetScreenRect(&r);
-                ((Popup*)this->parent)->OpenChild(this->popup, &r, this);
-                this->window->ActivateState(this->openState);
+                mWindow->GetScreenRect(&r);
+                ((Popup*)mParent)->OpenChild(this->popup, &r, this);
+                mWindow->ActivateState(this->openState);
             }
         }
         return 0;
 
     case WM_MOUSELEAVE:
         {
-            this->window->ClearState(this->hoverState);
+            mWindow->ClearState(this->hoverState);
         }
         return 0;
     }
@@ -95,7 +92,7 @@ LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, 
 /// Called by the parent when it is closing the popup for whatever reason.
 /// </summary>
 void nPopup::FolderItem::ClosingPopup() {
-    this->window->ClearState(this->openState);
+    mWindow->ClearState(this->openState);
 }
 
 

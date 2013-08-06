@@ -5,80 +5,117 @@
  *  Description...
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include <Windows.h>
+#include "../Utilities/Common.h"
 #include "Core.h"
+#include "CoreComHelpers.h"
 
-static IParsedText* (__cdecl * _pParseText)(LPCWSTR);
-static BOOL (__cdecl * _pRegisterDynamicTextFunction)(LPCWSTR, UCHAR, FORMATTINGPROC, bool);
-static BOOL (__cdecl * _pUnRegisterDynamicTextFunction)(LPCWSTR, UCHAR);
-static BOOL (__cdecl * _pDynamicTextChangeNotification)(LPCWSTR, UCHAR);
-static void (__cdecl * _pRegisterWindow)(LPCSTR, LPVOID);
-static void (__cdecl * _pUnRegisterWindow)(LPCSTR);
-static DrawableWindow* (__cdecl * _pFindRegisteredWindow)(LPCSTR);
-static void (__cdecl * _pAddWindowRegistrationListener)(LPCSTR, DrawableWindow*);
-static void (__cdecl * _pRemoveWindowRegistrationListener)(LPCSTR, DrawableWindow*);
+// Pointers to function in the core. Initalized by _Init, reset by _
+namespace nCore
+{
+    namespace System
+    {
+        DECL_FUNC_VAR(ParseText);
+        DECL_FUNC_VAR(RegisterDynamicTextFunction);
+        DECL_FUNC_VAR(UnRegisterDynamicTextFunction);
+        DECL_FUNC_VAR(DynamicTextChangeNotification);
+
+        DECL_FUNC_VAR(RegisterWindow);
+        DECL_FUNC_VAR(UnRegisterWindow);
+        DECL_FUNC_VAR(FindRegisteredWindow);
+        DECL_FUNC_VAR(AddWindowRegistrationListener);
+        DECL_FUNC_VAR(RemoveWindowRegistrationListener);
+    }
+}
 
 
 /// <summary>
 /// Initalizes the core communications.
 /// </summary>
 /// <returns>True if the core is succefully initalized.</returns>
-HRESULT nCore::System::_Init(HMODULE hCoreInstance) {
-    INIT_FUNC(_pParseText,IParsedText* (__cdecl *)(LPCWSTR), "ParseText");
-    INIT_FUNC(_pRegisterDynamicTextFunction, BOOL (__cdecl *)(LPCWSTR, UCHAR, FORMATTINGPROC, bool), "RegisterDynamicTextFunction");
-    INIT_FUNC(_pUnRegisterDynamicTextFunction, BOOL (__cdecl *)(LPCWSTR, UCHAR), "UnRegisterDynamicTextFunction");
-    INIT_FUNC(_pDynamicTextChangeNotification, BOOL (__cdecl *)(LPCWSTR, UCHAR), "DynamicTextChangeNotification");
+HRESULT nCore::System::_Init(HMODULE hCoreInstance)
+{
+    INIT_FUNC(ParseText);
+    INIT_FUNC(RegisterDynamicTextFunction);
+    INIT_FUNC(UnRegisterDynamicTextFunction);
+    INIT_FUNC(DynamicTextChangeNotification);
 
-    INIT_FUNC(_pRegisterWindow, void (__cdecl *)(LPCSTR, LPVOID), "RegisterWindow");
-    INIT_FUNC(_pUnRegisterWindow, void (__cdecl *)(LPCSTR), "UnRegisterWindow");
-    INIT_FUNC(_pFindRegisteredWindow, DrawableWindow* (__cdecl *)(LPCSTR), "FindRegisteredWindow");
-    INIT_FUNC(_pAddWindowRegistrationListener, void (__cdecl *)(LPCSTR, DrawableWindow*), "AddWindowRegistrationListener");
-    INIT_FUNC(_pRemoveWindowRegistrationListener, void (__cdecl *)(LPCSTR, DrawableWindow*), "RemoveWindowRegistrationListener");
+    INIT_FUNC(RegisterWindow);
+    INIT_FUNC(UnRegisterWindow);
+    INIT_FUNC(FindRegisteredWindow);
+    INIT_FUNC(AddWindowRegistrationListener);
+    INIT_FUNC(RemoveWindowRegistrationListener);
 
     return S_OK;
 }
 
 
-IParsedText* nCore::System::ParseText(LPCWSTR text) {
-    return _pParseText(text);
+/// <summary>
+/// Disconnects from the core
+/// </summary>
+void nCore::System::_DeInit()
+{
+    FUNC_VAR_NAME(ParseText) = nullptr;
+    FUNC_VAR_NAME(RegisterDynamicTextFunction) = nullptr;
+    FUNC_VAR_NAME(UnRegisterDynamicTextFunction) = nullptr;
+    FUNC_VAR_NAME(DynamicTextChangeNotification) = nullptr;
+
+    FUNC_VAR_NAME(RegisterWindow) = nullptr;
+    FUNC_VAR_NAME(UnRegisterWindow) = nullptr;
+    FUNC_VAR_NAME(FindRegisteredWindow) = nullptr;
+    FUNC_VAR_NAME(AddWindowRegistrationListener) = nullptr;
+    FUNC_VAR_NAME(RemoveWindowRegistrationListener) = nullptr;
 }
 
 
-BOOL nCore::System::RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic) {
-    return _pRegisterDynamicTextFunction(name, numArgs, formatter, dynamic);
+IParsedText* nCore::System::ParseText(LPCWSTR text)
+{
+    return FUNC_VAR_NAME(ParseText)(text);
 }
 
 
-BOOL nCore::System::UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs) {
-    return _pUnRegisterDynamicTextFunction(name, numArgs);
+BOOL nCore::System::RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic)
+{
+    return FUNC_VAR_NAME(RegisterDynamicTextFunction)(name, numArgs, formatter, dynamic);
 }
 
 
-BOOL nCore::System::DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs) {
-    return _pDynamicTextChangeNotification(name, numArgs);
+BOOL nCore::System::UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs)
+{
+    return FUNC_VAR_NAME(UnRegisterDynamicTextFunction)(name, numArgs);
 }
 
 
-void nCore::System::RegisterWindow(LPCSTR prefix, LPVOID window) {
-    _pRegisterWindow(prefix, window);
+BOOL nCore::System::DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs)
+{
+    return FUNC_VAR_NAME(DynamicTextChangeNotification)(name, numArgs);
 }
 
 
-void nCore::System::UnRegisterWindow(LPCSTR prefix) {
-    _pUnRegisterWindow(prefix);
+void nCore::System::RegisterWindow(LPCTSTR prefix, LPVOID window)
+{
+    FUNC_VAR_NAME(RegisterWindow)(prefix, window);
 }
 
 
-DrawableWindow *nCore::System::FindRegisteredWindow(LPCSTR prefix) {
-    return _pFindRegisteredWindow(prefix);
+void nCore::System::UnRegisterWindow(LPCTSTR prefix)
+{
+    FUNC_VAR_NAME(UnRegisterWindow)(prefix);
 }
 
 
-void nCore::System::AddWindowRegistrationListener(LPCSTR prefix, DrawableWindow *listener) {
-    _pAddWindowRegistrationListener(prefix, listener);
+DrawableWindow *nCore::System::FindRegisteredWindow(LPCTSTR prefix)
+{
+    return FUNC_VAR_NAME(FindRegisteredWindow)(prefix);
 }
 
 
-void nCore::System::RemoveWindowRegistrationListener(LPCSTR prefix, DrawableWindow *listener) {
-    _pRemoveWindowRegistrationListener(prefix, listener);
+void nCore::System::AddWindowRegistrationListener(LPCTSTR prefix, DrawableWindow *listener)
+{
+    FUNC_VAR_NAME(AddWindowRegistrationListener)(prefix, listener);
+}
+
+
+void nCore::System::RemoveWindowRegistrationListener(LPCTSTR prefix, DrawableWindow *listener)
+{
+    FUNC_VAR_NAME(RemoveWindowRegistrationListener)(prefix, listener);
 }

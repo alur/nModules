@@ -19,7 +19,7 @@
 
 class IconGroup : public Drawable {
 public:
-    explicit IconGroup(LPCSTR prefix);
+    explicit IconGroup(LPCTSTR prefix);
     virtual ~IconGroup();
 
     LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID);

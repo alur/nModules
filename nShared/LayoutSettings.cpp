@@ -8,6 +8,10 @@
 #pragma once
 
 #include "LayoutSettings.hpp"
+#include <algorithm>
+
+using std::max;
+using std::min;
 
 
 /// <summary>
@@ -36,29 +40,29 @@ LayoutSettings::~LayoutSettings() {
 /// Loads settings from an RC file using the specified defaults.
 /// </summary>
 void LayoutSettings::Load(Settings* settings, LayoutSettings* defaults) {
-    char buffer[32];
+    TCHAR buffer[32];
 
-    mColumnSpacing = settings->GetInt("ColumnSpacing", defaults->mColumnSpacing);
-    settings->GetOffsetRect("PaddingLeft", "PaddingTop", "PaddingRight", "PaddingBottom", &mPadding, &defaults->mPadding);
+    mColumnSpacing = settings->GetInt(_T("ColumnSpacing"), defaults->mColumnSpacing);
+    mPadding = settings->GetOffsetRect(_T("Padding"), &defaults->mPadding);
 
-    settings->GetString("Start", buffer, sizeof(buffer), "TopLeft");
-    if (_stricmp(buffer, "TopRight") == 0) {
+    settings->GetString(_T("Start"), buffer, sizeof(buffer), _T("TopLeft"));
+    if (_tcsicmp(buffer, _T("TopRight")) == 0) {
         mStartPosition = StartPosition::TopRight;
     }
-    else if (_stricmp(buffer, "BottomLeft") == 0) {
+    else if (_tcsicmp(buffer, _T("BottomLeft")) == 0) {
         mStartPosition = StartPosition::BottomLeft;
     }
-    else if (_stricmp(buffer, "BottomRight") == 0) {
+    else if (_tcsicmp(buffer, _T("BottomRight")) == 0) {
         mStartPosition = StartPosition::BottomRight;
     }
     else {
         mStartPosition = StartPosition::TopLeft;
     }
 
-    this->mRowSpacing = settings->GetInt("RowSpacing", defaults->mRowSpacing);
+    this->mRowSpacing = settings->GetInt(_T("RowSpacing"), defaults->mRowSpacing);
 
-    settings->GetString("PrimaryDirection", buffer, sizeof(buffer), "Horizontal");
-    if (_stricmp(buffer, "Vertical") == 0) {
+    settings->GetString(_T("PrimaryDirection"), buffer, sizeof(buffer), _T("Horizontal"));
+    if (_tcsicmp(buffer, _T("Vertical")) == 0) {
         mPrimaryDirection = Direction::Vertical;
     }
     else {
@@ -79,7 +83,7 @@ RECT LayoutSettings::RectFromID(int id, int itemWidth, int itemHeight, int conta
     switch (mPrimaryDirection) {
     case Direction::Vertical:
         {
-            int itemsPerColumn = max(1, (containerHeight - mPadding.top - mPadding.bottom + mRowSpacing)/(itemHeight + mRowSpacing));
+            int itemsPerColumn = max(1L, (containerHeight - mPadding.top - mPadding.bottom + mRowSpacing)/(itemHeight + mRowSpacing));
             column = id / itemsPerColumn;
             row = id % itemsPerColumn;
         }
@@ -87,7 +91,7 @@ RECT LayoutSettings::RectFromID(int id, int itemWidth, int itemHeight, int conta
 
     case Direction::Horizontal:
         {
-            int itemsPerRow = max(1, (containerWidth - mPadding.left - mPadding.right + mColumnSpacing)/(itemWidth + mColumnSpacing));
+            int itemsPerRow = max(1L, (containerWidth - mPadding.left - mPadding.right + mColumnSpacing)/(itemWidth + mColumnSpacing));
             row = id / itemsPerRow;
             column = id % itemsPerRow;
         }

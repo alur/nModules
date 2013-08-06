@@ -10,9 +10,10 @@
 #include "ContainerItem.hpp"
 #include "../nShared/LSModule.hpp"
 #include "Popup.hpp"
+#include "../Utilities/Math.h"
 
 
-ContainerItem::ContainerItem(Drawable* parent, LPCSTR prefix) : PopupItem(parent, prefix, true) {
+ContainerItem::ContainerItem(Drawable* parent, LPCTSTR prefix) : PopupItem(parent, prefix, true) {
     this->itemType = PopupItemType::CONTAINER;
 
     DrawableSettings defaults;
@@ -22,11 +23,11 @@ ContainerItem::ContainerItem(Drawable* parent, LPCSTR prefix) : PopupItem(parent
     defaultState.backgroundBrush.color = 0xAAFFFFFF;
     defaultState.textBrush.color = 0xFF000000;
 
-    this->window->Initialize(&defaults, &defaultState);
+    mWindow->Initialize(&defaults, &defaultState);
 
-    this->hoverState = this->window->AddState("Hover", 100, &defaultState);
+    this->hoverState = mWindow->AddState(L"Hover", 100, &defaultState);
 
-    this->window->Show();
+    mWindow->Show();
 }
 
 
@@ -35,7 +36,7 @@ ContainerItem::~ContainerItem() {
 
 
 int ContainerItem::GetDesiredWidth(int maxWidth) {
-    return min(maxWidth, this->window->GetDrawingSettings()->width);
+    return min(maxWidth, mWindow->GetDrawingSettings()->width);
 }
 
 
@@ -44,15 +45,15 @@ LRESULT ContainerItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
     case WM_MOUSEMOVE:
         {
             if (!this->hoverState->active) {
-                this->window->ActivateState(this->hoverState);
-                ((Popup*)this->parent)->CloseChild();
+                mWindow->ActivateState(this->hoverState);
+                ((Popup*)mParent)->CloseChild();
             }
         }
         return 0;
 
     case WM_MOUSELEAVE:
         {
-            this->window->ClearState(this->hoverState);
+            mWindow->ClearState(this->hoverState);
         }
         return 0;
     }

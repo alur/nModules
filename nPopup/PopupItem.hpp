@@ -15,7 +15,7 @@
 
 class PopupItem : public Drawable {
 public:
-    explicit PopupItem(Drawable* parent, LPCSTR prefix, bool independent = false);
+    explicit PopupItem(Drawable* parent, LPCTSTR prefix, bool independent = false);
     virtual ~PopupItem();
     void Position(int x, int y);
     virtual LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID) = 0;
@@ -35,7 +35,7 @@ protected:
         SEPARATOR
     };
     
-    bool ParseDotIcon(LPCSTR dotIcon);
+    bool ParseDotIcon(LPCTSTR dotIcon);
     void AddIcon(HICON icon);
 
     Settings* iconSettings;

@@ -11,7 +11,8 @@
 #include <dwrite.h>
 #include "Settings.hpp"
 
-class BrushSettings {
+class BrushSettings
+{
 public:
     explicit BrushSettings();
     explicit BrushSettings(const BrushSettings &source);
@@ -21,13 +22,13 @@ public:
     void Load(Settings* settings, BrushSettings* defaults);
 
     // The type of brush to use. SolidColor, LinearGradient, RadialGradient, Image. Default: SolidColor
-    char brushType[32];
+    TCHAR brushType[32];
 
     // The color of a SolidColor brush. Default: 0xFF000000 (black)
     ARGB color;
 
     // The colors to use in a gradient. Default: black
-    LPSTR gradientColors;
+    LPTSTR gradientColors;
 
     // The x coordinate of the center of a gradient. Default: 0
     float gradientCenterX;
@@ -60,10 +61,10 @@ public:
     float gradientStartY;
 
     // The locations along the gradient where the color changes. Default: "0.0"
-    LPSTR gradientStops;
+    LPTSTR gradientStops;
 
     // The image to use for this window. Default: "" (blank)
-    LPSTR image;
+    LPTSTR image;
 
     // The maximum opacity of the image. 0 to 1. Default: 1
     float imageOpacity;
@@ -72,11 +73,11 @@ public:
     float imageRotation;
 
     // How to position the image. Fit, Fill, Center, Stretch, or Tile. Default: Tile
-    char imageScalingMode[32];
+    TCHAR imageScalingMode[32];
 
     // Horizontal tiling mode. Clamp, Tile, or Mirror. Default: Tile
-    char tilingModeX[32];
+    TCHAR tilingModeX[32];
 
     // Vertical tiling mode. Clamp, Tile, or Mirror. Default: Tile
-    char tilingModeY[32];
+    TCHAR tilingModeY[32];
 };

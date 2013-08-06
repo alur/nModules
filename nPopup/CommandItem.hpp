@@ -11,18 +11,18 @@
 
 class CommandItem : public PopupItem {
 public:
-    explicit CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, LPCSTR customIcon = NULL);
-    explicit CommandItem(Drawable* parent, LPCSTR title, LPCSTR command, HICON customIcon);
+    explicit CommandItem(Drawable* parent, LPCTSTR title, LPCTSTR command, LPCTSTR customIcon = nullptr);
+    explicit CommandItem(Drawable* parent, LPCTSTR title, LPCTSTR command, HICON customIcon);
     virtual ~CommandItem();
     
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
     int GetDesiredWidth(int maxWidth);
 
 private:
-    void Init(LPCSTR title, LPCSTR command);
+    void Init(LPCTSTR title, LPCTSTR command);
 
-    LPCSTR title;
-    LPCSTR command;
+    LPCTSTR title;
+    LPCTSTR command;
 
     DrawableWindow::STATE hoverState;
 };

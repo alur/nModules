@@ -1,91 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="nPopup.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PopupItem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Popup.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SeparatorItem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FolderItem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandItem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InfoItem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ContentPopup.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FolderPopup.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ContainerItem.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Version.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SuicidalContentPopup.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClInclude Include="Version.h" />
+    <ClInclude Include="CommandItem.hpp" />
+    <ClInclude Include="ContainerItem.hpp" />
+    <ClInclude Include="ContentPopup.hpp" />
+    <ClInclude Include="FolderItem.hpp" />
+    <ClInclude Include="FolderPopup.hpp" />
+    <ClInclude Include="InfoItem.hpp" />
+    <ClInclude Include="nPopup.h" />
+    <ClInclude Include="Popup.hpp" />
+    <ClInclude Include="PopupItem.hpp" />
+    <ClInclude Include="SeparatorItem.hpp" />
+    <ClInclude Include="SuicidalContentPopup.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="nPopup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PopupItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Popup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CommandItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FolderItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SeparatorItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="InfoItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ContentPopup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FolderPopup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ContainerItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SuicidalContentPopup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClCompile Include="SuicidalContentPopup.cpp" />
+    <ClCompile Include="CommandItem.cpp" />
+    <ClCompile Include="ContainerItem.cpp" />
+    <ClCompile Include="ContentPopup.cpp" />
+    <ClCompile Include="FolderItem.cpp" />
+    <ClCompile Include="FolderPopup.cpp" />
+    <ClCompile Include="InfoItem.cpp" />
+    <ClCompile Include="nPopup.cpp" />
+    <ClCompile Include="Popup.cpp" />
+    <ClCompile Include="PopupItem.cpp" />
+    <ClCompile Include="SeparatorItem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nPopup.rc">

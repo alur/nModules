@@ -9,16 +9,15 @@
 #include <math.h>
 #include "shlwapi.h"
 #include "DesktopPainter.hpp"
-#include "../nShared/Debugging.h"
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/Factories.h"
-#include "../nShared/Macros.h"
 #include "../Utilities/StopWatch.hpp"
 #include "../nCoreCom/Core.h"
 #include "ClickHandler.hpp"
 #include <d2d1.h>
 #include <wincodec.h>
 #include <assert.h>
+#include <algorithm>
 
 extern MonitorInfo * g_pMonitorInfo;
 extern ClickHandler * g_pClickHandler;
@@ -29,13 +28,13 @@ using namespace D2D1;
 /// <summary>
 /// Creates a new instance of the DesktopPainter class.
 /// </summary>
-DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, "nDesk", g_pClickHandler) {
+DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, _T("nDesk"), g_pClickHandler) {
     // Initalize
     m_pWallpaperBrush = nullptr;
     m_pOldWallpaperBrush = nullptr;
     m_TransitionEffect = nullptr;
     m_bInvalidateAllOnUpdate = false;
-    mDontRenderWallpaper = LiteStep::GetRCBool("nDeskDontRenderWallpaper", TRUE) != FALSE;
+    mDontRenderWallpaper = LiteStep::GetRCBool(_T("nDeskDontRenderWallpaper"), TRUE) != FALSE;
     this->transitionStartTime = 0;
     this->transitionEndTime = 0;
     ZeroMemory(&m_TransitionSettings, sizeof(TransitionEffect::TransitionSettings));
@@ -59,7 +58,7 @@ DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, "nDesk", g_pCli
     defaults.y = g_pMonitorInfo->m_virtualDesktop.rect.top;
     Initialize(&defaults);
 
-    nCore::System::RegisterWindow("nDesk", this);
+    nCore::System::RegisterWindow(_T("nDesk"), this);
     UpdateWallpaper(true);
 }
 
@@ -68,7 +67,7 @@ DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, "nDesk", g_pCli
 /// Destroys this instance of the DesktopPainter class.
 /// </summary>
 DesktopPainter::~DesktopPainter() {
-    nCore::System::UnRegisterWindow("nDesk");
+    nCore::System::UnRegisterWindow(_T("nDesk"));
 
     DiscardDeviceResources();
 
@@ -327,7 +326,7 @@ void DesktopPainter::TransitionEnd() {
 /// Paints a composite of the previous wallpaper and the current one.
 /// </summary>
 void DesktopPainter::PaintComposite() {
-    float progress = min(1.0f, float(GetTickCount() - this->transitionStartTime)/(this->m_TransitionSettings.iTime));
+    float progress = std::min(1.0f, float(GetTickCount() - this->transitionStartTime)/(this->m_TransitionSettings.iTime));
 
     m_TransitionEffect->Paint(renderTarget, progress);
 
@@ -421,12 +420,12 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
 
     // Get whether or not to tile the wallpaper
     dwSize = sizeof(szTemp);
-    SHGetValue(HKEY_CURRENT_USER, "Control Panel\\Desktop", "TileWallpaper", &dwType, &szTemp, &dwSize);
+    SHGetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"TileWallpaper", &dwType, &szTemp, &dwSize);
     bTileWallpaper = atoi(szTemp) ? true : false;
 
     // Get whether or not to stretch the wallpaper
     dwSize = sizeof(szTemp);
-    SHGetValue(HKEY_CURRENT_USER, "Control Panel\\Desktop", "WallpaperStyle", &dwType, &szTemp, &dwSize);
+    SHGetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"WallpaperStyle", &dwType, &szTemp, &dwSize);
     iWallpaperStyle = atoi(szTemp);
 
     // Create a bitmap the size of the virtual screen

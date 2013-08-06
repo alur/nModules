@@ -7,53 +7,61 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "../nShared/DrawableWindow.hpp"
-#include "../nShared/Macros.h"
 #include <string>
 #include <map>
 #include <functional>
 
 using std::map;
-using std::string;
+using std::wstring;
 
-struct STRICmp : std::binary_function<std::string, std::string, bool> {
-    bool operator()(const string &s1, const string &s2) const {
-        return _stricmp(s1.c_str(), s2.c_str()) > 0;
+struct STRICmp : std::binary_function<wstring, wstring, bool>
+{
+    bool operator()(const wstring &s1, const wstring &s2) const
+    {
+        return _wcsicmp(s1.c_str(), s2.c_str()) > 0;
     }
 };
 
 
-static map<string, DrawableWindow*, STRICmp> registeredWindows;
-static map<string, list<DrawableWindow*>, STRICmp> registrationListeners;
+static map<wstring, DrawableWindow*, STRICmp> registeredWindows;
+static map<wstring, list<DrawableWindow*>, STRICmp> registrationListeners;
 
 
-EXPORT_CDECL(void) RegisterWindow(LPCSTR prefix, DrawableWindow *window) {
+EXPORT_CDECL(void) RegisterWindow(LPCWSTR prefix, DrawableWindow *window)
+{
     registeredWindows[prefix] = window;
-    for (auto listener : registrationListeners[prefix]) {
+    for (auto listener : registrationListeners[prefix])
+    {
         listener->SetParent(window);
     }
     registrationListeners[prefix].clear();
 }
 
 
-EXPORT_CDECL(void) UnRegisterWindow(LPCSTR prefix) {
-    registeredWindows.erase(string(prefix));
+EXPORT_CDECL(void) UnRegisterWindow(LPCWSTR prefix)
+{
+    registeredWindows.erase(prefix);
 }
 
 
-EXPORT_CDECL(DrawableWindow*) FindRegisteredWindow(LPCSTR prefix) {
+EXPORT_CDECL(DrawableWindow*) FindRegisteredWindow(LPCWSTR prefix)
+{
     auto iter = registeredWindows.find(prefix);
-    if (iter != registeredWindows.end()) {
+    if (iter != registeredWindows.end())
+    {
         return iter->second;
     }
     return nullptr;
 }
 
 
-EXPORT_CDECL(void) AddWindowRegistrationListener(LPCSTR prefix, DrawableWindow *listener) {
+EXPORT_CDECL(void) AddWindowRegistrationListener(LPCWSTR prefix, DrawableWindow *listener)
+{
     registrationListeners[prefix].push_back(listener);
 }
 
 
-EXPORT_CDECL(void) RemoveWindowRegistrationListener(LPCSTR prefix, DrawableWindow *listener) {
+EXPORT_CDECL(void) RemoveWindowRegistrationListener(LPCWSTR prefix, DrawableWindow *listener)
+{
     registrationListeners[prefix].remove(listener);
 }

@@ -20,7 +20,7 @@ using std::map;
 
 class Tray : public Drawable {
 public:
-    explicit Tray(LPCSTR);
+    explicit Tray(LPCTSTR);
     virtual ~Tray();
 
     // Adds an icon to the tray.

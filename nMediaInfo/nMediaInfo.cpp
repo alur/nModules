@@ -9,7 +9,6 @@
 #include "nMediaInfo.h"
 #include "../nShared/LSModule.hpp"
 #include <map>
-#include <strsafe.h>
 #include "TextFunctions.h"
 #include "CoverArt.hpp"
 #include "Bangs.h"
@@ -18,7 +17,7 @@
 using std::map;
 
 // The LSModule class
-LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
+LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
 UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
@@ -28,18 +27,21 @@ UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
 UINT WinampSongChangeMsg = 0;
 
 //
-map<string, CoverArt*> g_CoverArt;
+map<wstring, CoverArt*> gCoverArt;
 
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
-    if (!gLSModule.Initialize(parent, instance)) {
+int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */)
+{
+    if (!gLSModule.Initialize(parent, instance))
+    {
         return 1;
     }
 
-    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION))) {
+    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION)))
+    {
         return 1;
     }
 
@@ -59,14 +61,16 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
 /// <summary>
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
-void quitModule(HINSTANCE /* instance */) {
+void quitModule(HINSTANCE /* instance */)
+{
     TextFunctions::_UnRegister();
     Bangs::_Unregister();
 
-    for (auto &coverArt : g_CoverArt) {
+    for (auto &coverArt : gCoverArt)
+    {
         delete coverArt.second;
     }
-    g_CoverArt.clear();
+    gCoverArt.clear();
 
     gLSModule.DeInitalize();
 }
@@ -79,12 +83,15 @@ void quitModule(HINSTANCE /* instance */) {
 /// <param name="message">The type of message.</param>
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
-LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
-    if (message == WinampSongChangeMsg) {
+LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    if (message == WinampSongChangeMsg)
+    {
         Update();
         return 1;
     }
-    switch(message) {
+    switch(message)
+    {
     case WM_CREATE:
         {
             SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
@@ -99,7 +106,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_FULLSCREENACTIVATED:
         {
-            for (auto &coverart : g_CoverArt) {
+            for (auto &coverart : gCoverArt)
+            {
                 coverart.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
             }
         }
@@ -107,7 +115,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_FULLSCREENDEACTIVATED:
         {
-            for (auto &coverart : g_CoverArt) {
+            for (auto &coverart : gCoverArt)
+            {
                 coverart.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
             }
         }
@@ -125,32 +134,31 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// <summary>
 /// Loads settings.
 /// </summary>
-void LoadSettings() {
-    char szLine[MAX_LINE_LENGTH], szLabel[256];
-    LPSTR szTokens[] = { szLabel };
-    LPVOID f = LiteStep::LCOpen(NULL);
-
-    while (LiteStep::LCReadNextConfig(f, "*nCoverArt", szLine, sizeof(szLine))) {
-        LiteStep::LCTokenize(szLine+strlen("*nCoverArt")+1, szTokens, 1, NULL);
-        g_CoverArt.insert(g_CoverArt.begin(), std::pair<string, CoverArt*>(string(szLabel), new CoverArt(szLabel)));
-    }
-    LiteStep::LCClose(f);
+void LoadSettings()
+{
+    LiteStep::IterateOverLineTokens(_T("*nCoverArt"), [](LPCTSTR token) -> void
+    {
+        gCoverArt.insert(gCoverArt.begin(), std::pair<wstring, CoverArt*>(token, new CoverArt(token)));
+    });
 }
 
 
 /// <summary>
 /// Updates the cover art.
 /// </summary>
-void Update() {
+void Update()
+{
     static bool open = true;
 
-    if (open) {
+    if (open)
+    {
         // Winamp will spam a lot of Update messages on every track change, and they go through asynchronously.
         // I was unable to solve this with either mutexes or critical sections for some reason. (maybe it's not a threading problem?).
         // This solution seems to work good though, and comes with added benefit of usually ignoring the extra messages.
         open = false;
         TextFunctions::_Update();
-        for (auto &coverArt : g_CoverArt) {
+        for (auto &coverArt : gCoverArt)
+        {
             coverArt.second->Update();
         }
         open = true;

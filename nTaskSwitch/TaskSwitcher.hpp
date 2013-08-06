@@ -13,7 +13,8 @@
 #include "../nShared/LayoutSettings.hpp"
 #include "TaskThumbnail.hpp"
 
-class TaskSwitcher : public Drawable {
+class TaskSwitcher : public Drawable
+{
 public:
     explicit TaskSwitcher();
     virtual ~TaskSwitcher();

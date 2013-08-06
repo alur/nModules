@@ -35,9 +35,6 @@
     <ClCompile Include="nCore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InputParsing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ParsedText.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

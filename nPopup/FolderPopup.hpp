@@ -11,7 +11,7 @@
 
 class FolderPopup : public Popup {
 public:
-    explicit FolderPopup(LPCSTR title, LPCSTR bang, LPCSTR prefix);
+    explicit FolderPopup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix);
     virtual ~FolderPopup();
 
 protected:

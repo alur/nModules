@@ -10,18 +10,19 @@
 #include "../nCoreCom/Core.h"
 #include "../nShared/LSModule.hpp"
 #include "Taskbar.hpp"
+#include "../Utilities/Math.h"
 
 
 /// <summary>
 /// Constructor
 /// </summary>
-Taskbar::Taskbar(LPCSTR name) : Drawable(name) {
-    this->thumbnail = new WindowThumbnail("Thumbnail", this->settings);
+Taskbar::Taskbar(LPCTSTR name) : Drawable(name) {
+    this->thumbnail = new WindowThumbnail(_T("Thumbnail"), mSettings);
 
     LoadSettings();
 
     LayoutSettings defaults;
-    mLayoutSettings.Load(this->settings, &defaults);
+    mLayoutSettings.Load(mSettings, &defaults);
 
     DrawableSettings drawableDefaults;
     drawableDefaults.width = GetSystemMetrics(SM_CXSCREEN);
@@ -31,8 +32,8 @@ Taskbar::Taskbar(LPCSTR name) : Drawable(name) {
     BOOL b = FALSE;
     DwmGetColorizationColor(&stateDefaults.backgroundBrush.color, &b);
     
-    this->window->Initialize(&drawableDefaults, &stateDefaults);
-    this->window->Show();
+    mWindow->Initialize(&drawableDefaults, &stateDefaults);
+    mWindow->Show();
 }
 
 
@@ -54,14 +55,14 @@ Taskbar::~Taskbar() {
 /// Loads settings from LiteStep's RC files.
 /// </summary>
 void Taskbar::LoadSettings(bool /* isRefresh */) {
-    Settings* buttonSettings = settings->CreateChild("Button");
+    Settings* buttonSettings = mSettings->CreateChild(_T("Button"));
 
-    this->buttonWidth = buttonSettings->GetInt("Width", 150);
-    this->buttonHeight = buttonSettings->GetInt("Height", 36);
-    this->buttonMaxWidth = buttonSettings->GetInt("MaxWidth", this->buttonWidth);
-    this->buttonMaxHeight = buttonSettings->GetInt("MaxHeight", this->buttonHeight);
-    this->monitor = this->settings->GetMonitor("Monitor", 0xFFFFFFFF);
-    this->noThumbnails = this->settings->GetBool("NoThumbnails", false);
+    this->buttonWidth = buttonSettings->GetInt(_T("Width"), 150);
+    this->buttonHeight = buttonSettings->GetInt(_T("Height"), 36);
+    this->buttonMaxWidth = buttonSettings->GetInt(_T("MaxWidth"), this->buttonWidth);
+    this->buttonMaxHeight = buttonSettings->GetInt(_T("MaxHeight"), this->buttonHeight);
+    this->monitor = mSettings->GetMonitor(_T("Monitor"), 0xFFFFFFFF);
+    this->noThumbnails = mSettings->GetBool(_T("NoThumbnails"), false);
 }
 
 
@@ -135,7 +136,7 @@ bool Taskbar::MonitorChanged(HWND hWnd, UINT monitor, TaskButton** pOut) {
 
 
 void Taskbar::Repaint() {
-    this->window->Repaint();
+    mWindow->Repaint();
 }
 
 
@@ -143,7 +144,7 @@ void Taskbar::Repaint() {
 /// Repositions/Resizes all buttons.  
 /// </summary>
 void Taskbar::Relayout() {
-    DrawableSettings* drawingSettings = this->window->GetDrawingSettings();
+    DrawableSettings* drawingSettings = mWindow->GetDrawingSettings();
     int spacePerLine, lines, buttonSize, x0, y0, xdir, ydir;
 
     if (this->buttons.size() == 0) return;
@@ -231,7 +232,7 @@ void Taskbar::Relayout() {
 /// Handles window messages for this taskbar.
 /// </summary>
 LRESULT WINAPI Taskbar::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
-    this->eventHandler->HandleMessage(window, message, wParam, lParam);
+    mEventHandler->HandleMessage(window, message, wParam, lParam);
     return DefWindowProc(window, message, wParam, lParam);
 }
 

@@ -28,10 +28,10 @@ enum POPUPLEVEL {
     POPUPLEVEL_FOLDER
 };
 
-POPUPLINETYPE ProcessPopupLine(LPCSTR line, ContentPopup::ContentSource* source, LPSTR title, UINT cchTitle,
-    LPSTR command, UINT cchCommand, LPSTR icon, UINT cchIcon, LPSTR prefix, UINT cchPrefix);
+POPUPLINETYPE ProcessPopupLine(LPCTSTR line, ContentPopup::ContentSource* source, LPTSTR title, UINT cchTitle,
+    LPTSTR command, UINT cchCommand, LPTSTR icon, UINT cchIcon, LPTSTR prefix, UINT cchPrefix);
 
 void LoadSettings();
 void LoadPopups();
-bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out, LPCSTR parentPrefix);
-void __cdecl HandlePopupBang(HWND owner, LPCSTR bang, LPCSTR args);
+bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out, LPCTSTR parentPrefix);
+void __cdecl HandlePopupBang(HWND owner, LPCTSTR bang, LPCTSTR args);

@@ -27,7 +27,7 @@ public:
         BYPOSITION
     };
 
-    explicit Taskbar(LPCSTR);
+    explicit Taskbar(LPCTSTR);
     virtual ~Taskbar();
 
     void ShowThumbnail(HWND hwnd, LPRECT position);

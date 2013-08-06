@@ -6,7 +6,6 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "DrawableWindow.hpp"
-#include "../nShared/Debugging.h"
 
 
 HRESULT DrawableWindow::DragEnter(IDataObject *dataObj, DWORD keyState, POINTL point, DWORD *effect) {

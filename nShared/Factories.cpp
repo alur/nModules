@@ -5,69 +5,73 @@
  *  Manages Direct2D/DirectWrite/... factories
  *   
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../nShared/LiteStep.h"
-#include <strsafe.h>
+#include "../Utilities/Common.h"
 #include <d2d1.h>
 #include <dwrite.h>
 #include <wincodec.h>
 #include "Factories.h"
-#include "Macros.h"
 
-namespace Factories {
-    IDWriteFactory *pDWFactory = nullptr;
-    ID2D1Factory *pD2DFactory = nullptr;
-    IWICImagingFactory *pWICFactory = nullptr;
+namespace Factories
+{
+    static IDWriteFactory *sDWFactory = nullptr;
+    static ID2D1Factory *sD2DFactory = nullptr;
+    static IWICImagingFactory *sWICFactory = nullptr;
 }
 
 
 /// <summary>
 /// Releases all allocated factories.
 /// </summary>
-void Factories::Release() {
-    SAFERELEASE(pDWFactory);
-    SAFERELEASE(pD2DFactory);
-    SAFERELEASE(pWICFactory);
+void Factories::Release()
+{
+    SAFERELEASE(sDWFactory);
+    SAFERELEASE(sD2DFactory);
+    SAFERELEASE(sWICFactory);
 }
 
 
 /// <summary>
-/// Fetches a directwrite factory.
+/// Fetches a DirectWrite factory.
 /// </summary>
-HRESULT Factories::GetDWriteFactory(LPVOID* ppFactory) {
-    if (pDWFactory == nullptr) {
+HRESULT Factories::GetDWriteFactory(LPVOID *factory)
+{
+    if (sDWFactory == nullptr)
+    {
         HRESULT hr;
-        if (!SUCCEEDED(hr = DWriteCreateFactory(
+        RETURNONFAIL(hr, DWriteCreateFactory(
             DWRITE_FACTORY_TYPE_SHARED,
             __uuidof(IDWriteFactory),
-            reinterpret_cast<IUnknown**>(&pDWFactory)
-        ))) return hr;
+            reinterpret_cast<IUnknown**>(&sDWFactory)
+        ));
     }
-    *ppFactory = pDWFactory;
+    *factory = sDWFactory;
     return S_OK;
 }
 
 
 /// <summary>
-/// Fetches a direct2d factory.
+/// Fetches a Direct2D factory.
 /// </summary>
-HRESULT Factories::GetD2DFactory(LPVOID* ppFactory) {
-    if (pD2DFactory == nullptr) {
+HRESULT Factories::GetD2DFactory(LPVOID *factory)
+{
+    if (sD2DFactory == nullptr)
+    {
         D2D1_FACTORY_OPTIONS d2dFactoryOptions;
-        HRESULT hr;
         ZeroMemory(&d2dFactoryOptions, sizeof(D2D1_FACTORY_OPTIONS));
         #if defined(_DEBUG)
             // If the project is in a debug build, enable Direct2D debugging via SDK Layers.
             d2dFactoryOptions.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
         #endif
-
-        if (!SUCCEEDED(hr = D2D1CreateFactory(
+        
+        HRESULT hr;
+        RETURNONFAIL(hr, D2D1CreateFactory(
             D2D1_FACTORY_TYPE_MULTI_THREADED,
             __uuidof(ID2D1Factory),
             &d2dFactoryOptions,
-            reinterpret_cast<LPVOID*>(&pD2DFactory)
-        ))) return hr;
+            reinterpret_cast<LPVOID*>(&sD2DFactory)
+        ));
     }
-    *ppFactory = pD2DFactory;
+    *factory = sD2DFactory;
     return S_OK;
 }
 
@@ -75,18 +79,19 @@ HRESULT Factories::GetD2DFactory(LPVOID* ppFactory) {
 /// <summary>
 /// Fetches a WIC factory.
 /// </summary>
-HRESULT Factories::GetWICFactory(LPVOID* ppFactory) {
-    if (pWICFactory == nullptr) {
+HRESULT Factories::GetWICFactory(LPVOID *factory)
+{
+    if (sWICFactory == nullptr)
+    {
         HRESULT hr;
-
-        if (!SUCCEEDED(hr = CoCreateInstance(
+        RETURNONFAIL(hr, CoCreateInstance(
             CLSID_WICImagingFactory1,
             nullptr,
             CLSCTX_INPROC_SERVER,
             IID_IWICImagingFactory,
-            (LPVOID*)&pWICFactory
-        ))) return hr;
+            reinterpret_cast<LPVOID*>(&sWICFactory)
+        ));
     }
-    *ppFactory = pWICFactory;
+    *factory = sWICFactory;
     return S_OK;
 }

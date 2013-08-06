@@ -13,11 +13,11 @@
 
 // Verify works like assert in debug, but executes the command even in release mode.
 #if defined(_DEBUG)
-#  define VERIFY(f)     ASSERT(f)
-#  define VERIFY_HR(f)  ASSERT(SUCCEEDED(f))
+#   define VERIFY(f)     ASSERT(f)
+#   define VERIFY_HR(f)  ASSERT(SUCCEEDED(f))
 #else
-#  define VERIFY(f)     ((void)(f))
-#  define VERIFY_HR(f)  ((void)(f))
+#   define VERIFY(f)     ((void)(f))
+#   define VERIFY_HR(f)  ((void)(f))
 #endif
 
 /// <summary>
@@ -28,13 +28,13 @@ void DbgTraceMessageA(LPCSTR format, ...);
 void DbgTraceMessageW(LPCWSTR format, ...);
 
 #if defined(_DEBUG)
-#  define TRACE  DbgTraceMessageA
-#  define TRACEA  DbgTraceMessageA
-#  define TRACEW  DbgTraceMessageW
+#   define TRACE  DbgTraceMessageA
+#   define TRACEA  DbgTraceMessageA
+#   define TRACEW  DbgTraceMessageW
 #else
-#  define TRACE
-#  define TRACEA
-#  define TRACEW
+#   define TRACE
+#   define TRACEA
+#   define TRACEW
 #endif
 
 #if defined(_DEBUG)

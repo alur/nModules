@@ -11,7 +11,7 @@
 #include "Tray.hpp"
 #include "TrayIcon.hpp"
 #include "Windowsx.h"
-#include "../nShared/Debugging.h"
+#include <shellapi.h>
 
 
 extern LSModule gLSModule;
@@ -21,7 +21,8 @@ extern HWND g_hWndTrayNotify;
 /// <summary>
 /// Constructor
 /// </summary>
-TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings* parentSettings) : Drawable(parent, "Icon") {
+TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings* parentSettings) : Drawable(parent, _T("Icon"))
+{
     // Init
     this->callbackID = 0;
     this->callbackMessage = 0xFFFFFFFF;
@@ -36,11 +37,11 @@ TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings
     this->tip[0] = L'\0';
 
     // Create the drawable window
-    this->settings = parentSettings->CreateChild("Icon");
+    mSettings = parentSettings->CreateChild(_T("Icon"));
 
     StateSettings defaultStateSettings;
     defaultStateSettings.backgroundBrush.color = 0x00000000;
-    this->window->Initialize(nullptr, &defaultStateSettings);
+    mWindow->Initialize(nullptr, &defaultStateSettings);
     this->showingTip = false;
 
     //
@@ -62,7 +63,7 @@ TrayIcon::~TrayIcon() {
 /// Loads RC settings.
 /// </summary>
 void TrayIcon::LoadSettings(bool /* bIsRefresh */) {
-    this->iconSize = this->settings->GetInt("Size", 16);
+    this->iconSize = mSettings->GetInt(_T("Size"), 16);
 }
 
 
@@ -70,7 +71,7 @@ void TrayIcon::LoadSettings(bool /* bIsRefresh */) {
 /// Shows the trayicon.
 /// </summary>
 void TrayIcon::Show() {
-    this->window->Show();
+    mWindow->Show();
 }
 
 
@@ -96,15 +97,15 @@ void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
         SetIcon(pNID->hIcon);
     }
     if ((pNID->uFlags & NIF_TIP) == NIF_TIP) {
-        MultiByteToWideChar(CP_ACP, 0, pNID->szTip, -1, this->tip, TRAY_MAX_TIP_LENGTH);
+        StringCchCopy(this->tip, TRAY_MAX_TIP_LENGTH, pNID->szTip);
         if (this->showingTip) {
             if (this->tip[0] != L'\0') {
                 RECT r;
-                this->window->GetScreenRect(&r);
-                ((Tray*)this->parent)->ShowTip(this->tip, &r);
+                mWindow->GetScreenRect(&r);
+                ((Tray*)mParent)->ShowTip(this->tip, &r);
             }
             else {
-                ((Tray*)this->parent)->HideTip();
+                ((Tray*)mParent)->HideTip();
             }
         }
     }
@@ -120,10 +121,10 @@ void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
         WCHAR info[TRAY_MAX_INFO_LENGTH], infoTitle[TRAY_MAX_INFOTITLE_LENGTH];
 
         // uTimeout is only valid on 2000 and XP, so we can safely ignore it.
-        MultiByteToWideChar(CP_ACP, 0, pNID->szInfo, -1, info, TRAY_MAX_INFO_LENGTH);
-        MultiByteToWideChar(CP_ACP, 0, pNID->szInfoTitle, -1, infoTitle, TRAY_MAX_INFOTITLE_LENGTH);
+        StringCchCopy(info, TRAY_MAX_INFO_LENGTH, pNID->szInfo);
+        StringCchCopy(infoTitle, TRAY_MAX_INFOTITLE_LENGTH, pNID->szInfoTitle);
 
-        ((Tray*)this->parent)->EnqueueBalloon(this, infoTitle, info, pNID->dwInfoFlags, pNID->hBalloonIcon, (pNID->uFlags & NIF_REALTIME) == NIF_REALTIME);
+        ((Tray*)mParent)->EnqueueBalloon(this, infoTitle, info, pNID->dwInfoFlags, pNID->hBalloonIcon, (pNID->uFlags & NIF_REALTIME) == NIF_REALTIME);
     }
 
     this->showTip = true;
@@ -144,11 +145,11 @@ void TrayIcon::HandleSetVersion(LiteStep::LPLSNOTIFYICONDATA pNID) {
 void TrayIcon::SetIcon(HICON icon) {
     if (this->icon != icon) {
         this->icon = icon;
-        this->window->ClearOverlays();
+        mWindow->ClearOverlays();
         D2D1_RECT_F f;
         f.bottom = (float)this->iconSize; f.top = 0; f.left = 0; f.right = (float)this->iconSize;
-        this->iconOverlay = this->window->AddOverlay(f, this->icon);
-        this->window->Repaint();
+        this->iconOverlay = mWindow->AddOverlay(f, this->icon);
+        mWindow->Repaint();
     }
 }
 
@@ -157,7 +158,7 @@ void TrayIcon::SetIcon(HICON icon) {
 /// Repositions the icon.
 /// </summary>
 void TrayIcon::Reposition(RECT rect) {
-    this->window->SetPosition(rect);
+    mWindow->SetPosition(rect);
 }
 
 
@@ -165,7 +166,7 @@ void TrayIcon::Reposition(RECT rect) {
 /// Repositions the icon.
 /// </summary>
 void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height) {
-    this->window->SetPosition(x, y, width, height);
+    mWindow->SetPosition(x, y, width, height);
 }
 
 
@@ -173,7 +174,7 @@ void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height) {
 /// Gets the screen coordinate rect of this tray icon.
 /// </summary>
 void TrayIcon::GetScreenRect(LPRECT rect) {
-    this->window->GetScreenRect(rect);
+    mWindow->GetScreenRect(rect);
 }
 
 
@@ -183,7 +184,7 @@ void TrayIcon::GetScreenRect(LPRECT rect) {
 void TrayIcon::SendCallback(UINT message, WPARAM /* wParam */, LPARAM /* lParam */) {
     if (this->version >= 4) {
         RECT r;
-        this->window->GetScreenRect(&r);
+        mWindow->GetScreenRect(&r);
         PostMessage(this->callbackWindow, this->callbackMessage, (WPARAM)MAKEWPARAM(r.left, r.top), (LPARAM)MAKELPARAM(message, this->callbackID));
     }
     else {
@@ -212,13 +213,13 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam,
             this->showingTip = true;
             if (this->tip[0] != L'\0') {
                 RECT r;
-                this->window->GetScreenRect(&r);
-                ((Tray*)this->parent)->ShowTip(this->tip, &r);
+                mWindow->GetScreenRect(&r);
+                ((Tray*)mParent)->ShowTip(this->tip, &r);
             }
         }
 
         if (message == WM_RBUTTONDOWN || message == WM_LBUTTONDOWN) {
-            ((Tray*)this->parent)->HideTip();
+            ((Tray*)mParent)->HideTip();
         }
 
         AllowSetForegroundWindow(mProcessID);
@@ -239,7 +240,7 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam,
         }
     }
     else if (message == WM_MOUSELEAVE) {
-        ((Tray*)this->parent)->HideTip();
+        ((Tray*)mParent)->HideTip();
         this->showingTip = false;
     }
     else {

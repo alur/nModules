@@ -19,7 +19,7 @@ public:
     // Loads the actual settings.
     void Load(Settings* settings, DrawableSettings* defaults);
 
-    D2D1_TEXT_ANTIALIAS_MODE ParseAntiAliasMode(LPCSTR mode);
+    D2D1_TEXT_ANTIALIAS_MODE ParseAntiAliasMode(LPCTSTR mode);
 
     // True if the window should be topmost. Default: false
     bool alwaysOnTop;

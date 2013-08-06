@@ -8,15 +8,14 @@
 #include "../nShared/LiteStep.h"
 #include "TextFunctions.h"
 #include "../nCoreCom/Core.h"
-#include <strsafe.h>
-#include "../nShared/Debugging.h"
 
 #define TEXTFUNCTION(x) BOOL __cdecl x(LPCWSTR /* name */, UCHAR /* numArgs */, LPWSTR* /* args */, LPWSTR dest, size_t cchDest)
 #define IPC_GETLISTPOS 125
 #define IPC_GETPLAYLISTFILEW 214
 #define IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE 3027
 
-namespace TextFunctions {
+namespace TextFunctions
+{
     TEXTFUNCTION(MusicTrackTitle);
     TEXTFUNCTION(MusicTrackArtist);
     TEXTFUNCTION(MusicAlbumTitle);
@@ -29,7 +28,8 @@ namespace TextFunctions {
 }
 
 
-void TextFunctions::_Register() {
+void TextFunctions::_Register()
+{
     using nCore::System::RegisterDynamicTextFunction;
 
     RegisterDynamicTextFunction(L"MusicTrackTitle", 0, MusicTrackTitle, true);
@@ -38,7 +38,8 @@ void TextFunctions::_Register() {
 }
 
 
-void TextFunctions::_UnRegister() {
+void TextFunctions::_UnRegister()
+{
     using nCore::System::UnRegisterDynamicTextFunction;
 
     UnRegisterDynamicTextFunction(L"MusicTrackTitle", 0);
@@ -47,14 +48,16 @@ void TextFunctions::_UnRegister() {
 }
 
 
-void TextFunctions::_Update() {
+void TextFunctions::_Update()
+{
     HANDLE winampHandle;
     ULONG winampProc;
     HWND WA2Window;
     int trackID;
 
     // Winamp expects a 32bit struct so we can't use the ones in WA_IPC.
-    struct {
+    struct
+    {
         DWORD filename; // LPCWSTR
         DWORD metadata; // LPCWSTR
         DWORD ret;      // LPWSTR
@@ -62,7 +65,8 @@ void TextFunctions::_Update() {
     } fileInfo;
 
     // Get Winamps HWND
-    if ((WA2Window = FindWindowW(L"Winamp v1.x", nullptr)) == nullptr) {
+    if ((WA2Window = FindWindowW(L"Winamp v1.x", nullptr)) == nullptr)
+    {
         StringCchCopyW(trackTitle, sizeof(trackTitle), L"");
         return;
     }
@@ -73,7 +77,8 @@ void TextFunctions::_Update() {
 
     // Open a handle to winamp
     GetWindowThreadProcessId(WA2Window, &winampProc);
-    if ((winampHandle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, false, winampProc)) == nullptr) {
+    if ((winampHandle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, false, winampProc)) == nullptr)
+    {
         StringCchCopyW(trackTitle, sizeof(trackTitle), L"");
         return;
     }
@@ -99,29 +104,35 @@ void TextFunctions::_Update() {
 
     // Read the track title
     WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Title", 64, nullptr);
-    if (SendMessageW(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
+    if (SendMessageW(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE))
+    {
         ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &trackTitle, sizeof(trackTitle), nullptr);
     }
-    else {
+    else
+    {
         trackTitle[0] = '\0';
     }
     //TRACEW(L"trackTitle: %s", trackTitle);
 
     // Read the track artist
     WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Artist", 64, nullptr);
-    if (SendMessageW(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
+    if (SendMessageW(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE))
+    {
         ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &trackArtist, sizeof(trackArtist), nullptr);
     }
-    else {
+    else 
+    {
         trackArtist[0] = '\0';
     }
 
     // Read the album title
     WriteProcessMemory(winampHandle, (LPVOID)fileInfo.metadata, L"Album", 64, nullptr);
-    if (SendMessageW(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE)) {
+    if (SendMessageW(WA2Window, WM_USER, (WPARAM)remoteStruct, IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE))
+    {
         ReadProcessMemory(winampHandle, (LPCVOID)fileInfo.ret, &albumTitle, sizeof(albumTitle), nullptr);
     }
-    else {
+    else
+    {
         albumTitle[0] = '\0';
     }
 
@@ -142,16 +153,19 @@ void TextFunctions::_Update() {
 }
 
 
-TEXTFUNCTION(TextFunctions::MusicTrackTitle) {
+TEXTFUNCTION(TextFunctions::MusicTrackTitle)
+{
     return SUCCEEDED(StringCchCatW(dest, cchDest, trackTitle));
 }
 
 
-TEXTFUNCTION(TextFunctions::MusicTrackArtist) {
+TEXTFUNCTION(TextFunctions::MusicTrackArtist)
+{
     return SUCCEEDED(StringCchCatW(dest, cchDest, trackArtist));
 }
 
 
-TEXTFUNCTION(TextFunctions::MusicAlbumTitle) {
+TEXTFUNCTION(TextFunctions::MusicAlbumTitle)
+{
     return SUCCEEDED(StringCchCatW(dest, cchDest, albumTitle));
 }

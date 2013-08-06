@@ -20,7 +20,7 @@ public:
         BOTTOM
     };
 
-    explicit WindowThumbnail(LPCSTR prefix, Settings* parentSettings);
+    explicit WindowThumbnail(LPCTSTR prefix, Settings* parentSettings);
     virtual ~WindowThumbnail();
 
     void Show(HWND hwnd, LPRECT position);

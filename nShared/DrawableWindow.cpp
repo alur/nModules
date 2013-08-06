@@ -9,7 +9,6 @@
 #include <windowsx.h>
 #include <strsafe.h>
 #include "../nCoreCom/Core.h"
-#include "Macros.h"
 #include "DrawableWindow.hpp"
 #include "DrawableSettings.hpp"
 #include <d2d1.h>
@@ -17,11 +16,10 @@
 #include <dwrite.h>
 #include <Wincodec.h>
 #include "Factories.h"
-#include "Debugging.h"
 #include "Color.h"
 #include "MessageHandler.hpp"
 #include "../Utilities/StringUtils.h"
-#include "Math.h"
+#include "../Utilities/Math.h"
 
 
 using namespace D2D1;
@@ -65,10 +63,10 @@ DrawableWindow::DrawableWindow(Settings* settings, MessageHandler* msgHandler) {
     mCoveredByFullscreen = false;
 
     // Create the base state
-    State* state = new State("", new Settings(settings), 0, &this->text);
+    State* state = new State(_T(""), new Settings(settings), 0, &this->text);
     state->active = true;
     this->activeState = this->baseState = this->states.insert(this->states.begin(), state);
-    mBrushOwners[""] = (IBrushOwner*)state;
+    mBrushOwners[_T("")] = (IBrushOwner*)state;
 }
 
 
@@ -78,7 +76,7 @@ DrawableWindow::DrawableWindow(Settings* settings, MessageHandler* msgHandler) {
 /// <param name="window">The window to draw to.</param>
 /// <param name="prefix">The settings prefix to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
-DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHandler) : DrawableWindow(new Settings(prefix), msgHandler) {
+DrawableWindow::DrawableWindow(HWND window, LPCTSTR prefix, MessageHandler *msgHandler) : DrawableWindow(new Settings(prefix), msgHandler) {
     this->monitorInfo = new MonitorInfo();
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
     this->userMsgIDs = new UIDGenerator<UINT>(WM_FIRSTREGISTERED);
@@ -102,7 +100,7 @@ DrawableWindow::DrawableWindow(HWND window, LPCSTR prefix, MessageHandler *msgHa
 /// <param name="parent">The name of the parent's window.</param>
 /// <param name="settings">The settings to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
-DrawableWindow::DrawableWindow(LPCSTR parent, Settings *settings, MessageHandler *msgHandler) : DrawableWindow(new Settings(settings), msgHandler) {
+DrawableWindow::DrawableWindow(LPCTSTR parent, Settings *settings, MessageHandler *msgHandler) : DrawableWindow(new Settings(settings), msgHandler) {
     StringCchCopy(mParentName, _countof(mParentName), parent);
     mParent = nCore::System::FindRegisteredWindow(mParentName);
     mIsChild = true;
@@ -125,14 +123,14 @@ DrawableWindow::DrawableWindow(LPCSTR parent, Settings *settings, MessageHandler
 /// <param name="instance">Used for creating the window.</param>
 /// <param name="settings">The settings to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
-DrawableWindow::DrawableWindow(HWND /* parent */, LPCSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) : DrawableWindow(new Settings(settings), msgHandler) {
+DrawableWindow::DrawableWindow(HWND /* parent */, LPCTSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler) : DrawableWindow(new Settings(settings), msgHandler) {
     this->monitorInfo = new MonitorInfo();
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
     this->userMsgIDs = new UIDGenerator<UINT>(WM_FIRSTREGISTERED);
 
     // Create the window
     this->window = MessageHandler::CreateMessageWindowEx(WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_COMPOSITED,
-        windowClass, settings->prefix, WS_POPUP, 0, 0, 0, 0, NULL, NULL, instance, this);
+        windowClass, settings->GetPrefix(), WS_POPUP, 0, 0, 0, 0, NULL, NULL, instance, this);
     SetWindowPos(this->window, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
     SetWindowLongPtr(this->window, GWLP_USERDATA, MAGIC_DWORD);
 
@@ -180,7 +178,7 @@ DrawableWindow::~DrawableWindow() {
 
     // Register with the core
     if (this->drawingSettings->registerWithCore) {
-        nCore::System::UnRegisterWindow(settings->prefix);
+        nCore::System::UnRegisterWindow(settings->GetPrefix());
     }
 
     if (!mIsChild && this->window) {
@@ -219,7 +217,7 @@ DrawableWindow::~DrawableWindow() {
 /// <summary>
 /// Adds a brush owner.
 /// </summary>
-void DrawableWindow::AddBrushOwner(IBrushOwner *owner, LPCSTR name) {
+void DrawableWindow::AddBrushOwner(IBrushOwner *owner, LPCTSTR name) {
     mBrushOwners[name] = owner;
 }
 
@@ -309,7 +307,7 @@ DrawableWindow::PAINTER DrawableWindow::AddPrePainter(IPainter* painter) {
 /// <param name="defaultSettings">The default settings for this state.</param>
 /// <param name="defaultPriority">The default priority for this state. Higher priority states take precedence over lower priority states.</param>
 /// <returns>An object which can be used to activate/clear this state.</returns>
-DrawableWindow::STATE DrawableWindow::AddState(LPCSTR prefix, int defaultPriority, StateSettings* defaultSettings, DrawableWindow::STATE *stateGroup) {
+DrawableWindow::STATE DrawableWindow::AddState(LPCTSTR prefix, int defaultPriority, StateSettings* defaultSettings, DrawableWindow::STATE *stateGroup) {
     State* state = new State(prefix, this->baseState->settings->CreateChild(prefix), defaultPriority, &this->text);
     state->settings->AppendGroup(stateGroup ? (*stateGroup)->settings : this->baseState->settings);
     state->Load(defaultSettings);
@@ -343,7 +341,7 @@ void DrawableWindow::ActivateState(DrawableWindow::STATE state, bool repaint) {
 /// Performs an animation step.
 /// </summary>
 void DrawableWindow::Animate() {
-    float progress = Easing::Transform(clamp(0.0f, mAnimationClock.GetTime()/mAnimationDuration, 1.0f), this->animationEasing);
+    float progress = Easing::Transform(CLAMP(0.0f, mAnimationClock.GetTime()/mAnimationDuration, 1.0f), this->animationEasing);
 
     if (progress >= 1.0f) {
         this->animating = false;
@@ -495,7 +493,8 @@ void DrawableWindow::FullscreenDeactivated(HMONITOR monitor) {
 }
 
 
-IBrushOwner *DrawableWindow::GetBrushOwner(LPCSTR name) {
+IBrushOwner *DrawableWindow::GetBrushOwner(LPCTSTR name)
+{
     return mBrushOwners[name];
 }
 
@@ -577,9 +576,9 @@ HWND DrawableWindow::GetWindowHandle() {
 /// <summary>
 /// Returns the specified state, if it exists.
 /// </summary>
-State *DrawableWindow::GetState(LPCSTR stateName) {
+State *DrawableWindow::GetState(LPCTSTR stateName) {
     for (State *state : this->states) {
-        if (_stricmp(state->mName, stateName) == 0) {
+        if (_tcsicmp(state->mName, stateName) == 0) {
             return state;
         }
     }
@@ -750,7 +749,7 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
     }
 
     // Let the default messagehandler deal with anything else, if it is initialized.
-    if (this->msgHandler && this->msgHandler->initialized) {
+    if (this->msgHandler && this->msgHandler->mInitialized) {
         return this->msgHandler->HandleMessage(window, msg, wParam, lParam, this);
     }
     else {
@@ -788,7 +787,7 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings
 
     // Register with the core.
     if (this->drawingSettings->registerWithCore) {
-        nCore::System::RegisterWindow(this->settings->prefix, this);
+        nCore::System::RegisterWindow(this->settings->GetPrefix(), this);
     }
 
     // Put the window in its correct position.
@@ -1299,8 +1298,8 @@ void DrawableWindow::Show(int nCmdShow) {
 void DrawableWindow::SizeToText(int maxWidth, int maxHeight, int minWidth, int minHeight) {
     SIZE s;
     GetDesiredSize(maxWidth, maxHeight, &s);
-    s.cx = max(s.cx, minWidth);
-    s.cy = max(s.cy, minHeight);
+    s.cx = std::max(s.cx, (long)minWidth);
+    s.cy = std::max(s.cy, (long)minHeight);
     this->SetPosition(this->drawingSettings->x, this->drawingSettings->y, s.cx, s.cy);
 }
 

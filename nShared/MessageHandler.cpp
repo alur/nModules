@@ -5,14 +5,15 @@
  *  A class which can accept window messages.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../nShared/LiteStep.h"
+#include "../Utilities/Common.h"
 #include "MessageHandler.hpp"
-#include "Debugging.h"
+
 
 /// <summary>
 /// Fixes up a WNDCLASSEX struct to be used as a message handler.
 /// </summary>
-void MessageHandler::FixWindowClass(LPWNDCLASSEX ex) {
+void MessageHandler::FixWindowClass(LPWNDCLASSEX ex)
+{
     ex->cbWndExtra += sizeof(MessageHandler*);
     ex->lpfnWndProc = &MessageHandler::WindowProcedureInit;
 }
@@ -31,8 +32,9 @@ HWND MessageHandler::CreateMessageWindowEx(DWORD exStyle, LPCTSTR className, LPC
 /// <summary>
 /// Wrapper since we can't point to a member function directly.
 /// </summary>
-LRESULT WINAPI MessageHandler::WindowProcedure(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
-    return ((MessageHandler *)GetWindowLongPtr(window, 0))->HandleMessage(window, msg, wParam, lParam, NULL);
+LRESULT WINAPI MessageHandler::WindowProcedure(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    return ((MessageHandler *)GetWindowLongPtr(window, 0))->HandleMessage(window, msg, wParam, lParam, nullptr);
 }
 
 
@@ -40,12 +42,14 @@ LRESULT WINAPI MessageHandler::WindowProcedure(HWND window, UINT msg, WPARAM wPa
 /// Sets the windowproc and to MessageHandler::WindowProcedure and GWLP_MESSAGEHANDLER. This is done this
 /// way in order to reduce the amount of code in the window procedure.
 /// </summary>
-LRESULT WINAPI MessageHandler::WindowProcedureInit(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (msg == WM_CREATE) {
+LRESULT WINAPI MessageHandler::WindowProcedureInit(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    if (msg == WM_CREATE)
+    {
         MessageHandler* msgHandler = (MessageHandler *)((LPCREATESTRUCT)lParam)->lpCreateParams;
         SetWindowLongPtr(window, GWLP_MESSAGEHANDLER, (LONG_PTR)msgHandler);
         SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)&MessageHandler::WindowProcedure);
-        return msgHandler->HandleMessage(window, msg, wParam, lParam, NULL);
+        return msgHandler->HandleMessage(window, msg, wParam, lParam, nullptr);
     }
     return DefWindowProc(window, msg, wParam, lParam);
 }

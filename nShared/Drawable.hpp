@@ -7,32 +7,33 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include <list>
 #include "Settings.hpp"
 #include "DrawableWindow.hpp"
 #include "MessageHandler.hpp"
 #include "EventHandler.hpp"
 
-class Drawable : public MessageHandler {
+class Drawable : public MessageHandler
+{
 public:
-    explicit Drawable(LPCSTR prefix);
-    explicit Drawable(Drawable* parent, LPCSTR prefix, bool independent = false);
-    explicit Drawable(LPCSTR prefix, Settings* parentSettings);
+    explicit Drawable(LPCTSTR prefix);
+    explicit Drawable(Drawable *parent, LPCTSTR prefix, bool independent = false);
+    explicit Drawable(LPCTSTR prefix, LPSettings parentSettings);
     virtual ~Drawable();
 
+public:
     DrawableWindow *GetWindow();
     EventHandler *GetEventHandler();
 
 protected:
     // Used for reading litestep settings.
-    Settings *settings;
+    LPSettings mSettings;
 
     // The object which does actual drawing.
-    DrawableWindow *window;
+    DrawableWindow *mWindow;
 
     // The parent drawable, if there is one.
-    Drawable *parent;
+    Drawable *mParent;
 
     // Handles events.
-    EventHandler *eventHandler;
+    EventHandler *mEventHandler;
 };

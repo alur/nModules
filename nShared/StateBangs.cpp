@@ -11,11 +11,11 @@
 #include "../nCoreCom/Core.h"
 
 
-static std::function<DrawableWindow* (LPCSTR)> windowFinder;
+static std::function<DrawableWindow* (LPCTSTR)> windowFinder;
 
 
 static State *FindState(LPCTSTR *args, int numArgs, DrawableWindow *&window) {
-    char buffer[MAX_RCCOMMAND];
+    TCHAR buffer[MAX_RCCOMMAND];
     int numTokens = LiteStep::CommandTokenize(*args, nullptr, 0, nullptr);
 
     if (numTokens == numArgs + 1 || numTokens == numArgs + 2) {
@@ -27,7 +27,7 @@ static State *FindState(LPCTSTR *args, int numArgs, DrawableWindow *&window) {
                 return window->GetState(buffer);
             }
             else {
-                return window->GetState("");
+                return window->GetState(_T(""));
             }
         }
     }
@@ -49,9 +49,9 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            state->SetCornerRadiusX(float(atof(arg)));
+            state->SetCornerRadiusX(wcstof(arg, nullptr));
             window->Repaint();
         }
     }),
@@ -59,9 +59,9 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            state->SetCornerRadiusY(float(atof(arg)));
+            state->SetCornerRadiusY(wcstof(arg, nullptr));
             window->Repaint();
         }
     }),
@@ -69,9 +69,9 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            state->SetOutlineWidth(float(atof(arg)));
+            state->SetOutlineWidth(wcstof(arg, nullptr));
             window->Repaint();
         }
     }),
@@ -79,7 +79,7 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
             //state->SetFont(arg);
         }
@@ -88,7 +88,7 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
             //state->SetFontSize(strtof(arg, nullptr));
         }
@@ -97,7 +97,7 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
             //state->SetFontStretch(StateSettings::ParseFontStretch(arg));
         }
@@ -106,7 +106,7 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
             //state->SetFontStyle(StateSettings::ParseFontStyle(arg));
         }
@@ -115,7 +115,7 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
             //state->SetFontWeight(StateSettings::ParseFontWeight(arg));
         }
@@ -124,7 +124,7 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
             state->SetReadingDirection(StateSettings::ParseReadingDirection(arg));
             window->Repaint();
@@ -134,7 +134,7 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
             state->SetTextAlignment(StateSettings::ParseTextAlignment(arg));
             window->Repaint();
@@ -144,10 +144,10 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 4, window);
         if (state) {
-            char left[MAX_RCCOMMAND], top[MAX_RCCOMMAND], right[MAX_RCCOMMAND], bottom[MAX_RCCOMMAND];
-            LPSTR buffers[] = { left, top, right, bottom };
+            TCHAR left[MAX_RCCOMMAND], top[MAX_RCCOMMAND], right[MAX_RCCOMMAND], bottom[MAX_RCCOMMAND];
+            LPTSTR buffers[] = { left, top, right, bottom };
             LiteStep::CommandTokenize(args, buffers, _countof(buffers), nullptr);
-            state->SetTextOffsets(float(atof(left)), float(atof(top)), float(atof(right)), float(atof(bottom)));
+            state->SetTextOffsets(float(_ttof(left)), float(_ttof(top)), float(_ttof(right)), float(_ttof(bottom)));
             window->Repaint();
         }
     }),
@@ -155,9 +155,9 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            state->SetTextRotation(float(strtof(arg, nullptr)));
+            state->SetTextRotation(float(_tcstof(arg, nullptr)));
             window->Repaint();
         }
     }),
@@ -165,7 +165,7 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
             state->SetTextTrimmingGranuality(StateSettings::ParseTrimmingGranularity(arg));
             window->Repaint();
@@ -175,7 +175,7 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
             state->SetTextVerticalAlign(StateSettings::ParseParagraphAlignment(arg));
             window->Repaint();
@@ -185,7 +185,7 @@ static struct BangItem {
         DrawableWindow *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
-            char arg[MAX_RCCOMMAND];
+            TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
             state->SetWordWrapping(StateSettings::ParseWordWrapping(arg));
             window->Repaint();
@@ -197,7 +197,7 @@ static struct BangItem {
 /// <summary>
 /// Registers bangs.
 /// </summary>
-void StateBangs::_Register(LPCTSTR prefix, std::function<DrawableWindow* (LPCSTR)> windowFinder) {
+void StateBangs::Register(LPCTSTR prefix, std::function<DrawableWindow* (LPCTSTR)> windowFinder) {
     TCHAR bangName[64];
     ::windowFinder = windowFinder;
     for (BangItem item : BangMap) {
@@ -210,7 +210,7 @@ void StateBangs::_Register(LPCTSTR prefix, std::function<DrawableWindow* (LPCSTR
 /// <summary>
 /// Unregisters bangs.
 /// </summary>
-void StateBangs::_UnRegister(LPCTSTR prefix) {
+void StateBangs::UnRegister(LPCTSTR prefix) {
     TCHAR bangName[64];
     for (BangItem item : BangMap) {
         StringCchPrintf(bangName, _countof(bangName), TEXT("!%s%s"), prefix, item.name);

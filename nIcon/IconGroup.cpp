@@ -12,10 +12,8 @@
 #include <algorithm>
 #include <functional>
 #include "IconGroup.hpp"
-#include "../nShared/Macros.h"
-#include "../nShared/Debugging.h"
 #include "../nShared/LSModule.hpp"
-#include "../nShared/PIDL.h"
+#include <shellapi.h>
 
 
 #define CHANGE_SOURCES SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery
@@ -55,7 +53,7 @@ struct DoubleNullStrCollection {
 /// <summary>
 /// Constructor
 /// </summary>
-IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
+IconGroup::IconGroup(LPCTSTR prefix) : Drawable(prefix) {
     // Initalize all variables.
     this->mChangeNotifyUID = 0;
 
@@ -71,20 +69,20 @@ IconGroup::IconGroup(LPCSTR prefix) : Drawable(prefix) {
     StateSettings defaultState;
     defaultState.backgroundBrush.color = 0x00000000;
 
-    mSelectionRectagle.Init(this->settings);
+    mSelectionRectagle.Init(mSettings);
 
     mNextPositionID = 0;
 
-    this->window->Initialize(&defaults, &defaultState);
-    //this->window->AddDropRegion();
-    this->window->AddPostPainter(&mSelectionRectagle);
+    mWindow->Initialize(&defaults, &defaultState);
+    //mWindow->AddDropRegion();
+    mWindow->AddPostPainter(&mSelectionRectagle);
     // TODO::Add the selection rectangle as a brush owner
-    this->window->Show();
+    mWindow->Show();
 
-    mChangeNotifyMsg = this->window->RegisterUserMessage(this);
+    mChangeNotifyMsg = mWindow->RegisterUserMessage(this);
     
     WCHAR path[MAX_PATH];
-    this->settings->GetString("Folder", path, sizeof(path), "Desktop");
+    mSettings->GetString(_T("Folder"), path, _countof(path), _T("Desktop"));
     SetFolder(path);
 }
 
@@ -98,7 +96,7 @@ IconGroup::~IconGroup() {
     }
 
     if (mChangeNotifyMsg) {
-        this->window->ReleaseUserMessage(mChangeNotifyMsg);
+        mWindow->ReleaseUserMessage(mChangeNotifyMsg);
     }
 
     for (auto icon : mIcons) {
@@ -116,14 +114,14 @@ IconGroup::~IconGroup() {
 /// </summary>
 void IconGroup::LoadSettings() {
     // Icon settings
-    Settings *iconSettings = this->settings->CreateChild("Icon");
-    int iconSize = iconSettings->GetInt("Size", 48);
+    Settings *iconSettings = mSettings->CreateChild(_T("Icon"));
+    int iconSize = iconSettings->GetInt(_T("Size"), 48);
     delete iconSettings;
 
     // Tile settings
-    Settings *tileSettings = this->settings->CreateChild("Tile");
-    mTileHeight = tileSettings->GetInt("Height", iconSize + 20);
-    mTileWidth = tileSettings->GetInt("Width", iconSize + 20);
+    Settings *tileSettings = mSettings->CreateChild(_T("Tile"));
+    mTileHeight = tileSettings->GetInt(_T("Height"), iconSize + 20);
+    mTileWidth = tileSettings->GetInt(_T("Width"), iconSize + 20);
     delete tileSettings;
 
     //
@@ -136,9 +134,9 @@ void IconGroup::LoadSettings() {
     layoutDefaults.mPadding.bottom = 5;
     layoutDefaults.mStartPosition = LayoutSettings::StartPosition::TopLeft;
     layoutDefaults.mPrimaryDirection = LayoutSettings::Direction::Horizontal;
-    mLayoutSettings.Load(this->settings, &layoutDefaults);
+    mLayoutSettings.Load(mSettings, &layoutDefaults);
 
-    if (!settings->GetBool("DontHideDesktopSystemIcons", false)) {
+    if (!mSettings->GetBool(_T("DontHideDesktopSystemIcons"), false)) {
         AddNameFilter(L".controlPanel");
         AddNameFilter(L".libraries");
         AddNameFilter(L".network");
@@ -147,9 +145,9 @@ void IconGroup::LoadSettings() {
     }
 
     //
-    char buffer[64];
-    StringCchPrintfA(buffer, 64, "*%sHide", settings->prefix);
-    LiteStep::IterateOverLinesW(buffer, [this] (LPCWSTR line) -> void {
+    TCHAR buffer[64];
+    StringCchPrintf(buffer, 64, _T("*%sHide"), mSettings->GetPrefix());
+    LiteStep::IterateOverLines(buffer, [this] (LPCWSTR line) -> void {
         LiteStep::IterateOverTokens(line, std::bind(&IconGroup::AddNameFilter, this, std::placeholders::_1));
     });
 }
@@ -222,12 +220,12 @@ void IconGroup::SetFolder(LPWSTR folder) {
     }
     enumIDList->Release();
 
-    this->window->Repaint();
+    mWindow->Repaint();
 
     // Register for change notifications
     SHChangeNotifyEntry watchEntries[] = { idList, FALSE };
     mChangeNotifyUID = SHChangeNotifyRegister(
-        this->window->GetWindowHandle(),
+        mWindow->GetWindowHandle(),
         CHANGE_SOURCES,
         CHANGE_EVENTS,
         mChangeNotifyMsg,
@@ -256,7 +254,7 @@ void IconGroup::AddIcon(PCITEMID_CHILD pidl, bool noRedraw) {
     }
     
     int iconPosition = GetIconPosition(pidl);
-    RECT pos = mLayoutSettings.RectFromID(iconPosition, mTileWidth, mTileHeight, this->window->GetDrawingSettings()->width, this->window->GetDrawingSettings()->height);
+    RECT pos = mLayoutSettings.RectFromID(iconPosition, mTileWidth, mTileHeight, mWindow->GetDrawingSettings()->width, mWindow->GetDrawingSettings()->height);
 
     IconTile *icon = new IconTile(this, pidl, mWorkingFolder, mTileWidth, mTileHeight);
     icon->SetPosition(iconPosition, (int)pos.left, (int)pos.top, noRedraw);
@@ -276,7 +274,7 @@ void IconGroup::RemoveIcon(PCITEMID_CHILD pidl) {
         }
         return false;
     });
-    this->window->Repaint();
+    mWindow->Repaint();
 }
 
 
@@ -335,7 +333,7 @@ void IconGroup::UpdateAllIcons() {
     for (auto icon : mIcons) {
         icon->UpdateIcon(false);
     }
-    this->window->Repaint();
+    mWindow->Repaint();
 }
 
 
@@ -390,7 +388,7 @@ void IconGroup::DeselectAll() {
     for (IconTile *tile : mIcons) {
         tile->Deselect(false);
     }
-    this->window->Repaint();
+    mWindow->Repaint();
 }
 
 
@@ -401,7 +399,7 @@ void IconGroup::SelectAll() {
     for (IconTile *tile : mIcons) {
         tile->Select(false);
     }
-    this->window->Repaint();
+    mWindow->Repaint();
 }
 
 
@@ -431,7 +429,7 @@ void IconGroup::ContextMenu() {
     POINT pt;
     GetCursorPos(&pt);
     HRESULT hr;
-    int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, this->window->GetWindowHandle(), nullptr);
+    int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, mWindow->GetWindowHandle(), nullptr);
     if (command != 0) {
         CHAR verb[MAX_LINE_LENGTH];
         contextMenu->GetCommandString(command, GCS_VERBA, nullptr, LPSTR(verb), _countof(verb));
@@ -441,7 +439,7 @@ void IconGroup::ContextMenu() {
         ZeroMemory(&info, sizeof(info));
         info.cbSize = sizeof(info);
         //info.fMask = CMIC_MASK_UNICODE;
-        info.hwnd = this->window->GetWindowHandle();
+        info.hwnd = mWindow->GetWindowHandle();
         info.lpVerb = verb;
         hr = contextMenu->InvokeCommand(LPCMINVOKECOMMANDINFO(&info));
     }
@@ -463,7 +461,7 @@ void IconGroup::DoUndo() {
 /// </summary>
 void IconGroup::DoPaste() {
     if (IsClipboardFormatAvailable(CF_HDROP)) {
-        if (OpenClipboard(this->window->GetWindowHandle())) {
+        if (OpenClipboard(mWindow->GetWindowHandle())) {
             LPDROPFILES data = LPDROPFILES(GetClipboardData(CF_HDROP));
             bool move = false;
             WCHAR target[MAX_PATH];
@@ -480,7 +478,7 @@ void IconGroup::DoPaste() {
             SHFILEOPSTRUCTW shFileOp;
             ZeroMemory(&shFileOp, sizeof(shFileOp));
             shFileOp.wFunc = move ? FO_MOVE : FO_COPY;
-            shFileOp.hwnd = this->window->GetWindowHandle();
+            shFileOp.hwnd = mWindow->GetWindowHandle();
             shFileOp.pFrom = LPCWSTR((BYTE*)data + data->pFiles);
             shFileOp.pTo = target;
             shFileOp.fFlags = FOF_NOCONFIRMMKDIR;
@@ -538,7 +536,7 @@ void IconGroup::DoCopy(bool cut) {
     GlobalUnlock(dropEffect);
 
     // Put it all in the clipboard.
-    if (OpenClipboard(this->window->GetWindowHandle())) {
+    if (OpenClipboard(mWindow->GetWindowHandle())) {
         EmptyClipboard();
         SetClipboardData(CF_HDROP, clipData);
         SetClipboardData(RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT), dropEffect);
@@ -548,7 +546,7 @@ void IconGroup::DoCopy(bool cut) {
     //
     if (cut) {
         mClipBoardCutFiles = true;
-        this->window->Repaint();
+        mWindow->Repaint();
     }
 }
 
@@ -612,7 +610,7 @@ void IconGroup::ClearAllGhosting(bool repaint) {
             }
         }
         if (repaint) {
-            this->window->Repaint();
+            mWindow->Repaint();
         }
     }
 }
@@ -624,8 +622,8 @@ void IconGroup::ClearAllGhosting(bool repaint) {
 void IconGroup::StartRectangleSelection(D2D1_POINT_2U point) {
     mRectangleStart = point;
     mInRectangleSelection = true;
-    this->window->DisableMouseForwarding();
-    this->window->SetMouseCapture();
+    mWindow->DisableMouseForwarding();
+    mWindow->SetMouseCapture();
 }
 
 
@@ -635,7 +633,7 @@ void IconGroup::StartRectangleSelection(D2D1_POINT_2U point) {
 void IconGroup::EndRectangleSelection(D2D1_POINT_2U point) {
     mInRectangleSelection = false;
     mSelectionRectagle.Hide();
-    this->window->ReleaseMouseCapture();
+    mWindow->ReleaseMouseCapture();
 
     D2D1_RECT_F rect = D2D1::RectF(
         float(min(mRectangleStart.x, point.x)),
@@ -653,8 +651,8 @@ void IconGroup::EndRectangleSelection(D2D1_POINT_2U point) {
         }
     }
 
-    this->window->EnableMouseForwarding();
-    this->window->Repaint();
+    mWindow->EnableMouseForwarding();
+    mWindow->Repaint();
 }
 
 
@@ -681,7 +679,7 @@ void IconGroup::MoveRectangleSelection(D2D1_POINT_2U point) {
     }
 
     mSelectionRectagle.Show();
-    this->window->Repaint();
+    mWindow->Repaint();
 }
 
 
@@ -692,7 +690,7 @@ void IconGroup::HandleClipboardChange() {
     ClearAllGhosting(true);
     /*
     if (IsClipboardFormatAvailable(CF_HDROP)) {
-        if (OpenClipboard(this->window->GetWindowHandle())) {
+        if (OpenClipboard(mWindow->GetWindowHandle())) {
             CloseClipboard();
         }
         else if (mClipBoardCutFiles) {
@@ -735,28 +733,28 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
             case SHCNE_UPDATEITEM:
             case SHCNE_UPDATEDIR:
                 {
-                    UpdateIcon(PIDL::GetLastPIDLItem(idList[0]));
+                    UpdateIcon(ILFindLastID(idList[0]));
                 }
                 break;
 
             case SHCNE_MKDIR:
             case SHCNE_CREATE:
                 {
-                    AddIcon(PIDL::GetLastPIDLItem(idList[0]));
+                    AddIcon(ILFindLastID(idList[0]));
                 }
                 break;
 
             case SHCNE_RMDIR:
             case SHCNE_DELETE:
                 {
-                    RemoveIcon(PIDL::GetLastPIDLItem(idList[0]));
+                    RemoveIcon(ILFindLastID(idList[0]));
                 }
                 break;
 
             case SHCNE_RENAMEITEM:
             case SHCNE_RENAMEFOLDER:
                 {
-                    RenameIcon(PIDL::GetLastPIDLItem(idList[0]), PIDL::GetLastPIDLItem(idList[1]));
+                    RenameIcon(ILFindLastID(idList[0]), ILFindLastID(idList[1]));
                 }
                 break;
 
@@ -914,7 +912,7 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
                 LPITEMIDLIST curFolder;
                 HRESULT hr;
 
-                mChangeNotifyMsg = this->window->RegisterUserMessage(this);
+                mChangeNotifyMsg = mWindow->RegisterUserMessage(this);
 
                 if (SUCCEEDED(hr = mWorkingFolder->QueryInterface(IID_IPersistFolder2, (LPVOID*) &ipsf2))) {
                     if (SUCCEEDED(hr = ipsf2->GetCurFolder(&curFolder))) {
@@ -937,7 +935,7 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
             break;
         }
 
-        this->eventHandler->HandleMessage(window, message, wParam, lParam); 
+        mEventHandler->HandleMessage(window, message, wParam, lParam); 
         return DefWindowProc(window, message, wParam, lParam);
     }
 }

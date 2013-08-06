@@ -1,34 +1,48 @@
-//--------------------------------------------------------------------------------------
-// Process.h
-// The nModules Project
-//
-// Utilities for dealing with processes.
-//
-//--------------------------------------------------------------------------------------
-#include <Windows.h>
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *  Process.cpp
+ *  The nModules Project
+ *
+ *  Utilities for dealing with processes.
+ *  
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#include "Common.h"
 #include "Process.h"
 #include <Psapi.h>
-#include <strsafe.h>
 #include <Shlwapi.h>
 
 
-HRESULT GetProcessName(HWND hWnd, bool fullPath, LPWSTR name, DWORD cchName) {
+/// <summary>
+/// Retrives the name of a process, based on a window handle.
+/// </summary>
+/// <param name="hWnd">The window handle for which to get the process name.</param>
+/// <param name="fullPath">
+/// If true, the full path to the process is returned. If false, only the file name
+/// portion is returned.
+/// </param>
+/// <param name="name">Buffer that receives the process name.</param>
+/// <param name="cchName">The size of the name buffer.</param>
+HRESULT GetProcessName(HWND hWnd, bool fullPath, LPTSTR name, DWORD cchName)
+{
     DWORD dwProcessID;
-    GetWindowThreadProcessId(hWnd, &dwProcessID);
-    HANDLE hProc = OpenProcess(
-        PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | SYNCHRONIZE,
-        FALSE, dwProcessID);
-
-    if (hProc == nullptr) {
+    if (GetWindowThreadProcessId(hWnd, &dwProcessID) == 0)
+    {
         return HRESULT_FROM_WIN32(GetLastError());
     }
 
-    if (GetModuleFileNameExW(hProc, nullptr, name, cchName) == FALSE) {
+    HANDLE hProc = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, dwProcessID);
+    if (hProc == nullptr)
+    {
         return HRESULT_FROM_WIN32(GetLastError());
     }
 
-    if (!fullPath) {
-        return StringCchCopyW(name, cchName, PathFindFileNameW(name));
+    if (GetProcessImageFileName(hProc, name, cchName) == FALSE)
+    {
+        return HRESULT_FROM_WIN32(GetLastError());
+    }
+
+    if (!fullPath)
+    {
+        return StringCchCopy(name, cchName, PathFindFileName(name));
     }
 
     return S_OK;

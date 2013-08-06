@@ -1,16 +1,17 @@
-//--------------------------------------------------------------------------------------
-// StopWatch.hpp
-// The nModules project
-//
-// Measures time between events.
-//
-//--------------------------------------------------------------------------------------
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *  StopWatch.hpp
+ *  The nModules Project
+ *
+ *  Measures time between events.
+ *  
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
 /// <summary>
 /// Measures time between events.
 /// </sumary>
-class StopWatch {
+class StopWatch
+{
 public:
     /// <summary
     /// Constructor

@@ -10,10 +10,10 @@
 #include "../nShared/Version.h"
 
 // The name of the module
-#define MODULE_NAME "nIcon"
+#define MODULE_NAME L"nIcon"
 
 // The author of the module
-#define MODULE_AUTHOR "alur"
+#define MODULE_AUTHOR L"alur"
 
 // The version of this module
 #define MODULE_VERSION SHARED_VERSION

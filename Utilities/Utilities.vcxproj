@@ -27,27 +27,27 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -151,19 +151,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="Debugging.h" />
     <ClInclude Include="EnumArray.hpp" />
+    <ClInclude Include="FileIterator.hpp" />
     <ClInclude Include="GUID.h" />
-    <ClInclude Include="Iterator.hpp" />
+    <ClInclude Include="Macros.h" />
+    <ClInclude Include="Math.h" />
     <ClInclude Include="PointerIterator.hpp" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="StopWatch.hpp" />
     <ClInclude Include="StringUtils.h" />
+    <ClInclude Include="UIDGenerator.hpp" />
+    <ClInclude Include="Versioning.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Debugging.cpp" />
+    <ClCompile Include="FileIterator.cpp" />
+    <ClCompile Include="FileIteratorIterator.cpp" />
     <ClCompile Include="GUID.cpp" />
+    <ClCompile Include="Math.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="StopWatch.cpp" />
     <ClCompile Include="StringUtils.cpp" />
+    <ClCompile Include="Versioning.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

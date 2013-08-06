@@ -24,18 +24,13 @@
     <ClInclude Include="BrushBangs.h" />
     <ClInclude Include="BrushSettings.hpp" />
     <ClInclude Include="Color.h" />
-    <ClInclude Include="Debugging.h" />
+    <ClInclude Include="Coordinate.hpp" />
     <ClInclude Include="Drawable.hpp" />
     <ClInclude Include="DrawableWindowBangs.h" />
     <ClInclude Include="DrawableSettings.hpp" />
-    <ClInclude Include="FileIterator.hpp" />
     <ClInclude Include="IBrushOwner.hpp" />
-    <ClInclude Include="ImageBrush.hpp" />
-    <ClInclude Include="LinearGradientBrush.hpp" />
+    <ClInclude Include="Length.hpp" />
     <ClInclude Include="Overlay.hpp" />
-    <ClInclude Include="RadialGradientBrush.hpp" />
-    <ClInclude Include="RelativeValue.hpp" />
-    <ClInclude Include="SolidColorBrush.hpp" />
     <ClInclude Include="State.hpp" />
     <ClInclude Include="StateBangs.h" />
     <ClInclude Include="StateSettings.hpp" />
@@ -49,14 +44,10 @@
     <ClInclude Include="MessageHandler.hpp" />
     <ClInclude Include="LayoutSettings.hpp" />
     <ClInclude Include="LSModule.hpp" />
-    <ClInclude Include="Math.h" />
     <ClInclude Include="MonitorInfo.hpp" />
-    <ClInclude Include="PIDL.h" />
     <ClInclude Include="Settings.hpp" />
     <ClInclude Include="Tooltip.hpp" />
-    <ClInclude Include="UIDGenerator.hpp" />
     <ClInclude Include="Version.h" />
-    <ClInclude Include="Versioning.h" />
     <ClInclude Include="WindowThumbnail.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -65,15 +56,13 @@
     <ClCompile Include="BrushBangs.cpp" />
     <ClCompile Include="BrushSettings.cpp" />
     <ClCompile Include="Color.cpp" />
-    <ClCompile Include="Debugging.cpp" />
+    <ClCompile Include="Coordinate.cpp" />
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="DrawableWindowBangs.cpp" />
     <ClCompile Include="DrawableSettings.cpp" />
     <ClCompile Include="DrawableWindowDropTarget.cpp" />
     <ClCompile Include="DrawableWindowUnknown.cpp" />
-    <ClCompile Include="FileIterator.cpp" />
-    <ClCompile Include="FileIteratorIterator.cpp" />
-    <ClCompile Include="RelativeValue.cpp" />
+    <ClCompile Include="Length.cpp" />
     <ClCompile Include="StateBangs.cpp" />
     <ClCompile Include="StateSettings.cpp" />
     <ClCompile Include="DrawableWindow.cpp" />
@@ -86,18 +75,11 @@
     <ClCompile Include="LayoutSettings.cpp" />
     <ClCompile Include="LiteStep.cpp" />
     <ClCompile Include="LSModule.cpp" />
-    <ClCompile Include="Math.cpp" />
     <ClCompile Include="MessageHandler.cpp" />
     <ClCompile Include="MonitorInfo.cpp" />
-    <ClCompile Include="PIDL.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Tooltip.cpp" />
-    <ClCompile Include="UIDGenerator.cpp" />
-    <ClCompile Include="Versioning.cpp" />
     <ClCompile Include="WindowThumbnail.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include=".\Macros.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nCoreCom\nCoreCom.vcxproj">
@@ -124,27 +106,27 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
