@@ -38,7 +38,7 @@ HWND g_window;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCTSTR /* path */) {
+EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */) {
     // Initialize    
     if (!gLSModule.Initialize(parent, instance)) {
         return 1;
