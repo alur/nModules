@@ -15,15 +15,19 @@ Clock::Clock(LPCTSTR clockName) : Drawable(clockName)
 {
     mUse24HourDial = mSettings->GetBool(_T("24HourDial"), false);
 
-    mWindow->Initialize();
+    DrawableSettings windowDefaults;
+    windowDefaults.evaluateText = true;
+    windowDefaults.registerWithCore = true;
 
-    mSecondHand.Initialize(mSettings, L"SecondHand", 60.0f);
-    mMinuteHand.Initialize(mSettings, L"MinuteHand", 60.0f);
-    mHourHand.Initialize(mSettings, L"HourHand", mUse24HourDial ? 24.0f : 12.0f);
+    mWindow->Initialize(&windowDefaults);
 
-    mWindow->AddPostPainter(&mHourHand);
-    mWindow->AddPostPainter(&mMinuteHand);
-    mWindow->AddPostPainter(&mSecondHand);
+    mSecondHand.Initialize(mSettings, _T("SecondHand"), 60.0f);
+    mMinuteHand.Initialize(mSettings, _T("MinuteHand"), 60.0f);
+    mHourHand.Initialize(mSettings, _T("HourHand"), mUse24HourDial ? 24.0f : 12.0f);
+
+    mWindow->AddPrePainter(&mHourHand);
+    mWindow->AddPrePainter(&mMinuteHand);
+    mWindow->AddPrePainter(&mSecondHand);
 
     UpdateHands();
     mUpdateTimer = mWindow->SetCallbackTimer(mSettings->GetInt(_T("UpdateRate"), 1000), this);

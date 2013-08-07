@@ -93,11 +93,25 @@ void State::DiscardDeviceResources() {
 }
 
 
-void State::Paint(ID2D1RenderTarget* renderTarget) {
-    if (this->backBrush->brush) {
-        renderTarget->FillRoundedRectangle(this->drawingArea, this->backBrush->brush);
+void State::Paint(ID2D1RenderTarget* renderTarget)
+{
+    if (this->backBrush->brush)
+    {
+        if (this->backBrush->IsImageEdgeBrush())
+        {
+            for (Brush::EdgeType type = Brush::EdgeType(0); type != Brush::EdgeType::Count;
+                type = Brush::EdgeType(std::underlying_type<Brush::EdgeType>::type(type) + 1))
+            {
+                renderTarget->FillRectangle(this->backBrush->GetImageEdgeRectAndScaleBrush(type), this->backBrush->brush);
+            }
+        }
+        else
+        {
+            renderTarget->FillRoundedRectangle(this->drawingArea, this->backBrush->brush);
+        }
     }
-    if (this->outlineBrush->brush && this->drawingSettings->outlineWidth != 0) {
+    if (this->outlineBrush->brush && this->drawingSettings->outlineWidth != 0)
+    {
         renderTarget->DrawRoundedRectangle(this->outlineArea, this->outlineBrush->brush, this->drawingSettings->outlineWidth);
     }
     /*if (this->textShadowBrush->brush) {
@@ -105,7 +119,8 @@ void State::Paint(ID2D1RenderTarget* renderTarget) {
         renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textDropFormat, this->textArea, this->textShadowBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         renderTarget->SetTransform(Matrix3x2F::Identity());
     }*/
-    if (this->textBrush->brush && **this->text != L'\0') {
+    if (this->textBrush->brush && **this->text != L'\0')
+    {
         renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, this->textRotationOrigin));
         renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textFormat, this->textArea, this->textBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         renderTarget->SetTransform(Matrix3x2F::Identity());

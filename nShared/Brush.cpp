@@ -16,87 +16,113 @@
 #include <algorithm>
 
 
-Brush::Brush() {
-    this->brushType = SolidColor;
+Brush::Brush()
+{
+    this->brushType = Type::SolidColor;
     this->brush = nullptr;
     this->gradientStops = nullptr;
     this->gradientStopCount = 0;
 }
 
 
-Brush::~Brush() {
+Brush::~Brush()
+{
     Discard();
     SAFEFREE(this->gradientStops);
 }
 
 
-void Brush::Load(BrushSettings* settings) {
+void Brush::Load(BrushSettings* settings)
+{
     this->brushSettings = settings;
 
-    if (_tcsicmp(this->brushSettings->brushType, _T("Image")) == 0) {
-        this->brushType = Image;
+    if (_tcsicmp(this->brushSettings->brushType, _T("Image")) == 0)
+    {
+        this->brushType = Type::Image;
     }
-    else if (_tcsicmp(this->brushSettings->brushType, _T("LinearGradient")) == 0) {
-        this->brushType = LinearGradient;
+    else if (_tcsicmp(this->brushSettings->brushType, _T("LinearGradient")) == 0)
+    {
+        this->brushType = Type::LinearGradient;
         this->gradientStart = D2D1::Point2F(this->brushSettings->gradientStartX, this->brushSettings->gradientStartY);
         this->gradientEnd = D2D1::Point2F(this->brushSettings->gradientEndX, this->brushSettings->gradientEndY);
         LoadGradientStops();
     }
-    else if (_tcsicmp(this->brushSettings->brushType, _T("RadialGradient")) == 0) {
-        this->brushType = RadialGradient;
+    else if (_tcsicmp(this->brushSettings->brushType, _T("RadialGradient")) == 0)
+    {
+        this->brushType = Type::RadialGradient;
         this->gradientCenter = D2D1::Point2F(this->brushSettings->gradientCenterX, this->brushSettings->gradientCenterY);
         this->gradientOriginOffset = D2D1::Point2F(this->brushSettings->gradientOriginOffsetX, this->brushSettings->gradientOriginOffsetY);
         LoadGradientStops();
     }
-    else {
-        this->brushType = SolidColor;
+    else
+    {
+        this->brushType = Type::SolidColor;
     }
 
-    if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Tile")) == 0) {
-        this->scalingMode = Tile;
+    if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Tile")) == 0)
+    {
+        this->scalingMode = ImageScalingMode::Tile;
     }
-    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Fit")) == 0) {
-        this->scalingMode = Fit;
+    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Fit")) == 0)
+    {
+        this->scalingMode = ImageScalingMode::Fit;
     }
-    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Fill")) == 0) {
-        this->scalingMode = Fill;
+    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Fill")) == 0)
+    {
+        this->scalingMode = ImageScalingMode::Fill;
     }
-    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Stretch")) == 0) {
-        this->scalingMode = Stretch;
+    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Stretch")) == 0)
+    {
+        this->scalingMode = ImageScalingMode::Stretch;
     }
-    else {
-        this->scalingMode = Center;
+    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Edges")) == 0)
+    {
+        this->scalingMode = ImageScalingMode::Edges;
+    }
+    else
+    {
+        this->scalingMode = ImageScalingMode::Center;
     }
 
-    if (_tcsicmp(this->brushSettings->tilingModeX, _T("Mirror")) == 0) {
+    if (_tcsicmp(this->brushSettings->tilingModeX, _T("Mirror")) == 0)
+    {
         this->tileModeX = D2D1_EXTEND_MODE_MIRROR;
     }
-    else if (_tcsicmp(this->brushSettings->tilingModeX, _T("Clamp")) == 0) {
+    else if (_tcsicmp(this->brushSettings->tilingModeX, _T("Clamp")) == 0)
+    {
         this->tileModeX = D2D1_EXTEND_MODE_CLAMP;
     }
-    else {
+    else
+    {
         this->tileModeX = D2D1_EXTEND_MODE_WRAP;
     }
 
-    if (_tcsicmp(this->brushSettings->tilingModeY, _T("Mirror")) == 0) {
+    if (_tcsicmp(this->brushSettings->tilingModeY, _T("Mirror")) == 0)
+    {
         this->tileModeY = D2D1_EXTEND_MODE_MIRROR;
     }
-    else if (_tcsicmp(this->brushSettings->tilingModeY, _T("Clamp")) == 0) {
+    else if (_tcsicmp(this->brushSettings->tilingModeY, _T("Clamp")) == 0)
+    {
         this->tileModeY = D2D1_EXTEND_MODE_CLAMP;
     }
-    else {
+    else
+    {
         this->tileModeY = D2D1_EXTEND_MODE_WRAP;
     }
+
+    this->imageEdges = brushSettings->imageEdges;
 }
 
 
-void Brush::LoadGradientStops() {
+void Brush::LoadGradientStops()
+{
     TCHAR colorToken[MAX_LINE_LENGTH], stopToken[MAX_LINE_LENGTH];
     LPCTSTR colorPointer = this->brushSettings->gradientColors, stopPointer = this->brushSettings->gradientStops;
 
     using namespace LiteStep;
 
-    while (GetToken(colorPointer, colorToken, &colorPointer, FALSE) != FALSE && GetToken(stopPointer, stopToken, &stopPointer, FALSE) != FALSE) {
+    while (GetToken(colorPointer, colorToken, &colorPointer, FALSE) != FALSE && GetToken(stopPointer, stopToken, &stopPointer, FALSE) != FALSE)
+    {
         float stop;
         LPTSTR endPtr;
 
@@ -117,20 +143,23 @@ void Brush::Discard() {
 
 
 //
-HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
+HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget)
+{
     HRESULT hr = S_OK;
 
-    if (renderTarget) {
+    if (renderTarget)
+    {
         SAFERELEASE(this->brush);
 
-        switch (this->brushType) {
-        case SolidColor:
+        switch (this->brushType)
+        {
+        case Type::SolidColor:
             {
                 renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->brushSettings->color), (ID2D1SolidColorBrush**)&this->brush);
             }
             break;
 
-        case LinearGradient:
+        case Type::LinearGradient:
             {
                 ID2D1GradientStopCollection* stops;
                 renderTarget->CreateGradientStopCollection(this->gradientStops, this->gradientStopCount, &stops);
@@ -141,7 +170,7 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
             }
             break;
 
-        case RadialGradient:
+        case Type::RadialGradient:
             {
                 ID2D1GradientStopCollection* stops;
                 renderTarget->CreateGradientStopCollection(this->gradientStops, this->gradientStopCount, &stops);
@@ -153,7 +182,7 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
             }
             break;
 
-        case Image:
+        case Type::Image:
             {
                 if (SUCCEEDED(hr = LoadImageFile(renderTarget, this->brushSettings->image, &this->brush))) {
                     this->brush->SetOpacity(this->brushSettings->imageOpacity);
@@ -163,7 +192,8 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
         }
     }
 
-    if (SUCCEEDED(hr)) {
+    if (SUCCEEDED(hr))
+    {
         UpdatePosition(this->position);
     }
 
@@ -171,7 +201,121 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget) {
 }
 
 
-void Brush::ScaleImage() {
+bool Brush::IsImageEdgeBrush()
+{
+    return brushType == Type::Image && scalingMode == ImageScalingMode::Edges;
+}
+
+
+D2D1_RECT_F *Brush::GetImageEdgeRectAndScaleBrush(EdgeType edgeType)
+{
+    this->brush->SetTransform(mImageEdgeTransforms[edgeType]);
+    return &mImageEdgeRects[edgeType];
+}
+
+
+void Brush::ComputeEdgeData(D2D1_SIZE_F size)
+{
+    using namespace D2D1;
+
+    mImageEdgeRects[EdgeType::TopLeft] = D2D1::Rect(
+        position.left,
+        position.top,
+        position.left + imageEdges.left,
+        position.top + imageEdges.top);
+
+    mImageEdgeRects[EdgeType::TopCenter] = D2D1::Rect(
+        position.left + imageEdges.left,
+        position.top,
+        position.right - imageEdges.right,
+        position.top + imageEdges.top);
+
+    mImageEdgeRects[EdgeType::TopRight] = D2D1::Rect(
+        position.right - imageEdges.right,
+        position.top,
+        position.right,
+        position.top + imageEdges.top);
+
+    mImageEdgeRects[EdgeType::MiddleLeft] = D2D1::Rect(
+        position.left,
+        position.top + imageEdges.top,
+        position.left + imageEdges.left,
+        position.bottom - imageEdges.bottom);
+
+    mImageEdgeRects[EdgeType::MiddleCenter] = D2D1::Rect(
+        position.left + imageEdges.left,
+        position.top + imageEdges.top,
+        position.right - imageEdges.right,
+        position.bottom - imageEdges.bottom);
+
+    mImageEdgeRects[EdgeType::MiddleRight] = D2D1::Rect(
+        position.right - imageEdges.right,
+        position.top + imageEdges.top,
+        position.right,
+        position.bottom - imageEdges.bottom);
+
+    mImageEdgeRects[EdgeType::BottomLeft] = D2D1::Rect(
+        position.left,
+        position.bottom - imageEdges.bottom,
+        position.left + imageEdges.left,
+        position.bottom);
+
+    mImageEdgeRects[EdgeType::BottomCenter] = D2D1::Rect(
+        position.left + imageEdges.left,
+        position.bottom - imageEdges.bottom,
+        position.right - imageEdges.right,
+        position.bottom);
+
+    mImageEdgeRects[EdgeType::BottomRight] = D2D1::Rect(
+        position.right - imageEdges.right,
+        position.bottom - imageEdges.bottom,
+        position.right,
+        position.bottom);
+
+    mImageEdgeTransforms[EdgeType::TopLeft] = Matrix3x2F::Translation(this->position.left, this->position.top);
+    mImageEdgeTransforms[EdgeType::TopRight] = Matrix3x2F::Translation(this->position.right - size.width, this->position.top);
+    mImageEdgeTransforms[EdgeType::BottomLeft] = Matrix3x2F::Translation(this->position.left, this->position.bottom - size.height);
+    mImageEdgeTransforms[EdgeType::BottomRight] = Matrix3x2F::Translation(this->position.right - size.width, this->position.bottom - size.height);
+
+    mImageEdgeTransforms[EdgeType::TopCenter] = Matrix3x2F::Translation(this->position.left, this->position.top) *
+        Matrix3x2F::Scale(
+            (position.right - position.left) / (size.width - imageEdges.left - imageEdges.right),
+            1.0f,
+            Point2F(this->position.left + imageEdges.left, this->position.top)
+        );
+
+    mImageEdgeTransforms[EdgeType::MiddleLeft] = Matrix3x2F::Translation(this->position.left, this->position.top) *
+        Matrix3x2F::Scale(
+            1.0f,
+            (position.bottom - position.top) / (size.height - imageEdges.top - imageEdges.bottom),
+            Point2F(this->position.left, this->position.top + imageEdges.top)
+        );
+
+    mImageEdgeTransforms[EdgeType::MiddleRight] = Matrix3x2F::Translation(this->position.right - size.width, this->position.top) *
+        Matrix3x2F::Scale(
+            1.0f,
+            (position.bottom - position.top) / (size.height - imageEdges.top - imageEdges.bottom),
+            Point2F(this->position.right, this->position.top + imageEdges.top)
+        );
+
+    mImageEdgeTransforms[EdgeType::BottomCenter] = Matrix3x2F::Translation(this->position.left, this->position.bottom - size.height) *
+        Matrix3x2F::Scale(
+            (position.right - position.left) / (size.width - imageEdges.left - imageEdges.right),
+            1.0f,
+            Point2F(this->position.left + imageEdges.left, this->position.bottom)
+        );
+
+    mImageEdgeTransforms[EdgeType::MiddleCenter] = Matrix3x2F::Translation(this->position.left, this->position.top) *
+        Matrix3x2F::Scale(
+            (this->position.right - this->position.left) / (size.width - imageEdges.left - imageEdges.right),
+            (this->position.bottom - this->position.top) / (size.height - imageEdges.top - imageEdges.bottom),
+            Point2F(this->position.left + imageEdges.left, this->position.top + imageEdges.top)
+        );
+}
+
+
+void Brush::ScaleImage()
+{
     ID2D1Bitmap* bitmap;
     reinterpret_cast<ID2D1BitmapBrush*>(this->brush)->GetBitmap(&bitmap);
     D2D1_SIZE_F size = bitmap->GetSize();
@@ -186,8 +330,9 @@ void Brush::ScaleImage() {
         this->position.top + (this->position.bottom - this->position.top)/2.0f
     );
 
-    switch(this->scalingMode) {
-    case Center:
+    switch(this->scalingMode)
+    {
+    case ImageScalingMode::Center:
         {
             this->brush->SetTransform(Matrix3x2F::Translation(centerPoint.x - size.width/2.0f, centerPoint.y - size.height/2.0f));
             this->brushPosition.left = max(centerPoint.x - size.width/2.0f, this->position.left);
@@ -197,7 +342,7 @@ void Brush::ScaleImage() {
         }
         break;
 
-    case Stretch:
+    case ImageScalingMode::Stretch:
         {
             this->brush->SetTransform(
                 Matrix3x2F::Translation(this->position.left, this->position.top) *
@@ -210,7 +355,7 @@ void Brush::ScaleImage() {
         }
         break;
 
-    case Fit:
+    case ImageScalingMode::Fit:
         {
             float scale = min((this->position.right - this->position.left)/size.width, (this->position.bottom - this->position.top)/size.height);
             this->brush->SetTransform(
@@ -224,7 +369,7 @@ void Brush::ScaleImage() {
         }
         break;
 
-    case Fill:
+    case ImageScalingMode::Fill:
         {
             float scale = max((this->position.right - this->position.left)/size.width, (this->position.bottom - this->position.top)/size.height);
             this->brush->SetTransform(
@@ -234,32 +379,43 @@ void Brush::ScaleImage() {
         }
         break;
 
-    case Tile:
+    case ImageScalingMode::Tile:
         {
             this->brush->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
             reinterpret_cast<ID2D1BitmapBrush*>(this->brush)->SetExtendModeX(this->tileModeX);
             reinterpret_cast<ID2D1BitmapBrush*>(this->brush)->SetExtendModeY(this->tileModeY);
         }
         break;
+
+    case ImageScalingMode::Edges:
+        {
+            ComputeEdgeData(size);
+        }
+        break;
     }
 }
 
 
-void Brush::UpdatePosition(D2D1_RECT_F position) {
+void Brush::UpdatePosition(D2D1_RECT_F position)
+{
     this->position = this->brushPosition = position;
 
-    if (this->brush) {
-        if (this->brushType == Image) {
+    if (this->brush)
+    {
+        if (this->brushType == Type::Image)
+        {
             ScaleImage();
         }
-        else {
+        else
+        {
             this->brush->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
         }
     }
 }
 
 
-HRESULT Brush::LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2D1Brush **brush) {
+HRESULT Brush::LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2D1Brush **brush)
+{
     IWICImagingFactory* factory = NULL;
     IWICBitmap* wicBitmap = NULL;
     IWICFormatConverter* converter = NULL;
@@ -268,18 +424,23 @@ HRESULT Brush::LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2
     HRESULT hr = E_FAIL;
         
     HBITMAP hBitmap = LiteStep::LoadLSImage(image, NULL);
-    if (hBitmap) {
+    if (hBitmap)
+    {
         hr = factory->CreateFormatConverter(&converter);
-        if (SUCCEEDED(hr)) {
+        if (SUCCEEDED(hr))
+        {
             hr = factory->CreateBitmapFromHBITMAP(hBitmap, NULL, WICBitmapUseAlpha, &wicBitmap);
         }
-        if (SUCCEEDED(hr)) {
+        if (SUCCEEDED(hr))
+        {
             hr = converter->Initialize(wicBitmap, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut);
         }
-        if (SUCCEEDED(hr)) {
+        if (SUCCEEDED(hr))
+        {
             hr = renderTarget->CreateBitmapFromWicBitmap(converter, NULL, &bitmap);
         }
-        if (SUCCEEDED(hr)) {
+        if (SUCCEEDED(hr))
+        {
             hr = renderTarget->CreateBitmapBrush(bitmap, reinterpret_cast<ID2D1BitmapBrush**>(brush));
         }
 
@@ -293,10 +454,13 @@ HRESULT Brush::LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2
 }
 
 
-void Brush::SetColor(ARGB color) {
+void Brush::SetColor(ARGB color)
+{
     this->brushSettings->color = color;
-    if (this->brushType == BrushType::SolidColor) {
-        if (this->brush) {
+    if (this->brushType == Type::SolidColor)
+    {
+        if (this->brush)
+        {
             ((ID2D1SolidColorBrush*) this->brush)->SetColor(Color::ARGBToD2D(color));
         }
     }
@@ -307,9 +471,11 @@ void Brush::SetImage(ID2D1RenderTarget* renderTarget, LPCTSTR path)
 {
     this->brushSettings->image = StringUtils::ReallocOverwrite(this->brushSettings->image, path);
 
-    if (this->brushType == Image && renderTarget) {
+    if (this->brushType == Type::Image && renderTarget)
+    {
         ID2D1Brush *tempBrush;
-        if (SUCCEEDED(LoadImageFile(renderTarget, path, &tempBrush))) {
+        if (SUCCEEDED(LoadImageFile(renderTarget, path, &tempBrush)))
+        {
             SAFERELEASE(this->brush);
             this->brush = tempBrush;
             this->brush->SetOpacity(this->brushSettings->imageOpacity);

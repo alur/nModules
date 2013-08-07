@@ -66,6 +66,9 @@ public:
     // The image to use for this window. Default: "" (blank)
     LPTSTR image;
 
+    //
+    D2D1_RECT_F imageEdges;
+
     // The maximum opacity of the image. 0 to 1. Default: 1
     float imageOpacity;
 

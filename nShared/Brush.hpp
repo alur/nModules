@@ -8,12 +8,29 @@
 #pragma once
 
 #include "BrushSettings.hpp"
+#include "../Utilities/EnumArray.hpp"
 
 class Brush {
+public:
+    enum class EdgeType
+    {
+        TopLeft = 0,
+        TopCenter,
+        TopRight,
+        MiddleLeft,
+        MiddleCenter,
+        MiddleRight,
+        BottomLeft,
+        BottomCenter,
+        BottomRight,
+        Count
+    };
+
 public:
     explicit Brush();
     virtual ~Brush();
 
+public:
     // Loads brush settings.
     void Load(BrushSettings *settings);
 
@@ -35,13 +52,19 @@ public:
     HRESULT LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2D1Brush **brush);
 
 public:
+    bool IsImageEdgeBrush();
+    D2D1_RECT_F *GetImageEdgeRectAndScaleBrush(EdgeType edgeType);
+    void ComputeEdgeData(D2D1_SIZE_F size);
+
+public:
     void SetColor(ARGB color); 
     void SetImage(ID2D1RenderTarget *renderTarget, LPCTSTR path); 
     BrushSettings *GetBrushSettings();
 
 private:
     // The type of brush this is.
-    enum BrushType {
+    enum class Type
+    {
         SolidColor,
         LinearGradient,
         RadialGradient,
@@ -49,12 +72,14 @@ private:
     } brushType;
 
     // How to scale the brush.
-    enum ImageScalingMode {
+    enum class ImageScalingMode
+    {
         Fit,
         Fill,
         Stretch,
         Center,
-        Tile
+        Tile,
+        Edges
     } scalingMode;
 
     // Loads render targets.
@@ -75,13 +100,23 @@ private:
     // The current position of the 
     D2D1_RECT_F position;
 
+    // Defines how to scale the image for the Edges scaling mode.
+    D2D1_RECT_F imageEdges;
+
+    //
+    EnumArray<D2D1_RECT_F, EdgeType> mImageEdgeRects;
+
+    //
+    EnumArray<D2D1_MATRIX_3X2_F, EdgeType> mImageEdgeTransforms;
+
     // The gradient stops.
     D2D1_GRADIENT_STOP* gradientStops;
 
     // The number of gradient stops we have.
     UINT gradientStopCount;
 
-    union {
+    union
+    {
         // The center of a radial gradient.
         D2D1_POINT_2F gradientCenter;
 
@@ -89,7 +124,8 @@ private:
         D2D1_POINT_2F gradientStart;
     };
     
-    union {
+    union
+    {
         // How far away from the center the original of the radial gradient is.
         D2D1_POINT_2F gradientOriginOffset;
 

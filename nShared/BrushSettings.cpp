@@ -31,6 +31,7 @@ BrushSettings::BrushSettings()
     this->gradientStartY = 0.0f;
     this->gradientStops = _tcsdup(_T("0.0"));
     this->image = _tcsdup(_T(""));
+    this->imageEdges = D2D1::RectF();
     this->imageOpacity = 1.0f;
     this->imageRotation = 0.0f;
     StringCchCopy(this->imageScalingMode, sizeof(this->imageScalingMode), _T("Tile"));
@@ -56,6 +57,7 @@ BrushSettings::BrushSettings(const BrushSettings &source)
     this->gradientStartY = source.gradientStartY;
     this->gradientStops = _tcsdup(source.gradientStops);
     this->image = _tcsdup(source.image);
+    this->imageEdges = source.imageEdges;
     this->imageOpacity = source.imageOpacity;
     this->imageRotation = source.imageRotation;
     StringCchCopy(this->imageScalingMode, sizeof(this->imageScalingMode), source.imageScalingMode);
@@ -101,6 +103,7 @@ void BrushSettings::Load(Settings* settings, BrushSettings* defaults)
     this->gradientStops = StringUtils::ReallocOverwrite(this->gradientStops, buf);
     settings->GetString(_T("Image"), buf, sizeof(buf), defaults->image);
     this->image = StringUtils::ReallocOverwrite(this->image, buf);
+    this->imageEdges = settings->GetOffsetRectF(_T("ImageEdges"), &defaults->imageEdges);
     this->imageOpacity = settings->GetInt(_T("Alpha"), int(defaults->imageOpacity*255))/255.0f;
     this->imageRotation = settings->GetFloat(_T("ImageRotation"), defaults->imageRotation);
     settings->GetString(_T("ImageScalingMode"), this->imageScalingMode, sizeof(this->imageScalingMode), defaults->imageScalingMode);

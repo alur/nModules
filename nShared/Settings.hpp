@@ -62,6 +62,7 @@ public:
     RECT GetOffsetRect(LPCTSTR key, LPRECT defaultValue) const;
     RECT GetOffsetRect(LPCTSTR key, LONG defLeft, LONG defTop, LONG defRight, LONG defBottom) const;
     void SetOffsetRect(LPCTSTR key, LPRECT value) const;
+    D2D1_RECT_F GetOffsetRectF(LPCTSTR key, D2D1_RECT_F *defaultValue) const;
 
     void IterateOverStars(LPCTSTR key, std::function<void (LPCTSTR token)> callback) const;
     

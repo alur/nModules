@@ -490,6 +490,29 @@ void Settings::SetOffsetRect(LPCTSTR key, LPRECT value) const
 
 
 /// <summary>
+/// Reads a series of values into a D2D1_RECT_F structure.
+/// </summary>
+/// <param name="key">The key to read.</param>
+/// <param name="defaultValue">The default value.</param>
+D2D1_RECT_F Settings::GetOffsetRectF(LPCTSTR key, D2D1_RECT_F *defaultValue) const
+{
+    TCHAR leftKey[MAX_RCCOMMAND], topKey[MAX_RCCOMMAND], rightKey[MAX_RCCOMMAND], bottomKey[MAX_RCCOMMAND];
+    StringCchPrintf(leftKey, _countof(leftKey), _T("%sLeft"), key);
+    StringCchPrintf(topKey, _countof(topKey), _T("%sTop"), key);
+    StringCchPrintf(rightKey, _countof(rightKey), _T("%sRight"), key);
+    StringCchPrintf(bottomKey, _countof(bottomKey), _T("%sBottom"), key);
+
+    D2D1_RECT_F rect;
+    rect.left = GetFloat(leftKey, defaultValue->left);
+    rect.top = GetFloat(topKey, defaultValue->top);
+    rect.right = GetFloat(rightKey, defaultValue->right);
+    rect.bottom = GetFloat(bottomKey, defaultValue->bottom);
+
+    return rect;
+}
+
+
+/// <summary>
 /// 
 /// </summary>
 /// <param name="key"></param>
