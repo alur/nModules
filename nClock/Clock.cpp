@@ -88,7 +88,7 @@ LRESULT WINAPI Clock::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM
 
     case DrawableWindow::WM_NEWTOPPARENT:
         {
-            mUpdateTimer = 0;
+            mUpdateTimer = mWindow->SetCallbackTimer(mSettings->GetInt(_T("UpdateRate"), 1000), this);
         }
         return 0;
     }

@@ -22,6 +22,7 @@ public:
     void Paint(ID2D1RenderTarget *renderTarget) override;
     void DiscardDeviceResources() override;
     HRESULT ReCreateDeviceResources(ID2D1RenderTarget *renderTarget) override;
+    void UpdatePosition(D2D1_RECT_F parentPosition) override;
 
     //
 public:

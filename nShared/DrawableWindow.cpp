@@ -282,6 +282,7 @@ DrawableWindow::OVERLAY DrawableWindow::AddOverlay(D2D1_RECT_F position, IWICBit
 DrawableWindow::PAINTER DrawableWindow::AddPostPainter(IPainter* painter) {
     PAINTER ret = this->postPainters.insert(this->postPainters.end(), painter);
     ret->ReCreateDeviceResources(this->renderTarget);
+    ret->UpdatePosition(this->drawingArea);
 
     return ret;
 }
@@ -295,6 +296,7 @@ DrawableWindow::PAINTER DrawableWindow::AddPostPainter(IPainter* painter) {
 DrawableWindow::PAINTER DrawableWindow::AddPrePainter(IPainter* painter) {
     PAINTER ret = this->prePainters.insert(this->prePainters.end(), painter);
     ret->ReCreateDeviceResources(this->renderTarget);
+    ret->UpdatePosition(this->drawingArea);
 
     return ret;
 }
@@ -761,12 +763,15 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
 /// <summary>
 /// Hides the window.
 /// </summary>
-void DrawableWindow::Hide() {
+void DrawableWindow::Hide()
+{
     this->visible = false;
-    if (!mIsChild) {
+    if (!mIsChild)
+    {
         ShowWindow(this->window, SW_HIDE);
     }
-    else {
+    else
+    {
         RECT r = { (LONG)drawingArea.left, (LONG)drawingArea.top, (LONG)drawingArea.right, (LONG)drawingArea.bottom };
         mParent->Repaint(&r);
     }
@@ -1267,6 +1272,12 @@ void DrawableWindow::SetPosition(int x, int y, int width, int height) {
     }
     for (Overlay *overlay : this->overlays) {
         overlay->UpdatePosition(this->drawingArea);
+    }
+    for (IPainter *painter : this->prePainters) {
+        painter->UpdatePosition(this->drawingArea);
+    }
+    for (IPainter *painter : this->postPainters) {
+        painter->UpdatePosition(this->drawingArea);
     }
     for (DrawableWindow *child : this->children) {
         child->Move(child->drawingSettings->x, child->drawingSettings->y);

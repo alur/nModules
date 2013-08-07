@@ -18,4 +18,7 @@ public:
 
     //
     virtual HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) = 0;
+
+    //
+    virtual void UpdatePosition(D2D1_RECT_F parentPosition) = 0;
 };

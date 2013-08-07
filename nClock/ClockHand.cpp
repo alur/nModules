@@ -13,6 +13,7 @@
 /// </summary>
 ClockHand::ClockHand()
 {
+    mCenterPoint = D2D1::SizeF(0, 0);
 }
 
 
@@ -57,7 +58,25 @@ void ClockHand::DiscardDeviceResources()
 /// </summary>
 HRESULT ClockHand::ReCreateDeviceResources(ID2D1RenderTarget *renderTarget)
 {
-    return mBrush.ReCreate(renderTarget);
+    HRESULT hr = mBrush.ReCreate(renderTarget);
+    if (SUCCEEDED(hr))
+    {
+        mBrush.UpdatePosition(mHandRect);
+    }
+    return hr;
+}
+
+
+/// <summary>
+/// IPaintable::UpdatePosition
+/// Called when the parent has moved.
+/// </summary>
+void ClockHand::UpdatePosition(D2D1_RECT_F parentPosition)
+{
+    mCenterPoint = D2D1::SizeF(
+        (parentPosition.left + parentPosition.right) / 2.0f,
+        (parentPosition.top + parentPosition.bottom) / 2.0f
+        );
 }
 
 
@@ -76,11 +95,6 @@ void ClockHand::Initialize(Settings *clockSettings, LPCTSTR prefix, float maxVal
     mBrushSettings.Load(settings, &brushDefaults);
     mBrush.Load(&mBrushSettings);
 
-    float parentWidth = clockSettings->GetFloat(_T("Width"), 100.0f);
-    float parentHeight = clockSettings->GetFloat(_T("Height"), 100.0f);
-    float parentX = clockSettings->GetFloat(_T("X"), 100.0f);
-    float parentY = clockSettings->GetFloat(_T("Y"), 100.0f);
-
     float length = settings->GetFloat(_T("Length"), 50);
     float thickness = settings->GetFloat(_T("Thickness"), 3);
     float offset = settings->GetFloat(_T("Offset"), 0);
@@ -89,8 +103,6 @@ void ClockHand::Initialize(Settings *clockSettings, LPCTSTR prefix, float maxVal
     mHandRect.top = -thickness / 2.0f;
     mHandRect.bottom = mHandRect.top + thickness;
     mHandRect.right = mHandRect.left + length;
-
-    mCenterPoint = D2D1::SizeF(parentWidth / 2.0f + parentX, parentHeight / 2.0f + parentY);
 
     delete settings;
 }

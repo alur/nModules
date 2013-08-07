@@ -28,9 +28,22 @@ SelectionRectangle::~SelectionRectangle()
 /// <summary>
 ///
 /// </summary>
-void SelectionRectangle::Paint(ID2D1RenderTarget *renderTarget) {
-    if (!mHidden) {
-        renderTarget->FillRoundedRectangle(mRect, mBackBrush.brush);
+void SelectionRectangle::Paint(ID2D1RenderTarget *renderTarget)
+{
+    if (!mHidden)
+    {
+        if (mBackBrush.IsImageEdgeBrush())
+        {
+            for (Brush::EdgeType type = Brush::EdgeType(0); type != Brush::EdgeType::Count;
+                type = Brush::EdgeType(std::underlying_type<Brush::EdgeType>::type(type) + 1))
+            {
+                renderTarget->FillRectangle(mBackBrush.GetImageEdgeRectAndScaleBrush(type), mBackBrush.brush);
+            }
+        }
+        else
+        {
+            renderTarget->FillRoundedRectangle(mRect, mBackBrush.brush);
+        }
         renderTarget->DrawRoundedRectangle(mRect, mOutlineBrush.brush, mOutlineWidth);
     }
 }
@@ -55,11 +68,20 @@ HRESULT SelectionRectangle::ReCreateDeviceResources(ID2D1RenderTarget *renderTar
     return S_OK;
 }
 
+/// <summary>
+/// IPaintable::UpdatePosition
+/// Called when the parent has moved.
+/// </summary>
+void SelectionRectangle::UpdatePosition(D2D1_RECT_F parentPosition)
+{
+}
+
 
 /// <summary>
 ///
 /// </summary>
-void SelectionRectangle::Init(Settings *parentSettings) {
+void SelectionRectangle::Init(Settings *parentSettings)
+{
     Settings *settings = parentSettings->CreateChild(_T("SelectionRectangle"));
     Settings *outlineSettings = parentSettings->CreateChild(_T("Outline"));
     mRect.radiusX = settings->GetFloat(_T("CornerRadiusX"), 0.0f);
