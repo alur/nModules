@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.20617.1 PREVIEW
+VisualStudioVersion = 12.0.20623.1 VSUPREVIEW
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nDesk", "nDesk\nDesk.vcxproj", "{F1BBDAA9-8D85-49E0-9906-DB287103D90E}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -292,8 +292,5 @@ Global
 		{66F96FF8-FEC5-455A-BEAC-3975DB89A772} = {89964B45-85F2-4A2C-BA7D-2698E96A3609}
 		{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C} = {89964B45-85F2-4A2C-BA7D-2698E96A3609}
 		{0118E777-9742-4EB4-85EC-FB3E16E059A9} = {775BCCF7-072F-4F72-B412-8E2E1D3ED2A9}
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

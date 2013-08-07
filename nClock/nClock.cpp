@@ -53,6 +53,12 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
 /// </summary>
 EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */)
 {
+    for (auto item : gClocks)
+    {
+        delete item.second;
+    }
+    gClocks.clear();
+
     gLSModule.DeInitalize();
 }
 

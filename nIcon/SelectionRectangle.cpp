@@ -11,7 +11,8 @@
 /// <summary>
 ///
 /// </summary>
-SelectionRectangle::SelectionRectangle() {
+SelectionRectangle::SelectionRectangle()
+{
     mHidden = true;
 }
 
@@ -19,7 +20,8 @@ SelectionRectangle::SelectionRectangle() {
 /// <summary>
 ///
 /// </summary>
-SelectionRectangle::~SelectionRectangle() {
+SelectionRectangle::~SelectionRectangle()
+{
 }
 
 

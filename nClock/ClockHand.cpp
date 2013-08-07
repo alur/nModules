@@ -78,6 +78,8 @@ void ClockHand::Initialize(Settings *clockSettings, LPCTSTR prefix, float maxVal
 
     float parentWidth = clockSettings->GetFloat(_T("Width"), 100.0f);
     float parentHeight = clockSettings->GetFloat(_T("Height"), 100.0f);
+    float parentX = clockSettings->GetFloat(_T("X"), 100.0f);
+    float parentY = clockSettings->GetFloat(_T("Y"), 100.0f);
 
     float length = settings->GetFloat(_T("Length"), 50);
     float thickness = settings->GetFloat(_T("Thickness"), 3);
@@ -88,7 +90,7 @@ void ClockHand::Initialize(Settings *clockSettings, LPCTSTR prefix, float maxVal
     mHandRect.bottom = mHandRect.top + thickness;
     mHandRect.right = mHandRect.left + length;
 
-    mCenterPoint = D2D1::SizeF(parentWidth / 2.0f, parentHeight / 2.0f);
+    mCenterPoint = D2D1::SizeF(parentWidth / 2.0f + parentX, parentHeight / 2.0f + parentY);
 
     delete settings;
 }
