@@ -153,6 +153,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Clock.hpp" />
+    <ClInclude Include="ClockHand.hpp" />
     <ClInclude Include="nClock.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
@@ -160,6 +162,8 @@
     <ResourceCompile Include="nClock.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Clock.cpp" />
+    <ClCompile Include="ClockHand.cpp" />
     <ClCompile Include="nClock.cpp" />
   </ItemGroup>
   <ItemGroup>

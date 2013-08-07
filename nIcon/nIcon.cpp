@@ -133,11 +133,11 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// <summary>
 /// Reads through the .rc files and creates labels.
 /// </summary>
-void LoadSettings() {
-    LiteStep::IterateOverLines(L"*nIcon", [] (LPCTSTR line) -> void {
-        LiteStep::IterateOverTokens(line, [] (LPCTSTR token) -> void {
-            CreateGroup(token);
-        });
+void LoadSettings()
+{
+    LiteStep::IterateOverLineTokens(_T("*nIcon"), [] (LPCTSTR token) -> void
+    {
+        CreateGroup(token);
     });
 }
 
@@ -145,8 +145,8 @@ void LoadSettings() {
 /// <summary>
 /// Updates settings from the RC.
 /// </summary>
-void Refresh() {
-
+void Refresh()
+{
 }
 
 
@@ -154,11 +154,14 @@ void Refresh() {
 /// Creates a new group with the specified name.
 /// </summary>
 /// <param name="groupName">The name of the group to create.</param>
-void CreateGroup(LPCTSTR groupName) {
-    if (gIconGroups.find(groupName) == gIconGroups.end()) {
+void CreateGroup(LPCTSTR groupName)
+{
+    if (gIconGroups.find(groupName) == gIconGroups.end())
+    {
         gIconGroups[groupName] = new IconGroup(groupName);
     }
-    else {
+    else
+    {
         ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("Attempt to (re)create the already existing group %s!"), groupName);
     }
 }
