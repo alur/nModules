@@ -402,7 +402,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
     bool bTileWallpaper;
 
     // Temporary values
-    char szTemp[32];
+    WCHAR szTemp[32];
     DWORD dwSize, dwType;
 
     // D2D/WIC interfaces
@@ -421,12 +421,12 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
     // Get whether or not to tile the wallpaper
     dwSize = sizeof(szTemp);
     SHGetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"TileWallpaper", &dwType, &szTemp, &dwSize);
-    bTileWallpaper = atoi(szTemp) ? true : false;
+    bTileWallpaper = _ttoi(szTemp) ? true : false;
 
     // Get whether or not to stretch the wallpaper
     dwSize = sizeof(szTemp);
     SHGetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"WallpaperStyle", &dwType, &szTemp, &dwSize);
-    iWallpaperStyle = atoi(szTemp);
+    iWallpaperStyle = _ttoi(szTemp);
 
     // Create a bitmap the size of the virtual screen
     renderTarget->CreateCompatibleRenderTarget(&pBitmapRender);
