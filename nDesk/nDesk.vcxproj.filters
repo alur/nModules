@@ -1,106 +1,63 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\TransitionEffects">
-      <UniqueIdentifier>{75d8fe82-cd37-45f0-a132-648d7467b1f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\TransitionEffects">
+    <Filter Include="TransitionEffects">
       <UniqueIdentifier>{f7bb1e6b-d316-4baa-8be2-55a2b02e51a8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="nDesk.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include=".\DesktopPainter.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ClickHandler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include=".\WorkArea.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Bangs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Constants.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TransitionEffect.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include=".\TransitionEffects\FadeEffect.hpp">
-      <Filter>Header Files\TransitionEffects</Filter>
-    </ClInclude>
-    <ClInclude Include="TransitionEffects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClInclude Include=".\WorkArea.h" />
+    <ClInclude Include="Bangs.h" />
+    <ClInclude Include="ClickHandler.hpp" />
+    <ClInclude Include="Constants.h" />
+    <ClInclude Include=".\DesktopPainter.hpp" />
+    <ClInclude Include="nDesk.h" />
+    <ClInclude Include="Settings.h" />
+    <ClInclude Include="TransitionEffect.hpp" />
+    <ClInclude Include="TransitionEffects.h" />
+    <ClInclude Include="Version.h" />
     <ClInclude Include="TransitionEffects\SlideEffect.hpp">
-      <Filter>Header Files\TransitionEffects</Filter>
+      <Filter>TransitionEffects</Filter>
     </ClInclude>
     <ClInclude Include="TransitionEffects\BlindsEffect.hpp">
-      <Filter>Header Files\TransitionEffects</Filter>
-    </ClInclude>
-    <ClInclude Include=".\TransitionEffects\GridEffect.hpp">
-      <Filter>Header Files\TransitionEffects</Filter>
+      <Filter>TransitionEffects</Filter>
     </ClInclude>
     <ClInclude Include="TransitionEffects\CircularEffect.hpp">
-      <Filter>Header Files\TransitionEffects</Filter>
+      <Filter>TransitionEffects</Filter>
     </ClInclude>
-    <ClInclude Include="Settings.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include=".\TransitionEffects\FadeEffect.hpp">
+      <Filter>TransitionEffects</Filter>
     </ClInclude>
-    <ClInclude Include="Version.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include=".\TransitionEffects\GridEffect.hpp">
+      <Filter>TransitionEffects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="nDesk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DesktopPainter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ClickHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="WorkArea.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Bangs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\TransitionEffects\FadeEffect.cpp">
-      <Filter>Source Files\TransitionEffects</Filter>
+      <Filter>TransitionEffects</Filter>
     </ClCompile>
     <ClCompile Include="TransitionEffects\BlindsEffect.cpp">
-      <Filter>Source Files\TransitionEffects</Filter>
+      <Filter>TransitionEffects</Filter>
     </ClCompile>
     <ClCompile Include="TransitionEffects\SlideEffect.cpp">
-      <Filter>Source Files\TransitionEffects</Filter>
+      <Filter>TransitionEffects</Filter>
     </ClCompile>
     <ClCompile Include="TransitionEffects\GridEffect.cpp">
-      <Filter>Source Files\TransitionEffects</Filter>
+      <Filter>TransitionEffects</Filter>
     </ClCompile>
     <ClCompile Include="TransitionEffects\CircularEffect.cpp">
-      <Filter>Source Files\TransitionEffects</Filter>
+      <Filter>TransitionEffects</Filter>
     </ClCompile>
-    <ClCompile Include="Settings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClCompile Include="WorkArea.cpp" />
+    <ClCompile Include="Bangs.cpp" />
+    <ClCompile Include="ClickHandler.cpp" />
+    <ClCompile Include="DesktopPainter.cpp" />
+    <ClCompile Include="nDesk.cpp" />
+    <ClCompile Include="Settings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nDesk.rc">
