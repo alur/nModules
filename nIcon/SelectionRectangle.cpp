@@ -52,7 +52,8 @@ void SelectionRectangle::Paint(ID2D1RenderTarget *renderTarget)
 /// <summary>
 ///
 /// </summary>
-void SelectionRectangle::DiscardDeviceResources() {
+void SelectionRectangle::DiscardDeviceResources()
+{
     mBackBrush.Discard();
     mOutlineBrush.Discard();
 }
@@ -61,19 +62,22 @@ void SelectionRectangle::DiscardDeviceResources() {
 /// <summary>
 ///
 /// </summary>
-HRESULT SelectionRectangle::ReCreateDeviceResources(ID2D1RenderTarget *renderTarget) {
+HRESULT SelectionRectangle::ReCreateDeviceResources(ID2D1RenderTarget *renderTarget)
+{
     mBackBrush.ReCreate(renderTarget);
     mOutlineBrush.ReCreate(renderTarget);
 
     return S_OK;
 }
 
+
 /// <summary>
 /// IPaintable::UpdatePosition
 /// Called when the parent has moved.
 /// </summary>
-void SelectionRectangle::UpdatePosition(D2D1_RECT_F parentPosition)
+void SelectionRectangle::UpdatePosition(D2D1_RECT_F /* parentPosition */)
 {
+    // This is handled in SetRect instead.
 }
 
 
@@ -83,7 +87,7 @@ void SelectionRectangle::UpdatePosition(D2D1_RECT_F parentPosition)
 void SelectionRectangle::Init(Settings *parentSettings)
 {
     Settings *settings = parentSettings->CreateChild(_T("SelectionRectangle"));
-    Settings *outlineSettings = parentSettings->CreateChild(_T("Outline"));
+    Settings *outlineSettings = settings->CreateChild(_T("Outline"));
     mRect.radiusX = settings->GetFloat(_T("CornerRadiusX"), 0.0f);
     mRect.radiusY = settings->GetFloat(_T("CornerRadiusY"), 0.0f);
     mOutlineWidth = outlineSettings->GetFloat(_T("Width"),  0.5f);
@@ -95,7 +99,7 @@ void SelectionRectangle::Init(Settings *parentSettings)
 
     BrushSettings outlineDefaults;
     outlineDefaults.color = 0xDDFFFFFF;
-    mOutlineBrushSettings.Load(settings, &outlineDefaults);
+    mOutlineBrushSettings.Load(outlineSettings, &outlineDefaults);
     mOutlineBrush.Load(&mOutlineBrushSettings);
 
     delete settings;
@@ -106,17 +110,19 @@ void SelectionRectangle::Init(Settings *parentSettings)
 /// <summary>
 ///
 /// </summary>
-void SelectionRectangle::SetRect(D2D1_RECT_F rect) {
+void SelectionRectangle::SetRect(D2D1_RECT_F rect)
+{
     mBackBrush.UpdatePosition(rect);
-    mOutlineBrush.UpdatePosition(rect);
-    mRect.rect = rect;
+    mRect.rect = mBackBrush.brushPosition;
+    mOutlineBrush.UpdatePosition(mRect.rect);
 }
 
 
 /// <summary>
 ///
 /// </summary>
-void SelectionRectangle::Show() {
+void SelectionRectangle::Show()
+{
     mHidden = false;
 }
 
@@ -124,6 +130,7 @@ void SelectionRectangle::Show() {
 /// <summary>
 ///
 /// </summary>
-void SelectionRectangle::Hide() {
+void SelectionRectangle::Hide()
+{
     mHidden = true;
 }
