@@ -245,7 +245,9 @@ bool CoverArt::SetCoverFromTag(LPCWSTR filePath)
         BYTE picturePriority = 0xFF;
 
         TagLib::MPEG::File mp3File(filePath);
-        if (mp3File.ID3v2Tag()->frameListMap().contains("APIC"))
+        auto tag = mp3File.ID3v2Tag();
+
+        if (tag && tag->frameListMap().contains("APIC"))
         {
             for (auto frame : mp3File.ID3v2Tag()->frameListMap()["APIC"])
             {
