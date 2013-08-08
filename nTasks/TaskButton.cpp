@@ -303,7 +303,7 @@ void TaskButton::ShowMenu() {
     EnableMenuItem(this->menu, SC_RESTORE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWNORMAL ? MF_ENABLED : MF_GRAYED));
     EnableMenuItem(this->menu, SC_MOVE, MF_BYCOMMAND | (wp.showCmd == SW_SHOWNORMAL ? MF_ENABLED : MF_GRAYED));
     EnableMenuItem(this->menu, SC_SIZE, MF_BYCOMMAND | (wp.showCmd == SW_SHOWNORMAL ? MF_ENABLED : MF_GRAYED));
-    EnableMenuItem(this->menu, SC_MOVE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWMINIMIZED ? MF_ENABLED : MF_GRAYED));
+    EnableMenuItem(this->menu, SC_MINIMIZE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWMINIMIZED ? MF_ENABLED : MF_GRAYED));
     EnableMenuItem(this->menu, SC_MOVE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWMAXIMIZED ? MF_ENABLED : MF_GRAYED));
 
     // let application modify menu
@@ -340,14 +340,19 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
     switch (message) {
     case WM_LBUTTONUP:
         {
-            if (GetForegroundWindow() == this->watchedWindow) {
-                ShowWindow(this->watchedWindow, SW_MINIMIZE);
+            if (GetForegroundWindow() == this->watchedWindow)
+            {
+                PostMessage(this->watchedWindow, WM_SYSCOMMAND, SC_MINIMIZE, 0);
             }
-            else if (IsIconic(this->watchedWindow)) {
-                ShowWindow(this->watchedWindow, SW_RESTORE);
+            else if (IsIconic(this->watchedWindow))
+            {
+                //SetForegroundWindow(this->watchedWindow);
+                BringWindowToTop(this->watchedWindow);
+                PostMessage(this->watchedWindow, WM_SYSCOMMAND, SC_RESTORE, 0);
                 SetForegroundWindow(this->watchedWindow);
             }
-            else {
+            else
+            {
                 SetForegroundWindow(this->watchedWindow);
             }
             ((Taskbar*)mParent)->HideThumbnail();
@@ -363,7 +368,8 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
 
     case WM_MOUSEMOVE:
         {
-            if (!this->mouseIsOver) {
+            if (!this->mouseIsOver)
+            {
                 this->mouseIsOver = true;
                 SetHoverState(true);
 
@@ -384,12 +390,15 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
 
     case WM_TIMER:
         {
-            if (wParam == this->flashTimer) {
-                if (this->isFlashing) {
+            if (wParam == this->flashTimer)
+            {
+                if (this->isFlashing)
+                {
                     this->flashOn = !this->flashOn;
                     SetFlashingState(this->flashOn);
                 }
-                else {
+                else
+                {
                     mWindow->ClearCallbackTimer(this->flashTimer);
                 }
             }
