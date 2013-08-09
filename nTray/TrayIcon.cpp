@@ -207,7 +207,7 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam,
                 lsNID.uID = this->callbackID;
                 lsNID.guidItem = this->guid;
                 lsNID.uFlags = this->flags & NIF_GUID;
-                PostMessage(gLSModule.GetMessageWindow(), LM_SYSTRAY, NIM_DELETE, (LPARAM)&lsNID);
+                SendMessage(gLSModule.GetMessageWindow(), LM_SYSTRAY, NIM_DELETE, (LPARAM)&lsNID);
                 return 0;
             }
             this->showingTip = true;
