@@ -17,8 +17,8 @@ SeparatorItem::SeparatorItem(Drawable* parent) : PopupItem(parent, L"SeparatorIt
     defaults.height = 5;
 
     StateSettings defaultState;
-    defaultState.backgroundBrush.color = 0xAA000000;
-    defaultState.textBrush.color = 0xFF000000;
+    defaultState.backgroundBrush.color = Color::Create(0xAA000000);
+    defaultState.textBrush.color = Color::Create(0xFF000000);
 
     mWindow->Initialize(&defaults, &defaultState);
 

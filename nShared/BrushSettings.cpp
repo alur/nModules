@@ -9,6 +9,7 @@
 #include <strsafe.h>
 #include "BrushSettings.hpp"
 #include "../Utilities/StringUtils.h"
+#include "LiteralColorVal.hpp"
 
 
 /// <summary>
@@ -17,7 +18,7 @@
 BrushSettings::BrushSettings()
 {
     StringCchCopy(this->brushType, sizeof(this->brushType), _T("SolidColor"));
-    this->color = 0xFF000000;
+    this->color = std::unique_ptr<IColorVal>(new LiteralColorVal(0xFF000000));
     this->gradientColors = _tcsdup(_T("Black"));
     this->gradientCenterX = 0.0f;
     this->gradientCenterY = 0.0f;
@@ -43,7 +44,7 @@ BrushSettings::BrushSettings()
 BrushSettings::BrushSettings(const BrushSettings &source)
 {
     StringCchCopy(this->brushType, sizeof(this->brushType), source.brushType);
-    this->color = source.color;
+    this->color = std::unique_ptr<IColorVal>(source.color->Copy());
     this->gradientColors = _tcsdup(source.gradientColors);
     this->gradientCenterX = source.gradientCenterX;
     this->gradientCenterY = source.gradientCenterY;
@@ -85,8 +86,7 @@ void BrushSettings::Load(Settings* settings, BrushSettings* defaults)
     TCHAR buf[MAX_LINE_LENGTH];
 
     settings->GetString(_T("BrushType"), this->brushType, sizeof(this->brushType), defaults->brushType);
-    this->color = settings->GetColor(_T("Color"), defaults->color);
-    this->color = this->color & 0xFFFFFF | ((ARGB)settings->GetInt(_T("Alpha"), (this->color & 0xFF000000) >> 24) & 0xFF) << 24;
+    this->color = std::unique_ptr<IColorVal>(settings->GetColor(_T("Color"), defaults->color.get()));
     this->gradientEndX = settings->GetFloat(_T("GradientEndX"), defaults->gradientEndX);
     this->gradientEndY = settings->GetFloat(_T("GradientEndY"), defaults->gradientEndY);
     settings->GetString(_T("GradientColors"), buf, sizeof(buf), defaults->gradientColors);

@@ -20,8 +20,8 @@ ContainerItem::ContainerItem(Drawable* parent, LPCTSTR prefix) : PopupItem(paren
     defaults.registerWithCore = true;
 
     StateSettings defaultState;
-    defaultState.backgroundBrush.color = 0xAAFFFFFF;
-    defaultState.textBrush.color = 0xFF000000;
+    defaultState.backgroundBrush.color = Color::Create(0xAAFFFFFF);
+    defaultState.textBrush.color = Color::Create(0xFF000000);
 
     mWindow->Initialize(&defaults, &defaultState);
 

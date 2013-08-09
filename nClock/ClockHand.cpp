@@ -81,6 +81,16 @@ void ClockHand::UpdatePosition(D2D1_RECT_F parentPosition)
 
 
 /// <summary>
+/// IPaintable::UpdateDWMColor
+/// Called when the DWM color has changed. Returns true if this Paintable is currently using the DWM color.
+/// </summary>
+bool ClockHand::UpdateDWMColor(ARGB newColor, ID2D1RenderTarget* renderTarget)
+{
+    return mBrush.UpdateDWMColor(newColor, renderTarget);
+}
+
+
+/// <summary>
 /// Initializes this clock hand.
 /// </summary>
 void ClockHand::Initialize(Settings *clockSettings, LPCTSTR prefix, float maxValue)
@@ -91,7 +101,7 @@ void ClockHand::Initialize(Settings *clockSettings, LPCTSTR prefix, float maxVal
     mMaxValue = maxValue;
 
     BrushSettings brushDefaults;
-    brushDefaults.color = 0xFF77FFEE;
+    brushDefaults.color = Color::Create(0xFF77FFEE);
     mBrushSettings.Load(settings, &brushDefaults);
     mBrush.Load(&mBrushSettings);
 

@@ -161,7 +161,8 @@ void quitModule(HINSTANCE /* instance */) {
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
 LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
-    switch(message) {
+    switch(message)
+    {
     case WM_CREATE:
         {
             SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);

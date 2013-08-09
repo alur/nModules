@@ -14,11 +14,14 @@ public:
     explicit Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmapSource* source, int zOrder);
     virtual ~Overlay();
 
-    void DiscardDeviceResources();
-    void Paint(ID2D1RenderTarget* renderTarget);
-    HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
-
+    // IPainter
+public:
+    void DiscardDeviceResources() override;
+    void Paint(ID2D1RenderTarget* renderTarget) override;
+    HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) override;
+    bool UpdateDWMColor(ARGB newColor, ID2D1RenderTarget* renderTarget) override;
     void UpdatePosition(D2D1_RECT_F parentPosition);
+
     void SetSource(IWICBitmapSource* source);
     ID2D1BitmapBrush *GetBrush();
     int GetZOrder();

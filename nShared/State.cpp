@@ -114,7 +114,8 @@ void State::Paint(ID2D1RenderTarget* renderTarget)
     {
         renderTarget->DrawRoundedRectangle(this->outlineArea, this->outlineBrush->brush, this->drawingSettings->outlineWidth);
     }
-    /*if (this->textShadowBrush->brush) {
+    /*if (this->textShadowBrush->brush)
+    {
         renderTarget->SetTransform(Matrix3x2F::Rotation(this->drawingSettings->textRotation, this->textRotationOrigin));
         renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textDropFormat, this->textArea, this->textShadowBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         renderTarget->SetTransform(Matrix3x2F::Identity());
@@ -141,6 +142,17 @@ HRESULT State::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
     this->outlineArea.rect.top += this->drawingSettings->outlineWidth / 2;
     this->outlineArea.rect.bottom -= this->drawingSettings->outlineWidth / 2;
     return S_OK;
+}
+
+
+bool State::UpdateDWMColor(ARGB newColor, ID2D1RenderTarget *renderTarget)
+{
+    bool ret = false;
+    ret = backBrush->UpdateDWMColor(newColor, renderTarget) || ret;
+    ret = outlineBrush->UpdateDWMColor(newColor, renderTarget) || ret;
+    ret = textBrush->UpdateDWMColor(newColor, renderTarget) || ret;
+
+    return ret;
 }
 
 

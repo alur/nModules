@@ -198,9 +198,11 @@ void Settings::SetBool(LPCTSTR key, bool value) const
 /// <param name="key">The RC setting to retrive.</param>
 /// <param name="defaultValue">The default color to use, if the setting is invalid or unspecified.</param>
 /// <returns>The color.</returns>
-ARGB Settings::GetColor(LPCTSTR key, ARGB defaultValue) const
+IColorVal* Settings::GetColor(LPCTSTR key, const IColorVal* defaultValue) const
 {
-    return GetPrefixedRCColor(mPrefix, key, mGroup != nullptr ? mGroup->GetColor(key, defaultValue) : defaultValue);
+    TCHAR colorString[MAX_LINE_LENGTH];
+    GetLine(key, colorString, _countof(colorString), nullptr);
+    return ParseColor(colorString, defaultValue);
 }
 
 
@@ -339,6 +341,26 @@ void Settings::SetMonitor(LPCTSTR key, UINT value) const
     TCHAR valueString[10];
     StringCchPrintf(valueString, _countof(valueString), _T("%u"), value);
     SetString(key, valueString);
+}
+
+
+/// <summary>
+/// Gets a line from a prefixed RC value.
+/// </summary>
+/// <param name="key">The RC setting.</param>
+/// <param name="buffer">Where the string should be read to.</param>
+/// <param name="cchBuffer">The maximum number of characters to write to buffer.</param>
+/// <param name="defaultValue">The default string, used if the RC value is unspecified.</param>
+/// <returns>False if the length of the RC value is > cchDest. True otherwise.</returns>
+bool Settings::GetLine(LPCTSTR key, LPTSTR buffer, UINT cchBuffer, LPCTSTR defaultValue) const
+{
+    if (mGroup != nullptr)
+    {
+        TCHAR propagatedDefault[MAX_LINE_LENGTH];
+        mGroup->GetLine(key, propagatedDefault, _countof(propagatedDefault), defaultValue);
+        return GetPrefixedRCLine(mPrefix, key, buffer, propagatedDefault, cchBuffer);
+    }
+    return GetPrefixedRCLine(mPrefix, key, buffer, defaultValue, cchBuffer);
 }
 
 

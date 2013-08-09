@@ -36,9 +36,9 @@ StateSettings::StateSettings() {
     this->textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR;
     this->wordWrapping = DWRITE_WORD_WRAPPING_NO_WRAP;
 
-    this->backgroundBrush.color = 0xFF000000;
-    this->textBrush.color = 0xFFFFFFFF;
-    this->textDropShadowBrush.color = 0x00000000;
+    this->backgroundBrush.color = Color::Create(0xFF000000);
+    this->textBrush.color = Color::Create(0xFFFFFFFF);
+    this->textDropShadowBrush.color = Color::Create(0x00000000);
 }
 
 

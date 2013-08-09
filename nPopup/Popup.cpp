@@ -39,8 +39,7 @@ Popup::Popup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Drawable(prefix) {
     defaultSettings.width = 200;
 
     StateSettings defaultState;
-    defaultState.backgroundBrush.color = 0x440000FF;
-    defaultState.textRotation = -45.0f;
+    defaultState.backgroundBrush.color = Color::Create(0x440000FF);
     defaultState.fontSize = 32.0f;
     defaultState.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
     defaultState.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;

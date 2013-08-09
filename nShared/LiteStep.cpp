@@ -46,7 +46,7 @@ double LiteStep::GetPrefixedRCDouble(LPCTSTR prefix, LPCTSTR keyName, double def
 /// <param name="prefix">The prefix of the value to get.</param>
 /// <param name="keyName">Key of the value to get.</param>
 /// <param name="defaultValue">Default value, returned if the key is not specified.</param>
-ARGB LiteStep::GetPrefixedRCColor(LPCTSTR prefix, LPCTSTR keyName, ARGB defaultValue)
+IColorVal* LiteStep::GetPrefixedRCColor(LPCTSTR prefix, LPCTSTR keyName, const IColorVal* defaultValue)
 {
     TCHAR colorString[MAX_LINE_LENGTH];
     GetPrefixedRCLine(prefix, keyName, colorString, nullptr, _countof(colorString));
@@ -209,7 +209,7 @@ bool LiteStep::ParseBool(LPCTSTR boolString)
 /// </summary>
 /// <param name="colorString">The string to parse.</param>
 /// <param name="defaultValue">The default color, returned if the string is invalid.</param>
-ARGB LiteStep::ParseColor(LPCTSTR colorString, ARGB defaultValue)
+IColorVal* LiteStep::ParseColor(LPCTSTR colorString, const IColorVal* defaultValue)
 {
     return Color::Parse(colorString, defaultValue);
 }

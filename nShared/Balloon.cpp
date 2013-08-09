@@ -19,13 +19,13 @@ Balloon::Balloon(LPCTSTR prefix, Settings* parentSettings, UINT clickedMessage, 
     defaults.alwaysOnTop = true;
 
     StateSettings defaultState;
-    defaultState.backgroundBrush.color = 0xCCFAFAD2;
-    defaultState.textBrush.color = 0xFF000000;
+    defaultState.backgroundBrush.color = Color::Create(0xCCFAFAD2);
+    defaultState.textBrush.color = Color::Create(0xFF000000);
     defaultState.textOffsetTop = 4;
     defaultState.textOffsetBottom = 4;
     defaultState.textOffsetRight = 4;
     defaultState.textOffsetLeft = 40;
-    defaultState.outlineBrush.color = 0xAA000000;
+    defaultState.outlineBrush.color = Color::Create(0xAA000000);
     defaultState.outlineWidth = 1.5f;
     defaultState.wordWrapping = DWRITE_WORD_WRAPPING_WRAP;
     defaultState.cornerRadiusX = 4.0f;
@@ -44,8 +44,8 @@ Balloon::Balloon(LPCTSTR prefix, Settings* parentSettings, UINT clickedMessage, 
     titleDefaults.y = 4;
 
     StateSettings titleBaseStateDefaults;
-    titleBaseStateDefaults.textBrush.color = 0xFF000000;
-    titleBaseStateDefaults.backgroundBrush.color = 0;
+    titleBaseStateDefaults.textBrush.color = Color::Create(0xFF000000);
+    titleBaseStateDefaults.backgroundBrush.color = Color::Create(0x00000000);
     titleBaseStateDefaults.fontWeight = DWRITE_FONT_WEIGHT_BOLD;
 
     mTitleWindow->Initialize(&titleDefaults, &titleBaseStateDefaults);
@@ -59,9 +59,9 @@ Balloon::Balloon(LPCTSTR prefix, Settings* parentSettings, UINT clickedMessage, 
     closeBtnDefaults->height = 16;
 
     StateSettings closeBtnBaseStateDefaults;
-    closeBtnBaseStateDefaults.backgroundBrush.color = 0xAA77AACC;
-    closeBtnBaseStateDefaults.textBrush.color = 0xFF000000;
-    closeBtnBaseStateDefaults.outlineBrush.color = 0xFF000000;
+    closeBtnBaseStateDefaults.backgroundBrush.color = Color::Create(0xAA77AACC);
+    closeBtnBaseStateDefaults.textBrush.color = Color::Create(0xFF000000);
+    closeBtnBaseStateDefaults.outlineBrush.color = Color::Create(0xFF000000);
     closeBtnBaseStateDefaults.outlineWidth = 1.0f;
     closeBtnBaseStateDefaults.cornerRadiusX = 2.0f;
     closeBtnBaseStateDefaults.cornerRadiusY = 2.0f;

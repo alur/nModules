@@ -35,7 +35,7 @@ IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFo
     GetDisplayName(SHGDN_NORMAL, name, MAX_PATH);
 
     StateSettings baseStateDefaults;
-    baseStateDefaults.backgroundBrush.color = 0;
+    baseStateDefaults.backgroundBrush.color = Color::Create(0x00000000);
     baseStateDefaults.wordWrapping = DWRITE_WORD_WRAPPING_WRAP;
     baseStateDefaults.textOffsetTop = (float)mIconSize;
     baseStateDefaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
@@ -50,20 +50,20 @@ IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFo
     //mWindow->SizeToText(64, 300, 64);
 
     StateSettings hoverDefaults(baseStateDefaults);
-    hoverDefaults.backgroundBrush.color = 0xAA87CEEB;
-    hoverDefaults.outlineBrush.color = 0x99FFFFFF;
+    hoverDefaults.backgroundBrush.color = Color::Create(0xAA87CEEB);
+    hoverDefaults.outlineBrush.color = Color::Create(0x99FFFFFF);
     hoverDefaults.outlineWidth = 1.5f;
     mHoverState = mWindow->AddState(L"Hover", 100, &hoverDefaults);
 
     StateSettings selectedDefaults(hoverDefaults);
-    selectedDefaults.backgroundBrush.color = 0xCC87CEEB;
-    selectedDefaults.outlineBrush.color = 0xCCFFFFFF;
+    selectedDefaults.backgroundBrush.color = Color::Create(0xCC87CEEB);
+    selectedDefaults.outlineBrush.color = Color::Create(0xCCFFFFFF);
     selectedDefaults.outlineWidth = 1.5f;
     mSelectedState = mWindow->AddState(L"Selected", 150, &selectedDefaults);
 
     StateSettings focusedDefaults(hoverDefaults);
-    focusedDefaults.backgroundBrush.color = 0xAA87CEEB;
-    focusedDefaults.outlineBrush.color = 0x99FFFFFF;
+    focusedDefaults.backgroundBrush.color = Color::Create(0xAA87CEEB);
+    focusedDefaults.outlineBrush.color = Color::Create(0x99FFFFFF);
     focusedDefaults.outlineWidth = 1.5f;
     mFocusedState = mWindow->AddState(L"Focused", 200, &focusedDefaults);
     

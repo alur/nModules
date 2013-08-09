@@ -10,6 +10,7 @@
 #include "../nShared/DrawableWindow.hpp"
 #include "../nShared/LSModule.hpp"
 #include <Shlwapi.h>
+#include "../nShared/DWMColorVal.hpp"
 
 
 static UINT (*DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = nullptr;
@@ -58,14 +59,13 @@ void TaskSwitcher::LoadSettings() {
     defaults.text = _wcsdup(L"Test");
 
     StateSettings stateDefaults;
-    stateDefaults.backgroundBrush.color = 0xDD000000;
+    stateDefaults.backgroundBrush.color = Color::Create(0xDD000000);
     stateDefaults.fontSize = 16;
     stateDefaults.fontWeight = DWRITE_FONT_WEIGHT_LIGHT;
     stateDefaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
-    stateDefaults.textBrush.color = 0xFFFFFFFF;
+    stateDefaults.textBrush.color = Color::Create(0xFFFFFFFF);
     stateDefaults.textOffsetTop = 10;
-    BOOL b;
-    DwmGetColorizationColor(&stateDefaults.backgroundBrush.color, &b);
+    stateDefaults.backgroundBrush.color = std::unique_ptr<IColorVal>(new DWMColorVal());
 
     mWindow->Initialize(&defaults, &stateDefaults);
 

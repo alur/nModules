@@ -25,7 +25,7 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
 
     //
     StateSettings stateDefaults;
-    stateDefaults.backgroundBrush.color = 0x00000000;
+    stateDefaults.backgroundBrush.color = Color::Create(0x00000000);
     stateDefaults.textOffsetLeft = 36;
     stateDefaults.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
 
@@ -54,9 +54,8 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
     }
 
     // Check if we're minimized
-    WINDOWPLACEMENT wp;
-    GetWindowPlacement(watchedWindow, &wp);
-    if (wp.showCmd == SW_SHOWMINIMIZED || wp.showCmd == SW_SHOWMINNOACTIVE) {
+    if (IsIconic(watchedWindow))
+    {
         SetMinmizedState(true);
     }
 }
@@ -65,8 +64,10 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
 /// <summary>
 /// Destructor
 /// </summary>
-TaskButton::~TaskButton() {
-    if (this->isFlashing) {
+TaskButton::~TaskButton()
+{
+    if (this->isFlashing)
+    {
         mWindow->ClearCallbackTimer(this->flashTimer);
     }
 }
@@ -152,10 +153,12 @@ void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
 /// <summary>
 /// Activates this button.
 /// </summary>
-void TaskButton::Activate() {
+void TaskButton::Activate()
+{
     SetActiveState(true);
     
-    if (mStates[State::Minimized]->active) {
+    if (mStates[State::Minimized]->active)
+    {
         SetMinmizedState(false);
     }
 
@@ -238,24 +241,33 @@ void TaskButton::SetHoverState(bool value) {
 /// <summary>
 /// Activates or deactivates the minimized state.
 /// </summary>
-void TaskButton::SetMinmizedState(bool value) {
-    if (value) {
-        if (mStates[State::Hover]->active && mStates[State::Flashing]->active) {
-            mWindow->ActivateState(mStates[State::MinimizedFlashingHover]);
+void TaskButton::SetMinmizedState(bool value)
+{
+    if (value != mStates[State::Minimized]->active)
+    {
+        if (value)
+        {
+            if (mStates[State::Hover]->active && mStates[State::Flashing]->active)
+            {
+                mWindow->ActivateState(mStates[State::MinimizedFlashingHover]);
+            }
+            if (mStates[State::Hover]->active)
+            {
+                mWindow->ActivateState(mStates[State::MinimizedHover]);
+            }
+            if (mStates[State::Flashing]->active)
+            {
+                mWindow->ActivateState(mStates[State::MinimizedFlashing]);
+            }
+            mWindow->ActivateState(mStates[State::Minimized]);
         }
-        if (mStates[State::Hover]->active) {
-            mWindow->ActivateState(mStates[State::MinimizedHover]);
+        else
+        {
+            mWindow->ClearState(mStates[State::Minimized]);
+            mWindow->ClearState(mStates[State::MinimizedFlashing]);
+            mWindow->ClearState(mStates[State::MinimizedHover]);
+            mWindow->ClearState(mStates[State::MinimizedFlashingHover]);
         }
-        if (mStates[State::Flashing]->active) {
-            mWindow->ActivateState(mStates[State::MinimizedFlashing]);
-        }
-        mWindow->ActivateState(mStates[State::Minimized]);
-    }
-    else {
-        mWindow->ClearState(mStates[State::Minimized]);
-        mWindow->ClearState(mStates[State::MinimizedFlashing]);
-        mWindow->ClearState(mStates[State::MinimizedHover]);
-        mWindow->ClearState(mStates[State::MinimizedFlashingHover]);
     }
 }
 
@@ -263,7 +275,8 @@ void TaskButton::SetMinmizedState(bool value) {
 /// <summary>
 /// Deactivates this button.
 /// </summary>
-void TaskButton::Deactivate() {
+void TaskButton::Deactivate()
+{
     SetActiveState(false);
 }
 
@@ -343,6 +356,7 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
             if (GetForegroundWindow() == this->watchedWindow)
             {
                 PostMessage(this->watchedWindow, WM_SYSCOMMAND, SC_MINIMIZE, 0);
+                SetMinmizedState(true);
             }
             else if (IsIconic(this->watchedWindow))
             {

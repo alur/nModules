@@ -40,7 +40,7 @@ TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings
     mSettings = parentSettings->CreateChild(_T("Icon"));
 
     StateSettings defaultStateSettings;
-    defaultStateSettings.backgroundBrush.color = 0x00000000;
+    defaultStateSettings.backgroundBrush.color = Color::Create(0x00000000);
     mWindow->Initialize(nullptr, &defaultStateSettings);
     this->showingTip = false;
 

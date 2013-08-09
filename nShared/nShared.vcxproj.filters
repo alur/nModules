@@ -7,6 +7,9 @@
     <Filter Include="Drawables">
       <UniqueIdentifier>{12944f3b-db83-4b62-8719-0347689a275c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Color">
+      <UniqueIdentifier>{1215375f-9cf4-4851-9d31-14963dd51785}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Balloon.hpp">
@@ -20,7 +23,6 @@
     </ClInclude>
     <ClInclude Include="BrushBangs.h" />
     <ClInclude Include="BrushSettings.hpp" />
-    <ClInclude Include="Color.h" />
     <ClInclude Include="Easing.h" />
     <ClInclude Include="ErrorHandler.h" />
     <ClInclude Include="EventHandler.hpp" />
@@ -55,11 +57,28 @@
     <ClInclude Include="DrawableWindowBangs.h">
       <Filter>Drawables</Filter>
     </ClInclude>
+    <ClInclude Include="Color.h">
+      <Filter>Color</Filter>
+    </ClInclude>
+    <ClInclude Include="IColorVal.hpp">
+      <Filter>Color</Filter>
+    </ClInclude>
+    <ClInclude Include="LiteralColorVal.hpp">
+      <Filter>Color</Filter>
+    </ClInclude>
+    <ClInclude Include="DWMColorVal.hpp">
+      <Filter>Color</Filter>
+    </ClInclude>
+    <ClInclude Include="UnaryColorVal.hpp">
+      <Filter>Color</Filter>
+    </ClInclude>
+    <ClInclude Include="BinaryColorVal.hpp">
+      <Filter>Color</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BrushBangs.cpp" />
     <ClCompile Include="BrushSettings.cpp" />
-    <ClCompile Include="Color.cpp" />
     <ClCompile Include="Easing.cpp" />
     <ClCompile Include="ErrorHandler.cpp" />
     <ClCompile Include="EventHandler.cpp" />
@@ -105,6 +124,24 @@
     </ClCompile>
     <ClCompile Include="DrawableWindowDropTarget.cpp">
       <Filter>Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Color.cpp">
+      <Filter>Color</Filter>
+    </ClCompile>
+    <ClCompile Include="BinaryColorVal.cpp">
+      <Filter>Color</Filter>
+    </ClCompile>
+    <ClCompile Include="DWMColorVal.cpp">
+      <Filter>Color</Filter>
+    </ClCompile>
+    <ClCompile Include="LiteralColorVal.cpp">
+      <Filter>Color</Filter>
+    </ClCompile>
+    <ClCompile Include="UnaryColorVal.cpp">
+      <Filter>Color</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorParser.cpp">
+      <Filter>Color</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

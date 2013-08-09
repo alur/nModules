@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Balloon.hpp" />
+    <ClInclude Include="BinaryColorVal.hpp" />
     <ClInclude Include="Brush.hpp" />
     <ClInclude Include="BrushBangs.h" />
     <ClInclude Include="BrushSettings.hpp" />
@@ -28,8 +29,11 @@
     <ClInclude Include="Drawable.hpp" />
     <ClInclude Include="DrawableWindowBangs.h" />
     <ClInclude Include="DrawableSettings.hpp" />
+    <ClInclude Include="DWMColorVal.hpp" />
     <ClInclude Include="IBrushOwner.hpp" />
+    <ClInclude Include="IColorVal.hpp" />
     <ClInclude Include="Length.hpp" />
+    <ClInclude Include="LiteralColorVal.hpp" />
     <ClInclude Include="Overlay.hpp" />
     <ClInclude Include="State.hpp" />
     <ClInclude Include="StateBangs.h" />
@@ -47,22 +51,27 @@
     <ClInclude Include="MonitorInfo.hpp" />
     <ClInclude Include="Settings.hpp" />
     <ClInclude Include="Tooltip.hpp" />
+    <ClInclude Include="UnaryColorVal.hpp" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="WindowThumbnail.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Balloon.cpp" />
+    <ClCompile Include="BinaryColorVal.cpp" />
     <ClCompile Include="Brush.cpp" />
     <ClCompile Include="BrushBangs.cpp" />
     <ClCompile Include="BrushSettings.cpp" />
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="ColorParser.cpp" />
     <ClCompile Include="Coordinate.cpp" />
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="DrawableWindowBangs.cpp" />
     <ClCompile Include="DrawableSettings.cpp" />
     <ClCompile Include="DrawableWindowDropTarget.cpp" />
     <ClCompile Include="DrawableWindowUnknown.cpp" />
+    <ClCompile Include="DWMColorVal.cpp" />
     <ClCompile Include="Length.cpp" />
+    <ClCompile Include="LiteralColorVal.cpp" />
     <ClCompile Include="StateBangs.cpp" />
     <ClCompile Include="StateSettings.cpp" />
     <ClCompile Include="DrawableWindow.cpp" />
@@ -79,6 +88,7 @@
     <ClCompile Include="MonitorInfo.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Tooltip.cpp" />
+    <ClCompile Include="UnaryColorVal.cpp" />
     <ClCompile Include="WindowThumbnail.cpp" />
   </ItemGroup>
   <ItemGroup>

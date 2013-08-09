@@ -104,8 +104,13 @@ static struct BangItem
         {
             TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            brush->SetColor(LiteStep::ParseColor(arg, brush->GetBrushSettings()->color));
-            window->Repaint();
+            IColorVal* color;
+            if (ParseColor(arg, &color))
+            {
+                brush->SetColor(color);
+                delete color;
+                window->Repaint();
+            }
         }
     }),
     /*BangItem(TEXT("SetAlpha"),                [] (HWND, LPCTSTR args) -> void {

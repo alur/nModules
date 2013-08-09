@@ -8,6 +8,8 @@
 #pragma once
 
 #include <d2d1.h>
+#include "IColorVal.hpp"
+#include <memory>
 
 // Color of the format AARRGGBB.
 typedef DWORD ARGB, *LPARGB;
@@ -42,7 +44,11 @@ typedef struct AHSV
 // HSV max value
 #define COLOR_MAX_VALUE 100
 
-namespace Color {
+//
+bool ParseColor(LPCTSTR color, IColorVal **target);
+
+namespace Color
+{
     // Conversion functions
     ARGB RGBToARGB(int red, int green, int blue);
     ARGB ARGBToARGB(int alpha, int red, int green, int blue);
@@ -61,7 +67,8 @@ namespace Color {
     ARGB Mix(ARGB color1, ARGB color2, float weight);
 
     // Parsing
-    ARGB Parse(LPCTSTR colorString, ARGB defaultValue);
+    IColorVal* Parse(LPCTSTR colorString, const IColorVal* defaultValue);
+    std::unique_ptr<IColorVal> Create(ARGB value);
 
     // Holds a known color
     typedef struct KnownColor

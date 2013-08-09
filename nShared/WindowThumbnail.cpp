@@ -132,13 +132,13 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
     defaults.alwaysOnTop = true;
     
     StateSettings defaultState;
-    defaultState.backgroundBrush.color = 0xAA009900;
-    defaultState.textBrush.color = 0xFF000000;
+    defaultState.backgroundBrush.color = Color::Create(0xAA009900);
+    defaultState.textBrush.color = Color::Create(0xFF000000);
     defaultState.textOffsetTop = 2;
     defaultState.textOffsetBottom = 2;
     defaultState.textOffsetRight = 2;
     defaultState.textOffsetLeft = 2;
-    defaultState.outlineBrush.color = 0xAAFFFFFF;
+    defaultState.outlineBrush.color = Color::Create(0xAAFFFFFF);
     defaultState.outlineWidth = 2.0f;
 
     mWindow->Initialize(&defaults,  &defaultState);

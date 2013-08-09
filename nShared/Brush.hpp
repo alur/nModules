@@ -37,6 +37,9 @@ public:
     // Updates the brush to the new position of the window.
     void UpdatePosition(D2D1_RECT_F position);
 
+    //
+    bool UpdateDWMColor(ARGB newColor, ID2D1RenderTarget *renderTarget);
+
     // The brush.
     ID2D1Brush *brush;
 
@@ -57,7 +60,7 @@ public:
     void ComputeEdgeData(D2D1_SIZE_F size);
 
 public:
-    void SetColor(ARGB color); 
+    void SetColor(const IColorVal *color); 
     void SetImage(ID2D1RenderTarget *renderTarget, LPCTSTR path); 
     BrushSettings *GetBrushSettings();
 
@@ -111,6 +114,9 @@ private:
 
     // The gradient stops.
     D2D1_GRADIENT_STOP* gradientStops;
+    
+    //
+    IColorVal** gradientStopColors;
 
     // The number of gradient stops we have.
     UINT gradientStopCount;

@@ -7,6 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 #include <d2d1.h>
+#include "Color.h"
 
 class IPainter {
 public:
@@ -21,4 +22,7 @@ public:
 
     //
     virtual void UpdatePosition(D2D1_RECT_F parentPosition) = 0;
+
+    //
+    virtual bool UpdateDWMColor(ARGB newColor, ID2D1RenderTarget* renderTarget) = 0;
 };

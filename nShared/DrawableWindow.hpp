@@ -281,6 +281,10 @@ private:
     // Sends a message to every child window, all the way down the tree.
     void SendToAll(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
+    // Called when the DWM color has changed. Windows should invalidate
+    // if appropriate, but not update, in response to this.
+    bool UpdateDWMColor(ARGB newColor);
+
 private:
     //
     void Animate();

@@ -23,6 +23,7 @@ public:
     void DiscardDeviceResources() override;
     HRESULT ReCreateDeviceResources(ID2D1RenderTarget *renderTarget) override;
     void UpdatePosition(D2D1_RECT_F parentPosition) override;
+    bool UpdateDWMColor(ARGB newColor, ID2D1RenderTarget* renderTarget) override;
 
     //
 public:

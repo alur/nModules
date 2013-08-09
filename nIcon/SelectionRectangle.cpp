@@ -82,6 +82,16 @@ void SelectionRectangle::UpdatePosition(D2D1_RECT_F /* parentPosition */)
 
 
 /// <summary>
+/// IPaintable::UpdateDWMColor
+/// Called when the DWM color has changed. Returns true if this Paintable is currently using the DWM color.
+/// </summary>
+bool SelectionRectangle::UpdateDWMColor(ARGB newColor, ID2D1RenderTarget* renderTarget)
+{
+    return mBackBrush.UpdateDWMColor(newColor, renderTarget);
+}
+
+
+/// <summary>
 ///
 /// </summary>
 void SelectionRectangle::Init(Settings *parentSettings)
@@ -93,12 +103,12 @@ void SelectionRectangle::Init(Settings *parentSettings)
     mOutlineWidth = outlineSettings->GetFloat(_T("Width"),  0.5f);
 
     BrushSettings backDefaults;
-    backDefaults.color = 0x887777EE;
+    backDefaults.color = Color::Create(0x887777EE);
     mBackBrushSettings.Load(settings, &backDefaults);
     mBackBrush.Load(&mBackBrushSettings);
 
     BrushSettings outlineDefaults;
-    outlineDefaults.color = 0xDDFFFFFF;
+    outlineDefaults.color = Color::Create(0xDDFFFFFF);
     mOutlineBrushSettings.Load(outlineSettings, &outlineDefaults);
     mOutlineBrush.Load(&mOutlineBrushSettings);
 

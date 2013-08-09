@@ -134,3 +134,9 @@ ID2D1BitmapBrush *Overlay::GetBrush() {
 int Overlay::GetZOrder() {
     return this->zOrder;
 }
+
+
+bool Overlay::UpdateDWMColor(ARGB, ID2D1RenderTarget*)
+{
+    return false;
+}

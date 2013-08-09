@@ -21,6 +21,7 @@ Brush::Brush()
     this->brushType = Type::SolidColor;
     this->brush = nullptr;
     this->gradientStops = nullptr;
+    this->gradientStopColors = nullptr;
     this->gradientStopCount = 0;
 }
 
@@ -28,6 +29,11 @@ Brush::Brush()
 Brush::~Brush()
 {
     Discard();
+    for (int i = 0; i < this->gradientStopCount; ++i)
+    {
+        delete this->gradientStopColors[i];
+    }
+    SAFEFREE(this->gradientStopColors);
     SAFEFREE(this->gradientStops);
 }
 
@@ -121,23 +127,28 @@ void Brush::LoadGradientStops()
 
     using namespace LiteStep;
 
+    std::unique_ptr<IColorVal> defaultColor = Color::Create(0xFF000000);
+
     while (GetToken(colorPointer, colorToken, &colorPointer, FALSE) != FALSE && GetToken(stopPointer, stopToken, &stopPointer, FALSE) != FALSE)
     {
         float stop;
         LPTSTR endPtr;
 
-        ARGB color = ParseColor(colorToken, 0xFF000000);
+        IColorVal *color = ParseColor(colorToken, defaultColor.get());
         stop = (float)_tcstod(stopToken, &endPtr);
 
         this->gradientStops = (D2D1_GRADIENT_STOP*)realloc(this->gradientStops, ++this->gradientStopCount*sizeof(D2D1_GRADIENT_STOP));
-        this->gradientStops[this->gradientStopCount-1].color = Color::ARGBToD2D(color);
-        this->gradientStops[this->gradientStopCount-1].position = stop;
+        this->gradientStopColors = (IColorVal**)realloc(this->gradientStopColors, this->gradientStopCount*sizeof(IColorVal*));
+        this->gradientStopColors[this->gradientStopCount - 1] = color;
+        this->gradientStops[this->gradientStopCount - 1].color = Color::ARGBToD2D(color->Evaluate());
+        this->gradientStops[this->gradientStopCount - 1].position = stop;
     }
 }
 
 
 //
-void Brush::Discard() {
+void Brush::Discard()
+{
     SAFERELEASE(this->brush);
 }
 
@@ -155,7 +166,7 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget)
         {
         case Type::SolidColor:
             {
-                renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->brushSettings->color), (ID2D1SolidColorBrush**)&this->brush);
+                renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->brushSettings->color->Evaluate()), (ID2D1SolidColorBrush**)&this->brush);
             }
             break;
 
@@ -414,6 +425,46 @@ void Brush::UpdatePosition(D2D1_RECT_F position)
 }
 
 
+bool Brush::UpdateDWMColor(ARGB newColor, ID2D1RenderTarget *renderTarget)
+{
+    bool ret = false;
+
+    switch (this->brushType)
+    {
+    case Type::SolidColor:
+        {
+            if (!this->brushSettings->color->IsConstant() && this->brush)
+            {
+                ((ID2D1SolidColorBrush*) this->brush)->SetColor(Color::ARGBToD2D(this->brushSettings->color->Evaluate(newColor)));
+                ret = true;
+            }
+        }
+        break;
+
+    case Type::LinearGradient:
+    case Type::RadialGradient:
+        {
+            for (int i = 0; i < this->gradientStopCount; ++i)
+            {
+                if (!this->gradientStopColors[i]->IsConstant())
+                {
+                    this->gradientStops[i].color = Color::ARGBToD2D(this->gradientStopColors[i]->Evaluate(newColor));
+                    ret = true;
+                }
+            }
+
+            if (ret)
+            {
+                ReCreate(renderTarget);
+            }
+        }
+        break;
+    }
+
+    return ret;
+}
+
+
 HRESULT Brush::LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2D1Brush **brush)
 {
     IWICImagingFactory* factory = NULL;
@@ -454,24 +505,24 @@ HRESULT Brush::LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2
 }
 
 
-void Brush::SetColor(ARGB color)
+void Brush::SetColor(const IColorVal *color)
 {
-    this->brushSettings->color = color;
+    this->brushSettings->color = std::unique_ptr<IColorVal>(color->Copy());
     if (this->brushType == Type::SolidColor)
     {
         if (this->brush)
         {
-            ((ID2D1SolidColorBrush*) this->brush)->SetColor(Color::ARGBToD2D(color));
+            ((ID2D1SolidColorBrush*) this->brush)->SetColor(Color::ARGBToD2D(this->brushSettings->color->Evaluate()));
         }
     }
 }
 
 
-void Brush::SetImage(ID2D1RenderTarget* renderTarget, LPCTSTR path)
+void Brush::SetImage(ID2D1RenderTarget *renderTarget, LPCTSTR path)
 {
     this->brushSettings->image = StringUtils::ReallocOverwrite(this->brushSettings->image, path);
 
-    if (this->brushType == Type::Image && renderTarget)
+    if (this->brushType == Type::Image && renderTarget != nullptr)
     {
         ID2D1Brush *tempBrush;
         if (SUCCEEDED(LoadImageFile(renderTarget, path, &tempBrush)))

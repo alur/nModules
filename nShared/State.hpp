@@ -18,7 +18,6 @@ public:
     virtual ~State();
 
     void Load(StateSettings* defaultSettings);
-    void UpdatePosition(D2D1_RECT_F position);
     StateSettings* GetSettings();
         
     // Gets the "desired" size for a given width and height.
@@ -29,6 +28,8 @@ public:
     void DiscardDeviceResources() override;
     void Paint(ID2D1RenderTarget* renderTarget) override;
     HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) override;
+    void UpdatePosition(D2D1_RECT_F position) override;
+    bool UpdateDWMColor(ARGB newColor, ID2D1RenderTarget* renderTarget) override;
 
     // IBrushOwner
 public:

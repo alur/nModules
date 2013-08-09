@@ -11,6 +11,7 @@
 #include "../nShared/LSModule.hpp"
 #include "Taskbar.hpp"
 #include "../Utilities/Math.h"
+#include "../nShared/DWMColorVal.hpp"
 
 
 /// <summary>
@@ -29,8 +30,7 @@ Taskbar::Taskbar(LPCTSTR name) : Drawable(name) {
     drawableDefaults.height = 36;
 
     StateSettings stateDefaults;
-    BOOL b = FALSE;
-    DwmGetColorizationColor(&stateDefaults.backgroundBrush.color, &b);
+    stateDefaults.backgroundBrush.color = std::unique_ptr<IColorVal>(new DWMColorVal());
     
     mWindow->Initialize(&drawableDefaults, &stateDefaults);
     mWindow->Show();

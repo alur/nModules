@@ -36,7 +36,7 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
     defaults.height = height;
 
     StateSettings stateDefaults;
-    stateDefaults.backgroundBrush.color = 0x00000000;
+    stateDefaults.backgroundBrush.color = Color::Create(0x00000000);
 
     mWindow->Initialize(&defaults, &stateDefaults);
     mWindow->Show();
@@ -93,18 +93,18 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
 
     //
     StateSettings hoverDefaults(stateDefaults);
-    hoverDefaults.backgroundBrush.color = 0xCC888888;
+    hoverDefaults.backgroundBrush.color = Color::Create(0xCC888888);
     this->stateHover = mWindow->AddState(L"Hover", 100, &hoverDefaults);
 
     //
     StateSettings selectedDefaults(stateDefaults);
-    selectedDefaults.outlineBrush.color = 0xFFFFFFFF;
+    selectedDefaults.outlineBrush.color = Color::Create(0xFFFFFFFF);
     selectedDefaults.outlineWidth = 2.5f;
     this->stateSelected = mWindow->AddState(L"Selected", 150, &selectedDefaults);
 
     //
     StateSettings selectedHoverDefaults(hoverDefaults);
-    selectedHoverDefaults.outlineBrush.color = 0xFFFFFFFF;
+    selectedHoverDefaults.outlineBrush.color = Color::Create(0xFFFFFFFF);
     selectedHoverDefaults.outlineWidth = 2.5f;
     this->stateSelectedHover = mWindow->AddState(L"SelectedHover", 200, &selectedHoverDefaults);
 
@@ -115,7 +115,7 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
     iconDefaults.alwaysOnTop = true;
 
     StateSettings iconStateDefaults;
-    iconStateDefaults.backgroundBrush.color = 0;
+    iconStateDefaults.backgroundBrush.color = Color::Create(0x00000000);
     
     RECT r;
     mWindow->GetScreenRect(&r);

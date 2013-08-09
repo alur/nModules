@@ -21,8 +21,8 @@ InfoItem::InfoItem(Drawable* parent, LPCTSTR title, LPCTSTR customIcon) : PopupI
     defaults.evaluateText = true;
 
     StateSettings defaultState;
-    defaultState.backgroundBrush.color = 0xAAFF00FF;
-    defaultState.textBrush.color = 0xFF000000;
+    defaultState.backgroundBrush.color = Color::Create(0xAAFF00FF);
+    defaultState.textBrush.color = Color::Create(0xFF000000);
     defaultState.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
     defaultState.textOffsetLeft = 20;
     defaultState.textOffsetRight = 5;

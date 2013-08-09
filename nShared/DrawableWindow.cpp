@@ -730,11 +730,28 @@ LRESULT WINAPI DrawableWindow::HandleMessage(HWND window, UINT msg, WPARAM wPara
         }
         return 0;
 
+    case WM_DWMCOLORIZATIONCOLORCHANGED:
+        {
+            // When the intensity is really high, the alpha drops to 0 :/
+            if (wParam >> 24 == 0 && wParam != 0)
+            {
+                wParam |= 0xFF000000;
+            }
+
+            if (UpdateDWMColor(ARGB(wParam)))
+            {
+                UpdateWindow(this->window);
+            }
+        }
+        return 0;
+
     case WM_WINDOWPOSCHANGING:
         {
-            if (this->drawingSettings->alwaysOnTop) {
+            if (this->drawingSettings->alwaysOnTop)
+            {
                 LPWINDOWPOS windowPos = LPWINDOWPOS(lParam);
-                if (!mCoveredByFullscreen) {
+                if (!mCoveredByFullscreen)
+                {
                     windowPos->hwndInsertAfter = HWND_TOPMOST;
                 }
             }
@@ -783,7 +800,8 @@ void DrawableWindow::Hide()
 /// </summary>
 /// <param name="defaultSettings">The default settings for this window.</param>
 /// <param name="baseStateDefaults">The default settings for the base state.</param>
-void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings* baseStateDefaults) {
+void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings* baseStateDefaults)
+{
     // Load settings.
     this->drawingSettings->Load(this->settings, defaultSettings);
 
@@ -791,7 +809,8 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings
     this->baseState->Load(baseStateDefaults);
 
     // Register with the core.
-    if (this->drawingSettings->registerWithCore) {
+    if (this->drawingSettings->registerWithCore)
+    {
         nCore::System::RegisterWindow(this->settings->GetPrefix(), this);
     }
 
@@ -803,7 +822,8 @@ void DrawableWindow::Initialize(DrawableSettings* defaultSettings, StateSettings
     ReCreateDeviceResources();
 
     // AlwaysOnTop
-    if (!mIsChild && this->drawingSettings->alwaysOnTop) {
+    if (!mIsChild && this->drawingSettings->alwaysOnTop)
+    {
         ::SetParent(this->window, nullptr);
         SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
     }
@@ -1067,14 +1087,20 @@ void DrawableWindow::RemoveOverlay(OVERLAY overlay) {
 /// Repaints the window.
 /// </summary>
 /// <param name="region">The area of the window to repaint. If NULL, the whole window is repainted.</param>
-void DrawableWindow::Repaint(LPRECT region) {
-    if (this->initialized && this->visible) {
-        if (mIsChild) {
-            if (mParent != nullptr) {
-                if (region != nullptr) {
+void DrawableWindow::Repaint(LPRECT region)
+{
+    if (this->initialized && this->visible)
+    {
+        if (mIsChild)
+        {
+            if (mParent != nullptr)
+            {
+                if (region != nullptr)
+                {
                     mParent->Repaint(region);
                 }
-                else {
+                else
+                {
                     RECT r = { (LONG)drawingArea.left, (LONG)drawingArea.top, (LONG)drawingArea.right, (LONG)drawingArea.bottom };
                     mParent->Repaint(&r);
                 }
@@ -1193,6 +1219,42 @@ void DrawableWindow::SendToAll(HWND window, UINT msg, WPARAM wParam, LPARAM lPar
     for (DrawableWindow *child : this->children) {
         child->SendToAll(window, msg, wParam, lParam, data);
     }
+}
+
+// Called when the DWM color has changed. Windows should invalidate
+// if appropriate, but not update, in response to this.
+bool DrawableWindow::UpdateDWMColor(ARGB newColor)
+{
+    bool ret = false;
+
+    // It's important that ret is on the right hand side, to prevent short-circuiting
+    for (IPainter *painter : this->prePainters)
+    {
+        ret = painter->UpdateDWMColor(newColor, this->renderTarget) || ret;
+    }
+
+    for (State *state : this->states)
+    {
+        ret = state->UpdateDWMColor(newColor, this->renderTarget) || ret;
+    }
+    
+    for (IPainter *painter : this->postPainters) 
+    {
+        ret = painter->UpdateDWMColor(newColor, this->renderTarget) || ret;
+    }
+
+    if (ret)
+    {
+        RECT r = { (LONG)drawingArea.left, (LONG)drawingArea.top, (LONG)drawingArea.right, (LONG)drawingArea.bottom };
+        InvalidateRect(this->window, &r, TRUE);
+    }
+
+    for (DrawableWindow *child : this->children)
+    {
+        ret = child->UpdateDWMColor(newColor) || ret;
+    }
+
+    return ret;
 }
 
 

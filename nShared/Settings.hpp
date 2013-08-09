@@ -37,7 +37,7 @@ private:
 public:
     bool GetBool(LPCTSTR key, bool defaultValue) const;
     void SetBool(LPCTSTR key, bool value) const;
-    ARGB GetColor(LPCTSTR key, ARGB defaultValue) const;
+    IColorVal* GetColor(LPCTSTR key, const IColorVal* defaultValue) const;
     void SetColor(LPCTSTR key, ARGB value) const;
     double GetDouble(LPCTSTR key, double defaultValue) const;
     void SetDouble(LPCTSTR key, double value) const;

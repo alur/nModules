@@ -35,8 +35,8 @@ void nPopup::FolderItem::Init(LPCTSTR title, Popup* popup) {
     defaults.height = 20;
 
     StateSettings defaultState;
-    defaultState.backgroundBrush.color = 0xAA00FFFF;
-    defaultState.textBrush.color = 0xFF000000;
+    defaultState.backgroundBrush.color = Color::Create(0xAA00FFFF);
+    defaultState.textBrush.color = Color::Create(0xFF000000);
     defaultState.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
     defaultState.textOffsetLeft = 20;
     defaultState.textOffsetRight = 5;

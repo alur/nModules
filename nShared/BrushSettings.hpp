@@ -10,6 +10,7 @@
 #include <d2d1.h>
 #include <dwrite.h>
 #include "Settings.hpp"
+#include <memory>
 
 class BrushSettings
 {
@@ -25,7 +26,7 @@ public:
     TCHAR brushType[32];
 
     // The color of a SolidColor brush. Default: 0xFF000000 (black)
-    ARGB color;
+    std::unique_ptr<IColorVal> color;
 
     // The colors to use in a gradient. Default: black
     LPTSTR gradientColors;

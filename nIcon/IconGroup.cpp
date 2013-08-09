@@ -67,7 +67,7 @@ IconGroup::IconGroup(LPCTSTR prefix) : Drawable(prefix) {
     defaults.height = 300;
 
     StateSettings defaultState;
-    defaultState.backgroundBrush.color = 0x00000000;
+    defaultState.backgroundBrush.color = Color::Create(0x00000000);
 
     mSelectionRectagle.Init(mSettings);
 
@@ -194,6 +194,7 @@ void IconGroup::AddNameFilter(LPCWSTR name) {
 void IconGroup::SetFolder(LPWSTR folder) {
     PIDLIST_RELATIVE idList, idNext;
     IEnumIDList* enumIDList;
+    StopWatch stopWatch;
 
     // Just in case we are switching folders, deregister for old notifications
     if (mChangeNotifyUID != 0) {
@@ -215,7 +216,8 @@ void IconGroup::SetFolder(LPWSTR folder) {
 
     // Enumerate the contents of this folder
     mWorkingFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList);
-    while (enumIDList->Next(1, &idNext, NULL) != S_FALSE) {
+    while (enumIDList->Next(1, &idNext, NULL) != S_FALSE)
+    {
         AddIcon(idNext, true);
     }
     enumIDList->Release();
@@ -235,6 +237,8 @@ void IconGroup::SetFolder(LPWSTR folder) {
     // Let go fo the PIDLists
     CoTaskMemFree(idList);
     CoTaskMemFree(idNext);
+
+    TRACE("IconGroup::SetFolder took %.5fs", stopWatch.Clock());
 }
 
 

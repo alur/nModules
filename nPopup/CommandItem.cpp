@@ -38,8 +38,8 @@ void CommandItem::Init(LPCTSTR title, LPCTSTR command) {
     defaults.height = 20;
 
     StateSettings defaultState;
-    defaultState.backgroundBrush.color = 0xAAFFFF00;
-    defaultState.textBrush.color = 0xFF000000;
+    defaultState.backgroundBrush.color = Color::Create(0xAAFFFF00);
+    defaultState.textBrush.color = Color::Create(0xFF000000);
     defaultState.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
     defaultState.textOffsetLeft = 20;
     defaultState.textOffsetRight = 5;

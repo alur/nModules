@@ -22,7 +22,7 @@ namespace LiteStep
 
     // Fetching of prefixed data types
     bool GetPrefixedRCBool(LPCTSTR prefix, LPCTSTR keyName, bool defaultValue);
-    ARGB GetPrefixedRCColor(LPCTSTR prefix, LPCTSTR keyName, ARGB defaultValue);
+    IColorVal* GetPrefixedRCColor(LPCTSTR prefix, LPCTSTR keyName, const IColorVal* defaultValue);
     double GetPrefixedRCDouble(LPCTSTR prefix, LPCTSTR keyName, double defaultValue);
     float GetPrefixedRCFloat(LPCTSTR prefix, LPCTSTR keyName, float defaultValue);
     int GetPrefixedRCInt(LPCTSTR prefix, LPCTSTR keyName, int defaultValue);
@@ -38,7 +38,7 @@ namespace LiteStep
 
     // Parsing functions
     bool ParseBool(LPCTSTR boolString);
-    ARGB ParseColor(LPCTSTR colorString, ARGB defaultValue);
+    IColorVal* ParseColor(LPCTSTR colorString, const IColorVal* defaultValue);
     Coordinate ParseCoordinate(LPCTSTR coordinateString, Coordinate defaultValue);
     Length ParseLength(LPCTSTR lengthString, Length defaultValue);
     UINT ParseMonitor(LPCTSTR monitorString, UINT defaultValue);
