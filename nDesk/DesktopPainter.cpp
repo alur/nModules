@@ -440,7 +440,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
 
     // Load the desktop background
     Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&pWICFactory));
-    if (SUCCEEDED(hr = pWICFactory->CreateDecoderFromFilename(wszWallpaperPath, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder))) {
+    if (SUCCEEDED(hr = pWICFactory->CreateDecoderFromFilename(wszWallpaperPath, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pDecoder))) {
         // Get the first frame of the wallpaper
         pDecoder->GetFrame(0, &pSource);
 
