@@ -14,6 +14,7 @@
     <ClInclude Include="Versioning.h" />
     <ClInclude Include="UIDGenerator.hpp" />
     <ClInclude Include="FileIterator.hpp" />
+    <ClInclude Include="Error.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StringUtils.cpp" />
@@ -25,5 +26,6 @@
     <ClCompile Include="Versioning.cpp" />
     <ClCompile Include="FileIterator.cpp" />
     <ClCompile Include="FileIteratorIterator.cpp" />
+    <ClCompile Include="Error.cpp" />
   </ItemGroup>
 </Project>

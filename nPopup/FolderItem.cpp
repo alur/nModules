@@ -11,21 +11,24 @@
 #include "../nShared/LSModule.hpp"
 
 
-nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, LPCTSTR customIcon) : PopupItem(parent, L"FolderItem") {
+nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, LPCTSTR customIcon) : PopupItem(parent, L"FolderItem")
+{
     Init(title, popup);
     ParseDotIcon(customIcon);
     mWindow->Show();
 }
 
 
-nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, HICON icon) : PopupItem(parent, L"FolderItem") {
+nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, HICON icon) : PopupItem(parent, L"FolderItem")
+{
     Init(title, popup);
     AddIcon(icon);
     mWindow->Show();
 }
 
 
-void nPopup::FolderItem::Init(LPCTSTR title, Popup* popup) {
+void nPopup::FolderItem::Init(LPCTSTR title, Popup* popup)
+{
     this->title = _tcsdup(title);
     this->popup = popup;
     this->itemType = PopupItemType::FOLDER;
@@ -49,27 +52,33 @@ void nPopup::FolderItem::Init(LPCTSTR title, Popup* popup) {
 }
 
 
-nPopup::FolderItem::~FolderItem() {
-    if (this->popup != NULL) {
+nPopup::FolderItem::~FolderItem()
+{
+    if (this->popup != NULL)
+    {
         delete this->popup;
     }
     free((LPVOID)this->title);
 }
 
 
-int nPopup::FolderItem::GetDesiredWidth(int maxWidth) {
+int nPopup::FolderItem::GetDesiredWidth(int maxWidth)
+{
     SIZE s;
     mWindow->GetDesiredSize(maxWidth, mWindow->GetDrawingSettings()->height, &s);
     return s.cx;
 }
 
 
-LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
-    switch (msg) {
+LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID)
+{
+    switch (msg)
+    {
     case WM_MOUSEMOVE:
         {
             mWindow->ActivateState(this->hoverState);
-            if (this->popup != NULL) {
+            if (this->popup != NULL)
+            {
                 RECT r;
                 mWindow->GetScreenRect(&r);
                 ((Popup*)mParent)->OpenChild(this->popup, &r, this);
@@ -91,7 +100,8 @@ LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, 
 /// <summary>
 /// Called by the parent when it is closing the popup for whatever reason.
 /// </summary>
-void nPopup::FolderItem::ClosingPopup() {
+void nPopup::FolderItem::ClosingPopup()
+{
     mWindow->ClearState(this->openState);
 }
 
@@ -99,6 +109,7 @@ void nPopup::FolderItem::ClosingPopup() {
 /// <summary>
 /// 
 /// </summary>
-Popup* nPopup::FolderItem::GetPopup() {
+Popup* nPopup::FolderItem::GetPopup()
+{
     return this->popup;
 }

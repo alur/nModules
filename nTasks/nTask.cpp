@@ -10,7 +10,6 @@
 #include "Constants.h"
 #include "nTask.h"
 #include "Taskbar.hpp"
-#include "TestWindow.hpp"
 #include "Version.h"
 #include "WindowManager.h"
 
@@ -26,6 +25,9 @@ const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
 
 // All the taskbars we currently have loaded
 map<tstring, Taskbar*> gTaskbars;
+
+//
+void CreateTestWindow();
 
 
 /// <summary>
@@ -47,8 +49,9 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
     WindowManager::Start();
 
     // Register a bang command for creating our test window
-    LiteStep::AddBangCommand(_T("!nTaskTestWindow"), [] (HWND, LPCTSTR) -> void {
-        TestWindow::CreateTestWindow();
+    LiteStep::AddBangCommand(_T("!nTaskTestWindow"), [] (HWND, LPCTSTR) -> void
+    {
+        CreateTestWindow();
     });
 
     return 0;

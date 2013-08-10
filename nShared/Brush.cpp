@@ -444,7 +444,7 @@ bool Brush::UpdateDWMColor(ARGB newColor, ID2D1RenderTarget *renderTarget)
     case Type::LinearGradient:
     case Type::RadialGradient:
         {
-            for (int i = 0; i < this->gradientStopCount; ++i)
+            for (UINT i = 0; i < this->gradientStopCount; ++i)
             {
                 if (!this->gradientStopColors[i]->IsConstant())
                 {

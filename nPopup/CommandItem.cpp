@@ -73,6 +73,12 @@ LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM 
         }
         return 0;
 
+    case WM_RBUTTONDOWN:
+        {
+
+        }
+        return 0;
+
     case WM_MOUSEMOVE:
         {
             mWindow->ActivateState(this->hoverState);

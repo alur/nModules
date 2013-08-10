@@ -13,13 +13,15 @@
 using std::vector;
 using std::string;
 
-namespace TrayManager {
-    typedef struct {
+namespace TrayManager
+{
+    typedef struct TRAYICONDATA
+    {
         vector<TrayIcon*>* icons;
         GUID guidItem;
         UINT uID;
         HWND hwnd;
-    } TRAYICONDATA, *LPTRAYICONDATA;
+    } *LPTRAYICONDATA;
 
     typedef vector<LPTRAYICONDATA>::iterator TRAYICONDATAITER;
     typedef map<std::tstring, Tray*>::const_iterator TRAYSCITER;

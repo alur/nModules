@@ -154,6 +154,7 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="Debugging.h" />
     <ClInclude Include="EnumArray.hpp" />
+    <ClInclude Include="Error.h" />
     <ClInclude Include="FileIterator.hpp" />
     <ClInclude Include="GUID.h" />
     <ClInclude Include="Macros.h" />
@@ -167,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging.cpp" />
+    <ClCompile Include="Error.cpp" />
     <ClCompile Include="FileIterator.cpp" />
     <ClCompile Include="FileIteratorIterator.cpp" />
     <ClCompile Include="GUID.cpp" />

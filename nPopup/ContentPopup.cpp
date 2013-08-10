@@ -14,21 +14,24 @@
 #include <algorithm>
 
 
-ContentPopup::ContentPopup(ContentSource source, LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Popup(title, bang, prefix) {
+ContentPopup::ContentPopup(ContentSource source, LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Popup(title, bang, prefix)
+{
     this->loaded = false;
     this->dynamic = true;
     this->source = source;
 }
 
 
-ContentPopup::ContentPopup(LPCTSTR path, bool dynamic, LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Popup(title, bang, prefix) {
+ContentPopup::ContentPopup(LPCTSTR path, bool dynamic, LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Popup(title, bang, prefix)
+{
     this->loaded = false;
     this->dynamic = dynamic;
     this->source = ContentSource::PATH;
 
     TCHAR processedPath[MAX_PATH], originalPath[MAX_PATH];
     LPCTSTR splitter, end = _tcschr(path, L'\0');
-    do {
+    do
+    {
         splitter = _tcschr(path, L'|');
         StringCchCopyN(originalPath, MAX_PATH, path, (splitter != nullptr ? splitter : end) - path);
         PathCanonicalize(processedPath, originalPath);
@@ -40,23 +43,28 @@ ContentPopup::ContentPopup(LPCTSTR path, bool dynamic, LPCTSTR title, LPCTSTR ba
 }
 
 
-ContentPopup::~ContentPopup() {
-    for (WATCHFOLDERMAP::const_iterator iter = this->watchedFolders.begin(); iter != this->watchedFolders.end(); ++iter) {
+ContentPopup::~ContentPopup()
+{
+    for (WATCHFOLDERMAP::const_iterator iter = this->watchedFolders.begin(); iter != this->watchedFolders.end(); ++iter)
+    {
         iter->second.second->Release();
         mWindow->ReleaseUserMessage(iter->first);
         SHChangeNotifyDeregister(iter->second.first);
     }
     this->watchedFolders.clear();
 
-    for (list<LPCTSTR>::const_iterator iter = this->paths.begin(); iter != this->paths.end(); ++iter) {
+    for (list<LPCTSTR>::const_iterator iter = this->paths.begin(); iter != this->paths.end(); ++iter)
+    {
         free((LPVOID)*iter);
     }
     this->paths.clear();
 }
 
 
-void ContentPopup::PreShow() {
-    if (!this->loaded) {
+void ContentPopup::PreShow()
+{
+    if (!this->loaded)
+    {
         LoadContent();
         std::sort(this->items.begin(), this->items.end(), [] (PopupItem* a, PopupItem* b) { return a->CompareTo(b); });
         this->loaded = true;
@@ -64,16 +72,20 @@ void ContentPopup::PreShow() {
 }
 
 
-void ContentPopup::PostClose() {
-    if (this->dynamic) {
-        for (WATCHFOLDERMAP::const_iterator iter = this->watchedFolders.begin(); iter != this->watchedFolders.end(); ++iter) {
+void ContentPopup::PostClose()
+{
+    if (this->dynamic)
+    {
+        for (WATCHFOLDERMAP::const_iterator iter = this->watchedFolders.begin(); iter != this->watchedFolders.end(); ++iter)
+        {
             iter->second.second->Release();
             mWindow->ReleaseUserMessage(iter->first);
             SHChangeNotifyDeregister(iter->second.first);
         }
         this->watchedFolders.clear();
 
-        for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); ++iter) {
+        for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); ++iter)
+        {
             delete *iter;
         }
         this->items.clear();
@@ -83,22 +95,26 @@ void ContentPopup::PostClose() {
 }
 
 
-void ContentPopup::AddPath(LPCTSTR path) {
+void ContentPopup::AddPath(LPCTSTR path)
+{
     TCHAR processedPath[MAX_PATH];
 
     PathCanonicalize(processedPath, path);
     PathRemoveBackslash(processedPath);
     this->paths.push_back(_tcsdup(processedPath));
 
-    if (this->loaded) {
+    if (this->loaded)
+    {
         LoadPath(processedPath);
         std::sort(this->items.begin(), this->items.end(), [] (PopupItem* a, PopupItem* b) { return a->CompareTo(b); });
     }
 }
 
 
-void ContentPopup::LoadContent() {
-    switch (this->source) {
+void ContentPopup::LoadContent()
+{
+    switch (this->source)
+    {
     case ADMIN_TOOLS:
         LoadShellFolder(FOLDERID_AdminTools);
         break;
@@ -116,7 +132,8 @@ void ContentPopup::LoadContent() {
         break;
     
     case PATH:
-        for (list<LPCTSTR>::const_iterator iter = paths.begin(); iter != paths.end(); ++iter) {
+        for (list<LPCTSTR>::const_iterator iter = paths.begin(); iter != paths.end(); ++iter)
+        {
             LoadPath(*iter);
         }
         break;
@@ -146,7 +163,8 @@ void ContentPopup::LoadContent() {
 }
 
 
-void ContentPopup::LoadShellFolder(GUID folder, bool dontExpandFolders) {
+void ContentPopup::LoadShellFolder(GUID folder, bool dontExpandFolders)
+{
     PIDLIST_ABSOLUTE idList;
     IShellFolder *targetFolder, *rootFolder;
 
@@ -159,13 +177,15 @@ void ContentPopup::LoadShellFolder(GUID folder, bool dontExpandFolders) {
     //
     LoadFromIDList(targetFolder, idList, dontExpandFolders);
 
-    if (idList != NULL) {
+    if (idList != NULL)
+    {
         CoTaskMemFree(idList);
     }
 }
 
 
-void ContentPopup::LoadPath(LPCTSTR path) {
+void ContentPopup::LoadPath(LPCTSTR path)
+{
     PIDLIST_ABSOLUTE idList = NULL;
     IShellFolder *targetFolder, *rootFolder;
 
@@ -177,23 +197,28 @@ void ContentPopup::LoadPath(LPCTSTR path) {
     
     LoadFromIDList(targetFolder, idList, false);
 
-    if (idList != NULL) {
+    if (idList != NULL)
+    {
         CoTaskMemFree(idList);
     }
 }
 
 
-void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE idList, bool dontExpandFolders) {
+void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE idList, bool dontExpandFolders)
+{
     PIDLIST_RELATIVE idNext = NULL;
     IEnumIDList* enumIDList;
 
-    if (targetFolder == NULL || idList == NULL) {
+    if (targetFolder == NULL || idList == NULL)
+    {
         return;
     }
 
     // Enumerate the contents of this folder
-    if (SUCCEEDED(targetFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList))) {
-        while (enumIDList->Next(1, &idNext, NULL) != S_FALSE) {
+    if (SUCCEEDED(targetFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList)))
+    {
+        while (enumIDList->Next(1, &idNext, NULL) != S_FALSE)
+        {
             LoadSingleItem(targetFolder, idNext, dontExpandFolders);
             CoTaskMemFree(idNext);
         }
@@ -216,7 +241,8 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
 }
 
 
-void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE itemID, bool dontExpandFolders) {
+void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE itemID, bool dontExpandFolders)
+{
     STRRET ret;
     LPTSTR name, command;
     IExtractIconW* extractIcon;
@@ -227,9 +253,11 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
     PopupItem* item; 
     vector<PopupItem*>::const_iterator iter;
 
-    if (SUCCEEDED(targetFolder->GetDisplayNameOf(itemID, SHGDN_NORMAL, &ret))) {
+    if (SUCCEEDED(targetFolder->GetDisplayNameOf(itemID, SHGDN_NORMAL, &ret)))
+    {
         StrRetToStr(&ret, NULL, &name);
-        if (SUCCEEDED(targetFolder->GetDisplayNameOf(itemID, SHGDN_FORPARSING, &ret))) {
+        if (SUCCEEDED(targetFolder->GetDisplayNameOf(itemID, SHGDN_FORPARSING, &ret)))
+        {
             StrRetToStr(&ret, NULL, &command);
 
             // 
@@ -237,31 +265,38 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
             hr = targetFolder->GetAttributesOf(1, (LPCITEMIDLIST *)&itemID, &attributes);
             openable = SUCCEEDED(hr) && !dontExpandFolders && (((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE));
 
-            if (openable) {
+            if (openable)
+            {
                 for (iter = this->items.begin(); iter != this->items.end() && !(*iter)->CheckMerge(name); ++iter);
-                if (iter != this->items.end()) {
+                if (iter != this->items.end())
+                {
                     item = NULL;
                     ((ContentPopup*)((nPopup::FolderItem*)*iter)->GetPopup())->AddPath(command);
                 }
-                else {
+                else
+                {
                     item = new nPopup::FolderItem(this, name, new ContentPopup(command, this->dynamic, name, NULL, mSettings->GetPrefix()));
                 }
             }
-            else {
+            else
+            {
                 StringCchPrintf(quotedCommand, sizeof(quotedCommand), L"\"%s\"", command);
                 item = new CommandItem(this, name, quotedCommand);
             }
 
-            if (!this->noIcons && item != NULL) {
+            if (!this->noIcons && item != NULL)
+            {
                 // Get the IExtractIcon interface for this item.
                 hr = targetFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&itemID, IID_IExtractIconW, NULL, reinterpret_cast<LPVOID*>(&extractIcon));
 
-                if (SUCCEEDED(hr)) {
+                if (SUCCEEDED(hr))
+                {
                     item->SetIcon(extractIcon);
                 }
             }
 
-            if (item != NULL) {
+            if (item != NULL)
+            {
                 AddItem(item);
             }
 
@@ -272,17 +307,22 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
 }
 
 
-LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow) {
-    if (message >= WM_USER) {
+LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow)
+{
+    if (message >= WM_USER)
+    {
         WATCHFOLDERMAP::const_iterator folder = this->watchedFolders.find(message);
-        if (folder != this->watchedFolders.end()) {
+        if (folder != this->watchedFolders.end())
+        {
             long event;
             PIDLIST_ABSOLUTE* idList;
             HANDLE notifyLock = SHChangeNotification_Lock((HANDLE)wParam, (DWORD)lParam, &idList, &event);
 
-            if (notifyLock) {
+            if (notifyLock)
+            {
                 // TODO::Have to handle deletes and renames as well
-                switch (event) {
+                switch (event)
+                {
                 case SHCNE_CREATE:
                 case SHCNE_MKDIR:
                     {

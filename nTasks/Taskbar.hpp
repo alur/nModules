@@ -17,7 +17,8 @@
 
 using std::map;
 
-class Taskbar: public Drawable {
+class Taskbar: public Drawable
+{
 public:
     // Ways to sort the tasks.
     enum ORDERING {

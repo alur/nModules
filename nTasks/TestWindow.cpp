@@ -1,80 +1,383 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *  TestWindow.cpp
+ *  The nModules Project
+ *
+ *  A window for testing taskbar features.
+ *  
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../Utilities/Common.h"
+#include <ShlObj.h>
 #include "TestWindow.hpp"
 #include "../nShared/LSModule.hpp"
+#include "../Utilities/Error.h"
 #include <thread>
+#include "resource.h"
 
+extern LSModule gLSModule;
 
-void TestWindow::CreateTestWindow() {
-    std::thread worker(TestWindow::WindowWorker);
-    worker.detach();
-}
+#define PROGRESS_MAX (1 << 13)
 
-
-void TestWindow::WindowWorker() {
-    TestWindow *window = new TestWindow();
-
-    MSG msg;
-    while(GetMessage(&msg, NULL, 0, 0) > 0)
-    {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-
-    delete window;
-}
-
-
-TestWindow::TestWindow()
+/// <summary>
+/// Constructor
+/// </summary>
+TestWindow::TestWindow(ITaskbarList4 *taskbarList, HMODULE module)
+    : mTaskbarList(taskbarList)
+    , mModule(module)
+    , mProgressState(TBPF_NOPROGRESS)
 {
-    WNDCLASSEX wc;
-    ZeroMemory(&wc, sizeof(wc));
-    wc.cbSize = sizeof(wc);
-    wc.lpszClassName = _T("nTaskTestClass");
-    wc.style = CS_DBLCLKS;
-    wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
-    wc.hInstance = GetModuleHandle(NULL);
-    wc.lpfnWndProc = DefWindowProc;
-    MessageHandler::FixWindowClass(&wc);
-    mWindowClass = RegisterClassEx(&wc);
-
-    mWindow = CreateWindowEx(0, (LPCTSTR)mWindowClass, _T("nTaskTestWindow"), WS_OVERLAPPEDWINDOW, 100, 100, 500, 300, nullptr, nullptr, wc.hInstance, this);
-
-    //DialogBox(wc.hInstance, (), mWindow, );
-
-
-
-
-
-
-
-
-
-
-
-    //ShowWindow(mWindow, SW_SHOW);
+    mTaskbarList->AddRef();
 }
 
 
-TestWindow::~TestWindow() {
-    DestroyWindow(mWindow);
-    UnregisterClass((LPCTSTR)mWindowClass, GetModuleHandle(NULL));
+/// <summary>
+/// Destructor
+/// </summary>
+TestWindow::~TestWindow()
+{
+    ImageList_Destroy(mOverlayImages);
+    mTaskbarList->Release();
 }
 
 
-LRESULT WINAPI TestWindow::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID extra) {
-    switch (msg) {
-    case WM_DESTROY:
+/// <summary>
+/// Initializes the test window
+/// </summary>
+void TestWindow::Initialize(HWND dialogWindow)
+{
+    mDialogWindow = dialogWindow;
+
+    //
+    SetWindowText(mDialogWindow, L"nTaskTestWindow");
+    SetDlgItemText(mDialogWindow, IDC_WINDOWTITLE, L"nTaskTestWindow");
+
+    //
+    InitOverlay();
+    InitProgress();
+}
+
+
+/// <summary>
+/// Initializes the overlay part of the window.
+/// </summary>
+void TestWindow::InitOverlay()
+{
+    mOverlayDropdown = GetDlgItem(mDialogWindow, IDC_OVERLAY_COMBO);
+    mOverlayDescription = GetDlgItem(mDialogWindow, IDC_OVERLAY_DESC);
+
+    //
+    mOverlayItems.push_back(OverlayItem(_T("None"), nullptr));
+    mOverlayItems.push_back(OverlayItem(_T("Alert"), LoadIcon(NULL, IDI_ASTERISK)));
+    mOverlayItems.push_back(OverlayItem(_T("Question"), LoadIcon(NULL, IDI_QUESTION)));
+    mOverlayItems.push_back(OverlayItem(_T("Error"), LoadIcon(NULL, IDI_ERROR)));
+    mOverlayItems.push_back(OverlayItem(_T("Warning"), LoadIcon(NULL, IDI_WARNING)));
+    mOverlayItems.push_back(OverlayItem(_T("Shield"), LoadIcon(NULL, IDI_SHIELD)));
+
+    //
+    mOverlayImages = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, (int)mOverlayItems.size(), 10);
+
+    // Add items
+    COMBOBOXEXITEM item;
+    ZeroMemory(&item, sizeof(item));
+    
+    item.cchTextMax = 100;
+
+    for (int i = 0, j = 0; i < mOverlayItems.size(); ++i)
+    {
+        if (mOverlayItems[i].icon != nullptr)
         {
-            PostQuitMessage(0);
+            ImageList_AddIcon(mOverlayImages, mOverlayItems[i].icon);
+            item.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE;
+            item.iImage = j;
+            item.iSelectedImage = j;
+            ++j;
+        }
+        else
+        {
+            item.mask = CBEIF_TEXT;
+        }
+        item.iItem = i;
+        item.pszText = mOverlayItems[i].name;
+        SendMessage(mOverlayDropdown, CBEM_INSERTITEM, 0, LPARAM(&item));
+    }
+
+    //
+    SendMessage(mOverlayDropdown, CBEM_SETIMAGELIST, 0, LPARAM(mOverlayImages));
+
+    // Set active item
+    SendMessage(mOverlayDropdown, CB_SETCURSEL, 0, 0);
+}
+
+
+/// <summary>
+/// Initializes the progress part of the window.
+/// </summary>
+void TestWindow::InitProgress()
+{
+    mProgressSlider = GetDlgItem(mDialogWindow, IDC_PROGRESS_SLIDER);
+
+    CheckRadioButton(mDialogWindow, IDC_PROGRESS_NONE, IDC_PROGRESS_PAUSED, IDC_PROGRESS_NONE);
+    SendDlgItemMessage(mDialogWindow, IDC_PROGRESS_SLIDER, TBM_SETRANGE, TRUE, MAKELPARAM(0, PROGRESS_MAX));
+}
+
+
+/// <summary>
+/// Sets the progress state
+/// </summary>
+void TestWindow::SetProgressState(TBPFLAG state)
+{
+    mProgressState = state;
+    mTaskbarList->SetProgressState(mDialogWindow, state);
+    if (state != TBPF_NOPROGRESS && state != TBPF_INDETERMINATE)
+    {
+        SetProgressValue(GetProgressValue());
+    }
+}
+
+
+/// <summary>
+/// Sets the progress value
+/// </summary>
+void TestWindow::SetProgressValue(ULONGLONG value)
+{
+    if (mProgressState != TBPF_NOPROGRESS && mProgressState != TBPF_INDETERMINATE)
+    {
+        mTaskbarList->SetProgressValue(mDialogWindow, value, PROGRESS_MAX);
+    }
+}
+
+
+/// <summary>
+/// Gets the progress value
+/// </summary>
+ULONGLONG TestWindow::GetProgressValue()
+{
+    return SendMessage(mProgressSlider, TBM_GETPOS, 0, 0);
+}
+
+
+/// <summary>
+/// The test windows dialog process.
+/// </summary>
+INT_PTR CALLBACK TestWindow::DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_COMMAND:
+        {
+            switch (wParam)
+            {
+            case MAKEWPARAM(IDOK, BN_CLICKED):
+                {
+                    DestroyWindow(hwndDlg);
+                    PostQuitMessage(0);
+                }
+                return TRUE;
+
+            case MAKEWPARAM(IDC_PROGRESS_NONE, BN_CLICKED):
+                {
+                    SetProgressState(TBPF_NOPROGRESS);
+                }
+                return TRUE;
+
+            case MAKEWPARAM(IDC_PROGRESS_INDETERMINATE, BN_CLICKED):
+                {
+                    SetProgressState(TBPF_INDETERMINATE);
+                }
+                return TRUE;
+
+            case MAKEWPARAM(IDC_PROGRESS_NORMAL, BN_CLICKED):
+                {
+                    SetProgressState(TBPF_NORMAL);
+                }
+                return TRUE;
+
+            case MAKEWPARAM(IDC_PROGRESS_ERROR, BN_CLICKED):
+                {
+                    SetProgressState(TBPF_ERROR);
+                }
+                return TRUE;
+
+            case MAKEWPARAM(IDC_PROGRESS_PAUSED, BN_CLICKED):
+                {
+                    SetProgressState(TBPF_PAUSED);
+                }
+                return TRUE;
+
+            case MAKEWPARAM(IDC_WINDOWTITLE, EN_CHANGE):
+                {
+                    TCHAR windowTitle[256];
+                    GetWindowText((HWND) lParam, windowTitle, _countof(windowTitle));
+                    SetWindowText(mDialogWindow, windowTitle);
+                }
+                return TRUE;
+
+            case MAKEWPARAM(IDC_OVERLAY_DESC, EN_CHANGE):
+                {
+                    TCHAR overlayTitle[256];
+                    GetWindowText(mOverlayDescription, overlayTitle, _countof(overlayTitle));
+                    mTaskbarList->SetOverlayIcon(mDialogWindow, mOverlayItems[SendMessage(mOverlayDropdown, CB_GETCURSEL, 0, 0)].icon, overlayTitle);
+                }
+                return TRUE;
+
+            case MAKEWPARAM(IDC_OVERLAY_COMBO, CBN_SELCHANGE):
+                {
+                    TCHAR overlayTitle[256];
+                    GetWindowText(mOverlayDescription, overlayTitle, _countof(overlayTitle));
+                    mTaskbarList->SetOverlayIcon(mDialogWindow, mOverlayItems[SendMessage(mOverlayDropdown, CB_GETCURSEL, 0, 0)].icon, overlayTitle);
+                }
+                return TRUE;
+            }
         }
         break;
 
-    case WM_PAINT:
+    case WM_HSCROLL:
         {
+            if ((HWND)lParam == GetDlgItem(hwndDlg, IDC_PROGRESS_SLIDER))
+            {
+                SetProgressValue(SendMessage((HWND)lParam, TBM_GETPOS, 0, 0));
+            }
+        }
+        break;
 
+    case WM_INITDIALOG:
+        {
+            Initialize(hwndDlg);
+        }
+        return TRUE;
+
+    case WM_SYSCOMMAND:
+        {
+            switch (wParam & 0xFFF0)
+            {
+            case SC_CLOSE:
+                {
+                    DestroyWindow(hwndDlg);
+                    PostQuitMessage(0);
+                }
+                return TRUE;
+            }
         }
         break;
     }
+    return FALSE;
+}
 
-    return DefWindowProc(window, msg, wParam, lParam);
+
+/// <summary>
+/// External test window dialog proc, forwarding to the internal class proc.
+/// </summary>
+INT_PTR CALLBACK TestWindow::ExternDialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    if (message == WM_INITDIALOG)
+    {
+        SetWindowLongPtr(hwndDlg, GWLP_USERDATA, lParam);
+    }
+    
+    TestWindow *testWindow = (TestWindow *)GetWindowLongPtr(hwndDlg, GWLP_USERDATA);
+    if (testWindow)
+    {
+        return testWindow->DialogProc(hwndDlg, message, wParam, lParam);
+    }
+
+    return FALSE;
+}
+
+
+/// <summary>
+/// Handles HRESULT errors.
+/// </summary>
+static void ErrorHandler(LPCTSTR description, HRESULT error)
+{
+    TCHAR errorMessage[MAX_LINE_LENGTH];
+    TCHAR hrDescription[MAX_LINE_LENGTH];
+
+    DescriptionFromHR(error, hrDescription, _countof(hrDescription));
+    StringCchPrintf(errorMessage, _countof(errorMessage), _T("Error creating test window. %s\n\n%s"), description, hrDescription);
+
+    MessageBox(nullptr, errorMessage, _T("nTask Error"), MB_OK | MB_ICONERROR);
+}
+
+
+/// <summary>
+/// The test windows process.
+/// </summary>
+static void WindowWorker(HINSTANCE instance)
+{
+    HRESULT hr;
+    if (SUCCEEDED(hr = CoInitialize(nullptr)))
+    {
+        ITaskbarList4 *taskbarList;
+        hr = CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER,
+            IID_ITaskbarList4, reinterpret_cast<void**>(&taskbarList));
+        if (SUCCEEDED(hr))
+        {
+            hr = taskbarList->HrInit();
+            if (SUCCEEDED(hr))
+            {
+                TestWindow window(taskbarList, instance);
+
+                HWND parent = CreateWindowEx(WS_EX_APPWINDOW, _T("Static"), _T(""), WS_OVERLAPPEDWINDOW, 0, 0, 50, 50, nullptr, nullptr, instance, 0);
+
+                if (parent)
+                {
+                    if (DialogBoxParam(instance, MAKEINTRESOURCE(IDD_TEST_WINDOW), parent, TestWindow::ExternDialogProc, (LPARAM)&window) == -1)
+                    {
+                        ErrorHandler(_T("DialogBoxParam failed."), HRESULT_FROM_WIN32(GetLastError()));
+                    }
+
+                    DestroyWindow(parent);
+                }
+                else
+                {
+                    ErrorHandler(_T("CreateWindowEx failed."), HRESULT_FROM_WIN32(GetLastError()));
+                }
+            }
+            else
+            {
+                ErrorHandler(_T("ITaskbarList::HrInit failed."), hr);
+            }
+
+            taskbarList->Release();
+        }
+        else
+        {
+            ErrorHandler(_T("CoCreateInstance(IID_ITaskbarList4) failed."), hr);
+        }
+
+        CoUninitialize();
+    }
+    else
+    {
+        ErrorHandler(_T("Failed to get module handle."), hr);
+    }
+}
+
+
+/// <summary>
+/// Creates a test window.
+/// </summary>
+void CreateTestWindow()
+{
+    std::thread(WindowWorker, gLSModule.GetInstance()).detach();
+}
+
+
+/// <summary>
+/// Export version of CreateTestWindow, so that you can create the test window without loading nDesk.
+/// (e.g. while using another task module, or while running explorer)
+/// </summary>
+EXPORT_STDCALL(void) CreateTestWindow(HWND, HINSTANCE, LPTSTR, int)
+{
+    HMODULE module;
+    if (GetModuleHandleEx(
+        GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+        (LPCTSTR)&WindowWorker,
+        &module) != FALSE)
+    {
+        WindowWorker(module);
+    }
+    else
+    {
+        MessageBox(nullptr, _T("Error creating test window. Failed to get module handle :/"), _T("nTask Error"), MB_OK | MB_ICONERROR);
+    }
 }

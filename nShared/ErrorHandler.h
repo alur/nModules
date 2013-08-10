@@ -7,11 +7,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-namespace ErrorHandler {
+namespace ErrorHandler
+{
     /// <summary>
     /// The severity of an error.
     /// </summary>
-    enum class Level {
+    enum class Level
+    {
         Critical,
         Warning,
         Notice,

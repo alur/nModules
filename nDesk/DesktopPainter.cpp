@@ -28,7 +28,8 @@ using namespace D2D1;
 /// <summary>
 /// Creates a new instance of the DesktopPainter class.
 /// </summary>
-DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, _T("nDesk"), g_pClickHandler) {
+DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, _T("nDesk"), g_pClickHandler)
+{
     // Initalize
     m_pWallpaperBrush = nullptr;
     m_pOldWallpaperBrush = nullptr;
@@ -66,12 +67,14 @@ DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, _T("nDesk"), g_
 /// <summary>
 /// Destroys this instance of the DesktopPainter class.
 /// </summary>
-DesktopPainter::~DesktopPainter() {
+DesktopPainter::~DesktopPainter()
+{
     nCore::System::UnRegisterWindow(_T("nDesk"));
 
     DiscardDeviceResources();
 
-    if (m_TransitionEffect) {
+    if (m_TransitionEffect)
+    {
         delete m_TransitionEffect;
     }
 }
@@ -80,7 +83,8 @@ DesktopPainter::~DesktopPainter() {
 /// <summary>
 /// Releases all D2D device depenent resources
 /// </summary>
-void DesktopPainter::DiscardDeviceResources() {
+void DesktopPainter::DiscardDeviceResources()
+{
     SAFERELEASE(m_pWallpaperBrush);
     SAFERELEASE(m_pOldWallpaperBrush);
     DrawableWindow::DiscardDeviceResources();
@@ -90,7 +94,8 @@ void DesktopPainter::DiscardDeviceResources() {
 /// <summary>
 /// Returns the window we are drawing to.
 /// </summary>
-HWND DesktopPainter::GetWindow() {
+HWND DesktopPainter::GetWindow()
+{
     return m_hWnd;
 }
 
@@ -98,10 +103,12 @@ HWND DesktopPainter::GetWindow() {
 /// <summary>
 /// (Re)Creates all device dependent resources
 /// </summary>
-HRESULT DesktopPainter::ReCreateDeviceResources() {
+HRESULT DesktopPainter::ReCreateDeviceResources()
+{
     HRESULT hr = S_OK;
 
-    if (!this->renderTarget) {
+    if (!this->renderTarget)
+    {
         DrawableWindow::ReCreateDeviceResources();
         UpdateWallpaper(true);
     }
@@ -113,29 +120,35 @@ HRESULT DesktopPainter::ReCreateDeviceResources() {
 /// <summary>
 /// Changes the transition type
 /// </summary>
-void DesktopPainter::SetTransitionType(TransitionType transitionType) {
+void DesktopPainter::SetTransitionType(TransitionType transitionType)
+{
     m_TransitionType = transitionType;
 
     // If we are in the middle of a transition, let the current effect cleanup
-    if (m_pOldWallpaperBrush != nullptr) {
+    if (m_pOldWallpaperBrush != nullptr)
+    {
         m_TransitionEffect->End();
     }
 
     // Delete any existing transition effect
-    if (m_TransitionEffect) {
+    if (m_TransitionEffect)
+    {
         delete m_TransitionEffect;
     }
 
     //
     m_TransitionEffect = TransitionEffectFromType(transitionType);
 
-    if (m_TransitionEffect) {
+    if (m_TransitionEffect)
+    {
         m_TransitionEffect->Initialize(&m_TransitionSettings);
-        if (m_pOldWallpaperBrush != nullptr) {
+        if (m_pOldWallpaperBrush != nullptr)
+        {
             m_TransitionEffect->Start(m_pOldWallpaperBrush, m_pWallpaperBrush);
         }
     }
-    else if (m_pOldWallpaperBrush != nullptr) {
+    else if (m_pOldWallpaperBrush != nullptr)
+    {
         SAFERELEASE(m_pOldWallpaperBrush);
         Redraw();
     }
@@ -145,8 +158,10 @@ void DesktopPainter::SetTransitionType(TransitionType transitionType) {
 /// <summary>
 /// Retrives a new transition effect class based on the specified transition type
 /// </summary>
-TransitionEffect* DesktopPainter::TransitionEffectFromType(TransitionType transitionType) {
-    switch (transitionType) {
+TransitionEffect* DesktopPainter::TransitionEffectFromType(TransitionType transitionType)
+{
+    switch (transitionType)
+    {
     case FADE_IN: return new FadeEffect(FadeEffect::FadeType::FADE_IN);
     case FADE_OUT: return new FadeEffect(FadeEffect::FadeType::FADE_OUT);
 
@@ -188,7 +203,8 @@ TransitionEffect* DesktopPainter::TransitionEffectFromType(TransitionType transi
 /// <summary>
 /// Changes the transition time
 /// </summary>
-void DesktopPainter::SetTransitionTime(int iTransitionTime) {
+void DesktopPainter::SetTransitionTime(int iTransitionTime)
+{
     assert(iTransitionTime >= 0);
     m_TransitionSettings.iTime = iTransitionTime;
 }
@@ -197,7 +213,8 @@ void DesktopPainter::SetTransitionTime(int iTransitionTime) {
 /// <summary>
 /// Changes the square size for square based animations
 /// </summary>
-void DesktopPainter::SetSquareSize(int iSquareSize) {
+void DesktopPainter::SetSquareSize(int iSquareSize)
+{
     m_TransitionSettings.iSquareSize = iSquareSize;
     if (m_TransitionEffect) m_TransitionEffect->Resize();
 }
@@ -206,7 +223,8 @@ void DesktopPainter::SetSquareSize(int iSquareSize) {
 /// <summary>
 /// Changes m_bInvalidateAllOnUpdate.
 /// </summary>
-void DesktopPainter::SetInvalidateAllOnUpdate(bool bValue) {
+void DesktopPainter::SetInvalidateAllOnUpdate(bool bValue)
+{
     m_bInvalidateAllOnUpdate = bValue;
 }
 
@@ -214,18 +232,21 @@ void DesktopPainter::SetInvalidateAllOnUpdate(bool bValue) {
 /// <summary>
 /// Should be called when the desktop has been resized.
 /// </summary>
-void DesktopPainter::Resize() {
+void DesktopPainter::Resize()
+{
     // Resize the window
     SetWindowPos(m_hWnd, HWND_BOTTOM, g_pMonitorInfo->m_virtualDesktop.rect.left, g_pMonitorInfo->m_virtualDesktop.rect.top,
         g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height, SWP_NOACTIVATE|SWP_NOSENDCHANGING);
 
     CalculateSizeDepdenentStuff();
 
-    if (m_TransitionEffect) {
+    if (m_TransitionEffect)
+    {
         m_TransitionEffect->Resize();
     }
 
-    if (this->renderTarget) {
+    if (this->renderTarget)
+    {
         // Resize the render target
         renderTarget->Resize(D2D1::SizeU(g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height));
 
@@ -237,7 +258,8 @@ void DesktopPainter::Resize() {
 /// <summary>
 /// Should be called when the desktop has been resized, or during init.
 /// </summary>
-void DesktopPainter::CalculateSizeDepdenentStuff() {
+void DesktopPainter::CalculateSizeDepdenentStuff()
+{
     // Update the virtual desktop rect
     m_TransitionSettings.WPRect.top = 0;
     m_TransitionSettings.WPRect.left = 0;
@@ -250,10 +272,13 @@ void DesktopPainter::CalculateSizeDepdenentStuff() {
 /// Updates the desktop wallpaper.
 /// </summary>
 /// <param name="bNoTransition">If true, there will be no transition.</param>
-void DesktopPainter::UpdateWallpaper(bool bNoTransition) {
-    if (!mDontRenderWallpaper) {
+void DesktopPainter::UpdateWallpaper(bool bNoTransition)
+{
+    if (!mDontRenderWallpaper)
+    {
         // If we are currently doing a transition, end it.
-        if (m_pOldWallpaperBrush != nullptr) {
+        if (m_pOldWallpaperBrush != nullptr)
+        {
             m_TransitionEffect->End();
             SAFERELEASE(m_pOldWallpaperBrush)
         }
@@ -262,10 +287,12 @@ void DesktopPainter::UpdateWallpaper(bool bNoTransition) {
         CreateWallpaperBrush(&m_pWallpaperBrush);
 
         // If we are going to do a transition animation
-        if (!bNoTransition && m_pOldWallpaperBrush != nullptr && m_TransitionType != NONE) {
+        if (!bNoTransition && m_pOldWallpaperBrush != nullptr && m_TransitionType != NONE)
+        {
             TransitionStart();
         }
-        else {
+        else
+        {
             SAFERELEASE(m_pOldWallpaperBrush)
         }
     }
@@ -277,7 +304,8 @@ void DesktopPainter::UpdateWallpaper(bool bNoTransition) {
 /// <summary>
 /// Causes the whole desktop window to be redrawn
 /// </summary>
-void DesktopPainter::Redraw() {
+void DesktopPainter::Redraw()
+{
     InvalidateRect(m_bInvalidateAllOnUpdate ? nullptr : m_hWnd, nullptr, true);
     UpdateWindow(m_hWnd);
 }
@@ -286,7 +314,8 @@ void DesktopPainter::Redraw() {
 /// <summary>
 /// Regular painting
 /// </summary>
-void DesktopPainter::Paint() {
+void DesktopPainter::Paint()
+{
     renderTarget->FillRectangle(m_TransitionSettings.WPRect, m_pWallpaperBrush);
 }
 
@@ -294,12 +323,14 @@ void DesktopPainter::Paint() {
 /// <summary>
 /// Called prior to the first painting call, to let the transition effect initialize.
 /// </summary>
-void DesktopPainter::TransitionStart() {
+void DesktopPainter::TransitionStart()
+{
     this->transitionStartTime = GetTickCount();
     this->transitionEndTime = this->transitionStartTime + this->m_TransitionSettings.iTime;
     m_TransitionEffect->Start(m_pOldWallpaperBrush, m_pWallpaperBrush);
 
-    while (m_pOldWallpaperBrush != nullptr) {
+    while (m_pOldWallpaperBrush != nullptr)
+    {
         this->renderTarget->BeginDraw();
         bool inAnimation = true;
         PaintComposite();
@@ -313,7 +344,8 @@ void DesktopPainter::TransitionStart() {
 /// <summary>
 /// Called after the transition is done, to let the transition effect do cleanup.
 /// </summary>
-void DesktopPainter::TransitionEnd() {
+void DesktopPainter::TransitionEnd()
+{
     m_TransitionEffect->End();
     SAFERELEASE(m_pOldWallpaperBrush)
 
@@ -325,13 +357,15 @@ void DesktopPainter::TransitionEnd() {
 /// <summary>
 /// Paints a composite of the previous wallpaper and the current one.
 /// </summary>
-void DesktopPainter::PaintComposite() {
+void DesktopPainter::PaintComposite()
+{
     float progress = std::min(1.0f, float(GetTickCount() - this->transitionStartTime)/(this->m_TransitionSettings.iTime));
 
     m_TransitionEffect->Paint(renderTarget, progress);
 
     // We are done with the transition, let go of the old wallpaper
-    if (progress >= 1.0f) {
+    if (progress >= 1.0f)
+    {
         TransitionEnd();
     }
 }
@@ -341,40 +375,48 @@ void DesktopPainter::PaintComposite() {
 /// Handles certain window messages.
 /// </summary>
 LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg) {
+    switch (uMsg)
+    {
     case WM_ERASEBKGND:
         return 1;
 
     case WM_PAINT:
         {
-            if (!mDontRenderWallpaper) {
+            if (!mDontRenderWallpaper)
+            {
                 bool inAnimation = false;
 
-                if (SUCCEEDED(ReCreateDeviceResources())) {
+                if (SUCCEEDED(ReCreateDeviceResources()))
+                {
                     this->renderTarget->BeginDraw();
 
                     // m_pOldWallpaperBrush being non zero indicates that we are in the middle of a transition
-                    if (this->m_pOldWallpaperBrush != NULL) {
+                    if (this->m_pOldWallpaperBrush != NULL)
+                    {
                         PaintComposite();
                     }
-                    else {
+                    else
+                    {
                         Paint();
                     }
                 }
                 PaintChildren(inAnimation);
 
                 // If EndDraw fails we need to recreate all device-dependent resources
-                if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET) {
+                if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET)
+                {
                     DiscardDeviceResources();
                 }
 
                 ValidateRect(hWnd, NULL);
 
-                if (this->m_pOldWallpaperBrush != NULL || inAnimation) {
+                if (this->m_pOldWallpaperBrush != NULL || inAnimation)
+                {
                     Redraw();
                 }
             }
-            else {
+            else
+            {
                 ValidateRect(hWnd, NULL);
             }
         }
@@ -392,7 +434,8 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 /// <summary>
 /// Creates a brush of the current wallpaper.
 /// </summary>
-HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
+HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush)
+{
     //
     HRESULT hr = S_OK;
 
@@ -440,7 +483,8 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
 
     // Load the desktop background
     Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&pWICFactory));
-    if (SUCCEEDED(hr = pWICFactory->CreateDecoderFromFilename(wszWallpaperPath, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pDecoder))) {
+    if (SUCCEEDED(hr = pWICFactory->CreateDecoderFromFilename(wszWallpaperPath, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pDecoder)))
+    {
         // Get the first frame of the wallpaper
         pDecoder->GetFrame(0, &pSource);
 
@@ -448,7 +492,8 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
         UINT cxWallpaper, cyWallpaper;
         pSource->GetSize(&cxWallpaper, &cyWallpaper);
 
-        if (bTileWallpaper) { // Tile
+        if (bTileWallpaper)
+        {
             // Convert it to a D2D1 bitmap
             pWICFactory->CreateFormatConverter(&pConverter);
             pConverter->Initialize(pSource, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.f, WICBitmapPaletteTypeMedianCut);
@@ -458,61 +503,85 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
             int xInitial = -g_pMonitorInfo->m_virtualDesktop.rect.left + (int)floor((float)g_pMonitorInfo->m_virtualDesktop.rect.left/cxWallpaper)*cxWallpaper;
             int yInitial = -g_pMonitorInfo->m_virtualDesktop.rect.top + (int)floor((float)g_pMonitorInfo->m_virtualDesktop.rect.top/cyWallpaper)*cyWallpaper;
             // Do the tiling
-            for (int x = xInitial; x < g_pMonitorInfo->m_virtualDesktop.width - g_pMonitorInfo->m_virtualDesktop.rect.left; x += cxWallpaper) {
-                for (int y = yInitial; y < g_pMonitorInfo->m_virtualDesktop.height - g_pMonitorInfo->m_virtualDesktop.rect.top; y += cyWallpaper) {
+            for (int x = xInitial; x < g_pMonitorInfo->m_virtualDesktop.width - g_pMonitorInfo->m_virtualDesktop.rect.left; x += cxWallpaper)
+            {
+                for (int y = yInitial; y < g_pMonitorInfo->m_virtualDesktop.height - g_pMonitorInfo->m_virtualDesktop.rect.top; y += cyWallpaper)
+                {
                     D2D1_RECT_F f; f.top = (float)y; f.left = (float)x; f.right = (float)(x + cxWallpaper); f.bottom = (float)(y + cyWallpaper);
                     pBitmapRender->DrawBitmap(pBitmap, f);
                 }
             }
         }
-        else { // Some type of stretching
+        else // Some type of stretching
+        {
             // Work out the dimensions the wallpaper should be stretched to
             int WallpaperResX, WallpaperResY;
             double scaleX, scaleY;
-            switch (iWallpaperStyle) {
+            switch (iWallpaperStyle)
+            {
             case 2: // Stretch
-                WallpaperResX = g_pMonitorInfo->m_monitors[0].width;
-                WallpaperResY = g_pMonitorInfo->m_monitors[0].height;
+                {
+                    WallpaperResX = g_pMonitorInfo->m_monitors[0].width;
+                    WallpaperResY = g_pMonitorInfo->m_monitors[0].height;
+                }
                 break;
+
             case 6: // Fit
-                scaleX = (double)g_pMonitorInfo->m_monitors[0].width/cxWallpaper;
-                scaleY = (double)g_pMonitorInfo->m_monitors[0].height/cyWallpaper;
-                if (scaleX > scaleY) {
-                    WallpaperResY = g_pMonitorInfo->m_monitors[0].height;
-                    WallpaperResX = (int)(scaleY*cxWallpaper);
-                }
-                else {
-                    WallpaperResY = (int)(scaleX*cyWallpaper);
-                    WallpaperResX = g_pMonitorInfo->m_monitors[0].width;
+                {
+                    scaleX = (double)g_pMonitorInfo->m_monitors[0].width/cxWallpaper;
+                    scaleY = (double)g_pMonitorInfo->m_monitors[0].height/cyWallpaper;
+                    if (scaleX > scaleY)
+                    {
+                        WallpaperResY = g_pMonitorInfo->m_monitors[0].height;
+                        WallpaperResX = (int)(scaleY*cxWallpaper);
+                    }
+                    else
+                    {
+                        WallpaperResY = (int)(scaleX*cyWallpaper);
+                        WallpaperResX = g_pMonitorInfo->m_monitors[0].width;
+                    }
                 }
                 break;
+
             case 10: // Fill
-                scaleX = (double)g_pMonitorInfo->m_monitors[0].width/cxWallpaper;   
-                scaleY = (double)g_pMonitorInfo->m_monitors[0].height/cyWallpaper;
-                if (scaleX < scaleY) {
-                    WallpaperResY = g_pMonitorInfo->m_monitors[0].height;
-                    WallpaperResX = (int)(scaleY*cxWallpaper);
-                }
-                else {
-                    WallpaperResY = (int)(scaleX*cyWallpaper);
-                    WallpaperResX = g_pMonitorInfo->m_monitors[0].width;
+                {
+                    scaleX = (double)g_pMonitorInfo->m_monitors[0].width/cxWallpaper;   
+                    scaleY = (double)g_pMonitorInfo->m_monitors[0].height/cyWallpaper;
+                    if (scaleX < scaleY)
+                    {
+                        WallpaperResY = g_pMonitorInfo->m_monitors[0].height;
+                        WallpaperResX = (int)(scaleY*cxWallpaper);
+                    }
+                    else
+                    {
+                        WallpaperResY = (int)(scaleX*cyWallpaper);
+                        WallpaperResX = g_pMonitorInfo->m_monitors[0].width;
+                    }
                 }
                 break;
+
             case 22: // Span, essentially a fill over the virtual desktop
-                scaleX = (double)g_pMonitorInfo->m_virtualDesktop.width/cxWallpaper;    
-                scaleY = (double)g_pMonitorInfo->m_virtualDesktop.height/cyWallpaper;
-                if (scaleX < scaleY) {
-                    WallpaperResY = g_pMonitorInfo->m_virtualDesktop.height;
-                    WallpaperResX = (int)(scaleY*cxWallpaper);
-                }
-                else {
-                    WallpaperResY = (int)(scaleX*cyWallpaper);
-                    WallpaperResX = g_pMonitorInfo->m_virtualDesktop.width;
+                {
+                    scaleX = (double)g_pMonitorInfo->m_virtualDesktop.width/cxWallpaper;    
+                    scaleY = (double)g_pMonitorInfo->m_virtualDesktop.height/cyWallpaper;
+                    if (scaleX < scaleY)
+                    {
+                        WallpaperResY = g_pMonitorInfo->m_virtualDesktop.height;
+                        WallpaperResX = (int)(scaleY*cxWallpaper);
+                    }
+                    else
+                    {
+                        WallpaperResY = (int)(scaleX*cyWallpaper);
+                        WallpaperResX = g_pMonitorInfo->m_virtualDesktop.width;
+                    }
                 }
                 break;
+
             default: // Center (actually 0), but this way we can fail graciously if the value is invalid
-                WallpaperResX = cxWallpaper;
-                WallpaperResY = cyWallpaper;
+                {
+                    WallpaperResX = cxWallpaper;
+                    WallpaperResY = cyWallpaper;
+                }
                 break;
             }
 
@@ -525,7 +594,8 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
             pConverter->Initialize(pScaler, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.f, WICBitmapPaletteTypeMedianCut);
             renderTarget->CreateBitmapFromWicBitmap(pConverter, 0, &pBitmap);
 
-            if (iWallpaperStyle == 22) {
+            if (iWallpaperStyle == 22)
+            {
                 // Center the stretched wallpaper on the virtual desktop
                 D2D1_RECT_F dest, source;
                 dest.left = 0;
@@ -547,19 +617,23 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
 
                 pBitmapRender->DrawBitmap(pBitmap, dest, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, source);
             }
-            else {
+            else
+            {
                 // Center the stretched wallpaper on all monitors
-                for (int i = 0; i < (int)g_pMonitorInfo->m_monitors.size(); i++) {
+                for (int i = 0; i < (int)g_pMonitorInfo->m_monitors.size(); i++)
+                {
                     D2D1_RECT_F dest, source;
 
                     // Work out X coordinates and width
-                    if (g_pMonitorInfo->m_monitors[i].width > WallpaperResX) {
+                    if (g_pMonitorInfo->m_monitors[i].width > WallpaperResX)
+                    {
                         dest.left = (g_pMonitorInfo->m_monitors[i].width - WallpaperResX)/2.0f;
                         dest.right = (float)(dest.left + WallpaperResX);
                         source.left = 0.0f;
                         source.right = (float)WallpaperResX;
                     }
-                    else {
+                    else
+                    {
                         dest.left = 0.0f;
                         dest.right = (float)g_pMonitorInfo->m_monitors[i].width;
                         source.left = (WallpaperResX - g_pMonitorInfo->m_monitors[i].width)/2.0f;
@@ -569,13 +643,15 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush) {
                     dest.right += g_pMonitorInfo->m_monitors[i].rect.left - g_pMonitorInfo->m_virtualDesktop.rect.left;
 
                     // Work out Y coordinates and height
-                    if (g_pMonitorInfo->m_monitors[i].height > WallpaperResY) {
+                    if (g_pMonitorInfo->m_monitors[i].height > WallpaperResY)
+                    {
                         dest.top = (g_pMonitorInfo->m_monitors[i].height - WallpaperResY)/2.0f;
                         dest.bottom = (float)(dest.top + WallpaperResY);
                         source.top = 0.0f;
                         source.bottom = (float)WallpaperResY;
                     }
-                    else {
+                    else
+                    {
                         dest.top = 0.0f;
                         dest.bottom = (float)g_pMonitorInfo->m_monitors[i].height;
                         source.top = (WallpaperResY - g_pMonitorInfo->m_monitors[i].height)/2.0f;

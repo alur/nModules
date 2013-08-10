@@ -7,25 +7,62 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
-#include "../nShared/MessageHandler.hpp"
+#include <vector>
 
-class TestWindow : MessageHandler {
+void CreateTestWindow();
+
+class TestWindow
+{
+    // Constructor & Destructor
 public:
-    static void CreateTestWindow();
-
-private:
-    static void WindowWorker();
-
-private:
-    TestWindow();
+    TestWindow(ITaskbarList4 *taskbarList, HMODULE module);
     ~TestWindow();
 
+    // Variables
 private:
-    ATOM mWindowClass;
-    HWND mWindow;
+    ITaskbarList4 *mTaskbarList;
+    HMODULE mModule;
 
-    // MessageHandler implementation
+    // Window Procs
 public:
-    LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID extra) override;
+    INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+    static INT_PTR CALLBACK ExternDialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
+    // General
+private:
+    void Initialize(HWND dialogWindow);
+
+    HWND mDialogWindow;
+
+    // Overlay icon
+private:
+    void InitOverlay();
+
+    HWND mOverlayDropdown;
+    HWND mOverlayDescription;
+    HIMAGELIST mOverlayImages;
+
+    struct OverlayItem
+    {
+        OverlayItem(LPCTSTR name, HICON icon)
+        {
+            StringCchCopy(this->name, _countof(this->name), name);
+            this->icon = icon;
+        }
+
+        TCHAR name[MAX_PATH];
+        HICON icon;
+    };
+
+    std::vector<OverlayItem> mOverlayItems;
+
+    // Progress bar
+private:
+    void InitProgress();
+    void SetProgressState(TBPFLAG);
+    void SetProgressValue(ULONGLONG value);
+    ULONGLONG GetProgressValue();
+
+    TBPFLAG mProgressState;
+    HWND mProgressSlider;
 };

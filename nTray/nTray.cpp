@@ -40,14 +40,17 @@ bool g_InitPhase;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
+int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */)
+{
     g_InitPhase = true;
 
-    if (!gLSModule.Initialize(parent, instance)) {
+    if (!gLSModule.Initialize(parent, instance))
+    {
         return 1;
     }
     
-    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION))) {
+    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION)))
+    {
         return 1;
     }
 
@@ -58,7 +61,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
     g_hWndTrayNotify = (HWND)SendMessage(LiteStep::GetLitestepWnd(), LM_SYSTRAYREADY, NULL, NULL);
 
     // Register a bang for printing tray info
-    LiteStep::AddBangCommand(TEXT("!nTrayListIconIDs"), [] (HWND, LPCTSTR) -> void {
+    LiteStep::AddBangCommand(TEXT("!nTrayListIconIDs"), [] (HWND, LPCTSTR) -> void
+    {
         TrayManager::ListIconIDS();
     });
 
@@ -69,12 +73,14 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */) {
 /// <summary>
 /// Called by the core when this module is about to be unloaded.
 /// </summary>
-void quitModule(HINSTANCE /* instance */) {
+void quitModule(HINSTANCE /* instance */)
+{
     //
     LiteStep::RemoveBangCommand(TEXT("!nTrayListIconIDs"));
 
     // Remove all trays
-    for (auto &tray : g_Trays) {
+    for (auto &tray : g_Trays)
+    {
         delete tray.second;
     }
     g_Trays.clear();
@@ -92,8 +98,10 @@ void quitModule(HINSTANCE /* instance */) {
 /// <param name="message">The type of message.</param>
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
-LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
-    switch(message) {
+LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch(message)
+    {
     case WM_CREATE:
         {
             SetTimer(window, TIMER_INIT_COMPLETED, 100, NULL);
@@ -114,7 +122,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_FULLSCREENACTIVATED:
         {
-            for (auto &tray : g_Trays) {
+            for (auto &tray : g_Trays)
+            {
                 tray.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
             }
         }
@@ -122,7 +131,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_FULLSCREENDEACTIVATED:
         {
-            for (auto &tray : g_Trays) {
+            for (auto &tray : g_Trays)
+            {
                 tray.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
             }
         }
@@ -130,7 +140,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case WM_TIMER:
         {
-            switch(wParam) {
+            switch(wParam)
+            {
             case TIMER_INIT_COMPLETED:
                 {
                     KillTimer(window, TIMER_INIT_COMPLETED);
@@ -154,7 +165,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// <summary>
 /// Reads through the .rc files and creates trays.
 /// </summary>
-void LoadSettings() {
+void LoadSettings()
+{
     LiteStep::IterateOverLineTokens(_T("*nTray"), [] (LPCTSTR name) -> void
     {
         g_Trays.insert(g_Trays.begin(), std::pair<tstring, Tray*>(name, new Tray(name)));

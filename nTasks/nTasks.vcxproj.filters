@@ -29,5 +29,8 @@
     <ResourceCompile Include="nTask.rc">
       <Filter>Resources</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="Dialogs.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

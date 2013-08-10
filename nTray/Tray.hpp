@@ -18,7 +18,8 @@
 
 using std::map;
 
-class Tray : public Drawable {
+class Tray : public Drawable
+{
 public:
     explicit Tray(LPCTSTR);
     virtual ~Tray();
@@ -56,7 +57,8 @@ private:
 
 private:
     // All data required to display a balloon.
-    struct BalloonData {
+    struct BalloonData
+    {
         TrayIcon* icon;
         LPCWSTR infoTitle;
         LPCWSTR info;
@@ -65,22 +67,27 @@ private:
     };
 
     // All data required to determine whether to show or hide a particular icon.
-    struct IconID {
-        IconID(GUID guid) {
+    struct IconID
+    {
+        IconID(GUID guid)
+        {
             type = Type::GUID;
             this->guid = guid;
         }
-        IconID(LPCWSTR process) {
+        IconID(LPCWSTR process)
+        {
             type = Type::Process;
             StringCchCopyW(this->process, _countof(this->process), process);
         }
 
-        enum class Type {
+        enum class Type
+        {
             GUID,
             Process
         } type;
 
-        union {
+        union
+        {
             GUID guid;
             WCHAR process[MAX_PATH];
         };

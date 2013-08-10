@@ -10,8 +10,10 @@
 #include "PopupItem.hpp"
 #include "Popup.hpp"
 
-namespace nPopup {
-    class FolderItem : public PopupItem {
+namespace nPopup
+{
+    class FolderItem : public PopupItem
+    {
     public:
         explicit FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, LPCTSTR customIcon = nullptr);
         explicit FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, HICON customIcon);
