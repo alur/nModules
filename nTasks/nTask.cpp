@@ -7,6 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "../nShared/LSModule.hpp"
+#include "../nShared/ErrorHandler.h"
 #include "Constants.h"
 #include "nTask.h"
 #include "Taskbar.hpp"
@@ -24,7 +25,7 @@ const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
     LM_FULLSCREENDEACTIVATED, 0 };
 
 // All the taskbars we currently have loaded
-map<tstring, Taskbar*> gTaskbars;
+TaskbarMap gTaskbars;
 
 //
 void CreateTestWindow();
@@ -72,9 +73,9 @@ void quitModule(HINSTANCE /* hDllInstance */)
     WindowManager::Stop();
 
     // Remove all taskbars
-    for (auto iter : gTaskbars)
+    for (TaskbarMap::value_type taskbar : gTaskbars)
     {
-        delete iter.second;
+        delete taskbar.second;
     }
     gTaskbars.clear();
 
@@ -198,5 +199,12 @@ void LoadSettings()
 /// </summary>
 void CreateTaskbar(LPCTSTR taskbarName)
 {
-    gTaskbars.insert(gTaskbars.begin(), std::pair<tstring, Taskbar*>(taskbarName, new Taskbar(taskbarName)));
+    if (gTaskbars.find(taskbarName) == gTaskbars.end())
+    {
+        gTaskbars[taskbarName] = new Taskbar(taskbarName);
+    }
+    else
+    {
+        ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("Attempt to (re)create the already existing taskbar %s!"), taskbarName);
+    }
 }

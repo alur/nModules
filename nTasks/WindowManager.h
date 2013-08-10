@@ -9,13 +9,28 @@
 
 #include <string>
 
+//
+typedef map<std::tstring, Taskbar*> TaskbarMap;
+
 namespace WindowManager
 {
     /// <summary>
     /// Holds all information about a particular top level window.
     /// </summary>
-    typedef struct WindowInformation
+    struct WindowInformation
     {
+        ~WindowInformation()
+        {
+            if (hIcon != nullptr)
+            {
+                DestroyIcon(hIcon);
+            }
+            if (hOverlayIcon != nullptr)
+            {
+                DestroyIcon(hOverlayIcon);
+            }
+        }
+
         // The monitor this window is currently on
         UINT uMonitor;
 
@@ -33,12 +48,13 @@ namespace WindowManager
 
         // If the progress is determinate, how far along we are
         USHORT progress;
-    } WindowInformation;
+    };
 
     // Some helpful typedefs
-    typedef map<std::tstring, Taskbar*>::const_iterator TASKBARCITER;
-    typedef map<HWND, WindowInformation>::const_iterator WNDMAPCITER;
-    typedef map<HWND, WindowInformation>::iterator WNDMAPITER;
+    typedef map<HWND, WindowInformation> WindowMap;
+    //typedef map<std::tstring, Taskbar*>::const_iterator TASKBARCITER;
+    //typedef map<HWND, WindowInformation>::const_iterator WNDMAPCITER;
+    //typedef map<HWND, WindowInformation>::iterator WNDMAPITER;
 
     void Start();
     void Stop();

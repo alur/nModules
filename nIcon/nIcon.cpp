@@ -135,10 +135,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// </summary>
 void LoadSettings()
 {
-    LiteStep::IterateOverLineTokens(_T("*nIcon"), [] (LPCTSTR token) -> void
-    {
-        CreateGroup(token);
-    });
+    LiteStep::IterateOverLineTokens(_T("*nIcon"), CreateGroup);
 }
 
 
