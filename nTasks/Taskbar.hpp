@@ -15,22 +15,34 @@
 #include "../nShared/Drawable.hpp"
 #include "../nShared/WindowThumbnail.hpp"
 
-using std::map;
-
 class Taskbar: public Drawable
 {
+    // Public Typedefs
 public:
     // Ways to sort the tasks.
-    enum ORDERING {
-        BYAPPLICATION,
-        BYTITLE,
-        BYTIMEADDED,
-        BYPOSITION
+    enum class SortingType
+    {
+        Application,
+        Title,
+        TimeAdded,
+        Position
     };
 
+    // Private Typedefs
+private:
+    typedef std::map<HWND, TaskButton*> ButtonMap;
+
+    // Constructors and destructors
+public:
     explicit Taskbar(LPCTSTR);
     virtual ~Taskbar();
 
+    // MessageHandler
+public:
+    LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow) override;
+
+    // Public methods
+public:
     void ShowThumbnail(HWND hwnd, LPRECT position);
     void HideThumbnail();
 
@@ -39,31 +51,36 @@ public:
     bool MonitorChanged(HWND hWnd, UINT monitor, TaskButton** out);
     void RemoveTask(HWND);
     void Relayout();
-    LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow);
     void Repaint();
 
+    // Private methods
 private:
     // Removes a task from this taskbar
-    void RemoveTask(map<HWND, TaskButton*>::iterator iter);
+    void RemoveTask(ButtonMap::iterator iter);
 
+    // 
+private:
     // Settings which define how to organize the buttons
     LayoutSettings mLayoutSettings;
 
     // The taskbar buttons
-    map<HWND, TaskButton*> buttons;
+    ButtonMap mButtonMap;
 
     // The maximum width of a taskbar button
-    int buttonMaxWidth, buttonMaxHeight, buttonWidth, buttonHeight;
+    int mButtonMaxWidth;
+    int mButtonMaxHeight;
+    int mButtonWidth;
+    int mButtonHeight;
 
     // The monitor to display tasks for
-    UINT monitor;
+    UINT mMonitor;
 
     //
-    ORDERING ordering;
+    SortingType mSortingType;
 
     //
-    WindowThumbnail* thumbnail;
+    WindowThumbnail* mThumbnail;
 
     //
-    bool noThumbnails;
+    bool mNoThumbnails;
 };

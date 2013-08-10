@@ -30,7 +30,7 @@ extern map<tstring, Taskbar*> gTaskbars;
 
 extern LSModule gLSModule;
 
-//
+// The messages that the Window Manager wants from the core
 const UINT gWMMessages[] = {
     // Standard HSHELL
     LM_WINDOWCREATED, LM_WINDOWACTIVATED, LM_WINDOWDESTROYED, LM_LANGUAGE,

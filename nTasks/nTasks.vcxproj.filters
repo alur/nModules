@@ -12,6 +12,8 @@
     <ClCompile Include="nTask.cpp" />
     <ClCompile Include="Taskbar.cpp" />
     <ClCompile Include="TaskButton.cpp" />
+    <ClCompile Include="ProgressBar.cpp" />
+    <ClCompile Include="ButtonSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\WindowManager.h" />
@@ -24,6 +26,8 @@
     <ClInclude Include="resource.h">
       <Filter>Resources</Filter>
     </ClInclude>
+    <ClInclude Include="ProgressBar.hpp" />
+    <ClInclude Include="ButtonSettings.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nTask.rc">

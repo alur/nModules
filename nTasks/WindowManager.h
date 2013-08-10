@@ -9,11 +9,13 @@
 
 #include <string>
 
-namespace WindowManager {
+namespace WindowManager
+{
     /// <summary>
     /// Holds all information about a particular top level window.
     /// </summary>
-    typedef struct WindowInformation {
+    typedef struct WindowInformation
+    {
         // The monitor this window is currently on
         UINT uMonitor;
 

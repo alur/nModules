@@ -16,7 +16,8 @@
 /// <summary>
 /// Constructor
 /// </summary>
-TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, _T("Button")) {
+TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, _T("Button"))
+{
     //
     this->iconSettings = mSettings->CreateChild(_T("Icon"));
     LoadSettings();
@@ -48,7 +49,8 @@ TaskButton::TaskButton(Drawable* parent, HWND watchedWindow) : Drawable(parent, 
 
     // Reset the system menu for the window
     this->menu = GetSystemMenu(this->watchedWindow, FALSE);
-    if (!IsMenu(this->menu)) {
+    if (!IsMenu(this->menu))
+    {
         GetSystemMenu(this->watchedWindow, TRUE);
         this->menu = GetSystemMenu(this->watchedWindow, FALSE);
     }
@@ -76,42 +78,53 @@ TaskButton::~TaskButton()
 /// <summary>
 /// Sets the icon of this button.
 /// </summary>
-void TaskButton::SetIcon(HICON icon) {
-    if (mNoIcons) {
+void TaskButton::SetIcon(HICON icon)
+{
+    if (mNoIcons)
+    {
         return;
     }
 
     mWindow->RemoveOverlay(this->icon);
     this->icon.mValid = false;
     
-    if (icon == nullptr) {
+    if (icon == nullptr)
+    {
         icon = LoadIcon(NULL, IDI_APPLICATION);
     }
-    if (icon != nullptr) {
+    if (icon != nullptr)
+    {
         this->icon = mWindow->AddOverlay(mIconRect, icon, 10);
-        mWindow->Repaint();
     }
+    mWindow->Repaint();
 }
 
 
-void TaskButton::SetOverlayIcon(HICON overlayIcon) {
-    if (mNoIcons) {
+/// <summary>
+/// Sets the overlay icon of this button.
+/// </summary>
+void TaskButton::SetOverlayIcon(HICON overlayIcon)
+{
+    if (mNoIcons)
+    {
         return;
     }
     
     mWindow->RemoveOverlay(this->iconOverlay);
     this->iconOverlay.mValid = false;
-    if (overlayIcon != nullptr) {
+    if (overlayIcon != nullptr)
+    {
         this->iconOverlay = mWindow->AddOverlay(mOverlayIconRect, overlayIcon, 20);
-        mWindow->Repaint();
     }
+    mWindow->Repaint();
 }
 
 
 /// <summary>
 /// Sets the text of this button.
 /// </summary>
-void TaskButton::SetText(LPCWSTR title) {
+void TaskButton::SetText(LPCWSTR title)
+{
     mWindow->SetText(title);
     mWindow->Repaint();
 }
@@ -120,7 +133,8 @@ void TaskButton::SetText(LPCWSTR title) {
 /// <summary>
 /// Loads RC settings for task buttons.
 /// </summary>
-void TaskButton::LoadSettings(bool /* bIsRefresh */) {
+void TaskButton::LoadSettings(bool /* bIsRefresh */)
+{
     this->useFlashing = mSettings->GetBool(_T("UseFlashing"), true);
     this->flashInterval = mSettings->GetInt(_T("FlashInterval"), 500);
     mNoIcons = mSettings->GetBool(_T("NoIcons"), false);
@@ -145,7 +159,8 @@ void TaskButton::LoadSettings(bool /* bIsRefresh */) {
 /// <summary>
 /// Moves and resizes the taaskbutton.
 /// </summary>
-void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height) {
+void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height)
+{
     mWindow->SetPosition(x, y, width, height);
 }
 
@@ -174,15 +189,20 @@ void TaskButton::Activate()
 /// <summary>
 /// Activates or deactivates the flashing state.
 /// </summary>
-void TaskButton::SetFlashingState(bool value) {
-    if (value) {
-        if (mStates[State::Hover]->active && mStates[State::Minimized]->active) {
+void TaskButton::SetFlashingState(bool value)
+{
+    if (value)
+    {
+        if (mStates[State::Hover]->active && mStates[State::Minimized]->active)
+        {
             mWindow->ActivateState(mStates[State::MinimizedFlashingHover]);
         }
-        if (mStates[State::Minimized]->active) {
+        if (mStates[State::Minimized]->active)
+        {
             mWindow->ActivateState(mStates[State::MinimizedFlashing]);
         }
-        if (mStates[State::Hover]->active) {
+        if (mStates[State::Hover]->active)
+        {
             mWindow->ActivateState(mStates[State::FlashingHover]);
         }
         mWindow->ActivateState(mStates[State::Flashing]);

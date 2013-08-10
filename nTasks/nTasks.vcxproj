@@ -163,7 +163,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ButtonSettings.cpp" />
     <ClCompile Include="nTask.cpp" />
+    <ClCompile Include="ProgressBar.cpp" />
     <ClCompile Include="Taskbar.cpp" />
     <ClCompile Include="TaskButton.cpp" />
     <ClCompile Include="TestWindow.cpp" />
@@ -171,7 +173,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\nTask.h" />
+    <ClInclude Include="ButtonSettings.hpp" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="ProgressBar.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Taskbar.hpp" />
     <ClInclude Include="TaskButton.hpp" />

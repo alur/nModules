@@ -11,9 +11,12 @@
 #include "../nShared/Drawable.hpp"
 #include "../Utilities/EnumArray.hpp"
 
-class TaskButton : public Drawable {
+class TaskButton : public Drawable
+{
 private:
-    enum class State {
+    // All button states
+    enum class State
+    {
         Active = 0,
         ActiveHover,
         Flashing,
