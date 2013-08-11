@@ -661,19 +661,6 @@ State *Window::GetState(LPCTSTR stateName)
 
 
 /// <summary>
-/// Callback function for Paint(). Tells the specified window to repaint itself.
-/// </summary>
-/// <returns>TRUE</returns>
-BOOL CALLBACK ChildPainter(HWND hwnd, LPARAM lParam)
-{
-    UNREFERENCED_PARAMETER(lParam);
-
-    SendMessage(hwnd, WM_PAINT, NULL, NULL);
-    return TRUE;
-}
-
-
-/// <summary>
 /// Handles window messages for this drawablewindow. Any messages forwarded from here will have the extra parameter set to this.
 /// </summary>
 /// <param name="window">The handle of the window this message was sent to.</param>
@@ -720,6 +707,10 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
                     if (activeChild != nullptr)
                     {
                         activeChild->HandleMessage(window, WM_MOUSELEAVE, 0, 0, this);
+                    }
+                    else
+                    {
+                        this->msgHandler->HandleMessage(window, WM_MOUSEMOVE, wParam, lParam, this);
                     }
                     activeChild = (Window*)handler;
                 }
@@ -784,9 +775,13 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
             }
 
             // Paint actual owned/child windows.
-            EnumChildWindows(this->window, ChildPainter, NULL);
+            EnumChildWindows(this->window, [] (HWND hwnd, LPARAM) -> BOOL
+            {
+                SendMessage(hwnd, WM_PAINT, 0, 0);
+                return TRUE;
+            }, 0);
 
-            ValidateRect(this->window, NULL);
+            ValidateRect(this->window, nullptr);
 
             if (inAnimation)
             {

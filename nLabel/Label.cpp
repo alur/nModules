@@ -12,19 +12,23 @@
 extern map<wstring, Label*> g_AllLabels;
 
 
-Label::Label(LPCTSTR name) : Drawable(name) {
+Label::Label(LPCTSTR name) : Drawable(name)
+{
     Initalize();
 }
 
 
-Label::Label(LPCTSTR name, Drawable* parent) : Drawable(parent, name, true) {
+Label::Label(LPCTSTR name, Drawable* parent) : Drawable(parent, name, true)
+{
     Initalize();
 }
 
 
-Label::~Label() {
+Label::~Label()
+{
     // Remove all overlays
-    for (list<Drawable*>::const_iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++) {
+    for (list<Drawable*>::const_iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++)
+    {
         delete *iter;
     }
     this->overlays.clear();
@@ -33,7 +37,8 @@ Label::~Label() {
 }
 
 
-void Label::Initalize() {
+void Label::Initalize()
+{
     this->allLabelsIter = g_AllLabels.insert(g_AllLabels.begin(), pair<wstring, Label*>(wstring(mSettings->GetPrefix()), this));
     
     WindowSettings defaults;
@@ -45,13 +50,15 @@ void Label::Initalize() {
     LoadSettings();
 
     this->stateHover = mWindow->AddState(L"Hover", 100);
-    if (!mWindow->GetDrawingSettings()->hidden) {
+    if (!mWindow->GetDrawingSettings()->hidden)
+    {
         mWindow->Show();
     }
 }
 
 
-void Label::LoadSettings(bool /* isRefresh */) {
+void Label::LoadSettings(bool /* isRefresh */)
+{
     TCHAR prefix[MAX_RCCOMMAND];
     StringCchPrintf(prefix, _countof(prefix), _T("*%sOverlayLabel"), mSettings->GetPrefix());
 
@@ -62,11 +69,14 @@ void Label::LoadSettings(bool /* isRefresh */) {
 }
 
 
-LRESULT WINAPI Label::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LPVOID) {
-    if (uMsg == WM_MOUSEMOVE) {
+LRESULT WINAPI Label::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LPVOID)
+{
+    if (uMsg == WM_MOUSEMOVE)
+    {
         mWindow->ActivateState(this->stateHover);
     }
-    else if (uMsg == WM_MOUSELEAVE) {
+    else if (uMsg == WM_MOUSELEAVE)
+    {
         mWindow->ClearState(this->stateHover);
     }
     mEventHandler->HandleMessage(hWnd, uMsg, wParam, lParam);
