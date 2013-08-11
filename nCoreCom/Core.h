@@ -12,7 +12,7 @@
 #include "../Utilities/Versioning.h"
 #include "../nCore/IParsedText.hpp"
 
-class DrawableWindow;
+class Window;
 
 namespace nCore
 {
@@ -36,8 +36,8 @@ namespace nCore
         // Window Registrar
         void RegisterWindow(LPCTSTR prefix, LPVOID window);
         void UnRegisterWindow(LPCTSTR prefix);
-        DrawableWindow *FindRegisteredWindow(LPCTSTR prefix);
-        void AddWindowRegistrationListener(LPCTSTR prefix, DrawableWindow *listener);
-        void RemoveWindowRegistrationListener(LPCTSTR prefix, DrawableWindow *listener);
+        Window *FindRegisteredWindow(LPCTSTR prefix);
+        void AddWindowRegistrationListener(LPCTSTR prefix, Window *listener);
+        void RemoveWindowRegistrationListener(LPCTSTR prefix, Window *listener);
     }
 }

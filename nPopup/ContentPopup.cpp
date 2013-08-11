@@ -307,7 +307,7 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
 }
 
 
-LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow)
+LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID Window)
 {
     if (message >= WM_USER)
     {
@@ -351,5 +351,5 @@ LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wPa
             return 0;
         }
     }
-    return Popup::HandleMessage(window, message, wParam, lParam, drawableWindow); 
+    return Popup::HandleMessage(window, message, wParam, lParam, Window); 
 }

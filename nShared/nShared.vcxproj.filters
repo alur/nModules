@@ -10,6 +10,9 @@
     <Filter Include="Color">
       <UniqueIdentifier>{1215375f-9cf4-4851-9d31-14963dd51785}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Window">
+      <UniqueIdentifier>{e1aed713-6245-41eb-8fc8-4d5fbced6f3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Balloon.hpp">
@@ -45,18 +48,6 @@
     <ClInclude Include="Brush.hpp">
       <Filter>Brushes</Filter>
     </ClInclude>
-    <ClInclude Include="Drawable.hpp">
-      <Filter>Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="DrawableSettings.hpp">
-      <Filter>Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="DrawableWindow.hpp">
-      <Filter>Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="DrawableWindowBangs.h">
-      <Filter>Drawables</Filter>
-    </ClInclude>
     <ClInclude Include="Color.h">
       <Filter>Color</Filter>
     </ClInclude>
@@ -74,6 +65,27 @@
     </ClInclude>
     <ClInclude Include="BinaryColorVal.hpp">
       <Filter>Color</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowSettings.hpp">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.hpp">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowBangs.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowClass.hpp">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildDrawable.hpp">
+      <Filter>Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="IDrawable.hpp">
+      <Filter>Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawable.hpp">
+      <Filter>Drawables</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -107,24 +119,6 @@
     <ClCompile Include="Brush.cpp">
       <Filter>Brushes</Filter>
     </ClCompile>
-    <ClCompile Include="DrawableWindowUnknown.cpp">
-      <Filter>Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="Drawable.cpp">
-      <Filter>Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="DrawableSettings.cpp">
-      <Filter>Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="DrawableWindow.cpp">
-      <Filter>Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="DrawableWindowBangs.cpp">
-      <Filter>Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="DrawableWindowDropTarget.cpp">
-      <Filter>Drawables</Filter>
-    </ClCompile>
     <ClCompile Include="Color.cpp">
       <Filter>Color</Filter>
     </ClCompile>
@@ -142,6 +136,33 @@
     </ClCompile>
     <ClCompile Include="ColorParser.cpp">
       <Filter>Color</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowUnknown.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowSettings.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowBangs.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowClass.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowDropTarget.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="IDrawable.cpp">
+      <Filter>Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="ChildDrawable.cpp">
+      <Filter>Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Drawable.cpp">
+      <Filter>Drawables</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

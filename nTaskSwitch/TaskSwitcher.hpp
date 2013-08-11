@@ -9,7 +9,7 @@
 
 #include <dwmapi.h>
 #include "../nShared/Drawable.hpp"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 #include "../nShared/LayoutSettings.hpp"
 #include "TaskThumbnail.hpp"
 

@@ -16,7 +16,7 @@
 ContainerItem::ContainerItem(Drawable* parent, LPCTSTR prefix) : PopupItem(parent, prefix, true) {
     this->itemType = PopupItemType::CONTAINER;
 
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.registerWithCore = true;
 
     StateSettings defaultState;

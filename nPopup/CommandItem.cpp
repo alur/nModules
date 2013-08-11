@@ -33,7 +33,7 @@ void CommandItem::Init(LPCTSTR title, LPCTSTR command) {
     this->command = _tcsdup(command);
     this->itemType = PopupItemType::COMMAND;
 
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.width = 190;
     defaults.height = 20;
 

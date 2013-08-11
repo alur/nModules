@@ -40,7 +40,7 @@ private:
 
 private:
     //
-    DrawableWindow::OVERLAY mCoverArt;
+    Window::OVERLAY mCoverArt;
 
     // Path to the default cover art.
     WCHAR mDefaultCoverArt[MAX_PATH];

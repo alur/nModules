@@ -12,7 +12,7 @@
 
 
 SeparatorItem::SeparatorItem(Drawable* parent) : PopupItem(parent, L"SeparatorItem") {
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.width = 190;
     defaults.height = 5;
 

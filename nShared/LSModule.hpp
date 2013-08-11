@@ -36,7 +36,7 @@ public:
     bool ConnectToCore(VERSION minimumCoreVersion);
 
     // Creates a top-level drawable window.
-    DrawableWindow* CreateDrawableWindow(Settings* settings, MessageHandler* msgHandler);
+    Window* CreateDrawableWindow(Settings* settings, MessageHandler* msgHandler);
 
     // Registers the message handler to recieve these messages from the core.
     void RegisterForMessages(UINT messages[]);

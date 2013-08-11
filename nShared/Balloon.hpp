@@ -8,7 +8,7 @@
 #pragma once
 
 #include "Drawable.hpp"
-#include "DrawableWindow.hpp"
+#include "Window.hpp"
 
 class Balloon : public Drawable
 {
@@ -20,14 +20,14 @@ public:
     void Hide();
 
     void LoadSettings(bool = false);
-    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow);
+    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID Window);
 
 private:
     UINT mClickedMessage;
     MessageHandler* mCallbackHandler;
 
-    DrawableWindow* mTitleWindow;
-    DrawableWindow* mCloseBtnWindow;
+    Window* mTitleWindow;
+    Window* mCloseBtnWindow;
 
     Settings* mTitleSettings;
     Settings* mCloseBtnSettings;

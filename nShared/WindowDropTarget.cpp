@@ -1,20 +1,22 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableWindowDropTarget.cpp
+ *  WindowDropTarget.cpp
  *  The nModules Project
  *
  *  
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "DrawableWindow.hpp"
+#include "Window.hpp"
 
 
-HRESULT DrawableWindow::DragEnter(IDataObject *dataObj, DWORD keyState, POINTL point, DWORD *effect) {
+HRESULT Window::DragEnter(IDataObject *dataObj, DWORD keyState, POINTL point, DWORD *effect)
+{
     *effect = DROPEFFECT_COPY;
     return S_OK;
 }
 
 
-HRESULT DrawableWindow::DragOver(DWORD keyState, POINTL point, DWORD *effect) {
+HRESULT Window::DragOver(DWORD keyState, POINTL point, DWORD *effect)
+{
     if (point.x > 500)
         *effect = DROPEFFECT_COPY;
     else
@@ -23,17 +25,20 @@ HRESULT DrawableWindow::DragOver(DWORD keyState, POINTL point, DWORD *effect) {
 }
 
 
-HRESULT DrawableWindow::DragLeave() {
+HRESULT Window::DragLeave()
+{
     return S_OK;
 }
 
 
-HRESULT DrawableWindow::Drop(IDataObject *dataObj, DWORD keyState, POINTL point, DWORD *effect) {
+HRESULT Window::Drop(IDataObject *dataObj, DWORD keyState, POINTL point, DWORD *effect)
+{
     *effect = DROPEFFECT_COPY;
     return S_OK;
 }
 
 
-void DrawableWindow::AddDropRegion(LPRECT rect, IDropTarget *handler) {
+void Window::AddDropRegion(LPRECT rect, IDropTarget *handler)
+{
     RegisterDragDrop(GetWindowHandle(), (IDropTarget*)this);
 }

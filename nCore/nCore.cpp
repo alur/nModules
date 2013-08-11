@@ -12,7 +12,7 @@
 #include "../nShared/ErrorHandler.h"
 #include "../nShared/MonitorInfo.hpp"
 #include "../Utilities/Versioning.h"
-#include "../nShared/DrawableWindowBangs.h"
+#include "../nShared/WindowBangs.h"
 #include "../nShared/StateBangs.h"
 #include "../nShared/BrushBangs.h"
 #include "TextFunctions.h"
@@ -34,7 +34,7 @@ LPCTSTR gMsgHandler = _T("LSnCore");
 UINT_PTR timeTimer;
 
 // 
-EXPORT_CDECL(DrawableWindow*) FindRegisteredWindow(LPCTSTR prefix);
+EXPORT_CDECL(Window*) FindRegisteredWindow(LPCTSTR prefix);
 
 
 /// <summary>
@@ -65,7 +65,7 @@ int initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* path */)
     nCore::Connect(MakeVersion(MODULE_VERSION));
 
     // Register window bangs
-    DrawableWindowBangs::Register(_T("n"), FindRegisteredWindow);
+    WindowBangs::Register(_T("n"), FindRegisteredWindow);
     StateBangs::Register(_T("n"), FindRegisteredWindow);
     BrushBangs::Register(_T("n"), FindRegisteredWindow);
 
@@ -78,7 +78,7 @@ int initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* path */)
 /// </summary>
 void quitModule(HINSTANCE hDllInstance)
 {
-    DrawableWindowBangs::UnRegister(_T("n"));
+    WindowBangs::UnRegister(_T("n"));
     StateBangs::UnRegister(_T("n"));
     BrushBangs::UnRegister(_T("n"));
 

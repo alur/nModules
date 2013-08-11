@@ -7,11 +7,11 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
-#include "DrawableWindow.hpp"
+#include "Window.hpp"
 #include <functional>
 
 namespace BrushBangs
 {
-    void Register(LPCTSTR prefix, std::function<DrawableWindow* (LPCTSTR)> windowFinder);
+    void Register(LPCTSTR prefix, std::function<Window* (LPCTSTR)> windowFinder);
     void UnRegister(LPCTSTR prefix);
 }

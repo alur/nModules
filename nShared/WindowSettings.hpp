@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableSettings.hpp
+ *  WindowSettings.hpp
  *  The nModules Project
  *
- *  Settings used by DrawableWindow.
+ *  Settings used by Window.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
@@ -11,13 +11,14 @@
 #include <dwrite.h>
 #include "Settings.hpp"
 
-class DrawableSettings {
+class WindowSettings
+{
 public:
-    explicit DrawableSettings();
-    virtual ~DrawableSettings();
+    explicit WindowSettings();
+    virtual ~WindowSettings();
 
     // Loads the actual settings.
-    void Load(Settings* settings, DrawableSettings* defaults);
+    void Load(Settings* settings, WindowSettings* defaults);
 
     D2D1_TEXT_ANTIALIAS_MODE ParseAntiAliasMode(LPCTSTR mode);
 

@@ -7,7 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 #include "../nShared/Drawable.hpp"
 #include "../Utilities/EnumArray.hpp"
 
@@ -33,22 +33,27 @@ public:
     explicit TaskButton(Drawable* parent, HWND hWnd);
     virtual ~TaskButton();
 
+public:
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
+
+public:
     void Reposition(UINT x, UINT y, UINT width, UINT height);
 
     void Activate();
     void Deactivate();
 
-    void SetIcon(HICON hIcon);
-    void SetOverlayIcon(HICON hOverlayIcon);
-    void SetText(LPCWSTR pszTitle);
+    void SetIcon(HICON icon);
+    void SetOverlayIcon(HICON overlayIcon);
+    void SetText(LPCWSTR title);
+    void SetProgressState(TBPFLAG state);
+    void SetProgressValue(USHORT progress);
     void Flash();
 
-    void GetMinRect(LPPOINTS lpPoints);
+    void GetMinRect(LPPOINTS points);
     void ShowMenu();
     void Show();
 
     void LoadSettings(bool = false);
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
     
     void SetMinmizedState(bool value);
 
@@ -59,27 +64,28 @@ private:
 
 private:
     // Settings for painting the icon in the button.
-    Settings *iconSettings;
+    Settings *mIconSettings;
 
     // The window related to this button.
-    HWND watchedWindow;
+    HWND mWatchedWindow;
 
     // The system context menu for this window.
-    HMENU menu;
+    HMENU mMenu;
 
-    bool mouseIsOver;
-    bool isFlashing;
-    bool useFlashing;
-    bool flashOn;
-    int flashInterval;
-    UINT_PTR flashTimer;
+    bool mMouseIsOver;
+    bool mIsFlashing;
+    bool mUseFlashing;
+    bool mFlashOn;
+    int mFlashInterval;
+    UINT_PTR mFlashTimer;
 
     //
     bool mNoIcons;
     D2D1_RECT_F mIconRect;
     D2D1_RECT_F mOverlayIconRect;
 
-    EnumArray<DrawableWindow::STATE, State> mStates;
+    EnumArray<Window::STATE, State> mStates;
 
-    DrawableWindow::OVERLAY icon, iconOverlay;
+    Window::OVERLAY mIcon;
+    Window::OVERLAY mIconOverlay;
 };

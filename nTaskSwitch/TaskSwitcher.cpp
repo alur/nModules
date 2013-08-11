@@ -7,7 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../Utilities/Common.h"
 #include "TaskSwitcher.hpp"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 #include "../nShared/LSModule.hpp"
 #include <Shlwapi.h>
 #include "../nShared/DWMColorVal.hpp"
@@ -48,7 +48,7 @@ void TaskSwitcher::LoadSettings() {
     MonitorInfo::Monitor primaryMonitor;
     primaryMonitor = mWindow->GetMonitorInformation()->m_monitors[0];
 
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.alwaysOnTop = true;
 
     // Center in the workarea of the primary monitor.

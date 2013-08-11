@@ -9,7 +9,7 @@
 
 #include <dwmapi.h>
 #include "../nShared/Drawable.hpp"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 
 class TaskThumbnail : public Drawable {
 public:
@@ -35,7 +35,7 @@ private:
     HTHUMBNAIL thumbnail;
     WPARAM requestedIcon;
 
-    DrawableWindow::STATE stateHover, stateSelected, stateSelectedHover;
-    DrawableWindow* iconOverlayWindow;
+    Window::STATE stateHover, stateSelected, stateSelectedHover;
+    Window* iconOverlayWindow;
     RECT thumbnailMargins;
 };

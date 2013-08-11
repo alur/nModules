@@ -103,19 +103,19 @@ void nCore::System::UnRegisterWindow(LPCTSTR prefix)
 }
 
 
-DrawableWindow *nCore::System::FindRegisteredWindow(LPCTSTR prefix)
+Window *nCore::System::FindRegisteredWindow(LPCTSTR prefix)
 {
     return FUNC_VAR_NAME(FindRegisteredWindow)(prefix);
 }
 
 
-void nCore::System::AddWindowRegistrationListener(LPCTSTR prefix, DrawableWindow *listener)
+void nCore::System::AddWindowRegistrationListener(LPCTSTR prefix, Window *listener)
 {
     FUNC_VAR_NAME(AddWindowRegistrationListener)(prefix, listener);
 }
 
 
-void nCore::System::RemoveWindowRegistrationListener(LPCTSTR prefix, DrawableWindow *listener)
+void nCore::System::RemoveWindowRegistrationListener(LPCTSTR prefix, Window *listener)
 {
     FUNC_VAR_NAME(RemoveWindowRegistrationListener)(prefix, listener);
 }

@@ -31,7 +31,7 @@ namespace nPopup
         Popup* popup;
         LPCTSTR title;
 
-        DrawableWindow::STATE hoverState;
-        DrawableWindow::STATE openState;
+        Window::STATE hoverState;
+        Window::STATE openState;
     };
 }

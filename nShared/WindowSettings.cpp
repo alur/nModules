@@ -1,13 +1,13 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableSettings.cpp
+ *  WindowSettings.cpp
  *  The nModules Project
  *
- *  Holds all RC settings used by the DrawableWindow class.
+ *  Holds all RC settings used by the Window class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
-#include "DrawableSettings.hpp"
+#include "WindowSettings.hpp"
 #include "../Utilities/StringUtils.h"
 #include <map>
 
@@ -15,7 +15,8 @@
 /// <summary>
 /// Initalizes the class to all default settings.
 /// </summary>
-DrawableSettings::DrawableSettings() {
+WindowSettings::WindowSettings()
+{
     this->alwaysOnTop = false;
     this->blurBehind = false;
     this->clickThrough = false;
@@ -34,7 +35,8 @@ DrawableSettings::DrawableSettings() {
 /// <summary>
 /// Destructor.
 /// </summary>
-DrawableSettings::~DrawableSettings() {
+WindowSettings::~WindowSettings()
+{
     free(this->text);
 }
 
@@ -47,9 +49,12 @@ static std::map<D2D1_TEXT_ANTIALIAS_MODE, LPCTSTR> textAntiAliasModeMap = {
 
 
 template <typename T>
-static T GetValue(LPCTSTR string, std::map<T, LPCTSTR> map, T defValue) {
-    for (auto &x : map) {
-        if (_tcsicmp(string, x.second) == 0) {
+static T GetValue(LPCTSTR string, std::map<T, LPCTSTR> map, T defValue)
+{
+    for (auto &x : map)
+    {
+        if (_tcsicmp(string, x.second) == 0)
+        {
             return x.first;
         }
     }
@@ -58,9 +63,12 @@ static T GetValue(LPCTSTR string, std::map<T, LPCTSTR> map, T defValue) {
 
 
 template <typename T>
-static LPCTSTR GetName(T value, std::map<T, LPCTSTR> map) {
-    for (auto &x : map) {
-        if (x.first == value) {
+static LPCTSTR GetName(T value, std::map<T, LPCTSTR> map)
+{
+    for (auto &x : map)
+    {
+        if (x.first == value)
+        {
             return x.second;
         }
     }
@@ -71,9 +79,11 @@ static LPCTSTR GetName(T value, std::map<T, LPCTSTR> map) {
 /// <summary>
 /// Loads settings from an RC file using the specified defaults.
 /// </summary>
-void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
+void WindowSettings::Load(Settings* settings, WindowSettings* defaults)
+{
     WCHAR buf[MAX_LINE_LENGTH];
-    if (!defaults) {
+    if (!defaults)
+    {
         defaults = this;
     }
 
@@ -94,6 +104,7 @@ void DrawableSettings::Load(Settings* settings, DrawableSettings* defaults) {
 }
 
 
-D2D1_TEXT_ANTIALIAS_MODE DrawableSettings::ParseAntiAliasMode(LPCTSTR str) {
+D2D1_TEXT_ANTIALIAS_MODE WindowSettings::ParseAntiAliasMode(LPCTSTR str)
+{
     return GetValue(str, textAntiAliasModeMap, D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE);
 }

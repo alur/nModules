@@ -15,7 +15,7 @@ InfoItem::InfoItem(Drawable* parent, LPCTSTR title, LPCTSTR customIcon) : PopupI
     this->title = _tcsdup(title);
     this->itemType = PopupItemType::INFO;
 
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.width = 190;
     defaults.height = 20;
     defaults.evaluateText = true;

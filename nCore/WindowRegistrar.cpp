@@ -6,7 +6,7 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 #include <string>
 #include <map>
 #include <functional>
@@ -23,11 +23,11 @@ struct STRICmp : std::binary_function<wstring, wstring, bool>
 };
 
 
-static map<wstring, DrawableWindow*, STRICmp> registeredWindows;
-static map<wstring, list<DrawableWindow*>, STRICmp> registrationListeners;
+static map<wstring, Window*, STRICmp> registeredWindows;
+static map<wstring, list<Window*>, STRICmp> registrationListeners;
 
 
-EXPORT_CDECL(void) RegisterWindow(LPCWSTR prefix, DrawableWindow *window)
+EXPORT_CDECL(void) RegisterWindow(LPCWSTR prefix, Window *window)
 {
     registeredWindows[prefix] = window;
     for (auto listener : registrationListeners[prefix])
@@ -44,7 +44,7 @@ EXPORT_CDECL(void) UnRegisterWindow(LPCWSTR prefix)
 }
 
 
-EXPORT_CDECL(DrawableWindow*) FindRegisteredWindow(LPCWSTR prefix)
+EXPORT_CDECL(Window*) FindRegisteredWindow(LPCWSTR prefix)
 {
     auto iter = registeredWindows.find(prefix);
     if (iter != registeredWindows.end())
@@ -55,13 +55,13 @@ EXPORT_CDECL(DrawableWindow*) FindRegisteredWindow(LPCWSTR prefix)
 }
 
 
-EXPORT_CDECL(void) AddWindowRegistrationListener(LPCWSTR prefix, DrawableWindow *listener)
+EXPORT_CDECL(void) AddWindowRegistrationListener(LPCWSTR prefix, Window *listener)
 {
     registrationListeners[prefix].push_back(listener);
 }
 
 
-EXPORT_CDECL(void) RemoveWindowRegistrationListener(LPCWSTR prefix, DrawableWindow *listener)
+EXPORT_CDECL(void) RemoveWindowRegistrationListener(LPCWSTR prefix, Window *listener)
 {
     registrationListeners[prefix].remove(listener);
 }

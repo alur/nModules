@@ -34,7 +34,7 @@ Popup::Popup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Drawable(prefix) {
     mChildOffsetY = mSettings->GetInt(_T("ChildOffsetY"), 0);
     this->padding = mSettings->GetOffsetRect(_T("Padding"), 5, 5, 5, 5);
 
-    DrawableSettings defaultSettings;
+    WindowSettings defaultSettings;
     defaultSettings.alwaysOnTop = true;
     defaultSettings.width = 200;
 

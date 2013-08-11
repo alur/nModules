@@ -11,7 +11,7 @@
 
 
 Tooltip::Tooltip(LPCTSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings) {
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.width = 150;
     defaults.height = 40;
     defaults.alwaysOnTop = true;

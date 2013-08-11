@@ -28,7 +28,7 @@ using namespace D2D1;
 /// <summary>
 /// Creates a new instance of the DesktopPainter class.
 /// </summary>
-DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, _T("nDesk"), g_pClickHandler)
+DesktopPainter::DesktopPainter(HWND hWnd) : Window(hWnd, _T("nDesk"), g_pClickHandler)
 {
     // Initalize
     m_pWallpaperBrush = nullptr;
@@ -52,7 +52,7 @@ DesktopPainter::DesktopPainter(HWND hWnd) : DrawableWindow(hWnd, _T("nDesk"), g_
     m_TransitionSettings.fFadeTime = 0.2f;
     SetTransitionType(NONE);
 
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.width = g_pMonitorInfo->m_virtualDesktop.width;
     defaults.height = g_pMonitorInfo->m_virtualDesktop.height;
     defaults.x = g_pMonitorInfo->m_virtualDesktop.rect.left;
@@ -87,7 +87,7 @@ void DesktopPainter::DiscardDeviceResources()
 {
     SAFERELEASE(m_pWallpaperBrush);
     SAFERELEASE(m_pOldWallpaperBrush);
-    DrawableWindow::DiscardDeviceResources();
+    Window::DiscardDeviceResources();
 }
 
 
@@ -109,7 +109,7 @@ HRESULT DesktopPainter::ReCreateDeviceResources()
 
     if (!this->renderTarget)
     {
-        DrawableWindow::ReCreateDeviceResources();
+        Window::ReCreateDeviceResources();
         UpdateWallpaper(true);
     }
 
@@ -427,7 +427,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
         }
         return 0;
     }
-    return DrawableWindow::HandleMessage(hWnd, uMsg, wParam, lParam, NULL);
+    return Window::HandleMessage(hWnd, uMsg, wParam, lParam, NULL);
 }
 
 

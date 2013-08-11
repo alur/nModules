@@ -29,7 +29,7 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
         desktopWindow = FindWindowW(L"DesktopBackgroundClass", nullptr);
     }
 
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.x = x;
     defaults.y = y;
     defaults.width = width;
@@ -111,7 +111,7 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
     //
     this->iconOverlayWindow = gLSModule.CreateDrawableWindow(mSettings, this);
 
-    DrawableSettings iconDefaults;
+    WindowSettings iconDefaults;
     iconDefaults.alwaysOnTop = true;
 
     StateSettings iconStateDefaults;

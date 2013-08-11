@@ -12,7 +12,8 @@
 #include "IPainter.hpp"
 #include "IBrushOwner.hpp"
 
-class State : public IPainter, public IBrushOwner {
+class State : public IPainter, public IBrushOwner
+{
 public:
     explicit State(LPCTSTR stateName, Settings *settings, int defaultPriority, LPCWSTR *text);
     virtual ~State();
@@ -50,11 +51,10 @@ public:
     void SetWordWrapping(DWRITE_WORD_WRAPPING wrapping);
 
 public:
+    bool active;
+
     // The priority of this state.
     int priority;
-
-    // Whether or not this state is currently active.
-    bool active;
 
     // The name of this state.
     LPCTSTR mName;
@@ -69,6 +69,7 @@ private:
     // Creates 
     HRESULT CreateBrush(BrushSettings* settings, ID2D1Brush* brush);
 
+private:
     // The current drawing settings.
     StateSettings* drawingSettings;
 

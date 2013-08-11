@@ -7,7 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 #include "Drawable.hpp"
-#include "DrawableWindow.hpp"
+#include "Window.hpp"
 
 class Tooltip : public Drawable {
 public:

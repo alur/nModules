@@ -11,10 +11,10 @@
 #include "../nCoreCom/Core.h"
 
 
-static std::function<DrawableWindow* (LPCTSTR)> windowFinder;
+static std::function<Window* (LPCTSTR)> windowFinder;
 
 
-static State *FindState(LPCTSTR *args, int numArgs, DrawableWindow *&window) {
+static State *FindState(LPCTSTR *args, int numArgs, Window *&window) {
     TCHAR buffer[MAX_RCCOMMAND];
     int numTokens = LiteStep::CommandTokenize(*args, nullptr, 0, nullptr);
 
@@ -46,7 +46,7 @@ static struct BangItem {
     LiteStep::BANGCOMMANDPROC proc;
 } BangMap [] = {
     BangItem(TEXT("SetCornerRadiusX"),           [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -56,7 +56,7 @@ static struct BangItem {
         }
     }),
     BangItem(TEXT("SetCornerRadiusY"),           [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -66,7 +66,7 @@ static struct BangItem {
         }
     }),
     BangItem(TEXT("SetOutlineWidth"),            [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -76,7 +76,7 @@ static struct BangItem {
         }
     }),
     /*BangItem(TEXT("SetFont"),                    [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -85,7 +85,7 @@ static struct BangItem {
         }
     }),
     BangItem(TEXT("SetFontSize"),                [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -94,7 +94,7 @@ static struct BangItem {
         }
     }),
     BangItem(TEXT("SetFontStretch"),             [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -103,7 +103,7 @@ static struct BangItem {
         }
     }),
     BangItem(TEXT("SetFontStyle"),               [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -112,7 +112,7 @@ static struct BangItem {
         }
     }),
     BangItem(TEXT("SetFontWeight"),              [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -121,7 +121,7 @@ static struct BangItem {
         }
     }),*/
     BangItem(TEXT("SetReadingDirection"),        [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -131,7 +131,7 @@ static struct BangItem {
         }
     }),
     BangItem(TEXT("SetTextAlign"),               [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -141,7 +141,7 @@ static struct BangItem {
         }
     }),
     BangItem(TEXT("SetTextOffset"),              [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 4, window);
         if (state) {
             TCHAR left[MAX_RCCOMMAND], top[MAX_RCCOMMAND], right[MAX_RCCOMMAND], bottom[MAX_RCCOMMAND];
@@ -152,7 +152,7 @@ static struct BangItem {
         }
     }),
     BangItem(TEXT("SetTextRotation"),            [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -162,7 +162,7 @@ static struct BangItem {
         }
     }),
     BangItem(TEXT("SetTextTrimmingGranularity"), [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -172,7 +172,7 @@ static struct BangItem {
         }
     }),
     BangItem(TEXT("SetTextVerticalAlign"),       [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -182,7 +182,7 @@ static struct BangItem {
         }
     }),
     BangItem(TEXT("SetWordWrapping"),            [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
@@ -197,7 +197,7 @@ static struct BangItem {
 /// <summary>
 /// Registers bangs.
 /// </summary>
-void StateBangs::Register(LPCTSTR prefix, std::function<DrawableWindow* (LPCTSTR)> windowFinder) {
+void StateBangs::Register(LPCTSTR prefix, std::function<Window* (LPCTSTR)> windowFinder) {
     TCHAR bangName[64];
     ::windowFinder = windowFinder;
     for (BangItem item : BangMap) {

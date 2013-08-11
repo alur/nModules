@@ -10,13 +10,13 @@
 #include "../nCoreCom/Core.h"
 
 // Used to map window name -> window
-static std::function<DrawableWindow* (LPCTSTR)> windowFinder;
+static std::function<Window* (LPCTSTR)> windowFinder;
 
 
 /// <summary>
 /// Retrieves the brush and owning window
 /// </summary>
-static Brush *FindBrush(LPCTSTR *args, int numArgs, DrawableWindow *&window)
+static Brush *FindBrush(LPCTSTR *args, int numArgs, Window *&window)
 {
     TCHAR buffer[MAX_RCCOMMAND];
     int numTokens = LiteStep::CommandTokenize(*args, nullptr, 0, nullptr);
@@ -86,7 +86,7 @@ static struct BangItem
 {
     /*(BangItem(TEXT("SetBrushType"),            [] (HWND, LPCTSTR args) -> void
     {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush)
         {
@@ -98,7 +98,7 @@ static struct BangItem
     }),*/
     BangItem(TEXT("SetColor"),                [] (HWND, LPCTSTR args) -> void
     {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush)
         {
@@ -114,7 +114,7 @@ static struct BangItem
         }
     }),
     /*BangItem(TEXT("SetAlpha"),                [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
@@ -123,7 +123,7 @@ static struct BangItem
         }
     }), 
     BangItem(TEXT("SetGradientColors"),       [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
@@ -132,7 +132,7 @@ static struct BangItem
         }
     }),
     BangItem(TEXT("SetGradientStops"),        [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
@@ -141,7 +141,7 @@ static struct BangItem
         }
     }),
     BangItem(TEXT("SetGradientStart"),        [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
@@ -150,7 +150,7 @@ static struct BangItem
         }
     }),
     BangItem(TEXT("SetGradientEnd"),          [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
@@ -159,7 +159,7 @@ static struct BangItem
         }
     }),
     BangItem(TEXT("SetGradientCenter"),       [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
@@ -168,7 +168,7 @@ static struct BangItem
         }
     }),
     BangItem(TEXT("SetGradientRadius"),       [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
@@ -177,7 +177,7 @@ static struct BangItem
         }
     }),
     BangItem(TEXT("SetGradientOriginOffset"), [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
@@ -187,7 +187,7 @@ static struct BangItem
     }),*/
     BangItem(TEXT("SetImage"),                [] (HWND, LPCTSTR args) -> void
     {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush)
         {
@@ -198,7 +198,7 @@ static struct BangItem
         }
     }),
     /*BangItem(TEXT("SetImageRotation"),        [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
@@ -208,7 +208,7 @@ static struct BangItem
         }
     }),*/
     /*BangItem(TEXT("SetImageScalingMode"),     [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
@@ -217,7 +217,7 @@ static struct BangItem
         }
     }),
     BangItem(TEXT("SetTilingMode"),           [] (HWND, LPCTSTR args) -> void {
-        DrawableWindow *window = nullptr;
+        Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
             char arg[MAX_RCCOMMAND];
@@ -231,7 +231,7 @@ static struct BangItem
 /// <summary>
 /// Registers bangs.
 /// </summary>
-void BrushBangs::Register(LPCTSTR prefix, std::function<DrawableWindow* (LPCTSTR)> windowFinder)
+void BrushBangs::Register(LPCTSTR prefix, std::function<Window* (LPCTSTR)> windowFinder)
 {
     TCHAR bangName[64];
     ::windowFinder = windowFinder;

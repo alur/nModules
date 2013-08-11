@@ -10,7 +10,7 @@
 #include "LSModule.hpp"
 #include "Factories.h"
 #include "ErrorHandler.h"
-#include "DrawableWindow.hpp"
+#include "Window.hpp"
 #include "../nCoreCom/Core.h"
 
 
@@ -181,9 +181,9 @@ bool LSModule::ConnectToCore(VERSION minimumCoreVersion)
 /// Creates a top-level drawable window.
 /// </summary>
 /// <param name="settings">The settings structure to use.</param>
-DrawableWindow* LSModule::CreateDrawableWindow(Settings* settings, MessageHandler* msgHandler)
+Window* LSModule::CreateDrawableWindow(Settings* settings, MessageHandler* msgHandler)
 {
-    return new DrawableWindow(this->parent, (LPCTSTR)this->drawableClass, this->instance, settings, msgHandler);
+    return new Window(this->parent, (LPCTSTR)this->drawableClass, this->instance, settings, msgHandler);
 }
 
 

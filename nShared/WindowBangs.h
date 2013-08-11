@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableWindowBangs.h
+ *  WindowBangs.h
  *  The nModules Project
  *
  *  Bangs for drawable windows.
@@ -7,11 +7,11 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "DrawableWindow.hpp"
+#include "Window.hpp"
 
-namespace DrawableWindowBangs
+namespace WindowBangs
 {
-    void Register(LPCTSTR prefix, DrawableWindow* (*drawableFinder)(LPCTSTR));
+    void Register(LPCTSTR prefix, Window* (*windowFinder)(LPCTSTR));
     void UnRegister(LPCTSTR prefix);
 
     // Clickevent related
@@ -29,7 +29,8 @@ namespace DrawableWindowBangs
     void SetParent(HWND, LPCTSTR);
     void SetText(HWND, LPCTSTR);
 
-    struct BangItem {
+    struct BangItem
+    {
         LPCTSTR name;
         LiteStep::BANGCOMMANDPROC command;
     };

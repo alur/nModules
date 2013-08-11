@@ -11,7 +11,7 @@
 #include <vector>
 #include "../nShared/MessageHandler.hpp"
 #include "../nShared/Settings.hpp"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 
 using std::vector;
 

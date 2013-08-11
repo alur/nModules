@@ -33,7 +33,7 @@ void nPopup::FolderItem::Init(LPCTSTR title, Popup* popup)
     this->popup = popup;
     this->itemType = PopupItemType::FOLDER;
 
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.width = 190;
     defaults.height = 20;
 

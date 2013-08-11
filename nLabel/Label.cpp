@@ -36,7 +36,7 @@ Label::~Label() {
 void Label::Initalize() {
     this->allLabelsIter = g_AllLabels.insert(g_AllLabels.begin(), pair<wstring, Label*>(wstring(mSettings->GetPrefix()), this));
     
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.evaluateText = true;
     defaults.registerWithCore = true;
 

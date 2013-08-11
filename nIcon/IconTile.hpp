@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../nShared/Drawable.hpp"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 #include <ShlObj.h>
 
 class IconTile : public Drawable {
@@ -76,10 +76,10 @@ private:
     bool mGhosted;
 
     // 
-    DrawableWindow::STATE mHoverState, mSelectedState, mFocusedState;
+    Window::STATE mHoverState, mSelectedState, mFocusedState;
 
     //
-    DrawableWindow::OVERLAY mIconOverlay;
+    Window::OVERLAY mIconOverlay;
 
     // True if the mouse is currently above the icon.
     bool mMouseOver;

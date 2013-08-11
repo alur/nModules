@@ -13,7 +13,7 @@
 Balloon::Balloon(LPCTSTR prefix, Settings* parentSettings, UINT clickedMessage, MessageHandler* callbackHandler) : Drawable(prefix, parentSettings)
 {
     // Inialize the window.
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.width = 150;
     defaults.height = 40;
     defaults.alwaysOnTop = true;
@@ -39,7 +39,7 @@ Balloon::Balloon(LPCTSTR prefix, Settings* parentSettings, UINT clickedMessage, 
     // Create the a child window for the title of the balloon.
     mTitleSettings = parentSettings->CreateChild(_T("Title"));
     mTitleWindow = mWindow->CreateChild(mTitleSettings, this);
-    DrawableSettings titleDefaults;
+    WindowSettings titleDefaults;
     titleDefaults.x = 4;
     titleDefaults.y = 4;
 
@@ -54,7 +54,7 @@ Balloon::Balloon(LPCTSTR prefix, Settings* parentSettings, UINT clickedMessage, 
     // And another for the x button in the top right corner.
     mCloseBtnSettings = parentSettings->CreateChild(_T("CloseButton"));
     mCloseBtnWindow = mWindow->CreateChild(mCloseBtnSettings, this);
-    DrawableSettings* closeBtnDefaults = new DrawableSettings();
+    WindowSettings* closeBtnDefaults = new WindowSettings();
     closeBtnDefaults->width = 16;
     closeBtnDefaults->height = 16;
 
@@ -88,11 +88,11 @@ Balloon::~Balloon() {
 }
 
 
-LRESULT WINAPI Balloon::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow)
+LRESULT WINAPI Balloon::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID Window)
 {
     if (message == WM_LBUTTONDOWN)
     {
-        mCallbackHandler->HandleMessage(window, mClickedMessage, drawableWindow == mCloseBtnWindow ? 1 : NULL, NULL, drawableWindow);
+        mCallbackHandler->HandleMessage(window, mClickedMessage, Window == mCloseBtnWindow ? 1 : NULL, NULL, Window);
         return 0;
     }
     return DefWindowProc(window, message, wParam, lParam);

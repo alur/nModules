@@ -1,21 +1,23 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableBangs.cpp
+ *  WindowBangs.cpp
  *  The nModules Project
  *
  *  Bangs for drawable windows.
  *   
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "LiteStep.h"
-#include "DrawableWindowBangs.h"
+#include "WindowBangs.h"
 #include <strsafe.h>
 #include "../nCoreCom/Core.h"
 
 
-namespace DrawableWindowBangs {
+namespace WindowBangs
+{
     // Specified by the module during _Register. Used to map names -> drawables.
-    DrawableWindow* (*drawableFinder)(LPCTSTR) = nullptr;
+    Window* (*drawableFinder)(LPCTSTR) = nullptr;
 
-    BangItem BangMap[] = {
+    BangItem BangMap[] =
+    {
         { _T("Hide"),                       Hide                       },
         { _T("Show"),                       Show                       },
         { _T("On"),                         On                         },
@@ -37,9 +39,10 @@ using namespace LiteStep;
 /// <summary>
 /// Registers bangs.
 /// </summary>
-void DrawableWindowBangs::Register(LPCTSTR prefix, DrawableWindow* (*drawableFinder)(LPCTSTR)) {
+void WindowBangs::Register(LPCTSTR prefix, Window* (*drawableFinder)(LPCTSTR))
+{
     TCHAR bangName[64];
-    DrawableWindowBangs::drawableFinder = drawableFinder;
+    WindowBangs::drawableFinder = drawableFinder;
     for (BangItem item : BangMap) {
         StringCchPrintf(bangName, _countof(bangName), _T("!%s%s"), prefix, item.name);
         LiteStep::AddBangCommand(bangName, item.command);
@@ -50,21 +53,21 @@ void DrawableWindowBangs::Register(LPCTSTR prefix, DrawableWindow* (*drawableFin
 /// <summary>
 /// Unregisters bangs.
 /// </summary>
-void DrawableWindowBangs::UnRegister(LPCTSTR prefix) {
+void WindowBangs::UnRegister(LPCTSTR prefix) {
     TCHAR bangName[64];
     for (BangItem item : BangMap) {
         StringCchPrintf(bangName, _countof(bangName), _T("!%s%s"), prefix, item.name);
         LiteStep::RemoveBangCommand(bangName);
     }
-    DrawableWindowBangs::drawableFinder = nullptr;
+    WindowBangs::drawableFinder = nullptr;
 }
 
 
 /// <summary>
 /// Hides the window.
 /// </summary>
-void DrawableWindowBangs::Hide(HWND, LPCTSTR args) {
-    DrawableWindow* drawable = drawableFinder(args);
+void WindowBangs::Hide(HWND, LPCTSTR args) {
+    Window* drawable = drawableFinder(args);
     if (drawable != nullptr) {
         drawable->Hide();
     }
@@ -74,8 +77,8 @@ void DrawableWindowBangs::Hide(HWND, LPCTSTR args) {
 /// <summary>
 /// Shows the window.
 /// </summary>
-void DrawableWindowBangs::Show(HWND, LPCTSTR args) {
-    DrawableWindow* drawable = drawableFinder(args);
+void WindowBangs::Show(HWND, LPCTSTR args) {
+    Window* drawable = drawableFinder(args);
     if (drawable != nullptr) {
         drawable->Show();
         if (drawable->IsChild()) {
@@ -88,7 +91,7 @@ void DrawableWindowBangs::Show(HWND, LPCTSTR args) {
 /// <summary>
 /// Shows the window.
 /// </summary>
-void DrawableWindowBangs::Move(HWND, LPCTSTR args) {
+void WindowBangs::Move(HWND, LPCTSTR args) {
     TCHAR prefix[MAX_RCCOMMAND], xstr[MAX_RCCOMMAND], ystr[MAX_RCCOMMAND],
         durationstr[MAX_RCCOMMAND], easingstr[MAX_RCCOMMAND];
     LPTSTR tokens [] = { prefix, xstr, ystr, durationstr, easingstr };
@@ -96,7 +99,7 @@ void DrawableWindowBangs::Move(HWND, LPCTSTR args) {
     int numTokens = LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr);
 
     if (numTokens == 3 || numTokens == 4 || numTokens == 5) {
-        DrawableWindow* drawable = drawableFinder(prefix);
+        Window* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
             int x = 0, y = 0;
 
@@ -124,7 +127,7 @@ void DrawableWindowBangs::Move(HWND, LPCTSTR args) {
 /// <summary>
 /// Shows the window.
 /// </summary>
-void DrawableWindowBangs::Size(HWND, LPCTSTR args) {
+void WindowBangs::Size(HWND, LPCTSTR args) {
     TCHAR prefix[MAX_RCCOMMAND], widthstr[MAX_RCCOMMAND], heightstr[MAX_RCCOMMAND],
         durationstr[MAX_RCCOMMAND], easingstr[MAX_RCCOMMAND];
     LPTSTR tokens [] = { prefix, widthstr, heightstr, durationstr, easingstr };
@@ -132,7 +135,7 @@ void DrawableWindowBangs::Size(HWND, LPCTSTR args) {
     int numTokens = LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr);
 
     if (numTokens == 3 || numTokens == 4 || numTokens == 5) {
-        DrawableWindow* drawable = drawableFinder(prefix);
+        Window* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
             int width = 0, height = 0;
 
@@ -160,7 +163,7 @@ void DrawableWindowBangs::Size(HWND, LPCTSTR args) {
 /// <summary>
 /// Shows the window.
 /// </summary>
-void DrawableWindowBangs::Position(HWND, LPCTSTR args) {
+void WindowBangs::Position(HWND, LPCTSTR args) {
     TCHAR prefix[MAX_RCCOMMAND], xstr[MAX_RCCOMMAND], ystr[MAX_RCCOMMAND],
         widthstr[MAX_RCCOMMAND], heightstr[MAX_RCCOMMAND],
         durationstr[MAX_RCCOMMAND], easingstr[MAX_RCCOMMAND];
@@ -169,7 +172,7 @@ void DrawableWindowBangs::Position(HWND, LPCTSTR args) {
     int numTokens = LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr);
 
     if (numTokens == 5 || numTokens == 6 || numTokens == 7) {
-        DrawableWindow* drawable = drawableFinder(prefix);
+        Window* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
             int width = 0, height = 0, x = 0, y = 0;
 
@@ -197,12 +200,12 @@ void DrawableWindowBangs::Position(HWND, LPCTSTR args) {
 /// <summary>
 /// SetAlwaysOnTop
 /// </summary>
-void DrawableWindowBangs::SetAlwaysOnTop(HWND, LPCTSTR args) {
+void WindowBangs::SetAlwaysOnTop(HWND, LPCTSTR args) {
     TCHAR prefix[MAX_RCCOMMAND], value[MAX_RCCOMMAND];
     LPTSTR tokens [] = { prefix, value };
 
     if (LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr) == 2) {
-        DrawableWindow* drawable = drawableFinder(prefix);
+        Window* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
             drawable->SetAlwaysOnTop(LiteStep::ParseBool(value));
         }
@@ -213,12 +216,12 @@ void DrawableWindowBangs::SetAlwaysOnTop(HWND, LPCTSTR args) {
 /// <summary>
 /// Modifies the windows clickthrough setting.
 /// </summary>
-void DrawableWindowBangs::SetClickThrough(HWND, LPCTSTR args) {
+void WindowBangs::SetClickThrough(HWND, LPCTSTR args) {
     TCHAR prefix[MAX_RCCOMMAND], value[MAX_RCCOMMAND];
     LPTSTR tokens [] = { prefix, value };
 
     if (LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr) == 2) {
-        DrawableWindow* drawable = drawableFinder(prefix);
+        Window* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
             drawable->SetClickThrough(LiteStep::ParseBool(value));
         }
@@ -229,12 +232,12 @@ void DrawableWindowBangs::SetClickThrough(HWND, LPCTSTR args) {
 /// <summary>
 /// Changes the windows parent.
 /// </summary>
-void DrawableWindowBangs::SetParent(HWND, LPCTSTR args) {
+void WindowBangs::SetParent(HWND, LPCTSTR args) {
     TCHAR prefix[MAX_RCCOMMAND], value[MAX_RCCOMMAND];
     LPTSTR tokens [] = { prefix, value };
 
     if (LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr) == 2) {
-        DrawableWindow* drawable = drawableFinder(prefix);
+        Window* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
             //drawable->GetWindow()->SetParent(value);
         }
@@ -245,14 +248,14 @@ void DrawableWindowBangs::SetParent(HWND, LPCTSTR args) {
 /// <summary>
 /// Changes the windows parent.
 /// </summary>
-void DrawableWindowBangs::SetText(HWND, LPCTSTR args)
+void WindowBangs::SetText(HWND, LPCTSTR args)
 {
     TCHAR prefix[MAX_RCCOMMAND], value[MAX_LINE_LENGTH];
     LPTSTR tokens [] = { prefix, value };
 
     if (LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr) == 2)
     {
-        DrawableWindow* drawable = drawableFinder(prefix);
+        Window* drawable = drawableFinder(prefix);
         if (drawable != nullptr)
         {
             drawable->SetText(value);
@@ -263,12 +266,14 @@ void DrawableWindowBangs::SetText(HWND, LPCTSTR args)
 /// <summary>
 /// Adds an event handler.
 /// </summary>
-void DrawableWindowBangs::On(HWND, LPCTSTR /* args */) {
+void WindowBangs::On(HWND, LPCTSTR /* args */)
+{
 }
 
 
 /// <summary>
 /// Removes an event handler.
 /// </summary>
-void DrawableWindowBangs::Off(HWND, LPCTSTR /* args */) {
+void WindowBangs::Off(HWND, LPCTSTR /* args */)
+{
 }

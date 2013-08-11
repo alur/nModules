@@ -126,7 +126,7 @@ void WindowThumbnail::Hide() {
 
 
 void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.width = 150;
     defaults.height = 40;
     defaults.alwaysOnTop = true;

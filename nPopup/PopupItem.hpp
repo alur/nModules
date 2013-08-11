@@ -9,7 +9,7 @@
 
 #include "../nShared/LiteStep.h"
 #include "../nShared/Drawable.hpp"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 #include "../nShared/MessageHandler.hpp"
 #include <Shlobj.h>
 
@@ -42,5 +42,5 @@ protected:
 
     PopupItemType itemType;
 
-    DrawableWindow::OVERLAY iconOverlay;
+    Window::OVERLAY iconOverlay;
 };

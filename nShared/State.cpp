@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableWindowState.cpp
+ *  WindowState.cpp
  *  The nModules Project
  *
- *  A state for a DrawableWindow.
+ *  A state for a Window.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "LiteStep.h"

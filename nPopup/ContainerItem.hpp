@@ -18,5 +18,5 @@ public:
     int GetDesiredWidth(int maxWidth);
 
 private:
-    DrawableWindow::STATE hoverState;
+    Window::STATE hoverState;
 };

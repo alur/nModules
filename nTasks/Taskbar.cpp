@@ -26,7 +26,7 @@ Taskbar::Taskbar(LPCTSTR name) : Drawable(name)
     LayoutSettings defaults;
     mLayoutSettings.Load(mSettings, &defaults);
 
-    DrawableSettings drawableDefaults;
+    WindowSettings drawableDefaults;
     drawableDefaults.width = GetSystemMetrics(SM_CXSCREEN);
     drawableDefaults.height = 36;
 
@@ -169,7 +169,7 @@ void Taskbar::Repaint()
 /// </summary>
 void Taskbar::Relayout()
 {
-    DrawableSettings* drawingSettings = mWindow->GetDrawingSettings();
+    WindowSettings* drawingSettings = mWindow->GetDrawingSettings();
     int spacePerLine, lines, buttonSize, x0, y0, xdir, ydir;
 
     if (mButtonMap.size() == 0)

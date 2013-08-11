@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableSettings.cpp
+ *  WindowSettings.cpp
  *  The nModules Project
  *
- *  Holds all RC settings used by the DrawableWindow class.
+ *  Holds all RC settings used by the Window class.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"

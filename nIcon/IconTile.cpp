@@ -29,7 +29,7 @@ IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFo
     mGhostOpacity = mSettings->GetFloat(L"GhostOpacity", 0.6f);
     mGhosted = false;
 
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.width = width;
     defaults.height = height;
     GetDisplayName(SHGDN_NORMAL, name, MAX_PATH);
@@ -249,7 +249,7 @@ void IconTile::SetIcon() {
     D2D1_RECT_F pos;
     HRESULT hr;
 
-    DrawableSettings *drawingSettings = mWindow->GetDrawingSettings();
+    WindowSettings *drawingSettings = mWindow->GetDrawingSettings();
 
     pos.top = 0;
     pos.bottom = pos.top + mIconSize;

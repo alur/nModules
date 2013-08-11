@@ -9,7 +9,7 @@
 
 #include <map>
 #include "TaskButton.hpp"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 #include "../nShared/MessageHandler.hpp"
 #include "../nShared/LayoutSettings.hpp"
 #include "../nShared/Drawable.hpp"
@@ -39,7 +39,7 @@ public:
 
     // MessageHandler
 public:
-    LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow) override;
+    LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID Window) override;
 
     // Public methods
 public:

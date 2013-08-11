@@ -9,9 +9,9 @@
 
 #include <d2d1.h>
 #include "TransitionEffects.h"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 
-class DesktopPainter : protected DrawableWindow {
+class DesktopPainter : protected Window {
 public:
     // Available transition types
     enum TransitionType {

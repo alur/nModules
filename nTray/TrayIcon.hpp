@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../nShared/Drawable.hpp"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 
 class TrayIcon : public Drawable
 {
@@ -21,7 +21,7 @@ public:
     void Show();
 
     void LoadSettings(bool isRefresh = false);
-    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID drawableWindow);
+    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID Window);
     void SendCallback(UINT message, WPARAM wParam, LPARAM lParam);
     void GetScreenRect(LPRECT rect);
 
@@ -38,7 +38,7 @@ private:
 
     bool showTip; // True if we should show the tooltip
 
-    DrawableWindow::OVERLAY iconOverlay;
+    Window::OVERLAY iconOverlay;
 
     // Tray data
     WCHAR tip[TRAY_MAX_TIP_LENGTH];

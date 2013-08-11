@@ -24,5 +24,5 @@ private:
     LPCTSTR title;
     LPCTSTR command;
 
-    DrawableWindow::STATE hoverState;
+    Window::STATE hoverState;
 };

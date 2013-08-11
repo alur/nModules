@@ -9,7 +9,7 @@
 
 #include <map>
 #include "TrayIcon.hpp"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 #include "../nShared/Settings.hpp"
 #include "../nShared/LayoutSettings.hpp"
 #include "../nShared/Tooltip.hpp"

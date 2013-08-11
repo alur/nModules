@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../nShared/Drawable.hpp"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 
 class Label : public Drawable {
 public:
@@ -21,7 +21,7 @@ private:
     void Initalize();
     void LoadSettings(bool isRefresh = false);
 
-    DrawableWindow::STATE stateHover;
+    Window::STATE stateHover;
     list<Drawable*> overlays;
     map<wstring, Label*>::iterator allLabelsIter;
 };

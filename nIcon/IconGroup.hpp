@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../nShared/Drawable.hpp"
-#include "../nShared/DrawableWindow.hpp"
+#include "../nShared/Window.hpp"
 #include "../nShared/Settings.hpp"
 #include "IconTile.hpp"
 #include "SelectionRectangle.hpp"

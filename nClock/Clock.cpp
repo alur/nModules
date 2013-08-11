@@ -15,7 +15,7 @@ Clock::Clock(LPCTSTR clockName) : Drawable(clockName)
 {
     mUse24HourDial = mSettings->GetBool(_T("24HourDial"), false);
 
-    DrawableSettings windowDefaults;
+    WindowSettings windowDefaults;
     windowDefaults.evaluateText = true;
     windowDefaults.registerWithCore = true;
 
@@ -80,13 +80,13 @@ LRESULT WINAPI Clock::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM
         }
         return 0;
 
-    case DrawableWindow::WM_TOPPARENTLOST:
+    case Window::WM_TOPPARENTLOST:
         {
             mUpdateTimer = 0;
         }
         return 0;
 
-    case DrawableWindow::WM_NEWTOPPARENT:
+    case Window::WM_NEWTOPPARENT:
         {
             mUpdateTimer = mWindow->SetCallbackTimer(mSettings->GetInt(_T("UpdateRate"), 1000), this);
         }

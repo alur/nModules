@@ -62,7 +62,7 @@ IconGroup::IconGroup(LPCTSTR prefix) : Drawable(prefix) {
 
     LoadSettings();
 
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.width = 500;
     defaults.height = 300;
 
@@ -900,7 +900,7 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
             }
             break;
 
-        case DrawableWindow::WM_TOPPARENTLOST:
+        case Window::WM_TOPPARENTLOST:
             {
                 mChangeNotifyMsg = 0;
                 if (mChangeNotifyUID != 0) {
@@ -910,7 +910,7 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
             }
             break;
 
-        case DrawableWindow::WM_NEWTOPPARENT:
+        case Window::WM_NEWTOPPARENT:
             {
                 IPersistFolder2 *ipsf2;
                 LPITEMIDLIST curFolder;

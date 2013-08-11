@@ -21,9 +21,7 @@
 #include <thread>
 
 
-using std::map;
 using std::vector;
-using std::pair;
 using std::thread;
 
 
@@ -489,7 +487,7 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
     case LM_TASK_SETOVERLAYICON:
         {
-            SetOverlayIcon((HWND) wParam, (HICON) lParam);
+            SetOverlayIcon((HWND)wParam, (HICON)lParam);
         }
         return 0;
 
@@ -604,6 +602,39 @@ void WindowManager::SetOverlayIcon(HWND hWnd, HICON overlayIcon)
 }
 
 
+/// <summary>
+/// Sets the progress state for the specified window
+/// </summary>
+void WindowManager::SetProgressState(HWND hWnd, TBPFLAG state)
+{
+    WindowMap::iterator window = windowMap.find(hWnd);
+    if (window != windowMap.end())
+    {
+        for (TaskButton *button : window->second.buttons)
+        {
+            button->SetProgressState(state);
+        }
+        window->second.progressState = state;
+    }
+}
+
+
+/// <summary>
+/// Sets the progress value for the specified window
+/// </summary>
+void WindowManager::SetProgressValue(HWND hWnd, USHORT progress)
+{
+    WindowMap::iterator window = windowMap.find(hWnd);
+    if (window != windowMap.end())
+    {
+        for (TaskButton *button : window->second.buttons)
+        {
+            button->SetProgressValue(progress);
+        }
+        window->second.progress = progress;
+    }
+}
+
 
 /// <summary>
 /// Updates the icon of a particular HWND
@@ -668,7 +699,7 @@ void WindowManager::AddExisting()
         {
             if (IsTaskbarWindow(window))
             {
-                PostMessage(gLSModule.GetMessageWindow(), LM_WINDOWCREATED, (WPARAM)window, NULL);
+                PostMessage(gLSModule.GetMessageWindow(), LM_WINDOWCREATED, (WPARAM)window, 0);
             }
             return TRUE;
         }, 0);

@@ -10,7 +10,7 @@
 #include <string>
 
 //
-typedef map<std::tstring, Taskbar*> TaskbarMap;
+typedef std::map<std::tstring, Taskbar*> TaskbarMap;
 
 namespace WindowManager
 {
@@ -35,7 +35,7 @@ namespace WindowManager
         UINT uMonitor;
 
         // Pointers to the buttons that represent this window
-        vector<TaskButton*> buttons;
+        std::vector<TaskButton*> buttons;
 
         // The main icon of the window
         HICON hIcon;
@@ -51,10 +51,7 @@ namespace WindowManager
     };
 
     // Some helpful typedefs
-    typedef map<HWND, WindowInformation> WindowMap;
-    //typedef map<std::tstring, Taskbar*>::const_iterator TASKBARCITER;
-    //typedef map<HWND, WindowInformation>::const_iterator WNDMAPCITER;
-    //typedef map<HWND, WindowInformation>::iterator WNDMAPITER;
+    typedef std::map<HWND, WindowInformation> WindowMap;
 
     void Start();
     void Stop();
@@ -69,8 +66,10 @@ namespace WindowManager
     void UpdateIcon(HWND hWnd);
     void CALLBACK UpdateIconCallback(HWND hWnd, UINT uMsg, ULONG_PTR dwData, LRESULT lResult);
     void SetIcon(HWND, HICON);
+    void SetOverlayIcon(HWND hWnd, HICON hIcon);
+    void SetProgressState(HWND hWnd, TBPFLAG state);
+    void SetProgressValue(HWND hWnd, USHORT progress);
     void UpdateWindow(HWND hWnd, LPARAM data);
     void UpdateWindowMonitors();
     void AddExisting();
-    void SetOverlayIcon(HWND hWnd,  HICON hIcon);
 }

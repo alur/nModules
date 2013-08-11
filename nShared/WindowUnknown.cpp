@@ -1,23 +1,26 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  DrawableWindowUnknown.cpp
+ *  WindowUnknown.cpp
  *  The nModules Project
  *
  *  
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "DrawableWindow.hpp"
+#include "Window.hpp"
 
 
-ULONG DrawableWindow::AddRef() {
+ULONG Window::AddRef()
+{
     return 0;
 }
 
 
-HRESULT DrawableWindow::QueryInterface(REFIID /* riid */, void ** /* ppvObject */) {
+HRESULT Window::QueryInterface(REFIID /* riid */, void ** /* ppvObject */)
+{
     return E_NOINTERFACE;
 }
 
 
-ULONG DrawableWindow::Release() {
+ULONG Window::Release()
+{
     return 0;
 }

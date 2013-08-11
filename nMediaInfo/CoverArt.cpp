@@ -32,7 +32,7 @@
 /// <param name="name">The settings prefix to use.</param>
 CoverArt::CoverArt(LPCTSTR name) : Drawable(name)
 {
-    DrawableSettings defaults;
+    WindowSettings defaults;
     defaults.width = 200;
     defaults.height = 200;
     mWindow->Initialize(&defaults);
