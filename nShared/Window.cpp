@@ -341,11 +341,10 @@ Window::STATE Window::AddState(LPCTSTR prefix, int defaultPriority, StateSetting
     State* state = new State(prefix, mBaseState->settings->CreateChild(prefix), defaultPriority, &this->text);
     state->settings->AppendGroup(stateGroup ? (*stateGroup)->settings : mBaseState->settings);
     state->Load(defaultSettings);
-    //state->UpdatePosition(this->drawingArea);
+    state->UpdatePosition(this->drawingArea);
     state->ReCreateDeviceResources(this->renderTarget);
 
-    // TODO
-    // mBrushOwners[prefix] = (IBrushOwner*)state;
+    mBrushOwners[prefix] = (IBrushOwner*)state;
 
     // Insert the state based on its priority.
     STATE iter;
