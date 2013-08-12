@@ -407,6 +407,13 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                 {
                     DiscardDeviceResources();
                 }
+                
+                // Paint actual owned/child windows.
+                EnumChildWindows(hWnd, [] (HWND hwnd, LPARAM) -> BOOL
+                {
+                    SendMessage(hwnd, WM_PAINT, 0, 0);
+                    return TRUE;
+                }, 0);
 
                 ValidateRect(hWnd, NULL);
 
