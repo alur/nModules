@@ -81,7 +81,7 @@ void TestWindow::InitOverlay()
     
     item.cchTextMax = 100;
 
-    for (int i = 0, j = 0; i < mOverlayItems.size(); ++i)
+    for (size_t i = 0, j = 0; i < mOverlayItems.size(); ++i)
     {
         if (mOverlayItems[i].icon != nullptr)
         {

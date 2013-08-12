@@ -695,7 +695,7 @@ void WindowManager::AddExisting()
 {
     thread([] () -> void
     {
-        EnumDesktopWindows(nullptr, [] (HWND window, LPARAM) -> BOOL
+        EnumDesktopWindows(nullptr, (WNDENUMPROC)[] (HWND window, LPARAM) -> BOOL
         {
             if (IsTaskbarWindow(window))
             {
