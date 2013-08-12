@@ -92,8 +92,8 @@ Window::Window(HWND window, LPCTSTR prefix, MessageHandler *msgHandler)
     // Configure the mouse tracking struct
     ZeroMemory(&this->trackMouseStruct, sizeof(TRACKMOUSEEVENT));
     this->trackMouseStruct.cbSize = sizeof(TRACKMOUSEEVENT);
-    this->trackMouseStruct.hwndTrack = nullptr;
-    this->trackMouseStruct.dwFlags = 0;
+    this->trackMouseStruct.hwndTrack = this->window;
+    this->trackMouseStruct.dwFlags = TME_LEAVE;
     this->trackMouseStruct.dwHoverTime = 200;
 }
 
