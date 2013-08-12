@@ -29,7 +29,7 @@ Brush::Brush()
 Brush::~Brush()
 {
     Discard();
-    for (int i = 0; i < this->gradientStopCount; ++i)
+    for (UINT i = 0; i < this->gradientStopCount; ++i)
     {
         delete this->gradientStopColors[i];
     }

@@ -38,7 +38,7 @@ class Window : MessageHandler, IDropTarget
 {
     // typedefs
 public:
-    typedef PointerIterator<std::list<State*>::iterator, State> STATE;
+    typedef PointerIterator<list<State*>::iterator, State> STATE;
     typedef PointerIterator<list<Overlay*>::iterator, Overlay> OVERLAY;
     typedef PointerIterator<list<IPainter*>::iterator, IPainter> PAINTER;
 
@@ -56,6 +56,12 @@ public:
         // However, the receiver can now feel free to re-register with either
         // of those functions.
         WM_NEWTOPPARENT,
+
+        // Sent after the window has been resized.
+        // HIGHWORD(wParam): width
+        // LOWORD(wParam): height
+        // lParam: Custom value sent to resize
+        WM_SIZECHANGE,
 
         // The first message aviailable for registration.
         WM_FIRSTREGISTERED
@@ -218,7 +224,7 @@ public:
 
     // Sets the position of this Window, relative to its parent.
     void SetPosition(RECT rect);
-    void SetPosition(int x, int y, int width, int height);
+    void SetPosition(int x, int y, int width, int height, LPARAM extra = 0);
 
     // Sets the text of this window.
     void SetText(LPCWSTR text);
@@ -259,13 +265,13 @@ public:
 
 protected:
     // Paints this window.
-    void Paint(bool &inAnimation);
+    void Paint(bool &inAnimation, D2D1_RECT_F *updateRect);
 
     // Paints all overlays.
-    void PaintOverlays();
+    void PaintOverlays(D2D1_RECT_F *updateRect);
 
     // Paints all children.
-    void PaintChildren(bool &inAnimation);
+    void PaintChildren(bool &inAnimation, D2D1_RECT_F *updateRect);
 
     // The render target to draw to.
     ID2D1HwndRenderTarget* renderTarget;

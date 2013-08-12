@@ -65,6 +65,39 @@ public:
     D2D1_RECT_F GetOffsetRectF(LPCTSTR key, D2D1_RECT_F *defaultValue) const;
 
     void IterateOverStars(LPCTSTR key, std::function<void (LPCTSTR token)> callback) const;
+
+    ///
+    ///
+    ///
+    template <typename Type>
+    struct EnumItem
+    {
+        EnumItem(Type value, LPCTSTR name)
+        {
+            this->value = value;
+            this->name = name;
+        }
+        Type value;
+        LPCTSTR name;
+    };
+
+    /// <summary>
+    /// 
+    /// </summary>
+    template <typename Type>
+    Type GetEnum(LPCTSTR key, std::initializer_list<EnumItem<Type> > map, Type defaultValue)
+    {
+        TCHAR settingValue[MAX_LINE_LENGTH];
+        GetString(key, settingValue, _countof(settingValue), nullptr);
+        for (auto &item : map)
+        {
+            if (_tcsicmp(settingValue, item.name) == 0)
+            {
+                return item.value;
+            }
+        }
+        return defaultValue;
+    }
     
 private:
     // The fully specified prefix to read settings from the RC files with.

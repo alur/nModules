@@ -11,8 +11,10 @@
 #include "TrayIcon.hpp"
 #include "../Utilities/Process.h"
 #include "../Utilities/GUID.h"
+#include "../Utilities/Math.h"
 #include <shellapi.h>
 #include <Mmsystem.h>
+#include <map>
 
 
 extern HWND g_hWndTrayNotify;
@@ -77,17 +79,34 @@ void Tray::LoadSettings(bool /* IsRefresh */)
     mLayoutSettings.Load(mSettings, &layoutDefaults);
 
     Settings* iconSettings = mSettings->CreateChild(_T("Icon"));
-    this->iconSize = iconSettings->GetInt(_T("Size"), 16);
+    mIconSize = iconSettings->GetInt(_T("Size"), 16);
     delete iconSettings;
 
-    this->hideBalloons = mSettings->GetBool(_T("HideBalloons"), false);
+    mNoTooltips = mSettings->GetBool(_T("NoTooltips"), false);
+    mHideBalloons = mSettings->GetBool(_T("HideBalloons"), false);
     this->balloonTime = mSettings->GetInt(_T("BalloonTime"), 7000);
     this->noNotificationSounds = mSettings->GetBool(_T("NoNotificationSounds"), false);
     mSettings->GetString(_T("NotificationSound"), this->notificationSound, 128, _T("Notification.Default"));
 
-    TCHAR keyName[MAX_RCCOMMAND];
-    StringCchPrintf(keyName, _countof(keyName), L"*%sHide", mSettings->GetPrefix());
+    mTargetSize = D2D1::SizeU(
+        mSettings->GetInt(_T("Width"), 100),
+        mSettings->GetInt(_T("Height"), 100)
+    );
 
+    mOverflowAction = mSettings->GetEnum<OverflowAction>(_T("OverflowAction"),
+    {
+        { OverflowAction::None,      _T("None")      },
+        { OverflowAction::SizeDown,  _T("SizeDown")  },
+        { OverflowAction::SizeLeft,  _T("SizeLeft")  },
+        { OverflowAction::SizeRight, _T("SizeRight") },
+        { OverflowAction::SizeUp,    _T("SizeUp")    }
+    }, OverflowAction::None);
+
+    mSettings->GetString(_T("OnOverflow"), mOnOverflow, _countof(mOnOverflow), nullptr);
+
+    // Load hidden icons
+    TCHAR keyName[MAX_RCCOMMAND];
+    StringCchPrintf(keyName, _countof(keyName), _T("*%sHide"), mSettings->GetPrefix());
     LiteStep::IterateOverLines(keyName, [this] (LPCWSTR line) -> void
     {
         // Try to parse it as a GUID, if that fails assume it's a process.
@@ -216,7 +235,44 @@ void Tray::Relayout()
 
     for (auto icon : this->icons)
     {
-        icon->Reposition(mLayoutSettings.RectFromID(i++, this->iconSize, this->iconSize, drawingSettings->width, drawingSettings->height));
+        icon->Reposition(mLayoutSettings.RectFromID(i++, mIconSize, mIconSize, drawingSettings->width, drawingSettings->height));
+    }
+
+    // Get the size required to hold all our icons
+    if (mOverflowAction != OverflowAction::None)
+    {
+        //D2D1_SIZE_U requiredSize = mLayoutSettings.GetRequriedSize(i);
+        //if ((mWindow->GetDrawingSettings()->width != requiredSize.width || mWindow->GetDrawingSettings()->height != requiredSize.height) &&
+        //    (requiredSize.height != mTargetSize.height || requiredSize.width != mTargetSize.width))
+        //{
+        //    D2D1_SIZE_U newSize = D2D1::SizeU(
+        //        std::max(requiredSize.width, mTargetSize.width),
+        //        std::max(requiredSize.width, mTargetSize.width)
+        //    );
+        //    switch (mOverflowAction)
+        //    {
+        //    case OverflowAction::SizeLeft:
+        //        {
+        //        }
+        //        break;
+
+        //    case OverflowAction::SizeRight:
+        //        {
+        //        }
+        //        break;
+
+        //    case OverflowAction::SizeUp:
+        //        {
+        //        }
+        //        break;
+
+        //    case OverflowAction::SizeDown:
+        //        {
+        //        }
+        //        break;
+        //    }
+
+        //}
     }
 }
 
@@ -259,14 +315,23 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM
         }
         return 0;
 
+    case Window::WM_SIZECHANGE:
+        {
+            // lParam is 1 when the size change is due to OverflowAction
+            if (lParam == 1)
+            {
+            }
+        }
+        return 0;
+
     default:
         {
             if (message == this->balloonClickedMessage)
             {
-                // wParam is NULL if the dialog was clicked. 1 if the x was clicked.
-                if (wParam == NULL)
+                // wParam is 0 if the dialog was clicked. 1 if the x was clicked.
+                if (wParam == 0)
                 {
-                    this->activeBalloonIcon->SendCallback(NIN_BALLOONUSERCLICK, NULL, NULL);
+                    this->activeBalloonIcon->SendCallback(NIN_BALLOONUSERCLICK, 0, 0);
                 }
                 DismissBalloon(NIN_BALLOONHIDE);
             }
@@ -290,7 +355,10 @@ void Tray::InitCompleted()
 /// <summary>
 void Tray::ShowTip(LPCWSTR text, LPRECT position)
 {
-    this->tooltip->Show(text, position);
+    if (!mNoTooltips)
+    {
+        this->tooltip->Show(text, position);
+    }
 }
 
 
@@ -313,7 +381,7 @@ void Tray::EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD
     SHQueryUserNotificationState(&state);
 
     // Realtime balloons are discarded unless they can be shown imediately.
-    if (this->hideBalloons || realTime && (this->balloonTimer != 0 || state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME))
+    if (mHideBalloons || realTime && (this->balloonTimer != 0 || state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME))
     {
         return;
     }

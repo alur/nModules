@@ -314,9 +314,9 @@ void DesktopPainter::Redraw()
 /// <summary>
 /// Regular painting
 /// </summary>
-void DesktopPainter::Paint()
+void DesktopPainter::Paint(D2D1_RECT_F *rect)
 {
-    renderTarget->FillRectangle(m_TransitionSettings.WPRect, m_pWallpaperBrush);
+    renderTarget->FillRectangle(rect, m_pWallpaperBrush);
 }
 
 
@@ -334,7 +334,7 @@ void DesktopPainter::TransitionStart()
         this->renderTarget->BeginDraw();
         bool inAnimation = true;
         PaintComposite();
-        PaintChildren(inAnimation);
+        PaintChildren(inAnimation, &this->m_TransitionSettings.WPRect);
         this->renderTarget->EndDraw();
     }
     Redraw();
@@ -350,7 +350,7 @@ void DesktopPainter::TransitionEnd()
     SAFERELEASE(m_pOldWallpaperBrush)
 
     // Repaint, just for good measure
-    Paint();
+    Paint(&m_TransitionSettings.WPRect);
 }
 
 
@@ -386,40 +386,53 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
             {
                 bool inAnimation = false;
 
-                if (SUCCEEDED(ReCreateDeviceResources()))
-                {
-                    this->renderTarget->BeginDraw();
+                RECT updateRect;
 
-                    // m_pOldWallpaperBrush being non zero indicates that we are in the middle of a transition
-                    if (this->m_pOldWallpaperBrush != NULL)
-                    {
-                        PaintComposite();
-                    }
-                    else
-                    {
-                        Paint();
-                    }
-                }
-                PaintChildren(inAnimation);
-
-                // If EndDraw fails we need to recreate all device-dependent resources
-                if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET)
+                if (GetUpdateRect(hWnd, &updateRect, FALSE) != FALSE)
                 {
-                    DiscardDeviceResources();
-                }
+                    if (SUCCEEDED(ReCreateDeviceResources()))
+                    {
+                        this->renderTarget->BeginDraw();
+
+                        D2D1_RECT_F d2dUpdateRect = D2D1::RectF(
+                            updateRect.left, updateRect.top, updateRect.right, updateRect.bottom);
+
+                        this->renderTarget->PushAxisAlignedClip(d2dUpdateRect, D2D1_ANTIALIAS_MODE_ALIASED);
+
+                        // m_pOldWallpaperBrush being non zero indicates that we are in the middle of a transition
+                        if (this->m_pOldWallpaperBrush != nullptr)
+                        {
+                            PaintComposite();
+                        }
+                        else
+                        {
+                            Paint(&d2dUpdateRect);
+                        }
+                        
+                        PaintChildren(inAnimation, &d2dUpdateRect);
+
+                        this->renderTarget->PopAxisAlignedClip();
                 
-                // Paint actual owned/child windows.
-                EnumChildWindows(hWnd, [] (HWND hwnd, LPARAM) -> BOOL
-                {
-                    SendMessage(hwnd, WM_PAINT, 0, 0);
-                    return TRUE;
-                }, 0);
+                        // Paint actual owned/child windows.
+                        //EnumChildWindows(hWnd, [] (HWND hwnd, LPARAM) -> BOOL
+                        //{
+                        //    SendMessage(hwnd, WM_PAINT, 0, 0);
+                        //    return TRUE;
+                        //}, 0);
 
-                ValidateRect(hWnd, NULL);
+                        // If EndDraw fails we need to recreate all device-dependent resources
+                        if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET)
+                        {
+                            DiscardDeviceResources();
+                        }
+                    }
 
-                if (this->m_pOldWallpaperBrush != NULL || inAnimation)
-                {
-                    Redraw();
+                    ValidateRect(hWnd, NULL);
+
+                    if (this->m_pOldWallpaperBrush != NULL || inAnimation)
+                    {
+                        Redraw();
+                    }
                 }
             }
             else

@@ -19,7 +19,8 @@ namespace Math
     int RectIntersectArea(LPRECT rect1, LPRECT rect2);
     int RectUnionArea(LPRECT rect1, LPRECT rect2);
     int RectNonOverlappArea(LPRECT rect1, LPRECT rect2);
-
+    
+    float RectIntersectArea(D2D1_RECT_F *rect1, D2D1_RECT_F *rect2);
     float RectIntersectArea(D2D1_RECT_F rect1, D2D1_RECT_F rect2);
 
     float Lerp(float a, float b, float weight);

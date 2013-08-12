@@ -37,7 +37,8 @@ void EventHandler::HandleMessage(HWND, UINT msg, WPARAM wParam, LPARAM /* lParam
     ClickData cData;
 
     // Find the type of this click event
-    switch (msg) {
+    switch (msg)
+    {
         case WM_MOUSEWHEEL: cData.type = GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? WHEELUP : WHEELDOWN; break;
         case WM_MOUSEHWHEEL: cData.type = GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? WHEELRIGHT : WHEELLEFT; break;
         case WM_LBUTTONDOWN: cData.type = LEFTDOWN; break;
@@ -58,21 +59,24 @@ void EventHandler::HandleMessage(HWND, UINT msg, WPARAM wParam, LPARAM /* lParam
             break;
         case WM_MOUSELEAVE: cData.type = LEAVE; mouseOver = false; break;
         case WM_XBUTTONDOWN:
-            switch (GET_XBUTTON_WPARAM(wParam)) {
+            switch (GET_XBUTTON_WPARAM(wParam))
+            {
                 case XBUTTON1: cData.type = X1DOWN; break;
                 case XBUTTON2: cData.type = X2DOWN; break;
                 default: cData.type = UNKNOWN; break;
             }
             break;
         case WM_XBUTTONUP:
-            switch (GET_XBUTTON_WPARAM(wParam)) {
+            switch (GET_XBUTTON_WPARAM(wParam))
+            {
                 case XBUTTON1: cData.type = X1UP; break;
                 case XBUTTON2: cData.type = X2UP; break;
                 default: cData.type = UNKNOWN; break;
             }
             break;
         case WM_XBUTTONDBLCLK:
-            switch (GET_XBUTTON_WPARAM(wParam)) {
+            switch (GET_XBUTTON_WPARAM(wParam))
+            {
                 case XBUTTON1: cData.type = X1DOUBLE; break;
                 case XBUTTON2: cData.type = X2DOUBLE; break;
                 default: cData.type = UNKNOWN; break;
@@ -87,8 +91,10 @@ void EventHandler::HandleMessage(HWND, UINT msg, WPARAM wParam, LPARAM /* lParam
     //cData.area.left = cData.area.right = GET_X_LPARAM(lParam) + g_pMonitorInfo->m_virtualDesktop.rect.left; 
     //cData.area.top = cData.area.bottom = GET_Y_LPARAM(lParam) + g_pMonitorInfo->m_virtualDesktop.rect.top;
 
-    for (vector<ClickData>::const_iterator iter = m_clickHandlers.begin(); iter != m_clickHandlers.end(); iter++) {
-        if (EventHandler::Matches(cData, *iter)) {
+    for (vector<ClickData>::const_iterator iter = m_clickHandlers.begin(); iter != m_clickHandlers.end(); iter++)
+    {
+        if (EventHandler::Matches(cData, *iter))
+        {
             LiteStep::LSExecute(nullptr, iter->action, SW_SHOW);
         }
     }
@@ -179,8 +185,10 @@ void EventHandler::AddHandler(LPCTSTR szLine) {
 /// </summary>
 void EventHandler::RemoveHandlers(LPCTSTR szLine) {
     ClickData cData = ParseLine(szLine);
-    for (vector<ClickData>::const_iterator iter = m_clickHandlers.begin(); iter != m_clickHandlers.end(); iter++) {
-        if (Matches(*iter, cData)) {
+    for (vector<ClickData>::const_iterator iter = m_clickHandlers.begin(); iter != m_clickHandlers.end(); iter++)
+    {
+        if (Matches(*iter, cData))
+        {
             m_clickHandlers.erase(iter);
         }
     }

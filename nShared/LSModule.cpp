@@ -134,7 +134,7 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
     }
 
     // Create the main window.
-    if ((this->messageHandler = MessageHandler::CreateMessageWindowEx(WS_EX_TOOLWINDOW | WS_EX_COMPOSITED,
+    if ((this->messageHandler = MessageHandler::CreateMessageWindowEx(WS_EX_TOOLWINDOW,
         (LPCTSTR)this->messageHandlerClass, _T(""), WS_POPUP, 0, 0, 0, 0, this->parent, NULL, this->instance, this)) == NULL)
     {
         return false;

@@ -761,27 +761,41 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
     case WM_PAINT:
         {
             bool inAnimation = false;
-            if (SUCCEEDED(ReCreateDeviceResources()))
-            {
-                this->renderTarget->BeginDraw();
-                this->renderTarget->Clear();
-                Paint(inAnimation);
+            RECT updateRect;
 
-                // If EndDraw fails we need to recreate all device-dependent resources
-                if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET)
+            if (GetUpdateRect(window, &updateRect, FALSE) != FALSE)
+            {
+
+                if (SUCCEEDED(ReCreateDeviceResources()))
                 {
-                    DiscardDeviceResources();
+                    D2D1_RECT_F d2dUpdateRect = D2D1::RectF(
+                        updateRect.left, updateRect.top, updateRect.right, updateRect.bottom);
+
+                    this->renderTarget->BeginDraw();
+                    this->renderTarget->PushAxisAlignedClip(&d2dUpdateRect, D2D1_ANTIALIAS_MODE_ALIASED);
+                    this->renderTarget->Clear();
+
+                    Paint(inAnimation, &d2dUpdateRect);
+
+                    this->renderTarget->PopAxisAlignedClip();
+
+                    // If EndDraw fails we need to recreate all device-dependent resources
+                    if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET)
+                    {
+                        DiscardDeviceResources();
+                    }
                 }
+
+                // Paint actual owned/child windows.
+                EnumChildWindows(this->window, [] (HWND hwnd, LPARAM) -> BOOL
+                {
+                    SendMessage(hwnd, WM_PAINT, 0, 0);
+                    return TRUE;
+                }, 0);
+
+                ValidateRect(this->window, nullptr);
+
             }
-
-            // Paint actual owned/child windows.
-            EnumChildWindows(this->window, [] (HWND hwnd, LPARAM) -> BOOL
-            {
-                SendMessage(hwnd, WM_PAINT, 0, 0);
-                return TRUE;
-            }, 0);
-
-            ValidateRect(this->window, nullptr);
 
             if (inAnimation)
             {
@@ -966,9 +980,9 @@ void Window::Move(int x, int y)
 /// <summary>
 /// Removes the specified child.
 /// </summary>
-void Window::Paint(bool &inAnimation)
+void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
 {
-    if (this->visible)
+    if (this->visible && Math::RectIntersectArea(updateRect, &this->drawingArea) > 0)
     {
         this->renderTarget->PushAxisAlignedClip(this->drawingArea, D2D1_ANTIALIAS_MODE_ALIASED);
 
@@ -982,10 +996,10 @@ void Window::Paint(bool &inAnimation)
         }
 
         // Paint all overlays.
-        PaintOverlays();
+        PaintOverlays(updateRect);
 
         // Paint all children.
-        PaintChildren(inAnimation);
+        PaintChildren(inAnimation, updateRect);
 
         // Post painters.
         for (IPainter *painter : this->postPainters)
@@ -1007,11 +1021,11 @@ void Window::Paint(bool &inAnimation)
 /// <summary>
 /// Paints all child windows.
 /// </summary>
-void Window::PaintChildren(bool &inAnimation)
+void Window::PaintChildren(bool &inAnimation, D2D1_RECT_F *updateRect)
 {
     for (Window *child : this->children)
     {
-        child->Paint(inAnimation);
+        child->Paint(inAnimation, updateRect);
     }
 }
 
@@ -1019,7 +1033,7 @@ void Window::PaintChildren(bool &inAnimation)
 /// <summary>
 /// Paints all overlays.
 /// </summary>
-void Window::PaintOverlays()
+void Window::PaintOverlays(D2D1_RECT_F *updateRect)
 {
     for (Overlay *overlay : this->overlays)
     {
@@ -1459,8 +1473,11 @@ void Window::SetParent(Window *newParent)
 /// <param name="y">The y coordinate to move the window to. Relative to the parent.</param>
 /// <param name="width">The width to resize the window to.</param>
 /// <param name="height">The height to resize the window to.</param>
-void Window::SetPosition(int x, int y, int width, int height)
+void Window::SetPosition(int x, int y, int width, int height, LPARAM extra)
 {
+    //
+    bool isResize = width != this->drawingSettings->width || height != this->drawingSettings->height;
+
     // Update the drawing settings.
     this->drawingSettings->x = x;
     this->drawingSettings->y = y;
@@ -1508,6 +1525,12 @@ void Window::SetPosition(int x, int y, int width, int height)
     for (Window *child : this->children)
     {
         child->Move(child->drawingSettings->x, child->drawingSettings->y);
+    }
+
+    //
+    if (isResize)
+    {
+        this->msgHandler->HandleMessage(GetWindowHandle(), WM_SIZECHANGE, MAKEWPARAM(width, height), extra, this);
     }
 }
 

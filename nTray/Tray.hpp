@@ -56,6 +56,15 @@ private:
     bool WantIcon(LiteStep::LPLSNOTIFYICONDATA NID);
 
 private:
+    enum class OverflowAction
+    {
+        None,
+        SizeLeft,
+        SizeRight,
+        SizeUp,
+        SizeDown
+    };
+
     // All data required to display a balloon.
     struct BalloonData
     {
@@ -113,7 +122,7 @@ private:
     vector<TrayIcon*> icons;
 
     // The size of the icons.
-    int iconSize;
+    int mIconSize;
 
     // Defines how the tray icons should be layed out.
     LayoutSettings mLayoutSettings;
@@ -125,7 +134,18 @@ private:
     Balloon* balloon;
 
     // True if we should hide balloons.
-    bool hideBalloons;
+    bool mHideBalloons;
+
+    //
+    bool mNoTooltips;
+
+    // The size that the tray should be when it's not overflowing
+    D2D1_SIZE_U mTargetSize;
+
+    //
+    OverflowAction mOverflowAction;
+
+    TCHAR mOnOverflow[MAX_LINE_LENGTH];
 
     // Number of milliseconds to show balloons.
     int balloonTime;

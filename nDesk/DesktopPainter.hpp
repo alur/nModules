@@ -71,7 +71,7 @@ private:
     HRESULT ReCreateDeviceResources();
     void DiscardDeviceResources();
 
-    void Paint();
+    void Paint(D2D1_RECT_F*);
     void PaintComposite();
     void Redraw();
 
