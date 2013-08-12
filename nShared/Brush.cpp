@@ -229,6 +229,22 @@ void Brush::ComputeEdgeData(D2D1_SIZE_F size)
 {
     using namespace D2D1;
 
+    D2D1_RECT_F imageEdges = this->imageEdges;
+
+    // If the window isn't big enough, trim the edges.
+    if (imageEdges.left + imageEdges.right > size.width)
+    {
+        float scale = size.width / (imageEdges.left + imageEdges.right);
+        imageEdges.left *= scale;
+        imageEdges.right *= scale;
+    }
+    if (imageEdges.bottom + imageEdges.top > size.height)
+    {
+        float scale = size.width / (imageEdges.bottom + imageEdges.top);
+        imageEdges.bottom *= scale;
+        imageEdges.top *= scale;
+    }
+
     mImageEdgeRects[EdgeType::TopLeft] = D2D1::Rect(
         position.left,
         position.top,
