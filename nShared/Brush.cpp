@@ -240,7 +240,7 @@ void Brush::ComputeEdgeData(D2D1_SIZE_F size)
     }
     if (imageEdges.bottom + imageEdges.top > size.height)
     {
-        float scale = size.width / (imageEdges.bottom + imageEdges.top);
+        float scale = size.height / (imageEdges.bottom + imageEdges.top);
         imageEdges.bottom *= scale;
         imageEdges.top *= scale;
     }
