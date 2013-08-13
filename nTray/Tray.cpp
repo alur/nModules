@@ -88,9 +88,16 @@ void Tray::LoadSettings(bool /* IsRefresh */)
     this->noNotificationSounds = mSettings->GetBool(_T("NoNotificationSounds"), false);
     mSettings->GetString(_T("NotificationSound"), this->notificationSound, 128, _T("Notification.Default"));
 
+    WindowSettings *drawingSettings = mWindow->GetDrawingSettings();
+
     mTargetSize = D2D1::SizeU(
-        mSettings->GetInt(_T("Width"), 100),
-        mSettings->GetInt(_T("Height"), 100)
+        drawingSettings->width,
+        drawingSettings->height
+    );
+
+    mTargetPosition = D2D1::Point2U(
+        drawingSettings->x,
+        drawingSettings->y
     );
 
     mOverflowAction = mSettings->GetEnum<OverflowAction>(_T("OverflowAction"),
@@ -102,7 +109,7 @@ void Tray::LoadSettings(bool /* IsRefresh */)
         { OverflowAction::SizeUp,    _T("SizeUp")    }
     }, OverflowAction::None);
 
-    mSettings->GetString(_T("OnOverflow"), mOnOverflow, _countof(mOnOverflow), nullptr);
+    mSettings->GetLine(_T("OnResize"), mOnResize, _countof(mOnResize), nullptr);
 
     // Load hidden icons
     TCHAR keyName[MAX_RCCOMMAND];
@@ -230,49 +237,57 @@ void Tray::RemoveIcon(TrayIcon* pIcon)
 /// </summary>
 void Tray::Relayout()
 {
-    int i = 0;
     WindowSettings *drawingSettings = mWindow->GetDrawingSettings();
 
+    switch (mOverflowAction)
+    {
+    case OverflowAction::SizeRight:
+    case OverflowAction::SizeLeft:
+        {
+            int iconsPerColumn = mLayoutSettings.ItemsPerColumn(mIconSize, drawingSettings->height);
+            int requiredColumns = (int)(this->icons.size() + iconsPerColumn - 1) / iconsPerColumn; // ceil(y/x) = floor((y + x - 1)/x)
+            int requiredWidth = std::max((mIconSize + mLayoutSettings.mColumnSpacing) * requiredColumns +
+                mLayoutSettings.mColumnSpacing + mLayoutSettings.mPadding.left + mLayoutSettings.mPadding.right,
+                (long)mTargetSize.width);
+
+            if (drawingSettings->width != requiredWidth)
+            {
+                mWindow->SetPosition(
+                    mOverflowAction == OverflowAction::SizeRight ? mTargetPosition.x : mTargetPosition.x - (requiredWidth - mTargetSize.width),
+                    mTargetPosition.y,
+                    requiredWidth,
+                    mTargetSize.height,
+                    1
+                );
+            }
+        }
+        break;
+
+    case OverflowAction::SizeUp:
+    case OverflowAction::SizeDown:
+        int iconsPerRow = mLayoutSettings.ItemsPerRow(mIconSize, drawingSettings->width);
+        int requiredRows = (int)(this->icons.size() + iconsPerRow - 1) / iconsPerRow; // ceil(y/x) = floor((y + x - 1)/x)
+        int requiredHeight = std::max((mIconSize + mLayoutSettings.mRowSpacing) * requiredRows +
+            mLayoutSettings.mRowSpacing + mLayoutSettings.mPadding.top + mLayoutSettings.mPadding.bottom,
+            (long)mTargetSize.height);
+
+        if (drawingSettings->height != requiredHeight)
+        {
+            mWindow->SetPosition(
+                mTargetPosition.x,
+                mOverflowAction == OverflowAction::SizeDown ? mTargetPosition.y : mTargetPosition.y - (requiredHeight - mTargetSize.height),
+                mTargetSize.width,
+                requiredHeight,
+                1
+            );
+        }
+        break;
+    }
+
+    int i = 0;
     for (auto icon : this->icons)
     {
         icon->Reposition(mLayoutSettings.RectFromID(i++, mIconSize, mIconSize, drawingSettings->width, drawingSettings->height));
-    }
-
-    // Get the size required to hold all our icons
-    if (mOverflowAction != OverflowAction::None)
-    {
-        //D2D1_SIZE_U requiredSize = mLayoutSettings.GetRequriedSize(i);
-        //if ((mWindow->GetDrawingSettings()->width != requiredSize.width || mWindow->GetDrawingSettings()->height != requiredSize.height) &&
-        //    (requiredSize.height != mTargetSize.height || requiredSize.width != mTargetSize.width))
-        //{
-        //    D2D1_SIZE_U newSize = D2D1::SizeU(
-        //        std::max(requiredSize.width, mTargetSize.width),
-        //        std::max(requiredSize.width, mTargetSize.width)
-        //    );
-        //    switch (mOverflowAction)
-        //    {
-        //    case OverflowAction::SizeLeft:
-        //        {
-        //        }
-        //        break;
-
-        //    case OverflowAction::SizeRight:
-        //        {
-        //        }
-        //        break;
-
-        //    case OverflowAction::SizeUp:
-        //        {
-        //        }
-        //        break;
-
-        //    case OverflowAction::SizeDown:
-        //        {
-        //        }
-        //        break;
-        //    }
-
-        //}
     }
 }
 
@@ -317,10 +332,13 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM
 
     case Window::WM_SIZECHANGE:
         {
+            mSettings->SetInt(L"CurrentWidth", LOWORD(wParam));
+            mSettings->SetInt(L"CurrentHeight", HIWORD(wParam));
             // lParam is 1 when the size change is due to OverflowAction
             if (lParam == 1)
             {
             }
+            LiteStep::LSExecute(nullptr, mOnResize, 0);
         }
         return 0;
 

@@ -26,12 +26,13 @@ Taskbar::Taskbar(LPCTSTR name) : Drawable(name)
     LayoutSettings defaults;
     mLayoutSettings.Load(mSettings, &defaults);
 
+    StateSettings stateDefaults;
+    stateDefaults.backgroundBrush.color = std::unique_ptr<IColorVal>(new DWMColorVal());
+
     WindowSettings drawableDefaults;
     drawableDefaults.width = GetSystemMetrics(SM_CXSCREEN);
     drawableDefaults.height = 36;
-
-    StateSettings stateDefaults;
-    stateDefaults.backgroundBrush.color = std::unique_ptr<IColorVal>(new DWMColorVal());
+    drawableDefaults.registerWithCore = true;
     
     mWindow->Initialize(&drawableDefaults, &stateDefaults);
     mWindow->Show();
@@ -282,6 +283,16 @@ void Taskbar::Relayout()
 /// </summary>
 LRESULT WINAPI Taskbar::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID)
 {
+    switch (message)
+    {
+    case Window::WM_SIZECHANGE:
+        {
+            Relayout();
+            Repaint();
+        }
+        return 0;
+    }
+
     mEventHandler->HandleMessage(window, message, wParam, lParam);
     return DefWindowProc(window, message, wParam, lParam);
 }

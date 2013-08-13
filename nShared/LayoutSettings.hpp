@@ -30,6 +30,15 @@ public:
 
     // Loads the actual settings.
     void Load(Settings* settings, LayoutSettings* defaults);
+    
+    // Calculates the number of items that can fit in a column
+    int ItemsPerColumn(int itemHeight, int containerHeight);
+
+    // Calculates the number of items that can fit in a row
+    int ItemsPerRow(int itemWidth, int containerWidth);
+
+    // Calculates the positioning of an item based on its position ID.
+    int ItemLimit(int itemWidth, int itemHeight, int containerWidth, int containerHeight);
 
     // Calculates the positioning of an item based on its position ID.
     RECT RectFromID(int id, int itemWidth, int itemHeight, int containerWidth, int containerHeight);

@@ -142,10 +142,13 @@ private:
     // The size that the tray should be when it's not overflowing
     D2D1_SIZE_U mTargetSize;
 
+    // The position where the tray should be when it's not overflowing
+    D2D1_POINT_2U mTargetPosition;
+
     //
     OverflowAction mOverflowAction;
 
-    TCHAR mOnOverflow[MAX_LINE_LENGTH];
+    TCHAR mOnResize[MAX_LINE_LENGTH];
 
     // Number of milliseconds to show balloons.
     int balloonTime;

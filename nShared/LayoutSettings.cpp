@@ -39,51 +39,87 @@ LayoutSettings::~LayoutSettings() {
 /// <summary>
 /// Loads settings from an RC file using the specified defaults.
 /// </summary>
-void LayoutSettings::Load(Settings* settings, LayoutSettings* defaults) {
+void LayoutSettings::Load(Settings* settings, LayoutSettings* defaults)
+{
     TCHAR buffer[32];
 
     mColumnSpacing = settings->GetInt(_T("ColumnSpacing"), defaults->mColumnSpacing);
     mPadding = settings->GetOffsetRect(_T("Padding"), &defaults->mPadding);
 
     settings->GetString(_T("Start"), buffer, sizeof(buffer), _T("TopLeft"));
-    if (_tcsicmp(buffer, _T("TopRight")) == 0) {
+    if (_tcsicmp(buffer, _T("TopRight")) == 0)
+    {
         mStartPosition = StartPosition::TopRight;
     }
-    else if (_tcsicmp(buffer, _T("BottomLeft")) == 0) {
+    else if (_tcsicmp(buffer, _T("BottomLeft")) == 0)
+    {
         mStartPosition = StartPosition::BottomLeft;
     }
-    else if (_tcsicmp(buffer, _T("BottomRight")) == 0) {
+    else if (_tcsicmp(buffer, _T("BottomRight")) == 0)
+    {
         mStartPosition = StartPosition::BottomRight;
     }
-    else {
+    else
+    {
         mStartPosition = StartPosition::TopLeft;
     }
 
     this->mRowSpacing = settings->GetInt(_T("RowSpacing"), defaults->mRowSpacing);
 
     settings->GetString(_T("PrimaryDirection"), buffer, sizeof(buffer), _T("Horizontal"));
-    if (_tcsicmp(buffer, _T("Vertical")) == 0) {
+    if (_tcsicmp(buffer, _T("Vertical")) == 0)
+    {
         mPrimaryDirection = Direction::Vertical;
     }
-    else {
+    else
+    {
         mPrimaryDirection = Direction::Horizontal;
     }
 }
 
 
 /// <summary>
+/// Calculates the number of items that can fit in a column
+/// </summary>
+int LayoutSettings::ItemsPerColumn(int itemHeight, int containerHeight)
+{
+    return max(1L, (containerHeight - mPadding.top - mPadding.bottom + mRowSpacing)/(itemHeight + mRowSpacing));
+}
+
+
+/// <summary>
+/// Calculates the number of items that can fit in a row
+/// </summary>
+int LayoutSettings::ItemsPerRow(int itemWidth, int containerWidth)
+{
+    return max(1L, (containerWidth - mPadding.left - mPadding.right + mColumnSpacing)/(itemWidth + mColumnSpacing));
+}
+
+
+/// <summary>
+/// Calculates how many items can fit in a container of the given size.
+/// </summary>
+int LayoutSettings::ItemLimit(int itemWidth, int itemHeight, int containerWidth, int containerHeight)
+{
+    return ItemsPerColumn(itemHeight, containerHeight) * ItemsPerRow(itemWidth, containerWidth);
+}
+
+
+/// <summary>
 /// Calculates the positioning of an item based on its position ID.
 /// </summary>
-RECT LayoutSettings::RectFromID(int id, int itemWidth, int itemHeight, int containerWidth, int containerHeight) {
+RECT LayoutSettings::RectFromID(int id, int itemWidth, int itemHeight, int containerWidth, int containerHeight)
+{
     RECT rect = {0};
     int row = 0, column = 0;
     
     // The required space to fit n items in a row is n*itemWidth + (n-1)*columnSpacing
     // Thus, the number of items you can fit in a row is (width + columnSpacing)/(itemWidth + columnSpacing)
-    switch (mPrimaryDirection) {
+    switch (mPrimaryDirection)
+    {
     case Direction::Vertical:
         {
-            int itemsPerColumn = max(1L, (containerHeight - mPadding.top - mPadding.bottom + mRowSpacing)/(itemHeight + mRowSpacing));
+            int itemsPerColumn = ItemsPerColumn(itemHeight, containerHeight);
             column = id / itemsPerColumn;
             row = id % itemsPerColumn;
         }
@@ -91,14 +127,15 @@ RECT LayoutSettings::RectFromID(int id, int itemWidth, int itemHeight, int conta
 
     case Direction::Horizontal:
         {
-            int itemsPerRow = max(1L, (containerWidth - mPadding.left - mPadding.right + mColumnSpacing)/(itemWidth + mColumnSpacing));
+            int itemsPerRow = ItemsPerRow(itemWidth, containerWidth);
             row = id / itemsPerRow;
             column = id % itemsPerRow;
         }
         break;
     }
 
-    switch (mStartPosition) {
+    switch (mStartPosition)
+    {
     case StartPosition::BottomLeft:
         {
             rect.left = mPadding.left + column * (itemWidth + mColumnSpacing);
