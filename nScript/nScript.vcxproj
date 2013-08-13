@@ -29,6 +29,9 @@
     <ClCompile Include="nScript.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\External\v8\v8.vcxproj">
+      <Project>{3c70e163-9964-4164-8e26-f2c850905d0f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\nShared\nShared.vcxproj">
       <Project>{91b4220f-6589-4739-bca7-3ff9f83fce04}</Project>
     </ProjectReference>
@@ -133,6 +136,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -152,6 +156,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

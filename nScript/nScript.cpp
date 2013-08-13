@@ -10,14 +10,8 @@
 #include "nScript.h"
 #include <map>
 #include "Version.h"
-#include "v8\v8.h"
+#include "../External/v8/include/v8.h"
 
-
-#ifdef _DEBUG
-#   pragma comment(lib, "v8_base.debug.lib")
-#else
-#   pragma comment(lib, "v8_base.lib")
-#endif
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "Winmm.lib")
 
