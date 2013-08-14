@@ -35,6 +35,7 @@ CoverArt::CoverArt(LPCTSTR name) : Drawable(name)
     WindowSettings defaults;
     defaults.width = 200;
     defaults.height = 200;
+    defaults.registerWithCore = true;
     mWindow->Initialize(&defaults);
 
     LoadSettings();

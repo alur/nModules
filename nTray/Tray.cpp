@@ -30,6 +30,9 @@ Tray::Tray(LPCTSTR name) : Drawable(name)
     this->tooltip = new Tooltip(L"Tooltip", mSettings);
     this->balloon = new Balloon(L"Balloon", mSettings, this->balloonClickedMessage, this);
 
+    WindowSettings defaults;
+    defaults.registerWithCore = true;
+
     mWindow->Initialize();
     mWindow->Show();
 

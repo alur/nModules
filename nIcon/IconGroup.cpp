@@ -65,6 +65,7 @@ IconGroup::IconGroup(LPCTSTR prefix) : Drawable(prefix) {
     WindowSettings defaults;
     defaults.width = 500;
     defaults.height = 300;
+    defaults.registerWithCore = true;
 
     StateSettings defaultState;
     defaultState.backgroundBrush.color = Color::Create(0x00000000);

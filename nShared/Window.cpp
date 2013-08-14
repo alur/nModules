@@ -675,11 +675,11 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
 {
     UNREFERENCED_PARAMETER(extra);
 
+    UpdateLock updateLock(this);
+
     // Forward mouse messages to the lowest level child window which the mouse is over.
     if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST && !mDontForwardMouse)
     {
-        UpdateLock updateLock(this);
-
         int xPos = GET_X_LPARAM(lParam);
         int yPos = GET_Y_LPARAM(lParam);
         MessageHandler *handler = nullptr;
@@ -748,7 +748,6 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
     {
     case WM_MOUSELEAVE:
         {
-            UpdateLock updateLock(this);
             isTrackingMouse = false;
             if (activeChild != nullptr)
             {
