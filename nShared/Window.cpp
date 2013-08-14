@@ -58,6 +58,8 @@ Window::Window(Settings* settings, MessageHandler* msgHandler)
     mDontForwardMouse = false;
     mCaptureHandler = nullptr;
     mIsChild = false;
+    mNeedsUpdate = false;
+    mUpdateLockCount = 0;
     this->timerIDs = nullptr;
     this->userMsgIDs = nullptr;
     this->monitorInfo = nullptr;
@@ -676,7 +678,9 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
     // Forward mouse messages to the lowest level child window which the mouse is over.
     if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST && !mDontForwardMouse)
     {
-        int xPos = GET_X_LPARAM(lParam); 
+        UpdateLock updateLock(this);
+
+        int xPos = GET_X_LPARAM(lParam);
         int yPos = GET_Y_LPARAM(lParam);
         MessageHandler *handler = nullptr;
 
@@ -744,6 +748,7 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
     {
     case WM_MOUSELEAVE:
         {
+            UpdateLock updateLock(this);
             isTrackingMouse = false;
             if (activeChild != nullptr)
             {
@@ -1191,6 +1196,42 @@ HRESULT Window::ReCreateDeviceResources()
 /// <summary>
 /// Releases a SetMouseCapture
 /// </summary>
+void Window::PopUpdateLock()
+{
+    if (!mIsChild)
+    {
+        if (--mUpdateLockCount == 0 && mNeedsUpdate)
+        {
+            mNeedsUpdate = false;
+            UpdateWindow(GetWindowHandle());
+        }
+    }
+    else if (mParent)
+    {
+        mParent->PopUpdateLock();
+    }
+}
+
+
+/// <summary>
+/// Releases a SetMouseCapture
+/// </summary>
+void Window::PushUpdateLock()
+{
+    if (!mIsChild)
+    {
+        ++mUpdateLockCount;
+    }
+    else if (mParent)
+    {
+        mParent->PushUpdateLock();
+    }
+}
+
+
+/// <summary>
+/// Releases a SetMouseCapture
+/// </summary>
 void Window::ReleaseMouseCapture()
 {
     if (!mIsChild)
@@ -1258,7 +1299,14 @@ void Window::Repaint(LPRECT region)
         }
         else {
             InvalidateRect(this->window, region, TRUE);
-            UpdateWindow(this->window);
+            if (mUpdateLockCount == 0)
+            {
+                UpdateWindow(this->window);
+            }
+            else
+            {
+                mNeedsUpdate = true;
+            }
         }
     }
 }

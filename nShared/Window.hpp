@@ -42,6 +42,22 @@ public:
     typedef PointerIterator<list<Overlay*>::iterator, Overlay> OVERLAY;
     typedef PointerIterator<list<IPainter*>::iterator, IPainter> PAINTER;
 
+public:
+    friend class UpdateLock;
+    class UpdateLock
+    {
+    public:
+        explicit UpdateLock(Window*);
+        ~UpdateLock();
+
+    public:
+        void Unlock();
+
+    private:
+        Window *mWindow;
+        bool mLocked;
+    };
+
     // enums
 public:
     // Reserved window messages.
@@ -179,6 +195,10 @@ public:
 
     // Moves this window.
     void Move(int x, int y);
+
+    //
+    void PopUpdateLock();
+    void PushUpdateLock();
 
     // Stops capturing mouse input.
     void ReleaseMouseCapture();
@@ -407,7 +427,6 @@ private:
     //
     std::map<std::tstring, IBrushOwner*> mBrushOwners;
 
-    
     // The base state -- the one to use when no others are active.
     STATE mBaseState;
 
@@ -416,6 +435,12 @@ private:
 
     // All current states.
     std::list<State*> mStates;
+
+    //
+    int mUpdateLockCount;
+
+    //
+    bool mNeedsUpdate;
 
 public:
     // Registers a part of this window as a drop-region

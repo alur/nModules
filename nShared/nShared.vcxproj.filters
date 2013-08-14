@@ -164,5 +164,8 @@
     <ClCompile Include="Drawable.cpp">
       <Filter>Drawables</Filter>
     </ClCompile>
+    <ClCompile Include="WindowUpdateLock.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

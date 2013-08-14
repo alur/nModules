@@ -96,6 +96,7 @@
     <ClCompile Include="Tooltip.cpp" />
     <ClCompile Include="UnaryColorVal.cpp" />
     <ClCompile Include="WindowThumbnail.cpp" />
+    <ClCompile Include="WindowUpdateLock.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nCoreCom\nCoreCom.vcxproj">
