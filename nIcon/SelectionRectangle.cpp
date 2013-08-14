@@ -131,6 +131,15 @@ void SelectionRectangle::SetRect(D2D1_RECT_F rect)
 /// <summary>
 ///
 /// </summary>
+const D2D1_RECT_F &SelectionRectangle::GetRect() const
+{
+    return mRect.rect;
+}
+
+
+/// <summary>
+///
+/// </summary>
 void SelectionRectangle::Show()
 {
     mHidden = false;

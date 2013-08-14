@@ -1283,7 +1283,7 @@ void Window::RemoveOverlay(OVERLAY overlay)
 /// Repaints the window.
 /// </summary>
 /// <param name="region">The area of the window to repaint. If NULL, the whole window is repainted.</param>
-void Window::Repaint(LPRECT region)
+void Window::Repaint(LPCRECT region)
 {
     if (this->initialized && this->visible)
     {
@@ -1313,6 +1313,30 @@ void Window::Repaint(LPRECT region)
                 mNeedsUpdate = true;
             }
         }
+    }
+}
+
+
+/// <summary>
+/// Repaints the window.
+/// </summary>
+/// <param name="region">The area of the window to repaint. If NULL, the whole window is repainted.</param>
+void Window::Repaint(const D2D1_RECT_F *region)
+{
+    if (this->initialized && this->visible)
+    {
+        RECT r;
+        if (region == nullptr)
+        {
+            region = &this->drawingArea;
+        }
+
+        r.left = (LONG)(region->left - 1.5f);
+        r.top = (LONG)(region->top - 1.5f);
+        r.bottom = (LONG)(region->bottom + 1.5f);
+        r.right = (LONG)(region->right + 1.5f);
+
+        Repaint(&r);
     }
 }
 

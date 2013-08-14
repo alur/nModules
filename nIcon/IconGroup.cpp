@@ -641,6 +641,7 @@ void IconGroup::EndRectangleSelection(D2D1_POINT_2U point) {
     mInRectangleSelection = false;
     mSelectionRectagle.Hide();
     mWindow->ReleaseMouseCapture();
+    mWindow->Repaint(&mSelectionRectagle.GetRect());
 
     D2D1_RECT_F rect = D2D1::RectF(
         float(min(mRectangleStart.x, point.x)),
@@ -651,15 +652,15 @@ void IconGroup::EndRectangleSelection(D2D1_POINT_2U point) {
 
     for (IconTile *tile : mIcons) {
         if (tile->IsInRect(rect)) {
-            tile->Select(false);
+            tile->Select();
         }
         else {
-            tile->Deselect(false);
+            tile->Deselect();
         }
     }
 
     mWindow->EnableMouseForwarding();
-    mWindow->Repaint();
+    mWindow->Repaint(&rect);
 }
 
 
@@ -674,19 +675,21 @@ void IconGroup::MoveRectangleSelection(D2D1_POINT_2U point) {
         float(max(mRectangleStart.y, point.y))
     );
 
+    mWindow->Repaint(&mSelectionRectagle.GetRect());
+
     mSelectionRectagle.SetRect(rect);
 
     for (IconTile *tile : mIcons) {
         if (tile->IsInRect(rect)) {
-            tile->Select(false);
+            tile->Select();
         }
         else {
-            tile->Deselect(false);
+            tile->Deselect();
         }
     }
 
     mSelectionRectagle.Show();
-    mWindow->Repaint();
+    mWindow->Repaint(&rect);
 }
 
 

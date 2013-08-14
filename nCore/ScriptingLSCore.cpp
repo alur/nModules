@@ -57,7 +57,6 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
 {
     //
     // LiteStep
-    // - AboutDialog()
     // - Bangs
     // - - Add(bang, func)
     // - - Execute(bang, args)
@@ -83,6 +82,8 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
     // General
     //
     Handle<ObjectTemplate> liteStep = ObjectTemplate::New();
+
+    //
     liteStep->Set(String::New(CAST(L"Execute")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 1)
@@ -92,6 +93,23 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
 
         String::Value command(args[0]);
         LiteStep::LSExecute(nullptr, CAST(*command), 0);
+    }));
+
+    //
+    liteStep->Set(String::New(CAST(L"Recycle")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    {
+        HWND hLiteStep = LiteStep::GetLitestepWnd();
+    
+        if (hLiteStep)
+        {
+            PostMessage(hLiteStep, 9260, 0, 0);
+        }
+    }));
+
+    //
+    liteStep->Set(String::New(CAST(L"Refresh")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    {
+        LiteStep::LSExecuteEx(nullptr, L"", L"!Refresh", L"", L"", 0);
     }));
 
     //
@@ -130,15 +148,30 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
         }
 
         String::Value bang(args[0]);
-        String::Value params(args[1]);
 
-        LiteStep::LSExecuteEx(nullptr, L"", CAST(*bang), CAST(*params), L"", 0);
+        if (args.Length() == 2)
+        {
+            String::Value params(args[1]);
+            LiteStep::LSExecuteEx(nullptr, L"", CAST(*bang), CAST(*params), L"", 0);
+        }
+        else
+        {
+            LiteStep::LSExecuteEx(nullptr, L"", CAST(*bang), L"", L"", 0);
+        }
     }));
 
     //
     bangs->Set(String::New(CAST(L"List")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
+        //HandleScope handleScope(Isolate::GetCurrent());
 
+        //Handle<Array> array = Array::New(size...);
+        //array->
+
+        LiteStep::EnumLSData(ELD_BANGS, (FARPROC)(LiteStep::ENUMBANGSPROC) [] (LPCWSTR bang, LPARAM list) -> BOOL
+        {
+            return FALSE;
+        }, 0);
     }));
     
     //

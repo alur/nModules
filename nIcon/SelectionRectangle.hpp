@@ -29,6 +29,7 @@ public:
 public:
     void Init(Settings *parentSettings);
     void SetRect(D2D1_RECT_F rect);
+    const D2D1_RECT_F &GetRect() const;
     void Show();
     void Hide();
 

@@ -213,7 +213,8 @@ public:
     void RemoveOverlay(OVERLAY overlay);
 
     // Forces this window to redraw.
-    void Repaint(LPRECT region = nullptr);
+    void Repaint(LPCRECT region);
+    void Repaint(const D2D1_RECT_F *region = nullptr);
 
     // Resizes the window.
     void Resize(int width, int height);
