@@ -18,7 +18,7 @@ public:
 
 public:
     HRESULT CompareID(PCITEMID_CHILD id);
-    void SetPosition(int id, int x, int y, bool noRedraw = false);
+    void SetPosition(int id, int x, int y);
     LRESULT WINAPI HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID);
     HRESULT GetDisplayName(SHGDNF flags, LPWSTR buf, UINT cchBuf);
 

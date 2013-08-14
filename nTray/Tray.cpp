@@ -240,6 +240,8 @@ void Tray::RemoveIcon(TrayIcon* pIcon)
 /// </summary>
 void Tray::Relayout()
 {
+    Window::UpdateLock lock(mWindow);
+
     WindowSettings *drawingSettings = mWindow->GetDrawingSettings();
 
     switch (mOverflowAction)

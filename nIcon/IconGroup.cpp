@@ -216,10 +216,12 @@ void IconGroup::SetFolder(LPWSTR folder) {
     }
 
     // Enumerate the contents of this folder
+    Window::UpdateLock lock(mWindow);
+
     mWorkingFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList);
     while (enumIDList->Next(1, &idNext, NULL) != S_FALSE)
     {
-        AddIcon(idNext, true);
+        AddIcon(idNext);
     }
     enumIDList->Release();
 
@@ -246,7 +248,7 @@ void IconGroup::SetFolder(LPWSTR folder) {
 /// <summary>
 /// Add's the icon with the specified ID to the view
 /// </summary>
-void IconGroup::AddIcon(PCITEMID_CHILD pidl, bool noRedraw) {
+void IconGroup::AddIcon(PCITEMID_CHILD pidl) {
     // Don't add existing icons
     if (FindIcon(pidl) != nullptr) return;
 
@@ -262,7 +264,7 @@ void IconGroup::AddIcon(PCITEMID_CHILD pidl, bool noRedraw) {
     RECT pos = mLayoutSettings.RectFromID(iconPosition, mTileWidth, mTileHeight, mWindow->GetDrawingSettings()->width, mWindow->GetDrawingSettings()->height);
 
     IconTile *icon = new IconTile(this, pidl, mWorkingFolder, mTileWidth, mTileHeight);
-    icon->SetPosition(iconPosition, (int)pos.left, (int)pos.top, noRedraw);
+    icon->SetPosition(iconPosition, (int)pos.left, (int)pos.top);
     mIcons.push_back(icon);
 }
 

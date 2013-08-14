@@ -164,6 +164,8 @@ void TaskSwitcher::AddWindow(HWND window) {
 
 
 void TaskSwitcher::Show(int delta) {
+    Window::UpdateLock updateLock(mWindow);
+
     this->hoveredThumbnail = nullptr;
     this->selectedWindow = 0;
     this->peeking = false;

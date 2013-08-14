@@ -35,7 +35,7 @@ private:
     //
     HRESULT GetDisplayNameOf(PCITEMID_CHILD pidl, SHGDNF flags, LPWSTR buf, UINT cchBuf);
     HRESULT GetFolderPath(LPWSTR buf, UINT cchBuf);
-    void AddIcon(PCITEMID_CHILD pidl, bool noRedraw = false);
+    void AddIcon(PCITEMID_CHILD pidl);
     void RemoveIcon(PCITEMID_CHILD pidl);
     void UpdateIcon(PCITEMID_CHILD pidl);
     void UpdateAllIcons();

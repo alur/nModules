@@ -675,11 +675,11 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
 {
     UNREFERENCED_PARAMETER(extra);
 
-    UpdateLock updateLock(this);
-
     // Forward mouse messages to the lowest level child window which the mouse is over.
     if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST && !mDontForwardMouse)
     {
+        UpdateLock updateLock(this);
+
         int xPos = GET_X_LPARAM(lParam);
         int yPos = GET_Y_LPARAM(lParam);
         MessageHandler *handler = nullptr;
@@ -737,6 +737,7 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
     // Forward keyboard messages to the active child
     if (msg >= WM_KEYFIRST && msg <= WM_KEYLAST)
     {
+        UpdateLock updateLock(this);
         if (activeChild != nullptr)
         {
             activeChild->HandleMessage(window, msg, wParam, lParam, this);
@@ -748,6 +749,7 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
     {
     case WM_MOUSELEAVE:
         {
+            UpdateLock updateLock(this);
             isTrackingMouse = false;
             if (activeChild != nullptr)
             {
@@ -810,6 +812,7 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
 
     case WM_TIMER:
         {
+            UpdateLock updateLock(this);
             map<UINT_PTR, MessageHandler*>::const_iterator iter = timers.find(wParam);
             if (iter != timers.end())
             {
@@ -839,6 +842,8 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
 
     case WM_DWMCOLORIZATIONCOLORCHANGED:
         {
+            UpdateLock updateLock(this);
+
             // When the intensity is really high, the alpha drops to 0 :/
             if (wParam >> 24 == 0 && wParam != 0)
             {
@@ -867,8 +872,9 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
     }
 
     // Forward registered user messages.
-    if (msg >= WM_USER)
+    if (msg >= WM_FIRSTREGISTERED)
     {
+        UpdateLock updateLock(this);
         map<UINT,MessageHandler*>::const_iterator handler = this->userMessages.find(msg);
         if (handler != this->userMessages.end())
         {
@@ -1522,8 +1528,15 @@ void Window::SetParent(Window *newParent)
 /// <param name="height">The height to resize the window to.</param>
 void Window::SetPosition(int x, int y, int width, int height, LPARAM extra)
 {
+    UpdateLock lock(this);
+
     //
     bool isResize = width != this->drawingSettings->width || height != this->drawingSettings->height;
+
+    if (isResize || mIsChild)
+    {
+        Repaint();
+    }
 
     // Update the drawing settings.
     this->drawingSettings->x = x;
@@ -1569,9 +1582,17 @@ void Window::SetPosition(int x, int y, int width, int height, LPARAM extra)
     {
         painter->UpdatePosition(this->drawingArea);
     }
-    for (Window *child : this->children)
+    if (isResize || mIsChild)
     {
-        child->Move(child->drawingSettings->x, child->drawingSettings->y);
+        for (Window *child : this->children)
+        {
+            child->Move(child->drawingSettings->x, child->drawingSettings->y);
+        }
+    }
+
+    if (isResize || mIsChild)
+    {
+        Repaint();
     }
 
     //

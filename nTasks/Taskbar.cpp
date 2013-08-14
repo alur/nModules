@@ -92,7 +92,6 @@ TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout)
         if (!noLayout)
         {
             Relayout();
-            Repaint();
         }
 
         return pButton;
@@ -170,6 +169,7 @@ void Taskbar::Repaint()
 /// </summary>
 void Taskbar::Relayout()
 {
+    Window::UpdateLock lock(mWindow);
     WindowSettings* drawingSettings = mWindow->GetDrawingSettings();
     int spacePerLine, lines, buttonSize, x0, y0, xdir, ydir;
 
@@ -288,7 +288,6 @@ LRESULT WINAPI Taskbar::HandleMessage(HWND window, UINT message, WPARAM wParam, 
     case Window::WM_SIZECHANGE:
         {
             Relayout();
-            Repaint();
         }
         return 0;
     }

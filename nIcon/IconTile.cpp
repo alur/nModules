@@ -170,12 +170,9 @@ int IconTile::GetPositionID() {
 }
 
 
-void IconTile::SetPosition(int id, int x, int y, bool noRedraw) {
+void IconTile::SetPosition(int id, int x, int y) {
     mPositionID = id;
     mWindow->Move(x, y);
-    if (!noRedraw) {
-        mWindow->Repaint();
-    }
 }
 
 
