@@ -40,6 +40,10 @@
 
 #include "v8stdint.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4100)
+#pragma warning(disable: 4127)
+
 #ifdef _WIN32
 
 // Setup for Windows DLL export/import. When building the V8 DLL the
@@ -623,7 +627,7 @@ template <class T> class Persistent // NOLINT
    * cell remain and IsEmpty will still return false.
    */
   // TODO(dcarney): deprecate
-  V8_INLINE(void Dispose(Isolate* isolate)) { Dispose(); }
+  V8_INLINE(void Dispose(Isolate* /*isolate*/)) { Dispose(); }
 
   /**
    * Make the reference to this object weak.  When only weak handles
@@ -6545,5 +6549,7 @@ void* Context::GetAlignedPointerFromEmbedderData(int index) {
 #undef V8EXPORT
 #undef TYPE_CHECK
 
+
+#pragma warning(pop)
 
 #endif  // V8_H_

@@ -18,6 +18,7 @@
 #include "TextFunctions.h"
 #include "ParsedText.hpp"
 #include "Version.h"
+#include "Scripting.h"
 
 
 // The messages we want from the core
@@ -69,6 +70,9 @@ int initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* path */)
     StateBangs::Register(_T("n"), FindRegisteredWindow);
     BrushBangs::Register(_T("n"), FindRegisteredWindow);
 
+    // Start the scripting manager
+    Scripting::Initialize();
+
     return 0;
 }
 
@@ -78,6 +82,8 @@ int initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* path */)
 /// </summary>
 void quitModule(HINSTANCE hDllInstance)
 {
+    Scripting::Shutdown();
+
     WindowBangs::UnRegister(_T("n"));
     StateBangs::UnRegister(_T("n"));
     BrushBangs::UnRegister(_T("n"));

@@ -42,7 +42,7 @@ HRESULT nCore::Connect(VERSION minVersion)
     INIT_FUNC(GetCoreVersion);
 
     // Should check the version here
-    VERSION coreVersion = GetCoreVersion();
+    VERSION coreVersion = FUNC_VAR_NAME(GetCoreVersion)();
     // The major version must be the same
     if (GetMajorVersion(minVersion) != GetMajorVersion(coreVersion))
     {
@@ -95,5 +95,6 @@ bool nCore::Initialized()
 /// </summary>
 VERSION nCore::GetCoreVersion()
 {
+    assert(nCore::Initialized());
     return FUNC_VAR_NAME(GetCoreVersion)();
 }
