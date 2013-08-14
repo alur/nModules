@@ -2,12 +2,13 @@
  *  ScriptingLSCore.cpp
  *  The nModules Project
  *
- *  Manages the JavaScript API.
+ *  Manages the LiteStep object.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "../External/v8/include/v8.h"
 #include "ScriptingLSCore.h"
+#include "ScriptingHelpers.h"
 #include <map>
 
 
@@ -15,16 +16,17 @@ using namespace v8;
 
 
 // All bangs currently registered by scripts.
-static std::map<std::string, Persistent<Function> > gScriptBangs;
+static std::map<std::wstring, Persistent<Function> > gScriptBangs;
 
 //
 extern Persistent<Context> gScriptingContext;
 
+//typedef wchar_t uint16_t;
 
 /// <summary>
 /// Called by LiteStep in order to execute a particular bang, with a particular set of params.
 /// </summary>
-static void ScriptBangThump(HWND, LPCSTR bang, LPCSTR params)
+static void ScriptBangThump(HWND, LPCTSTR bang, LPCTSTR params)
 {
     auto iter = gScriptBangs.find(bang);
     if (iter != gScriptBangs.end())
@@ -41,7 +43,7 @@ static void ScriptBangThump(HWND, LPCSTR bang, LPCSTR params)
 
         Handle<Function> func = Local<Function>::New(isolate, iter->second);
         Handle<Context> context = Local<Context>::New(isolate, gScriptingContext);
-        Handle<Value> arg = String::New(params);
+        Handle<Value> arg = String::New(CAST(params));
 
         func->Call(context->Global(), 1, &arg);
     }
@@ -81,78 +83,80 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
     // General
     //
     Handle<ObjectTemplate> liteStep = ObjectTemplate::New();
-    liteStep->Set(String::New("Execute"), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    liteStep->Set(String::New(CAST(L"Execute")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 1)
         {
             return;
         }
 
-        String::AsciiValue command(args[0]);
-        LiteStep::LSExecuteA(nullptr, *command, 0);
+        String::Value command(args[0]);
+        LiteStep::LSExecute(nullptr, CAST(*command), 0);
     }));
 
     //
     // Bangs
     //
     Handle<ObjectTemplate> bangs = ObjectTemplate::New();
-    liteStep->Set(String::New("Bangs"), bangs);
+    liteStep->Set(String::New(CAST(L"Bangs")), bangs);
 
-    bangs->Set(String::New("Add"), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    bangs->Set(String::New(CAST(L"Add")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 2)
         {
             return;
         }
 
-        String::AsciiValue bang(args[0]);
+        String::Value value(args[0]);
+        LPCWSTR bang = CAST(*value);
 
         // Following the behavior of LS's AddBandCommand, Add overwrites previous bangs.
-        if (gScriptBangs.find(*bang) != gScriptBangs.end())
+        if (gScriptBangs.find(bang) != gScriptBangs.end())
         {
-            gScriptBangs[*bang].Dispose();
+            gScriptBangs[bang].Dispose();
         }
         
-        gScriptBangs[*bang].Reset(Isolate::GetCurrent(), args[1].As<Function>());
+        gScriptBangs[bang].Reset(Isolate::GetCurrent(), args[1].As<Function>());
 
-        LiteStep::AddBangCommandExA(*bang, ScriptBangThump);
+        LiteStep::AddBangCommandEx(bang, ScriptBangThump);
     }));
 
     //
-    bangs->Set(String::New("Execute"), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    bangs->Set(String::New(CAST(L"Execute")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 1 && args.Length() != 2)
         {
             return;
         }
 
-        String::AsciiValue bang(args[0]);
-        String::AsciiValue params(args[1]);
+        String::Value bang(args[0]);
+        String::Value params(args[1]);
 
-        LiteStep::LSExecuteExA(nullptr, "", *bang, *params, "", 0);
+        LiteStep::LSExecuteEx(nullptr, L"", CAST(*bang), CAST(*params), L"", 0);
     }));
 
     //
-    bangs->Set(String::New("List"), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    bangs->Set(String::New(CAST(L"List")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
 
     }));
     
     //
-    bangs->Set(String::New("Remove"), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    bangs->Set(String::New(CAST(L"Remove")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {   
         if (args.Length() != 1)
         {
             return;
         }
-        String::AsciiValue bang(args[0]);
+        String::Value value(args[0]);
+        LPCWSTR bang = CAST(*value);
 
-        auto iter = gScriptBangs.find(*bang);
+        auto iter = gScriptBangs.find(bang);
         if (iter != gScriptBangs.end())
         {
             iter->second.Dispose();
             gScriptBangs.erase(iter);
-            LiteStep::RemoveBangCommandA(*bang);
+            LiteStep::RemoveBangCommand(bang);
         }
     }));
 
@@ -160,46 +164,46 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
     // Evars
     //
     Handle<ObjectTemplate> evars = ObjectTemplate::New();
-    liteStep->Set(String::New("Evars"), evars);
+    liteStep->Set(String::New(CAST(L"Evars")), evars);
 
-    evars->Set(String::New("Set"), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    evars->Set(String::New(CAST(L"Set")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 2)
         {
             return;
         }
 
-        String::AsciiValue key(args[0]);
-        String::AsciiValue value(args[1]);
+        String::Value key(args[0]);
+        String::Value value(args[1]);
 
-        args.GetReturnValue().Set(LiteStep::LSSetVariableA(*key, *value));
+        args.GetReturnValue().Set(LiteStep::LSSetVariable(CAST(*key), CAST(*value)));
     }));
 
     //
-    evars->Set(String::New("Get"), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    evars->Set(String::New(CAST(L"Get")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 1)
         {
             return;
         }
 
-        String::AsciiValue key(args[0]);
+        String::Value key(args[0]);
 
-        char buf[MAX_LINE_LENGTH];
-        LiteStep::GetRCLineA(*key, buf, MAX_LINE_LENGTH, nullptr);
+        wchar_t buf[MAX_LINE_LENGTH];
+        LiteStep::GetRCLine(CAST(*key), buf, _countof(buf), nullptr);
 
-        args.GetReturnValue().Set(String::New(buf));
+        args.GetReturnValue().Set(String::New(CAST(buf)));
     }));
 
     //
-    evars->Set(String::New("GetNumeric"), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    evars->Set(String::New(CAST(L"GetNumeric")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 1 && args.Length() != 2)
         {
             return;
         }
 
-        String::AsciiValue key(args[0]);
+        String::Value key(args[0]);
         DOUBLE defaultValue = 0.0;
 
         if (args.Length() == 2)
@@ -207,7 +211,7 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
             defaultValue = (*args[1].As<Number>())->Value();
         }
 
-        args.GetReturnValue().Set(Number::New(LiteStep::GetRCDoubleA(*key, defaultValue)));
+        args.GetReturnValue().Set(Number::New(LiteStep::GetRCDouble(CAST(*key), defaultValue)));
     }));
 
     return handleScope.Close(liteStep);
@@ -222,6 +226,6 @@ void Scripting::LSCore::Shutdown()
     for (auto &item : gScriptBangs)
     {
         item.second.Dispose();
-        LiteStep::RemoveBangCommandA(item.first.c_str());
+        LiteStep::RemoveBangCommand(item.first.c_str());
     }
 }

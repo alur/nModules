@@ -93,6 +93,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -107,6 +108,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -131,6 +133,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <SDLCheck>true</SDLCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -157,6 +160,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <SDLCheck>true</SDLCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -171,7 +175,9 @@
     <ClInclude Include="nCore.h" />
     <ClInclude Include="ParsedText.hpp" />
     <ClInclude Include="Scripting.h" />
+    <ClInclude Include="ScriptingHelpers.h" />
     <ClInclude Include="ScriptingLSCore.h" />
+    <ClInclude Include="ScriptingNCore.h" />
     <ClInclude Include="TextFunctions.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
@@ -180,6 +186,7 @@
     <ClCompile Include="ParsedText.cpp" />
     <ClCompile Include="Scripting.cpp" />
     <ClCompile Include="ScriptingLSCore.cpp" />
+    <ClCompile Include="ScriptingNCore.cpp" />
     <ClCompile Include="TextFunctions.cpp" />
     <ClCompile Include="WindowRegistrar.cpp" />
   </ItemGroup>

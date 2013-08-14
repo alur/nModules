@@ -21,6 +21,12 @@
     <ClInclude Include="ScriptingLSCore.h">
       <Filter>Scripting</Filter>
     </ClInclude>
+    <ClInclude Include="ScriptingNCore.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptingHelpers.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowRegistrar.cpp" />
@@ -31,6 +37,9 @@
       <Filter>Scripting</Filter>
     </ClCompile>
     <ClCompile Include="ScriptingLSCore.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptingNCore.cpp">
       <Filter>Scripting</Filter>
     </ClCompile>
   </ItemGroup>
