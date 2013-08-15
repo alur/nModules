@@ -124,13 +124,15 @@ bool Popup::CheckFocus(HWND newActive, __int8 direction) {
 }
 
 
-void Popup::Close() {
+void Popup::Close()
+{
     mWindow->Hide();
     this->expandLeft = mSettings->GetBool(L"ExpandLeft", false);
     CloseChild(true);
-    PostClose();
+    //PostClose();
     this->mouseOver = false;
-    if (this->owner != NULL) {
+    if (this->owner != NULL)
+    {
         this->owner->openChild = NULL;
         ((nPopup::FolderItem*)this->owner->childItem)->ClosingPopup();
         this->owner->childItem = NULL;

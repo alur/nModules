@@ -82,6 +82,9 @@ public:
         //
         WM_ANIMATIONPAINT,
 
+        //
+        WM_HIDDEN,
+
         // The first message aviailable for registration.
         WM_FIRSTREGISTERED
     };

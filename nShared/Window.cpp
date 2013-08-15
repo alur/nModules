@@ -909,6 +909,7 @@ void Window::Hide()
     if (!mIsChild)
     {
         ShowWindow(this->window, SW_HIDE);
+        PostMessage(this->window, WM_HIDDEN, 0, 0);
     }
     else
     {
@@ -1564,10 +1565,10 @@ void Window::SetPosition(int x, int y, int width, int height, LPARAM extra)
     //
     bool isResize = width != this->drawingSettings->width || height != this->drawingSettings->height;
 
-    if (isResize || mIsChild)
-    {
+    //if (isResize || mIsChild)
+    //{
         Repaint();
-    }
+    //}
 
     // Update the drawing settings.
     this->drawingSettings->x = x;
@@ -1621,10 +1622,10 @@ void Window::SetPosition(int x, int y, int width, int height, LPARAM extra)
         }
     }
 
-    if (isResize || mIsChild)
-    {
+    //if (isResize || mIsChild)
+    //{
         Repaint();
-    }
+    //}
 
     //
     if (isResize)
