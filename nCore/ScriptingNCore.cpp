@@ -259,5 +259,101 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         }
     }));
 
+    //
+    nCore->Set(String::New(CAST(L"GetX")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    {
+        if (args.Length() != 1)
+        {
+            return;
+        }
+
+        // Find the window to operate on
+        if (!args[0]->IsString())
+        {
+            return;
+        }
+        String::Value windowName(args[0]);
+        Window *window = FindRegisteredWindow(CAST(*windowName));
+
+        if (window == nullptr)
+        {
+            return;
+        }
+
+        args.GetReturnValue().Set(window->GetDrawingSettings()->x);
+    }));
+
+    //
+    nCore->Set(String::New(CAST(L"GetY")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    {
+        if (args.Length() != 1)
+        {
+            return;
+        }
+
+        // Find the window to operate on
+        if (!args[0]->IsString())
+        {
+            return;
+        }
+        String::Value windowName(args[0]);
+        Window *window = FindRegisteredWindow(CAST(*windowName));
+
+        if (window == nullptr)
+        {
+            return;
+        }
+
+        args.GetReturnValue().Set(window->GetDrawingSettings()->y);
+    }));
+
+    //
+    nCore->Set(String::New(CAST(L"GetHeight")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    {
+        if (args.Length() != 1)
+        {
+            return;
+        }
+
+        // Find the window to operate on
+        if (!args[0]->IsString())
+        {
+            return;
+        }
+        String::Value windowName(args[0]);
+        Window *window = FindRegisteredWindow(CAST(*windowName));
+
+        if (window == nullptr)
+        {
+            return;
+        }
+
+        args.GetReturnValue().Set(window->GetDrawingSettings()->height);
+    }));
+
+    //
+    nCore->Set(String::New(CAST(L"GetWidth")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    {
+        if (args.Length() != 1)
+        {
+            return;
+        }
+
+        // Find the window to operate on
+        if (!args[0]->IsString())
+        {
+            return;
+        }
+        String::Value windowName(args[0]);
+        Window *window = FindRegisteredWindow(CAST(*windowName));
+
+        if (window == nullptr)
+        {
+            return;
+        }
+
+        args.GetReturnValue().Set(window->GetDrawingSettings()->width);
+    }));
+
     return handleScope.Close(nCore);
 }
