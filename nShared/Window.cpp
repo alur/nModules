@@ -805,7 +805,7 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
 
             if (inAnimation)
             {
-                PostMessage(window, WM_PAINT, 0, 0);
+                PostMessage(window, WM_ANIMATIONPAINT, 0, 0);
             }
         }
         return 0;
@@ -867,6 +867,12 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
                     windowPos->hwndInsertAfter = HWND_TOPMOST;
                 }
             }
+        }
+        return 0;
+
+    case WM_ANIMATIONPAINT:
+        {
+            //PostMessage(window, WM_PAINT, 0, 0);
         }
         return 0;
     }

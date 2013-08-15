@@ -433,14 +433,13 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     
                     mNeedsUpdate = false;
 
-                    if (inAnimation)
-                    {
-                        PostMessage(hWnd, WM_PAINT, 0, 0);
-                    }
-
                     if (this->m_pOldWallpaperBrush != NULL)
                     {
                         Redraw();
+                    }
+                    else if (inAnimation)
+                    {
+                        PostMessage(hWnd, WM_ANIMATIONPAINT, 0, 0);
                     }
                 }
             }

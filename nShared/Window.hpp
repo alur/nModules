@@ -79,8 +79,21 @@ public:
         // lParam: Custom value sent to resize
         WM_SIZECHANGE,
 
+        //
+        WM_ANIMATIONPAINT,
+
         // The first message aviailable for registration.
         WM_FIRSTREGISTERED
+    };
+
+    // Reserved window timers.
+    enum ReservedTimers
+    {
+        //
+        VT_ANIMATE,
+
+        //
+        VT_FIRSTREGISTERED
     };
 
     // Constructors & Destructor
