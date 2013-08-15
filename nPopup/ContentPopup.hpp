@@ -35,7 +35,7 @@ public:
 
 protected:
     void PreShow() override;
-    void PostClose() override;
+    virtual void PostClose() override;
 
 private:
     //

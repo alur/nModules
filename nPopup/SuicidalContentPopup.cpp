@@ -15,8 +15,7 @@ SuicidalContentPopup::SuicidalContentPopup(LPCTSTR path, LPCTSTR title, LPCTSTR 
 }
 
 
-void SuicidalContentPopup::Close()
+void SuicidalContentPopup::PostClose()
 {
-    Popup::Close();
     delete this;
 }

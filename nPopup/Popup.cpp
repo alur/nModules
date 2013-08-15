@@ -261,11 +261,22 @@ void Popup::Show(LPRECT position, Popup* owner) {
 
 
 LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
-    switch (msg) {
+    switch (msg)
+    {
+    case Window::WM_HIDDEN:
+        {
+            PostClose();
+        }
+        return 0;
+
     case WM_ACTIVATE:
-        if (LOWORD(wParam) == WA_INACTIVE && mWindow->IsVisible()) {
-            if (!CheckFocus((HWND)lParam, 3)) {
-                Close();
+        {
+            if (LOWORD(wParam) == WA_INACTIVE && mWindow->IsVisible())
+            {
+                if (!CheckFocus((HWND)lParam, 3))
+                {
+                    Close();
+                }
             }
         }
         return 0;

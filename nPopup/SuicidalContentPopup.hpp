@@ -14,5 +14,5 @@ public:
     explicit SuicidalContentPopup(LPCTSTR path, LPCTSTR title, LPCTSTR prefix);
 
 public:
-    void Close() override;
+    void PostClose() override;
 };

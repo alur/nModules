@@ -309,11 +309,7 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
 
 LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID Window)
 {
-    if (message == Window::WM_HIDDEN)
-    {
-        PostClose();
-    }
-    else if (message >= Window::WM_FIRSTREGISTERED)
+    if (message >= Window::WM_FIRSTREGISTERED)
     {
         WATCHFOLDERMAP::const_iterator folder = this->watchedFolders.find(message);
         if (folder != this->watchedFolders.end())
