@@ -33,7 +33,7 @@ Tray::Tray(LPCTSTR name) : Drawable(name)
     WindowSettings defaults;
     defaults.registerWithCore = true;
 
-    mWindow->Initialize();
+    mWindow->Initialize(&defaults);
     mWindow->Show();
 
     this->balloonTimer = 0;
