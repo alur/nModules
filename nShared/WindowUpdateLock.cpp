@@ -12,7 +12,7 @@ Window::UpdateLock::UpdateLock(Window * window)
     : mWindow(window)
     , mLocked(true)
 {
-    mWindow->PushUpdateLock();
+    mWindow->PushUpdateLock(this);
 }
 
 
@@ -27,6 +27,6 @@ void Window::UpdateLock::Unlock()
     if (mLocked)
     {
         mLocked = false;
-        mWindow->PopUpdateLock();
+        mWindow->PopUpdateLock(this);
     }
 }

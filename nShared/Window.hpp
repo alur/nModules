@@ -27,6 +27,7 @@
 #include "../Utilities/StopWatch.hpp"
 #include "IBrushOwner.hpp"
 #include "WindowClass.hpp"
+#include <set>
 
 
 using std::vector;
@@ -46,6 +47,7 @@ public:
     friend class UpdateLock;
     class UpdateLock
     {
+        friend class Window;
     public:
         explicit UpdateLock(Window*);
         ~UpdateLock();
@@ -213,8 +215,8 @@ public:
     void Move(int x, int y);
 
     //
-    void PopUpdateLock();
-    void PushUpdateLock();
+    void PopUpdateLock(UpdateLock *lock);
+    void PushUpdateLock(UpdateLock *lock);
 
     // Stops capturing mouse input.
     void ReleaseMouseCapture();
@@ -458,7 +460,7 @@ private:
     std::list<State*> mStates;
 
     //
-    int mUpdateLockCount;
+    std::set<UpdateLock*> mActiveLocks;
 
 public:
     // Registers a part of this window as a drop-region

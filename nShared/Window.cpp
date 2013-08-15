@@ -59,7 +59,6 @@ Window::Window(Settings* settings, MessageHandler* msgHandler)
     mCaptureHandler = nullptr;
     mIsChild = false;
     mNeedsUpdate = false;
-    mUpdateLockCount = 0;
     this->timerIDs = nullptr;
     this->userMsgIDs = nullptr;
     this->monitorInfo = nullptr;
@@ -191,6 +190,12 @@ Window::~Window()
     else if (mIsChild)
     {
         nCore::System::RemoveWindowRegistrationListener(mParentName, this);
+    }
+
+    // Clear all update locks, to prevent crashes
+    for (UpdateLock *lock : mActiveLocks)
+    {
+        lock->mLocked = false;
     }
 
     // Register with the core
@@ -1209,11 +1214,12 @@ HRESULT Window::ReCreateDeviceResources()
 /// <summary>
 /// Releases a SetMouseCapture
 /// </summary>
-void Window::PopUpdateLock()
+void Window::PopUpdateLock(UpdateLock *lock)
 {
     if (!mIsChild)
     {
-        if (--mUpdateLockCount == 0 && mNeedsUpdate)
+        mActiveLocks.erase(lock);
+        if (mActiveLocks.empty() && mNeedsUpdate)
         {
             mNeedsUpdate = false;
             UpdateWindow(GetWindowHandle());
@@ -1221,7 +1227,7 @@ void Window::PopUpdateLock()
     }
     else if (mParent)
     {
-        mParent->PopUpdateLock();
+        mParent->PopUpdateLock(lock);
     }
 }
 
@@ -1229,15 +1235,16 @@ void Window::PopUpdateLock()
 /// <summary>
 /// Releases a SetMouseCapture
 /// </summary>
-void Window::PushUpdateLock()
+void Window::PushUpdateLock(UpdateLock *lock)
 {
     if (!mIsChild)
     {
-        ++mUpdateLockCount;
+        mActiveLocks.insert(lock);
+        lock->mWindow = this;
     }
     else if (mParent)
     {
-        mParent->PushUpdateLock();
+        mParent->PushUpdateLock(lock);
     }
 }
 
@@ -1312,7 +1319,7 @@ void Window::Repaint(LPCRECT region)
         }
         else {
             InvalidateRect(this->window, region, TRUE);
-            if (mUpdateLockCount == 0)
+            if (mActiveLocks.empty())
             {
                 UpdateWindow(this->window);
             }
