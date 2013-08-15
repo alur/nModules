@@ -207,5 +207,57 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         }
     }));
 
+    //
+    nCore->Set(String::New(CAST(L"Hide")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    {
+        if (args.Length() != 1)
+        {
+            return;
+        }
+
+        // Find the window to operate on
+        if (!args[0]->IsString())
+        {
+            return;
+        }
+        String::Value windowName(args[0]);
+        Window *window = FindRegisteredWindow(CAST(*windowName));
+
+        if (window == nullptr)
+        {
+            return;
+        }
+
+        window->Hide();
+    }));
+
+    //
+    nCore->Set(String::New(CAST(L"Show")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    {
+        if (args.Length() != 1)
+        {
+            return;
+        }
+
+        // Find the window to operate on
+        if (!args[0]->IsString())
+        {
+            return;
+        }
+        String::Value windowName(args[0]);
+        Window *window = FindRegisteredWindow(CAST(*windowName));
+
+        if (window == nullptr)
+        {
+            return;
+        }
+
+        window->Show();
+        if (window->IsChild())
+        {
+            window->Repaint();
+        }
+    }));
+
     return handleScope.Close(nCore);
 }

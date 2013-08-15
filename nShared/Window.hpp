@@ -325,6 +325,10 @@ private:
     void ParentLeft();
     void UpdateParentVariables();
 
+protected:
+    //
+    bool mNeedsUpdate;
+
 private:
     // The child window the mouse is currently over.
     Window* activeChild;
@@ -439,9 +443,6 @@ private:
 
     //
     int mUpdateLockCount;
-
-    //
-    bool mNeedsUpdate;
 
 public:
     // Registers a part of this window as a drop-region

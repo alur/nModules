@@ -32,12 +32,15 @@ map<tstring, Label*> g_AllLabels;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */) {
-    if (!gLSModule.Initialize(parent, instance)) {
+EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */)
+{
+    if (!gLSModule.Initialize(parent, instance))
+    {
         return 1;
     }
 
-    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION))) {
+    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION)))
+    {
         return 1;
     }
 

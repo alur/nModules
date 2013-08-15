@@ -247,6 +247,15 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
         args.GetReturnValue().Set(Number::New(LiteStep::GetRCDouble(CAST(*key), defaultValue)));
     }));
 
+    //
+    // Modules
+    //
+    Handle<ObjectTemplate> modules = ObjectTemplate::New();
+    liteStep->Set(String::New(CAST(L"Modules")), modules);
+
+
+
+
     return handleScope.Close(liteStep);
 }
 

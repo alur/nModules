@@ -385,8 +385,6 @@ void Window::Animate()
         this->animating = false;
     }
 
-    TRACE("%.4f", progress);
-
     RECT step;
     step.left = this->animationStart.left + long(progress*(this->animationTarget.left - this->animationStart.left));
     step.top = this->animationStart.top + long(progress*(this->animationTarget.top - this->animationStart.top));
@@ -769,9 +767,11 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
             bool inAnimation = false;
             RECT updateRect;
 
+            UpdateLock lock(this);
+
             if (GetUpdateRect(window, &updateRect, FALSE) != FALSE)
             {
-
+                ValidateRect(this->window, nullptr);
                 if (SUCCEEDED(ReCreateDeviceResources()))
                 {
                     D2D1_RECT_F d2dUpdateRect = D2D1::RectF(
@@ -793,19 +793,19 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
                 }
 
                 // Paint actual owned/child windows.
-                EnumChildWindows(this->window, [] (HWND hwnd, LPARAM) -> BOOL
-                {
-                    SendMessage(hwnd, WM_PAINT, 0, 0);
-                    return TRUE;
-                }, 0);
-
-                ValidateRect(this->window, nullptr);
-
+                //EnumChildWindows(this->window, [] (HWND hwnd, LPARAM) -> BOOL
+                //{
+                //    SendMessage(hwnd, WM_PAINT, 0, 0);
+                //    return TRUE;
+                //}, 0);
             }
+
+            // We just painted, don't update
+            mNeedsUpdate = false;
 
             if (inAnimation)
             {
-                Repaint();
+                PostMessage(window, WM_PAINT, 0, 0);
             }
         }
         return 0;
@@ -992,6 +992,7 @@ void Window::Move(int x, int y)
 /// </summary>
 void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
 {
+    UpdateLock lock(this);
     if (this->visible && Math::RectIntersectArea(updateRect, &this->drawingArea) > 0)
     {
         this->renderTarget->PushAxisAlignedClip(this->drawingArea, D2D1_ANTIALIAS_MODE_ALIASED);

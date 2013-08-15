@@ -384,12 +384,16 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
         {
             if (!mDontRenderWallpaper)
             {
+                UpdateLock lock(this);
+
                 bool inAnimation = false;
 
                 RECT updateRect;
 
                 if (GetUpdateRect(hWnd, &updateRect, FALSE) != FALSE)
                 {
+                    ValidateRect(hWnd, NULL);
+
                     if (SUCCEEDED(ReCreateDeviceResources()))
                     {
                         this->renderTarget->BeginDraw();
@@ -426,10 +430,15 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                             DiscardDeviceResources();
                         }
                     }
+                    
+                    mNeedsUpdate = false;
 
-                    ValidateRect(hWnd, NULL);
+                    if (inAnimation)
+                    {
+                        PostMessage(hWnd, WM_PAINT, 0, 0);
+                    }
 
-                    if (this->m_pOldWallpaperBrush != NULL || inAnimation)
+                    if (this->m_pOldWallpaperBrush != NULL)
                     {
                         Redraw();
                     }

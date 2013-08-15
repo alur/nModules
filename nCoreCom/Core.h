@@ -39,5 +39,8 @@ namespace nCore
         Window *FindRegisteredWindow(LPCTSTR prefix);
         void AddWindowRegistrationListener(LPCTSTR prefix, Window *listener);
         void RemoveWindowRegistrationListener(LPCTSTR prefix, Window *listener);
+
+        // Scripting Service
+
     }
 }

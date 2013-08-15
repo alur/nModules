@@ -142,11 +142,10 @@ TrayIcon* Tray::AddIcon(LiteStep::LPLSNOTIFYICONDATA NID)
     {
         TrayIcon* icon = new TrayIcon(this, NID, mSettings);
         this->icons.push_back(icon);
-        Relayout();
         icon->Show();
         if (!g_InitPhase)
         {
-            mWindow->Repaint();
+            Relayout();
         }
         return icon;
     }
@@ -230,7 +229,6 @@ void Tray::RemoveIcon(TrayIcon* pIcon)
         delete pIcon;
 
         Relayout();
-        mWindow->Repaint();
     }
 }
 
@@ -366,16 +364,16 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM
 
 /// <summary>
 /// Called when the init phase has ended.
-/// <summary>
+/// </summary>
 void Tray::InitCompleted()
 {
-    mWindow->Repaint();
+    Relayout();
 }
 
 
 /// <summary>
 /// Shows the specified tooltip for this tray.
-/// <summary>
+/// </summary>
 void Tray::ShowTip(LPCWSTR text, LPRECT position)
 {
     if (!mNoTooltips)
@@ -387,7 +385,7 @@ void Tray::ShowTip(LPCWSTR text, LPRECT position)
 
 /// <summary>
 /// Hides the tooltip for this tray.
-/// <summary>
+/// </summary>
 void Tray::HideTip()
 {
     this->tooltip->Hide();
@@ -396,7 +394,7 @@ void Tray::HideTip()
 
 /// <summary>
 /// Enqueues a balloon.
-/// <summary>
+/// </summary>
 void Tray::EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD infoFlags, HICON balloonIcon, bool realTime)
 {
     // Get the user notification state.
@@ -432,7 +430,7 @@ void Tray::EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD
 
 /// <summary>
 /// Dismisses a balloon notification prematurely.
-/// <summary>
+/// </summary>
 void Tray::DismissBalloon(UINT message)
 {
     // Reset the timer.
@@ -448,7 +446,7 @@ void Tray::DismissBalloon(UINT message)
 
 /// <summary>
 /// Hides the current balloon and shows the next balloon in the queue.
-/// <summary>
+/// </summary>
 void Tray::ShowNextBalloon()
 {
     if (this->activeBalloonIcon != NULL)
