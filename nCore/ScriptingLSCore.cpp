@@ -96,7 +96,7 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
     }));
 
     //
-    liteStep->Set(String::New(CAST(L"Recycle")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    liteStep->Set(String::New(CAST(L"Recycle")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &) -> void
     {
         HWND hLiteStep = LiteStep::GetLitestepWnd();
     
@@ -107,7 +107,7 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
     }));
 
     //
-    liteStep->Set(String::New(CAST(L"Refresh")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    liteStep->Set(String::New(CAST(L"Refresh")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &) -> void
     {
         LiteStep::LSExecuteEx(nullptr, L"", L"!Refresh", L"", L"", 0);
     }));
@@ -252,7 +252,6 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
     //
     Handle<ObjectTemplate> modules = ObjectTemplate::New();
     liteStep->Set(String::New(CAST(L"Modules")), modules);
-
 
 
 

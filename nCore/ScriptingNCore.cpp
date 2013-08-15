@@ -32,7 +32,13 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
     //
     Handle<ObjectTemplate> nCore = ObjectTemplate::New();
 
-    nCore->Set(String::New(CAST(L"Move")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    //
+    // Window
+    //
+    Handle<ObjectTemplate> window = ObjectTemplate::New();
+    nCore->Set(String::New(CAST(L"Window")), window);
+
+    window->Set(String::New(CAST(L"Move")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() < 3 || args.Length() > 5)
         {
@@ -90,7 +96,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         }
     }));
 
-    nCore->Set(String::New(CAST(L"Size")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    window->Set(String::New(CAST(L"Size")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() < 3 || args.Length() > 5)
         {
@@ -148,7 +154,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         }
     }));
 
-    nCore->Set(String::New(CAST(L"Position")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    window->Set(String::New(CAST(L"Position")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() < 5 || args.Length() > 7)
         {
@@ -208,7 +214,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
     }));
 
     //
-    nCore->Set(String::New(CAST(L"Hide")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    window->Set(String::New(CAST(L"Hide")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 1)
         {
@@ -232,7 +238,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
     }));
 
     //
-    nCore->Set(String::New(CAST(L"Show")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    window->Set(String::New(CAST(L"Show")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 1)
         {
@@ -260,7 +266,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
     }));
 
     //
-    nCore->Set(String::New(CAST(L"GetX")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    window->Set(String::New(CAST(L"GetX")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 1)
         {
@@ -284,7 +290,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
     }));
 
     //
-    nCore->Set(String::New(CAST(L"GetY")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    window->Set(String::New(CAST(L"GetY")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 1)
         {
@@ -308,7 +314,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
     }));
 
     //
-    nCore->Set(String::New(CAST(L"GetHeight")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    window->Set(String::New(CAST(L"GetHeight")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 1)
         {
@@ -332,7 +338,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
     }));
 
     //
-    nCore->Set(String::New(CAST(L"GetWidth")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    window->Set(String::New(CAST(L"GetWidth")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
         if (args.Length() != 1)
         {

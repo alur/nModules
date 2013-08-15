@@ -25,7 +25,7 @@ Persistent<Context> gScriptingContext;
 /// <summary>
 /// Executes a piece of JavaScript.
 /// </summary>
-static void RunCode(LPCWSTR code, void (*callback)(Handle<Value>))
+static void RunCode(LPCWSTR code, void (*callback)(Handle<Value>), LPCWSTR fileName = nullptr)
 {
     // Get the default Isolate created at startup.
     Isolate* isolate = Isolate::GetCurrent();
@@ -39,16 +39,40 @@ static void RunCode(LPCWSTR code, void (*callback)(Handle<Value>))
 
     // Create a string containing the JavaScript source code.
     Handle<String> source = String::New(CAST(code));
-
+    
     // Compile the source code.
     TryCatch tryCatch;
-    Handle<Script> script = Script::Compile(source);
+    Handle<Script> script;
+    if (fileName)
+    {
+        script = Script::Compile(source, String::New(CAST(fileName)));
+    }
+    else
+    {
+        script = Script::Compile(source);
+    }
+
     if (script.IsEmpty())
     {
         if (tryCatch.HasCaught())
         {
+            Handle<Message> message = tryCatch.Message();
             String::Value exception(tryCatch.Exception());
-            MessageBox(nullptr, CAST(*exception), L"nScript Error", MB_OK);
+            if (message.IsEmpty())
+            {
+                MessageBox(nullptr, CAST(*exception), L"nScript Error", MB_OK);
+            }
+            else
+            {
+                String::Value fileName(message->GetScriptResourceName());
+                int lineNum = message->GetLineNumber();
+
+                WCHAR msg[MAX_LINE_LENGTH];
+
+                StringCchPrintfW(msg, _countof(msg), L"%s\nLine %d of %s", *exception, lineNum, *fileName);
+
+                MessageBox(nullptr, msg, L"nScript Error", MB_OK);
+            }
         }
         return;
     }
@@ -59,8 +83,24 @@ static void RunCode(LPCWSTR code, void (*callback)(Handle<Value>))
     {
         if (tryCatch.HasCaught())
         {
+            Handle<Message> message = tryCatch.Message();
             String::Value exception(tryCatch.Exception());
-            MessageBox(nullptr, CAST(*exception), L"nScript Exception", MB_OK);
+
+            if (message.IsEmpty())
+            {
+                MessageBox(nullptr, CAST(*exception), L"nScript Exception", MB_OK);
+            }
+            else
+            {
+                String::Value fileName(message->GetScriptResourceName());
+                int lineNum = message->GetLineNumber();
+
+                WCHAR msg[MAX_LINE_LENGTH];
+
+                StringCchPrintfW(msg, _countof(msg), L"%ls\nLine %d of %ls", *exception, lineNum, *fileName);
+
+                MessageBox(nullptr, msg, L"nScript Exception", MB_OK);
+            }
         }
         return;
     } 
@@ -115,11 +155,11 @@ void Scripting::Initialize()
         {
             String::Value result(value);
             MessageBox(nullptr, CAST(*result), L"nScript", MB_OK);
-        });
+        }, L"!nAlertScript");
     });
     LiteStep::AddBangCommand(L"!nExecScript", [] (HWND, LPCTSTR code)
     {
-        RunCode(code, nullptr);
+        RunCode(code, nullptr, L"!nExecScript");
     });
 
     // Load script files
@@ -134,7 +174,7 @@ void Scripting::Initialize()
 
         str.assign(std::istreambuf_iterator<wchar_t>(t), std::istreambuf_iterator<wchar_t>());
 
-        RunCode(str.c_str(), nullptr);        
+        RunCode(str.c_str(), nullptr, file);
     });
 }
 
