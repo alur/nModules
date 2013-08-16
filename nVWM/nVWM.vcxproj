@@ -76,12 +76,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>C:\LiteStep64\debug\modules\</OutDir>
     <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
-    <TargetName>$(ProjectName)-0.5</TargetName>
+    <TargetName>$(ProjectName)-0.6.5</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
     <OutDir>C:\LiteStep32\debug\modules\</OutDir>
-    <TargetName>$(ProjectName)-0.6</TargetName>
+    <TargetName>$(ProjectName)-0.6.5</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

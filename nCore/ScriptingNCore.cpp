@@ -36,7 +36,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
     // Window
     //
     Handle<ObjectTemplate> window = ObjectTemplate::New();
-    nCore->Set(String::New(CAST(L"Window")), window);
+    nCore->Set(String::New(CAST(L"Window")), window, PropertyAttribute::ReadOnly);
 
     window->Set(String::New(CAST(L"Move")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
@@ -94,7 +94,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
             window->SetAnimation(x, y, window->GetDrawingSettings()->width, window->GetDrawingSettings()->height,
                 duration, easingType);
         }
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     window->Set(String::New(CAST(L"Size")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
@@ -152,7 +152,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
             window->SetAnimation(window->GetDrawingSettings()->x, window->GetDrawingSettings()->y,
                 width, height, duration, easingType);
         }
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     window->Set(String::New(CAST(L"Position")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
@@ -211,7 +211,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
             
             window->SetAnimation(x, y, width, height, duration, easingType);
         }
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     window->Set(String::New(CAST(L"Hide")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
@@ -235,7 +235,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         }
 
         window->Hide();
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     window->Set(String::New(CAST(L"Show")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
@@ -263,7 +263,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         {
             window->Repaint();
         }
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     window->Set(String::New(CAST(L"GetX")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
@@ -287,7 +287,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         }
 
         args.GetReturnValue().Set(window->GetDrawingSettings()->x);
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     window->Set(String::New(CAST(L"GetY")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
@@ -311,7 +311,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         }
 
         args.GetReturnValue().Set(window->GetDrawingSettings()->y);
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     window->Set(String::New(CAST(L"GetHeight")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
@@ -335,7 +335,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         }
 
         args.GetReturnValue().Set(window->GetDrawingSettings()->height);
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     window->Set(String::New(CAST(L"GetWidth")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
@@ -359,7 +359,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         }
 
         args.GetReturnValue().Set(window->GetDrawingSettings()->width);
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     return handleScope.Close(nCore);
 }

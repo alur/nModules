@@ -79,12 +79,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
     <OutDir>C:\LiteStep32\debug\modules\</OutDir>
-    <TargetName>$(ProjectName)-0.6</TargetName>
+    <TargetName>$(ProjectName)-0.6.5</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
     <OutDir>C:\LiteStep64\debug\modules\</OutDir>
-    <TargetName>$(ProjectName)-0.5</TargetName>
+    <TargetName>$(ProjectName)-0.6.5</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -175,6 +175,7 @@
     <ClInclude Include="nCore.h" />
     <ClInclude Include="ParsedText.hpp" />
     <ClInclude Include="Scripting.h" />
+    <ClInclude Include="ScriptingEvents.h" />
     <ClInclude Include="ScriptingHelpers.h" />
     <ClInclude Include="ScriptingLSCore.h" />
     <ClInclude Include="ScriptingNCore.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="nCore.cpp" />
     <ClCompile Include="ParsedText.cpp" />
     <ClCompile Include="Scripting.cpp" />
+    <ClCompile Include="ScriptingEvents.cpp" />
     <ClCompile Include="ScriptingLSCore.cpp" />
     <ClCompile Include="ScriptingNCore.cpp" />
     <ClCompile Include="TextFunctions.cpp" />

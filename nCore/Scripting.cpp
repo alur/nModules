@@ -125,11 +125,11 @@ static void InitV8()
 
     //
     Handle<ObjectTemplate> global = ObjectTemplate::New();
-    global->Set(String::New(CAST(L"LiteStep")), Scripting::LSCore::Initialize(isolate));
-    global->Set(String::New(CAST(L"nCore")), Scripting::NCore::Initialize(isolate));
+    global->Set(String::New(CAST(L"LiteStep")), Scripting::LSCore::Initialize(isolate), PropertyAttribute::ReadOnly);
+    global->Set(String::New(CAST(L"nCore")), Scripting::NCore::Initialize(isolate), PropertyAttribute::ReadOnly);
     //global->Set(String::New(CAST(L"dump_var")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     //{
-
+    
     //}));
 
     // Create a new context.

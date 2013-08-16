@@ -93,7 +93,7 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
 
         String::Value command(args[0]);
         LiteStep::LSExecute(nullptr, CAST(*command), 0);
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     liteStep->Set(String::New(CAST(L"Recycle")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &) -> void
@@ -104,19 +104,19 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
         {
             PostMessage(hLiteStep, 9260, 0, 0);
         }
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     liteStep->Set(String::New(CAST(L"Refresh")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &) -> void
     {
         LiteStep::LSExecuteEx(nullptr, L"", L"!Refresh", L"", L"", 0);
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     // Bangs
     //
     Handle<ObjectTemplate> bangs = ObjectTemplate::New();
-    liteStep->Set(String::New(CAST(L"Bangs")), bangs);
+    liteStep->Set(String::New(CAST(L"Bangs")), bangs, PropertyAttribute::ReadOnly);
 
     bangs->Set(String::New(CAST(L"Add")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
@@ -137,7 +137,7 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
         gScriptBangs[bang].Reset(Isolate::GetCurrent(), args[1].As<Function>());
 
         LiteStep::AddBangCommandEx(bang, ScriptBangThump);
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     bangs->Set(String::New(CAST(L"Execute")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
@@ -158,7 +158,7 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
         {
             LiteStep::LSExecuteEx(nullptr, L"", CAST(*bang), L"", L"", 0);
         }
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     //bangs->Set(String::New(CAST(L"List")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
@@ -191,13 +191,13 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
             gScriptBangs.erase(iter);
             LiteStep::RemoveBangCommand(bang);
         }
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     // Evars
     //
     Handle<ObjectTemplate> evars = ObjectTemplate::New();
-    liteStep->Set(String::New(CAST(L"Evars")), evars);
+    liteStep->Set(String::New(CAST(L"Evars")), evars, PropertyAttribute::ReadOnly);
 
     evars->Set(String::New(CAST(L"Set")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     {
@@ -210,7 +210,7 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
         String::Value value(args[1]);
 
         args.GetReturnValue().Set(LiteStep::LSSetVariable(CAST(*key), CAST(*value)));
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     evars->Set(String::New(CAST(L"Get")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
@@ -226,7 +226,7 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
         LiteStep::GetRCLine(CAST(*key), buf, _countof(buf), nullptr);
 
         args.GetReturnValue().Set(String::New(CAST(buf)));
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     evars->Set(String::New(CAST(L"GetNumeric")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
@@ -245,15 +245,13 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
         }
 
         args.GetReturnValue().Set(Number::New(LiteStep::GetRCDouble(CAST(*key), defaultValue)));
-    }));
+    }), PropertyAttribute::ReadOnly);
 
     //
     // Modules
     //
     Handle<ObjectTemplate> modules = ObjectTemplate::New();
-    liteStep->Set(String::New(CAST(L"Modules")), modules);
-
-
+    liteStep->Set(String::New(CAST(L"Modules")), modules, PropertyAttribute::ReadOnly);
 
     return handleScope.Close(liteStep);
 }
