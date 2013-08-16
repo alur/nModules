@@ -161,18 +161,18 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate)
     }));
 
     //
-    bangs->Set(String::New(CAST(L"List")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
-    {
-        //HandleScope handleScope(Isolate::GetCurrent());
+    //bangs->Set(String::New(CAST(L"List")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    //{
+    //    //HandleScope handleScope(Isolate::GetCurrent());
 
-        //Handle<Array> array = Array::New(size...);
-        //array->
+    //    //Handle<Array> array = Array::New(size...);
+    //    //array->
 
-        LiteStep::EnumLSData(ELD_BANGS, (FARPROC)(LiteStep::ENUMBANGSPROC) [] (LPCWSTR bang, LPARAM list) -> BOOL
-        {
-            return FALSE;
-        }, 0);
-    }));
+    //    LiteStep::EnumLSData(ELD_BANGS, (FARPROC)(LiteStep::ENUMBANGSPROC) [] (LPCWSTR bang, LPARAM list) -> BOOL
+    //    {
+    //        return FALSE;
+    //    }, 0);
+    //}));
     
     //
     bangs->Set(String::New(CAST(L"Remove")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void

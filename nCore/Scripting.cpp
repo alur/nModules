@@ -127,10 +127,10 @@ static void InitV8()
     Handle<ObjectTemplate> global = ObjectTemplate::New();
     global->Set(String::New(CAST(L"LiteStep")), Scripting::LSCore::Initialize(isolate));
     global->Set(String::New(CAST(L"nCore")), Scripting::NCore::Initialize(isolate));
-    global->Set(String::New(CAST(L"dump_var")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
-    {
+    //global->Set(String::New(CAST(L"dump_var")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
+    //{
 
-    }));
+    //}));
 
     // Create a new context.
     Handle<Context> context = Context::New(isolate, nullptr, global);
@@ -169,7 +169,7 @@ void Scripting::Initialize()
         std::wstring str;
 
         t.seekg(0, std::ios::end);   
-        str.reserve(t.tellg());
+        str.reserve(std::wstring::size_type(t.tellg()));
         t.seekg(0, std::ios::beg);
 
         str.assign(std::istreambuf_iterator<wchar_t>(t), std::istreambuf_iterator<wchar_t>());

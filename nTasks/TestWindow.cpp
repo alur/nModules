@@ -87,8 +87,8 @@ void TestWindow::InitOverlay()
         {
             ImageList_AddIcon(mOverlayImages, mOverlayItems[i].icon);
             item.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE;
-            item.iImage = j;
-            item.iSelectedImage = j;
+            item.iImage = (int)j;
+            item.iSelectedImage = (int)j;
             ++j;
         }
         else

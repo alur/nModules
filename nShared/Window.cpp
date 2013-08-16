@@ -780,7 +780,7 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
                 if (SUCCEEDED(ReCreateDeviceResources()))
                 {
                     D2D1_RECT_F d2dUpdateRect = D2D1::RectF(
-                        updateRect.left, updateRect.top, updateRect.right, updateRect.bottom);
+                        (FLOAT)updateRect.left, (FLOAT)updateRect.top, (FLOAT)updateRect.right, (FLOAT)updateRect.bottom);
 
                     this->renderTarget->BeginDraw();
                     this->renderTarget->PushAxisAlignedClip(&d2dUpdateRect, D2D1_ANTIALIAS_MODE_ALIASED);
@@ -1058,6 +1058,8 @@ void Window::PaintChildren(bool &inAnimation, D2D1_RECT_F *updateRect)
 /// </summary>
 void Window::PaintOverlays(D2D1_RECT_F *updateRect)
 {
+    UNREFERENCED_PARAMETER(updateRect);
+
     for (Overlay *overlay : this->overlays)
     {
         overlay->Paint(this->renderTarget);

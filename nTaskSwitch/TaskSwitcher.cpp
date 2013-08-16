@@ -13,7 +13,7 @@
 #include "../nShared/DWMColorVal.hpp"
 
 
-static UINT (*DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = nullptr;
+static UINT (WINAPI *DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = nullptr;
 static HWND desktopWindow = nullptr;
 
 
@@ -21,7 +21,7 @@ TaskSwitcher::TaskSwitcher() : Drawable(L"nTaskSwitch")
 {
     if (DwmpActivateLivePreview == nullptr)
     {
-        DwmpActivateLivePreview = (UINT (*)(UINT, HWND, HWND, UINT))GetProcAddress(GetModuleHandleW(L"DWMAPI.DLL"), (LPCSTR)0x71);
+        DwmpActivateLivePreview = (UINT (WINAPI *)(UINT, HWND, HWND, UINT))GetProcAddress(GetModuleHandleW(L"DWMAPI.DLL"), (LPCSTR)0x71);
     }
     if (desktopWindow == nullptr)
     {

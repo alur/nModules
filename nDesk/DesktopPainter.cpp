@@ -399,7 +399,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         this->renderTarget->BeginDraw();
 
                         D2D1_RECT_F d2dUpdateRect = D2D1::RectF(
-                            updateRect.left, updateRect.top, updateRect.right, updateRect.bottom);
+                            (FLOAT)updateRect.left, (FLOAT)updateRect.top, (FLOAT)updateRect.right, (FLOAT)updateRect.bottom);
 
                         this->renderTarget->PushAxisAlignedClip(d2dUpdateRect, D2D1_ANTIALIAS_MODE_ALIASED);
 
