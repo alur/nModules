@@ -1,0 +1,34 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=nDocs.chm
+Contents file=nDocs.hhc
+Default topic=Window.xml
+Display compile progress=No
+Language=0x409 English (United States)
+Title=nModules 0.7 Documentation
+
+
+[FILES]
+Brush.xml
+Changelog.xml
+Layout.xml
+nCalendar.xml
+nClock.xml
+nCore.xml
+nDesk.xml
+nDocs.css
+nDocs.xslt
+nIcon.xml
+nKey.xml
+nLabel.xml
+nMediaInfo.xml
+nPopup.xml
+nTask.xml
+nTaskSwitch.xml
+nTray.xml
+nWallpaper.xml
+State.xml
+Window.xml
+
+[INFOTYPES]
+

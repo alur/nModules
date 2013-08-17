@@ -5,3 +5,4 @@ bin
 *.user
 *.aps
 *.dat
+/Documentation/*.chm

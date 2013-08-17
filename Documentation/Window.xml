@@ -1,0 +1,309 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="nDocs.xslt"?>
+ 
+<page>
+  <title>Window</title>
+  <tableofcontents/>
+	<description>
+	  Almost everything that is drawn in the nModules is a Window. A window is...
+	</description>
+
+  <section>
+    <title>Behavior</title>
+    <description>
+      These are setting which affect the behavior of their Window.
+    </description>
+    
+    <setting>
+      <name>AlwaysOnTop</name>
+      <type>Boolean</type>
+      <default>False</default>
+      <description>
+        When set to true, this window will stay above all other non-fullscreen
+        windows (aside from those who are also AlwaysOnTop, of course). When a 
+        LiteStep window gains focus, these windows will be shown above fullscreen
+        windows, until a fullscreen window on that monitor gains focus, or is 
+        otherwise re-marked as fullscreen.
+      </description>
+      <bangs>
+        You can modify this propery by using the following bang
+        <bang>
+          <name>nSetAlwaysOnTop</name>
+          <parameters>
+            <parameter>
+              <name>windowName</name>
+              <type>Window</type>
+              <description>The name of the window to modify the AlwaysOnTop attribute for.</description>
+            </parameter>
+            <parameter>
+              <name>value</name>
+              <type>Boolean</type>
+              <description>The new value for the AlwaysOnTop attribute.</description>
+            </parameter>
+          </parameters>
+        </bang>
+      </bangs>
+      <scripting>
+        This property can be read by calling the
+        <scriptfunc>nCore.Window.AlwaysOnTop()</scriptfunc> function, and set
+        by calling the <scriptfunc>nCore.Window.AlwaysOnTop(value)</scriptfunc>
+        function.
+      </scripting>
+      <note>
+        This setting currently has no effect on child windows.
+      </note>
+    </setting>
+    
+    <setting>
+      <name>ClickThrough</name>
+      <type>Boolean</type>
+      <default>False</default>
+      <description>
+        When set to true, all mouse events are sent to the parent of this Window, and are not handled by this Window itself.
+      </description>
+      <bangs>
+        You can modify this propery by using the following bang
+        <bang>
+          <name>nSetClickThrough</name>
+          <parameters>
+            <parameter>
+              <name>windowName</name>
+              <type>Window</type>
+              <description>The name of the window to modify the ClickThrough attribute for.</description>
+            </parameter>
+            <parameter>
+              <name>value</name>
+              <type>Boolean</type>
+              <description>The new value for the ClickThrough attribute.</description>
+            </parameter>
+          </parameters>
+        </bang>
+      </bangs>
+      <scripting>
+        This property can be read by calling the
+        <scriptfunc>nCore.Window.ClickThrough()</scriptfunc> function, and set
+        by calling the <scriptfunc>nCore.Window.ClickThrough(value)</scriptfunc>
+        function.
+      </scripting>
+      <note>
+        This setting currently has no effect on top-level windows.
+      </note>
+    </setting>
+
+    <setting>
+      <name>Hidden</name>
+      <type>Boolean</type>
+      <default>False</default>
+      <description>
+        When set to true, this window will initially be hidden.
+      </description>
+      <bangs>
+        You can hide windows by using the bang
+        <bang>
+          <name>nHide</name>
+          <parameters>
+            <parameter>
+              <name>windowName</name>
+              <type>Window</type>
+              <description>The name of the window to hide.</description>
+            </parameter>
+          </parameters>
+        </bang>
+        and show them by using the bang
+        <bang>
+          <name>nShow</name>
+          <parameters>
+            <parameter>
+              <name>windowName</name>
+              <type>Window</type>
+              <description>The name of the window to show.</description>
+            </parameter>
+          </parameters>
+        </bang>
+      </bangs>
+      <scripting>
+        You can determine if a Window is visible by calling the
+        <scriptfunc>nCore.Window.Visible()</scriptfunc> function.
+        You can show a window by calling
+        <scriptfunc>nCore.Window.Show()</scriptfunc> function, and hide a
+        window by calling <scriptfunc>nCore.Window.Hide()</scriptfunc>
+        function.
+      </scripting>
+    </setting>
+    
+    <setting>
+      <name>Parent</name>
+      <type>Window</type>
+      <description>
+        If this setting is specified, this Window will set itself as a child of the specified Parent window.
+        There are some reserved values, listed below, which should not be used as window names.
+      </description>
+      <enumeration>
+        <title>Special Values</title>
+        <value>
+          <name>nDesk</name>
+          <description>
+            nDesk represents the desktop background window, so setting the Parent
+            setting to this will keep the window below all other windows.
+          </description>
+        </value>
+        <value>
+          <name>Monitor*</name>
+          <description>Where * is a number greater than or equal to 1.</description>
+        </value>
+      </enumeration>
+      <note class="red">The Monitor* value is not implemented yet.</note>
+    </setting>
+    
+    <setting>
+      <name>ShowOnTaskbar</name>
+      <type>Boolean</type>
+      <default>False</default>
+      <description>
+        When this is set to true, this window will be shown on the taskbar.
+      </description>
+      <note class="red">This is a planned setting, and is not yet implemented.</note>
+    </setting>
+    
+    <setting>
+      <name>Text</name>
+      <type>Text</type>
+      <description>
+        The ...
+      </description>
+    </setting>
+    
+    <setting>
+      <name>TextAntiAliasMode</name>
+      <type>Enumeration</type>
+      <default>ClearType</default>
+      <description>
+        Defines how the text is antialiased in this window.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>ClearType</name>
+          <description>The text is renderd using ClearType anti aliasing.</description>
+        </value>
+        <value>
+          <name>GrayScale</name>
+          <description>The text is renderd using GrayScale anti aliasing.</description>
+        </value>
+        <value>
+          <name>Aliased</name>
+          <description>The text is renderd without any anti aliasing.</description>
+        </value>
+      </enumeration>
+    </setting>
+
+    <setting>
+      <name>WindowTitle</name>
+      <type>Text</type>
+      <default>WindowName</default>
+      <description>
+        The title to use for this window. When this window has ShowOnTaskbar set to true, this is the
+        title that appears in the taskbar, in the alt-tab dialog, and in the task manager.
+      </description>
+      <note class="red">This is a planned setting, and is not yet implemented.</note>
+    </setting>
+  </section>
+  
+  <section>
+    <title>Positioning</title>
+    <description>
+      These are setting used to position the Window.
+    </description>
+
+    <setting>
+      <name>AnchorBottom</name>
+      <type>Boolean</type>
+      <default>False</default>
+      <description>
+      </description>
+      <note class="red">This is a planned setting, and is not yet implemented.</note>
+    </setting>
+    
+    <setting>
+      <name>AnchorLeft</name>
+      <type>Boolean</type>
+      <default>False</default>
+      <description>
+      </description>
+      <note class="red">This is a planned setting, and is not yet implemented.</note>
+    </setting>
+
+    <setting>
+      <name>AnchorRight</name>
+      <type>Boolean</type>
+      <default>False</default>
+      <description>
+      </description>
+      <note class="red">This is a planned setting, and is not yet implemented.</note>
+    </setting>
+    
+    <setting>
+      <name>AnchorTop</name>
+      <type>Boolean</type>
+      <default>False</default>
+      <description>
+      </description>
+      <note class="red">This is a planned setting, and is not yet implemented.</note>
+    </setting>
+    
+    <setting>
+      <name>CoordinateOrigin</name>
+      <type>Enumeration</type>
+      <default>TopLeft</default>
+      <description>
+      </description>
+      <note class="red">This is a planned setting, and is not yet implemented.</note>
+    </setting>
+    
+    <setting>
+      <name>X</name>
+      <type>Integer</type>
+      <default>0</default>
+      <description>
+      </description>
+    </setting>
+    
+    <setting>
+      <name>Y</name>
+      <type>Integer</type>
+      <default>0</default>
+      <description>
+      </description>
+    </setting>
+  
+    <setting>
+      <name>Width</name>
+      <type>Integer</type>
+      <default>100</default>
+      <description>
+      </description>
+    </setting>
+    
+    <setting>
+      <name>Height</name>
+      <type>Integer</type>
+      <default>100</default>
+      <description>
+      </description>
+    </setting>
+  </section>
+
+  <section>
+    <title>Bangs</title>
+    <description>
+      All windows support the following bang commands.
+    </description>
+  </section>
+
+  <section>
+    <title>Scripting</title>
+    <description>
+      All windows support the following bang commands.
+    </description>
+  </section>
+</page>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="nDocs.xslt"?>
+ 
+<page>
+  <title>nPopup</title>
+  <tableofcontents/>
+  <description>
+	Description of this page
+  </description>
+
+  <section>
+    <title>Behavior</title>
+    <description>
+      These are setting which affect the behavior of their Window.
+    </description>
+  </section>
+</page>

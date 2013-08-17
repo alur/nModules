@@ -110,6 +110,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utilities", "Utilities\Util
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "v8", "External\v8\v8.vcxproj", "{3C70E163-9964-4164-8E26-F2C850905D0F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{9FF5765E-B755-42D7-8D36-0A1BC717C7F3}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Layout.xml = Documentation\Layout.xml
+		Documentation\nDocs.css = Documentation\nDocs.css
+		Documentation\nDocs.xslt = Documentation\nDocs.xslt
+		Documentation\Window.xml = Documentation\Window.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project", "Project", "{532C8632-0BE1-4183-9157-B61E8B25071E}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\nDocs.css = Documentation\nDocs.css
+		Documentation\nDocs.xslt = Documentation\nDocs.xslt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{37667A55-822C-4DC5-9443-4EA427FBD4B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -303,5 +319,7 @@ Global
 		{84B7F148-7FDD-4D3D-BC0D-5901F9DB7E4C} = {89964B45-85F2-4A2C-BA7D-2698E96A3609}
 		{0118E777-9742-4EB4-85EC-FB3E16E059A9} = {775BCCF7-072F-4F72-B412-8E2E1D3ED2A9}
 		{3C70E163-9964-4164-8E26-F2C850905D0F} = {775BCCF7-072F-4F72-B412-8E2E1D3ED2A9}
+		{532C8632-0BE1-4183-9157-B61E8B25071E} = {9FF5765E-B755-42D7-8D36-0A1BC717C7F3}
+		{37667A55-822C-4DC5-9443-4EA427FBD4B3} = {9FF5765E-B755-42D7-8D36-0A1BC717C7F3}
 	EndGlobalSection
 EndGlobal

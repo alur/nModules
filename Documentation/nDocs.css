@@ -1,0 +1,123 @@
+body
+{
+	background-color: white;
+    padding: 0 1em;
+}
+
+
+h3 .type
+{
+    font-size: 0.6em;
+    display: inline-block;
+    margin-left: 10px;
+    color: black;
+}
+
+.tableofcontents
+{
+    float: right;
+    margin-right: 1em;
+    margin-left: 1em;
+    background-color: #BBE1ED;
+    padding: 1em;
+}
+
+.tableofcontents ol
+{
+    padding-left: 1.5em;
+    margin-left: 0;
+    margin-bottom: 0;
+}
+
+li a
+{
+    text-decoration: none;
+}
+
+li a:hover
+{
+    text-decoration: underline;
+}
+
+.tableofcontents h4
+{
+    margin-top: 0;
+    margin-bottom: 0.5em;
+}
+
+
+.section
+{
+    margin-left: 1em;
+}
+
+
+.setting
+{
+    margin-left: 1em;
+}
+
+
+.scriptfunc
+{
+    font-size: 0.9em;
+    display: inline-block;
+    /* background-color: #BBE1ED; */
+    color: #0794BF;
+    word-spacing: 0.3em;
+    padding: 0.1em;
+}
+
+
+.note.red
+{
+    color: #BC0707;
+}
+
+
+.bang
+{
+    font-size: 0.9em;
+    display: inline-block;
+    background-color: #E1EFBB;
+    word-spacing: 0.3em;
+    padding: 0.1em;
+}
+
+
+h1, h2, h3, h4
+{
+    margin-bottom: 0.1em;
+    margin-top: 0.7em;
+}
+
+
+h5, h6
+{
+    margin-bottom: 0.1em;
+    margin-top: 0.1em;
+}
+
+
+div.note
+{
+    margin-top: 0.5em;
+}
+
+
+h1, h2, h3
+{
+    color: #8AC007;
+}
+
+
+.enumeration
+{
+    margin-left: 1em;
+}
+
+
+.enumeration .description
+{
+    margin-left: 1em;
+}
