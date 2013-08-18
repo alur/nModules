@@ -1,0 +1,194 @@
+﻿body
+{
+	background-color: black;
+    padding: 0 1em;
+}
+
+
+h3 .type, h4 .type
+{
+    display: inline-block;
+    color: #0794BF;
+    text-decoration: none;
+}
+
+
+h3 .type:hover, h4 .type:hover
+{
+    text-decoration: underline;
+}
+
+
+h3 .type
+{
+    font-size: 0.6em;
+    margin-left: 1em;
+}
+
+
+h4 .type
+{
+    font-size: 0.7em;
+    margin-left: 0.7em;
+}
+
+
+.tableofcontents
+{
+    float: right;
+    margin-right: 1em;
+    margin-left: 1em;
+    background-color: #BBE1ED;
+    padding: 1em;
+}
+
+.tableofcontents ol
+{
+    padding-left: 1.5em;
+    margin-left: 0;
+    margin-bottom: 0;
+}
+
+li a
+{
+    text-decoration: none;
+}
+
+li a:hover
+{
+    text-decoration: underline;
+}
+
+.tableofcontents h4
+{
+    margin-top: 0;
+    margin-bottom: 0.5em;
+}
+
+
+.section
+{
+    margin-left: 1em;
+    overflow: hidden;
+    zoom: 1;
+}
+
+
+.setting, .bang
+{
+    margin-left: 1em;
+}
+
+
+.scriptfunc
+{
+    font-size: 0.9em;
+    display: inline-block;
+    /* background-color: #BBE1ED; */
+    color: #0794BF;
+    word-spacing: 0.3em;
+    padding: 0.1em;
+}
+
+
+.note.red
+{
+    color: #BC0707;
+}
+
+
+.bangref, .settingref
+{
+    font-size: 0.9em;
+    display: inline-block;
+    /* background-color: #BBE1ED; */
+    color: #0794BF;
+    word-spacing: 0.3em;
+    padding: 0.1em;
+    text-decoration: none;
+}
+
+
+h1, h2, h3, h4
+{
+    margin-bottom: 0.1em;
+    margin-top: 0.7em;
+}
+
+
+h5, h6
+{
+    margin-bottom: 0.1em;
+    margin-top: 0.1em;
+}
+
+
+div.note
+{
+    margin-top: 0.5em;
+}
+
+
+h1, h2, h3
+{
+    color: #8AC007;
+}
+
+
+.enumeration
+{
+    margin-left: 1em;
+}
+
+
+.enumeration .description
+{
+    margin-left: 1em;
+}
+
+
+.blockcode
+{
+    background-color: #E1EFBB;
+    padding: 0.5em;
+}
+
+
+div.code
+{
+    background-color: #E1EFBB;
+    padding: 0.5em;
+    margin: 1em 0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+}
+
+.code .multi-key
+{
+    color: #BC0707;
+}
+
+.code .single-key
+{
+    color: #0794BF;
+}
+
+.code .comment
+{
+    color: #354902;
+}
+
+.code .group-name
+{
+    font-weight: bold;
+}
+
+.code .group
+{
+    margin-left: 2em;
+}
+
+.bang-parameters
+{
+    font-family: 'Courier New', monospace;
+}

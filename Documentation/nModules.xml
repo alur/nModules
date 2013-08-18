@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="nDocs.xslt"?>
+
+<page>
+  <title>nModules 0.7</title>
+  <description>
+    The nModules are a set of LiteStep modules designed for Windows Vista and
+    beyond, using Direct2D for rendering. The nModules currently consist of 13
+    modules: nCalendar, nClock, nCore, nDesk, nIcon, nKey, nLabel, nMediaInfo,
+    nPopup, nTask, nTaskSwitch, nTray, and nWallpaper.
+  </description>
+
+  <section>
+    <title>Requirements</title>
+    <description>
+      <ul>
+        <li>Windows Vista, Windows 7, or Windows 8.</li>
+        <li>
+          <a href="http://www.microsoft.com/en-us/download/details.aspx?id=39315">
+            The Visual Studio 2013 C++ Reditributable.
+          </a>
+        </li>
+        <li>
+          The <a href="http://www.microsoft.com/en-us/download/details.aspx?id=30679">2013-08-04 0.25.0 LiteStep alpha build</a>, or newer. Latest is recommended.
+        </li>
+        <li>
+          Note that the latest 0.25.0 alphas require 
+          <a href="">
+            The Visual Studio 2012 C++ Reditributable.
+          </a>
+        </li>
+      </ul>
+      <b>Note</b>
+      <p>
+        If you get the <b>32-bit</b> modules, you need the 32-bit LiteStep core, and the
+        32-bit redistributables (A.K.A. x86). A 32-bit LiteStep core can <b>not</b> load
+        64-bit modules.
+      </p>
+      <p>
+        If you get the <b>64-bit</b> modules, you need the 64-bit LiteStep core, the
+        64-bit redistributables (A.K.A. x64), and a 64-bit operating system. A
+        64-bit LiteStep core can <b>not</b> load 32-bit modules.
+      </p>
+    </description>
+  </section>
+
+  <section>
+    <title>Developers</title>
+    <developers>
+      <developer>
+        <name>Erik Welander</name>
+        <nick>alur</nick>
+        <email>alur@lsdev.org</email>
+      </developer>
+    </developers>
+  </section>
+
+  <section>
+    <title>Changelog</title>
+    <description>
+    </description>
+    
+    <version>
+      <title>0.7</title>
+      <date>Future</date>
+      <changes>
+        <added>proper documentation.</added>
+        <added>initial release of nCalendar.</added>
+        <added>the Events JS object.</added>
+        <fixed>display of empty balloons.</fixed>
+      </changes>
+    </version>
+    
+    <version>
+      <title>0.6</title>
+      <date>August 15th, 2013</date>
+      <changes>
+        <added>the Edges scaling mode, for brushes.</added>
+        <fixed>issue where some tasks would not minimize or restore with nTask.</fixed>
+        <fixed>issue where clock hands would not align with the center of the clock.</fixed>
+        <fixed>issue where images used as clock hands would not render correctly.</fixed>
+        <fixed>issue where nDesk was not reading the wallpaper style properly, resulting in the wrong style being applied.</fixed>
+        <fixed>issue crash in nMediaInfo when trying to extract data from a non-existent mp3 file.</fixed>
+        <removed>the SolidColor brush's Alpha setting, for performance reasons.</removed>
+        <changed>colors based on DWMColor now automatically update when the DWM color changes.</changed>
+        <fixed>nDesk failing to load wallpaper containing invalid metadata.</fixed>
+        <fixed>regression where tray icons beloning to dead windows did not go away on mouseover.</fixed>
+        <added>!nTaskTestWindow to nTask, for easing testing of advanced taskbar features.</added>
+        <changed>much more efficient rendering.</changed>
+        <added>automatic tray sizing.</added>
+        <fixed>issue where parent windows would sometimes not detect hovering.</fixed>
+        <added>JavaScript scripting support.</added>
+      </changes>
+    </version>
+    
+    <version>
+      <title>0.5</title>
+      <date>August 7th, 2013</date>
+      <changes>
+        <fixed>clicks on balloons not working.</fixed>
+        <added>a TextAntiAlias mode to all top-level Windows.</added>
+        <changed>all modules are now natively unicode. Support for unicode setting names as well as unicode tray tips.</changed>
+        <added>nTask will now display icon overlays set by programs.</added>
+        <added>initial release of nClock.</added>
+      </changes>
+    </version>
+
+    <version>
+      <title>0.4</title>
+      <date>July 28th, 2013</date>
+      <changes>
+        <fixed>possible crash on recycle with gradient brushes.</fixed>
+        <fixed>possible crash when launching games.</fixed>
+        <added>!PopupDynamicFolder bang</added>
+        <added>window, state, and brush bang commands. Including window animation.</added>
+        <fixed>X/Y flip in PopupItem</fixed>
+        <added>it is now possible to hide tray icons based on their GUID or process name.</added>
+        <added>AlwaysOnTop windows will now stay behind all fullscreen windows.</added>
+        <fixed>eventual crash when nIcon couldn't find an icon to display.</fixed>
+        <fixed>the Mix color function.</fixed>
+        <fixed>bug where tray icons were not allowed to set the foreground window.</fixed>
+        <added>a ChildOffsetX and ChildOffsetY setting to nPopup.</added>
+        <added>a minimized state for task buttons.</added>
+      </changes>
+    </version>
+    
+    <version>
+      <title>0.3</title>
+      <date>July 23th, 2013</date>
+      <changes>
+        <changed>window thumbnails will no longer be split between several monitors.</changed>
+        <added>a ButtonNoIcons setting to nTask.</added>
+        <added>initial release of nWallpaper.</added>
+        <added>a ClickThrough setting.</added>
+        <added>a selection rectangle for nIcon.</added>
+        <changed>the Parent setting will now work, even if the parent is created after the child.</changed>
+        <fixed>significantly smoother wallpaper animations.</fixed>
+        <added>files are now "ghosted" in nIcon when they are cut out.</added>
+        <fixed>crash on alt-tab.</fixed>
+        <fixed>reseting of the system menus in some applications.</fixed>
+        <fixed>the right click context menu in nIcon now applies to all selected items.</fixed>
+        <fixed>icon positioning with multiple nIcon groups.</fixed>
+      </changes>
+    </version>
+    
+    <version>
+      <title>0.2</title>
+      <date>June 27th, 2013</date>
+      <changes>
+        <added>initial release of nIcon.</added>
+        <added>initial release of nKey.</added>
+        <added>initial release of nLabel.</added>
+        <added>initial release of nMediaInfo.</added>
+        <added>initial release of nPopup.</added>
+        <added>initial release of nTask.</added>
+        <added>initial release of nTaskSwitch.</added>
+        <added>initial release of nTray.</added>
+        <fixed>nDesk crash on Windows 7.</fixed>
+      </changes>
+    </version>
+    
+    <version>
+      <title>0.1</title>
+      <date>August 7th, 2012</date>
+      <changes>
+        <added>initial release of nDesk.</added>
+        <added>initial release of nCore.</added>
+      </changes>
+    </version>
+  </section>
+</page>

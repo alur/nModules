@@ -112,19 +112,42 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "v8", "External\v8\v8.vcxpro
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{9FF5765E-B755-42D7-8D36-0A1BC717C7F3}"
 	ProjectSection(SolutionItems) = preProject
-		Documentation\Layout.xml = Documentation\Layout.xml
-		Documentation\nDocs.css = Documentation\nDocs.css
-		Documentation\nDocs.xslt = Documentation\nDocs.xslt
-		Documentation\Window.xml = Documentation\Window.xml
+		Documentation\nModules.xml = Documentation\nModules.xml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project", "Project", "{532C8632-0BE1-4183-9157-B61E8B25071E}"
 	ProjectSection(SolutionItems) = preProject
+		Documentation\Index.html = Documentation\Index.html
 		Documentation\nDocs.css = Documentation\nDocs.css
+		Documentation\nDocs.hhc = Documentation\nDocs.hhc
+		Documentation\nDocs.hhp = Documentation\nDocs.hhp
 		Documentation\nDocs.xslt = Documentation\nDocs.xslt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{37667A55-822C-4DC5-9443-4EA427FBD4B3}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Brush.xml = Documentation\Brush.xml
+		Documentation\Layout.xml = Documentation\Layout.xml
+		Documentation\State.xml = Documentation\State.xml
+		Documentation\Window.xml = Documentation\Window.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{042B0947-FD89-49C2-8FC1-F33113F0F11C}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\nCalendar.xml = Documentation\nCalendar.xml
+		Documentation\nClock.xml = Documentation\nClock.xml
+		Documentation\nCore.xml = Documentation\nCore.xml
+		Documentation\nDesk.xml = Documentation\nDesk.xml
+		Documentation\nIcon.xml = Documentation\nIcon.xml
+		Documentation\nKey.xml = Documentation\nKey.xml
+		Documentation\nLabel.xml = Documentation\nLabel.xml
+		Documentation\nMediaInfo.xml = Documentation\nMediaInfo.xml
+		Documentation\nPopup.xml = Documentation\nPopup.xml
+		Documentation\nTask.xml = Documentation\nTask.xml
+		Documentation\nTaskSwitch.xml = Documentation\nTaskSwitch.xml
+		Documentation\nTray.xml = Documentation\nTray.xml
+		Documentation\nWallpaper.xml = Documentation\nWallpaper.xml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -321,5 +344,6 @@ Global
 		{3C70E163-9964-4164-8E26-F2C850905D0F} = {775BCCF7-072F-4F72-B412-8E2E1D3ED2A9}
 		{532C8632-0BE1-4183-9157-B61E8B25071E} = {9FF5765E-B755-42D7-8D36-0A1BC717C7F3}
 		{37667A55-822C-4DC5-9443-4EA427FBD4B3} = {9FF5765E-B755-42D7-8D36-0A1BC717C7F3}
+		{042B0947-FD89-49C2-8FC1-F33113F0F11C} = {9FF5765E-B755-42D7-8D36-0A1BC717C7F3}
 	EndGlobalSection
 EndGlobal

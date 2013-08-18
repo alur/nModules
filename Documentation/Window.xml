@@ -195,6 +195,7 @@
           <description>The text is renderd without any anti aliasing.</description>
         </value>
       </enumeration>
+      <note>This setting only applies to top-level windows. All child windows will use their parent's anti-alias mode.</note>
     </setting>
 
     <setting>
@@ -257,6 +258,25 @@
       <default>TopLeft</default>
       <description>
       </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>TopLeft</name>
+          <description>The text is renderd using ClearType anti aliasing.</description>
+        </value>
+        <value>
+          <name>TopRight</name>
+          <description>The text is renderd using GrayScale anti aliasing.</description>
+        </value>
+        <value>
+          <name>BottomLeft</name>
+          <description>The text is renderd using ClearType anti aliasing.</description>
+        </value>
+        <value>
+          <name>BottomRight</name>
+          <description>The text is renderd using GrayScale anti aliasing.</description>
+        </value>
+      </enumeration>
       <note class="red">This is a planned setting, and is not yet implemented.</note>
     </setting>
     

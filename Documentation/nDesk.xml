@@ -5,13 +5,76 @@
   <title>nDesk</title>
   <tableofcontents/>
   <description>
-	Description of this page
+    nDesk is a desktop module for LiteStep. It creates the desktop background
+    window, containing the wallpaper, and specifies the work areas for
+    monitors.
   </description>
 
   <section>
-    <title>Behavior</title>
+    <title>Loading</title>
     <description>
-      These are setting which affect the behavior of their Window.
+      To load the module, you should add a LoadModule line pointing to nDesk
+      in your LiteStep configuration.
+      <code>
+        <singlesetting name="LoadModule">"$ModulesDir$nDesk-0.7.dll"</singlesetting>
+      </code>
+      Or, if you are using NetLoadModule,
+      <code>
+        <multisetting name="NetLoadModule">nDesk-0.7</multisetting>
+      </code>
+      Make sure to load nCore before nDesk, since nDesk depends on the
+      functionality exported by nCore.
+    </description>
+  </section>
+  
+  <section>
+    <title>Workarea</title>
+    <description>
+      To load the module, you should add a LoadModule line pointing to nDesk
+      in your LiteStep configuration.
+      <code>
+        <singlesetting name="LoadModule">"$ModulesDir$nDesk-0.7.dll"</singlesetting>
+      </code>
+      Or, if you are using NetLoadModule,
+      <code>
+        <multisetting name="NetLoadModule">nDesk-0.7</multisetting>
+      </code>
+      Make sure to load nCore before nDesk, since nDesk depends on the
+      functionality exported by nCore.
+    </description>
+  </section>
+  
+  <section>
+    <title>Transition Effects</title>
+    <description>
+      To load the module, you should add a LoadModule line pointing to nDesk
+      in your LiteStep configuration.
+      <code>
+        <singlesetting name="LoadModule">"$ModulesDir$nDesk-0.7.dll"</singlesetting>
+      </code>
+      Or, if you are using NetLoadModule,
+      <code>
+        <multisetting name="NetLoadModule">nDesk-0.7</multisetting>
+      </code>
+      Make sure to load nCore before nDesk, since nDesk depends on the
+      functionality exported by nCore.
+    </description>
+  </section>
+  
+  <section>
+    <title>Events</title>
+    <description>
+      To load the module, you should add a LoadModule line pointing to nDesk
+      in your LiteStep configuration.
+      <code>
+        <singlesetting name="LoadModule">"$ModulesDir$nDesk-0.7.dll"</singlesetting>
+      </code>
+      Or, if you are using NetLoadModule,
+      <code>
+        <multisetting name="NetLoadModule">nDesk-0.7</multisetting>
+      </code>
+      Make sure to load nCore before nDesk, since nDesk depends on the
+      functionality exported by nCore.
     </description>
   </section>
 </page>

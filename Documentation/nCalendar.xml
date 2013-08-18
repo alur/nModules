@@ -5,13 +5,47 @@
   <title>nCalendar</title>
   <tableofcontents/>
   <description>
-	Description of this page
+    nClock allows you to create calendars.
   </description>
 
   <section>
-    <title>Behavior</title>
+    <title>Loading</title>
     <description>
-      These are setting which affect the behavior of their Window.
+      To load the module, you should add a LoadModule line pointing to nCalendar
+      in your LiteStep configuration.
+      <code>
+        <singlesetting name="LoadModule">"$ModulesDir$nCalendar-0.7.dll"</singlesetting>
+      </code>
+      Or, if you are using NetLoadModule,
+      <code>
+        <multisetting name="NetLoadModule">nCalendar-0.7</multisetting>
+      </code>
+      Make sure to load nCore before nCalendar, since nCalendar depends on the
+      functionality exported by nCore.
+    </description>
+  </section>
+
+  <section>
+    <title>Creating Calendars</title>
+    <description>
+      You create a calendar by using the *nCalendar command, like this:
+      <code>
+        <multisetting name="nCalendar">CalendarName</multisetting>
+      </code>
+      You can also create multiple calendars on a single line, like this:
+      <code>
+        <multisetting name="nCalendar">CalendarOne CalendarTwo CalendarThree</multisetting>
+      </code>
+      It is also possible to create and destroy calendars at runtime, using the
+      <bangref>nCalendarCreate</bangref> and <bangref>nCalendarDestroy</bangref> bangs,
+      or the <scriptfunc>nCalendar.Create</scriptfunc> and
+      <scriptfunc>nCalendar.Destroy</scriptfunc> functions.
+    </description>
+  </section>
+
+  <section>
+    <title>Calendar Configuration</title>
+    <description>
     </description>
   </section>
 </page>

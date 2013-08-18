@@ -9,6 +9,10 @@
 </OBJECT>
 <UL>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="nModules">
+		<param name="Local" value="nModules.xml">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Modules">
 		</OBJECT>
 	<UL>

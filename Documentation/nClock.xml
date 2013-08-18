@@ -1,17 +1,421 @@
 <?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="nDocs.xslt"?>
- 
+
 <page>
   <title>nClock</title>
   <tableofcontents/>
   <description>
-	Description of this page
+    nClock allows you to create analog clocks.
   </description>
 
   <section>
-    <title>Behavior</title>
+    <title>Loading</title>
     <description>
-      These are setting which affect the behavior of their Window.
+      To load the module, you should add a LoadModule line pointing to nClock
+      in your LiteStep configuration.
+      <code>
+        <singlesetting name="LoadModule">"$ModulesDir$nClock-0.7.dll"</singlesetting>
+      </code>
+      Or, if you are using NetLoadModule,
+      <code>
+        <multisetting name="NetLoadModule">nClock-0.7</multisetting>
+      </code>
+      Make sure to load nCore before nClock, since nClock depends on the
+      functionality exported by nCore.
+    </description>
+  </section>
+
+  <section>
+    <title>Creating Clocks</title>
+    <description>
+      You create a clock by using the *nClock command, like this:
+      <code>
+        <multisetting name="nClock">ClockName</multisetting>
+      </code>
+      You can also create multiple clocks on a single line, like this:
+      <code>
+        <multisetting name="nClock">ClockOne ClockTwo ClockThree</multisetting>
+      </code>
+      
+      It is also possible to create and destroy clocks at runtime, using the
+      <bangref>nClockCreate</bangref> and <bangref>nClockDestroy</bangref> bangs,
+      or the <scriptfunc>nClock.Create</scriptfunc> and
+      <scriptfunc>nClock.Destroy</scriptfunc> functions.
+    </description>
+  </section>
+
+  <section>
+    <title>Clock Configuration</title>
+    <description>
+      The clock is a <xref>Window</xref> whose prefix is the name of the clock. Each clock has 3 hands: the
+      HourHand, the MinuteHand, and the SecondHand.
+    </description>
+
+    <setting>
+      <name>24HourDial</name>
+      <type>Boolean</type>
+      <default>False</default>
+      <description>
+        When this is set to true, the HourHand will make one lap every 24 hours, instead of every 12 hours.
+      </description>
+      <bangs>
+        You can change this setting by calling the
+        <bangref>nClockSet24HourDial</bangref>
+        bang.
+      </bangs>
+      <scripting>
+        You can read or set this setting by calling the
+        <scriptfunc>nClock.24HourDial</scriptfunc> function.
+      </scripting>
+    </setting>
+
+    <setting>
+      <name>UpdateRate</name>
+      <type>Integer</type>
+      <default>1000</default>
+      <description>
+        Specifies how often the hands will move, in milliseconds.
+      </description>
+      <bangs>
+        You can change the update rate by calling the <bangref>nClockSetUpdateRate</bangref> bang.
+      </bangs>
+      <scripting>
+        You can read or set the update rate by calling the
+        <scriptfunc>nClock.UpdateRate</scriptfunc> function.
+      </scripting>
+    </setting>
+  </section>
+
+  <section>
+    <title>Hand Configuration</title>
+    <description>
+      Each hand is a <xref>Brush</xref>, whose prefix is the name of the hand.
+    </description>
+
+    <setting>
+      <name>Length</name>
+      <type>Float</type>
+      <default>50.0</default>
+      <description>
+        How long this hand is.
+      </description>
+      <bangs>
+        You can change the hand length by using the <bangref>nClockSetHandLength</bangref> bang.
+      </bangs>
+      <scripting>
+        You can read or set the hand length by calling the
+        <scriptfunc>nClock.Hand.Length</scriptfunc> function.
+      </scripting>
+    </setting>
+
+    <setting>
+      <name>Offset</name>
+      <type>Float</type>
+      <default>0.0</default>
+      <description>
+        Where the hand begins, relative to the center of the clock.
+      </description>
+      <bangs>
+        You can change the hand offset by using the
+        <bangref>nClockSetHandOffset</bangref> bang.
+      </bangs>
+      <scripting>
+        You can read or set the hand offset by calling the
+        <scriptfunc>nClock.Hand.Offset</scriptfunc> function.
+      </scripting>
+    </setting>
+
+    <setting>
+      <name>Thickness</name>
+      <type>Float</type>
+      <default>3.0</default>
+      <description>
+        How thick the clock hand is.
+      </description>
+      <bangs>
+        You can change the hand thickness by using the
+        <bangref>nClockSetHandThickness</bangref> bang.
+      </bangs>
+      <scripting>
+        You can read or set the hand thickness by calling the
+        <scriptfunc>nClock.Hand.Thickness</scriptfunc> function.
+      </scripting>
+    </setting>
+
+    <setting>
+      <name>SmoothMovement</name>
+      <type>Boolean</type>
+      <default>False</default>
+      <description>
+        When this is set to true, this hand will move between clock ticks smoothly, rather than jumping to the closest clock tick.
+      </description>
+      <bangs>
+        You can change this setting by using the
+        <bangref>nClockSetSmoothMovement</bangref> bang.
+      </bangs>
+      <scripting>
+        You can read or set the hand thickness by calling the
+        <scriptfunc>nClock.Hand.SmoothMovement</scriptfunc> function.
+      </scripting>
+    </setting>
+  </section>
+
+  <section>
+    <title>Bangs</title>
+    <description>
+    </description>
+
+    <bang>
+      <name>nClockCreate</name>
+      <description>
+        Creates a new clock.
+      </description>
+      <parameters>
+        <parameter>
+          <name>clockName</name>
+          <type>Clock</type>
+          <description>The name of the clock to create.</description>
+        </parameter>
+      </parameters>
+    </bang>
+    <bang>
+      <name>nClockDestroy</name>
+      <description>
+        Destroys the specified clock.
+      </description>
+      <parameters>
+        <parameter>
+          <name>clockName</name>
+          <type>Clock</type>
+          <description>The name of the clock to destroy.</description>
+        </parameter>
+      </parameters>
+    </bang>
+    <bang>
+      <name>nClockSet24HourDial</name>
+      <description>
+        Changes the <settingref>24HourDial</settingref> setting.
+      </description>
+      <parameters>
+        <parameter>
+          <name>clockName</name>
+          <type>Clock</type>
+          <description>The name of the clock to change the 24HourDial setting for.</description>
+        </parameter>
+        <parameter>
+          <name>value</name>
+          <type>Boolean</type>
+          <description>The new value for the 24HourDial setting.</description>
+        </parameter>
+      </parameters>
+    </bang>
+    <bang>
+      <name>nClockSetUpdateRate</name>
+      <description>
+        Changes the <settingref>UpdateRate</settingref> setting.
+      </description>
+      <parameters>
+        <parameter>
+          <name>clockName</name>
+          <type>Clock</type>
+          <description>The name of the clock to change the UpdateRate for.</description>
+        </parameter>
+        <parameter>
+          <name>value</name>
+          <type>Integer</type>
+          <description>The new update rate.</description>
+        </parameter>
+      </parameters>
+    </bang>
+    <bang>
+      <name>nClockSetHandLength</name>
+      <description>
+        Changes the <settingref>Length</settingref> of a hand.
+      </description>
+      <parameters>
+        <parameter>
+          <name>clockName</name>
+          <type>Clock</type>
+          <description>The name of the clock owning the hand.</description>
+        </parameter>
+        <parameter>
+          <name>handName</name>
+          <type>Hand</type>
+          <description>The name of the hand to change the length for.</description>
+        </parameter>
+        <parameter>
+          <name>length</name>
+          <type>Float</type>
+          <description>The new hand length.</description>
+        </parameter>
+      </parameters>
+    </bang>
+    <bang>
+      <name>nClockSetHandOffset</name>
+      <description>
+        Changes the <settingref>Offset</settingref> of a hand.
+      </description>
+      <parameters>
+        <parameter>
+          <name>clockName</name>
+          <type>Clock</type>
+          <description>The name of the clock owning the hand.</description>
+        </parameter>
+        <parameter>
+          <name>handName</name>
+          <type>Hand</type>
+          <description>The name of the hand to change the offset for.</description>
+        </parameter>
+        <parameter>
+          <name>offset</name>
+          <type>Float</type>
+          <description>The new hand offset.</description>
+        </parameter>
+      </parameters>
+    </bang>
+    <bang>
+      <name>nClockSetHandThickness</name>
+      <description>
+        Changes the <settingref>Thickness</settingref> of a hand.
+      </description>
+      <parameters>
+        <parameter>
+          <name>clockName</name>
+          <type>Clock</type>
+          <description>The name of the clock owning the hand.</description>
+        </parameter>
+        <parameter>
+          <name>handName</name>
+          <type>Hand</type>
+          <description>The name of the hand to change the thickness for.</description>
+        </parameter>
+        <parameter>
+          <name>thickness</name>
+          <type>Float</type>
+          <description>The new hand thickness.</description>
+        </parameter>
+      </parameters>
+    </bang>
+    <bang>
+      <name>nClockSetSmoothMovement</name>
+      <description>
+        Changes the <settingref>SmoothMovement</settingref> setting of a hand.
+      </description>
+      <parameters>
+        <parameter>
+          <name>clockName</name>
+          <type>Clock</type>
+          <description>The name of the clock owning the hand.</description>
+        </parameter>
+        <parameter>
+          <name>handName</name>
+          <type>Hand</type>
+          <description>The name of the hand to change the setting for.</description>
+        </parameter>
+        <parameter>
+          <name>value</name>
+          <type>Boolean</type>
+          <description>The new value.</description>
+        </parameter>
+      </parameters>
+    </bang>
+  </section>
+
+  <section>
+    <title>Scripting</title>
+    <description>
+      nClock exports a single JavaScript object, nClock.
+      <blockcode>nClock
+{
+  Create           : function(clockName)
+  Destroy          : function(clockName)
+  24HourDial       : function(clockName, value)
+  UpdateRate       : function(clockName, value)
+
+  Hand
+  {
+    Length         : function(clockName, handName, value)
+    Offset         : function(clockName, handName, value)
+    Thickness      : function(clockName, handName, value)
+    SmoothMovement : function(clockName, handName, value)
+  }
+}</blockcode>
+    </description>
+    <scriptfuncs>
+      <scriptfunc>
+        <name>nClock.24HourDial</name>
+        <parameters>
+          <parameter>
+            <name>clockName</name>
+            <type>Clock</type>
+          </parameter>
+        </parameters>
+      </scriptfunc>
+    </scriptfuncs>
+  </section>
+
+  <section>
+    <title>Events</title>
+    <description>
+      nClock will trigger events with the groupname nClock.
+    </description>
+  </section>
+
+  <section>
+    <title>Sample Configuration</title>
+    <description>
+      <img>nClock.png</img>
+      These settings create the hands as shown on the right.
+      <code>
+        <multisetting name="nClock">Clock</multisetting>
+        <multisetting name="nLabel">ClockDot</multisetting>
+        <group name="Clock">
+          <singlesetting name="X" type="int">0</singlesetting>
+          <singlesetting name="Y" type="int">0</singlesetting>
+          <singlesetting name="Width" type="int">100</singlesetting>
+          <singlesetting name="Height" type="int">100</singlesetting>
+          <singlesetting name="Color" type="color">Green</singlesetting>
+          <blankrow/>
+          <comment> Default updaterate is 1 second</comment>
+          <singlesetting name="UpdateRate" type="int">500</singlesetting>
+          <blankrow/>
+          <comment> Switches to a 24hour dial</comment>
+          <comment>24HourDial</comment>
+          <blankrow/>
+          <group name="HourHand">
+            <singlesetting name="Color" type="color">Black</singlesetting>
+            <singlesetting name="Length" type="float">40</singlesetting>
+            <singlesetting name="Thickness" type="float">4</singlesetting>
+            <singlesetting name="SmoothMovement" type="bool"/>
+          </group>
+          <blankrow/>
+          <group name="MinuteHand">
+            <singlesetting name="Color" type="color">Black</singlesetting>
+            <singlesetting name="Length" type="float">45</singlesetting>
+            <singlesetting name="Thickness" type="float">2</singlesetting>
+            <singlesetting name="SmoothMovement" type="bool"/>
+          </group>
+          <blankrow/>
+          <group name="SecondHand">
+            <singlesetting name="Color" type="color">Red</singlesetting>
+            <singlesetting name="Length" type="float">55</singlesetting>
+            <singlesetting name="Thickness" type="float">2</singlesetting>
+            <singlesetting name="Offset" type="float">-10</singlesetting>
+          </group>
+          <blankrow/>
+          <group name="Dot">
+            <singlesetting name="X" type="int">$(@@Width - @Width)/2$</singlesetting>
+            <singlesetting name="Y" type="int">$(@@Height - @Height/2$</singlesetting>
+            <singlesetting name="Width" type="int">6</singlesetting>
+            <singlesetting name="Height" type="int">6</singlesetting>
+            <singlesetting name="CornerRadiusX" type="int">$@Width$</singlesetting>
+            <singlesetting name="CornerRadiusY" type="int">$@Height$</singlesetting>
+            <blankrow/>
+            <singlesetting name="Color" type="color">Black</singlesetting>
+            <singlesetting name="Parent" type="window">@@</singlesetting>
+          </group>
+        </group>
+      </code>
     </description>
   </section>
 </page>

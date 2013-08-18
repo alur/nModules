@@ -5,13 +5,64 @@
   <title>nCore</title>
   <tableofcontents/>
   <description>
-	Description of this page
+    nCore provides core utility functions which all other nModules use. It
+    parses user input, reads configuration files, keeps track of existing
+    windows, manages inter-modules communication, handles the dynamic text
+    functionality, provides most of the !Bang commands, and the scripting
+    support.
   </description>
 
   <section>
-    <title>Behavior</title>
+    <title>Loading</title>
     <description>
-      These are setting which affect the behavior of their Window.
+      To load the module, you should add a LoadModule line pointing to nCalendar
+      in your LiteStep configuration.
+      <code>
+        <singlesetting name="LoadModule">"$ModulesDir$nCore-0.7.dll"</singlesetting>
+      </code>
+      Or, if you are using NetLoadModule,
+      <code>
+        <multisetting name="NetLoadModule">nCore-0.7</multisetting>
+      </code>
+      Make sure to load nCore before any other nModule, since they all depend on the
+      functinonality exported by nCore.
+    </description>
+  </section>
+
+  <section>
+    <title>Dynamic Text</title>
+    <description>
+      nCore provides a dynamic text service, which will automatically replace
+      certain parts of text with data, and update the text when that data
+      changes. nCore looks for pieces in the string of the following format 
+      <b>[Function('param1', 'param2', ...)]</b> or <b>[Function]</b> as
+      possible canidates for data providers. Note that function names <b>are</b>
+      case sensitive! When no data provider is registered for a particular
+      function, no text replacement will be done.
+      <p>
+        For example, the string <blockcode>"Today is a [Time('%A')]."</blockcode>
+        would evaulate to <blockcode>Today is a <placeholder>WeekDay</placeholder><jscript>
+          document.getElementById('WeekDay').innerHTML = 
+          ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][(new Date()).getDay()];
+        </jscript>.</blockcode>
+      </p>
+      <p>
+        nCore provides a few default text functions, listed below. Others may be
+        provided by other modules, or by scripts using the 
+        <scriptfunc>nCore.AddTextFunction</scriptfunc> function.
+      </p>
+    </description>
+    <textfunctions>
+      <textfunction>
+        <name>Text</name>
+      </textfunction>
+    </textfunctions>
+  </section>
+  
+  <section>
+    <title>Scripting</title>
+    <description>
+      nCore exports 3 global objects. LiteStep, nCore, and Events.
     </description>
   </section>
 </page>
