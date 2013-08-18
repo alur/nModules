@@ -137,7 +137,10 @@ void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID)
         StringCchCopy(info, TRAY_MAX_INFO_LENGTH, pNID->szInfo);
         StringCchCopy(infoTitle, TRAY_MAX_INFOTITLE_LENGTH, pNID->szInfoTitle);
 
-        ((Tray*)mParent)->EnqueueBalloon(this, infoTitle, info, pNID->dwInfoFlags, pNID->hBalloonIcon, (pNID->uFlags & NIF_REALTIME) == NIF_REALTIME);
+        if (*info != L'\0' || *infoTitle != L'\0')
+        {
+            ((Tray*)mParent)->EnqueueBalloon(this, infoTitle, info, pNID->dwInfoFlags, pNID->hBalloonIcon, (pNID->uFlags & NIF_REALTIME) == NIF_REALTIME);
+        }
     }
 
     this->showTip = true;
