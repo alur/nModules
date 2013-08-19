@@ -418,16 +418,16 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
     {
     case WM_LBUTTONUP:
         {
-            if (GetForegroundWindow() == mWatchedWindow)
-            {
-                PostMessage(mWatchedWindow, WM_SYSCOMMAND, SC_MINIMIZE, 0);
-                SetMinmizedState(true);
-            }
-            else if (IsIconic(mWatchedWindow))
+            if (IsIconic(mWatchedWindow))
             {
                 BringWindowToTop(mWatchedWindow);
                 PostMessage(mWatchedWindow, WM_SYSCOMMAND, SC_RESTORE, 0);
                 SetForegroundWindow(mWatchedWindow);
+            }
+            else if (GetForegroundWindow() == mWatchedWindow)
+            {
+                PostMessage(mWatchedWindow, WM_SYSCOMMAND, SC_MINIMIZE, 0);
+                SetMinmizedState(true);
             }
             else
             {
