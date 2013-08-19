@@ -99,7 +99,7 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
     this->parent = parent;
     this->instance = instance;
 
-    CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 
     // Register the messageHandler window class
     StringCchPrintf(className, _countof(className), _T("LS%sMessageHandler"), this->moduleName);
