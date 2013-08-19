@@ -118,9 +118,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project", "Project", "{532C8632-0BE1-4183-9157-B61E8B25071E}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\Index.html = Documentation\Index.html
-		Documentation\nDocs.css = Documentation\nDocs.css
+		Documentation\nDocs-dark.css = Documentation\nDocs-dark.css
+		Documentation\nDocs-light.css = Documentation\nDocs-light.css
 		Documentation\nDocs.hhc = Documentation\nDocs.hhc
 		Documentation\nDocs.hhp = Documentation\nDocs.hhp
+		Documentation\nDocs.js = Documentation\nDocs.js
 		Documentation\nDocs.xslt = Documentation\nDocs.xslt
 	EndProjectSection
 EndProject

@@ -68,6 +68,7 @@
         <added>initial release of nCalendar.</added>
         <added>the Events JS object.</added>
         <fixed>display of empty balloons.</fixed>
+        <fixed>issue where !Shutdown did not work after a recycle.</fixed>
       </changes>
     </version>
     

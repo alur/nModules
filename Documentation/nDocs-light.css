@@ -5,7 +5,7 @@ body
 }
 
 
-h3 .type, h4 .type
+h3 .type, h4 .type, h5 .type
 {
     display: inline-block;
     color: #0794BF;
@@ -13,9 +13,14 @@ h3 .type, h4 .type
 }
 
 
-h3 .type:hover, h4 .type:hover
+h3 .type:hover, h4 .type:hover, h5 .type:hover
 {
     text-decoration: underline;
+}
+
+.bangparamdesc
+{
+    margin-left: 1em;
 }
 
 
@@ -27,6 +32,12 @@ h3 .type
 
 
 h4 .type
+{
+    font-size: 0.7em;
+    margin-left: 0.7em;
+}
+
+h5 .type
 {
     font-size: 0.7em;
     margin-left: 0.7em;
@@ -96,6 +107,11 @@ li a:hover
     color: #BC0707;
 }
 
+.bangs, .scripting
+{
+    margin-left: 1em;
+}
+
 
 .bangref, .settingref
 {
@@ -120,6 +136,12 @@ h5, h6
 {
     margin-bottom: 0.1em;
     margin-top: 0.1em;
+}
+
+
+.bang h5
+{
+    margin-top: 0.3em;
 }
 
 

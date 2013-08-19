@@ -59,11 +59,37 @@
         When this is set to true, the HourHand will make one lap every 24 hours, instead of every 12 hours.
       </description>
       <bangs>
-        You can change this setting by calling the
-        <bangref>nClockSet24HourDial</bangref>
-        bang.
+        <bang>
+          <name>nClockSet24HourDial</name>
+          <description>
+            Sets the <settingref>24HourDial</settingref> setting for the clock named clockName to the specified value.
+          </description>
+          <parameters>
+            <parameter>
+              <name>clockName</name>
+              <type>Clock</type>
+              <description>The name of the clock to change the 24HourDial setting for.</description>
+            </parameter>
+            <parameter>
+              <name>value</name>
+              <type>Boolean</type>
+              <description>The new value for the 24HourDial setting.</description>
+            </parameter>
+          </parameters>
+        </bang>
       </bangs>
       <scripting>
+
+        <scriptfunc>
+          <name>nClock.24HourDial</name>
+          <parameters>
+            <parameter>
+              <name>clockName</name>
+              <type>Clock</type>
+            </parameter>
+          </parameters>
+        </scriptfunc>
+        
         You can read or set this setting by calling the
         <scriptfunc>nClock.24HourDial</scriptfunc> function.
       </scripting>
@@ -188,24 +214,6 @@
           <name>clockName</name>
           <type>Clock</type>
           <description>The name of the clock to destroy.</description>
-        </parameter>
-      </parameters>
-    </bang>
-    <bang>
-      <name>nClockSet24HourDial</name>
-      <description>
-        Changes the <settingref>24HourDial</settingref> setting.
-      </description>
-      <parameters>
-        <parameter>
-          <name>clockName</name>
-          <type>Clock</type>
-          <description>The name of the clock to change the 24HourDial setting for.</description>
-        </parameter>
-        <parameter>
-          <name>value</name>
-          <type>Boolean</type>
-          <description>The new value for the 24HourDial setting.</description>
         </parameter>
       </parameters>
     </bang>

@@ -136,7 +136,7 @@
 
   <!-- Bang -->
   <xsl:template match="bang">
-    <h3 id="!{name}">
+    <h5 id="!{name}">
       !<xsl:value-of select="name"/>
       <span class="bang-parameters">
         <xsl:for-each select="parameters/parameter">
@@ -146,19 +146,19 @@
           </i>
         </xsl:for-each>
       </span>
-    </h3>
+    </h5>
     <div class="bang">
       <xsl:apply-templates select="description"/>
       <xsl:for-each select="parameters/parameter">
-        <h4>
+        <h5>
           <xsl:value-of select="name"/>
           <xsl:text> </xsl:text>
           <a class="type" href="Types#{type}">
             [<xsl:value-of select="type"/>]
           </a>
-        </h4>
-        <div class="description">
-          <xsl:value-of select="description"/>
+        </h5>
+        <div class="bangparamdesc">
+          <xsl:apply-templates select="description"/>
         </div>
       </xsl:for-each>
     </div>
@@ -172,6 +172,9 @@
     <div class="scripting">
       <xsl:apply-templates/>
     </div>
+  </xsl:template>
+  <xsl:template match="scriptfunc">
+    
   </xsl:template>
 
   <!-- Default -->
