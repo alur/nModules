@@ -10,10 +10,11 @@
 #include "../nShared/Window.hpp"
 #include "../nShared/Drawable.hpp"
 #include "../Utilities/EnumArray.hpp"
+#include "ButtonSettings.hpp"
 
 class TaskButton : public Drawable
 {
-private:
+public:
     // All button states
     enum class State
     {
@@ -30,7 +31,7 @@ private:
     };
 
 public:
-    explicit TaskButton(Drawable* parent, HWND hWnd);
+    explicit TaskButton(Drawable *parent, HWND hWnd, ButtonSettings &buttonSettings);
     virtual ~TaskButton();
 
 public:
@@ -63,8 +64,8 @@ private:
     void SetHoverState(bool value);
 
 private:
-    // Settings for painting the icon in the button.
-    Settings *mIconSettings;
+    //
+    ButtonSettings &mButtonSettings;
 
     // The window related to this button.
     HWND mWatchedWindow;
@@ -72,17 +73,13 @@ private:
     // The system context menu for this window.
     HMENU mMenu;
 
+    //
     bool mMouseIsOver;
-    bool mIsFlashing;
-    bool mUseFlashing;
-    bool mFlashOn;
-    int mFlashInterval;
-    UINT_PTR mFlashTimer;
 
     //
-    bool mNoIcons;
-    D2D1_RECT_F mIconRect;
-    D2D1_RECT_F mOverlayIconRect;
+    bool mIsFlashing;
+    bool mFlashOn;
+    UINT_PTR mFlashTimer;
 
     EnumArray<Window::STATE, State> mStates;
 

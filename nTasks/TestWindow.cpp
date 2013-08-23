@@ -203,6 +203,12 @@ INT_PTR CALLBACK TestWindow::DialogProc(HWND hwndDlg, UINT message, WPARAM wPara
                 }
                 return TRUE;
 
+            case MAKEWPARAM(IDC_FLASH, BN_CLICKED):
+                {
+                    FlashWindow(mDialogWindow, TRUE);
+                }
+                return TRUE;
+
             case MAKEWPARAM(IDC_WINDOWTITLE, EN_CHANGE):
                 {
                     TCHAR windowTitle[256];

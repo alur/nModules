@@ -209,6 +209,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
             g_pDesktopPainter->Resize();
             nDesk::Settings::OnResolutionChange();
             WorkArea::LoadSettings(g_pMonitorInfo);
+            InvalidateRect(nullptr, nullptr, TRUE);
         }
         break;
     

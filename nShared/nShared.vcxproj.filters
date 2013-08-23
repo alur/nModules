@@ -13,6 +13,9 @@
     <Filter Include="Window">
       <UniqueIdentifier>{e1aed713-6245-41eb-8fc8-4d5fbced6f3f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="States">
+      <UniqueIdentifier>{aa8b19b7-102e-4ff5-aacb-612001488eb4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Balloon.hpp">
@@ -24,8 +27,6 @@
     <ClInclude Include="WindowThumbnail.hpp">
       <Filter>Drawables</Filter>
     </ClInclude>
-    <ClInclude Include="BrushBangs.h" />
-    <ClInclude Include="BrushSettings.hpp" />
     <ClInclude Include="Easing.h" />
     <ClInclude Include="ErrorHandler.h" />
     <ClInclude Include="EventHandler.hpp" />
@@ -39,9 +40,6 @@
     <ClInclude Include="MonitorInfo.hpp" />
     <ClInclude Include="Overlay.hpp" />
     <ClInclude Include="Settings.hpp" />
-    <ClInclude Include="State.hpp" />
-    <ClInclude Include="StateBangs.h" />
-    <ClInclude Include="StateSettings.hpp" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="Coordinate.hpp" />
     <ClInclude Include="Length.hpp" />
@@ -75,9 +73,6 @@
     <ClInclude Include="WindowBangs.h">
       <Filter>Window</Filter>
     </ClInclude>
-    <ClInclude Include="WindowClass.hpp">
-      <Filter>Window</Filter>
-    </ClInclude>
     <ClInclude Include="ChildDrawable.hpp">
       <Filter>Drawables</Filter>
     </ClInclude>
@@ -87,10 +82,32 @@
     <ClInclude Include="Drawable.hpp">
       <Filter>Drawables</Filter>
     </ClInclude>
+    <ClInclude Include="State.hpp">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="StateBangs.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="StateSettings.hpp">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="BrushSettings.hpp">
+      <Filter>Brushes</Filter>
+    </ClInclude>
+    <ClInclude Include="BrushBangs.h">
+      <Filter>Brushes</Filter>
+    </ClInclude>
+    <ClInclude Include="StateRender.hpp">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="IStateRender.hpp">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="IStateWindowData.hpp">
+      <Filter>States</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BrushBangs.cpp" />
-    <ClCompile Include="BrushSettings.cpp" />
     <ClCompile Include="Easing.cpp" />
     <ClCompile Include="ErrorHandler.cpp" />
     <ClCompile Include="EventHandler.cpp" />
@@ -102,9 +119,6 @@
     <ClCompile Include="MonitorInfo.cpp" />
     <ClCompile Include="Overlay.cpp" />
     <ClCompile Include="Settings.cpp" />
-    <ClCompile Include="State.cpp" />
-    <ClCompile Include="StateBangs.cpp" />
-    <ClCompile Include="StateSettings.cpp" />
     <ClCompile Include="WindowThumbnail.cpp">
       <Filter>Drawables</Filter>
     </ClCompile>
@@ -149,9 +163,6 @@
     <ClCompile Include="WindowBangs.cpp">
       <Filter>Window</Filter>
     </ClCompile>
-    <ClCompile Include="WindowClass.cpp">
-      <Filter>Window</Filter>
-    </ClCompile>
     <ClCompile Include="WindowDropTarget.cpp">
       <Filter>Window</Filter>
     </ClCompile>
@@ -166,6 +177,24 @@
     </ClCompile>
     <ClCompile Include="WindowUpdateLock.cpp">
       <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="State.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="StateBangs.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="StateSettings.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="BrushBangs.cpp">
+      <Filter>Brushes</Filter>
+    </ClCompile>
+    <ClCompile Include="BrushSettings.cpp">
+      <Filter>Brushes</Filter>
+    </ClCompile>
+    <ClCompile Include="StateRender.cpp">
+      <Filter>States</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

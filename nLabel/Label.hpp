@@ -9,6 +9,8 @@
 
 #include "../nShared/Drawable.hpp"
 #include "../nShared/Window.hpp"
+#include "../nShared/StateRender.hpp"
+
 
 class Label : public Drawable {
 public:
@@ -18,10 +20,21 @@ public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
 private:
+    enum class States
+    {
+        Base = 0,
+        Hover,
+        Count
+    };
+
+private:
     void Initalize();
     void LoadSettings(bool isRefresh = false);
 
     Window::STATE stateHover;
-    list<Drawable*> overlays;
-    map<wstring, Label*>::iterator allLabelsIter;
+
+    StateRender<States> mStateRender;
+    
+    list<Drawable*> mOverlays;
+    map<wstring, Label*>::iterator mAllLabelsIter;
 };

@@ -55,18 +55,18 @@ void State::UpdatePosition(D2D1_RECT_F position) {
     this->textArea.left += this->drawingSettings->textOffsetLeft;
     this->textArea.right -= this->drawingSettings->textOffsetRight;
 
-    this->backBrush->UpdatePosition(position);
-    this->outlineBrush->UpdatePosition(position);
-    this->textBrush->UpdatePosition(position);
-    this->textShadowBrush->UpdatePosition(position);
+    // Adjust the drawing area to account for the outline.
+    this->drawingArea.rect.left += this->drawingSettings->outlineWidth / 2.0f;
+    this->drawingArea.rect.right -= this->drawingSettings->outlineWidth / 2.0f;
+    this->drawingArea.rect.top += this->drawingSettings->outlineWidth / 2.0f;
+    this->drawingArea.rect.bottom -= this->drawingSettings->outlineWidth / 2.0f;
+
+    this->backBrush->UpdatePosition(drawingArea.rect);
+    this->outlineBrush->UpdatePosition(drawingArea.rect);
+    this->textBrush->UpdatePosition(drawingArea.rect);
+    this->textShadowBrush->UpdatePosition(drawingArea.rect);
 
     this->drawingArea.rect = this->backBrush->brushPosition;
-
-    this->outlineArea = this->drawingArea;
-    this->outlineArea.rect.left += this->drawingSettings->outlineWidth / 2;
-    this->outlineArea.rect.right -= this->drawingSettings->outlineWidth / 2;
-    this->outlineArea.rect.top += this->drawingSettings->outlineWidth / 2;
-    this->outlineArea.rect.bottom -= this->drawingSettings->outlineWidth / 2;
 }
 
 
@@ -112,7 +112,7 @@ void State::Paint(ID2D1RenderTarget* renderTarget)
     }
     if (this->outlineBrush->brush && this->drawingSettings->outlineWidth != 0)
     {
-        renderTarget->DrawRoundedRectangle(this->outlineArea, this->outlineBrush->brush, this->drawingSettings->outlineWidth);
+        renderTarget->DrawRoundedRectangle(this->drawingArea, this->outlineBrush->brush, this->drawingSettings->outlineWidth);
     }
     /*if (this->textShadowBrush->brush)
     {
@@ -136,11 +136,6 @@ HRESULT State::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
     textShadowBrush->ReCreate(renderTarget);
 
     this->drawingArea.rect = this->backBrush->brushPosition;
-    this->outlineArea = this->drawingArea;
-    this->outlineArea.rect.left += this->drawingSettings->outlineWidth / 2;
-    this->outlineArea.rect.right -= this->drawingSettings->outlineWidth / 2;
-    this->outlineArea.rect.top += this->drawingSettings->outlineWidth / 2;
-    this->outlineArea.rect.bottom -= this->drawingSettings->outlineWidth / 2;
     return S_OK;
 }
 

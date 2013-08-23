@@ -29,9 +29,10 @@
     <ClInclude Include="Coordinate.hpp" />
     <ClInclude Include="IDrawable.hpp" />
     <ClInclude Include="Drawable.hpp" />
+    <ClInclude Include="IStateRender.hpp" />
+    <ClInclude Include="StateRender.hpp" />
     <ClInclude Include="WindowBangs.h" />
     <ClInclude Include="WindowSettings.hpp" />
-    <ClInclude Include="WindowClass.hpp" />
     <ClInclude Include="DWMColorVal.hpp" />
     <ClInclude Include="IBrushOwner.hpp" />
     <ClInclude Include="IColorVal.hpp" />
@@ -56,6 +57,7 @@
     <ClInclude Include="Tooltip.hpp" />
     <ClInclude Include="UnaryColorVal.hpp" />
     <ClInclude Include="Version.h" />
+    <ClInclude Include="IStateWindowData.hpp" />
     <ClInclude Include="WindowThumbnail.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -70,9 +72,9 @@
     <ClCompile Include="Coordinate.cpp" />
     <ClCompile Include="IDrawable.cpp" />
     <ClCompile Include="Drawable.cpp" />
+    <ClCompile Include="StateRender.cpp" />
     <ClCompile Include="WindowBangs.cpp" />
     <ClCompile Include="WindowSettings.cpp" />
-    <ClCompile Include="WindowClass.cpp" />
     <ClCompile Include="WindowDropTarget.cpp" />
     <ClCompile Include="WindowUnknown.cpp" />
     <ClCompile Include="DWMColorVal.cpp" />

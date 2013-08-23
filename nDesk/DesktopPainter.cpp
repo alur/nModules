@@ -705,9 +705,10 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush)
 
     pBitmapRender->GetBitmap(&pBitmap);
     renderTarget->CreateBitmapBrush(pBitmap, ppBitmapBrush);
+    //(*ppBitmapBrush)->SetTransform(D2D1::Matrix3x2F::Translation(g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.rect.top))
 
-    SAFERELEASE(pBitmap)
-    SAFERELEASE(pBitmapRender)
+    SAFERELEASE(pBitmap);
+    SAFERELEASE(pBitmapRender);
 
     return S_OK;
 }

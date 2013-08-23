@@ -7,6 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "../nShared/LSModule.hpp"
+#include "../nShared/ErrorHandler.h"
 #include "Label.hpp"
 #include "nLabel.h"
 #include <map>
@@ -22,11 +23,12 @@ LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSIO
 UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
     LM_FULLSCREENDEACTIVATED, 0 };
 
-// All the top-level labels we currently have loaded
-map<tstring, Label*> g_TopLevelLabels;
+// All the top-level labels we currently have loaded.
+// These do not include overlay labels
+map<tstring, Label*> gTopLevelLabels;
 
 // All the labels we currently have loaded. Labels add and remove themselfs from this list.
-map<tstring, Label*> g_AllLabels;
+map<tstring, Label*> gAllLabels;
 
 
 /// <summary>
@@ -56,13 +58,12 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
     // Remove all labels
-    for (auto label : g_TopLevelLabels) {
+    for (auto label : gTopLevelLabels)
+    {
         delete label.second;
     }
     
     gLSModule.DeInitalize();
-
-    g_TopLevelLabels.clear();
 }
 
 
@@ -89,7 +90,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_FULLSCREENACTIVATED:
         {
-            for (auto &label : g_TopLevelLabels) {
+            for (auto &label : gTopLevelLabels)
+            {
                 label.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
             }
         }
@@ -97,7 +99,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_FULLSCREENDEACTIVATED:
         {
-            for (auto &label : g_TopLevelLabels) {
+            for (auto &label : gTopLevelLabels)
+            {
                 label.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
             }
         }
@@ -117,8 +120,24 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// </summary>
 void LoadSettings()
 {
-    LiteStep::IterateOverLineTokens(_T("*nLabel"), [] (LPCTSTR token) -> void
+    LiteStep::IterateOverLineTokens(_T("*nLabel"), [] (LPCTSTR labelName) -> void
     {
-        g_TopLevelLabels.insert(g_TopLevelLabels.begin(), std::pair<tstring, Label*>(token, new Label(token)));
+        CreateLabel(labelName);
     });
+}
+
+
+/// <summary>
+/// Creates a new label
+/// </summary>
+void CreateLabel(LPCTSTR labelName)
+{
+    if (gAllLabels.find(labelName) == gAllLabels.end())
+    {
+        gTopLevelLabels[labelName] = new Label(labelName);
+    }
+    else
+    {
+        ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("Attempt to (re)create the already existing label %s!"), labelName);
+    }
 }

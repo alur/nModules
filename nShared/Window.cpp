@@ -45,7 +45,6 @@ Window::Window(Settings* settings, MessageHandler* msgHandler)
     this->activeChild = nullptr;
     this->animating = false;
     ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
-    this->drawingSettings = new WindowSettings();
     this->initialized = false;
     this->isTrackingMouse = false;
     this->msgHandler = msgHandler;
@@ -64,6 +63,8 @@ Window::Window(Settings* settings, MessageHandler* msgHandler)
     this->monitorInfo = nullptr;
     this->window = nullptr;
     mCoveredByFullscreen = false;
+    mWindowData = nullptr;
+    mStateRender = nullptr;
 
     // Create the base state
     State* state = new State(_T(""), new Settings(settings), 0, &this->text);
@@ -199,7 +200,7 @@ Window::~Window()
     }
 
     // Register with the core
-    if (this->drawingSettings->registerWithCore)
+    if (mWindowSettings.registerWithCore)
     {
         nCore::System::UnRegisterWindow(mSettings->GetPrefix());
     }
@@ -212,13 +213,6 @@ Window::~Window()
     SAFERELEASE(this->parsedText);
 
     DiscardDeviceResources();
-
-    // Delete all states
-    for (auto state : mStates)
-    {
-        delete state;
-    }
-    mStates.clear();
 
     // Delete all overlays
     ClearOverlays();
@@ -235,7 +229,6 @@ Window::~Window()
         SAFEDELETE(this->monitorInfo);
     }
 
-    SAFEDELETE(this->drawingSettings);
     SAFEDELETE(mSettings);
     free((LPVOID)this->text);
 }
@@ -488,10 +481,7 @@ void Window::DiscardDeviceResources()
     {
         overlay->DiscardDeviceResources();
     }
-    for (State *state : mStates)
-    {
-        state->DiscardDeviceResources();
-    }
+    mStateRender->DiscardDeviceResources();
     for (IPainter *painter : this->postPainters)
     {
         painter->DiscardDeviceResources();
@@ -533,7 +523,7 @@ void Window::FullscreenActivated(HMONITOR monitor, HWND fullscreenWindow)
         if (MonitorFromWindow(this->window, MONITOR_DEFAULTTONULL) == monitor)
         {
             mCoveredByFullscreen = true;
-            if (this->drawingSettings->alwaysOnTop)
+            if (mWindowSettings.alwaysOnTop && visible)
             {
                 SetWindowPos(this->window, fullscreenWindow, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
             }
@@ -552,7 +542,7 @@ void Window::FullscreenDeactivated(HMONITOR monitor)
         if (MonitorFromWindow(this->window, MONITOR_DEFAULTTONULL) == monitor)
         {
             mCoveredByFullscreen = false;
-            if (this->drawingSettings->alwaysOnTop)
+            if (mWindowSettings.alwaysOnTop)
             {
                 SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
             }
@@ -585,7 +575,7 @@ void Window::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size)
 /// <returns>The drawing settings for the default state.</returns>
 WindowSettings* Window::GetDrawingSettings()
 {
-    return this->drawingSettings;
+    return &mWindowSettings;
 }
 
 
@@ -691,7 +681,7 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
         {
             for (Window *child : this->children)
             {
-                if (!child->drawingSettings->clickThrough)
+                if (!child->mWindowSettings.clickThrough)
                 {
                     D2D1_RECT_F pos = child->drawingArea;
                     if (xPos >= pos.left && xPos <= pos.right && yPos >= pos.top && yPos <= pos.bottom)
@@ -864,7 +854,7 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
 
     case WM_WINDOWPOSCHANGING:
         {
-            if (this->drawingSettings->alwaysOnTop)
+            if (mWindowSettings.alwaysOnTop)
             {
                 LPWINDOWPOS windowPos = LPWINDOWPOS(lParam);
                 if (!mCoveredByFullscreen)
@@ -925,40 +915,38 @@ void Window::Hide()
 
 
 /// <summary>
-/// Initalizes this window.
+/// Initializes this window.
 /// </summary>
-/// <param name="defaultSettings">The default settings for this window.</param>
-/// <param name="baseStateDefaults">The default settings for the base state.</param>
-void Window::Initialize(WindowSettings* defaultSettings, StateSettings* baseStateDefaults)
+void Window::Initialize(WindowSettings &windowSettings, IStateRender *stateRender)
 {
-    // Load settings.
-    this->drawingSettings->Load(mSettings, defaultSettings);
+    mWindowSettings = windowSettings;
 
     // Load the base state
-    mBaseState->Load(baseStateDefaults);
+    mStateRender = stateRender;
+    mWindowData = mStateRender->CreateWindowData();
 
     // Register with the core.
-    if (this->drawingSettings->registerWithCore)
+    if (mWindowSettings.registerWithCore)
     {
         nCore::System::RegisterWindow(mSettings->GetPrefix(), this);
     }
 
     // Put the window in its correct position.
-    SetPosition(this->drawingSettings->x, this->drawingSettings->y,
-        this->drawingSettings->width, this->drawingSettings->height);
+    SetPosition(mWindowSettings.x, mWindowSettings.y,
+        mWindowSettings.width, mWindowSettings.height);
 
     // Create D2D resources.
     ReCreateDeviceResources();
 
     // AlwaysOnTop
-    if (!mIsChild && this->drawingSettings->alwaysOnTop)
+    if (!mIsChild && mWindowSettings.alwaysOnTop)
     {
         ::SetParent(this->window, nullptr);
         SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
     }
     
     // Set the text.
-    SetText(this->drawingSettings->text);
+    SetText(mWindowSettings.text);
 
     this->initialized = true;
 }
@@ -995,7 +983,7 @@ bool Window::IsVisible()
 /// <param name="y">The y coordinate to move the window to. Relative to the parent.</param>
 void Window::Move(int x, int y)
 {
-    SetPosition(x, y, this->drawingSettings->width, this->drawingSettings->height);
+    SetPosition(x, y, mWindowSettings.width, mWindowSettings.height);
 }
 
 
@@ -1010,7 +998,7 @@ void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
         this->renderTarget->PushAxisAlignedClip(this->drawingArea, D2D1_ANTIALIAS_MODE_ALIASED);
 
         // Paint the active state.
-        this->activeState->Paint(this->renderTarget);
+        mStateRender->Paint(this->renderTarget, mWindowData);
         
         // Pre painters.
         for (IPainter *painter : this->prePainters)
@@ -1133,7 +1121,7 @@ void Window::ReleaseUserMessage(UINT message)
 /// <param name="height">The height to resize the window to.</param>
 void Window::Resize(int width, int height)
 {
-    SetPosition(this->drawingSettings->x, this->drawingSettings->y, width, height);
+    SetPosition(mWindowSettings.x, mWindowSettings.y, width, height);
 }
 
 
@@ -1155,7 +1143,7 @@ HRESULT Window::ReCreateDeviceResources()
             // Create the render target
             if (SUCCEEDED(hr))
             {
-                D2D1_SIZE_U size = D2D1::SizeU(this->drawingSettings->width, this->drawingSettings->height);
+                D2D1_SIZE_U size = D2D1::SizeU(mWindowSettings.width, mWindowSettings.height);
                 hr = pD2DFactory->CreateHwndRenderTarget(
                     RenderTargetProperties(
                         D2D1_RENDER_TARGET_TYPE_DEFAULT,
@@ -1166,7 +1154,7 @@ HRESULT Window::ReCreateDeviceResources()
                 );
                 if (SUCCEEDED(hr))
                 {
-                    this->renderTarget->SetTextAntialiasMode(this->drawingSettings->textAntiAliasMode);
+                    this->renderTarget->SetTextAntialiasMode(mWindowSettings.textAntiAliasMode);
                 }
             }
         }
@@ -1186,10 +1174,7 @@ HRESULT Window::ReCreateDeviceResources()
                 painter->ReCreateDeviceResources(this->renderTarget);
             }
 
-            for (State *state : mStates)
-            {
-                state->ReCreateDeviceResources(this->renderTarget);
-            }
+            mStateRender->ReCreateDeviceResources(this->renderTarget);
 
             for (Overlay *overlay : this->overlays)
             {
@@ -1363,8 +1348,8 @@ void Window::Repaint(const D2D1_RECT_F *region)
 /// </summary>
 void Window::SetAlwaysOnTop(bool value)
 {
-    bool oldValue = this->drawingSettings->alwaysOnTop;
-    this->drawingSettings->alwaysOnTop = true;
+    bool oldValue = mWindowSettings.alwaysOnTop;
+    mWindowSettings.alwaysOnTop = value;
     if (!mIsChild && !mCoveredByFullscreen)
     {
         if (value)
@@ -1392,10 +1377,10 @@ void Window::SetAnimation(int x, int y, int width, int height, int duration, Eas
 {
     RECT target = { x, y, x + width, y + height };
     this->animationTarget = target;
-    this->animationStart.top = this->drawingSettings->y;
-    this->animationStart.left = this->drawingSettings->x;
-    this->animationStart.bottom = this->drawingSettings->y + this->drawingSettings->height;
-    this->animationStart.right = this->drawingSettings->x + this->drawingSettings->width;
+    this->animationStart.top = mWindowSettings.y;
+    this->animationStart.left = mWindowSettings.x;
+    this->animationStart.bottom = mWindowSettings.y + mWindowSettings.height;
+    this->animationStart.right = mWindowSettings.x + mWindowSettings.width;
     this->animationEasing = easing;
 
     mAnimationClock.Clock();
@@ -1438,7 +1423,7 @@ UINT_PTR Window::SetCallbackTimer(UINT elapse, MessageHandler* msgHandler)
 /// </summary>
 void Window::SetClickThrough(bool value)
 {
-    this->drawingSettings->clickThrough = value;
+    mWindowSettings.clickThrough = value;
 }
 
 
@@ -1492,10 +1477,7 @@ bool Window::UpdateDWMColor(ARGB newColor)
         ret = painter->UpdateDWMColor(newColor, this->renderTarget) || ret;
     }
 
-    for (State *state : mStates)
-    {
-        ret = state->UpdateDWMColor(newColor, this->renderTarget) || ret;
-    }
+    mStateRender->UpdateDWMColor(newColor, this->renderTarget);
     
     for (IPainter *painter : this->postPainters) 
     {
@@ -1553,8 +1535,8 @@ void Window::SetParent(Window *newParent)
     UpdateParentVariables();
     SendToAll(this->window, WM_NEWTOPPARENT, 0, 0, this);
 
-    SetPosition(this->drawingSettings->x, this->drawingSettings->y,
-        this->drawingSettings->width, this->drawingSettings->height);
+    SetPosition(mWindowSettings.x, mWindowSettings.y,
+        mWindowSettings.width, mWindowSettings.height);
     ReCreateDeviceResources();
     Repaint();
 }
@@ -1572,7 +1554,7 @@ void Window::SetPosition(int x, int y, int width, int height, LPARAM extra)
     UpdateLock lock(this);
 
     //
-    bool isResize = width != this->drawingSettings->width || height != this->drawingSettings->height;
+    bool isResize = width != mWindowSettings.width || height != mWindowSettings.height;
 
     //if (isResize || mIsChild)
     //{
@@ -1580,10 +1562,10 @@ void Window::SetPosition(int x, int y, int width, int height, LPARAM extra)
     //}
 
     // Update the drawing settings.
-    this->drawingSettings->x = x;
-    this->drawingSettings->y = y;
-    this->drawingSettings->width = width;
-    this->drawingSettings->height = height;
+    mWindowSettings.x = x;
+    mWindowSettings.y = y;
+    mWindowSettings.width = width;
+    mWindowSettings.height = height;
 
     // Position the window and/or set the backarea.
     if (!mIsChild)
@@ -1607,10 +1589,7 @@ void Window::SetPosition(int x, int y, int width, int height, LPARAM extra)
     }
 
     // Update all paintables.
-    for (State *state : mStates)
-    {
-        state->UpdatePosition(this->drawingArea);
-    }
+    mStateRender->UpdatePosition(this->drawingArea, mWindowData);
     for (Overlay *overlay : this->overlays)
     {
         overlay->UpdatePosition(this->drawingArea);
@@ -1627,7 +1606,7 @@ void Window::SetPosition(int x, int y, int width, int height, LPARAM extra)
     {
         for (Window *child : this->children)
         {
-            child->Move(child->drawingSettings->x, child->drawingSettings->y);
+            child->Move(child->mWindowSettings.x, child->mWindowSettings.y);
         }
     }
 
@@ -1652,7 +1631,7 @@ void Window::Show(int nCmdShow)
     if (!mIsChild)
     {
         ShowWindow(this->window, nCmdShow);
-        if (this->drawingSettings->alwaysOnTop)
+        if (mWindowSettings.alwaysOnTop)
         {
             SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
         }
@@ -1674,7 +1653,7 @@ void Window::SizeToText(int maxWidth, int maxHeight, int minWidth, int minHeight
     GetDesiredSize(maxWidth, maxHeight, &s);
     s.cx = std::max(s.cx, (long)minWidth);
     s.cy = std::max(s.cy, (long)minHeight);
-    this->SetPosition(this->drawingSettings->x, this->drawingSettings->y, s.cx, s.cy);
+    this->SetPosition(mWindowSettings.x, mWindowSettings.y, s.cx, s.cy);
 }
 
 
@@ -1684,7 +1663,7 @@ void Window::SizeToText(int maxWidth, int maxHeight, int minWidth, int minHeight
 /// <param name="text">The text for this window.</param>
 void Window::SetText(LPCWSTR text)
 {
-    if (this->drawingSettings->evaluateText)
+    if (mWindowSettings.evaluateText)
     {
         SAFEDELETE(this->parsedText);
         this->parsedText = (IParsedText*)nCore::System::ParseText(text);
@@ -1715,28 +1694,11 @@ void Window::SetTextOffsets(float left, float top, float right, float bottom)
 
 
 /// <summary>
-/// Toggles the specified state.
-/// </summary>
-/// <param name="state">The state to toggle</param>
-void Window::ToggleState(STATE state)
-{
-    if (state->active)
-    {
-        ClearState(state);
-    }
-    else
-    {
-        ActivateState(state);
-    }
-}
-
-
-/// <summary>
 /// Forcibly updates the text.
 /// </summary>
 void Window::UpdateText()
 {
-    if (this->drawingSettings->evaluateText)
+    if (mWindowSettings.evaluateText)
     {
         WCHAR buf[4096];
         this->parsedText->Evaluate(buf, 4096);
@@ -1744,7 +1706,7 @@ void Window::UpdateText()
     }
     else
     {
-        this->text = StringUtils::ReallocOverwrite(const_cast<LPWSTR>(this->text), this->drawingSettings->text);
+        this->text = StringUtils::ReallocOverwrite(const_cast<LPWSTR>(this->text), mWindowSettings.text);
     }
     Repaint();
 }

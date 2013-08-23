@@ -8,3 +8,4 @@
 #pragma once
 
 void LoadSettings();
+void CreateLabel(LPCTSTR labelName);

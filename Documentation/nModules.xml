@@ -69,6 +69,8 @@
         <added>the Events JS object.</added>
         <fixed>display of empty balloons.</fixed>
         <fixed>issue where !Shutdown did not work after a recycle.</fixed>
+        <fixed>the HoverActive state wasn't triggered by hovering.</fixed>
+        <added>a Flash button to the !nTaskTestWindow.</added>
       </changes>
     </version>
     

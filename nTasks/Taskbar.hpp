@@ -30,7 +30,8 @@ public:
 
     // Private Typedefs
 private:
-    typedef std::map<HWND, TaskButton*> ButtonMap;
+    typedef std::list<TaskButton*> ButtonList;
+    typedef std::map<HWND, ButtonList::const_iterator> ButtonMap;
 
     // Constructors and destructors
 public:
@@ -65,6 +66,7 @@ private:
 
     // The taskbar buttons
     ButtonMap mButtonMap;
+    ButtonList mButtonList;
 
     // The maximum width of a taskbar button
     int mButtonMaxWidth;

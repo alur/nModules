@@ -51,7 +51,7 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
 
     // Start the window manager
     WindowManager::Start();
-
+     
     // Register a bang command for creating our test window
     LiteStep::AddBangCommand(_T("!nTaskTestWindow"), [] (HWND, LPCTSTR) -> void
     {

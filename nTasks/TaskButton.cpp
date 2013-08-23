@@ -11,6 +11,7 @@
 #include "../nShared/LSModule.hpp"
 #include "Taskbar.hpp"
 #include "TaskButton.hpp"
+#include <shellapi.h>
 
 
 /// <summary>
@@ -278,6 +279,10 @@ void TaskButton::SetHoverState(bool value)
             {
                 mWindow->ActivateState(mStates[State::FlashingHover]);
             }
+            if (mStates[State::Active]->active)
+            {
+                mWindow->ActivateState(mStates[State::ActiveHover]);
+            }
             if (mStates[State::Minimized]->active)
             {
                 mWindow->ActivateState(mStates[State::MinimizedHover]);
@@ -288,6 +293,7 @@ void TaskButton::SetHoverState(bool value)
         {
             mWindow->ClearState(mStates[State::Hover]);
             mWindow->ClearState(mStates[State::MinimizedHover]);
+            mWindow->ClearState(mStates[State::ActiveHover]);
             mWindow->ClearState(mStates[State::FlashingHover]);
             mWindow->ClearState(mStates[State::MinimizedFlashingHover]);
         }

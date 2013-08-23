@@ -9,7 +9,7 @@
 #include "../nShared/LSModule.hpp"
 #include "Label.hpp"
 
-extern map<wstring, Label*> g_AllLabels;
+extern map<wstring, Label*> gAllLabels;
 
 
 Label::Label(LPCTSTR name) : Drawable(name)
@@ -27,19 +27,18 @@ Label::Label(LPCTSTR name, Drawable* parent) : Drawable(parent, name, true)
 Label::~Label()
 {
     // Remove all overlays
-    for (list<Drawable*>::const_iterator iter = this->overlays.begin(); iter != this->overlays.end(); iter++)
+    for (Drawable * label : mOverlays)
     {
-        delete *iter;
+        delete label;
     }
-    this->overlays.clear();
 
-    g_AllLabels.erase(this->allLabelsIter);
+    gAllLabels.erase(mAllLabelsIter);
 }
 
 
 void Label::Initalize()
 {
-    this->allLabelsIter = g_AllLabels.insert(g_AllLabels.begin(), pair<wstring, Label*>(wstring(mSettings->GetPrefix()), this));
+    mAllLabelsIter = gAllLabels.insert(gAllLabels.begin(), pair<wstring, Label*>(wstring(mSettings->GetPrefix()), this));
     
     WindowSettings defaults;
     defaults.evaluateText = true;
@@ -64,7 +63,7 @@ void Label::LoadSettings(bool /* isRefresh */)
 
     LiteStep::IterateOverLineTokens(prefix, [this] (LPCTSTR token) -> void
     {
-        this->overlays.push_back(new Label(token, this));
+        mOverlays.push_back(new Label(token, this));
     });
 }
 
@@ -73,12 +72,13 @@ LRESULT WINAPI Label::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 {
     if (uMsg == WM_MOUSEMOVE)
     {
-        mWindow->ActivateState(this->stateHover);
+        mStateRender.ActivateState(States::Hover);
     }
     else if (uMsg == WM_MOUSELEAVE)
     {
-        mWindow->ClearState(this->stateHover);
+        mStateRender.ClearState(States::Hover);
     }
+
     mEventHandler->HandleMessage(hWnd, uMsg, wParam, lParam);
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

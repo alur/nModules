@@ -5,13 +5,72 @@
   <title>nLabel</title>
   <tableofcontents/>
   <description>
-	Description of this page
+    nLabel allows you to create generic windows, generally used for custom dialogs or as containers for other modules.
   </description>
 
   <section>
-    <title>Behavior</title>
+    <title>Loading</title>
     <description>
-      These are setting which affect the behavior of their Window.
+      To load the module, you should add a LoadModule line pointing to nLabel
+      in your LiteStep configuration.
+      <code>
+        <singlesetting name="LoadModule">"nLabel-0.7.dll"</singlesetting>
+      </code>
+      Or, if you are using NetLoadModule,
+      <code>
+        <multisetting name="NetLoadModule">nLabel-0.7</multisetting>
+      </code>
+      Make sure to load nCore before nLabel, since nLabel depends on the
+      functionality exported by nCore.
+    </description>
+  </section>
+
+  <section>
+    <title>Creating Labels</title>
+    <description>
+      There are 2 types of labels. Overlay labels and regular labels. Overlay labels are a lightweight
+      method of creating children for other labels. There is no behavioral difference between setting
+      the Parent setting of a label to another label, and creating an overlay label for  that label.
+      However, since the overlay label is created by its parent, it can be done more efficiently. The
+      overlay label will also be created and destroy together with its parent.
+      
+      <p>
+        You create a label by using the *nLabel command, like this:
+        <code>
+          <multisetting name="nLabel">LabelName</multisetting>
+        </code>
+        You can also create multiple label on a single line, like this:
+        <code>
+          <multisetting name="nLabel">LabelOne LabelTwo LabelThree</multisetting>
+        </code>
+      </p>
+
+      <p>
+        You create an overlay label by using the *(parentName)OverlayLabel command. For example, to
+        create an overlay label named Overlay for the label named Demo:
+        <code>
+          <multisetting name="DemoOverlayLabel">Overlay</multisetting>
+        </code>
+        Just like with labels you can create multiple overlay labels on one line.
+        <code>
+          <multisetting name="DemoOverlayLabel">Overlay1 Overlay2 Overlay3</multisetting>
+        </code>
+      </p>
+      
+      It is also possible to create and destroy labels as well as overlay labels at runtime, using the
+      <bangref>nLabelCreate</bangref>, <bangref>nLabelDestroy</bangref>, <bangref>nLabelCreateOverlay</bangref>,
+      and <bangref>nLabelDestroyOverlay</bangref> bangs, or the <scriptfunc>nLabel.Create</scriptfunc>,
+      <scriptfunc>nLabel.Destroy</scriptfunc>, <scriptfunc>nLabel.CreateOverlay</scriptfunc>, and
+      <scriptfunc>nLabel.DestroyOverlay</scriptfunc> functions.
+    </description>
+  </section>
+
+  <section>
+    <title>Label Configuration</title>
+    <description>
+      Each label is a <xref>Window</xref> whose prefix is the name of the label. In addition to the
+      base state, each label also has a Hover state, which is active while the mouse hovers over the
+      label, or one of its children.
     </description>
   </section>
 </page>

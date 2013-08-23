@@ -15,6 +15,11 @@
 class State : public IPainter, public IBrushOwner
 {
 public:
+    struct WindowData {
+
+    };
+
+public:
     explicit State(LPCTSTR stateName, Settings *settings, int defaultPriority, LPCWSTR *text);
     virtual ~State();
 

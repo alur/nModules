@@ -26,7 +26,7 @@
 #include "../Utilities/PointerIterator.hpp"
 #include "../Utilities/StopWatch.hpp"
 #include "IBrushOwner.hpp"
-#include "WindowClass.hpp"
+#include "IStateRender.hpp"
 #include <set>
 
 
@@ -39,7 +39,6 @@ class Window : MessageHandler, IDropTarget
 {
     // typedefs
 public:
-    typedef PointerIterator<list<State*>::iterator, State> STATE;
     typedef PointerIterator<list<Overlay*>::iterator, Overlay> OVERLAY;
     typedef PointerIterator<list<IPainter*>::iterator, IPainter> PAINTER;
 
@@ -136,20 +135,11 @@ public:
     PAINTER AddPrePainter(IPainter *painter);
     PAINTER AddPostPainter(IPainter *painter);
 
-    // Adds a new state.
-    STATE AddState(LPCTSTR prefix, int defaultPriority, StateSettings *defaultSettings = nullptr, STATE *stateGroup = nullptr);
-
-    // Marks a particular state as active.
-    void ActivateState(STATE state, bool repaint = true);
-
     // Stops a timer.
     void ClearCallbackTimer(UINT_PTR);
 
     // Removes all overlays.
     void ClearOverlays();
-
-    // Clears the active flag of a particular state.
-    void ClearState(STATE state, bool repaint = true);
 
     // Creates a new child window.
     Window *CreateChild(Settings *childSettings, MessageHandler *msgHandler);
@@ -203,7 +193,7 @@ public:
     void Hide();
 
     // Initializes the Window.
-    void Initialize(WindowSettings* defaultSettings = nullptr, StateSettings* baseStateDefaults = nullptr);
+    void Initialize(WindowSettings &windowSettings, IStateRender *stateRender);
 
     //
     bool IsChild();
@@ -280,9 +270,6 @@ public:
     // Sizes the window to fit the text.
     void SizeToText(int maxWidth, int maxHeight, int minWidth = 0, int minHeight = 0);
 
-    // Toggles the specified state.
-    void ToggleState(STATE state);
-
     // Forcibly updates the text.
     void UpdateText();
 
@@ -351,9 +338,6 @@ private:
     // The child window the mouse is currently over.
     Window* activeChild;
 
-    // The currently active state, or states.end().
-    STATE activeState;
-
     // True if we are currently animating.
     bool animating;
 
@@ -379,7 +363,13 @@ private:
     D2D1_RECT_F drawingArea;
 
     // The drawing settings.
-    WindowSettings* drawingSettings;
+    WindowSettings mWindowSettings;
+
+    //
+    IStateRender *mStateRender;
+
+    //
+    IStateWindowData *mWindowData;
 
     // If Initalize has been called.
     bool initialized;
@@ -432,7 +422,7 @@ private:
     // The text we are currently drawing.
     LPCWSTR text;
 
-    //
+    // The name of this windows parent, if it uses a Parent setting.
     TCHAR mParentName[64];
 
     // True if this is a child window.
@@ -444,22 +434,16 @@ private:
     // If we are capturing mouse input, the message handler which will receieve it.
     MessageHandler *mCaptureHandler;
 
-    //
+    // True when there is a fullscreen window covering this label. Only valid when this is a top level window.
     bool mCoveredByFullscreen;
 
-    //
+    // 
     std::map<std::tstring, IBrushOwner*> mBrushOwners;
-
-    // The base state -- the one to use when no others are active.
-    STATE mBaseState;
 
     // Settings.
     Settings* mSettings;
 
-    // All current states.
-    std::list<State*> mStates;
-
-    //
+    // All currently active locks.
     std::set<UpdateLock*> mActiveLocks;
 
 public:

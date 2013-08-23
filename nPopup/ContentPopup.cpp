@@ -204,6 +204,8 @@ void ContentPopup::LoadPath(LPCTSTR path)
 }
 
 
+static float time;
+
 void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE idList, bool dontExpandFolders)
 {
     PIDLIST_RELATIVE idNext = NULL;
@@ -214,6 +216,9 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
         return;
     }
 
+    time = 0.0f;
+
+    StopWatch watch;
     // Enumerate the contents of this folder
     if (SUCCEEDED(targetFolder->EnumObjects(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIDList)))
     {
@@ -238,6 +243,9 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
 
         this->watchedFolders.insert(WATCHFOLDERMAP::value_type(message, std::pair<UINT, IShellFolder*>(shnrUID, targetFolder)));
     }
+
+    TRACE("[Popup::LoadFromIDList] Total Time: %.5f, %.5f", watch.Clock(), time);
+
 }
 
 
@@ -265,6 +273,8 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
             hr = targetFolder->GetAttributesOf(1, (LPCITEMIDLIST *)&itemID, &attributes);
             openable = SUCCEEDED(hr) && !dontExpandFolders && (((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE));
 
+            StopWatch watch;
+
             if (openable)
             {
                 for (iter = this->items.begin(); iter != this->items.end() && !(*iter)->CheckMerge(name); ++iter);
@@ -283,6 +293,8 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
                 StringCchPrintf(quotedCommand, sizeof(quotedCommand), L"\"%s\"", command);
                 item = new CommandItem(this, name, quotedCommand);
             }
+
+            time += watch.Clock();
 
             if (!this->noIcons && item != NULL)
             {
