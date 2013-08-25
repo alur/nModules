@@ -20,7 +20,7 @@ using std::tstring;
 LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
-const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
+const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED, LM_FULLSCREENDEACTIVATED, 0 };
 
 // All current clocks
 map<tstring, Clock*> gClocks;
@@ -90,6 +90,24 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         {
         }
         return 0;
+
+    case LM_FULLSCREENACTIVATED:
+        {
+            for (auto group : gClocks)
+            {
+                group.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+            }
+        }
+        return 0;
+
+    case LM_FULLSCREENDEACTIVATED:
+        {
+            for (auto group : gClocks)
+            {
+                group.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+            }
+        }
+        return 0;
     }
     return DefWindowProc(window, message, wParam, lParam);
 }
@@ -111,7 +129,8 @@ void LoadSettings()
 /// Creates a new clock with the specified name.
 /// </summary>
 /// <param name="clockName">The name of the clock to create.</param>
-void CreateClock(LPCTSTR clockName) {
+void CreateClock(LPCTSTR clockName)
+{
     if (gClocks.find(clockName) == gClocks.end())
     {
         gClocks[clockName] = new Clock(clockName);

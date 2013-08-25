@@ -27,7 +27,7 @@ Label::Label(LPCTSTR name, Drawable* parent) : Drawable(parent, name, true)
 Label::~Label()
 {
     // Remove all overlays
-    for (Drawable * label : mOverlays)
+    for (Label * label : mOverlays)
     {
         delete label;
     }

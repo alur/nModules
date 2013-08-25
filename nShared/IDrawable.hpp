@@ -18,7 +18,9 @@ public:
     explicit IDrawable(LPCTSTR prefix);
     explicit IDrawable(IDrawable *parent, LPCTSTR prefix, bool independent = false);
     explicit IDrawable(LPCTSTR prefix, LPSettings parentSettings);
-    virtual ~IDrawable();
+
+protected:
+    ~IDrawable();
 
 public:
     Window *GetWindow();
@@ -31,9 +33,6 @@ protected:
 
     // The object which does actual drawing.
     Window *mWindow;
-
-    // The window class.
-    //WindowClass *mWindowClass;
 
     // The parent drawable, if there is one.
     IDrawable *mParent;

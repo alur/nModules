@@ -14,8 +14,10 @@
   <ItemGroup>
     <ClInclude Include="Version.h" />
     <ClInclude Include="nCalendar.h" />
+    <ClInclude Include="Calendar.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nCalendar.cpp" />
+    <ClCompile Include="Calendar.cpp" />
   </ItemGroup>
 </Project>

@@ -12,7 +12,8 @@
 #include "../nShared/StateRender.hpp"
 
 
-class Label : public Drawable {
+class Label : public Drawable
+{
 public:
     explicit Label(LPCTSTR name);
     explicit Label(LPCTSTR name, Drawable* parent);
@@ -33,6 +34,6 @@ private:
 
     StateRender<States> mStateRender;
     
-    list<Drawable*> mOverlays;
+    list<Label*> mOverlays;
     map<wstring, Label*>::iterator mAllLabelsIter;
 };

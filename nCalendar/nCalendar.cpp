@@ -5,8 +5,11 @@
  *  Main .cpp file for the nCalendar module.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#include "../Utilities/Common.h"
+#include "../nShared/ErrorHandler.h"
 #include "../nShared/LiteStep.h"
 #include "../nShared/LSModule.hpp"
+#include "Calendar.hpp"
 #include "nCalendar.h"
 #include <map>
 #include "Version.h"
@@ -16,13 +19,16 @@
 LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
-const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
+const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED, LM_FULLSCREENDEACTIVATED, 0 };
+
+// All current clocks
+map<tstring, Calendar*> gCalendars;
 
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */)
+EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */)
 {
     if (!gLSModule.Initialize(parent, instance))
     {
@@ -46,6 +52,12 @@ int initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */)
 /// </summary>
 void quitModule(HINSTANCE /* instance */)
 {
+    for (auto item : gCalendars)
+    {
+        delete item.second;
+    }
+    gCalendars.clear();
+
     gLSModule.DeInitalize();
 }
 
@@ -77,6 +89,24 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         {
         }
         return 0;
+
+    case LM_FULLSCREENACTIVATED:
+        {
+            for (auto calendar : gCalendars)
+            {
+                calendar.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+            }
+        }
+        return 0;
+
+    case LM_FULLSCREENDEACTIVATED:
+        {
+            for (auto calendar : gCalendars)
+            {
+                calendar.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+            }
+        }
+        return 0;
     }
     return DefWindowProc(window, message, wParam, lParam);
 }
@@ -87,4 +117,24 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// </summary>
 void LoadSettings()
 {
+    LiteStep::IterateOverLineTokens(_T("*nCalendar"), [] (LPCTSTR calendarName) -> void
+    {
+        CreateCalendar(calendarName);
+    });
+}
+
+/// <summary>
+/// Creates a new calendar with the specified name.
+/// </summary>
+/// <param name="calendarName">The name of the calendar to create.</param>
+void CreateCalendar(LPCTSTR calendarName)
+{
+    if (gCalendars.find(calendarName) == gCalendars.end())
+    {
+        gCalendars[calendarName] = new Calendar(calendarName);
+    }
+    else
+    {
+        ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("Attempt to (re)create the already existing calendar %s!"), calendarName);
+    }
 }
