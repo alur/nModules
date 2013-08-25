@@ -9,6 +9,7 @@
 #include <strsafe.h>
 #include <Shlwapi.h>
 #include <shellapi.h>
+#include "TileSettings.hpp"
 #include "IconTile.hpp"
 #include "IconGroup.hpp"
 #include "../nShared/LSModule.hpp"
@@ -17,7 +18,12 @@
 #include "../Utilities/Math.h"
 
 
-IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder, int width, int height) : Drawable(parent, L"Icon") {
+IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder, int width, int height, TileSettings &tileSettings)
+    : Drawable(parent, L"Icon")
+    , mTileSettings(tileSettings)
+    , mMouseOver(false)
+    , mGhosted(false)
+{
     WCHAR name[MAX_PATH];
 
     mPositionID = 0;
@@ -25,49 +31,13 @@ IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFo
     mItem = (PITEMID_CHILD)malloc(item->mkid.cb + 2);
     memcpy(mItem, item, item->mkid.cb + 2);
 
-    mIconSize = mSettings->GetInt(L"Size", 48);
-    mGhostOpacity = mSettings->GetFloat(L"GhostOpacity", 0.6f);
-    mGhosted = false;
-
-    WindowSettings defaults;
-    defaults.width = width;
-    defaults.height = height;
     GetDisplayName(SHGDN_NORMAL, name, MAX_PATH);
 
-    StateSettings baseStateDefaults;
-    baseStateDefaults.backgroundBrush.color = Color::Create(0x00000000);
-    baseStateDefaults.wordWrapping = DWRITE_WORD_WRAPPING_WRAP;
-    baseStateDefaults.textOffsetTop = (float)mIconSize;
-    baseStateDefaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
-
-    mWindow->Initialize(&defaults, &baseStateDefaults);
+    mWindow->Initialize(mTileSettings.mTileWindowSettings, &mTileSettings.mTileStateRender);
     mWindow->SetText(name);
-
-    SetIcon();
-
     mWindow->Resize(width, height);
 
-    //mWindow->SizeToText(64, 300, 64);
-
-    StateSettings hoverDefaults(baseStateDefaults);
-    hoverDefaults.backgroundBrush.color = Color::Create(0xAA87CEEB);
-    hoverDefaults.outlineBrush.color = Color::Create(0x99FFFFFF);
-    hoverDefaults.outlineWidth = 1.5f;
-    mHoverState = mWindow->AddState(L"Hover", 100, &hoverDefaults);
-
-    StateSettings selectedDefaults(hoverDefaults);
-    selectedDefaults.backgroundBrush.color = Color::Create(0xCC87CEEB);
-    selectedDefaults.outlineBrush.color = Color::Create(0xCCFFFFFF);
-    selectedDefaults.outlineWidth = 1.5f;
-    mSelectedState = mWindow->AddState(L"Selected", 150, &selectedDefaults);
-
-    StateSettings focusedDefaults(hoverDefaults);
-    focusedDefaults.backgroundBrush.color = Color::Create(0xAA87CEEB);
-    focusedDefaults.outlineBrush.color = Color::Create(0x99FFFFFF);
-    focusedDefaults.outlineWidth = 1.5f;
-    mFocusedState = mWindow->AddState(L"Focused", 200, &focusedDefaults);
-    
-    mMouseOver = false;
+    SetIcon();
 
     mWindow->Show();
 }
@@ -92,7 +62,7 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
             if (!mMouseOver)
             {
                 mMouseOver = true;
-                mWindow->ActivateState(mHoverState);
+                mTileSettings.mTileStateRender.ActivateState(State::Hover, mWindow);
             }
         }
         return 0;
@@ -100,7 +70,7 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
     case WM_MOUSELEAVE:
         {
             mMouseOver = false;
-            mWindow->ClearState(mHoverState);
+            mTileSettings.mTileStateRender.ClearState(State::Hover, mWindow);
         }
         return 0;
 
@@ -114,22 +84,25 @@ LRESULT WINAPI IconTile::HandleMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM
 
     case WM_LBUTTONDOWN:
         {
-            if (GetKeyState(VK_CONTROL) >= 0) {
+            if (GetKeyState(VK_CONTROL) >= 0)
+            {
                 ((IconGroup*)mParent)->DeselectAll();
-                mWindow->ActivateState(mSelectedState);
+                mTileSettings.mTileStateRender.ActivateState(State::Selected, mWindow);
             }
-            else {
-                mWindow->ToggleState(mSelectedState);
+            else
+            {
+                mTileSettings.mTileStateRender.ToggleState(State::Selected, mWindow);
             }
         }
         return 0;
 
     case WM_RBUTTONDOWN:
         {
-            if (GetKeyState(VK_CONTROL) >= 0 && !IsSelected()) {
+            if (GetKeyState(VK_CONTROL) >= 0 && !IsSelected())
+            {
                 ((IconGroup*)mParent)->DeselectAll();
             }
-            mWindow->ActivateState(mSelectedState);
+            mTileSettings.mTileStateRender.ActivateState(State::Selected, mWindow);
             ((IconGroup*)mParent)->ContextMenu();
         }
         return 0;
@@ -145,23 +118,27 @@ PCITEMID_CHILD IconTile::GetItem() {
 }
 
 
-bool IconTile::IsInRect(D2D1_RECT_F rect) {
+bool IconTile::IsInRect(D2D1_RECT_F rect)
+{
     return Math::RectIntersectArea(rect, mWindow->GetDrawingRect()) > 0;
 }
 
 
-void IconTile::Select(bool repaint) {
-    mWindow->ActivateState(mSelectedState, repaint);
+void IconTile::Select(bool repaint)
+{
+    mTileSettings.mTileStateRender.ActivateState(State::Selected, mWindow);
 }
 
 
-void IconTile::Deselect(bool repaint) {
-    mWindow->ClearState(mSelectedState, repaint);
+void IconTile::Deselect(bool repaint)
+{
+    mTileSettings.mTileStateRender.ClearState(State::Selected, mWindow);
 }
 
 
-bool IconTile::IsSelected() {
-    return mSelectedState->active;
+bool IconTile::IsSelected()
+{
+    return mTileSettings.mTileStateRender.IsStateActive(State::Selected, mWindow);
 }
 
 
@@ -221,7 +198,7 @@ bool IconTile::IsGhosted() {
 /// Enabled ghots mode -- i.e. when the tile is "cut"
 /// </summary>
 void IconTile::SetGhost() {
-    mIconOverlay->GetBrush()->SetOpacity(mGhostOpacity);
+    mIconOverlay->GetBrush()->SetOpacity(mTileSettings.mGhostOpacity);
     mGhosted = true;
 }
 
@@ -252,9 +229,9 @@ void IconTile::SetIcon() {
     WindowSettings *drawingSettings = mWindow->GetDrawingSettings();
 
     pos.top = 0;
-    pos.bottom = pos.top + mIconSize;
-    pos.left = (drawingSettings->width - (float)mIconSize)/2;
-    pos.right = pos.left + mIconSize;
+    pos.bottom = pos.top + mTileSettings.mIconSize;
+    pos.left = (drawingSettings->width - (float)mTileSettings.mIconSize)/2;
+    pos.right = pos.left + mTileSettings.mIconSize;
 
     // First, lets try IThumbnailProvider
     hr = mShellFolder->GetUIObjectOf(nullptr, 1, (LPCITEMIDLIST *)&mItem, IID_IThumbnailProvider, nullptr, reinterpret_cast<LPVOID*>(&thumbnailProvider));
@@ -262,7 +239,7 @@ void IconTile::SetIcon() {
         HBITMAP hBMP = nullptr;
         WTS_ALPHATYPE alphaType;
 
-        hr = thumbnailProvider->GetThumbnail(mIconSize, &hBMP, &alphaType);
+        hr = thumbnailProvider->GetThumbnail(mTileSettings.mIconSize, &hBMP, &alphaType);
 
         if (SUCCEEDED(hr)) {
             BITMAP bmp;
@@ -271,14 +248,14 @@ void IconTile::SetIcon() {
             if (bmp.bmWidth > bmp.bmHeight) {
                 float scale = float(bmp.bmHeight) / float(bmp.bmWidth);
 
-                pos.top = mIconSize*(1 - scale)/2;
-                pos.bottom = mIconSize*(1 + scale)/2;
+                pos.top = mTileSettings.mIconSize*(1 - scale)/2;
+                pos.bottom = mTileSettings.mIconSize*(1 + scale)/2;
             }
             else if (bmp.bmWidth < bmp.bmHeight) {
                 float scale = float(bmp.bmWidth) / float(bmp.bmHeight);
 
-                pos.left = mIconSize*(1 - scale)/2;
-                pos.right = mIconSize*(1 + scale)/2;
+                pos.left = mTileSettings.mIconSize*(1 - scale)/2;
+                pos.right = mTileSettings.mIconSize*(1 + scale)/2;
             }
 
             mIconOverlay = mWindow->AddOverlay(pos, hBMP);
@@ -295,7 +272,7 @@ void IconTile::SetIcon() {
         if (SUCCEEDED(hr)) {
             HBITMAP hBMP = nullptr;
             WCHAR location[MAX_PATH];
-            SIZE size = { mIconSize, mIconSize };
+            SIZE size = { mTileSettings.mIconSize, mTileSettings.mIconSize };
             DWORD flags = 0;
 
             hr = extractImage->GetLocation(location, _countof(location), nullptr, &size, 0, &flags);
@@ -326,13 +303,13 @@ void IconTile::SetIcon() {
         if (SUCCEEDED(hr)) {
             if (wcscmp(iconFile, L"*") == 0) { // * always leads to bogus icons (32x32) :/
                 IImageList *imageList;
-                SHGetImageList(mIconSize > 48 ? SHIL_JUMBO : (mIconSize > 32 ? SHIL_EXTRALARGE : (mIconSize > 16 ? SHIL_LARGE : SHIL_SMALL)),
+                SHGetImageList(mTileSettings.mIconSize > 48 ? SHIL_JUMBO : (mTileSettings.mIconSize > 32 ? SHIL_EXTRALARGE : (mTileSettings.mIconSize > 16 ? SHIL_LARGE : SHIL_SMALL)),
                     IID_IImageList, reinterpret_cast<LPVOID*>(&imageList));
                 hr = imageList->GetIcon(iconIndex, ILD_TRANSPARENT, &icon);
                 SAFERELEASE(imageList);
             }
             else {
-                hr = extractIcon->Extract(iconFile, iconIndex, &icon, nullptr, MAKELONG(mIconSize, 0));
+                hr = extractIcon->Extract(iconFile, iconIndex, &icon, nullptr, MAKELONG(mTileSettings.mIconSize, 0));
             }
         }
 

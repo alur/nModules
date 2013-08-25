@@ -53,7 +53,8 @@ struct DoubleNullStrCollection {
 /// <summary>
 /// Constructor
 /// </summary>
-IconGroup::IconGroup(LPCTSTR prefix) : Drawable(prefix) {
+IconGroup::IconGroup(LPCTSTR prefix) : Drawable(prefix)
+{
     // Initalize all variables.
     this->mChangeNotifyUID = 0;
 
@@ -62,19 +63,21 @@ IconGroup::IconGroup(LPCTSTR prefix) : Drawable(prefix) {
 
     LoadSettings();
 
-    WindowSettings defaults;
+    WindowSettings defaults, windowSettings;
     defaults.width = 500;
     defaults.height = 300;
     defaults.registerWithCore = true;
+    windowSettings.Load(mSettings, &defaults);
 
-    StateSettings defaultState;
-    defaultState.backgroundBrush.color = Color::Create(0x00000000);
+    StateRender<State>::InitData initData;
+    initData[State::Base].defaults.backgroundBrush.color = Color::Create(0x00000000);
+    mStateRender.Load(initData, mSettings);
 
     mSelectionRectagle.Init(mSettings);
 
     mNextPositionID = 0;
 
-    mWindow->Initialize(&defaults, &defaultState);
+    mWindow->Initialize(windowSettings, &mStateRender);
     //mWindow->AddDropRegion();
     mWindow->AddPostPainter(&mSelectionRectagle);
     // TODO::Add the selection rectangle as a brush owner
@@ -117,6 +120,7 @@ void IconGroup::LoadSettings() {
     // Icon settings
     Settings *iconSettings = mSettings->CreateChild(_T("Icon"));
     int iconSize = iconSettings->GetInt(_T("Size"), 48);
+    mTileSettings.Load(iconSettings);
     delete iconSettings;
 
     // Tile settings
@@ -263,7 +267,7 @@ void IconGroup::AddIcon(PCITEMID_CHILD pidl) {
     int iconPosition = GetIconPosition(pidl);
     RECT pos = mLayoutSettings.RectFromID(iconPosition, mTileWidth, mTileHeight, mWindow->GetDrawingSettings()->width, mWindow->GetDrawingSettings()->height);
 
-    IconTile *icon = new IconTile(this, pidl, mWorkingFolder, mTileWidth, mTileHeight);
+    IconTile *icon = new IconTile(this, pidl, mWorkingFolder, mTileWidth, mTileHeight, mTileSettings);
     icon->SetPosition(iconPosition, (int)pos.left, (int)pos.top);
     mIcons.push_back(icon);
 }

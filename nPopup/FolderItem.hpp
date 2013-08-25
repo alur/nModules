@@ -8,17 +8,33 @@
 #pragma once
 
 #include "PopupItem.hpp"
-#include "Popup.hpp"
+//#include "Popup.hpp"
+
+class Popup;
 
 namespace nPopup
 {
     class FolderItem : public PopupItem
     {
     public:
+        enum class State
+        {
+            Base = 0,
+            Open,
+            Hover,
+            Count
+        };
+
+    public:
         explicit FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, LPCTSTR customIcon = nullptr);
         explicit FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, HICON customIcon);
+        explicit FolderItem(Drawable* parent, LPCTSTR title, std::function<Popup*(LPVOID)> popupCreator, LPVOID creationData);
         virtual ~FolderItem();
 
+    private:
+        explicit FolderItem(Drawable* parent, Popup* popup, LPCTSTR title);
+
+    public:
         LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
         void ClosingPopup();
@@ -26,12 +42,9 @@ namespace nPopup
         Popup* GetPopup();
 
     private:
-        void Init(LPCTSTR title, Popup* popup);
-
-        Popup* popup;
-        LPCTSTR title;
-
-        Window::STATE hoverState;
-        Window::STATE openState;
+        Popup *mPopup;
+        LPCTSTR mTitle;
+        std::function<Popup*(LPVOID)> mPopupCreator;
+        LPVOID mCreationData;
     };
 }

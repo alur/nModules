@@ -12,12 +12,20 @@
 #include "../External/taglib/mpeg/id3v2/frames/attachedpictureframe.h"
 #include <list>
 #include "../Utilities/EnumArray.hpp"
+#include "../nShared/StateRender.hpp"
 
 using std::wstring;
 using std::list;
 
 class CoverArt : public Drawable
 {
+private:
+    enum class States
+    {
+        Base = 0,
+        Count
+    };
+
 public:
     explicit CoverArt(LPCTSTR name);
     virtual ~CoverArt();
@@ -41,6 +49,9 @@ private:
 private:
     //
     Window::OVERLAY mCoverArt;
+
+    //
+    StateRender<States> mStateRender;
 
     // Path to the default cover art.
     WCHAR mDefaultCoverArt[MAX_PATH];

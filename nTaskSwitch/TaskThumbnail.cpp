@@ -6,6 +6,7 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../Utilities/Common.h"
+#include "ThumbnailSettings.hpp"
 #include "TaskThumbnail.hpp"
 #include "../nShared/LSModule.hpp"
 #include <strsafe.h>
@@ -21,35 +22,41 @@ static UINT (*DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT
 extern LSModule gLSModule;
 
 
-TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, int width, int height) : Drawable(parent, L"Task") {
-    if (DwmpActivateLivePreview == nullptr) {
+TaskThumbnail::TaskThumbnail(
+    Drawable* parent,
+    HWND targetWindow,
+    int x,
+    int y,
+    int width,
+    int height,
+    ThumbnailSettings& thumbnailSettings
+)
+    : Drawable(parent, L"Task")
+    , mThumbnailSettings(thumbnailSettings)
+    , mTargetWindow(targetWindow)
+{
+    if (DwmpActivateLivePreview == nullptr)
+    {
         DwmpActivateLivePreview = (UINT (*)(UINT, HWND, HWND, UINT))GetProcAddress(GetModuleHandleW(L"DWMAPI.DLL"), (LPCSTR)0x71);
     }
-    if (desktopWindow == nullptr) {
+    if (desktopWindow == nullptr)
+    {
         desktopWindow = FindWindowW(L"DesktopBackgroundClass", nullptr);
     }
 
-    WindowSettings defaults;
-    defaults.x = x;
-    defaults.y = y;
-    defaults.width = width;
-    defaults.height = height;
-
-    StateSettings stateDefaults;
-    stateDefaults.backgroundBrush.color = Color::Create(0x00000000);
-
-    mWindow->Initialize(&defaults, &stateDefaults);
+    mWindow->Initialize(mThumbnailSettings.mWindowSettings, &mThumbnailSettings.mStateRender);
+    mWindow->SetPosition(x, y, width, height);
     mWindow->Show();
 
-    this->targetWindow = targetWindow;
-    DwmRegisterThumbnail(mWindow->GetWindowHandle(), targetWindow, &this->thumbnail);
+    DwmRegisterThumbnail(mWindow->GetWindowHandle(), targetWindow, &mThumbnail);
     
     // 
     DWM_THUMBNAIL_PROPERTIES properties;
     properties.dwFlags = DWM_TNP_SOURCECLIENTAREAONLY;
     properties.fSourceClientAreaOnly = FALSE;
     
-    if (targetWindow == desktopWindow) {
+    if (targetWindow == desktopWindow)
+    {
         properties.dwFlags |= DWM_TNP_RECTSOURCE;
         MonitorInfo* monInfo = mWindow->GetMonitorInformation();
         properties.rcSource = monInfo->m_monitors[0].rect;
@@ -59,69 +66,52 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
         properties.rcSource.right -= monInfo->m_virtualDesktop.rect.left;
     }
     
-    DwmUpdateThumbnailProperties(this->thumbnail, &properties);
+    DwmUpdateThumbnailProperties(mThumbnail, &properties);
 
     //
     SIZE sourceSize;
-    if (targetWindow == desktopWindow) {
+    if (targetWindow == desktopWindow)
+    {
         MonitorInfo* monInfo = mWindow->GetMonitorInformation();
         sourceSize.cx = monInfo->m_monitors[0].width;
         sourceSize.cy = monInfo->m_monitors[0].height;
     }
-    else {
-        DwmQueryThumbnailSourceSize(this->thumbnail, &sourceSize);
+    else
+    {
+        DwmQueryThumbnailSourceSize(mThumbnail, &sourceSize);
     }
-    this->thumbnailMargins = mSettings->GetOffsetRect(L"Margin", 10, 10, 10, 10);
 
+    //
     double scale = Math::min(
-        (width - this->thumbnailMargins.left - this->thumbnailMargins.right)/(double)sourceSize.cx,
-        (height - this->thumbnailMargins.bottom - this->thumbnailMargins.top)/(double)sourceSize.cy);
+        (width - mThumbnailSettings.mThumbnailMargins.left - mThumbnailSettings.mThumbnailMargins.right)/(double)sourceSize.cx,
+        (height - mThumbnailSettings.mThumbnailMargins.bottom - mThumbnailSettings.mThumbnailMargins.top)/(double)sourceSize.cy);
     sourceSize.cx = long(sourceSize.cx*scale);
     sourceSize.cy = long(sourceSize.cy*scale);
 
-    int horizontalOffset = (width - this->thumbnailMargins.left - this->thumbnailMargins.right - sourceSize.cx)/2;
-    int verticalOffset = (height - this->thumbnailMargins.top - this->thumbnailMargins.bottom - sourceSize.cy)/2;
+    int horizontalOffset = (width - mThumbnailSettings.mThumbnailMargins.left - mThumbnailSettings.mThumbnailMargins.right - sourceSize.cx)/2;
+    int verticalOffset = (height - mThumbnailSettings.mThumbnailMargins.top - mThumbnailSettings.mThumbnailMargins.bottom - sourceSize.cy)/2;
 
     properties.dwFlags = DWM_TNP_VISIBLE | DWM_TNP_RECTDESTINATION;
     properties.fVisible = TRUE;
-    properties.rcDestination.bottom = y + height - this->thumbnailMargins.bottom - verticalOffset;
-    properties.rcDestination.top = y + this->thumbnailMargins.top + verticalOffset;
-    properties.rcDestination.left = x + this->thumbnailMargins.left + horizontalOffset;
-    properties.rcDestination.right = x + width - this->thumbnailMargins.right - horizontalOffset;
+    properties.rcDestination.bottom = y + height - mThumbnailSettings.mThumbnailMargins.bottom - verticalOffset;
+    properties.rcDestination.top = y + mThumbnailSettings.mThumbnailMargins.top + verticalOffset;
+    properties.rcDestination.left = x + mThumbnailSettings.mThumbnailMargins.left + horizontalOffset;
+    properties.rcDestination.right = x + width - mThumbnailSettings.mThumbnailMargins.right - horizontalOffset;
 
-    DwmUpdateThumbnailProperties(this->thumbnail, &properties);
-
-    //
-    StateSettings hoverDefaults(stateDefaults);
-    hoverDefaults.backgroundBrush.color = Color::Create(0xCC888888);
-    this->stateHover = mWindow->AddState(L"Hover", 100, &hoverDefaults);
-
-    //
-    StateSettings selectedDefaults(stateDefaults);
-    selectedDefaults.outlineBrush.color = Color::Create(0xFFFFFFFF);
-    selectedDefaults.outlineWidth = 2.5f;
-    this->stateSelected = mWindow->AddState(L"Selected", 150, &selectedDefaults);
-
-    //
-    StateSettings selectedHoverDefaults(hoverDefaults);
-    selectedHoverDefaults.outlineBrush.color = Color::Create(0xFFFFFFFF);
-    selectedHoverDefaults.outlineWidth = 2.5f;
-    this->stateSelectedHover = mWindow->AddState(L"SelectedHover", 200, &selectedHoverDefaults);
+    DwmUpdateThumbnailProperties(mThumbnail, &properties);
 
     //
     this->iconOverlayWindow = gLSModule.CreateDrawableWindow(mSettings, this);
 
-    WindowSettings iconDefaults;
-    iconDefaults.alwaysOnTop = true;
-
-    StateSettings iconStateDefaults;
-    iconStateDefaults.backgroundBrush.color = Color::Create(0x00000000);
+    StateRender<IconState>::InitData iconInitData;
+    iconInitData[IconState::Base].defaults.backgroundBrush.color = Color::Create(0x00000000);
+    mIconStateRender.Load(iconInitData, mSettings);
     
     RECT r;
     mWindow->GetScreenRect(&r);
-    this->iconOverlayWindow->Initialize(&iconDefaults, &iconStateDefaults);
-    this->iconOverlayWindow->SetPosition(r.right - 32 - horizontalOffset - this->thumbnailMargins.right + 4,
-        r.bottom - 32 - verticalOffset - this->thumbnailMargins.bottom + 4, 32, 32);
+    this->iconOverlayWindow->Initialize(mThumbnailSettings.mIconWindowSettings, &mIconStateRender);
+    this->iconOverlayWindow->SetPosition(r.right - 32 - horizontalOffset - mThumbnailSettings.mThumbnailMargins.right + 4,
+        r.bottom - 32 - verticalOffset - mThumbnailSettings.mThumbnailMargins.bottom + 4, 32, 32);
 
     SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
     SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
@@ -130,7 +120,20 @@ TaskThumbnail::TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, 
 }
 
 
-void TaskThumbnail::UpdateIconPosition() {
+void TaskThumbnail::ActivateState(State state)
+{
+    mThumbnailSettings.mStateRender.ActivateState(state, mWindow);
+}
+
+
+void TaskThumbnail::ClearState(State state)
+{
+    mThumbnailSettings.mStateRender.ClearState(state, mWindow);
+}
+
+
+void TaskThumbnail::UpdateIconPosition()
+{
     RECT r;
     mWindow->GetScreenRect(&r);
     this->iconOverlayWindow->SetPosition(r.right - 32, r.bottom - 32, 32, 32);
@@ -140,64 +143,65 @@ void TaskThumbnail::UpdateIconPosition() {
 }
 
 
-TaskThumbnail::~TaskThumbnail() {
+TaskThumbnail::~TaskThumbnail()
+{
     delete this->iconOverlayWindow;
-    DwmUnregisterThumbnail(this->thumbnail);
+    DwmUnregisterThumbnail(mThumbnail);
 }
 
 
-void TaskThumbnail::Activate() {
-    if (this->targetWindow == desktopWindow) {
+void TaskThumbnail::Activate()
+{
+    if (mTargetWindow == desktopWindow)
+    {
         LiteStep::LSExecute(nullptr, L"!MinimizeWindows", SW_NORMAL);
     }
-    else {
+    else
+    {
         WINDOWPLACEMENT wp;
 
         // Work out the window RECT
         ZeroMemory(&wp, sizeof(WINDOWPLACEMENT));
-        GetWindowPlacement(this->targetWindow, &wp);
-        if (wp.showCmd == SW_SHOWMINIMIZED) {
-            ShowWindow(this->targetWindow, SW_SHOWNORMAL);
+        GetWindowPlacement(mTargetWindow, &wp);
+        if (wp.showCmd == SW_SHOWMINIMIZED)
+        {
+            ShowWindow(mTargetWindow, SW_SHOWNORMAL);
         }
 
-        SetActiveWindow(this->targetWindow);
-        SetForegroundWindow(this->targetWindow);
+        SetActiveWindow(mTargetWindow);
+        SetForegroundWindow(mTargetWindow);
     }
 }
 
 
-void TaskThumbnail::Select() {
-    if (this->stateHover->active) {
-        mWindow->ActivateState(this->stateSelectedHover);
-    }
-    mWindow->ActivateState(this->stateSelected);
+void TaskThumbnail::Select()
+{
+    ActivateState(State::Selected);
 }
 
 
-void TaskThumbnail::Deselect() {
-    mWindow->ClearState(this->stateSelected);
-    mWindow->ClearState(this->stateSelectedHover);
+void TaskThumbnail::Deselect()
+{
+    ClearState(State::Selected);
 }
 
 
-LRESULT WINAPI TaskThumbnail::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID extra) {
+LRESULT WINAPI TaskThumbnail::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID extra)
+{
     UNREFERENCED_PARAMETER(extra);
 
-    switch (message) {
+    switch (message)
+    {
     case WM_MOUSEMOVE:
         {
-            if (this->stateSelected->active) {
-                mWindow->ActivateState(this->stateSelectedHover);
-            }
-            mWindow->ActivateState(this->stateHover);
+            ActivateState(State::Hover);
             ((TaskSwitcher*)mParent)->HoveringOverTask(this);
         }
         return 0;
 
     case WM_MOUSELEAVE:
         {
-            mWindow->ClearState(this->stateHover);
-            mWindow->ClearState(this->stateSelectedHover);
+            ClearState(State::Hover);
         }
         return 0;
 
@@ -212,7 +216,8 @@ LRESULT WINAPI TaskThumbnail::HandleMessage(HWND window, UINT message, WPARAM wP
 }
 
 
-void TaskThumbnail::SetIcon(HICON icon) {
+void TaskThumbnail::SetIcon(HICON icon)
+{
     D2D1_RECT_F pos;
     pos.right = 32;
     pos.bottom = 32;
@@ -227,15 +232,19 @@ void TaskThumbnail::SetIcon(HICON icon) {
 /// <summary>
 /// Updates the icon
 /// </summary>
-void TaskThumbnail::UpdateIcon() {
-    if (this->targetWindow != desktopWindow) {
+void TaskThumbnail::UpdateIcon()
+{
+    if (mTargetWindow != desktopWindow)
+    {
         this->requestedIcon = ICON_BIG;
-        SendMessageCallbackW(this->targetWindow, WM_GETICON, ICON_BIG, NULL, UpdateIconCallback, (ULONG_PTR)this);
+        SendMessageCallbackW(mTargetWindow, WM_GETICON, ICON_BIG, NULL, UpdateIconCallback, (ULONG_PTR)this);
     }
-    else {
+    else
+    {
         HICON icon = ExtractIconW(gLSModule.GetInstance(), L"shell32.dll", 34);
 
-        if (icon) {
+        if (icon)
+        {
             SetIcon(icon);
             DestroyIcon(icon);
         }
@@ -246,16 +255,20 @@ void TaskThumbnail::UpdateIcon() {
 /// <summary>
 /// Updates the icon
 /// </summary>
-void CALLBACK TaskThumbnail::UpdateIconCallback(HWND hWnd, UINT uMsg, ULONG_PTR dwData, LRESULT lResult) {
+void CALLBACK TaskThumbnail::UpdateIconCallback(HWND hWnd, UINT uMsg, ULONG_PTR dwData, LRESULT lResult)
+{
     // We really only expect WM_GETICON messages.
-    if (uMsg == WM_GETICON) {
+    if (uMsg == WM_GETICON)
+    {
         TaskThumbnail* taskThumbnail = (TaskThumbnail*)dwData;
 
         // If we got an icon back, use it.
-        if (lResult != 0) {
+        if (lResult != 0)
+        {
             taskThumbnail->SetIcon((HICON)lResult);
         }
-        else switch (taskThumbnail->requestedIcon) {
+        else switch (taskThumbnail->requestedIcon)
+        {
         case ICON_BIG:
             {
                 taskThumbnail->requestedIcon = ICON_SMALL;

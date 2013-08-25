@@ -117,7 +117,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)/xm;$(ProjectDir)/it;$(ProjectDir)/s3m;$(ProjectDir)/mod;$(ProjectDir)/riff/wav;$(ProjectDir)/riff/aiff;$(ProjectDir)/riff;$(ProjectDir)/trueaudio;$(ProjectDir)/wavpack;$(ProjectDir)/ape;$(ProjectDir)/mpeg/id3v1;$(ProjectDir)/mpeg/id3v2/frames;$(ProjectDir)/mpeg/id3v2;$(ProjectDir)/ogg/speex;$(ProjectDir)/ogg/vobris;$(ProjectDir)/mp4;$(ProjectDir)/mpc;$(ProjectDir)/flac;$(ProjectDir)/ogg/flac;$(ProjectDir)/ogg;$(ProjectDir)/mpeg;$(ProjectDir)/asf;$(ProjectDir)/toolkit;$(ProjectDir)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TAGLIB_STATIC;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;TAGLIB_STATIC;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
@@ -138,7 +138,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)/xm;$(ProjectDir)/it;$(ProjectDir)/s3m;$(ProjectDir)/mod;$(ProjectDir)/riff/wav;$(ProjectDir)/riff/aiff;$(ProjectDir)/riff;$(ProjectDir)/trueaudio;$(ProjectDir)/wavpack;$(ProjectDir)/ape;$(ProjectDir)/mpeg/id3v1;$(ProjectDir)/mpeg/id3v2/frames;$(ProjectDir)/mpeg/id3v2;$(ProjectDir)/ogg/speex;$(ProjectDir)/ogg/vobris;$(ProjectDir)/mp4;$(ProjectDir)/mpc;$(ProjectDir)/flac;$(ProjectDir)/ogg/flac;$(ProjectDir)/ogg;$(ProjectDir)/mpeg;$(ProjectDir)/asf;$(ProjectDir)/toolkit;$(ProjectDir)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TAGLIB_STATIC;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;TAGLIB_STATIC;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>

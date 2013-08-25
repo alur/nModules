@@ -13,19 +13,22 @@
 #include "../Utilities/Math.h"
 
 
-ContainerItem::ContainerItem(Drawable* parent, LPCTSTR prefix) : PopupItem(parent, prefix, true) {
-    this->itemType = PopupItemType::CONTAINER;
-
-    WindowSettings defaults;
+ContainerItem::ContainerItem(Drawable* parent, LPCTSTR prefix)
+    : PopupItem(parent, prefix, PopupItem::Type::Container, true)
+{
+    WindowSettings defaults, windowSettings;
     defaults.registerWithCore = true;
+    windowSettings.Load(mSettings, &defaults);
 
-    StateSettings defaultState;
-    defaultState.backgroundBrush.color = Color::Create(0xAAFFFFFF);
-    defaultState.textBrush.color = Color::Create(0xFF000000);
+    StateRender<State>::InitData initData;
+    for (auto &stateInitData : initData)
+    {
+        stateInitData.defaults.backgroundBrush.color = Color::Create(0xAAFFFFFF);
+        stateInitData.defaults.textBrush.color = Color::Create(0xFF000000);
+    }
+    mStateRender.Load(initData, mSettings);
 
-    mWindow->Initialize(&defaults, &defaultState);
-
-    this->hoverState = mWindow->AddState(L"Hover", 100, &defaultState);
+    mWindow->Initialize(windowSettings, &mStateRender);
 
     mWindow->Show();
 }
@@ -44,16 +47,14 @@ LRESULT ContainerItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
     switch (msg) {
     case WM_MOUSEMOVE:
         {
-            if (!this->hoverState->active) {
-                mWindow->ActivateState(this->hoverState);
-                ((Popup*)mParent)->CloseChild();
-            }
+            mStateRender.ActivateState(State::Hover, mWindow);
+            ((Popup*)mParent)->CloseChild();
         }
         return 0;
 
     case WM_MOUSELEAVE:
         {
-            mWindow->ClearState(this->hoverState);
+            mStateRender.ClearState(State::Hover, mWindow);
         }
         return 0;
     }

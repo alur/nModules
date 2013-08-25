@@ -8,6 +8,7 @@
 #pragma once
 
 #include <map>
+#include "ButtonSettings.hpp"
 #include "TaskButton.hpp"
 #include "../nShared/Window.hpp"
 #include "../nShared/MessageHandler.hpp"
@@ -32,6 +33,12 @@ public:
 private:
     typedef std::list<TaskButton*> ButtonList;
     typedef std::map<HWND, ButtonList::const_iterator> ButtonMap;
+
+    enum class States
+    {
+        Base = 0,
+        Count
+    };
 
     // Constructors and destructors
 public:
@@ -65,6 +72,7 @@ private:
     LayoutSettings mLayoutSettings;
 
     // The taskbar buttons
+    ButtonSettings mButtonSettings;
     ButtonMap mButtonMap;
     ButtonList mButtonList;
 
@@ -73,6 +81,9 @@ private:
     int mButtonMaxHeight;
     int mButtonWidth;
     int mButtonHeight;
+
+    //
+    StateRender<States> mStateRender;
 
     // The monitor to display tasks for
     UINT mMonitor;

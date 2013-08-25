@@ -9,56 +9,51 @@
 #include <strsafe.h>
 #include "FolderItem.hpp"
 #include "../nShared/LSModule.hpp"
+#include "Popup.hpp"
 
 
-nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, LPCTSTR customIcon) : PopupItem(parent, L"FolderItem")
+nPopup::FolderItem::FolderItem(Drawable* parent, Popup* popup, LPCTSTR title)
+    : PopupItem(parent, L"FolderItem", PopupItem::Type::Folder)
+    , mPopup(popup)
+    , mPopupCreator(nullptr)
+    , mCreationData(nullptr)
+    , mTitle(_tcsdup(title))
 {
-    Init(title, popup);
+    mWindow->Initialize(((Popup*)mParent)->mPopupSettings.mFolderWindowSettings, &((Popup*)mParent)->mPopupSettings.mFolderStateRender);
+    mWindow->SetText(title);
+}
+
+
+nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, LPCTSTR customIcon)
+    : FolderItem(parent, popup, title)
+{
     ParseDotIcon(customIcon);
     mWindow->Show();
 }
 
 
-nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, HICON icon) : PopupItem(parent, L"FolderItem")
+nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, HICON icon)
+    : FolderItem(parent, popup, title)
 {
-    Init(title, popup);
     AddIcon(icon);
     mWindow->Show();
 }
 
 
-void nPopup::FolderItem::Init(LPCTSTR title, Popup* popup)
+nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, std::function<Popup*(LPVOID)> popupCreator, LPVOID creationData)
+    : FolderItem(parent, nullptr, title)
 {
-    this->title = _tcsdup(title);
-    this->popup = popup;
-    this->itemType = PopupItemType::FOLDER;
-
-    WindowSettings defaults;
-    defaults.width = 190;
-    defaults.height = 20;
-
-    StateSettings defaultState;
-    defaultState.backgroundBrush.color = Color::Create(0xAA00FFFF);
-    defaultState.textBrush.color = Color::Create(0xFF000000);
-    defaultState.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
-    defaultState.textOffsetLeft = 20;
-    defaultState.textOffsetRight = 5;
-
-    mWindow->Initialize(&defaults, &defaultState);
-    mWindow->SetText(title);
-
-    this->hoverState = mWindow->AddState(L"Hover", 100, &defaultState);
-    this->openState = mWindow->AddState(L"Open", 80, &defaultState);
+    mPopupCreator = popupCreator;
+    mCreationData = creationData;
+    mWindow->Show();
 }
 
 
 nPopup::FolderItem::~FolderItem()
 {
-    if (this->popup != NULL)
-    {
-        delete this->popup;
-    }
-    free((LPVOID)this->title);
+    delete mPopup;
+    delete mCreationData;
+    free((LPVOID)mTitle);
 }
 
 
@@ -76,20 +71,20 @@ LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, 
     {
     case WM_MOUSEMOVE:
         {
-            mWindow->ActivateState(this->hoverState);
-            if (this->popup != NULL)
+            ((Popup*)mParent)->mPopupSettings.mFolderStateRender.ActivateState(State::Hover, mWindow);
+            if (GetPopup())
             {
                 RECT r;
                 mWindow->GetScreenRect(&r);
-                ((Popup*)mParent)->OpenChild(this->popup, &r, this);
-                mWindow->ActivateState(this->openState);
+                ((Popup*)mParent)->OpenChild(mPopup, &r, this);
+                ((Popup*)mParent)->mPopupSettings.mFolderStateRender.ActivateState(State::Open, mWindow);
             }
         }
         return 0;
 
     case WM_MOUSELEAVE:
         {
-            mWindow->ClearState(this->hoverState);
+            ((Popup*)mParent)->mPopupSettings.mFolderStateRender.ClearState(State::Hover, mWindow);
         }
         return 0;
     }
@@ -102,7 +97,7 @@ LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, 
 /// </summary>
 void nPopup::FolderItem::ClosingPopup()
 {
-    mWindow->ClearState(this->openState);
+    ((Popup*)mParent)->mPopupSettings.mFolderStateRender.ClearState(State::Open, mWindow);
 }
 
 
@@ -111,5 +106,12 @@ void nPopup::FolderItem::ClosingPopup()
 /// </summary>
 Popup* nPopup::FolderItem::GetPopup()
 {
-    return this->popup;
+    if (!mPopup && mPopupCreator)
+    {
+        mPopup = mPopupCreator(mCreationData);
+        delete mCreationData;
+        mCreationData = nullptr;
+        mPopupCreator = nullptr;
+    }
+    return mPopup;
 }

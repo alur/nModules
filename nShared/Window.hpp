@@ -180,6 +180,9 @@ public:
     //
     State *GetState(LPCTSTR stateName);
 
+    //
+    IStateWindowData *GetWindowData();
+
     // Returns the handle to the top-level window in this window stack.
     HWND GetWindowHandle();
 
@@ -334,6 +337,9 @@ protected:
     //
     bool mNeedsUpdate;
 
+    // Settings.
+    Settings* mSettings;
+
 private:
     // The child window the mouse is currently over.
     Window* activeChild;
@@ -439,9 +445,6 @@ private:
 
     // 
     std::map<std::tstring, IBrushOwner*> mBrushOwners;
-
-    // Settings.
-    Settings* mSettings;
 
     // All currently active locks.
     std::set<UpdateLock*> mActiveLocks;

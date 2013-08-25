@@ -16,6 +16,9 @@ class WindowSettings
 public:
     explicit WindowSettings();
     virtual ~WindowSettings();
+    
+    WindowSettings(const WindowSettings &wndSettings);
+    WindowSettings& operator=(const WindowSettings &wndSettings);
 
     // Loads the actual settings.
     void Load(Settings* settings, WindowSettings* defaults);

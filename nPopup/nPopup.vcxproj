@@ -129,6 +129,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <SDLCheck>true</SDLCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PreprocessorDefinitions>NDEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -153,6 +154,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <SDLCheck>true</SDLCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PreprocessorDefinitions>NDEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -167,7 +169,9 @@
     <ClInclude Include="ContentPopup.hpp" />
     <ClInclude Include="FolderItem.hpp" />
     <ClInclude Include="FolderPopup.hpp" />
+    <ClInclude Include="IconCache.hpp" />
     <ClInclude Include="InfoItem.hpp" />
+    <ClInclude Include="PopupSettings.hpp" />
     <ClInclude Include="nPopup.h" />
     <ClInclude Include="Popup.hpp" />
     <ClInclude Include="PopupItem.hpp" />
@@ -181,10 +185,12 @@
     <ClCompile Include="ContentPopup.cpp" />
     <ClCompile Include="FolderItem.cpp" />
     <ClCompile Include="FolderPopup.cpp" />
+    <ClCompile Include="IconCache.cpp" />
     <ClCompile Include="InfoItem.cpp" />
     <ClCompile Include="nPopup.cpp" />
     <ClCompile Include="Popup.cpp" />
     <ClCompile Include="PopupItem.cpp" />
+    <ClCompile Include="PopupSettings.cpp" />
     <ClCompile Include="SeparatorItem.cpp" />
     <ClCompile Include="SuicidalContentPopup.cpp" />
   </ItemGroup>

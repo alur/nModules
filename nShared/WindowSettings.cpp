@@ -33,6 +33,27 @@ WindowSettings::WindowSettings()
 
 
 /// <summary>
+/// Copy constructor
+/// </summary>
+WindowSettings::WindowSettings(const WindowSettings &wndSettings)
+{
+    memcpy(this, &wndSettings, sizeof(wndSettings));
+    this->text = _wcsdup(this->text);
+}
+
+
+/// <summary>
+/// Assignment operator
+/// </summary>
+WindowSettings &WindowSettings::operator=(const WindowSettings &wndSettings)
+{
+    memcpy(this, &wndSettings, sizeof(wndSettings));
+    this->text = _wcsdup(this->text);
+    return *this;
+}
+
+
+/// <summary>
 /// Destructor.
 /// </summary>
 WindowSettings::~WindowSettings()

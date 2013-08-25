@@ -8,12 +8,25 @@
 #pragma once
 
 #include "../nShared/Drawable.hpp"
+#include "../nShared/StateRender.hpp"
 #include "../nShared/Window.hpp"
 
 class TrayIcon : public Drawable
 {
 public:
-    explicit TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings* parentSettings);
+    enum class States
+    {
+        Base = 0,
+        Count
+    };
+
+public:
+    explicit TrayIcon(
+        Drawable* parent,
+        LiteStep::LPLSNOTIFYICONDATA pNID,
+        WindowSettings &wndSettings,
+        StateRender<States> *stateRender
+    );
     virtual ~TrayIcon();
     
     void Reposition(RECT rect);
@@ -37,6 +50,8 @@ private:
     bool showingTip;
 
     bool showTip; // True if we should show the tooltip
+
+    StateRender<States> *mStateRender;
 
     Window::OVERLAY iconOverlay;
 

@@ -15,11 +15,15 @@ Clock::Clock(LPCTSTR clockName) : Drawable(clockName)
 {
     mUse24HourDial = mSettings->GetBool(_T("24HourDial"), false);
 
-    WindowSettings windowDefaults;
+    StateRender<States>::InitData initData;
+    mStateRender.Load(initData, mSettings);
+
+    WindowSettings windowDefaults, windowSettings;
     windowDefaults.evaluateText = true;
     windowDefaults.registerWithCore = true;
+    windowSettings.Load(mSettings, &windowDefaults);
 
-    mWindow->Initialize(&windowDefaults);
+    mWindow->Initialize(windowSettings, &mStateRender);
 
     mSecondHand.Initialize(mSettings, _T("SecondHand"), 60.0f);
     mMinuteHand.Initialize(mSettings, _T("MinuteHand"), 60.0f);

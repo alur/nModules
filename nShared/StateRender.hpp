@@ -9,6 +9,7 @@
 
 #include "IStateRender.hpp"
 #include "State.hpp"
+#include "StateWindowData.hpp"
 #include "../Utilities/EnumArray.hpp"
 #include <list>
 
@@ -17,51 +18,181 @@ class StateRender : public IStateRender
 {
 public:
     EnumArray<State, StateEnum> mStates;
-    std::list<State*> mStateOrder;
+
+    struct StateInitData
+    {
+        StateInitData()
+        {
+            priority = 0;
+            prefix = _T("");
+            base = StateEnum::Base;
+        }
+
+        std::initializer_list<StateEnum> dependencies;
+        StateSettings defaults;
+        int priority;
+        LPCTSTR prefix;
+        StateEnum base;
+    };
+
+    typedef EnumArray<StateInitData, StateEnum> InitData;
+
+private:
+    int mDeviceRefCount;
+    EnumArray<std::list<StateEnum>, StateEnum> mDependentStates;
+    EnumArray<std::list<StateEnum>, StateEnum> mStateDependencies;
 
 public:
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     StateRender()
     {
+        mDeviceRefCount = 0;
     }
 
 public:
     /// <summary>
     /// Activates the specified state.
     /// </summary>
-    void ActivateState(StateEnum state)
+    void ActivateState(StateEnum state, Window *window)
     {
+        StateWindowData<StateEnum> *data;
+        data = decltype(data)(window->GetWindowData());
 
+        if (!data->active[state])
+        {
+            data->active[state] = true;
+
+            for (StateEnum state : mDependentStates[state])
+            {
+                bool shouldActivate = true;
+                for (StateEnum state : mStateDependencies[state])
+                {
+                    if (!data->active[state])
+                    {
+                        shouldActivate = false;
+                        break;
+                    }
+                }
+
+                if (shouldActivate)
+                {
+                    ActivateState(state, window);
+                }
+            }
+
+            if (data->currentState < state)
+            {
+                data->currentState = state;
+                window->Repaint();
+            }
+        }
     }
     
 
     /// <summary>
     /// Clears the specified state.
     /// </summary>
-    void ClearState(StateEnum state)
+    void ClearState(StateEnum state, Window *window)
     {
-         
+        assert(state != StateEnum::Base);
+
+        StateWindowData<StateEnum> *data;
+        data = decltype(data)(window->GetWindowData());
+
+        if (data->active[state])
+        {
+            data->active[state] = false;
+
+            if (state == data->currentState)
+            {
+                for (; !data->active[data->currentState] && data->currentState != StateEnum::Base; EnumDecrement(data->currentState));
+                window->Repaint();
+            }
+            
+            for (StateEnum state : mDependentStates[state])
+            {
+                ClearState(state, window);
+            }
+        }
     }
     
 
     /// <summary>
     /// Toggles the specified state.
     /// </summary>
-    void ToggleState(StateEnum state)
+    void ToggleState(StateEnum state, Window *window)
     {
-        if (mStates[state].active)
+        StateWindowData<StateEnum> *data;
+        data = decltype(data)(window->GetWindowData());
+        if (data->active[state])
         {
-            ClearState(state);
+            ClearState(state, window);
         }
         else
         {
-            ActivateState(state);
+            ActivateState(state, window);
+        }
+    }
+    
+
+    /// <summary>
+    /// Toggles the specified state.
+    /// </summary>
+    bool IsStateActive(StateEnum state, Window *window)
+    {
+        StateWindowData<StateEnum> *data;
+        data = decltype(data)(window->GetWindowData());
+        return data->active[state];
+    }
+
+    
+    /// <summary>
+    /// Toggles the specified state.
+    /// </summary>
+    void Load(InitData &initData, Settings *baseSettings)
+    {
+        for (StateEnum state = StateEnum::Base; state != StateEnum::Count; EnumIncrement(state))
+        {
+            Settings *stateSettings = baseSettings->CreateChild(initData[state].prefix);
+            if (state != StateEnum::Base)
+            {
+                stateSettings->AppendGroup(mStates[StateEnum::Base].settings);
+            }
+            for (StateEnum depState : initData[state].dependencies)
+            {
+                mDependentStates[depState].push_back(state);
+            }
+            mStateDependencies[state] = initData[state].dependencies;
+            mStates[state].Load(&initData[state].defaults, initData[state].prefix, stateSettings);
         }
     }
 
     
-    IStateWindowData *CreateWindowData() override
+    void GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size, Window *window) override
     {
+        mStates[StateEnum::Base].GetDesiredSize(maxWidth, maxHeight, size, window);
+    }
 
+
+    void SetTextOffsets(float left, float top, float right, float bottom) override
+    {
+        for (State &state : mStates)
+        {
+            state.SetTextOffsets(left, top, right, bottom);
+        }
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    IStateWindowData *CreateWindowData(Window * window) override
+    {
+        StateWindowData<StateEnum> *data = new StateWindowData<StateEnum>();
+        data->window = window;
+        return data;
     }
 
     
@@ -69,33 +200,53 @@ public:
     /// Paints the currently active state to the specified render target, using
     /// the specified window data.
     /// </summary>
-    void Paint(ID2D1RenderTarget* renderTarget, IStateWindowData *windowData) const override
+    void Paint(ID2D1RenderTarget* renderTarget, IStateWindowData *windowData) override
     {
+        StateWindowData<StateEnum> *data;
+        data = decltype(data)(windowData);
 
+        mStates[data->currentState].Paint(renderTarget, &data->data[data->currentState], data->window);
     }
 
     
     /// <summary>
     /// Updates the window data based on the given window position.
     /// </summary>
-    void UpdatePosition(D2D1_RECT_F parentPosition, IStateWindowData *windowData) const override
+    void UpdatePosition(D2D1_RECT_F parentPosition, IStateWindowData *windowData) override
     {
-
+        StateWindowData<StateEnum> *data;
+        data = decltype(data)(windowData);
+        
+        for (StateEnum state = StateEnum::Base; state != StateEnum::Count; EnumIncrement(state))
+        {
+            mStates[state].UpdatePosition(parentPosition, &data->data[state]);
+        }
     }
 
 
     void DiscardDeviceResources() override
     {
-
+        if (--mDeviceRefCount == 0)
+        {
+            for (State &state : mStates)
+            {
+                state.DiscardDeviceResources();
+            }
+        }
     }
 
 
     HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) override
     {
-        for (State &state : mStates)
+        if (mDeviceRefCount++ == 0)
         {
-
+            for (State &state : mStates)
+            {
+                state.ReCreateDeviceResources(renderTarget);
+            }
         }
+
+        return S_OK;
     }
 
 
@@ -105,7 +256,7 @@ public:
 
         for (State &state : mStates)
         {
-            ret = state.UpdateDWMColor(newColor, this->renderTarget) || ret;
+            ret = state.UpdateDWMColor(newColor, renderTarget) || ret;
         }
 
         return ret;

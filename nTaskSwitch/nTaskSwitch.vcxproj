@@ -129,6 +129,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <SDLCheck>true</SDLCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PreprocessorDefinitions>NDEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -153,6 +154,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <SDLCheck>true</SDLCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PreprocessorDefinitions>NDEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -165,6 +167,7 @@
     <ClInclude Include="nTaskSwitch.h" />
     <ClInclude Include="TaskSwitcher.hpp" />
     <ClInclude Include="TaskThumbnail.hpp" />
+    <ClInclude Include="ThumbnailSettings.hpp" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +177,7 @@
     <ClCompile Include="nTaskSwitch.cpp" />
     <ClCompile Include="TaskSwitcher.cpp" />
     <ClCompile Include="TaskThumbnail.cpp" />
+    <ClCompile Include="ThumbnailSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nCoreCom\nCoreCom.vcxproj">

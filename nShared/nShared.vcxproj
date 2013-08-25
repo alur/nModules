@@ -31,6 +31,7 @@
     <ClInclude Include="Drawable.hpp" />
     <ClInclude Include="IStateRender.hpp" />
     <ClInclude Include="StateRender.hpp" />
+    <ClInclude Include="StateWindowData.hpp" />
     <ClInclude Include="WindowBangs.h" />
     <ClInclude Include="WindowSettings.hpp" />
     <ClInclude Include="DWMColorVal.hpp" />
@@ -72,7 +73,6 @@
     <ClCompile Include="Coordinate.cpp" />
     <ClCompile Include="IDrawable.cpp" />
     <ClCompile Include="Drawable.cpp" />
-    <ClCompile Include="StateRender.cpp" />
     <ClCompile Include="WindowBangs.cpp" />
     <ClCompile Include="WindowSettings.cpp" />
     <ClCompile Include="WindowDropTarget.cpp" />
@@ -232,6 +232,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <SDLCheck>true</SDLCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PreprocessorDefinitions>NDEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -253,7 +254,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>WIN64;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN64;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>

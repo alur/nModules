@@ -65,12 +65,6 @@ Window::Window(Settings* settings, MessageHandler* msgHandler)
     mCoveredByFullscreen = false;
     mWindowData = nullptr;
     mStateRender = nullptr;
-
-    // Create the base state
-    State* state = new State(_T(""), new Settings(settings), 0, &this->text);
-    state->active = true;
-    this->activeState = mBaseState = mStates.insert(mStates.begin(), state);
-    mBrushOwners[_T("")] = (IBrushOwner*)state;
 }
 
 
@@ -328,49 +322,6 @@ Window::PAINTER Window::AddPrePainter(IPainter* painter)
 }
 
 
-
-/// <summary>
-/// Adds a new state.
-/// </summary>
-/// <param name="prefix">The prefix for this state. This is appended to the prefix of this window.</param>
-/// <param name="defaultSettings">The default settings for this state.</param>
-/// <param name="defaultPriority">The default priority for this state. Higher priority states take precedence over lower priority states.</param>
-/// <returns>An object which can be used to activate/clear this state.</returns>
-Window::STATE Window::AddState(LPCTSTR prefix, int defaultPriority, StateSettings* defaultSettings, STATE *stateGroup)
-{
-    State* state = new State(prefix, mBaseState->settings->CreateChild(prefix), defaultPriority, &this->text);
-    state->settings->AppendGroup(stateGroup ? (*stateGroup)->settings : mBaseState->settings);
-    state->Load(defaultSettings);
-    state->UpdatePosition(this->drawingArea);
-    state->ReCreateDeviceResources(this->renderTarget);
-
-    mBrushOwners[prefix] = (IBrushOwner*)state;
-
-    // Insert the state based on its priority.
-    STATE iter;
-    for (iter = mStates.begin(); iter != mStates.end() && iter->priority > state->priority; ++iter);
-    return mStates.insert(iter.mIter, state);
-}
-
-
-/// <summary>
-/// Actives a certain state.
-/// </summary>
-/// <param name="state">The state to activate.</param>
-void Window::ActivateState(STATE state, bool repaint)
-{
-    state->active = true;
-    if (this->activeState == mStates.end() || this->activeState->priority < state->priority)
-    {
-        this->activeState = state;
-        if (repaint)
-        {
-            Repaint();
-        }
-    }
-}
-
-
 /// <summary>
 /// Performs an animation step.
 /// </summary>
@@ -422,26 +373,6 @@ void Window::ClearOverlays()
         delete overlay;
     }
     this->overlays.clear();
-}
-
-
-/// <summary>
-/// Clears a certain state.
-/// </summary>
-/// <param name="state">The state to clear.</param>
-void Window::ClearState(STATE state, bool repaint)
-{
-    state->active = false;
-    if (state == this->activeState)
-    {
-        // We just cleared the active state, find the highest priority next active state.
-        for (state++; state != mStates.end() && !state->active; ++state);
-        this->activeState = state;
-        if (repaint)
-        {
-            Repaint();
-        }
-    }
 }
 
 
@@ -565,7 +496,7 @@ IBrushOwner *Window::GetBrushOwner(LPCTSTR name)
 /// <param name="size">Out. The desired size will be placed in this SIZE.</param>
 void Window::GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size)
 {
-    mBaseState->GetDesiredSize(maxWidth, maxHeight, size);
+    mStateRender->GetDesiredSize(maxWidth, maxHeight, size, this);
 }
 
 
@@ -644,14 +575,16 @@ HWND Window::GetWindowHandle()
 /// </summary>
 State *Window::GetState(LPCTSTR stateName)
 {
-    for (State *state : mStates)
-    {
-        if (_tcsicmp(state->mName, stateName) == 0)
-        {
-            return state;
-        }
-    }
     return nullptr;
+}
+
+
+/// <summary>
+/// Returns the data states use to render to this window.
+/// </summary>
+IStateWindowData *Window::GetWindowData()
+{
+    return mWindowData;
 }
 
 
@@ -923,7 +856,7 @@ void Window::Initialize(WindowSettings &windowSettings, IStateRender *stateRende
 
     // Load the base state
     mStateRender = stateRender;
-    mWindowData = mStateRender->CreateWindowData();
+    mWindowData = mStateRender->CreateWindowData(this);
 
     // Register with the core.
     if (mWindowSettings.registerWithCore)
@@ -1686,10 +1619,7 @@ void Window::SetText(LPCWSTR text)
 /// <param name="bottom">The text offset from the bottom.</param>
 void Window::SetTextOffsets(float left, float top, float right, float bottom)
 {
-    for (State *state : mStates)
-    {
-        state->SetTextOffsets(left, top, right, bottom);
-    }
+    mStateRender->SetTextOffsets(left, top, right, bottom);
 }
 
 

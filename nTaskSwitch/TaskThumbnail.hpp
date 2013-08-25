@@ -7,17 +7,42 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "../Utilities/Common.h"
 #include <dwmapi.h>
 #include "../nShared/Drawable.hpp"
+#include "../nShared/StateRender.hpp"
+#include "ThumbnailSettings.hpp"
 #include "../nShared/Window.hpp"
 
-class TaskThumbnail : public Drawable {
+class TaskThumbnail : public Drawable
+{
 public:
-    explicit TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, int width, int height);
+    enum class State
+    {
+        Base = 0,
+        Hover,
+        Selected,
+        SelectedHover,
+        Count
+    };
+
+    enum class IconState
+    {
+        Base = 0,
+        Count
+    };
+
+public:
+    explicit TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, int width, int height, ThumbnailSettings& thumbnailSettings);
     virtual ~TaskThumbnail();
 
+public:
+    TaskThumbnail & operator=(const TaskThumbnail &) /* = deleted */;
+
+public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
+public:
     void Activate();
 
     void Select();
@@ -25,17 +50,25 @@ public:
     
     void UpdateIconPosition();
 
-    HWND targetWindow;
+    HWND mTargetWindow;
+
+public:
+    void ActivateState(State state);
+    void ClearState(State state);
 
 private:
     void UpdateIcon();
     void SetIcon(HICON icon);
     static void CALLBACK UpdateIconCallback(HWND hWnd, UINT uMsg, ULONG_PTR dwData, LRESULT lResult);
 
-    HTHUMBNAIL thumbnail;
+private:
+    ThumbnailSettings& mThumbnailSettings;
+
+    // Since the icons are independent top-level windows, they can not share this.
+    StateRender<TaskThumbnail::IconState> mIconStateRender;
+
+    HTHUMBNAIL mThumbnail;
     WPARAM requestedIcon;
 
-    Window::STATE stateHover, stateSelected, stateSelectedHover;
     Window* iconOverlayWindow;
-    RECT thumbnailMargins;
 };

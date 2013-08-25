@@ -15,6 +15,7 @@
     <ClInclude Include="UIDGenerator.hpp" />
     <ClInclude Include="FileIterator.hpp" />
     <ClInclude Include="Error.h" />
+    <ClInclude Include="CRC32.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StringUtils.cpp" />
@@ -27,5 +28,6 @@
     <ClCompile Include="FileIterator.cpp" />
     <ClCompile Include="FileIteratorIterator.cpp" />
     <ClCompile Include="Error.cpp" />
+    <ClCompile Include="CRC32.cpp" />
   </ItemGroup>
 </Project>

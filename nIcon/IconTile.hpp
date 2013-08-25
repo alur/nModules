@@ -7,14 +7,28 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "TileSettings.hpp"
 #include "../nShared/Drawable.hpp"
 #include "../nShared/Window.hpp"
 #include <ShlObj.h>
 
 class IconTile : public Drawable {
 public:
-    explicit IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder, int width, int height);
+    enum class State
+    {
+        Base = 0,
+        Hover,
+        Selected,
+        Focused,
+        Count
+    };
+
+public:
+    explicit IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFolder, int width, int height, TileSettings &tileSettings);
     virtual ~IconTile();
+
+private:
+    IconTile & operator=(const IconTile &) /*= deleted*/;
 
 public:
     HRESULT CompareID(PCITEMID_CHILD id);
@@ -59,6 +73,8 @@ private:
     void SetIcon();
 
 private:
+    TileSettings &mTileSettings;
+
     // Pointer to the shellfolder this item is in.
     IShellFolder2* mShellFolder;
 
@@ -69,14 +85,7 @@ private:
     int mPositionID;
 
     //
-    int mIconSize;
-
-    //
-    float mGhostOpacity;
     bool mGhosted;
-
-    // 
-    Window::STATE mHoverState, mSelectedState, mFocusedState;
 
     //
     Window::OVERLAY mIconOverlay;

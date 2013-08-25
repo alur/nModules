@@ -7,6 +7,7 @@
 *   
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
+#include "ButtonSettings.hpp"
 #include "TaskButton.hpp"
 #include "Taskbar.hpp"
 #include "WindowManager.h"
@@ -264,7 +265,7 @@ void WindowManager::MarkAsMinimized(HWND hWnd)
     {
         for (TaskButton *button : iter->second.buttons)
         {
-            button->SetMinmizedState(true);
+            button->ActivateState(TaskButton::State::Minimized);
         }
     }
 }

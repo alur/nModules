@@ -14,8 +14,18 @@
 #include <Shlobj.h>
 
 class PopupItem : public Drawable {
+protected:
+    enum class Type
+    {
+        Command = 0,
+        Info,
+        Folder,
+        Container,
+        Separator
+    };
+
 public:
-    explicit PopupItem(Drawable* parent, LPCTSTR prefix, bool independent = false);
+    explicit PopupItem(Drawable* parent, LPCTSTR prefix, Type type, bool independent = false);
     virtual ~PopupItem();
     void Position(int x, int y);
     virtual LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID) = 0;
@@ -27,20 +37,16 @@ public:
     bool CheckMerge(LPCWSTR name);
 
 protected:
-    enum PopupItemType {
-        COMMAND = 0,
-        INFO,
-        FOLDER,
-        CONTAINER,
-        SEPARATOR
-    };
-    
     bool ParseDotIcon(LPCTSTR dotIcon);
     void AddIcon(HICON icon);
 
     Settings* iconSettings;
 
-    PopupItemType itemType;
+    Type mItemType;
 
     Window::OVERLAY iconOverlay;
+
+private:
+    UINT32 mIconHash;
+    bool mHasIcon;
 };

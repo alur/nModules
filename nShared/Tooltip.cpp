@@ -2,7 +2,7 @@
  *  Tooltip.cpp
  *  The nModules Project
  *
- *  
+ *  A general tooltip window.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
@@ -10,36 +10,39 @@
 #include <algorithm>
 
 
-Tooltip::Tooltip(LPCTSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings) {
-    WindowSettings defaults;
-    defaults.width = 150;
-    defaults.height = 40;
-    defaults.alwaysOnTop = true;
+/// <summary>
+/// Constructor
+/// </summary>
+Tooltip::Tooltip(LPCTSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings)
+{
+    LoadSettings();
 
-    StateSettings defaultState;
-    defaultState.backgroundBrush.color = Color::Create(0xCCFAFAD2);
-    defaultState.textBrush.color = Color::Create(0xFF000000);
-    defaultState.textOffsetTop = 2;
-    defaultState.textOffsetBottom = 2;
-    defaultState.textOffsetRight = 2;
-    defaultState.textOffsetLeft = 2;
-    defaultState.outlineBrush.color = Color::Create(0xFF000000);
-    defaultState.outlineWidth = 0.75f;
+    WindowSettings windowDefaults;
+    WindowSettings windowSettings;
+    windowDefaults.width = 150;
+    windowDefaults.height = 40;
+    windowDefaults.alwaysOnTop = true;
+    windowSettings.Load(mSettings, &windowDefaults);
 
-    mWindow->Initialize(&defaults, &defaultState);
-
-    this->maxHeight = mSettings->GetInt(_T("MaxHeight"), 100);
-    this->maxWidth = mSettings->GetInt(_T("MaxWidth"), 300);
+    mWindow->Initialize(windowSettings, &mStateRender);
 }
 
 
-Tooltip::~Tooltip() {
+/// <summary>
+/// Destructor
+/// </summary>
+Tooltip::~Tooltip()
+{
 }
 
 
-void Tooltip::Show(LPCWSTR text, LPRECT position) {
+/// <summary>
+/// Shows the tooltip at the specified position.
+/// </summary>
+void Tooltip::Show(LPCWSTR text, LPRECT position)
+{
     mWindow->SetText(text);
-    mWindow->SizeToText(this->maxWidth, this->maxHeight);
+    mWindow->SizeToText(mMaxWidth, mMaxHeight);
 
     // Show it centerd on x, 5 px above, while forcing it to stay on the virtual desktop
     MonitorInfo* monInfo = mWindow->GetMonitorInformation();
@@ -53,16 +56,40 @@ void Tooltip::Show(LPCWSTR text, LPRECT position) {
 }
 
 
-void Tooltip::Hide() {
+/// <summary>
+/// Hides the tooltip
+/// </summary>
+void Tooltip::Hide()
+{
     mWindow->Hide();
 }
 
 
-void Tooltip::LoadSettings(bool /*bIsRefresh*/) {
+/// <summary>
+/// Loads settings from the RC files
+/// </summary>
+void Tooltip::LoadSettings()
+{
+    mMaxHeight = mSettings->GetInt(_T("MaxHeight"), 100);
+    mMaxWidth = mSettings->GetInt(_T("MaxWidth"), 300);
 
+    StateRender<States>::InitData stateInitData;
+    stateInitData[States::Base].defaults.backgroundBrush.color = Color::Create(0xCCFAFAD2);
+    stateInitData[States::Base].defaults.textBrush.color = Color::Create(0xFF000000);
+    stateInitData[States::Base].defaults.textOffsetTop = 2;
+    stateInitData[States::Base].defaults.textOffsetBottom = 2;
+    stateInitData[States::Base].defaults.textOffsetRight = 2;
+    stateInitData[States::Base].defaults.textOffsetLeft = 2;
+    stateInitData[States::Base].defaults.outlineBrush.color = Color::Create(0xFF000000);
+    stateInitData[States::Base].defaults.outlineWidth = 0.75f;
+    mStateRender.Load(stateInitData, mSettings);
 }
 
 
-LRESULT WINAPI Tooltip::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
+/// <summary>
+/// Handles Window messages
+/// </summary>
+LRESULT WINAPI Tooltip::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID)
+{
     return DefWindowProc(window, message, wParam, lParam);
 }

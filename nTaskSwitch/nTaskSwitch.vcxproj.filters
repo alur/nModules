@@ -11,6 +11,7 @@
     <ClInclude Include="nTaskSwitch.h" />
     <ClInclude Include="TaskSwitcher.hpp" />
     <ClInclude Include="TaskThumbnail.hpp" />
+    <ClInclude Include="ThumbnailSettings.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nTaskSwitch.rc">
@@ -21,5 +22,6 @@
     <ClCompile Include="TaskThumbnail.cpp" />
     <ClCompile Include="TaskSwitcher.cpp" />
     <ClCompile Include="nTaskSwitch.cpp" />
+    <ClCompile Include="ThumbnailSettings.cpp" />
   </ItemGroup>
 </Project>

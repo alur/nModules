@@ -212,7 +212,7 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget)
 }
 
 
-bool Brush::IsImageEdgeBrush()
+bool Brush::IsImageEdgeBrush() const
 {
     return brushType == Type::Image && scalingMode == ImageScalingMode::Edges;
 }

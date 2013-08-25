@@ -32,11 +32,16 @@
 /// <param name="name">The settings prefix to use.</param>
 CoverArt::CoverArt(LPCTSTR name) : Drawable(name)
 {
+    StateRender<States>::InitData initData;
+    mStateRender.Load(initData, mSettings);
+
     WindowSettings defaults;
+    WindowSettings windowSettings;
     defaults.width = 200;
     defaults.height = 200;
     defaults.registerWithCore = true;
-    mWindow->Initialize(&defaults);
+    windowSettings.Load(mSettings, &defaults);
+    mWindow->Initialize(windowSettings, &mStateRender);
 
     LoadSettings();
     Update();

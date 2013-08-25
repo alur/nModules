@@ -21,7 +21,15 @@ extern HWND g_hWndTrayNotify;
 /// <summary>
 /// Constructor
 /// </summary>
-TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings* parentSettings) : Drawable(parent, _T("Icon"))
+TrayIcon::TrayIcon
+(
+    Drawable* parent,
+    LiteStep::LPLSNOTIFYICONDATA pNID,
+    WindowSettings &wndSettings,
+    StateRender<States> *stateRender
+)
+    : Drawable(parent, _T("Icon"))
+    , mStateRender(stateRender)
 {
     // Init
     this->callbackID = 0;
@@ -36,12 +44,7 @@ TrayIcon::TrayIcon(Drawable* parent, LiteStep::LPLSNOTIFYICONDATA pNID, Settings
     this->flags = 0;
     this->tip[0] = L'\0';
 
-    // Create the drawable window
-    mSettings = parentSettings->CreateChild(_T("Icon"));
-
-    StateSettings defaultStateSettings;
-    defaultStateSettings.backgroundBrush.color = Color::Create(0x00000000);
-    mWindow->Initialize(nullptr, &defaultStateSettings);
+    mWindow->Initialize(wndSettings, stateRender);
     this->showingTip = false;
 
     //

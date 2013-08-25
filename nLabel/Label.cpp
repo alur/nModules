@@ -40,15 +40,19 @@ void Label::Initalize()
 {
     mAllLabelsIter = gAllLabels.insert(gAllLabels.begin(), pair<wstring, Label*>(wstring(mSettings->GetPrefix()), this));
     
+    StateRender<States>::InitData initData;
+    initData[States::Hover].prefix = _T("Hover");
+    mStateRender.Load(initData, mSettings);
+
     WindowSettings defaults;
+    WindowSettings windowSettings;
     defaults.evaluateText = true;
     defaults.registerWithCore = true;
-
-    mWindow->Initialize(&defaults);
+    windowSettings.Load(mSettings, &defaults);
+    mWindow->Initialize(windowSettings, &mStateRender);
 
     LoadSettings();
 
-    this->stateHover = mWindow->AddState(L"Hover", 100);
     if (!mWindow->GetDrawingSettings()->hidden)
     {
         mWindow->Show();
@@ -72,11 +76,11 @@ LRESULT WINAPI Label::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 {
     if (uMsg == WM_MOUSEMOVE)
     {
-        mStateRender.ActivateState(States::Hover);
+        mStateRender.ActivateState(States::Hover, mWindow);
     }
     else if (uMsg == WM_MOUSELEAVE)
     {
-        mStateRender.ClearState(States::Hover);
+        mStateRender.ClearState(States::Hover, mWindow);
     }
 
     mEventHandler->HandleMessage(hWnd, uMsg, wParam, lParam);

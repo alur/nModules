@@ -52,12 +52,18 @@ DesktopPainter::DesktopPainter(HWND hWnd) : Window(hWnd, _T("nDesk"), g_pClickHa
     m_TransitionSettings.fFadeTime = 0.2f;
     SetTransitionType(NONE);
 
+    StateRender<States>::InitData initData;
+    mStateRender.Load(initData, mSettings);
+
     WindowSettings defaults;
+    WindowSettings windowSettings;
     defaults.width = g_pMonitorInfo->m_virtualDesktop.width;
     defaults.height = g_pMonitorInfo->m_virtualDesktop.height;
     defaults.x = g_pMonitorInfo->m_virtualDesktop.rect.left;
     defaults.y = g_pMonitorInfo->m_virtualDesktop.rect.top;
-    Initialize(&defaults);
+    windowSettings.Load(mSettings, &defaults);
+
+    Initialize(windowSettings, &mStateRender);
 
     nCore::System::RegisterWindow(_T("nDesk"), this);
     UpdateWallpaper(true);

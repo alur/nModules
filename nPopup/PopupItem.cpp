@@ -7,45 +7,61 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "Popup.hpp"
 #include "../nShared/LSModule.hpp"
+#include "IconCache.hpp"
 #include <shellapi.h>
 
 
 extern LSModule gLSModule;
+static IconCache iconCache;
 
 
-PopupItem::PopupItem(Drawable* parent, LPCTSTR prefix, bool independent) : Drawable(parent, prefix, independent) {
+PopupItem::PopupItem(Drawable* parent, LPCTSTR prefix, Type type, bool independent)
+    : Drawable(parent, prefix, independent)
+    , mItemType(type)
+    , mHasIcon(false)
+{
     this->iconSettings = mSettings->CreateChild(L"Icon");
-    this->itemType = PopupItemType::SEPARATOR;
 }
 
 
-PopupItem::~PopupItem() {
+PopupItem::~PopupItem()
+{
     SAFEDELETE(this->iconSettings);
+    if (mHasIcon)
+    {
+        iconCache.ReleaseIcon(mIconHash);
+    }
 }
 
 
-void PopupItem::Position(int x, int y) {
+void PopupItem::Position(int x, int y)
+{
     mWindow->Move(x, y);
 }
 
 
-int PopupItem::GetHeight() {
+int PopupItem::GetHeight()
+{
     return mWindow->GetDrawingSettings()->height;
 }
 
 
-void PopupItem::SetWidth(int width) {
+void PopupItem::SetWidth(int width)
+{
     mWindow->Resize(width, mWindow->GetDrawingSettings()->height);
 }
 
 
-bool PopupItem::CheckMerge(LPCWSTR name) {
-    return this->itemType == PopupItemType::FOLDER && _wcsicmp(name, mWindow->GetText()) == 0;
+bool PopupItem::CheckMerge(LPCWSTR name)
+{
+    return mItemType == Type::Folder && _wcsicmp(name, mWindow->GetText()) == 0;
 }
 
 
-bool PopupItem::ParseDotIcon(LPCTSTR dotIcon) {
-    if (dotIcon == NULL || ((Popup*)mParent)->noIcons) {
+bool PopupItem::ParseDotIcon(LPCTSTR dotIcon)
+{
+    if (dotIcon == NULL || ((Popup*)mParent)->noIcons)
+    {
         return false;
     }
 
@@ -83,7 +99,7 @@ void PopupItem::AddIcon(HICON icon) {
 
 
 bool PopupItem::CompareTo(PopupItem* b) {
-    return this->itemType > b->itemType || this->itemType == b->itemType && _wcsicmp(mWindow->GetText(), b->mWindow->GetText()) < 0;
+    return mItemType > b->mItemType || mItemType == b->mItemType && _wcsicmp(mWindow->GetText(), b->mWindow->GetText()) < 0;
 }
 
 
@@ -94,47 +110,71 @@ void PopupItem::SetIcon(IExtractIconW* extractIcon) {
     UINT flags;
     HRESULT hr;
 
-    if (!((Popup*)mParent)->noIcons) {
-
+    if (!((Popup*)mParent)->noIcons)
+    {
         // Get the location of the file containing the appropriate icon, and the index of the icon.
         hr = extractIcon->GetIconLocation(GIL_FORSHELL, iconFile, MAX_PATH, &iconIndex, &flags);
 
-        // Extract the icon.
-        if (SUCCEEDED(hr)) {
-            hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(64, 0));
-        }
-    
-        // If the extraction failed, fall back to a 32x32 icon.
-        if (hr == S_FALSE) {
-            hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(32, 0));
-        }
+        //
+        if (SUCCEEDED(hr))
+        {
+            mIconHash = iconCache.ComputeHash(iconFile, iconIndex);
 
-        // And then to a 16x16
-        if (hr == S_FALSE) {
-            hr = extractIcon->Extract(iconFile, iconIndex, NULL, &icon, MAKELONG(0, 16));
-        }
+            icon = iconCache.GetIcon(mIconHash);
 
-        if (hr == S_FALSE) {
-            icon = ExtractIconW(gLSModule.GetInstance(), iconFile, iconIndex);
-        }
-
-        if (SUCCEEDED(hr) && icon != NULL) {
-            AddIcon(icon);
-        }
-        else {
-            TRACEW(L"Failed to extract icon %s,%i", iconFile, iconIndex);
-
-            // Try to fall back to the default icon.
-            icon = ExtractIconW(gLSModule.GetInstance(), L"shell32.dll", 1);
-
-            if (icon != NULL) {
+            if (icon)
+            {
+                mHasIcon = true;
                 AddIcon(icon);
-                hr = S_FALSE;
             }
-        }
+            else
+            {
+                // Extract the icon.
+                if (SUCCEEDED(hr))
+                {
+                    hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(64, 0));
+                }
+    
+                // If the extraction failed, fall back to a 32x32 icon.
+                if (hr == S_FALSE)
+                {
+                    hr = extractIcon->Extract(iconFile, iconIndex, &icon, NULL, MAKELONG(32, 0));
+                }
 
-        if (hr == S_FALSE && icon != NULL) {
-            DestroyIcon(icon);
+                // And then to a 16x16
+                if (hr == S_FALSE)
+                {
+                    hr = extractIcon->Extract(iconFile, iconIndex, NULL, &icon, MAKELONG(0, 16));
+                }
+
+                if (hr == S_FALSE)
+                {
+                    icon = ExtractIconW(gLSModule.GetInstance(), iconFile, iconIndex);
+                }
+
+                if (SUCCEEDED(hr) && icon != NULL)
+                {
+                    AddIcon(icon);
+                }
+                else
+                {
+                    TRACEW(L"Failed to extract icon %s,%i", iconFile, iconIndex);
+
+                    // Try to fall back to the default icon.
+                    icon = ExtractIconW(gLSModule.GetInstance(), L"shell32.dll", 1);
+
+                    if (icon != NULL)
+                    {
+                        AddIcon(icon);
+                        hr = S_FALSE;
+                    }
+                }
+
+                if (icon != nullptr)
+                {
+                    iconCache.StoreIcon(mIconHash, icon);
+                }
+            }
         }
     }
 

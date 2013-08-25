@@ -10,10 +10,19 @@
 
 #include "../Utilities/EnumArray.hpp"
 #include "State.hpp"
+#include "IStateWindowData.hpp"
 
 template <class StateEnum>
-class StateWindowData : public StateWindowData
+class StateWindowData : public IStateWindowData
 {
 public:
-    EnumArray<WindowData, StateEnum> data;
+    StateWindowData()
+    {
+        ZeroMemory(this, sizeof(*this));
+    }
+
+    EnumArray<State::WindowData, StateEnum> data;
+    EnumArray<bool, StateEnum> active;
+    Window *window;
+    StateEnum currentState;
 };

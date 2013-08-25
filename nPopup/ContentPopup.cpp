@@ -273,19 +273,45 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
             hr = targetFolder->GetAttributesOf(1, (LPCITEMIDLIST *)&itemID, &attributes);
             openable = SUCCEEDED(hr) && !dontExpandFolders && (((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE));
 
+            
             StopWatch watch;
-
             if (openable)
             {
                 for (iter = this->items.begin(); iter != this->items.end() && !(*iter)->CheckMerge(name); ++iter);
+
                 if (iter != this->items.end())
                 {
                     item = NULL;
-                    ((ContentPopup*)((nPopup::FolderItem*)*iter)->GetPopup())->AddPath(command);
+                    //((ContentPopup*)((nPopup::FolderItem*)*iter)->GetPopup())->AddPath(command);
                 }
                 else
                 {
-                    item = new nPopup::FolderItem(this, name, new ContentPopup(command, this->dynamic, name, NULL, mSettings->GetPrefix()));
+                    if (this->dynamic)
+                    {
+                        struct CreationData
+                        {
+                            CreationData(LPCTSTR command, LPCTSTR name, LPCTSTR prefix)
+                            {
+                                StringCchCopy(this->command, _countof(this->command), command);
+                                StringCchCopy(this->name, _countof(this->name), name);
+                                StringCchCopy(this->prefix, _countof(this->prefix), prefix);
+                            }
+
+                            TCHAR command[MAX_LINE_LENGTH];
+                            TCHAR name[MAX_PATH];
+                            TCHAR prefix[MAX_RCCOMMAND];
+                        };
+
+                        item = new nPopup::FolderItem(this, name, [] (LPVOID param) -> Popup*
+                        {
+                            CreationData* data = (CreationData*) param;
+                            return new ContentPopup(data->command, true, data->name, nullptr, data->prefix);
+                        }, new CreationData(command, name, mSettings->GetPrefix()));
+                    }
+                    else
+                    {
+                        item = new nPopup::FolderItem(this, name, new ContentPopup(command, this->dynamic, name, NULL, mSettings->GetPrefix()));
+                    }
                 }
             }
             else
@@ -293,7 +319,6 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
                 StringCchPrintf(quotedCommand, sizeof(quotedCommand), L"\"%s\"", command);
                 item = new CommandItem(this, name, quotedCommand);
             }
-
             time += watch.Clock();
 
             if (!this->noIcons && item != NULL)

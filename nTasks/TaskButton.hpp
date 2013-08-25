@@ -9,6 +9,7 @@
 
 #include "../nShared/Window.hpp"
 #include "../nShared/Drawable.hpp"
+#include "../nShared/StateRender.hpp"
 #include "../Utilities/EnumArray.hpp"
 #include "ButtonSettings.hpp"
 
@@ -18,14 +19,15 @@ public:
     // All button states
     enum class State
     {
-        Active = 0,
-        ActiveHover,
-        Flashing,
-        FlashingHover,
-        Hover,
+        Base = 0,
         Minimized,
-        MinimizedHover,
+        Flashing,
         MinimizedFlashing,
+        Active,
+        Hover,
+        MinimizedHover,
+        ActiveHover,
+        FlashingHover,
         MinimizedFlashingHover,
         Count
     };
@@ -33,6 +35,8 @@ public:
 public:
     explicit TaskButton(Drawable *parent, HWND hWnd, ButtonSettings &buttonSettings);
     virtual ~TaskButton();
+
+    TaskButton& operator=(const TaskButton &) /* = deleted */;
 
 public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
@@ -54,14 +58,9 @@ public:
     void ShowMenu();
     void Show();
 
-    void LoadSettings(bool = false);
-    
-    void SetMinmizedState(bool value);
-
-private:
-    void SetFlashingState(bool value);
-    void SetActiveState(bool value);
-    void SetHoverState(bool value);
+    void ActivateState(State state);
+    void ClearState(State state);
+    void ToggleState(State state);
 
 private:
     //
@@ -78,10 +77,7 @@ private:
 
     //
     bool mIsFlashing;
-    bool mFlashOn;
     UINT_PTR mFlashTimer;
-
-    EnumArray<Window::STATE, State> mStates;
 
     Window::OVERLAY mIcon;
     Window::OVERLAY mIconOverlay;

@@ -7,7 +7,10 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+class Popup;
+
 #include "PopupItem.hpp"
+#include "PopupSettings.hpp"
 #include <vector>
 #include "../nShared/MessageHandler.hpp"
 #include "../nShared/Settings.hpp"
@@ -16,10 +19,18 @@
 using std::vector;
 
 class Popup : public Drawable {
+private:
+    enum class State
+    {
+        Base = 0,
+        Count
+    };
+
 public:
     explicit Popup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix);
     virtual ~Popup();
 
+public:
     void AddItem(PopupItem* item);
     void RemoveItem(PopupItem* item);
     void Show();
@@ -36,11 +47,18 @@ public:
     //
     LPCTSTR GetBang();
 
+public:
     //
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
+public:
     //
     bool noIcons;
+
+    //
+    PopupSettings mPopupSettings;
+
+    StateRender<State> mStateRender;
 
 protected:
     //

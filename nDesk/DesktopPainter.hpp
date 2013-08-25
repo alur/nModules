@@ -9,12 +9,15 @@
 
 #include <d2d1.h>
 #include "TransitionEffects.h"
+#include "../nShared/StateRender.hpp"
 #include "../nShared/Window.hpp"
 
-class DesktopPainter : protected Window {
+class DesktopPainter : protected Window
+{
 public:
     // Available transition types
-    enum TransitionType {
+    enum TransitionType
+    {
         NONE,
 
         FADE_IN,
@@ -67,6 +70,12 @@ public:
     HWND GetWindow();
 
 private:
+    enum class States
+    {
+        Base = 0,
+        Count
+    };
+
     void CalculateSizeDepdenentStuff();
     HRESULT ReCreateDeviceResources();
     void DiscardDeviceResources();
@@ -91,6 +100,8 @@ private:
     // Direct2D targets
     ID2D1BitmapBrush* m_pWallpaperBrush;
     ID2D1BitmapBrush* m_pOldWallpaperBrush;
+
+    StateRender<States> mStateRender;
 
     //
     bool mDontRenderWallpaper;

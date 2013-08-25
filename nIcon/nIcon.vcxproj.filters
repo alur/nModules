@@ -12,12 +12,14 @@
     <ClInclude Include="IconTile.hpp" />
     <ClInclude Include="nIcon.h" />
     <ClInclude Include="SelectionRectangle.hpp" />
+    <ClInclude Include="TileSettings.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SelectionRectangle.cpp" />
     <ClCompile Include="IconGroup.cpp" />
     <ClCompile Include="IconTile.cpp" />
     <ClCompile Include="nIcon.cpp" />
+    <ClCompile Include="TileSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include=".\nIcon.rc">

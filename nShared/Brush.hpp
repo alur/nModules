@@ -55,7 +55,7 @@ public:
     HRESULT LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2D1Brush **brush);
 
 public:
-    bool IsImageEdgeBrush();
+    bool IsImageEdgeBrush() const;
     D2D1_RECT_F *GetImageEdgeRectAndScaleBrush(EdgeType edgeType);
     void ComputeEdgeData(D2D1_SIZE_F size);
 

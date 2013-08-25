@@ -31,8 +31,6 @@ private:
     void Initalize();
     void LoadSettings(bool isRefresh = false);
 
-    Window::STATE stateHover;
-
     StateRender<States> mStateRender;
     
     list<Drawable*> mOverlays;

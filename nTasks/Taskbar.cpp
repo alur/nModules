@@ -26,15 +26,18 @@ Taskbar::Taskbar(LPCTSTR name) : Drawable(name)
     LayoutSettings defaults;
     mLayoutSettings.Load(mSettings, &defaults);
 
-    StateSettings stateDefaults;
-    stateDefaults.backgroundBrush.color = std::unique_ptr<IColorVal>(new DWMColorVal());
+    StateRender<States>::InitData initData;
+    initData[States::Base].defaults.backgroundBrush.color = std::unique_ptr<IColorVal>(new DWMColorVal());
 
-    WindowSettings drawableDefaults;
+    mStateRender.Load(initData, mSettings);
+
+    WindowSettings drawableDefaults, windowSettings;
     drawableDefaults.width = GetSystemMetrics(SM_CXSCREEN);
     drawableDefaults.height = 36;
     drawableDefaults.registerWithCore = true;
+    windowSettings.Load(mSettings, &drawableDefaults);
     
-    mWindow->Initialize(&drawableDefaults, &stateDefaults);
+    mWindow->Initialize(windowSettings, &mStateRender);
     mWindow->Show();
 }
 
@@ -61,6 +64,8 @@ void Taskbar::LoadSettings(bool /* isRefresh */)
 {
     Settings* buttonSettings = mSettings->CreateChild(_T("Button"));
 
+    mButtonSettings.Load(buttonSettings);
+
     mButtonWidth = buttonSettings->GetInt(_T("Width"), 150);
     mButtonHeight = buttonSettings->GetInt(_T("Height"), 36);
     mButtonMaxWidth = buttonSettings->GetInt(_T("MaxWidth"), mButtonWidth);
@@ -81,7 +86,7 @@ TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout)
     {
         assert(mButtonMap.find(hWnd) == mButtonMap.end());
 
-        TaskButton* pButton = new TaskButton(this, hWnd);
+        TaskButton* pButton = new TaskButton(this, hWnd, mButtonSettings);
         mButtonMap[hWnd] = mButtonList.insert(mButtonList.end(), pButton);
 
         if (hWnd == GetForegroundWindow())

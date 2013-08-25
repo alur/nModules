@@ -9,7 +9,16 @@
 
 #include "PopupItem.hpp"
 
-class InfoItem : public PopupItem {
+class InfoItem : public PopupItem
+{
+public:
+    enum class State
+    {
+        Base = 0,
+        Hover,
+        Count
+    };
+
 public:
     explicit InfoItem(Drawable* parent, LPCTSTR title, LPCTSTR customIcon = nullptr);
     virtual ~InfoItem();
@@ -19,6 +28,4 @@ public:
 
 private:
     LPCTSTR title;
-
-    Window::STATE hoverState;
 };

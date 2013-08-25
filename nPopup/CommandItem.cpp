@@ -12,42 +12,32 @@
 #include "Popup.hpp"
 
 
-CommandItem::CommandItem(Drawable* parent, LPCTSTR title, LPCTSTR command, LPCTSTR customIcon) : PopupItem(parent, L"Item") {
-    Init(title, command);
+CommandItem::CommandItem(LPCTSTR title, LPCTSTR command, Drawable* parent)
+    : PopupItem(parent, L"Item", PopupItem::Type::Command)
+    , title(_tcsdup(title))
+    , command(_tcsdup(command))
+{
+    mWindow->Initialize(((Popup*)mParent)->mPopupSettings.mCommandWindowSettings, &((Popup*)mParent)->mPopupSettings.mCommandStateRender);
+    mWindow->SetText(title);
+}
+
+
+CommandItem::CommandItem(Drawable* parent, LPCTSTR title, LPCTSTR command, LPCTSTR customIcon)
+    : CommandItem(title, command, parent)
+{
     ParseDotIcon(customIcon);
     mWindow->Show();
 }
 
 
-CommandItem::CommandItem(Drawable* parent, LPCTSTR title, LPCTSTR command, HICON icon) : PopupItem(parent, L"Item") {
-    Init(title, command);
-    if (icon != NULL) {
+CommandItem::CommandItem(Drawable* parent, LPCTSTR title, LPCTSTR command, HICON icon)
+    : CommandItem(title, command, parent)
+{
+    if (icon != nullptr)
+    {
         AddIcon(icon);
     }
     mWindow->Show();
-}
-
-
-void CommandItem::Init(LPCTSTR title, LPCTSTR command) {
-    this->title = _tcsdup(title);
-    this->command = _tcsdup(command);
-    this->itemType = PopupItemType::COMMAND;
-
-    WindowSettings defaults;
-    defaults.width = 190;
-    defaults.height = 20;
-
-    StateSettings defaultState;
-    defaultState.backgroundBrush.color = Color::Create(0xAAFFFF00);
-    defaultState.textBrush.color = Color::Create(0xFF000000);
-    defaultState.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
-    defaultState.textOffsetLeft = 20;
-    defaultState.textOffsetRight = 5;
-
-    mWindow->Initialize(&defaults, &defaultState);
-    mWindow->SetText(title);
-
-    this->hoverState = mWindow->AddState(L"Hover", 100, &defaultState);
 }
 
 
@@ -81,14 +71,14 @@ LRESULT CommandItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM 
 
     case WM_MOUSEMOVE:
         {
-            mWindow->ActivateState(this->hoverState);
+            ((Popup*)mParent)->mPopupSettings.mCommandStateRender.ActivateState(State::Hover, mWindow);
             ((Popup*)mParent)->CloseChild();
         }
         return 0;
 
     case WM_MOUSELEAVE:
         {
-            mWindow->ClearState(this->hoverState);
+            ((Popup*)mParent)->mPopupSettings.mCommandStateRender.ClearState(State::Hover, mWindow);
         }
         return 0;
     }

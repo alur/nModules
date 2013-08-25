@@ -30,10 +30,14 @@ Tray::Tray(LPCTSTR name) : Drawable(name)
     this->tooltip = new Tooltip(L"Tooltip", mSettings);
     this->balloon = new Balloon(L"Balloon", mSettings, this->balloonClickedMessage, this);
 
-    WindowSettings defaults;
-    defaults.registerWithCore = true;
+    StateRender<States>::InitData initData;
+    mStateRender.Load(initData, mSettings);
 
-    mWindow->Initialize(&defaults);
+    WindowSettings defaults, windowSettings;
+    defaults.registerWithCore = true;
+    windowSettings.Load(mSettings, &defaults);
+
+    mWindow->Initialize(windowSettings, &mStateRender);
     mWindow->Show();
 
     this->balloonTimer = 0;
@@ -81,10 +85,6 @@ void Tray::LoadSettings(bool /* IsRefresh */)
     LayoutSettings layoutDefaults;
     mLayoutSettings.Load(mSettings, &layoutDefaults);
 
-    Settings* iconSettings = mSettings->CreateChild(_T("Icon"));
-    mIconSize = iconSettings->GetInt(_T("Size"), 16);
-    delete iconSettings;
-
     mNoTooltips = mSettings->GetBool(_T("NoTooltips"), false);
     mHideBalloons = mSettings->GetBool(_T("HideBalloons"), false);
     this->balloonTime = mSettings->GetInt(_T("BalloonTime"), 7000);
@@ -130,6 +130,19 @@ void Tray::LoadSettings(bool /* IsRefresh */)
             mHiddenIconIDs.push_back(IconID(line));
         }
     });
+
+    // Load icon settings
+    Settings* iconSettings = mSettings->CreateChild(_T("Icon"));
+    mIconSize = iconSettings->GetInt(_T("Size"), 16);
+
+    StateRender<TrayIcon::States>::InitData iconInitData;
+    iconInitData[TrayIcon::States::Base].defaults.backgroundBrush.color = Color::Create(0x00000000);
+    mIconStates.Load(iconInitData, iconSettings);
+
+    WindowSettings iconDefaults;
+    mIconWindowSettings.Load(iconSettings, &iconDefaults);
+    
+    delete iconSettings;
 }
 
 
@@ -140,7 +153,7 @@ TrayIcon* Tray::AddIcon(LiteStep::LPLSNOTIFYICONDATA NID)
 {
     if (WantIcon(NID))
     {
-        TrayIcon* icon = new TrayIcon(this, NID, mSettings);
+        TrayIcon* icon = new TrayIcon(this, NID, mIconWindowSettings, &mIconStates);
         this->icons.push_back(icon);
         icon->Show();
         if (!g_InitPhase)
@@ -154,7 +167,7 @@ TrayIcon* Tray::AddIcon(LiteStep::LPLSNOTIFYICONDATA NID)
 
 
 /// <summary>
-/// Adds the specified icon to this tray.
+/// Returns true if this tray wants the specified icon.
 /// </summary>
 bool Tray::WantIcon(LiteStep::LPLSNOTIFYICONDATA NID)
 {
@@ -505,19 +518,19 @@ void Tray::ShowNextBalloon()
 
     // 
     HICON icon = NULL;
-    if ((d.infoFlags & NIIF_INFO) == NIIF_INFO)
+    if ((d.infoFlags & 0x3) == NIIF_INFO)
     {
         icon = this->infoIcon;
     }
-    else if ((d.infoFlags & NIIF_WARNING) == NIIF_WARNING)
+    else if ((d.infoFlags & 0x3) == NIIF_WARNING)
     {
         icon = this->warningIcon;
     }
-    else if ((d.infoFlags & NIIF_ERROR) == NIIF_ERROR)
+    else if ((d.infoFlags & 0x3) == NIIF_ERROR)
     {
         icon = this->errorIcon;
     }
-    else if ((d.infoFlags & NIIF_USER ) == NIIF_USER && d.balloonIcon != NULL)
+    else if ((d.infoFlags & NIIF_USER) == NIIF_USER && d.balloonIcon != NULL)
     {
         icon = d.balloonIcon;
     }

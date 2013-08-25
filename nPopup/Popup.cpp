@@ -34,17 +34,21 @@ Popup::Popup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Drawable(prefix) {
     mChildOffsetY = mSettings->GetInt(_T("ChildOffsetY"), 0);
     this->padding = mSettings->GetOffsetRect(_T("Padding"), 5, 5, 5, 5);
 
-    WindowSettings defaultSettings;
+    mPopupSettings.Load(mSettings);
+
+    WindowSettings defaultSettings, windowSettings;
     defaultSettings.alwaysOnTop = true;
     defaultSettings.width = 200;
+    windowSettings.Load(mSettings, &defaultSettings);
 
-    StateSettings defaultState;
-    defaultState.backgroundBrush.color = Color::Create(0x440000FF);
-    defaultState.fontSize = 32.0f;
-    defaultState.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
-    defaultState.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
+    StateRender<State>::InitData initData;
+    initData[State::Base].defaults.backgroundBrush.color = Color::Create(0x440000FF);
+    initData[State::Base].defaults.fontSize = 32.0f;
+    initData[State::Base].defaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
+    initData[State::Base].defaults.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
+    mStateRender.Load(initData, mSettings);
 
-    mWindow->Initialize(&defaultSettings, &defaultState);
+    mWindow->Initialize(windowSettings, &mStateRender);
     mWindow->SetText(title);
 
     SetParent(mWindow->GetWindowHandle(), NULL);

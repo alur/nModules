@@ -14,6 +14,27 @@
 
 #include <initializer_list>
 
+
+/// <summary>
+/// Increments the value of enumVal
+/// </summary>
+template <typename EnumType>
+static EnumType EnumIncrement(EnumType &enumVal)
+{
+    return enumVal = EnumType(std::underlying_type<EnumType>::type(enumVal) + 1);
+}
+
+
+/// <summary>
+/// Decrements the value of enumVal
+/// </summary>
+template <typename EnumType>
+static EnumType EnumDecrement(EnumType &enumVal)
+{
+    return enumVal = EnumType(std::underlying_type<EnumType>::type(enumVal) - 1);
+}
+
+
 template<class ElementType, class IndexType>
 class EnumArray
 {
@@ -60,6 +81,15 @@ public:
     /// Retrives the element correspoding to the specified index.
     /// </summary>
     ElementType &operator[] (IndexType index)
+    {
+        return mArray[std::underlying_type<IndexType>::type(index)];
+    }
+
+
+    /// <summary>
+    /// Retrives the element correspoding to the specified index.
+    /// </summary>
+    const ElementType &operator[] (IndexType index) const
     {
         return mArray[std::underlying_type<IndexType>::type(index)];
     }

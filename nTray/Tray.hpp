@@ -21,6 +21,13 @@ using std::map;
 class Tray : public Drawable
 {
 public:
+    enum class States
+    {
+        Base = 0,
+        Count
+    };
+
+public:
     explicit Tray(LPCTSTR);
     virtual ~Tray();
 
@@ -101,6 +108,12 @@ private:
             WCHAR process[MAX_PATH];
         };
     };
+
+private:
+    StateRender<States> mStateRender;
+    StateRender<TrayIcon::States> mIconStates;
+
+    WindowSettings mIconWindowSettings;
 
 private:
     // Balloons queued up to be displayed.

@@ -15,37 +15,44 @@ using std::min;
 using std::max;
 
 
-WindowThumbnail::WindowThumbnail(LPCTSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings) {
+WindowThumbnail::WindowThumbnail(LPCTSTR prefix, Settings* parentSettings) : Drawable(prefix, parentSettings)
+{
     this->thumbnailHandle = nullptr;
 
     LoadSettings();
 }
 
 
-WindowThumbnail::~WindowThumbnail() {
+WindowThumbnail::~WindowThumbnail()
+{
 }
 
 
-void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
+void WindowThumbnail::Show(HWND hwnd, LPRECT position)
+{
     HRESULT hr = S_OK;
     SIZE sourceSize = {0};
 
     this->hwnd = hwnd;
 
-    if (this->thumbnailHandle != nullptr) {
+    if (this->thumbnailHandle != nullptr)
+    {
         DwmUnregisterThumbnail(this->thumbnailHandle);
     }
 
     hr = DwmRegisterThumbnail(mWindow->GetWindowHandle(), hwnd, &this->thumbnailHandle);
     
-    if (SUCCEEDED(hr)) {
+    if (SUCCEEDED(hr))
+    {
         hr = DwmQueryThumbnailSourceSize(this->thumbnailHandle, &sourceSize);
     }
 
-    if (SUCCEEDED(hr)) {
+    if (SUCCEEDED(hr))
+    {
         int x, y, width, height, maxWidth, maxHeight;
         double scale;
-        switch (this->position) {
+        switch (this->position)
+        {
         default:
         case TOP:
         case BOTTOM:
@@ -82,7 +89,8 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
             break;
         }
 
-        switch (this->position) {
+        switch (this->position)
+        {
             case TOP:
                 mWindow->SetPosition(position->left, position->top - 1, position->right - position->left, 1);
                 break;
@@ -111,13 +119,15 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position) {
         hr = DwmUpdateThumbnailProperties(this->thumbnailHandle, &properties);
     }
 
-    if (SUCCEEDED(hr)) {
+    if (SUCCEEDED(hr))
+    {
         mWindow->Show();
     }
 }
 
 
-void WindowThumbnail::Hide() {
+void WindowThumbnail::Hide()
+{
     DwmUnregisterThumbnail(this->thumbnailHandle);
     this->thumbnailHandle = NULL;
     this->hwnd = NULL;
@@ -125,23 +135,29 @@ void WindowThumbnail::Hide() {
 }
 
 
-void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
-    WindowSettings defaults;
-    defaults.width = 150;
-    defaults.height = 40;
-    defaults.alwaysOnTop = true;
-    
-    StateSettings defaultState;
-    defaultState.backgroundBrush.color = Color::Create(0xAA009900);
-    defaultState.textBrush.color = Color::Create(0xFF000000);
-    defaultState.textOffsetTop = 2;
-    defaultState.textOffsetBottom = 2;
-    defaultState.textOffsetRight = 2;
-    defaultState.textOffsetLeft = 2;
-    defaultState.outlineBrush.color = Color::Create(0xAAFFFFFF);
-    defaultState.outlineWidth = 2.0f;
+void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/)
+{
+    // Load Window settings
+    WindowSettings windowSettings;
+    WindowSettings windowDefaults;
+    windowDefaults.width = 150;
+    windowDefaults.height = 40;
+    windowDefaults.alwaysOnTop = true;
+    windowSettings.Load(mSettings, &windowDefaults);
 
-    mWindow->Initialize(&defaults,  &defaultState);
+    // Load state Settings
+    StateRender<States>::InitData stateDefaults;
+    stateDefaults[States::Base].defaults.backgroundBrush.color = Color::Create(0xAA009900);
+    stateDefaults[States::Base].defaults.textBrush.color = Color::Create(0xFF000000);
+    stateDefaults[States::Base].defaults.textOffsetTop = 2;
+    stateDefaults[States::Base].defaults.textOffsetBottom = 2;
+    stateDefaults[States::Base].defaults.textOffsetRight = 2;
+    stateDefaults[States::Base].defaults.textOffsetLeft = 2;
+    stateDefaults[States::Base].defaults.outlineBrush.color = Color::Create(0xAAFFFFFF);
+    stateDefaults[States::Base].defaults.outlineWidth = 2.0f;
+    mStateRender.Load(stateDefaults, mSettings);
+
+    mWindow->Initialize(windowSettings, &mStateRender);
 
     TCHAR szBuf[32];
 
@@ -150,16 +166,20 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
     this->maxWidth = mSettings->GetInt(_T("MaxWidth"), 300);
     this->offset = mSettings->GetOffsetRect(_T("Offset"), 5, 5, 5, 5);
     mSettings->GetString(_T("Position"), szBuf, sizeof(szBuf), _T("Top")); 
-    if (_tcsicmp(szBuf, _T("Left")) == 0) {
+    if (_tcsicmp(szBuf, _T("Left")) == 0)
+    {
         this->position = LEFT;
     }
-    else if (_tcsicmp(szBuf, _T("Right")) == 0) {
+    else if (_tcsicmp(szBuf, _T("Right")) == 0)
+    {
         this->position = RIGHT;
     }
-    else if (_tcsicmp(szBuf, _T("Bottom")) == 0) {
+    else if (_tcsicmp(szBuf, _T("Bottom")) == 0)
+    {
         this->position = BOTTOM;
     }
-    else {
+    else
+    {
         this->position = TOP;
     }
     this->sizeToButton = mSettings->GetBool(_T("SizeToButton"), true);
@@ -167,8 +187,10 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/) {
 }
 
 
-LRESULT WINAPI WindowThumbnail::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
-    switch (message) {
+LRESULT WINAPI WindowThumbnail::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID)
+{
+    switch (message)
+    {
     case WM_SIZE:
         {
             DWM_THUMBNAIL_PROPERTIES properties;

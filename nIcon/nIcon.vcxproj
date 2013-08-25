@@ -129,6 +129,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <SDLCheck>true</SDLCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PreprocessorDefinitions>NDEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -145,7 +146,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>WIN64;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN64;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
@@ -167,6 +168,7 @@
     <ClInclude Include="IconGroup.hpp" />
     <ClInclude Include="nIcon.h" />
     <ClInclude Include="SelectionRectangle.hpp" />
+    <ClInclude Include="TileSettings.hpp" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +176,7 @@
     <ClCompile Include="IconGroup.cpp" />
     <ClCompile Include="nIcon.cpp" />
     <ClCompile Include="SelectionRectangle.cpp" />
+    <ClCompile Include="TileSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include=".\nIcon.rc" />

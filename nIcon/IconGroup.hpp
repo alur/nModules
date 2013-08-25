@@ -10,6 +10,7 @@
 #include "../nShared/Drawable.hpp"
 #include "../nShared/Window.hpp"
 #include "../nShared/Settings.hpp"
+#include "TileSettings.hpp"
 #include "IconTile.hpp"
 #include "SelectionRectangle.hpp"
 #include "../nShared/LayoutSettings.hpp"
@@ -17,7 +18,15 @@
 #include <set>
 
 
-class IconGroup : public Drawable {
+class IconGroup : public Drawable
+{
+public:
+    enum class State
+    {
+        Base = 0,
+        Count
+    };
+
 public:
     explicit IconGroup(LPCTSTR prefix);
     virtual ~IconGroup();
@@ -55,6 +64,11 @@ private:
 private:
     //
     LayoutSettings mLayoutSettings;
+
+    //
+    TileSettings mTileSettings;
+
+    StateRender<State> mStateRender;
 
     //
     int mTileWidth;

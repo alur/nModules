@@ -7,35 +7,49 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+class State;
+
 #include "StateSettings.hpp"
 #include "Brush.hpp"
 #include "IPainter.hpp"
 #include "IBrushOwner.hpp"
+#include "Window.hpp"
 
-class State : public IPainter, public IBrushOwner
+class State : public IBrushOwner
 {
 public:
-    struct WindowData {
+    struct WindowData
+    {
+        // The area we draw text in
+        D2D1_RECT_F textArea;
 
+        // The area we draw in.
+        D2D1_ROUNDED_RECT drawingArea;
+    
+        // The area we draw the outline in.
+        D2D1_ROUNDED_RECT outlineArea;
+
+        // The point we rotate text around.
+        D2D1_POINT_2F textRotationOrigin;
     };
 
 public:
-    explicit State(LPCTSTR stateName, Settings *settings, int defaultPriority, LPCWSTR *text);
+    explicit State();
     virtual ~State();
 
-    void Load(StateSettings* defaultSettings);
+    void Load(StateSettings* defaultSettings, LPCTSTR prefix, Settings *settings);
     StateSettings* GetSettings();
         
     // Gets the "desired" size for a given width and height.
-    void GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size);
+    void GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size, class Window *window);
 
     // IPainter
 public:
-    void DiscardDeviceResources() override;
-    void Paint(ID2D1RenderTarget* renderTarget) override;
-    HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) override;
-    void UpdatePosition(D2D1_RECT_F position) override;
-    bool UpdateDWMColor(ARGB newColor, ID2D1RenderTarget* renderTarget) override;
+    void DiscardDeviceResources();
+    void Paint(ID2D1RenderTarget* renderTarget, WindowData *windowData, class Window *window);
+    HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
+    void UpdatePosition(D2D1_RECT_F position, WindowData *windowData);
+    bool UpdateDWMColor(ARGB newColor, ID2D1RenderTarget* renderTarget);
 
     // IBrushOwner
 public:
@@ -56,11 +70,6 @@ public:
     void SetWordWrapping(DWRITE_WORD_WRAPPING wrapping);
 
 public:
-    bool active;
-
-    // The priority of this state.
-    int priority;
-
     // The name of this state.
     LPCTSTR mName;
 
@@ -76,38 +85,23 @@ private:
 
 private:
     // The current drawing settings.
-    StateSettings* drawingSettings;
+    StateSettings mStateSettings;
 
     // The brush we are currently painting the background with.
-    Brush* backBrush;
+    Brush mBackBrush;
 
     // The brush we are currently painting the text with.
-    Brush* textBrush;
+    Brush mTextBrush;
 
     // The brush we are currently painting the text with.
-    Brush* textShadowBrush;
+    Brush mTextShadowBrush;
 
     // The brush to paint the outline with.
-    Brush* outlineBrush;
-
-    // The area we draw text in
-    D2D1_RECT_F textArea;
+    Brush mOutlineBrush;
 
     // Defines how the text is formatted.
     IDWriteTextFormat* textFormat;
 
-    // Points to the windows text.
-    LPCWSTR* text;
-
     //
     LPCSTR stateName;
-
-    // The area we draw in.
-    D2D1_ROUNDED_RECT drawingArea;
-    
-    // The area we draw the outline in.
-    D2D1_ROUNDED_RECT outlineArea;
-
-    // The point we rotate text around.
-    D2D1_POINT_2F textRotationOrigin;
 };

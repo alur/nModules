@@ -8,8 +8,18 @@
 #pragma once
 
 #include "PopupItem.hpp"
+#include "../nShared/StateRender.hpp"
 
-class ContainerItem : public PopupItem {
+class ContainerItem : public PopupItem
+{
+public:
+    enum class State
+    {
+        Base = 0,
+        Hover,
+        Count
+    };
+
 public:
     explicit ContainerItem(Drawable* parent, LPCTSTR prefix);
     virtual ~ContainerItem();
@@ -18,5 +28,5 @@ public:
     int GetDesiredWidth(int maxWidth);
 
 private:
-    Window::STATE hoverState;
+    StateRender<State> mStateRender;
 };

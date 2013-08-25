@@ -5,33 +5,90 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Items">
+      <UniqueIdentifier>{72d0eed5-07c4-4846-b559-18110dd3a211}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Popups">
+      <UniqueIdentifier>{da52309c-a08f-4474-9a25-ff8e0242349c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings">
+      <UniqueIdentifier>{323231d6-e06e-4b8b-a723-0fb390881302}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Version.h" />
-    <ClInclude Include="CommandItem.hpp" />
-    <ClInclude Include="ContainerItem.hpp" />
-    <ClInclude Include="ContentPopup.hpp" />
-    <ClInclude Include="FolderItem.hpp" />
-    <ClInclude Include="FolderPopup.hpp" />
-    <ClInclude Include="InfoItem.hpp" />
     <ClInclude Include="nPopup.h" />
-    <ClInclude Include="Popup.hpp" />
-    <ClInclude Include="PopupItem.hpp" />
-    <ClInclude Include="SeparatorItem.hpp" />
-    <ClInclude Include="SuicidalContentPopup.hpp" />
+    <ClInclude Include="CommandItem.hpp">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="ContainerItem.hpp">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="FolderItem.hpp">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="InfoItem.hpp">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="PopupItem.hpp">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="SeparatorItem.hpp">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="ContentPopup.hpp">
+      <Filter>Popups</Filter>
+    </ClInclude>
+    <ClInclude Include="FolderPopup.hpp">
+      <Filter>Popups</Filter>
+    </ClInclude>
+    <ClInclude Include="SuicidalContentPopup.hpp">
+      <Filter>Popups</Filter>
+    </ClInclude>
+    <ClInclude Include="Popup.hpp">
+      <Filter>Popups</Filter>
+    </ClInclude>
+    <ClInclude Include="PopupSettings.hpp">
+      <Filter>Settings</Filter>
+    </ClInclude>
+    <ClInclude Include="IconCache.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SuicidalContentPopup.cpp" />
-    <ClCompile Include="CommandItem.cpp" />
-    <ClCompile Include="ContainerItem.cpp" />
-    <ClCompile Include="ContentPopup.cpp" />
-    <ClCompile Include="FolderItem.cpp" />
-    <ClCompile Include="FolderPopup.cpp" />
-    <ClCompile Include="InfoItem.cpp" />
     <ClCompile Include="nPopup.cpp" />
-    <ClCompile Include="Popup.cpp" />
-    <ClCompile Include="PopupItem.cpp" />
-    <ClCompile Include="SeparatorItem.cpp" />
+    <ClCompile Include="CommandItem.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainerItem.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="FolderItem.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="InfoItem.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="PopupItem.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="SeparatorItem.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="ContentPopup.cpp">
+      <Filter>Popups</Filter>
+    </ClCompile>
+    <ClCompile Include="FolderPopup.cpp">
+      <Filter>Popups</Filter>
+    </ClCompile>
+    <ClCompile Include="SuicidalContentPopup.cpp">
+      <Filter>Popups</Filter>
+    </ClCompile>
+    <ClCompile Include="Popup.cpp">
+      <Filter>Popups</Filter>
+    </ClCompile>
+    <ClCompile Include="PopupSettings.cpp">
+      <Filter>Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="IconCache.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nPopup.rc">

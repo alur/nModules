@@ -9,14 +9,23 @@
 
 #include "PopupItem.hpp"
 
-class SeparatorItem : public PopupItem {
+class SeparatorItem : public PopupItem
+{
+public:
+    enum class State
+    {
+        Base = 0,
+        Hover,
+        Count
+    };
+
 public:
     explicit SeparatorItem(Drawable* parent);
     virtual ~SeparatorItem();
 
+public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
-    int GetDesiredWidth(int maxWidth);
 
-private:
-    Window::STATE hoverState;
+public:
+    int GetDesiredWidth(int maxWidth);
 };

@@ -7,15 +7,12 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+class ButtonSettings;
+
 #include "TaskButton.hpp"
-#include "../Utilities/EnumArray.hpp"
 
 class ButtonSettings
 {
-public:
-    explicit ButtonSettings();
-    virtual ~ButtonSettings();
-
     // Button Specific settings
 public:
     bool mUseFlashing;
@@ -25,20 +22,17 @@ public:
     float mIconSize;
     float mIconX;
     float mIconY;
+    D2D1_RECT_F mIconRect;
 
     float mOverlayIconSize;
     float mOverlayIconOffsetX;
     float mOverlayIconOffsetY;
+    D2D1_RECT_F mOverlayIconRect;
 
     // Window settings
 public:
     WindowSettings mWindowSettings;
-    WindowSettings mWindowDefaults;
-    
-    // State settings
-public:
-    //EnumArray<TaskButton::State, StateSettings> mStateSettings;
-    //EnumArray<TaskButton::State, StateSettings> mStateDefaults;
+    StateRender<TaskButton::State> mStateRender;
 
     //
 public:

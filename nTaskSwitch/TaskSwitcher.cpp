@@ -39,16 +39,30 @@ TaskSwitcher::TaskSwitcher() : Drawable(L"nTaskSwitch")
 }
 
 
-TaskSwitcher::~TaskSwitcher() {
+TaskSwitcher::~TaskSwitcher()
+{
     Hide();
 }
 
 
-void TaskSwitcher::LoadSettings() {
+void TaskSwitcher::LoadSettings()
+{
     MonitorInfo::Monitor primaryMonitor;
     primaryMonitor = mWindow->GetMonitorInformation()->m_monitors[0];
 
-    WindowSettings defaults;
+    mThumbnailSettings.Load(mSettings);
+
+    StateRender<State>::InitData initData;
+    initData[State::Base].defaults.backgroundBrush.color = Color::Create(0xDD000000);
+    initData[State::Base].defaults.fontSize = 16;
+    initData[State::Base].defaults.fontWeight = DWRITE_FONT_WEIGHT_LIGHT;
+    initData[State::Base].defaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
+    initData[State::Base].defaults.textBrush.color = Color::Create(0xFFFFFFFF);
+    initData[State::Base].defaults.textOffsetTop = 10;
+    initData[State::Base].defaults.backgroundBrush.color = std::unique_ptr<IColorVal>(new DWMColorVal());
+    mStateRender.Load(initData, mSettings);
+
+    WindowSettings defaults, windowSettings;
     defaults.alwaysOnTop = true;
 
     // Center in the workarea of the primary monitor.
@@ -57,20 +71,12 @@ void TaskSwitcher::LoadSettings() {
     defaults.width = int(primaryMonitor.workAreaWidth*0.6);
     defaults.height = 600;
     defaults.text = _wcsdup(L"Test");
+    windowSettings.Load(mSettings, &defaults);
 
-    StateSettings stateDefaults;
-    stateDefaults.backgroundBrush.color = Color::Create(0xDD000000);
-    stateDefaults.fontSize = 16;
-    stateDefaults.fontWeight = DWRITE_FONT_WEIGHT_LIGHT;
-    stateDefaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
-    stateDefaults.textBrush.color = Color::Create(0xFFFFFFFF);
-    stateDefaults.textOffsetTop = 10;
-    stateDefaults.backgroundBrush.color = std::unique_ptr<IColorVal>(new DWMColorVal());
-
-    mWindow->Initialize(&defaults, &stateDefaults);
+    mWindow->Initialize(windowSettings, &mStateRender);
 
     this->windowsPerRow = mSettings->GetInt(L"WindowsPerRow", 7);
-    // LivePreview_ms doesn't seem to have any effect on explorer in windows 8.
+    // LivePreview_ms doesn't seem to have any effect on explorer in Windows 8.
     this->peekDelay = mSettings->GetInt(L"PeekDelay", SHRegGetIntW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AltTab\\LivePreview_ms", 1000));
 
     LayoutSettings layoutDefaults;
@@ -80,7 +86,6 @@ void TaskSwitcher::LoadSettings() {
     layoutDefaults.mPadding.bottom = 40;
     layoutDefaults.mRowSpacing = 0;
     layoutDefaults.mColumnSpacing = 0;
-
     this->layoutSettings.Load(mSettings, &layoutDefaults);
 
     this->taskWidth = (mWindow->GetDrawingSettings()->width - this->layoutSettings.mPadding.left - this->layoutSettings.mPadding.right - (this->windowsPerRow - 1) * this->layoutSettings.mColumnSpacing)/this->windowsPerRow;
@@ -88,21 +93,25 @@ void TaskSwitcher::LoadSettings() {
 }
 
 
-LRESULT WINAPI TaskSwitcher::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID extra) {
+LRESULT WINAPI TaskSwitcher::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID extra)
+{
     UNREFERENCED_PARAMETER(extra);
 
-    if (message == WM_KEYUP || message == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE) {
+    if (message == WM_KEYUP || message == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE)
+    {
         Hide();
         return 0;
     }
-    else if (message == WM_TIMER && wParam == this->peekTimer && mWindow->IsVisible()) {
+    else if (message == WM_TIMER && wParam == this->peekTimer && mWindow->IsVisible())
+    {
         this->peeking = true;
-        Preview(this->shownWindows[this->selectedWindow]->targetWindow);
+        Preview(this->shownWindows[this->selectedWindow]->mTargetWindow);
         mWindow->ClearCallbackTimer(this->peekTimer);
         this->peekTimer = 0;
         return 0;
     }
-    else if (message == WM_MOUSEMOVE || message == WM_MOUSELEAVE) {
+    else if (message == WM_MOUSEMOVE || message == WM_MOUSELEAVE)
+    {
         HoveringOverTask(nullptr);
     }
 
@@ -110,38 +119,48 @@ LRESULT WINAPI TaskSwitcher::HandleMessage(HWND window, UINT message, WPARAM wPa
 }
 
 
-void TaskSwitcher::HandleAltTab() {
-    if (mWindow->IsVisible()) {
+void TaskSwitcher::HandleAltTab()
+{
+    if (mWindow->IsVisible())
+    {
         UpdateActiveWindow(1);
     }
-    else {
+    else
+    {
         Show(1);
     }
 }
 
 
-void TaskSwitcher::HandleAltShiftTab() {
-    if (mWindow->IsVisible()) {
+void TaskSwitcher::HandleAltShiftTab()
+{
+    if (mWindow->IsVisible())
+    {
         UpdateActiveWindow(-1);
     }
-    else {
+    else
+    {
         Show(-1);
     }
 }
 
 
-void TaskSwitcher::Hide() {
-    if (this->peekTimer != 0) {
+void TaskSwitcher::Hide()
+{
+    if (this->peekTimer != 0)
+    {
         mWindow->ClearCallbackTimer(this->peekTimer);
         this->peekTimer = 0;
     }
     this->peeking = false;
     mWindow->Hide();
 
-    if (this->shownWindows.size() != 0) {
+    if (this->shownWindows.size() != 0)
+    {
         (this->hoveredThumbnail ? this->hoveredThumbnail : this->shownWindows[this->selectedWindow])->Activate();
 
-        for (vector<TaskThumbnail*>::iterator wnd = this->shownWindows.begin(); wnd != this->shownWindows.end(); ++wnd) {
+        for (vector<TaskThumbnail*>::iterator wnd = this->shownWindows.begin(); wnd != this->shownWindows.end(); ++wnd)
+        {
             delete *wnd;
         }
         this->shownWindows.clear(); 
@@ -151,19 +170,22 @@ void TaskSwitcher::Hide() {
 }
 
 
-void TaskSwitcher::AddWindow(HWND window) {
+void TaskSwitcher::AddWindow(HWND window)
+{
     this->shownWindows.push_back(new TaskThumbnail(
         this,
         window,
         this->layoutSettings.mPadding.left + this->shownWindows.size() % this->windowsPerRow * (this->taskWidth + this->layoutSettings.mColumnSpacing),
         this->layoutSettings.mPadding.top + (int)this->shownWindows.size() / this->windowsPerRow * (this->taskHeight + this->layoutSettings.mRowSpacing),
         this->taskWidth,
-        this->taskHeight
+        this->taskHeight,
+        mThumbnailSettings
     ));
 }
 
 
-void TaskSwitcher::Show(int delta) {
+void TaskSwitcher::Show(int delta)
+{
     Window::UpdateLock updateLock(mWindow);
 
     this->hoveredThumbnail = nullptr;
@@ -174,7 +196,8 @@ void TaskSwitcher::Show(int delta) {
     SetForegroundWindow(mWindow->GetWindowHandle());
     EnumDesktopWindows(nullptr, LoadWindowsCallback, (LPARAM)this);
 
-    if (desktopWindow) {
+    if (desktopWindow)
+    {
         AddWindow(desktopWindow);
     }
 
@@ -188,7 +211,8 @@ void TaskSwitcher::Show(int delta) {
 
     mWindow->Show(SW_SHOWNORMAL);
     
-    for (auto &thumbnail : this->shownWindows) {
+    for (auto &thumbnail : this->shownWindows)
+    {
         thumbnail->UpdateIconPosition();
     }
 
@@ -201,8 +225,10 @@ void TaskSwitcher::Show(int delta) {
 /// <summary>
 /// Worker used by AddExisting.
 /// </summary>
-BOOL CALLBACK TaskSwitcher::LoadWindowsCallback(HWND window, LPARAM taskSwitcher) {
-    if (IsTaskbarWindow(window)) {
+BOOL CALLBACK TaskSwitcher::LoadWindowsCallback(HWND window, LPARAM taskSwitcher)
+{
+    if (IsTaskbarWindow(window))
+    {
         ((TaskSwitcher*)taskSwitcher)->AddWindow(window);
     }
     return TRUE;
@@ -212,7 +238,8 @@ BOOL CALLBACK TaskSwitcher::LoadWindowsCallback(HWND window, LPARAM taskSwitcher
 /// <summary>
 /// Determines if a window should be shown on the taskbar.
 /// </summary>
-bool TaskSwitcher::IsTaskbarWindow(HWND hWnd) {
+bool TaskSwitcher::IsTaskbarWindow(HWND hWnd)
+{
     // Make sure it's actually a window.
     if (!IsWindow(hWnd))
         return false;
@@ -240,17 +267,22 @@ bool TaskSwitcher::IsTaskbarWindow(HWND hWnd) {
 /// <summary>
 /// 
 /// </summary>
-void TaskSwitcher::UpdateActiveWindow(int delta) {
-    if (this->shownWindows.size() > 0) {
-        if (delta != 0) {
+void TaskSwitcher::UpdateActiveWindow(int delta)
+{
+    if (this->shownWindows.size() > 0)
+    {
+        if (delta != 0)
+        {
             this->shownWindows[this->selectedWindow]->Deselect();
 
             this->selectedWindow += delta;
 
-            if (this->selectedWindow < 0) {
+            if (this->selectedWindow < 0)
+            {
                 this->selectedWindow = int(this->shownWindows.size() - 1);
             }
-            else if (this->selectedWindow >= int(this->shownWindows.size())) {
+            else if (this->selectedWindow >= int(this->shownWindows.size()))
+            {
                 this->selectedWindow = 0;
             }
 
@@ -258,12 +290,14 @@ void TaskSwitcher::UpdateActiveWindow(int delta) {
             this->hoveredThumbnail = nullptr;
         }
 
-        HWND targetWindow = this->hoveredThumbnail ? this->hoveredThumbnail->targetWindow : this->shownWindows[this->selectedWindow]->targetWindow;
+        HWND targetWindow = this->hoveredThumbnail ? this->hoveredThumbnail->mTargetWindow : this->shownWindows[this->selectedWindow]->mTargetWindow;
 
-        if (targetWindow == desktopWindow) {
+        if (targetWindow == desktopWindow)
+        {
             mWindow->SetText(L"Desktop");
         }
-        else {
+        else
+        {
             WCHAR text[MAX_PATH];
             GetWindowTextW(targetWindow, text, MAX_PATH);
             mWindow->SetText(text);
@@ -275,23 +309,30 @@ void TaskSwitcher::UpdateActiveWindow(int delta) {
 }
 
 
-void TaskSwitcher::Preview(HWND window) {
-    if (this->peeking) {
-        if (window == desktopWindow) {
+void TaskSwitcher::Preview(HWND window)
+{
+    if (this->peeking)
+    {
+        if (window == desktopWindow)
+        {
             DwmpActivateLivePreview(1, GetDesktopWindow(), mWindow->GetWindowHandle(), 1);
         }
-        else {
+        else
+        {
             DwmpActivateLivePreview(1, window, mWindow->GetWindowHandle(), 1);
         }
     }
-    else if (this->peekTimer != 0) {
+    else if (this->peekTimer != 0)
+    {
         SetTimer(mWindow->GetWindowHandle(), this->peekTimer, this->peekDelay, nullptr);
     }
 }
 
 
-void TaskSwitcher::HoveringOverTask(TaskThumbnail* task) {
-    if (task != this->hoveredThumbnail) {
+void TaskSwitcher::HoveringOverTask(TaskThumbnail* task)
+{
+    if (task != this->hoveredThumbnail)
+    {
         this->hoveredThumbnail = task;
         UpdateActiveWindow(0);
     }
