@@ -28,7 +28,7 @@ public:
             base = StateEnum::Base;
         }
 
-        std::initializer_list<StateEnum> dependencies;
+        std::list<StateEnum> dependencies;
         StateSettings defaults;
         int priority;
         LPCTSTR prefix;
@@ -160,11 +160,11 @@ public:
             {
                 stateSettings->AppendGroup(mStates[StateEnum::Base].settings);
             }
-            for (StateEnum depState : initData[state].dependencies)
+            mStateDependencies[state] = initData[state].dependencies;
+            for (StateEnum depState : mStateDependencies[state])
             {
                 mDependentStates[depState].push_back(state);
             }
-            mStateDependencies[state] = initData[state].dependencies;
             mStates[state].Load(&initData[state].defaults, initData[state].prefix, stateSettings);
         }
     }
