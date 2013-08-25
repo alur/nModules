@@ -1410,7 +1410,7 @@ bool Window::UpdateDWMColor(ARGB newColor)
         ret = painter->UpdateDWMColor(newColor, this->renderTarget) || ret;
     }
 
-    mStateRender->UpdateDWMColor(newColor, this->renderTarget);
+    ret = mStateRender->UpdateDWMColor(newColor, this->renderTarget) || ret;
     
     for (IPainter *painter : this->postPainters) 
     {
