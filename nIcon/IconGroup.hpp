@@ -114,4 +114,9 @@ private:
     D2D1_POINT_2U mRectangleStart;
     bool mInRectangleSelection;
     SelectionRectangle mSelectionRectagle;
+
+    // Context menu temps
+private:
+    IContextMenu2 *mContextMenu2;
+    IContextMenu3 *mContextMenu3;
 };

@@ -53,14 +53,15 @@ struct DoubleNullStrCollection {
 /// <summary>
 /// Constructor
 /// </summary>
-IconGroup::IconGroup(LPCTSTR prefix) : Drawable(prefix)
+IconGroup::IconGroup(LPCTSTR prefix)
+    : Drawable(prefix)
+    , mChangeNotifyUID(0)
+    , mContextMenu2(nullptr)
+    , mContextMenu3(nullptr)
+    , mClipBoardCutFiles(false)
+    , mInRectangleSelection(false)
+    , mNextPositionID(0)
 {
-    // Initalize all variables.
-    this->mChangeNotifyUID = 0;
-
-    mClipBoardCutFiles = false;
-    mInRectangleSelection = false;
-
     LoadSettings();
 
     WindowSettings defaults, windowSettings;
@@ -74,8 +75,6 @@ IconGroup::IconGroup(LPCTSTR prefix) : Drawable(prefix)
     mStateRender.Load(initData, mSettings);
 
     mSelectionRectagle.Init(mSettings);
-
-    mNextPositionID = 0;
 
     mWindow->Initialize(windowSettings, &mStateRender);
     //mWindow->AddDropRegion();
@@ -116,7 +115,8 @@ IconGroup::~IconGroup() {
 /// <summary>
 /// 
 /// </summary>
-void IconGroup::LoadSettings() {
+void IconGroup::LoadSettings()
+{
     // Icon settings
     Settings *iconSettings = mSettings->CreateChild(_T("Icon"));
     int iconSize = iconSettings->GetInt(_T("Size"), 48);
@@ -141,7 +141,8 @@ void IconGroup::LoadSettings() {
     layoutDefaults.mPrimaryDirection = LayoutSettings::Direction::Horizontal;
     mLayoutSettings.Load(mSettings, &layoutDefaults);
 
-    if (!mSettings->GetBool(_T("DontHideDesktopSystemIcons"), false)) {
+    if (!mSettings->GetBool(_T("DontHideDesktopSystemIcons"), false))
+    {
         AddNameFilter(L".controlPanel");
         AddNameFilter(L".libraries");
         AddNameFilter(L".network");
@@ -417,46 +418,75 @@ void IconGroup::SelectAll() {
 /// <summary>
 /// Brings up the context menu for the currently selected icons.
 /// </summary>
-void IconGroup::ContextMenu() {
+void IconGroup::ContextMenu()
+{
     IContextMenu *contextMenu;
     HMENU menu;
     std::vector<LPCITEMIDLIST> items;
+                HRESULT hr;
 
-    for (IconTile *tile : mIcons) {
-        if (tile->IsSelected()) {
+    for (IconTile *tile : mIcons)
+    {
+        if (tile->IsSelected())
+        {
             items.push_back(tile->GetItem());
         }
     }
 
-    if (items.empty()) {
+    if (items.empty())
+    {
         return;
     }
 
-    mWorkingFolder->GetUIObjectOf(nullptr, UINT(items.size()), &items[0], IID_IContextMenu, nullptr, reinterpret_cast<LPVOID*>(&contextMenu));
+    if (SUCCEEDED(hr = mWorkingFolder->GetUIObjectOf(nullptr, UINT(items.size()), &items[0], IID_IContextMenu, nullptr, reinterpret_cast<LPVOID*>(&contextMenu))))
+    {
+        menu = CreatePopupMenu();
+        if (menu)
+        {
+            if (SUCCEEDED(hr = contextMenu->QueryContextMenu(menu, 0, 1, 1024, CMF_NORMAL | CMF_CANRENAME)))
+            {
+                POINT pt;
+                GetCursorPos(&pt);
+                contextMenu->QueryInterface(IID_IContextMenu2, (LPVOID*)&mContextMenu2);
+                contextMenu->QueryInterface(IID_IContextMenu3, (LPVOID*)&mContextMenu3);
+                int command = TrackPopupMenuEx(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, mWindow->GetWindowHandle(), nullptr);
+                SAFERELEASE(mContextMenu2);
+                SAFERELEASE(mContextMenu3);
+                if (command != 0)
+                {
+                    //WCHAR verb[MAX_LINE_LENGTH];
+                    //if (SUCCEEDED(hr = contextMenu->GetCommandString(command, GCS_VERBW, nullptr, LPSTR(verb), _countof(verb))))
+                    {
+                        // TODO::Figure out why InvokeCommand fails if i go for unicode.
+                        CMINVOKECOMMANDINFOEX info;
+                        ZeroMemory(&info, sizeof(info));
+                        info.cbSize = sizeof(info);
+                        info.fMask = CMIC_MASK_UNICODE | CMIC_MASK_PTINVOKE;
+                        if (GetKeyState(VK_CONTROL) < 0)
+                        {
+                            info.fMask |= CMIC_MASK_CONTROL_DOWN;
+                        }
+                        if (GetKeyState(VK_SHIFT) < 0)
+                        {
+                            info.fMask |= CMIC_MASK_SHIFT_DOWN;
+                        }
 
-    menu = CreatePopupMenu();
-    contextMenu->QueryContextMenu(menu, 0, 0, 0, CMF_NORMAL);
+                        info.hwnd = mWindow->GetWindowHandle();
+                        //info.lpVerb = verb;
+                        //info.lpVerbW = verb;
+                        info.lpVerb = MAKEINTRESOURCEA(command - 1);
+                        info.lpVerbW = MAKEINTRESOURCEW(command - 1);
+                        info.ptInvoke = pt;
+                        hr = contextMenu->InvokeCommand(LPCMINVOKECOMMANDINFO(&info));
+                    }
+                }
+            }
 
-    POINT pt;
-    GetCursorPos(&pt);
-    HRESULT hr;
-    int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, mWindow->GetWindowHandle(), nullptr);
-    if (command != 0) {
-        CHAR verb[MAX_LINE_LENGTH];
-        contextMenu->GetCommandString(command, GCS_VERBA, nullptr, LPSTR(verb), _countof(verb));
+            DestroyMenu(menu);
+        }
 
-        // TODO::Figure out why InvokeCommand fails if i go for unicode.
-        CMINVOKECOMMANDINFOEX info;
-        ZeroMemory(&info, sizeof(info));
-        info.cbSize = sizeof(info);
-        //info.fMask = CMIC_MASK_UNICODE;
-        info.hwnd = mWindow->GetWindowHandle();
-        info.lpVerb = verb;
-        hr = contextMenu->InvokeCommand(LPCMINVOKECOMMANDINFO(&info));
+        contextMenu->Release();
     }
-
-    DestroyMenu(menu);
-    contextMenu->Release();
 }
 
 
@@ -786,6 +816,23 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
         return 0;
     }
     else {
+        if (mContextMenu3)
+        {
+            LRESULT result;
+            if (SUCCEEDED(mContextMenu3->HandleMenuMsg2(message, wParam, lParam, &result)))
+            {
+                return result;
+            }
+        }
+        
+        if (mContextMenu2)
+        {
+            if (SUCCEEDED(mContextMenu2->HandleMenuMsg(message, wParam, lParam)))
+            {
+                return 0;
+            }
+        }
+
         switch (message)
         {
         case WM_KEYDOWN:
