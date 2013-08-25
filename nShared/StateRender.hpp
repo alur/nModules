@@ -158,7 +158,7 @@ public:
             Settings *stateSettings = baseSettings->CreateChild(initData[state].prefix);
             if (state != StateEnum::Base)
             {
-                stateSettings->AppendGroup(mStates[StateEnum::Base].settings);
+                stateSettings->AppendGroup(mStates[initData[state].base].settings);
             }
             mStateDependencies[state] = initData[state].dependencies;
             for (StateEnum depState : mStateDependencies[state])
