@@ -72,4 +72,5 @@ namespace WindowManager
     void UpdateWindow(HWND hWnd, LPARAM data);
     void UpdateWindowMonitors();
     void AddExisting();
+    void RunWindowMaintenance();
 }

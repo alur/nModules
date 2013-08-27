@@ -94,6 +94,7 @@ void WindowManager::Start()
     {
         SetTimer(gLSModule.GetMessageWindow(), TIMER_CHECKMONITOR, 250, nullptr);
     }
+    SetTimer(gLSModule.GetMessageWindow(), TIMER_MAINTENANCE, 250, nullptr);
 
     SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)gLSModule.GetMessageWindow(), (LPARAM)gWMMessages);
 }
@@ -111,6 +112,7 @@ void WindowManager::Stop()
     // Clean up
     SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)gLSModule.GetMessageWindow(), (LPARAM)gWMMessages);
     KillTimer(gLSModule.GetMessageWindow(), TIMER_CHECKMONITOR);
+    KillTimer(gLSModule.GetMessageWindow(), TIMER_MAINTENANCE);
     delete g_pMonitorInfo;
     activeWindow = nullptr;
     windowMap.clear();
@@ -382,9 +384,26 @@ void WindowManager::UpdateWindowMonitors()
             mods.push_back(iter->first);
         }
     }
-    for (HWND hwnd : mods)
+    if (!mods.empty())
     {
-        MonitorChanged(hwnd, g_pMonitorInfo->MonitorFromHWND(hwnd));
+        // Prevent all taskbars from painting during the update.
+        std::vector<Window::UpdateLock*> updateLocks(gTaskbars.size());
+        int i = 0;
+        for (auto taskbar : gTaskbars)
+        {
+            updateLocks[i++] = new Window::UpdateLock(taskbar.second->GetWindow());
+        }
+
+        for (HWND hwnd : mods)
+        {
+            MonitorChanged(hwnd, g_pMonitorInfo->MonitorFromHWND(hwnd));
+        }
+        
+        // Clear update locks
+        for (Window::UpdateLock *updateLock : updateLocks)
+        {
+            delete updateLock;
+        }
     }
 }
 
@@ -480,6 +499,12 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             case TIMER_CHECKMONITOR:
                 {
                     UpdateWindowMonitors();
+                }
+                return 0;
+
+            case TIMER_MAINTENANCE:
+                {
+                    RunWindowMaintenance();
                 }
                 return 0;
             }
@@ -707,4 +732,55 @@ void WindowManager::AddExisting()
 
         PostMessage(gLSModule.GetMessageWindow(), WM_ADDED_EXISTING, 0, 0);
     }).detach();
+}
+
+
+/// <summary>
+/// Removes any invalid windows, and rechecks the minimized state of windows.
+/// </summary>
+void WindowManager::RunWindowMaintenance()
+{
+    // Check that we are currently running
+    assert(isStarted);
+
+    // Prevent all taskbars from painting during the update.
+    std::vector<Window::UpdateLock*> updateLocks(gTaskbars.size());
+    int i = 0;
+    for (auto taskbar : gTaskbars)
+    {
+        updateLocks[i++] = new Window::UpdateLock(taskbar.second->GetWindow());
+    }
+    
+    vector<HWND> removals;
+    for (WindowMap::iterator iter = windowMap.begin(); iter != windowMap.end(); iter++)
+    {
+        if (!IsWindow(iter->first))
+        {
+            removals.push_back(iter->first);
+        }
+        else
+        {
+            for (TaskButton *button : iter->second.buttons)
+            {
+                if (IsIconic(iter->first))
+                {
+                    button->ActivateState(TaskButton::State::Minimized);
+                }
+                else
+                {
+                    button->ClearState(TaskButton::State::Minimized);
+                }
+            }
+        }
+    }
+    for (HWND hwnd : removals)
+    {
+        RemoveWindow(hwnd);
+    }
+
+    // Clear update locks
+    for (Window::UpdateLock *updateLock : updateLocks)
+    {
+        delete updateLock;
+    }
 }
