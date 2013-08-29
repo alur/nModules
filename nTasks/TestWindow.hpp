@@ -9,10 +9,13 @@
 
 #include <vector>
 
-void CreateTestWindow();
-
 class TestWindow
 {
+    // Static functions
+public:
+    static void Create();
+    static void DestroyAll();
+
     // Constructor & Destructor
 public:
     TestWindow(ITaskbarList4 *taskbarList, HMODULE module);

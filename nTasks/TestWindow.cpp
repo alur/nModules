@@ -10,10 +10,17 @@
 #include "TestWindow.hpp"
 #include "../nShared/LSModule.hpp"
 #include "../Utilities/Error.h"
+#include <mutex>
+#include <map>
+#include <set>
 #include <thread>
 #include "resource.h"
 
 extern LSModule gLSModule;
+
+// List of all currently living test dialogs.
+static std::set<HWND> sTestDialogs;
+static std::mutex sTestDialogsMutex;
 
 #define PROGRESS_MAX (1 << 13)
 
@@ -205,6 +212,7 @@ INT_PTR CALLBACK TestWindow::DialogProc(HWND hwndDlg, UINT message, WPARAM wPara
 
             case MAKEWPARAM(IDC_FLASH, BN_CLICKED):
                 {
+                    SetForegroundWindow(FindWindow(L"DesktopBackgroundClass", nullptr));
                     FlashWindow(mDialogWindow, TRUE);
                 }
                 return TRUE;
@@ -248,6 +256,17 @@ INT_PTR CALLBACK TestWindow::DialogProc(HWND hwndDlg, UINT message, WPARAM wPara
     case WM_INITDIALOG:
         {
             Initialize(hwndDlg);
+            sTestDialogsMutex.lock();
+            sTestDialogs.insert(hwndDlg);
+            sTestDialogsMutex.unlock();
+        }
+        return TRUE;
+
+    case WM_DESTROY:
+        {
+            sTestDialogsMutex.lock();
+            sTestDialogs.erase(hwndDlg);
+            sTestDialogsMutex.unlock();
         }
         return TRUE;
 
@@ -362,9 +381,29 @@ static void WindowWorker(HINSTANCE instance)
 /// <summary>
 /// Creates a test window.
 /// </summary>
-void CreateTestWindow()
+void TestWindow::Create()
 {
     std::thread(WindowWorker, gLSModule.GetInstance()).detach();
+}
+
+
+/// <summary>
+/// Creates a test window.
+/// </summary>
+void TestWindow::DestroyAll()
+{
+    std::vector<HANDLE> windowHandles;
+    sTestDialogsMutex.lock();
+    for (HWND hwnd : sTestDialogs)
+    {
+        windowHandles.push_back(OpenThread(SYNCHRONIZE, FALSE, GetWindowThreadProcessId(hwnd, nullptr)));
+        PostMessage(hwnd, WM_COMMAND, MAKEWPARAM(IDOK, BN_CLICKED), 0);
+    }
+    sTestDialogsMutex.unlock();
+    if (!windowHandles.empty())
+    {
+        WaitForMultipleObjects((DWORD)windowHandles.size(), &windowHandles[0], TRUE, INFINITE);
+    }
 }
 
 

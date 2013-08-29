@@ -57,9 +57,6 @@
 
   <section>
     <title>Changelog</title>
-    <description>
-    </description>
-    
     <version>
       <title>0.7</title>
       <date>Future</date>
@@ -74,6 +71,9 @@
         <fixed>balloons using NIIF_ERROR would show NIIF_INFO instead.</fixed>
         <changed>signficantly faster dynamic popups.</changed>
         <changed>more efficient child window creation.</changed>
+		<fixed>the minimized state should now be triggered reliably.</fixed>
+		<fixed>faster update when many tasks change monitors at once (VWM modules).</fixed>
+		<fixed>crash when recycling with an open test window.</fixed>
       </changes>
     </version>
     
