@@ -93,13 +93,13 @@ LRESULT WINAPI Balloon::HandleMessage(HWND window, UINT message, WPARAM wParam, 
 void Balloon::LoadSettings()
 {
     StateRender<States>::InitData backInit;
-    backInit[States::Base].defaults.backgroundBrush.color = Color::Create(0xCCFAFAD2);
-    backInit[States::Base].defaults.textBrush.color = Color::Create(0xFF000000);
+    backInit[States::Base].defaults.brushSettings[State::BrushType::Background].color = Color::Create(0xCCFAFAD2);
+    backInit[States::Base].defaults.brushSettings[State::BrushType::Text].color = Color::Create(0xFF000000);
     backInit[States::Base].defaults.textOffsetTop = 4;
     backInit[States::Base].defaults.textOffsetBottom = 4;
     backInit[States::Base].defaults.textOffsetRight = 4;
     backInit[States::Base].defaults.textOffsetLeft = 40;
-    backInit[States::Base].defaults.outlineBrush.color = Color::Create(0xAA000000);
+    backInit[States::Base].defaults.brushSettings[State::BrushType::Outline].color = Color::Create(0xAA000000);
     backInit[States::Base].defaults.outlineWidth = 1.5f;
     backInit[States::Base].defaults.wordWrapping = DWRITE_WORD_WRAPPING_WRAP;
     backInit[States::Base].defaults.cornerRadiusX = 4.0f;
@@ -107,15 +107,15 @@ void Balloon::LoadSettings()
     mBackStates.Load(backInit, mSettings);
 
     StateRender<States>::InitData titleInit;
-    titleInit[States::Base].defaults.textBrush.color = Color::Create(0xFF000000);
-    titleInit[States::Base].defaults.backgroundBrush.color = Color::Create(0x00000000);
+    titleInit[States::Base].defaults.brushSettings[State::BrushType::Text].color = Color::Create(0xFF000000);
+    titleInit[States::Base].defaults.brushSettings[State::BrushType::Background].color = Color::Create(0x00000000);
     titleInit[States::Base].defaults.fontWeight = DWRITE_FONT_WEIGHT_BOLD;
     mTitleStates.Load(titleInit, mTitleSettings);
     
     StateRender<States>::InitData closeInit;
-    closeInit[States::Base].defaults.backgroundBrush.color = Color::Create(0xAA77AACC);
-    closeInit[States::Base].defaults.textBrush.color = Color::Create(0xFF000000);
-    closeInit[States::Base].defaults.outlineBrush.color = Color::Create(0xFF000000);
+    closeInit[States::Base].defaults.brushSettings[State::BrushType::Background].color = Color::Create(0xAA77AACC);
+    closeInit[States::Base].defaults.brushSettings[State::BrushType::Text].color = Color::Create(0xFF000000);
+    closeInit[States::Base].defaults.brushSettings[State::BrushType::Outline].color = Color::Create(0xFF000000);
     closeInit[States::Base].defaults.outlineWidth = 1.0f;
     closeInit[States::Base].defaults.cornerRadiusX = 2.0f;
     closeInit[States::Base].defaults.cornerRadiusY = 2.0f;

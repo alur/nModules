@@ -104,7 +104,7 @@ TaskThumbnail::TaskThumbnail(
     this->iconOverlayWindow = gLSModule.CreateDrawableWindow(mSettings, this);
 
     StateRender<IconState>::InitData iconInitData;
-    iconInitData[IconState::Base].defaults.backgroundBrush.color = Color::Create(0x00000000);
+    iconInitData[IconState::Base].defaults.brushSettings[::State::BrushType::Background].color = Color::Create(0x00000000);
     mIconStateRender.Load(iconInitData, mSettings);
     
     RECT r;

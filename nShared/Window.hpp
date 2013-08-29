@@ -9,7 +9,6 @@
 
 #include "../Utilities/Common.h"
 #include "WindowSettings.hpp"
-#include "StateSettings.hpp"
 #include "State.hpp"
 #include "Overlay.hpp"
 #include "MessageHandler.hpp"

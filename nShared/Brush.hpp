@@ -26,6 +26,29 @@ public:
         Count
     };
 
+    struct WindowData
+    {
+        WindowData()
+        {
+            brushTransform = D2D1::Matrix3x2F::Identity();
+        }
+
+        // The current position of the window we are drawing to.
+        D2D1_RECT_F position;
+
+        // The position, within the window, which we should actually draw to. (for center scaling and such).
+        D2D1_RECT_F brushPosition;
+        
+        // The current transform of the brush
+        D2D1_MATRIX_3X2_F brushTransform;
+
+        // If we are in Edges mode, the rectangles of the various partitions.
+        EnumArray<D2D1_RECT_F, EdgeType> imageEdgeRects;
+
+        // If we are in Edges scaling mode, the transforms used for the various edges.
+        EnumArray<D2D1_MATRIX_3X2_F, EdgeType> imageEdgeTransforms;
+    };
+
 public:
     explicit Brush();
     virtual ~Brush();
@@ -35,16 +58,13 @@ public:
     void Load(BrushSettings *settings);
 
     // Updates the brush to the new position of the window.
-    void UpdatePosition(D2D1_RECT_F position);
+    void UpdatePosition(D2D1_RECT_F position, WindowData *windowData);
 
     //
     bool UpdateDWMColor(ARGB newColor, ID2D1RenderTarget *renderTarget);
 
     // The brush.
     ID2D1Brush *brush;
-
-    //
-    D2D1_RECT_F brushPosition;
 
     // Discards the brush.
     void Discard();
@@ -56,8 +76,8 @@ public:
 
 public:
     bool IsImageEdgeBrush() const;
-    D2D1_RECT_F *GetImageEdgeRectAndScaleBrush(EdgeType edgeType);
-    void ComputeEdgeData(D2D1_SIZE_F size);
+    D2D1_RECT_F *GetImageEdgeRectAndScaleBrush(EdgeType edgeType, WindowData *windowData);
+    void ComputeEdgeData(D2D1_SIZE_F size, WindowData *windowData);
 
 public:
     void SetColor(const IColorVal *color); 
@@ -89,7 +109,7 @@ private:
     void LoadGradientStops();
 
     //
-    void ScaleImage();
+    void ScaleImage(WindowData *windowData);
     
     // The current drawing settings.
     BrushSettings* brushSettings;
@@ -100,17 +120,8 @@ private:
     //
     D2D1_EXTEND_MODE tileModeY;
 
-    // The current position of the 
-    D2D1_RECT_F position;
-
     // Defines how to scale the image for the Edges scaling mode.
     D2D1_RECT_F imageEdges;
-
-    //
-    EnumArray<D2D1_RECT_F, EdgeType> mImageEdgeRects;
-
-    //
-    EnumArray<D2D1_MATRIX_3X2_F, EdgeType> mImageEdgeTransforms;
 
     // The gradient stops.
     D2D1_GRADIENT_STOP* gradientStops;

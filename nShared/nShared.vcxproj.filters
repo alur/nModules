@@ -88,9 +88,6 @@
     <ClInclude Include="StateBangs.h">
       <Filter>States</Filter>
     </ClInclude>
-    <ClInclude Include="StateSettings.hpp">
-      <Filter>States</Filter>
-    </ClInclude>
     <ClInclude Include="BrushSettings.hpp">
       <Filter>Brushes</Filter>
     </ClInclude>

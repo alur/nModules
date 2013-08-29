@@ -126,7 +126,7 @@ static struct BangItem {
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            state->SetReadingDirection(StateSettings::ParseReadingDirection(arg));
+            state->SetReadingDirection(State::Settings::ParseReadingDirection(arg));
             window->Repaint();
         }
     }),
@@ -136,7 +136,7 @@ static struct BangItem {
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            state->SetTextAlignment(StateSettings::ParseTextAlignment(arg));
+            state->SetTextAlignment(State::Settings::ParseTextAlignment(arg));
             window->Repaint();
         }
     }),
@@ -167,7 +167,7 @@ static struct BangItem {
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            state->SetTextTrimmingGranuality(StateSettings::ParseTrimmingGranularity(arg));
+            state->SetTextTrimmingGranuality(State::Settings::ParseTrimmingGranularity(arg));
             window->Repaint();
         }
     }),
@@ -177,7 +177,7 @@ static struct BangItem {
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            state->SetTextVerticalAlign(StateSettings::ParseParagraphAlignment(arg));
+            state->SetTextVerticalAlign(State::Settings::ParseParagraphAlignment(arg));
             window->Repaint();
         }
     }),
@@ -187,7 +187,7 @@ static struct BangItem {
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            state->SetWordWrapping(StateSettings::ParseWordWrapping(arg));
+            state->SetWordWrapping(State::Settings::ParseWordWrapping(arg));
             window->Repaint();
         }
     })

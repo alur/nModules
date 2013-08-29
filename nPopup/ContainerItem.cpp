@@ -23,8 +23,8 @@ ContainerItem::ContainerItem(Drawable* parent, LPCTSTR prefix)
     StateRender<State>::InitData initData;
     for (auto &stateInitData : initData)
     {
-        stateInitData.defaults.backgroundBrush.color = Color::Create(0xAAFFFFFF);
-        stateInitData.defaults.textBrush.color = Color::Create(0xFF000000);
+        stateInitData.defaults.brushSettings[::State::BrushType::Background].color = Color::Create(0xAAFFFFFF);
+        stateInitData.defaults.brushSettings[::State::BrushType::Text].color = Color::Create(0xFF000000);
     }
     mStateRender.Load(initData, mSettings);
 

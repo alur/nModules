@@ -203,11 +203,6 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget)
         }
     }
 
-    if (SUCCEEDED(hr))
-    {
-        UpdatePosition(this->position);
-    }
-
     return hr;
 }
 
@@ -218,14 +213,14 @@ bool Brush::IsImageEdgeBrush() const
 }
 
 
-D2D1_RECT_F *Brush::GetImageEdgeRectAndScaleBrush(EdgeType edgeType)
+D2D1_RECT_F *Brush::GetImageEdgeRectAndScaleBrush(EdgeType edgeType, WindowData *windowData)
 {
-    this->brush->SetTransform(mImageEdgeTransforms[edgeType]);
-    return &mImageEdgeRects[edgeType];
+    this->brush->SetTransform(windowData->imageEdgeTransforms[edgeType]);
+    return &windowData->imageEdgeRects[edgeType];
 }
 
 
-void Brush::ComputeEdgeData(D2D1_SIZE_F size)
+void Brush::ComputeEdgeData(D2D1_SIZE_F size, WindowData *windowData)
 {
     using namespace D2D1;
 
@@ -245,103 +240,103 @@ void Brush::ComputeEdgeData(D2D1_SIZE_F size)
         imageEdges.top *= scale;
     }
 
-    mImageEdgeRects[EdgeType::TopLeft] = D2D1::Rect(
-        position.left,
-        position.top,
-        position.left + imageEdges.left,
-        position.top + imageEdges.top);
+    windowData->imageEdgeRects[EdgeType::TopLeft] = D2D1::Rect(
+        windowData->position.left,
+        windowData->position.top,
+        windowData->position.left + imageEdges.left,
+        windowData->position.top + imageEdges.top);
 
-    mImageEdgeRects[EdgeType::TopCenter] = D2D1::Rect(
-        position.left + imageEdges.left,
-        position.top,
-        position.right - imageEdges.right,
-        position.top + imageEdges.top);
+    windowData->imageEdgeRects[EdgeType::TopCenter] = D2D1::Rect(
+        windowData->position.left + imageEdges.left,
+        windowData->position.top,
+        windowData->position.right - imageEdges.right,
+        windowData->position.top + imageEdges.top);
 
-    mImageEdgeRects[EdgeType::TopRight] = D2D1::Rect(
-        position.right - imageEdges.right,
-        position.top,
-        position.right,
-        position.top + imageEdges.top);
+    windowData->imageEdgeRects[EdgeType::TopRight] = D2D1::Rect(
+        windowData->position.right - imageEdges.right,
+        windowData->position.top,
+        windowData->position.right,
+        windowData->position.top + imageEdges.top);
 
-    mImageEdgeRects[EdgeType::MiddleLeft] = D2D1::Rect(
-        position.left,
-        position.top + imageEdges.top,
-        position.left + imageEdges.left,
-        position.bottom - imageEdges.bottom);
+    windowData->imageEdgeRects[EdgeType::MiddleLeft] = D2D1::Rect(
+        windowData->position.left,
+        windowData->position.top + imageEdges.top,
+        windowData->position.left + imageEdges.left,
+        windowData->position.bottom - imageEdges.bottom);
 
-    mImageEdgeRects[EdgeType::MiddleCenter] = D2D1::Rect(
-        position.left + imageEdges.left,
-        position.top + imageEdges.top,
-        position.right - imageEdges.right,
-        position.bottom - imageEdges.bottom);
+    windowData->imageEdgeRects[EdgeType::MiddleCenter] = D2D1::Rect(
+        windowData->position.left + imageEdges.left,
+        windowData->position.top + imageEdges.top,
+        windowData->position.right - imageEdges.right,
+        windowData->position.bottom - imageEdges.bottom);
 
-    mImageEdgeRects[EdgeType::MiddleRight] = D2D1::Rect(
-        position.right - imageEdges.right,
-        position.top + imageEdges.top,
-        position.right,
-        position.bottom - imageEdges.bottom);
+    windowData->imageEdgeRects[EdgeType::MiddleRight] = D2D1::Rect(
+        windowData->position.right - imageEdges.right,
+        windowData->position.top + imageEdges.top,
+        windowData->position.right,
+        windowData->position.bottom - imageEdges.bottom);
 
-    mImageEdgeRects[EdgeType::BottomLeft] = D2D1::Rect(
-        position.left,
-        position.bottom - imageEdges.bottom,
-        position.left + imageEdges.left,
-        position.bottom);
+    windowData->imageEdgeRects[EdgeType::BottomLeft] = D2D1::Rect(
+        windowData->position.left,
+        windowData->position.bottom - imageEdges.bottom,
+        windowData->position.left + imageEdges.left,
+        windowData->position.bottom);
 
-    mImageEdgeRects[EdgeType::BottomCenter] = D2D1::Rect(
-        position.left + imageEdges.left,
-        position.bottom - imageEdges.bottom,
-        position.right - imageEdges.right,
-        position.bottom);
+    windowData->imageEdgeRects[EdgeType::BottomCenter] = D2D1::Rect(
+        windowData->position.left + imageEdges.left,
+        windowData->position.bottom - imageEdges.bottom,
+        windowData->position.right - imageEdges.right,
+        windowData->position.bottom);
 
-    mImageEdgeRects[EdgeType::BottomRight] = D2D1::Rect(
-        position.right - imageEdges.right,
-        position.bottom - imageEdges.bottom,
-        position.right,
-        position.bottom);
+    windowData->imageEdgeRects[EdgeType::BottomRight] = D2D1::Rect(
+        windowData->position.right - imageEdges.right,
+        windowData->position.bottom - imageEdges.bottom,
+        windowData->position.right,
+        windowData->position.bottom);
 
-    mImageEdgeTransforms[EdgeType::TopLeft] = Matrix3x2F::Translation(this->position.left, this->position.top);
-    mImageEdgeTransforms[EdgeType::TopRight] = Matrix3x2F::Translation(this->position.right - size.width, this->position.top);
-    mImageEdgeTransforms[EdgeType::BottomLeft] = Matrix3x2F::Translation(this->position.left, this->position.bottom - size.height);
-    mImageEdgeTransforms[EdgeType::BottomRight] = Matrix3x2F::Translation(this->position.right - size.width, this->position.bottom - size.height);
+    windowData->imageEdgeTransforms[EdgeType::TopLeft] = Matrix3x2F::Translation(windowData->position.left, windowData->position.top);
+    windowData->imageEdgeTransforms[EdgeType::TopRight] = Matrix3x2F::Translation(windowData->position.right - size.width, windowData->position.top);
+    windowData->imageEdgeTransforms[EdgeType::BottomLeft] = Matrix3x2F::Translation(windowData->position.left, windowData->position.bottom - size.height);
+    windowData->imageEdgeTransforms[EdgeType::BottomRight] = Matrix3x2F::Translation(windowData->position.right - size.width, windowData->position.bottom - size.height);
 
-    mImageEdgeTransforms[EdgeType::TopCenter] = Matrix3x2F::Translation(this->position.left, this->position.top) *
+    windowData->imageEdgeTransforms[EdgeType::TopCenter] = Matrix3x2F::Translation(windowData->position.left, windowData->position.top) *
         Matrix3x2F::Scale(
-            (position.right - position.left) / (size.width - imageEdges.left - imageEdges.right),
+            (windowData->position.right - windowData->position.left) / (size.width - imageEdges.left - imageEdges.right),
             1.0f,
-            Point2F(this->position.left + imageEdges.left, this->position.top)
+            Point2F(windowData->position.left + imageEdges.left, windowData->position.top)
         );
 
-    mImageEdgeTransforms[EdgeType::MiddleLeft] = Matrix3x2F::Translation(this->position.left, this->position.top) *
+    windowData->imageEdgeTransforms[EdgeType::MiddleLeft] = Matrix3x2F::Translation(windowData->position.left, windowData->position.top) *
         Matrix3x2F::Scale(
             1.0f,
-            (position.bottom - position.top) / (size.height - imageEdges.top - imageEdges.bottom),
-            Point2F(this->position.left, this->position.top + imageEdges.top)
+            (windowData->position.bottom - windowData->position.top) / (size.height - imageEdges.top - imageEdges.bottom),
+            Point2F(windowData->position.left, windowData->position.top + imageEdges.top)
         );
 
-    mImageEdgeTransforms[EdgeType::MiddleRight] = Matrix3x2F::Translation(this->position.right - size.width, this->position.top) *
+    windowData->imageEdgeTransforms[EdgeType::MiddleRight] = Matrix3x2F::Translation(windowData->position.right - size.width, windowData->position.top) *
         Matrix3x2F::Scale(
             1.0f,
-            (position.bottom - position.top) / (size.height - imageEdges.top - imageEdges.bottom),
-            Point2F(this->position.right, this->position.top + imageEdges.top)
+            (windowData->position.bottom - windowData->position.top) / (size.height - imageEdges.top - imageEdges.bottom),
+            Point2F(windowData->position.right, windowData->position.top + imageEdges.top)
         );
 
-    mImageEdgeTransforms[EdgeType::BottomCenter] = Matrix3x2F::Translation(this->position.left, this->position.bottom - size.height) *
+    windowData->imageEdgeTransforms[EdgeType::BottomCenter] = Matrix3x2F::Translation(windowData->position.left, windowData->position.bottom - size.height) *
         Matrix3x2F::Scale(
-            (position.right - position.left) / (size.width - imageEdges.left - imageEdges.right),
+            (windowData->position.right - windowData->position.left) / (size.width - imageEdges.left - imageEdges.right),
             1.0f,
-            Point2F(this->position.left + imageEdges.left, this->position.bottom)
+            Point2F(windowData->position.left + imageEdges.left, windowData->position.bottom)
         );
 
-    mImageEdgeTransforms[EdgeType::MiddleCenter] = Matrix3x2F::Translation(this->position.left, this->position.top) *
+    windowData->imageEdgeTransforms[EdgeType::MiddleCenter] = Matrix3x2F::Translation(windowData->position.left, windowData->position.top) *
         Matrix3x2F::Scale(
-            (this->position.right - this->position.left) / (size.width - imageEdges.left - imageEdges.right),
-            (this->position.bottom - this->position.top) / (size.height - imageEdges.top - imageEdges.bottom),
-            Point2F(this->position.left + imageEdges.left, this->position.top + imageEdges.top)
+            (windowData->position.right - windowData->position.left) / (size.width - imageEdges.left - imageEdges.right),
+            (windowData->position.bottom - windowData->position.top) / (size.height - imageEdges.top - imageEdges.bottom),
+            Point2F(windowData->position.left + imageEdges.left, windowData->position.top + imageEdges.top)
         );
 }
 
 
-void Brush::ScaleImage()
+void Brush::ScaleImage(WindowData *windowData)
 {
     ID2D1Bitmap* bitmap;
     reinterpret_cast<ID2D1BitmapBrush*>(this->brush)->GetBitmap(&bitmap);
@@ -353,62 +348,59 @@ void Brush::ScaleImage()
     using std::max;
 
     D2D1_POINT_2F centerPoint = Point2F(
-        this->position.left + (this->position.right - this->position.left)/2.0f,
-        this->position.top + (this->position.bottom - this->position.top)/2.0f
+        windowData->position.left + (windowData->position.right - windowData->position.left)/2.0f,
+        windowData->position.top + (windowData->position.bottom - windowData->position.top)/2.0f
     );
 
     switch(this->scalingMode)
     {
     case ImageScalingMode::Center:
         {
-            this->brush->SetTransform(Matrix3x2F::Translation(centerPoint.x - size.width/2.0f, centerPoint.y - size.height/2.0f));
-            this->brushPosition.left = max(centerPoint.x - size.width/2.0f, this->position.left);
-            this->brushPosition.top = max(centerPoint.y - size.height/2.0f, this->position.top);
-            this->brushPosition.right = min(this->brushPosition.left + size.width, this->position.right);
-            this->brushPosition.bottom = min(this->brushPosition.top + size.height, this->position.bottom);
+            windowData->brushTransform = Matrix3x2F::Translation(centerPoint.x - size.width/2.0f, centerPoint.y - size.height/2.0f);
+            windowData->brushPosition.left = max(centerPoint.x - size.width/2.0f, windowData->position.left);
+            windowData->brushPosition.top = max(centerPoint.y - size.height/2.0f, windowData->position.top);
+            windowData->brushPosition.right = min(windowData->brushPosition.left + size.width, windowData->position.right);
+            windowData->brushPosition.bottom = min(windowData->brushPosition.top + size.height, windowData->position.bottom);
         }
         break;
 
     case ImageScalingMode::Stretch:
         {
-            this->brush->SetTransform(
-                Matrix3x2F::Translation(this->position.left, this->position.top) *
+            windowData->brushTransform =
+                Matrix3x2F::Translation(windowData->position.left, windowData->position.top) *
                 Matrix3x2F::Scale(
-                    (this->position.right - this->position.left)/size.width,
-                    (this->position.bottom - this->position.top)/size.height,
-                    Point2F(this->position.left, this->position.top)
-                )
-            );
+                    (windowData->position.right - windowData->position.left)/size.width,
+                    (windowData->position.bottom - windowData->position.top)/size.height,
+                    Point2F(windowData->position.left, windowData->position.top)
+                );
         }
         break;
 
     case ImageScalingMode::Fit:
         {
-            float scale = min((this->position.right - this->position.left)/size.width, (this->position.bottom - this->position.top)/size.height);
-            this->brush->SetTransform(
-                Matrix3x2F::Translation(centerPoint.x - size.width/2.0f, centerPoint.y - size.height/2.0f) *
-                Matrix3x2F::Scale(scale, scale, centerPoint)
-            );
-            this->brushPosition.left = centerPoint.x - scale*size.width/2.0f;
-            this->brushPosition.top = centerPoint.y - scale*size.height/2.0f;
-            this->brushPosition.right = this->brushPosition.left + scale*size.width;
-            this->brushPosition.bottom = this->brushPosition.top + scale*size.height;
+            float scale = min((windowData->position.right - windowData->position.left)/size.width, (windowData->position.bottom - windowData->position.top)/size.height);
+            windowData->brushTransform =
+                Matrix3x2F::Translation(centerPoint.x - size.width / 2.0f, centerPoint.y - size.height / 2.0f) *
+                Matrix3x2F::Scale(scale, scale, centerPoint);
+            windowData->brushPosition.left = centerPoint.x - scale*size.width/2.0f;
+            windowData->brushPosition.top = centerPoint.y - scale*size.height/2.0f;
+            windowData->brushPosition.right = windowData->brushPosition.left + scale*size.width;
+            windowData->brushPosition.bottom = windowData->brushPosition.top + scale*size.height;
         }
         break;
 
     case ImageScalingMode::Fill:
         {
-            float scale = max((this->position.right - this->position.left)/size.width, (this->position.bottom - this->position.top)/size.height);
-            this->brush->SetTransform(
-                Matrix3x2F::Translation(centerPoint.x - size.width/2.0f, centerPoint.y - size.height/2.0f) *
-                Matrix3x2F::Scale(scale, scale, centerPoint)
-            );
+            float scale = max((windowData->position.right - windowData->position.left)/size.width, (windowData->position.bottom - windowData->position.top)/size.height);
+            windowData->brushTransform =
+                Matrix3x2F::Translation(centerPoint.x - size.width / 2.0f, centerPoint.y - size.height / 2.0f) *
+                Matrix3x2F::Scale(scale, scale, centerPoint);
         }
         break;
 
     case ImageScalingMode::Tile:
         {
-            this->brush->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
+            windowData->brushTransform = D2D1::Matrix3x2F::Translation(windowData->position.left, windowData->position.top);
             reinterpret_cast<ID2D1BitmapBrush*>(this->brush)->SetExtendModeX(this->tileModeX);
             reinterpret_cast<ID2D1BitmapBrush*>(this->brush)->SetExtendModeY(this->tileModeY);
         }
@@ -416,26 +408,26 @@ void Brush::ScaleImage()
 
     case ImageScalingMode::Edges:
         {
-            ComputeEdgeData(size);
+            ComputeEdgeData(size, windowData);
         }
         break;
     }
 }
 
 
-void Brush::UpdatePosition(D2D1_RECT_F position)
+void Brush::UpdatePosition(D2D1_RECT_F position, WindowData *windowData)
 {
-    this->position = this->brushPosition = position;
+    windowData->position = windowData->brushPosition = position;
 
     if (this->brush)
     {
         if (this->brushType == Type::Image)
         {
-            ScaleImage();
+            ScaleImage(windowData);
         }
         else
         {
-            this->brush->SetTransform(D2D1::Matrix3x2F::Translation(this->position.left, this->position.top));
+            windowData->brushTransform = D2D1::Matrix3x2F::Translation(windowData->position.left, windowData->position.top);
         }
     }
 }
@@ -483,28 +475,28 @@ bool Brush::UpdateDWMColor(ARGB newColor, ID2D1RenderTarget *renderTarget)
 
 HRESULT Brush::LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2D1Brush **brush)
 {
-    IWICImagingFactory* factory = NULL;
-    IWICBitmap* wicBitmap = NULL;
-    IWICFormatConverter* converter = NULL;
-    ID2D1Bitmap* bitmap = NULL;
+    IWICImagingFactory* factory = nullptr;
+    IWICBitmap* wicBitmap = nullptr;
+    IWICFormatConverter* converter = nullptr;
+    ID2D1Bitmap* bitmap = nullptr;
     Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
     HRESULT hr = E_FAIL;
         
-    HBITMAP hBitmap = LiteStep::LoadLSImage(image, NULL);
+    HBITMAP hBitmap = LiteStep::LoadLSImage(image, nullptr);
     if (hBitmap)
     {
         hr = factory->CreateFormatConverter(&converter);
         if (SUCCEEDED(hr))
         {
-            hr = factory->CreateBitmapFromHBITMAP(hBitmap, NULL, WICBitmapUseAlpha, &wicBitmap);
+            hr = factory->CreateBitmapFromHBITMAP(hBitmap, nullptr, WICBitmapUseAlpha, &wicBitmap);
         }
         if (SUCCEEDED(hr))
         {
-            hr = converter->Initialize(wicBitmap, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.f, WICBitmapPaletteTypeMedianCut);
+            hr = converter->Initialize(wicBitmap, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.f, WICBitmapPaletteTypeMedianCut);
         }
         if (SUCCEEDED(hr))
         {
-            hr = renderTarget->CreateBitmapFromWicBitmap(converter, NULL, &bitmap);
+            hr = renderTarget->CreateBitmapFromWicBitmap(converter, nullptr, &bitmap);
         }
         if (SUCCEEDED(hr))
         {
@@ -546,7 +538,7 @@ void Brush::SetImage(ID2D1RenderTarget *renderTarget, LPCTSTR path)
             SAFERELEASE(this->brush);
             this->brush = tempBrush;
             this->brush->SetOpacity(this->brushSettings->imageOpacity);
-            ScaleImage();
+            //ScaleImage(windowData);
         }
     }
 }

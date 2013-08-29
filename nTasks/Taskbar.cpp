@@ -27,7 +27,7 @@ Taskbar::Taskbar(LPCTSTR name) : Drawable(name)
     mLayoutSettings.Load(mSettings, &defaults);
 
     StateRender<States>::InitData initData;
-    initData[States::Base].defaults.backgroundBrush.color = std::unique_ptr<IColorVal>(new DWMColorVal());
+    initData[States::Base].defaults.brushSettings[State::BrushType::Background].color = std::unique_ptr<IColorVal>(new DWMColorVal());
 
     mStateRender.Load(initData, mSettings);
 

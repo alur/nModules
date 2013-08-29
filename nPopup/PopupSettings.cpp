@@ -25,8 +25,8 @@ void PopupSettings::Load(Settings *settings)
         StateRender<CommandItem::State>::InitData commandInitData;
         for (auto &stateInitData : commandInitData)
         {
-            stateInitData.defaults.backgroundBrush.color = Color::Create(0xAAFFFF00);
-            stateInitData.defaults.textBrush.color = Color::Create(0xFF000000);
+            stateInitData.defaults.brushSettings[State::BrushType::Background].color = Color::Create(0xAAFFFF00);
+            stateInitData.defaults.brushSettings[State::BrushType::Text].color = Color::Create(0xFF000000);
             stateInitData.defaults.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
             stateInitData.defaults.textOffsetLeft = 20;
             stateInitData.defaults.textOffsetRight = 5;
@@ -49,8 +49,8 @@ void PopupSettings::Load(Settings *settings)
         StateRender<nPopup::FolderItem::State>::InitData folderInitData;
         for (auto &stateInitData : folderInitData)
         {
-            stateInitData.defaults.backgroundBrush.color = Color::Create(0xAA00FFFF);
-            stateInitData.defaults.textBrush.color = Color::Create(0xFF000000);
+            stateInitData.defaults.brushSettings[State::BrushType::Background].color = Color::Create(0xAA00FFFF);
+            stateInitData.defaults.brushSettings[State::BrushType::Text].color = Color::Create(0xFF000000);
             stateInitData.defaults.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
             stateInitData.defaults.textOffsetLeft = 20;
             stateInitData.defaults.textOffsetRight = 5;
@@ -75,8 +75,8 @@ void PopupSettings::Load(Settings *settings)
         StateRender<InfoItem::State>::InitData infoInitData;
         for (auto &stateInitData : infoInitData)
         {
-            stateInitData.defaults.backgroundBrush.color = Color::Create(0xAA000000);
-            stateInitData.defaults.textBrush.color = Color::Create(0xFF000000);
+            stateInitData.defaults.brushSettings[State::BrushType::Background].color = Color::Create(0xAA00FF00);
+            stateInitData.defaults.brushSettings[State::BrushType::Text].color = Color::Create(0xFF000000);
             stateInitData.defaults.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
             stateInitData.defaults.textOffsetLeft = 20;
             stateInitData.defaults.textOffsetRight = 5;
@@ -99,8 +99,8 @@ void PopupSettings::Load(Settings *settings)
         StateRender<SeparatorItem::State>::InitData separatorInitData;
         for (auto &stateInitData : separatorInitData)
         {
-            stateInitData.defaults.backgroundBrush.color = Color::Create(0xAA000000);
-            stateInitData.defaults.textBrush.color = Color::Create(0xFF000000);
+            stateInitData.defaults.brushSettings[State::BrushType::Background].color = Color::Create(0xAA000000);
+            stateInitData.defaults.brushSettings[State::BrushType::Text].color = Color::Create(0xFF000000);
         }
         separatorInitData[SeparatorItem::State::Hover].prefix = L"Hover";
         mSeparatorStateRender.Load(separatorInitData, separatorSettings);

@@ -29,7 +29,7 @@ public:
         }
 
         std::list<StateEnum> dependencies;
-        StateSettings defaults;
+        State::Settings defaults;
         int priority;
         LPCTSTR prefix;
         StateEnum base;

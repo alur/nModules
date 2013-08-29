@@ -53,13 +53,12 @@ void TaskSwitcher::LoadSettings()
     mThumbnailSettings.Load(mSettings);
 
     StateRender<State>::InitData initData;
-    initData[State::Base].defaults.backgroundBrush.color = Color::Create(0xDD000000);
+    initData[State::Base].defaults.brushSettings[::State::BrushType::Background].color = std::unique_ptr<IColorVal>(new DWMColorVal());
     initData[State::Base].defaults.fontSize = 16;
     initData[State::Base].defaults.fontWeight = DWRITE_FONT_WEIGHT_LIGHT;
     initData[State::Base].defaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
-    initData[State::Base].defaults.textBrush.color = Color::Create(0xFFFFFFFF);
+    initData[State::Base].defaults.brushSettings[::State::BrushType::Text].color = Color::Create(0xFFFFFFFF);
     initData[State::Base].defaults.textOffsetTop = 10;
-    initData[State::Base].defaults.backgroundBrush.color = std::unique_ptr<IColorVal>(new DWMColorVal());
     mStateRender.Load(initData, mSettings);
 
     WindowSettings defaults, windowSettings;

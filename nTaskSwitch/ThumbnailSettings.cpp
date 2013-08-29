@@ -21,18 +21,18 @@ void ThumbnailSettings::Load(Settings *settings)
 
     //
     StateRender<TaskThumbnail::State>::InitData initData;
-    initData[TaskThumbnail::State::Base].defaults.backgroundBrush.color = Color::Create(0x00000000);
+    initData[TaskThumbnail::State::Base].defaults.brushSettings[::State::BrushType::Background].color = Color::Create(0x00000000);
 
-    initData[TaskThumbnail::State::Hover].defaults.backgroundBrush.color = Color::Create(0xCC888888);
+    initData[TaskThumbnail::State::Hover].defaults.brushSettings[::State::BrushType::Background].color = Color::Create(0xCC888888);
     initData[TaskThumbnail::State::Hover].prefix = L"Hover";
     
-    initData[TaskThumbnail::State::Selected].defaults.backgroundBrush.color = Color::Create(0x00000000);
-    initData[TaskThumbnail::State::Selected].defaults.outlineBrush.color = Color::Create(0xFFFFFFFF);
+    initData[TaskThumbnail::State::Selected].defaults.brushSettings[::State::BrushType::Background].color = Color::Create(0x00000000);
+    initData[TaskThumbnail::State::Selected].defaults.brushSettings[::State::BrushType::Outline].color = Color::Create(0xFFFFFFFF);
     initData[TaskThumbnail::State::Selected].defaults.outlineWidth = 2.5f;
     initData[TaskThumbnail::State::Selected].prefix = L"Selected";
     
-    initData[TaskThumbnail::State::SelectedHover].defaults.backgroundBrush.color = Color::Create(0x00000000);
-    initData[TaskThumbnail::State::SelectedHover].defaults.outlineBrush.color = Color::Create(0xFFFFFFFF);
+    initData[TaskThumbnail::State::SelectedHover].defaults.brushSettings[::State::BrushType::Background].color = Color::Create(0x00000000);
+    initData[TaskThumbnail::State::SelectedHover].defaults.brushSettings[::State::BrushType::Outline].color = Color::Create(0xFFFFFFFF);
     initData[TaskThumbnail::State::SelectedHover].defaults.outlineWidth = 2.5f;
     initData[TaskThumbnail::State::SelectedHover].prefix = L"SelectedHover";
     initData[TaskThumbnail::State::SelectedHover].dependencies = { TaskThumbnail::State::Hover, TaskThumbnail::State::Selected };

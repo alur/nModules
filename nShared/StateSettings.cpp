@@ -7,7 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
-#include "StateSettings.hpp"
+#include "State.hpp"
 #include <map>
 
 using std::map;
@@ -16,7 +16,8 @@ using std::map;
 /// <summary>
 /// Initalizes the class to all default settings.
 /// </summary>
-StateSettings::StateSettings() {
+State::Settings::Settings()
+{
     this->cornerRadiusX = 0.0f;
     this->cornerRadiusY = 0.0f;
     StringCchCopy(this->font, _countof(this->font), _T("Arial"));
@@ -36,16 +37,17 @@ StateSettings::StateSettings() {
     this->textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR;
     this->wordWrapping = DWRITE_WORD_WRAPPING_NO_WRAP;
 
-    this->backgroundBrush.color = Color::Create(0xFF000000);
-    this->textBrush.color = Color::Create(0xFFFFFFFF);
-    this->textDropShadowBrush.color = Color::Create(0x00000000);
+    brushSettings[State::BrushType::Text].color = Color::Create(0xFFFFFFFF);
 }
 
 
 template <typename T>
-static T GetValue(LPCTSTR string, map<T, LPCTSTR> map, T defValue) {
-    for (auto &x : map) {
-        if (_tcsicmp(string, x.second) == 0) {
+static T GetValue(LPCTSTR string, map<T, LPCTSTR> map, T defValue)
+{
+    for (auto &x : map)
+    {
+        if (_tcsicmp(string, x.second) == 0)
+        {
             return x.first;
         }
     }
@@ -54,9 +56,12 @@ static T GetValue(LPCTSTR string, map<T, LPCTSTR> map, T defValue) {
 
 
 template <typename T>
-static LPCTSTR GetName(T value, map<T, LPCTSTR> map) {
-    for (auto &x : map) {
-        if (x.first == value) {
+static LPCTSTR GetName(T value, map<T, LPCTSTR> map)
+{
+    for (auto &x : map)
+    {
+        if (x.first == value)
+        {
             return x.second;
         }
     }
@@ -64,29 +69,34 @@ static LPCTSTR GetName(T value, map<T, LPCTSTR> map) {
 }
 
 
-static map<DWRITE_READING_DIRECTION, LPCTSTR> readingDirectionMap = {
+static map<DWRITE_READING_DIRECTION, LPCTSTR> readingDirectionMap =
+{
     { DWRITE_READING_DIRECTION_LEFT_TO_RIGHT, _T("LeftToRight") },
     { DWRITE_READING_DIRECTION_RIGHT_TO_LEFT, _T("RightToLeft") }
 };
 
-static map<DWRITE_WORD_WRAPPING, LPCTSTR> wordWrappingMap = {
+static map<DWRITE_WORD_WRAPPING, LPCTSTR> wordWrappingMap =
+{
     { DWRITE_WORD_WRAPPING_NO_WRAP, _T("NoWrap") },
     { DWRITE_WORD_WRAPPING_WRAP,    _T("Wrap")   }
 };
 
-static map<DWRITE_FONT_STYLE, LPCTSTR> fontStyleMap = {
+static map<DWRITE_FONT_STYLE, LPCTSTR> fontStyleMap =
+{
     { DWRITE_FONT_STYLE_NORMAL,  _T("Normal")     },
     { DWRITE_FONT_STYLE_OBLIQUE, _T("Oblique")    },
     { DWRITE_FONT_STYLE_ITALIC,  _T("Italic")     }
 };
 
-static map<DWRITE_TEXT_ALIGNMENT, LPCTSTR> textAlignmentMap = {
+static map<DWRITE_TEXT_ALIGNMENT, LPCTSTR> textAlignmentMap =
+{
     { DWRITE_TEXT_ALIGNMENT_LEADING,  _T("Left")   },
     { DWRITE_TEXT_ALIGNMENT_CENTER,   _T("Center") },
     { DWRITE_TEXT_ALIGNMENT_TRAILING, _T("Right")  }
 };
 
-static map<DWRITE_PARAGRAPH_ALIGNMENT, LPCTSTR> paragraphAlignmentMap = {
+static map<DWRITE_PARAGRAPH_ALIGNMENT, LPCTSTR> paragraphAlignmentMap =
+{
     { DWRITE_PARAGRAPH_ALIGNMENT_NEAR,     _T("Top")     },
     { DWRITE_PARAGRAPH_ALIGNMENT_CENTER,   _T("Middle")  },
     { DWRITE_PARAGRAPH_ALIGNMENT_FAR,      _T("Bottom")  }
@@ -98,7 +108,8 @@ static map<DWRITE_TRIMMING_GRANULARITY, LPCTSTR> trimmingGranularityMap = {
     { DWRITE_TRIMMING_GRANULARITY_NONE,         _T("None")      }
 };
 
-static map<DWRITE_FONT_STRETCH, LPCTSTR> fontStretchMap = {
+static map<DWRITE_FONT_STRETCH, LPCTSTR> fontStretchMap =
+{
     { DWRITE_FONT_STRETCH_NORMAL,           _T("Normal")          },
     { DWRITE_FONT_STRETCH_ULTRA_CONDENSED,  _T("Ultra Condensed") },
     { DWRITE_FONT_STRETCH_EXTRA_CONDENSED,  _T("Extra Condensed") },
@@ -111,7 +122,8 @@ static map<DWRITE_FONT_STRETCH, LPCTSTR> fontStretchMap = {
     { DWRITE_FONT_STRETCH_ULTRA_EXPANDED,   _T("Ultra Expanded")  }
 };
 
-static map<DWRITE_FONT_WEIGHT, LPCTSTR> fontWeightMap = {
+static map<DWRITE_FONT_WEIGHT, LPCTSTR> fontWeightMap =
+{
     { DWRITE_FONT_WEIGHT_THIN,         _T("Thin")         },
     { DWRITE_FONT_WEIGHT_EXTRA_LIGHT,  _T("Extra Light")  },
     { DWRITE_FONT_WEIGHT_ULTRA_LIGHT,  _T("Ultra Light")  },
@@ -134,10 +146,12 @@ static map<DWRITE_FONT_WEIGHT, LPCTSTR> fontWeightMap = {
 /// <summary>
 /// Loads settings from an RC file using the specified defaults.
 /// </summary>
-void StateSettings::Load(Settings* settings, StateSettings* defaults) {
-    std::unique_ptr<StateSettings> newDefs;
-    if (!defaults) {
-        newDefs = std::unique_ptr<StateSettings>(new StateSettings());
+void State::Settings::Load(::Settings* settings, Settings* defaults)
+{
+    std::unique_ptr<Settings> newDefs;
+    if (!defaults)
+    {
+        newDefs = std::unique_ptr<Settings>(new Settings());
         defaults = newDefs.get();
     }
     TCHAR buffer[128];
@@ -179,57 +193,59 @@ void StateSettings::Load(Settings* settings, StateSettings* defaults) {
     settings->GetString(_T("WordWrapping"), buffer, _countof(buffer), GetName(defaults->wordWrapping, wordWrappingMap));
     this->wordWrapping = ParseWordWrapping(buffer);
 
-    this->backgroundBrush.Load(settings, &defaults->backgroundBrush);
+    // Load brushes
+    this->brushSettings[State::BrushType::Background].Load(settings, &defaults->brushSettings[State::BrushType::Background]);
     
-    Settings* outlineSettings = settings->CreateChild(_T("Outline"));
-    this->outlineBrush.Load(outlineSettings, &defaults->outlineBrush);
+    ::Settings* outlineSettings = settings->CreateChild(_T("Outline"));
+    this->brushSettings[State::BrushType::Outline].Load(outlineSettings, &defaults->brushSettings[State::BrushType::Outline]);
+
+    ::Settings* textSettings = settings->CreateChild(_T("Font"));
+    this->brushSettings[State::BrushType::Text].Load(textSettings, &defaults->brushSettings[State::BrushType::Text]);
+
+    ::Settings* textOutlineSettings = textSettings->CreateChild(_T("Outline"));
+    this->brushSettings[State::BrushType::TextOutline].Load(textOutlineSettings, &defaults->brushSettings[State::BrushType::TextOutline]);
+    
     delete outlineSettings;
-
-    Settings* textSettings = settings->CreateChild(_T("Font"));
-    this->textBrush.Load(textSettings, &defaults->textBrush);
     delete textSettings;
-
-    Settings* dropSettings = settings->CreateChild(_T("TextDropShadow"));
-    this->textDropShadowBrush.Load(dropSettings, &defaults->textDropShadowBrush);
-    delete dropSettings;
+    delete textOutlineSettings;
 }
 
 
-DWRITE_FONT_STRETCH StateSettings::ParseFontStretch(LPCTSTR fontStretch) {
+DWRITE_FONT_STRETCH State::Settings::ParseFontStretch(LPCTSTR fontStretch) {
     return GetValue(fontStretch, fontStretchMap, DWRITE_FONT_STRETCH_NORMAL);
 }
 
 
-DWRITE_FONT_STYLE StateSettings::ParseFontStyle(LPCTSTR fontStyle) {
+DWRITE_FONT_STYLE State::Settings::ParseFontStyle(LPCTSTR fontStyle) {
     return GetValue(fontStyle, fontStyleMap, DWRITE_FONT_STYLE_NORMAL);
 }
 
 
-DWRITE_FONT_WEIGHT StateSettings::ParseFontWeight(LPCTSTR weight) {
+DWRITE_FONT_WEIGHT State::Settings::ParseFontWeight(LPCTSTR weight) {
     return GetValue(weight, fontWeightMap, DWRITE_FONT_WEIGHT_NORMAL);
 }
 
 
-DWRITE_TEXT_ALIGNMENT StateSettings::ParseTextAlignment(LPCTSTR textAlignment) {
+DWRITE_TEXT_ALIGNMENT State::Settings::ParseTextAlignment(LPCTSTR textAlignment) {
     return GetValue(textAlignment, textAlignmentMap, DWRITE_TEXT_ALIGNMENT_LEADING);
 }
 
 
-DWRITE_PARAGRAPH_ALIGNMENT StateSettings::ParseParagraphAlignment(LPCTSTR paragraphAlignment) {
+DWRITE_PARAGRAPH_ALIGNMENT State::Settings::ParseParagraphAlignment(LPCTSTR paragraphAlignment) {
     return GetValue(paragraphAlignment, paragraphAlignmentMap, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 }
 
 
-DWRITE_TRIMMING_GRANULARITY StateSettings::ParseTrimmingGranularity(LPCTSTR trimmingGranularity) {
+DWRITE_TRIMMING_GRANULARITY State::Settings::ParseTrimmingGranularity(LPCTSTR trimmingGranularity) {
     return GetValue(trimmingGranularity, trimmingGranularityMap, DWRITE_TRIMMING_GRANULARITY_CHARACTER);
 }
 
 
-DWRITE_READING_DIRECTION StateSettings::ParseReadingDirection(LPCTSTR readingDirection) {
+DWRITE_READING_DIRECTION State::Settings::ParseReadingDirection(LPCTSTR readingDirection) {
     return GetValue(readingDirection, readingDirectionMap, DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
 }
 
 
-DWRITE_WORD_WRAPPING StateSettings::ParseWordWrapping(LPCTSTR wordWrapping) {
+DWRITE_WORD_WRAPPING State::Settings::ParseWordWrapping(LPCTSTR wordWrapping) {
     return GetValue(wordWrapping, wordWrappingMap, DWRITE_WORD_WRAPPING_NO_WRAP);
 }

@@ -71,7 +71,7 @@ IconGroup::IconGroup(LPCTSTR prefix)
     windowSettings.Load(mSettings, &defaults);
 
     StateRender<State>::InitData initData;
-    initData[State::Base].defaults.backgroundBrush.color = Color::Create(0x00000000);
+    initData[State::Base].defaults.brushSettings[::State::BrushType::Background].color = Color::Create(0x00000000);
     mStateRender.Load(initData, mSettings);
 
     mSelectionRectagle.Init(mSettings);

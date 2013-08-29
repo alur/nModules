@@ -50,7 +50,6 @@
     <ClInclude Include="Overlay.hpp" />
     <ClInclude Include="State.hpp" />
     <ClInclude Include="StateBangs.h" />
-    <ClInclude Include="StateSettings.hpp" />
     <ClInclude Include="Window.hpp" />
     <ClInclude Include="Easing.h" />
     <ClInclude Include="ErrorHandler.h" />

@@ -17,6 +17,12 @@ Calendar::Calendar(LPCWSTR calendarName)
     // Load state settings
     StateRender<State>::InitData initData;
     mStateRender.Load(initData, mSettings);
+
+    //
+    WindowSettings windowSettings;
+    windowSettings.Load(mSettings, nullptr);
+
+    mWindow->Initialize(windowSettings, &mStateRender);
 }
 
 

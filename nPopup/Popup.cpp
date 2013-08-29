@@ -42,7 +42,7 @@ Popup::Popup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Drawable(prefix) {
     windowSettings.Load(mSettings, &defaultSettings);
 
     StateRender<State>::InitData initData;
-    initData[State::Base].defaults.backgroundBrush.color = Color::Create(0x440000FF);
+    initData[State::Base].defaults.brushSettings[::State::BrushType::Background].color = Color::Create(0x440000FF);
     initData[State::Base].defaults.fontSize = 32.0f;
     initData[State::Base].defaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
     initData[State::Base].defaults.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;

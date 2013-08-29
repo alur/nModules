@@ -61,7 +61,7 @@ HRESULT ClockHand::ReCreateDeviceResources(ID2D1RenderTarget *renderTarget)
     HRESULT hr = mBrush.ReCreate(renderTarget);
     if (SUCCEEDED(hr))
     {
-        mBrush.UpdatePosition(mHandRect);
+        mBrush.UpdatePosition(mHandRect, &mBrushWindowData);
     }
     return hr;
 }

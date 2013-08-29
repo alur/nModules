@@ -37,9 +37,11 @@ public:
 private:
     Brush mBackBrush;
     BrushSettings mBackBrushSettings;
+    Brush::WindowData mBackBrushWindowData;
 
     Brush mOutlineBrush;
     BrushSettings mOutlineBrushSettings;
+    Brush::WindowData mOutlineBrushWindowData;
 
     float mOutlineWidth;
     D2D1_ROUNDED_RECT mRect;

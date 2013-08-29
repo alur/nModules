@@ -136,7 +136,7 @@ void Tray::LoadSettings(bool /* IsRefresh */)
     mIconSize = iconSettings->GetInt(_T("Size"), 16);
 
     StateRender<TrayIcon::States>::InitData iconInitData;
-    iconInitData[TrayIcon::States::Base].defaults.backgroundBrush.color = Color::Create(0x00000000);
+    iconInitData[TrayIcon::States::Base].defaults.brushSettings[State::BrushType::Background].color = Color::Create(0x00000000);
     mIconStates.Load(iconInitData, iconSettings);
 
     WindowSettings iconDefaults;

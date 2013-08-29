@@ -74,13 +74,13 @@ void Tooltip::LoadSettings()
     mMaxWidth = mSettings->GetInt(_T("MaxWidth"), 300);
 
     StateRender<States>::InitData stateInitData;
-    stateInitData[States::Base].defaults.backgroundBrush.color = Color::Create(0xCCFAFAD2);
-    stateInitData[States::Base].defaults.textBrush.color = Color::Create(0xFF000000);
+    stateInitData[States::Base].defaults.brushSettings[State::BrushType::Background].color = Color::Create(0xCCFAFAD2);
+    stateInitData[States::Base].defaults.brushSettings[State::BrushType::Text].color = Color::Create(0xFF000000);
     stateInitData[States::Base].defaults.textOffsetTop = 2;
     stateInitData[States::Base].defaults.textOffsetBottom = 2;
     stateInitData[States::Base].defaults.textOffsetRight = 2;
     stateInitData[States::Base].defaults.textOffsetLeft = 2;
-    stateInitData[States::Base].defaults.outlineBrush.color = Color::Create(0xFF000000);
+    stateInitData[States::Base].defaults.brushSettings[State::BrushType::Outline].color = Color::Create(0xFF000000);
     stateInitData[States::Base].defaults.outlineWidth = 0.75f;
     mStateRender.Load(stateInitData, mSettings);
 }

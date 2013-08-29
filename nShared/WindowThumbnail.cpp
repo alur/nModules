@@ -147,13 +147,13 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/)
 
     // Load state Settings
     StateRender<States>::InitData stateDefaults;
-    stateDefaults[States::Base].defaults.backgroundBrush.color = Color::Create(0xAA009900);
-    stateDefaults[States::Base].defaults.textBrush.color = Color::Create(0xFF000000);
+    stateDefaults[States::Base].defaults.brushSettings[State::BrushType::Background].color = Color::Create(0xAA009900);
+    stateDefaults[States::Base].defaults.brushSettings[State::BrushType::Text].color = Color::Create(0xFF000000);
     stateDefaults[States::Base].defaults.textOffsetTop = 2;
     stateDefaults[States::Base].defaults.textOffsetBottom = 2;
     stateDefaults[States::Base].defaults.textOffsetRight = 2;
     stateDefaults[States::Base].defaults.textOffsetLeft = 2;
-    stateDefaults[States::Base].defaults.outlineBrush.color = Color::Create(0xAAFFFFFF);
+    stateDefaults[States::Base].defaults.brushSettings[State::BrushType::Outline].color = Color::Create(0xAAFFFFFF);
     stateDefaults[States::Base].defaults.outlineWidth = 2.0f;
     mStateRender.Load(stateDefaults, mSettings);
 

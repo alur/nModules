@@ -42,7 +42,7 @@ void ButtonSettings::Load(Settings *buttonSettings)
     for (auto &x : initData)
     {
         //
-        x.defaults.backgroundBrush.color = Color::Create(0x00000000);
+        x.defaults.brushSettings[State::BrushType::Background].color = Color::Create(0x00000000);
         x.defaults.textOffsetLeft = 36;
         x.defaults.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
     }

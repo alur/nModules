@@ -37,7 +37,7 @@ void SelectionRectangle::Paint(ID2D1RenderTarget *renderTarget)
             for (Brush::EdgeType type = Brush::EdgeType(0); type != Brush::EdgeType::Count;
                 type = Brush::EdgeType(std::underlying_type<Brush::EdgeType>::type(type) + 1))
             {
-                renderTarget->FillRectangle(mBackBrush.GetImageEdgeRectAndScaleBrush(type), mBackBrush.brush);
+                renderTarget->FillRectangle(mBackBrush.GetImageEdgeRectAndScaleBrush(type, &mBackBrushWindowData), mBackBrush.brush);
             }
         }
         else
@@ -122,9 +122,9 @@ void SelectionRectangle::Init(Settings *parentSettings)
 /// </summary>
 void SelectionRectangle::SetRect(D2D1_RECT_F rect)
 {
-    mBackBrush.UpdatePosition(rect);
-    mRect.rect = mBackBrush.brushPosition;
-    mOutlineBrush.UpdatePosition(mRect.rect);
+    mBackBrush.UpdatePosition(rect, &mBackBrushWindowData);
+    mRect.rect = mBackBrushWindowData.position;
+    mOutlineBrush.UpdatePosition(mRect.rect, &mOutlineBrushWindowData);
 }
 
 

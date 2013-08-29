@@ -53,26 +53,24 @@ void State::UpdatePosition(D2D1_RECT_F position, WindowData *windowData)
     windowData->drawingArea.rect.top += mStateSettings.outlineWidth / 2.0f;
     windowData->drawingArea.rect.bottom -= mStateSettings.outlineWidth / 2.0f;
 
-    mBackBrush.UpdatePosition(windowData->drawingArea.rect);
-    mOutlineBrush.UpdatePosition(windowData->drawingArea.rect);
-    mTextBrush.UpdatePosition(windowData->drawingArea.rect);
-    mTextShadowBrush.UpdatePosition(windowData->drawingArea.rect);
-
-    windowData->drawingArea.rect = mBackBrush.brushPosition;
+    for (BrushType type = BrushType(0); type != BrushType::Count; EnumIncrement(type))
+    {
+        mBrushes[type].UpdatePosition(windowData->drawingArea.rect, &windowData->brushData[type]);
+    }
 }
 
 
-void State::Load(StateSettings* defaultSettings, LPCTSTR prefix, Settings *settings)
+void State::Load(Settings* defaultSettings, LPCTSTR prefix, ::Settings *settings)
 {
     assert(!this->settings);
     this->settings = settings;
 
     mStateSettings.Load(this->settings, defaultSettings);
-
-    mBackBrush.Load(&mStateSettings.backgroundBrush);
-    mOutlineBrush.Load(&mStateSettings.outlineBrush);
-    mTextBrush.Load(&mStateSettings.textBrush);
-    mTextShadowBrush.Load(&mStateSettings.textDropShadowBrush);
+    
+    for (BrushType type = BrushType(0); type != BrushType::Count; EnumIncrement(type))
+    {
+        mBrushes[type].Load(&mStateSettings.brushSettings[type]);
+    }
 
     CreateTextFormat(this->textFormat);
 }
@@ -80,33 +78,37 @@ void State::Load(StateSettings* defaultSettings, LPCTSTR prefix, Settings *setti
 
 void State::DiscardDeviceResources()
 {
-    mBackBrush.Discard();
-    mOutlineBrush.Discard();
-    mTextBrush.Discard();
-    mTextShadowBrush.Discard();
+    for (Brush & brush : mBrushes)
+    {
+        brush.Discard();
+    }
 }
 
 
 void State::Paint(ID2D1RenderTarget* renderTarget, WindowData *windowData, Window *window)
 {
-    if (mBackBrush.brush)
+    if (mBrushes[BrushType::Background].brush)
     {
-        if (mBackBrush.IsImageEdgeBrush())
+        if (mBrushes[BrushType::Background].IsImageEdgeBrush())
         {
             for (Brush::EdgeType type = Brush::EdgeType(0); type != Brush::EdgeType::Count;
                 type = Brush::EdgeType(std::underlying_type<Brush::EdgeType>::type(type) + 1))
             {
-                renderTarget->FillRectangle(mBackBrush.GetImageEdgeRectAndScaleBrush(type), mBackBrush.brush);
+                renderTarget->FillRectangle(mBrushes[BrushType::Background].GetImageEdgeRectAndScaleBrush(type,
+                    &windowData->brushData[BrushType::Background]), mBrushes[BrushType::Background].brush);
             }
         }
         else
         {
-            renderTarget->FillRoundedRectangle(windowData->drawingArea, mBackBrush.brush);
+            mBrushes[BrushType::Background].brush->SetTransform(windowData->brushData[BrushType::Background].brushTransform);
+            //mBrushes[BrushType::Background].brush->SetTransform(D2D1::Matrix3x2F::Identity());
+            renderTarget->FillRoundedRectangle(windowData->drawingArea, mBrushes[BrushType::Background].brush);
         }
     }
-    if (mOutlineBrush.brush && mStateSettings.outlineWidth != 0)
+    if (mBrushes[BrushType::Outline].brush && mStateSettings.outlineWidth != 0)
     {
-        renderTarget->DrawRoundedRectangle(windowData->drawingArea, mOutlineBrush.brush, mStateSettings.outlineWidth);
+        mBrushes[BrushType::Outline].brush->SetTransform(windowData->brushData[BrushType::Outline].brushTransform);
+        renderTarget->DrawRoundedRectangle(windowData->drawingArea, mBrushes[BrushType::Outline].brush, mStateSettings.outlineWidth);
     }
     /*if (this->textShadowBrush->brush)
     {
@@ -114,10 +116,11 @@ void State::Paint(ID2D1RenderTarget* renderTarget, WindowData *windowData, Windo
         renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textDropFormat, this->textArea, this->textShadowBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         renderTarget->SetTransform(Matrix3x2F::Identity());
     }*/
-    if (mTextBrush.brush && *window->GetText() != L'\0')
+    if (mBrushes[BrushType::Text].brush && *window->GetText() != L'\0')
     {
         renderTarget->SetTransform(Matrix3x2F::Rotation(mStateSettings.textRotation, windowData->textRotationOrigin));
-        renderTarget->DrawText(window->GetText(), lstrlenW(window->GetText()), this->textFormat, windowData->textArea, mTextBrush.brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+        mBrushes[BrushType::Text].brush->SetTransform(windowData->brushData[BrushType::Text].brushTransform);
+        renderTarget->DrawText(window->GetText(), lstrlenW(window->GetText()), this->textFormat, windowData->textArea, mBrushes[BrushType::Text].brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         renderTarget->SetTransform(Matrix3x2F::Identity());
     }
 }
@@ -125,10 +128,10 @@ void State::Paint(ID2D1RenderTarget* renderTarget, WindowData *windowData, Windo
 
 HRESULT State::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget)
 {
-    mBackBrush.ReCreate(renderTarget);
-    mOutlineBrush.ReCreate(renderTarget);
-    mTextBrush.ReCreate(renderTarget);
-    mTextShadowBrush.ReCreate(renderTarget);
+    for (Brush & brush : mBrushes)
+    {
+        brush.ReCreate(renderTarget);
+    }
 
     //this->drawingArea.rect = mBackBrush.brushPosition;
     return S_OK;
@@ -138,9 +141,9 @@ HRESULT State::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget)
 bool State::UpdateDWMColor(ARGB newColor, ID2D1RenderTarget *renderTarget)
 {
     bool ret = false;
-    ret = mBackBrush.UpdateDWMColor(newColor, renderTarget) || ret;
-    ret = mOutlineBrush.UpdateDWMColor(newColor, renderTarget) || ret;
-    ret = mTextBrush.UpdateDWMColor(newColor, renderTarget) || ret;
+    ret = mBrushes[BrushType::Background].UpdateDWMColor(newColor, renderTarget) || ret;
+    ret = mBrushes[BrushType::Outline].UpdateDWMColor(newColor, renderTarget) || ret;
+    ret = mBrushes[BrushType::Text].UpdateDWMColor(newColor, renderTarget) || ret;
 
     return ret;
 }
@@ -292,15 +295,19 @@ Brush* State::GetBrush(LPCTSTR brushName)
 {
     if (*brushName == _T('\0'))
     {
-        return &mBackBrush;
+        return &mBrushes[BrushType::Background];
     }
     else if (_tcsicmp(brushName, _T("Text")) == 0)
     {
-        return &mTextBrush;
+        return &mBrushes[BrushType::Text];
     }
     else if (_tcsicmp(brushName, _T("Outline")) == 0)
     {
-        return &mOutlineBrush;
+        return &mBrushes[BrushType::Outline];
+    }
+    else if (_tcsicmp(brushName, _T("TextOutline")) == 0)
+    {
+        return &mBrushes[BrushType::TextOutline];
     }
 
     return nullptr;

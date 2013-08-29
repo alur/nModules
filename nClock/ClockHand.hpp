@@ -46,4 +46,5 @@ private:
 
     Brush mBrush;
     BrushSettings mBrushSettings;
+    Brush::WindowData mBrushWindowData;
 };

@@ -1108,6 +1108,7 @@ HRESULT Window::ReCreateDeviceResources()
             }
 
             mStateRender->ReCreateDeviceResources(this->renderTarget);
+            mStateRender->UpdatePosition(this->drawingArea, mWindowData);
 
             for (Overlay *overlay : this->overlays)
             {
