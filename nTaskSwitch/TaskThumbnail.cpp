@@ -45,7 +45,7 @@ TaskThumbnail::TaskThumbnail(
     }
 
     mWindow->Initialize(mThumbnailSettings.mWindowSettings, &mThumbnailSettings.mStateRender);
-    mWindow->SetPosition(x, y, width, height);
+    mWindow->SetPosition((float)x, (float)y, (float)width, (float)height);
     mWindow->Show();
 
     DwmRegisterThumbnail(mWindow->GetWindowHandle(), targetWindow, &mThumbnail);
@@ -110,8 +110,8 @@ TaskThumbnail::TaskThumbnail(
     RECT r;
     mWindow->GetScreenRect(&r);
     this->iconOverlayWindow->Initialize(mThumbnailSettings.mIconWindowSettings, &mIconStateRender);
-    this->iconOverlayWindow->SetPosition(r.right - 32 - horizontalOffset - mThumbnailSettings.mThumbnailMargins.right + 4,
-        r.bottom - 32 - verticalOffset - mThumbnailSettings.mThumbnailMargins.bottom + 4, 32, 32);
+    this->iconOverlayWindow->SetPosition(float(r.right - 32 - horizontalOffset - mThumbnailSettings.mThumbnailMargins.right + 4),
+        float(r.bottom - 32 - verticalOffset - mThumbnailSettings.mThumbnailMargins.bottom + 4), 32, 32);
 
     SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
     SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
@@ -136,7 +136,7 @@ void TaskThumbnail::UpdateIconPosition()
 {
     RECT r;
     mWindow->GetScreenRect(&r);
-    this->iconOverlayWindow->SetPosition(r.right - 32, r.bottom - 32, 32, 32);
+    this->iconOverlayWindow->SetPosition((float)r.right - 32, (float)r.bottom - 32, 32, 32);
 
     SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOP,
         0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);

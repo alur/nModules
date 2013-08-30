@@ -190,7 +190,7 @@ void TrayIcon::Reposition(RECT rect)
 /// </summary>
 void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height)
 {
-    mWindow->SetPosition(x, y, width, height);
+    mWindow->SetPosition((float)x, (float)y, (float)width, (float)height);
 }
 
 

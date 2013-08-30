@@ -65,9 +65,9 @@ void TaskSwitcher::LoadSettings()
     defaults.alwaysOnTop = true;
 
     // Center in the workarea of the primary monitor.
-    defaults.x = int(primaryMonitor.workArea.left + primaryMonitor.workAreaWidth*0.2);
+    defaults.x = float(primaryMonitor.workArea.left + primaryMonitor.workAreaWidth*0.2f);
     defaults.y = 200;
-    defaults.width = int(primaryMonitor.workAreaWidth*0.6);
+    defaults.width = float(primaryMonitor.workAreaWidth*0.6f);
     defaults.height = 600;
     defaults.text = _wcsdup(L"Test");
     windowSettings.Load(mSettings, &defaults);
@@ -87,7 +87,7 @@ void TaskSwitcher::LoadSettings()
     layoutDefaults.mColumnSpacing = 0;
     this->layoutSettings.Load(mSettings, &layoutDefaults);
 
-    this->taskWidth = (mWindow->GetSize().width - this->layoutSettings.mPadding.left - this->layoutSettings.mPadding.right - (this->windowsPerRow - 1) * this->layoutSettings.mColumnSpacing)/this->windowsPerRow;
+    this->taskWidth = int((mWindow->GetSize().width - this->layoutSettings.mPadding.left - this->layoutSettings.mPadding.right - (this->windowsPerRow - 1) * this->layoutSettings.mColumnSpacing)/this->windowsPerRow);
     this->taskHeight = int(this->taskWidth/1.518f);
 }
 
@@ -204,9 +204,9 @@ void TaskSwitcher::Show(int delta)
 
     mWindow->SetPosition(
         mWindow->GetDrawingSettings()->x,
-        mWindow->GetMonitorInformation()->m_monitors[0].workAreaHeight/2 - height/2 + mWindow->GetMonitorInformation()->m_monitors[0].workArea.top,
+        mWindow->GetMonitorInformation()->m_monitors[0].workAreaHeight/2.0f - height/2.0f + (float)mWindow->GetMonitorInformation()->m_monitors[0].workArea.top,
         mWindow->GetDrawingSettings()->width, 
-        height);
+        (float)height);
 
     mWindow->Show(SW_SHOWNORMAL);
     

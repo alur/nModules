@@ -95,14 +95,15 @@ void Tray::LoadSettings(bool /* IsRefresh */)
 
     WindowSettings *drawingSettings = mWindow->GetDrawingSettings();
 
+    // TODO::FIX ME!
     mTargetSize = D2D1::SizeU(
-        drawingSettings->width.Evaluate(0),
-        drawingSettings->height.Evaluate(0)
+        (UINT32)drawingSettings->width.Evaluate(0),
+        (UINT32)drawingSettings->height.Evaluate(0)
     );
 
     mTargetPosition = D2D1::Point2U(
-        drawingSettings->x.Evaluate(0),
-        drawingSettings->y.Evaluate(0)
+        (UINT32)drawingSettings->x.Evaluate(0),
+        (UINT32)drawingSettings->y.Evaluate(0)
     );
 
     mOverflowAction = mSettings->GetEnum<OverflowAction>(_T("OverflowAction"),
@@ -262,7 +263,7 @@ void Tray::Relayout()
     case OverflowAction::SizeRight:
     case OverflowAction::SizeLeft:
         {
-            int iconsPerColumn = mLayoutSettings.ItemsPerColumn(mIconSize, size.height);
+            int iconsPerColumn = mLayoutSettings.ItemsPerColumn(mIconSize, (int)size.height);
             int requiredColumns = (int)(this->icons.size() + iconsPerColumn - 1) / iconsPerColumn; // ceil(y/x) = floor((y + x - 1)/x)
             int requiredWidth = std::max((mIconSize + mLayoutSettings.mColumnSpacing) * requiredColumns +
                 mLayoutSettings.mColumnSpacing + mLayoutSettings.mPadding.left + mLayoutSettings.mPadding.right,
@@ -271,10 +272,10 @@ void Tray::Relayout()
             if (size.width != requiredWidth)
             {
                 mWindow->SetPosition(
-                    mOverflowAction == OverflowAction::SizeRight ? mTargetPosition.x : mTargetPosition.x - (requiredWidth - mTargetSize.width),
-                    mTargetPosition.y,
-                    requiredWidth,
-                    mTargetSize.height,
+                    float(mOverflowAction == OverflowAction::SizeRight ? mTargetPosition.x : mTargetPosition.x - (requiredWidth - mTargetSize.width)),
+                    (float)mTargetPosition.y,
+                    (float)requiredWidth,
+                    (float)mTargetSize.height,
                     1
                 );
             }
@@ -283,7 +284,7 @@ void Tray::Relayout()
 
     case OverflowAction::SizeUp:
     case OverflowAction::SizeDown:
-        int iconsPerRow = mLayoutSettings.ItemsPerRow(mIconSize, size.width);
+        int iconsPerRow = mLayoutSettings.ItemsPerRow(mIconSize, (int)size.width);
         int requiredRows = (int)(this->icons.size() + iconsPerRow - 1) / iconsPerRow; // ceil(y/x) = floor((y + x - 1)/x)
         int requiredHeight = std::max((mIconSize + mLayoutSettings.mRowSpacing) * requiredRows +
             mLayoutSettings.mRowSpacing + mLayoutSettings.mPadding.top + mLayoutSettings.mPadding.bottom,
@@ -292,10 +293,10 @@ void Tray::Relayout()
         if (size.height != requiredHeight)
         {
             mWindow->SetPosition(
-                mTargetPosition.x,
-                mOverflowAction == OverflowAction::SizeDown ? mTargetPosition.y : mTargetPosition.y - (requiredHeight - mTargetSize.height),
-                mTargetSize.width,
-                requiredHeight,
+                (float)mTargetPosition.x,
+                float(mOverflowAction == OverflowAction::SizeDown ? mTargetPosition.y : mTargetPosition.y - (requiredHeight - mTargetSize.height)),
+                (float)mTargetSize.width,
+                (float)requiredHeight,
                 1
             );
         }
@@ -305,7 +306,7 @@ void Tray::Relayout()
     int i = 0;
     for (auto icon : this->icons)
     {
-        icon->Reposition(mLayoutSettings.RectFromID(i++, mIconSize, mIconSize, size.width, size.height));
+        icon->Reposition(mLayoutSettings.RectFromID(i++, mIconSize, mIconSize, (int)size.width, (int)size.height));
     }
 }
 
