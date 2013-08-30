@@ -114,6 +114,7 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position)
         else
         {
             mWindow->SetPosition((float)x, (float)y, (float)width, (float)height);
+            HandleMessage(nullptr, WM_SIZE, 0, MAKELPARAM(width, height), nullptr);
         }
 
         DWM_THUMBNAIL_PROPERTIES properties;
