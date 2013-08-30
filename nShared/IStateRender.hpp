@@ -16,6 +16,7 @@ public:
     virtual void GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size, class Window *window) = 0;
     virtual IStateWindowData *CreateWindowData(class Window *window) = 0;
     virtual void Paint(ID2D1RenderTarget* renderTarget, IStateWindowData *windowData) = 0;
+    virtual void PaintText(ID2D1RenderTarget* renderTarget, IStateWindowData *windowData) = 0;
     virtual void UpdatePosition(D2D1_RECT_F parentPosition, IStateWindowData *windowData) = 0;
     virtual void DiscardDeviceResources() = 0;
     virtual HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) = 0;

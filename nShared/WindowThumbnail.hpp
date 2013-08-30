@@ -49,6 +49,8 @@ private:
     int maxWidth;
     int maxHeight;
     int thumbnailOpacity;
+    bool mAnimate;
+    int mAnimationDuration;
 
     StateRender<States> mStateRender;
 };

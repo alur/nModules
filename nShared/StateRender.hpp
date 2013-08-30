@@ -210,6 +210,19 @@ public:
 
     
     /// <summary>
+    /// Paints the currently active state to the specified render target, using
+    /// the specified window data.
+    /// </summary>
+    void PaintText(ID2D1RenderTarget* renderTarget, IStateWindowData *windowData) override
+    {
+        StateWindowData<StateEnum> *data;
+        data = decltype(data)(windowData);
+
+        mStates[data->currentState].PaintText(renderTarget, &data->data[data->currentState], data->window);
+    }
+
+    
+    /// <summary>
     /// Updates the window data based on the given window position.
     /// </summary>
     void UpdatePosition(D2D1_RECT_F parentPosition, IStateWindowData *windowData) override

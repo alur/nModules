@@ -15,6 +15,10 @@ public:
     RelatedNumber(float constant);
     RelatedNumber(float constant, float related);
 
+    RelatedNumber operator-(const RelatedNumber&);
+    RelatedNumber operator+(const RelatedNumber&);
+    RelatedNumber operator*(const float);
+
     //
 public:
     float Evaluate(float related);

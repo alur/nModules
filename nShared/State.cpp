@@ -110,12 +110,11 @@ void State::Paint(ID2D1RenderTarget* renderTarget, WindowData *windowData, Windo
         mBrushes[BrushType::Outline].brush->SetTransform(windowData->brushData[BrushType::Outline].brushTransform);
         renderTarget->DrawRoundedRectangle(windowData->drawingArea, mBrushes[BrushType::Outline].brush, mStateSettings.outlineWidth);
     }
-    /*if (this->textShadowBrush->brush)
-    {
-        renderTarget->SetTransform(Matrix3x2F::Rotation(mStateSettings.textRotation, this->textRotationOrigin));
-        renderTarget->DrawText(*this->text, lstrlenW(*this->text), this->textDropFormat, this->textArea, this->textShadowBrush->brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
-        renderTarget->SetTransform(Matrix3x2F::Identity());
-    }*/
+}
+
+
+void State::PaintText(ID2D1RenderTarget* renderTarget, WindowData *windowData, Window *window)
+{
     if (mBrushes[BrushType::Text].brush && *window->GetText() != L'\0')
     {
         renderTarget->SetTransform(Matrix3x2F::Rotation(mStateSettings.textRotation, windowData->textRotationOrigin));

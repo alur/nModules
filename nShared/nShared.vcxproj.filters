@@ -107,6 +107,7 @@
       <Filter>States</Filter>
     </ClInclude>
     <ClInclude Include="RelatedNumber.hpp" />
+    <ClInclude Include="RelatedRect.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Easing.cpp" />
@@ -195,5 +196,6 @@
       <Filter>Brushes</Filter>
     </ClCompile>
     <ClCompile Include="RelatedNumber.cpp" />
+    <ClCompile Include="RelatedRect.cpp" />
   </ItemGroup>
 </Project>

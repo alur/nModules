@@ -41,30 +41,30 @@ void Window::TextChangeHandler(LPVOID drawable)
 /// <param name="settings">The settings to use.</param>
 /// <param name="msgHandler">The default message handler for this window.</param>
 Window::Window(Settings* settings, MessageHandler* msgHandler)
+    : activeChild(nullptr)
+    , mAnimating(false)
+    , initialized(false)
+    , isTrackingMouse(false)
+    , msgHandler(msgHandler)
+    , parsedText(nullptr)
+    , mParent(nullptr)
+    , renderTarget(nullptr)
+    , mSettings(settings)
+    , text(nullptr)
+    , visible(nullptr)
+    , mDontForwardMouse(false)
+    , mCaptureHandler(nullptr)
+    , mIsChild(false)
+    , mNeedsUpdate(false)
+    , timerIDs(nullptr)
+    , userMsgIDs(nullptr)
+    , monitorInfo(nullptr)
+    , window(nullptr)
+    , mCoveredByFullscreen(false)
+    , mWindowData(nullptr)
+    , mStateRender(nullptr)
 {
-    this->activeChild = nullptr;
-    this->animating = false;
     ZeroMemory(&this->drawingArea, sizeof(this->drawingArea));
-    this->initialized = false;
-    this->isTrackingMouse = false;
-    this->msgHandler = msgHandler;
-    this->parsedText = nullptr;
-    mParent = nullptr;
-    this->renderTarget = nullptr;
-    mSettings = settings;
-    this->text = nullptr;
-    this->visible = false;
-    mDontForwardMouse = false;
-    mCaptureHandler = nullptr;
-    mIsChild = false;
-    mNeedsUpdate = false;
-    this->timerIDs = nullptr;
-    this->userMsgIDs = nullptr;
-    this->monitorInfo = nullptr;
-    this->window = nullptr;
-    mCoveredByFullscreen = false;
-    mWindowData = nullptr;
-    mStateRender = nullptr;
 }
 
 
@@ -327,20 +327,20 @@ Window::PAINTER Window::AddPrePainter(IPainter* painter)
 /// </summary>
 void Window::Animate()
 {
-    float progress = Easing::Transform(CLAMP(0.0f, mAnimationClock.GetTime()/mAnimationDuration, 1.0f), this->animationEasing);
+    float progress = Easing::Transform(CLAMP(0.0f, mAnimationClock.GetTime()/mAnimationDuration, 1.0f), mAnimationEasing);
 
     if (progress >= 1.0f)
     {
-        this->animating = false;
+        mAnimating = false;
     }
 
-    RECT step;
-    step.left = this->animationStart.left + long(progress*(this->animationTarget.left - this->animationStart.left));
-    step.top = this->animationStart.top + long(progress*(this->animationTarget.top - this->animationStart.top));
-    step.right = this->animationStart.right + long(progress*(this->animationTarget.right - this->animationStart.right));
-    step.bottom = this->animationStart.bottom + long(progress*(this->animationTarget.bottom - this->animationStart.bottom));
+    RelatedRect step;
+    step.left = mAnimationStart.left + (mAnimationTarget.left - mAnimationStart.left)*progress;
+    step.top = mAnimationStart.top + (mAnimationTarget.top - mAnimationStart.top)*progress;
+    step.right = mAnimationStart.right + (mAnimationTarget.right - mAnimationStart.right)*progress;
+    step.bottom = mAnimationStart.bottom + (mAnimationTarget.bottom - mAnimationStart.bottom)*progress;
 
-    SetPosition(step);
+    SetPosition(step.left, step.top, step.right - step.left, step.bottom - step.top);
 }
 
 
@@ -741,7 +741,7 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
 
                 // Handled specially here for top-level windows, as we must NOT resize
                 // the top-level window between BeginPaint and EndPaint.
-                if (this->animating)
+                if (mAnimating)
                 {
                     Animate();
                 }
@@ -970,6 +970,7 @@ void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
         }
 
         // Paint the active state's text.
+        mStateRender->PaintText(this->renderTarget, mWindowData);
 
         // Paint all overlays.
         PaintOverlays(updateRect);
@@ -983,8 +984,8 @@ void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
             painter->Paint(this->renderTarget);
         }
         
-        inAnimation |= this->animating;
-        if (this->animating && mIsChild)
+        inAnimation |= mAnimating;
+        if (mAnimating && mIsChild)
         {
             Animate();
         }
@@ -1349,49 +1350,14 @@ void Window::SetAlwaysOnTop(bool value)
 /// <param name="height">The height to animate to.</param>
 /// <param name="duration">The number of milliseconds to complete the animation in.</param>
 /// <param name="easing">The easing to use.</param>
-void Window::SetAnimation(float x, float y, float width, float height, int duration, Easing::Type easing)
-{
-    RECT target = { x, y, x + width, y + height };
-    this->animationTarget = target;
-    this->animationStart.top = mPosition.y;
-    this->animationStart.left = mPosition.x;
-    this->animationStart.bottom = mPosition.y + mSize.height;
-    this->animationStart.right = mPosition.x + mSize.width;
-    this->animationEasing = easing;
-
-    mAnimationClock.Clock();
-    mAnimationDuration = duration / 1000.0f;
-
-    this->animating = true;
-
-    Repaint();
-}
-
-
-/// <summary>
-/// Starts a new animation, or updates the parameters of the current one.
-/// </summary>
-/// <param name="x">The x coordinate to animate to.</param>
-/// <param name="y">The y coordinate to animate to.</param>
-/// <param name="width">The width to animate to.</param>
-/// <param name="height">The height to animate to.</param>
-/// <param name="duration">The number of milliseconds to complete the animation in.</param>
-/// <param name="easing">The easing to use.</param>
 void Window::SetAnimation(RelatedNumber x, RelatedNumber y, RelatedNumber width, RelatedNumber height, int duration, Easing::Type easing)
 {
-    // TODO::FIX ME!
-    RECT target = { x.Evaluate(0), y.Evaluate(0), x.Evaluate(0) + width.Evaluate(0), y.Evaluate(0) + height.Evaluate(0) };
-    this->animationTarget = target;
-    this->animationStart.top = mPosition.y;
-    this->animationStart.left = mPosition.x;
-    this->animationStart.bottom = mPosition.y + mSize.height;
-    this->animationStart.right = mPosition.x + mSize.width;
-    this->animationEasing = easing;
-
+    mAnimationTarget = RelatedRect(x, y, x + width, y + height);
+    mAnimationStart = RelatedRect(mWindowSettings.x, mWindowSettings.y, mWindowSettings.x + mWindowSettings.width, mWindowSettings.y + mWindowSettings.height);
+    mAnimationEasing = easing;
     mAnimationClock.Clock();
     mAnimationDuration = duration / 1000.0f;
-
-    this->animating = true;
+    mAnimating = true;
 
     Repaint();
 }
@@ -1453,6 +1419,16 @@ void Window::SetMouseCapture(MessageHandler *captureHandler)
 /// </summary>
 /// <param name="rect">The new position of the window.</param>
 void Window::SetPosition(RECT rect)
+{
+    SetPosition(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+}
+
+
+/// <summary>
+/// Moves and resizes the window.
+/// </summary>
+/// <param name="rect">The new position of the window.</param>
+void Window::SetPosition(D2D1_RECT_F rect)
 {
     SetPosition(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
 }
@@ -1611,13 +1587,14 @@ void Window::SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, 
     // Position the window and/or set the backarea.
     if (!mIsChild)
     {
-        SetWindowPos(this->window, 0, mPosition.x, mPosition.y, mSize.width, mSize.height, SWP_NOZORDER | SWP_NOACTIVATE);
-        this->drawingArea = D2D1::RectF(0, 0, (float)mSize.width, (float)mSize.height);
+        SetWindowPos(this->window, 0, int(mPosition.x + 0.5f), int(mPosition.y + 0.5f), int(mSize.width + 0.5f), int(mSize.height + 0.5f), SWP_NOZORDER | SWP_NOACTIVATE);
+        this->drawingArea = D2D1::RectF(0, 0, mSize.width, mSize.height);
         if (this->renderTarget)
         {
-            HRESULT hr = this->renderTarget->Resize(D2D1::SizeU(mSize.width, mSize.height));
+            HRESULT hr = this->renderTarget->Resize(D2D1::SizeU(UINT32(mSize.width + 0.5f), UINT32(mSize.height + 0.5f)));
             assert(SUCCEEDED(hr));
         }
+        TRACE("%d", int(mPosition.y + 0.5f) + int(mSize.height + 0.5f));
     }
     else if(mParent)
     {

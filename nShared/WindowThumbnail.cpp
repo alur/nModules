@@ -89,26 +89,32 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position)
             break;
         }
 
-        switch (this->position)
+        if (mAnimate)
         {
-            case TOP:
-                mWindow->SetPosition(position->left, position->top - 1, position->right - position->left, 1);
-                break;
+            switch (this->position)
+            {
+                case TOP:
+                    mWindow->SetPosition(position->left, position->top - 1, position->right - position->left, 1);
+                    break;
 
-            case BOTTOM:
-                mWindow->SetPosition(position->left, position->bottom, position->right - position->left, 1);
-                break;
+                case BOTTOM:
+                    mWindow->SetPosition(position->left, position->bottom, position->right - position->left, 1);
+                    break;
 
-            case LEFT:
-                mWindow->SetPosition(position->left, position->bottom, 1, position->bottom - position->top);
-                break;
+                case LEFT:
+                    mWindow->SetPosition(position->left, position->bottom, 1, position->bottom - position->top);
+                    break;
 
-            case RIGHT:
-                mWindow->SetPosition(position->right, position->bottom, 1, position->bottom - position->top);
-                break;
+                case RIGHT:
+                    mWindow->SetPosition(position->right, position->bottom, 1, position->bottom - position->top);
+                    break;
+            }
+            mWindow->SetAnimation(x, y, width, height, mAnimationDuration, Easing::Type::Sine);
         }
-        mWindow->SetPosition(x, y, width, height);
-        //mWindow->SetAnimation(x, y, width, height, 200, Easing::Type::Sine);
+        else
+        {
+            mWindow->SetPosition(x, y, width, height);
+        }
 
         DWM_THUMBNAIL_PROPERTIES properties;
         properties.dwFlags = DWM_TNP_VISIBLE | DWM_TNP_SOURCECLIENTAREAONLY | DWM_TNP_OPACITY;
@@ -182,6 +188,8 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/)
     {
         this->position = TOP;
     }
+    mAnimate = mSettings->GetBool(_T("Animate"), false);
+    mAnimationDuration = mSettings->GetInt(_T("AnimationDuration"), 200);
     this->sizeToButton = mSettings->GetBool(_T("SizeToButton"), true);
     this->thumbnailOpacity = mSettings->GetInt(_T("ThumbnailOpacity"), 255);
 }

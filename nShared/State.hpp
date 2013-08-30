@@ -141,6 +141,7 @@ public:
 public:
     void DiscardDeviceResources();
     void Paint(ID2D1RenderTarget* renderTarget, WindowData *windowData, class Window *window);
+    void PaintText(ID2D1RenderTarget* renderTarget, WindowData *windowData, class Window *window);
     HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
     void UpdatePosition(D2D1_RECT_F position, WindowData *windowData);
     bool UpdateDWMColor(ARGB newColor, ID2D1RenderTarget* renderTarget);

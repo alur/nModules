@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  RelatedNumber.hpp
+ *  RelatedNumber.cpp
  *  The nModules Project
  *
  *  Represents a number which is partially dependent on another number.
@@ -12,7 +12,6 @@
 /// Constructor
 /// </summary>
 RelatedNumber::RelatedNumber()
-    : RelatedNumber(0.0f, 0.0f)
 {
 }
 
@@ -33,6 +32,33 @@ RelatedNumber::RelatedNumber(float constant, float related)
     : mConstantPart(constant)
     , mRelatedPart(related)
 {
+}
+
+
+/// <summary>
+/// Subtraction operator
+/// </summary>
+RelatedNumber RelatedNumber::operator-(const RelatedNumber &other)
+{
+    return RelatedNumber(this->mConstantPart - other.mConstantPart, this->mRelatedPart - other.mRelatedPart);
+}
+
+
+/// <summary>
+/// Addition operator
+/// </summary>
+RelatedNumber RelatedNumber::operator+(const RelatedNumber &other)
+{
+    return RelatedNumber(this->mConstantPart + other.mConstantPart, this->mRelatedPart + other.mRelatedPart);
+}
+
+
+/// <summary>
+/// Multiplication operator
+/// </summary>
+RelatedNumber RelatedNumber::operator*(const float factor)
+{
+    return RelatedNumber(this->mConstantPart * factor, this->mRelatedPart * factor);
 }
 
 

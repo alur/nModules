@@ -26,6 +26,7 @@
 #include "../Utilities/StopWatch.hpp"
 #include "IBrushOwner.hpp"
 #include "IStateRender.hpp"
+#include "RelatedRect.hpp"
 #include <set>
 
 
@@ -245,7 +246,6 @@ public:
     void SetAlwaysOnTop(bool value);
 
     // Performs an animation.
-    void SetAnimation(float x, float y, float width, float height, int duration, Easing::Type easing);
     void SetAnimation(RelatedNumber x, RelatedNumber y, RelatedNumber width, RelatedNumber height, int duration, Easing::Type easing);
 
     // Registers a timer
@@ -268,6 +268,7 @@ public:
 
     // Sets the position of this Window, relative to its parent.
     void SetPosition(RECT rect);
+    void SetPosition(D2D1_RECT_F rect);
     void SetPosition(float x, float y, float width, float height, LPARAM extra = 0);
     void SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, RelatedNumber height, LPARAM extra = 0);
 
@@ -362,22 +363,22 @@ private:
     Window* activeChild;
 
     // True if we are currently animating.
-    bool animating;
+    bool mAnimating;
 
     // The easing we are using for the current animation.
-    Easing::Type animationEasing;
+    Easing::Type mAnimationEasing;
 
     // How long, in seconds, the animation should last.
     float mAnimationDuration;
 
     // If we are currently doing an animation, the position at the start of the animation.
-    RECT animationStart;
+    RelatedRect mAnimationStart;
 
     // If we are currently doing an animation, how far along we are.
     StopWatch mAnimationClock;
 
     // If we are currently doing an animation, the position target of the animation.
-    RECT animationTarget;
+    RelatedRect mAnimationTarget;
 
     // The children of this Window.
     list<Window*> children;
