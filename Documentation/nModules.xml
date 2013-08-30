@@ -74,6 +74,7 @@
 		<fixed>the minimized state should now be triggered reliably.</fixed>
 		<fixed>faster update when many tasks change monitors at once (VWM modules).</fixed>
 		<fixed>crash when recycling with an open test window.</fixed>
+		<added>you can now use +, -, and %'s in Width, Height, X, and Y.</added>
       </changes>
     </version>
     

@@ -74,10 +74,16 @@ public:
         WM_NEWTOPPARENT,
 
         // Sent after the window has been resized.
-        // HIGHWORD(wParam): width
-        // LOWORD(wParam): height
+        // HIGHWORD(wParam): new width
+        // LOWORD(wParam): new height
         // lParam: Custom value sent to resize
         WM_SIZECHANGE,
+        
+        // Sent after the window has moved.
+        // HIGHWORD(wParam): new x
+        // LOWORD(wParam): new y
+        // lParam: Custom value sent to move
+        WM_POSITIONCHANGE,
 
         //
         WM_ANIMATIONPAINT,

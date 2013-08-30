@@ -738,6 +738,13 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
                 //    SendMessage(hwnd, WM_PAINT, 0, 0);
                 //    return TRUE;
                 //}, 0);
+
+                // Handled specially here for top-level windows, as we must NOT resize
+                // the top-level window between BeginPaint and EndPaint.
+                if (this->animating)
+                {
+                    Animate();
+                }
             }
 
             // We just painted, don't update
@@ -953,7 +960,7 @@ void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
     {
         this->renderTarget->PushAxisAlignedClip(this->drawingArea, D2D1_ANTIALIAS_MODE_ALIASED);
 
-        // Paint the active state.
+        // Paint the active state's background.
         mStateRender->Paint(this->renderTarget, mWindowData);
         
         // Pre painters.
@@ -961,6 +968,8 @@ void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
         {
             painter->Paint(this->renderTarget);
         }
+
+        // Paint the active state's text.
 
         // Paint all overlays.
         PaintOverlays(updateRect);
@@ -975,7 +984,7 @@ void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
         }
         
         inAnimation |= this->animating;
-        if (this->animating)
+        if (this->animating && mIsChild)
         {
             Animate();
         }
@@ -1567,6 +1576,9 @@ void Window::SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, 
 {
     UpdateLock lock(this);
 
+    // Invalidate the current area.
+    Repaint();
+
     // Update the drawing settings.
     mWindowSettings.x = x;
     mWindowSettings.y = y;
@@ -1590,6 +1602,7 @@ void Window::SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, 
 
     // 
     bool isResize = newSize.height != mSize.height || newSize.width != mSize.width;
+    bool isMove = newPosition.x != mPosition.x || newPosition.y != mPosition.y;
 
     // Update mSize and mPosition
     mSize = newSize;
@@ -1602,7 +1615,8 @@ void Window::SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, 
         this->drawingArea = D2D1::RectF(0, 0, (float)mSize.width, (float)mSize.height);
         if (this->renderTarget)
         {
-            this->renderTarget->Resize(D2D1::SizeU(mSize.width, mSize.height));
+            HRESULT hr = this->renderTarget->Resize(D2D1::SizeU(mSize.width, mSize.height));
+            assert(SUCCEEDED(hr));
         }
     }
     else if(mParent)
@@ -1637,12 +1651,19 @@ void Window::SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, 
         }
     }
 
+    // Invalidate the new area.
     Repaint();
 
     //
     if (isResize)
     {
         this->msgHandler->HandleMessage(GetWindowHandle(), WM_SIZECHANGE, MAKEWPARAM(mSize.width, mSize.height), extra, this);
+    }
+
+    //
+    if (isMove)
+    {
+        this->msgHandler->HandleMessage(GetWindowHandle(), WM_POSITIONCHANGE, MAKEWPARAM(mPosition.x, mPosition.y), extra, this);
     }
 }
 
