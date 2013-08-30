@@ -50,6 +50,7 @@ public:
     bool GetLine(LPCTSTR key, LPTSTR buffer, UINT cchBuffer, LPCTSTR defaultValue) const;
     UINT GetMonitor(LPCTSTR key, UINT defaultValue) const;
     void SetMonitor(LPCTSTR key, UINT value) const;
+    RelatedNumber GetRelatedNumber(LPCTSTR key, RelatedNumber defaultValue) const;
     bool GetString(LPCTSTR key, LPTSTR buffer, UINT cchBuffer, LPCTSTR defaultValue) const;
     void SetString(LPCTSTR key, LPCTSTR value) const;
     

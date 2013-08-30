@@ -87,7 +87,7 @@ void TaskSwitcher::LoadSettings()
     layoutDefaults.mColumnSpacing = 0;
     this->layoutSettings.Load(mSettings, &layoutDefaults);
 
-    this->taskWidth = (mWindow->GetDrawingSettings()->width - this->layoutSettings.mPadding.left - this->layoutSettings.mPadding.right - (this->windowsPerRow - 1) * this->layoutSettings.mColumnSpacing)/this->windowsPerRow;
+    this->taskWidth = (mWindow->GetSize().width - this->layoutSettings.mPadding.left - this->layoutSettings.mPadding.right - (this->windowsPerRow - 1) * this->layoutSettings.mColumnSpacing)/this->windowsPerRow;
     this->taskHeight = int(this->taskWidth/1.518f);
 }
 

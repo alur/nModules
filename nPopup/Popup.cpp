@@ -239,7 +239,7 @@ void Popup::Show(LPRECT position, Popup* owner) {
 
 
     if (this->expandLeft) {
-        x = position->left - mWindow->GetDrawingSettings()->width;
+        x = position->left - mWindow->GetSize().width;
         if (x < limits.left) {
             this->expandLeft = false;
             x = this->owner ? position->right : limits.left;
@@ -247,13 +247,13 @@ void Popup::Show(LPRECT position, Popup* owner) {
     }
     else {
         x = position->right;
-        if (x > limits.right - mWindow->GetDrawingSettings()->width) {
+        if (x > limits.right - mWindow->GetSize().width) {
             this->expandLeft = true;
-            x = (this->owner ? position->left : limits.right) - mWindow->GetDrawingSettings()->width;
+            x = (this->owner ? position->left : limits.right) - mWindow->GetSize().width;
         }
     }
 
-    y = max(limits.top, min(limits.bottom - mWindow->GetDrawingSettings()->height, position->top));
+    y = max<float>(limits.top, min<float>(limits.bottom - mWindow->GetSize().height, position->top));
 
     mWindow->Move(x, y);
 

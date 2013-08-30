@@ -149,7 +149,7 @@ void Balloon::Show(LPCWSTR title, LPCWSTR text, HICON icon, LPSIZE iconSize, LPR
         mWindow->AddOverlay(f, icon);
 
         offsetLeft = iconSize->cx + 8;
-        mTitleWindow->Move(iconSize->cx + 8, 4);
+        mTitleWindow->Move((float)iconSize->cx + 8, 4);
     }
     else
     {
@@ -163,17 +163,17 @@ void Balloon::Show(LPCWSTR title, LPCWSTR text, HICON icon, LPSIZE iconSize, LPR
     mTitleWindow->SizeToText(400, 16, 0, 16);
 
     mWindow->SetText(text);
-    mWindow->SizeToText(400, 400, mTitleWindow->GetDrawingSettings()->width + offsetLeft + 24, 8 + iconSize->cy);
+    mWindow->SizeToText(400, 400, (int)mTitleWindow->GetSize().width + offsetLeft + 24, 8 + iconSize->cy);
 
-    mCloseBtnWindow->Move(mWindow->GetDrawingSettings()->width - 20, 4);
+    mCloseBtnWindow->Move(mWindow->GetSize().width - 20, 4);
 
     // Show it centerd on x, 5 px above, while forcing it to stay on the virtual desktop
     MonitorInfo* monInfo = mWindow->GetMonitorInformation();
     mWindow->Move(
-        std::min(std::max(monInfo->m_virtualDesktop.rect.left, targetPosition->left - mWindow->GetDrawingSettings()->width/2),
-            monInfo->m_virtualDesktop.rect.right - mWindow->GetDrawingSettings()->width),
-        std::min(std::max(monInfo->m_virtualDesktop.rect.top, targetPosition->top - mWindow->GetDrawingSettings()->height - 5),
-            monInfo->m_virtualDesktop.rect.bottom - mWindow->GetDrawingSettings()->height));
+        std::min<float>(std::max<float>((float)monInfo->m_virtualDesktop.rect.left, (float)targetPosition->left - mWindow->GetSize().width/2.0f),
+            (float)monInfo->m_virtualDesktop.rect.right - mWindow->GetSize().width),
+        std::min<float>(std::max<float>((float)monInfo->m_virtualDesktop.rect.top, (float)targetPosition->top - mWindow->GetSize().height - 5.0f),
+            (float)monInfo->m_virtualDesktop.rect.bottom - mWindow->GetSize().height));
 
     mWindow->Show();
 }

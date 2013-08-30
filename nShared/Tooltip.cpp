@@ -46,11 +46,12 @@ void Tooltip::Show(LPCWSTR text, LPRECT position)
 
     // Show it centerd on x, 5 px above, while forcing it to stay on the virtual desktop
     MonitorInfo* monInfo = mWindow->GetMonitorInformation();
+
     mWindow->Move(
-        std::min(std::max(monInfo->m_virtualDesktop.rect.left, position->left + (position->right - position->left)/2 - mWindow->GetDrawingSettings()->width/2),
-            monInfo->m_virtualDesktop.rect.right - mWindow->GetDrawingSettings()->width),
-        std::min(std::max(monInfo->m_virtualDesktop.rect.top, position->top - mWindow->GetDrawingSettings()->height - 5),
-            monInfo->m_virtualDesktop.rect.bottom - mWindow->GetDrawingSettings()->height));
+        std::min<float>(std::max<float>(monInfo->m_virtualDesktop.rect.left, position->left + (position->right - position->left)/2.0f - mWindow->GetSize().width/2),
+            monInfo->m_virtualDesktop.rect.right - mWindow->GetSize().width),
+        std::min<float>(std::max<float>(monInfo->m_virtualDesktop.rect.top, position->top - mWindow->GetSize().height - 5),
+            monInfo->m_virtualDesktop.rect.bottom - mWindow->GetSize().height));
 
     mWindow->Show();
 }

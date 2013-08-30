@@ -266,7 +266,7 @@ void IconGroup::AddIcon(PCITEMID_CHILD pidl) {
     }
     
     int iconPosition = GetIconPosition(pidl);
-    RECT pos = mLayoutSettings.RectFromID(iconPosition, mTileWidth, mTileHeight, mWindow->GetDrawingSettings()->width, mWindow->GetDrawingSettings()->height);
+    RECT pos = mLayoutSettings.RectFromID(iconPosition, mTileWidth, mTileHeight, mWindow->GetSize().width, mWindow->GetSize().height);
 
     IconTile *icon = new IconTile(this, pidl, mWorkingFolder, mTileWidth, mTileHeight, mTileSettings);
     icon->SetPosition(iconPosition, (int)pos.left, (int)pos.top);

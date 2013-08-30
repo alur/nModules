@@ -10,8 +10,7 @@
 
 #include "../Utilities/Common.h"
 #include "Color.h"
-#include "Coordinate.hpp"
-#include "Length.hpp"
+#include "RelatedNumber.hpp"
 #include <functional>
 #include <ShlObj.h>
 
@@ -29,6 +28,7 @@ namespace LiteStep
     __int64 GetPrefixedRCInt64(LPCTSTR prefix, LPCTSTR keyName, __int64 defaultValue);
     bool GetPrefixedRCLine(LPCTSTR prefix, LPCTSTR keyName, LPTSTR buffer, LPCTSTR defaultValue, size_t cchBuffer);
     UINT GetPrefixedRCMonitor(LPCTSTR prefix, LPCTSTR keyName, UINT defaultValue);
+    RelatedNumber GetPrefixedRCRelatedNumber(LPCTSTR prefix, LPCTSTR keyName, RelatedNumber defaultValue);
     bool GetPrefixedRCString(LPCTSTR prefix, LPCTSTR keyName, LPTSTR buffer, LPCTSTR defaultValue, size_t cchBuffer);
 
     // Utility functions
@@ -39,10 +39,6 @@ namespace LiteStep
     // Parsing functions
     bool ParseBool(LPCTSTR boolString);
     IColorVal* ParseColor(LPCTSTR colorString, const IColorVal* defaultValue);
-    Coordinate ParseCoordinate(LPCTSTR coordinateString, Coordinate defaultValue);
-    Length ParseLength(LPCTSTR lengthString, Length defaultValue);
     UINT ParseMonitor(LPCTSTR monitorString, UINT defaultValue);
-    
-    bool ParseCoordinate(LPCWSTR coordinate, LPINT target);
-    bool ParseLength(LPCWSTR length, LPINT target);
+    bool ParseRelated(LPCTSTR lengthString, RelatedNumber *result);
 }

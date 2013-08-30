@@ -42,13 +42,13 @@ void PopupItem::Position(int x, int y)
 
 int PopupItem::GetHeight()
 {
-    return mWindow->GetDrawingSettings()->height;
+    return mWindow->GetSize().height;
 }
 
 
 void PopupItem::SetWidth(int width)
 {
-    mWindow->Resize(width, mWindow->GetDrawingSettings()->height);
+    mWindow->Resize(width, mWindow->GetSize().height);
 }
 
 

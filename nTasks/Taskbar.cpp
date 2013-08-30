@@ -176,7 +176,8 @@ void Taskbar::Repaint()
 void Taskbar::Relayout()
 {
     Window::UpdateLock lock(mWindow);
-    WindowSettings* drawingSettings = mWindow->GetDrawingSettings();
+    D2D1_SIZE_F const *size = &mWindow->GetSize();
+
     int spacePerLine, lines, buttonSize, x0, y0, xdir, ydir;
 
     if (mButtonMap.size() == 0)
@@ -198,7 +199,7 @@ void Taskbar::Relayout()
 
     case LayoutSettings::StartPosition::TopRight:
         {
-            x0 = drawingSettings->width - mLayoutSettings.mPadding.right;
+            x0 = size->width - mLayoutSettings.mPadding.right;
             y0 = mLayoutSettings.mPadding.top;
             xdir = -1;
             ydir = 1;
@@ -208,7 +209,7 @@ void Taskbar::Relayout()
     case LayoutSettings::StartPosition::BottomLeft:
         {
             x0 = mLayoutSettings.mPadding.left;
-            y0 = drawingSettings->height - mLayoutSettings.mPadding.bottom;
+            y0 = size->height - mLayoutSettings.mPadding.bottom;
             xdir = 1;
             ydir = -1;
         }
@@ -216,8 +217,8 @@ void Taskbar::Relayout()
 
     case LayoutSettings::StartPosition::BottomRight:
         {
-            x0 = drawingSettings->width - mLayoutSettings.mPadding.right;
-            y0 = drawingSettings->height - mLayoutSettings.mPadding.bottom;
+            x0 = size->width - mLayoutSettings.mPadding.right;
+            y0 = size->height - mLayoutSettings.mPadding.bottom;
             xdir = -1;
             ydir = -1;
         }
@@ -226,8 +227,8 @@ void Taskbar::Relayout()
 
     if (mLayoutSettings.mPrimaryDirection == LayoutSettings::Direction::Horizontal)
     {
-        spacePerLine = drawingSettings->width - mLayoutSettings.mPadding.left - mLayoutSettings.mPadding.right;
-        lines = (drawingSettings->height + mLayoutSettings.mRowSpacing - mLayoutSettings.mPadding.top - mLayoutSettings.mPadding.bottom)/(mLayoutSettings.mRowSpacing + mButtonHeight);
+        spacePerLine = size->width - mLayoutSettings.mPadding.left - mLayoutSettings.mPadding.right;
+        lines = (size->height + mLayoutSettings.mRowSpacing - mLayoutSettings.mPadding.top - mLayoutSettings.mPadding.bottom)/(mLayoutSettings.mRowSpacing + mButtonHeight);
         // We need to consider that buttons can't be split between multiple lines.
         buttonSize = (int)min(mButtonMaxWidth, min(spacePerLine * lines / (int)mButtonMap.size(), spacePerLine / (int)ceil(mButtonMap.size() / (float)lines)) - mLayoutSettings.mColumnSpacing);
         if (ydir == -1)
@@ -244,7 +245,7 @@ void Taskbar::Relayout()
         {
             (*iter)->Reposition(x, y, buttonSize, mButtonHeight);
             x += xdir*(buttonSize + mLayoutSettings.mColumnSpacing);
-            if (x < mLayoutSettings.mPadding.left || x > drawingSettings->width - mLayoutSettings.mPadding.right - buttonSize)
+            if (x < mLayoutSettings.mPadding.left || x > size->width - mLayoutSettings.mPadding.right - buttonSize)
             {
                 x = x0;
                 y += ydir*(mButtonHeight + mLayoutSettings.mRowSpacing);
@@ -254,8 +255,8 @@ void Taskbar::Relayout()
     }
     else
     {
-        spacePerLine = drawingSettings->height - mLayoutSettings.mPadding.top - mLayoutSettings.mPadding.bottom;
-        lines = (drawingSettings->width + mLayoutSettings.mColumnSpacing - mLayoutSettings.mPadding.left - mLayoutSettings.mPadding.right)/(mLayoutSettings.mColumnSpacing + mButtonWidth);
+        spacePerLine = size->height - mLayoutSettings.mPadding.top - mLayoutSettings.mPadding.bottom;
+        lines = (size->width + mLayoutSettings.mColumnSpacing - mLayoutSettings.mPadding.left - mLayoutSettings.mPadding.right)/(mLayoutSettings.mColumnSpacing + mButtonWidth);
         buttonSize = (int)min(mButtonMaxHeight, min(spacePerLine * lines / (int)mButtonMap.size(), spacePerLine / (int)ceil(mButtonMap.size() / (float)lines)) - mLayoutSettings.mRowSpacing);
         if (ydir == -1)
         {
@@ -271,7 +272,7 @@ void Taskbar::Relayout()
         {
             (*iter)->Reposition(x, y, mButtonWidth, buttonSize);
             y += ydir*(buttonSize + mLayoutSettings.mRowSpacing);
-            if (y < mLayoutSettings.mPadding.top || y > drawingSettings->height - mLayoutSettings.mPadding.bottom - buttonSize)
+            if (y < mLayoutSettings.mPadding.top || y > size->height - mLayoutSettings.mPadding.bottom - buttonSize)
             {
                 y = y0;
                 x += xdir*(mButtonWidth + mLayoutSettings.mColumnSpacing);

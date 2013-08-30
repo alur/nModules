@@ -39,7 +39,7 @@ ContainerItem::~ContainerItem() {
 
 
 int ContainerItem::GetDesiredWidth(int maxWidth) {
-    return min(maxWidth, mWindow->GetDrawingSettings()->width);
+    return min<float>(maxWidth, mWindow->GetSize().width);
 }
 
 

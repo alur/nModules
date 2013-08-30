@@ -77,11 +77,14 @@ void WindowBangs::Hide(HWND, LPCTSTR args) {
 /// <summary>
 /// Shows the window.
 /// </summary>
-void WindowBangs::Show(HWND, LPCTSTR args) {
+void WindowBangs::Show(HWND, LPCTSTR args)
+{
     Window* drawable = drawableFinder(args);
-    if (drawable != nullptr) {
+    if (drawable != nullptr)
+    {
         drawable->Show();
-        if (drawable->IsChild()) {
+        if (drawable->IsChild())
+        {
             drawable->Repaint();
         }
     }
@@ -91,32 +94,31 @@ void WindowBangs::Show(HWND, LPCTSTR args) {
 /// <summary>
 /// Shows the window.
 /// </summary>
-void WindowBangs::Move(HWND, LPCTSTR args) {
+void WindowBangs::Move(HWND, LPCTSTR args)
+{
     TCHAR prefix[MAX_RCCOMMAND], xstr[MAX_RCCOMMAND], ystr[MAX_RCCOMMAND],
         durationstr[MAX_RCCOMMAND], easingstr[MAX_RCCOMMAND];
     LPTSTR tokens [] = { prefix, xstr, ystr, durationstr, easingstr };
 
     int numTokens = LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr);
 
-    if (numTokens == 3 || numTokens == 4 || numTokens == 5) {
+    if (numTokens == 3 || numTokens == 4 || numTokens == 5)
+    {
         Window* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
-            int x = 0, y = 0;
+            RelatedNumber x, y;
 
-            if (ParseCoordinate(xstr, &x) && ParseCoordinate(ystr, &y)) {
-                if (numTokens == 3) {
+            if (ParseRelated(xstr, &x) && ParseRelated(ystr, &y))
+            {
+                if (numTokens == 3)
+                {
                     drawable->Move(x, y);
-                    if (drawable->IsChild()) {
-                        drawable->Repaint();
-                    }
                 }
-                else {
-                    int duration = 0;
-                    if (ParseCoordinate(durationstr, &duration)) {
-                        drawable->SetAnimation(x, y, drawable->GetDrawingSettings()->width, 
-                            drawable->GetDrawingSettings()->height, duration,
-                            numTokens == 4 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
-                    }
+                else
+                {
+                    drawable->SetAnimation(x, y, drawable->GetDrawingSettings()->width,
+                        drawable->GetDrawingSettings()->height, _ttoi(durationstr),
+                        numTokens == 4 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
                 }
             }
         }
@@ -127,32 +129,31 @@ void WindowBangs::Move(HWND, LPCTSTR args) {
 /// <summary>
 /// Shows the window.
 /// </summary>
-void WindowBangs::Size(HWND, LPCTSTR args) {
+void WindowBangs::Size(HWND, LPCTSTR args)
+{
     TCHAR prefix[MAX_RCCOMMAND], widthstr[MAX_RCCOMMAND], heightstr[MAX_RCCOMMAND],
         durationstr[MAX_RCCOMMAND], easingstr[MAX_RCCOMMAND];
     LPTSTR tokens [] = { prefix, widthstr, heightstr, durationstr, easingstr };
 
     int numTokens = LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr);
 
-    if (numTokens == 3 || numTokens == 4 || numTokens == 5) {
+    if (numTokens == 3 || numTokens == 4 || numTokens == 5)
+    {
         Window* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
-            int width = 0, height = 0;
+            RelatedNumber width, height;
 
-            if (ParseLength(widthstr, &width) && ParseLength(heightstr, &height)) {
-                if (numTokens == 3) {
+            if (ParseRelated(widthstr, &width) && ParseRelated(heightstr, &height))
+            {
+                if (numTokens == 3)
+                {
                     drawable->Resize(width, height);
-                    if (drawable->IsChild()) {
-                        drawable->Repaint();
-                    }
                 }
-                else {
-                    int duration = 0;
-                    if (ParseCoordinate(durationstr, &duration)) {
-                        drawable->SetAnimation(drawable->GetDrawingSettings()->x, 
-                            drawable->GetDrawingSettings()->y, width, height, duration,
-                            numTokens == 4 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
-                    }
+                else
+                {
+                    drawable->SetAnimation(drawable->GetDrawingSettings()->x, 
+                        drawable->GetDrawingSettings()->y, width, height, _ttoi(durationstr),
+                        numTokens == 4 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
                 }
             }
         }
@@ -171,25 +172,28 @@ void WindowBangs::Position(HWND, LPCTSTR args) {
 
     int numTokens = LiteStep::CommandTokenize(args, tokens, _countof(tokens), nullptr);
 
-    if (numTokens == 5 || numTokens == 6 || numTokens == 7) {
+    if (numTokens == 5 || numTokens == 6 || numTokens == 7)
+    {
         Window* drawable = drawableFinder(prefix);
-        if (drawable != nullptr) {
-            int width = 0, height = 0, x = 0, y = 0;
+        if (drawable != nullptr)
+        {
+            RelatedNumber width, height, x, y;
 
-            if (ParseLength(widthstr, &width) && ParseLength(heightstr, &height)
-                && ParseCoordinate(xstr, &x) && ParseCoordinate(ystr, &y)) {
-                if (numTokens == 5) {
+            if (ParseRelated(widthstr, &width) && ParseRelated(heightstr, &height)
+                && ParseRelated(xstr, &x) && ParseRelated(ystr, &y))
+            {
+                if (numTokens == 5)
+                {
                     drawable->SetPosition(x, y, width, height);
-                    if (drawable->IsChild()) {
+                    if (drawable->IsChild())
+                    {
                         drawable->Repaint();
                     }
                 }
-                else {
-                    int duration = 0;
-                    if (ParseCoordinate(durationstr, &duration)) {
-                        drawable->SetAnimation(x, y, width, height, duration,
-                            numTokens == 6 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
-                    }
+                else
+                {
+                    drawable->SetAnimation(x, y, width, height, _ttoi(durationstr),
+                        numTokens == 6 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
                 }
             }
         }

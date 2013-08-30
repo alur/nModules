@@ -38,6 +38,7 @@
     <ClInclude Include="IDrawable.hpp" />
     <ClInclude Include="Drawable.hpp" />
     <ClInclude Include="IStateRender.hpp" />
+    <ClInclude Include="RelatedNumber.hpp" />
     <ClInclude Include="StateRender.hpp" />
     <ClInclude Include="StateWindowData.hpp" />
     <ClInclude Include="WindowBangs.h" />
@@ -80,6 +81,7 @@
     <ClCompile Include="Coordinate.cpp" />
     <ClCompile Include="IDrawable.cpp" />
     <ClCompile Include="Drawable.cpp" />
+    <ClCompile Include="RelatedNumber.cpp" />
     <ClCompile Include="WindowBangs.cpp" />
     <ClCompile Include="WindowSettings.cpp" />
     <ClCompile Include="WindowDropTarget.cpp" />

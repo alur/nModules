@@ -27,26 +27,28 @@ void WorkArea::ParseLine(MonitorInfo *mInfo, LPCTSTR pszLine)
     // Parse the input string
     if (LiteStep::LCTokenize(pszLine, szTokens, 5, nullptr) == 5)
     {
-        if (ParseCoordinate(szLeft, &left) && ParseCoordinate(szTop, &top) && ParseCoordinate(szRight, &right) && ParseCoordinate(szBottom, &bottom))
-        {
-            UINT monitor = ParseMonitor(szMonitor, UINT(-2));
+        left = _ttoi(szLeft);
+        top = _ttoi(szTop);
+        right = _ttoi(szRight);
+        bottom = _ttoi(szBottom);
 
-            if (monitor == UINT(-1))
+        UINT monitor = ParseMonitor(szMonitor, UINT(-2));
+
+        if (monitor == UINT(-1))
+        {
+            for (auto &monitor : mInfo->m_monitors)
             {
-                for (auto &monitor : mInfo->m_monitors)
-                {
-                    RECT r = { monitor.rect.left + left, monitor.rect.top + top, monitor.rect.right - right, monitor.rect.bottom - bottom };
-                    SystemParametersInfoW(SPI_SETWORKAREA, 1, &r, 0);
-                }
-                return;
-            }
-            else if (monitor < mInfo->m_monitors.size())
-            {
-                RECT mRect = mInfo->m_monitors[monitor].rect;
-                RECT r = { mRect.left + left, mRect.top + top, mRect.right - right, mRect.bottom - bottom };
+                RECT r = { monitor.rect.left + left, monitor.rect.top + top, monitor.rect.right - right, monitor.rect.bottom - bottom };
                 SystemParametersInfoW(SPI_SETWORKAREA, 1, &r, 0);
-                return;
             }
+            return;
+        }
+        else if (monitor < mInfo->m_monitors.size())
+        {
+            RECT mRect = mInfo->m_monitors[monitor].rect;
+            RECT r = { mRect.left + left, mRect.top + top, mRect.right - right, mRect.bottom - bottom };
+            SystemParametersInfoW(SPI_SETWORKAREA, 1, &r, 0);
+            return;
         }
     }
 

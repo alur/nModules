@@ -128,6 +128,25 @@ UINT LiteStep::GetPrefixedRCMonitor(LPCTSTR prefix, LPCTSTR keyName, UINT defaul
 
 
 /// <summary>
+/// Retrives a RelatedNumber with a particular prefix from the LiteStep configuration.
+/// </summary>
+/// <param name="prefix">The prefix of the value to get.</param>
+/// <param name="keyName">Key of the value to get.</param>
+/// <param name="defaultValue">Default value, returned if the key is not specified.</param>
+RelatedNumber LiteStep::GetPrefixedRCRelatedNumber(LPCTSTR prefix, LPCTSTR keyName, RelatedNumber defaultValue)
+{
+    TCHAR numberString[MAX_LINE_LENGTH];
+    GetPrefixedRCLine(prefix, keyName, numberString, nullptr, _countof(numberString));
+    RelatedNumber result;
+    if (ParseRelated(numberString, &result))
+    {
+        return result;
+    }
+    return defaultValue;
+}
+
+
+/// <summary>
 /// Retrives a string with a particular prefix from the LiteStep configuration.
 /// </summary>
 /// <param name="prefix">The prefix of the value to get.</param>
@@ -216,56 +235,6 @@ IColorVal* LiteStep::ParseColor(LPCTSTR colorString, const IColorVal* defaultVal
 
 
 /// <summary>
-/// Parses a coordinate from a configuration string.
-/// </summary>
-/// <param name="coordinateString">The string to parse.</param>
-/// <param name="defaultValue">The default coordinate, returned if the string is invalid.</param>
-Coordinate LiteStep::ParseCoordinate(LPCTSTR coordinateString, Coordinate defaultValue)
-{
-    if (coordinateString == nullptr)
-    {
-        return defaultValue;
-    }
-
-    // Valid formats
-    // x+%y, %y+x, x-%y, %y-x, %x, x
-    if (*coordinateString == _T('%'))
-    {
-    }
-    else
-    {
-    }
-
-    return defaultValue;
-}
-
-
-/// <summary>
-/// Parses a length from a configuration string.
-/// </summary>
-/// <param name="lengthString">The string to parse.</param>
-/// <param name="defaultValue">The default coordinate, returned if the string is invalid.</param>
-Length ParseLength(LPCTSTR lengthString, Length defaultValue)
-{
-    if (lengthString == nullptr)
-    {
-        return defaultValue;
-    }
-
-    // Valid formats
-    // x+%y, %y+x, x-%y, %y-x, %x, x
-    if (*lengthString == _T('%'))
-    {
-    }
-    else
-    {
-    }
-
-    return defaultValue;
-}
-
-
-/// <summary>
 /// Parses a monitor ID from a monitor configuration string.
 /// </summary>
 /// <param name="monitorString">The string to parse.</param>
@@ -320,40 +289,47 @@ UINT LiteStep::ParseMonitor(LPCTSTR monitorString, UINT defaultValue)
 
 
 /// <summary>
-/// Parses a user inputed coordinate.
+/// Parses a RelatedNumber from a configuration string.
 /// </summary>
-/// <param name="coordinate">The string to parse.</param>
-/// <param name="target">Pointer to an integer which will be set to the valid coordinate.</param>
-/// <returns>True if szCoordinate is a valid coordinate.</return>
-bool LiteStep::ParseCoordinate(LPCWSTR coordinate, LPINT target) {
-    LPWSTR endPtr;
-    int i = wcstol(coordinate, &endPtr, 0);
-
-    if (*coordinate == L'\0' || *endPtr != L'\0') {
+/// <param name="relatedString">The string to parse.</param>
+/// <param name="result">If this is not null, and the function returns true, this will be set to the parsed related number.</param>
+/// <return>true if the string is valid related number.</return>
+bool LiteStep::ParseRelated(LPCTSTR relatedString, RelatedNumber *result)
+{
+    if (relatedString == nullptr || *relatedString == _T('\0'))
+    {
         return false;
     }
 
-    *target = i;
+    float constant = 0;
+    float percentage = 0;
+    
+    // Look at the string as a collection of tokens, delimited by + and -
+    while (*relatedString)
+    {
+        // strtof is broken (doesn't set endptr).
+        float number = (float)_tcstod(relatedString, const_cast<LPTSTR*>(&relatedString));
+        if (*relatedString == _T('%'))
+        {
+            percentage += number;
+            ++relatedString;
+        }
+        else
+        {
+            constant += number;
+        }
 
-    return true;
-}
-
-
-/// <summary>
-/// Parses a user inputed length.
-/// </summary>
-/// <param name="length">The string to parse.</param>
-/// <param name="target">Pointer to an integer which will be set to the valid length.</param>
-/// <returns>True if szLength is a valid length.</return>
-bool LiteStep::ParseLength(LPCWSTR length, LPINT target) {
-    LPWSTR endPtr;
-    int i = wcstol(length, &endPtr, 0);
-
-    if (*length == L'\0' || *endPtr != L'\0') {
-        return false;
+        // The next token has to be a +, -, or end of string.
+        if (*relatedString != _T('+') && *relatedString != _T('-') && *relatedString != _T('\0'))
+        {
+            return false;
+        }
     }
 
-    *target = i;
+    if (result)
+    {
+        *result = RelatedNumber(constant, percentage / 100.0f);
+    }
 
     return true;
 }

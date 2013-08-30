@@ -10,6 +10,7 @@
 #include <d2d1.h>
 #include <dwrite.h>
 #include "Settings.hpp"
+#include "Length.hpp"
 
 class WindowSettings
 {
@@ -38,7 +39,7 @@ public:
     bool evaluateText;
 
     // The height of the window. Default: 100
-    int height;
+    RelatedNumber height;
 
     // True if the window should start hidden. Default: false
     bool hidden;
@@ -53,11 +54,11 @@ public:
     D2D1_TEXT_ANTIALIAS_MODE textAntiAliasMode;
 
     // The width of the window. Default: 100
-    int width;
+    RelatedNumber width;
 
     // The x position of the window, relative to the parent. Default: 0
-    int x;
+    RelatedNumber x;
 
     // The y position of the window, relative to the parent. Default: 0
-    int y;
+    RelatedNumber y;
 };

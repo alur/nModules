@@ -49,7 +49,7 @@ CommandItem::~CommandItem() {
 
 int CommandItem::GetDesiredWidth(int maxWidth) {
     SIZE s;
-    mWindow->GetDesiredSize(maxWidth, mWindow->GetDrawingSettings()->height, &s);
+    mWindow->GetDesiredSize(maxWidth, mWindow->GetSize().height, &s);
     return s.cx;
 }
 

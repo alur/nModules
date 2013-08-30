@@ -21,14 +21,14 @@ WindowSettings::WindowSettings()
     this->blurBehind = false;
     this->clickThrough = false;
     this->evaluateText = false;
-    this->height = 100;
+    this->height = RelatedNumber(100);
     this->hidden = false;
     this->registerWithCore = false;
     this->text = _wcsdup(L"");
     this->textAntiAliasMode = D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
-    this->width = 100;
-    this->x = 0;
-    this->y = 0;
+    this->width = RelatedNumber(100);
+    this->x = RelatedNumber(0);
+    this->y = RelatedNumber(0);
 }
 
 
@@ -112,16 +112,16 @@ void WindowSettings::Load(Settings* settings, WindowSettings* defaults)
     this->blurBehind = settings->GetBool(_T("BlurBehind"), defaults->blurBehind);
     this->clickThrough = settings->GetBool(_T("ClickThrough"), defaults->clickThrough);
     this->evaluateText = defaults->evaluateText;
-    this->height = settings->GetInt(_T("Height"), defaults->height);
+    this->height = settings->GetRelatedNumber(_T("Height"), defaults->height);
     this->hidden = settings->GetBool(_T("Hidden"), defaults->hidden);
     this->registerWithCore = defaults->registerWithCore;
     settings->GetString(_T("Text"), buf, _countof(buf), defaults->text);
     this->text = StringUtils::ReallocOverwrite(this->text, buf);
     settings->GetString(_T("TextAntiAliasMode"), buf, _countof(buf), GetName(defaults->textAntiAliasMode, textAntiAliasModeMap));
     this->textAntiAliasMode = ParseAntiAliasMode(buf);
-    this->width = settings->GetInt(_T("Width"), defaults->width);
-    this->x = settings->GetInt(_T("X"), defaults->x);
-    this->y = settings->GetInt(_T("Y"), defaults->y);
+    this->width = settings->GetRelatedNumber(_T("Width"), defaults->width);
+    this->x = settings->GetRelatedNumber(_T("X"), defaults->x);
+    this->y = settings->GetRelatedNumber(_T("Y"), defaults->y);
 }
 
 

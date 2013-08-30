@@ -114,8 +114,8 @@ void CoverArt::LoadSettings()
     // Position the image so that it covers the entire window.
     D2D1_RECT_F pos = D2D1::RectF(
         0, 0,
-        (float)mWindow->GetDrawingSettings()->width,
-        (float)mWindow->GetDrawingSettings()->height
+        (float)mWindow->GetSize().width,
+        (float)mWindow->GetSize().height
     );
     mCoverArt = mWindow->AddOverlay(pos, (IWICBitmapSource*)nullptr);
 

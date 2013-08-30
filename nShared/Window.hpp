@@ -173,6 +173,10 @@ public:
     //
     ID2D1RenderTarget *GetRenderTarget();
 
+    //
+    D2D1_POINT_2F const &GetPosition() const;
+    D2D1_SIZE_F const &GetSize() const;
+
     // Returns the screen-coordinate position of this window.
     void GetScreenRect(LPRECT rect);
     
@@ -204,7 +208,8 @@ public:
     bool IsVisible();
 
     // Moves this window.
-    void Move(int x, int y);
+    void Move(float x, float y);
+    void Move(RelatedNumber x, RelatedNumber y);
 
     //
     void PopUpdateLock(UpdateLock *lock);
@@ -227,13 +232,15 @@ public:
     void Repaint(const D2D1_RECT_F *region = nullptr);
 
     // Resizes the window.
-    void Resize(int width, int height);
+    void Resize(float width, float height);
+    void Resize(RelatedNumber width, RelatedNumber height);
 
     //
     void SetAlwaysOnTop(bool value);
 
     // Performs an animation.
-    void SetAnimation(int x, int y, int width, int height, int duration, Easing::Type easing);
+    void SetAnimation(float x, float y, float width, float height, int duration, Easing::Type easing);
+    void SetAnimation(RelatedNumber x, RelatedNumber y, RelatedNumber width, RelatedNumber height, int duration, Easing::Type easing);
 
     // Registers a timer
     UINT_PTR SetCallbackTimer(UINT elapse, MessageHandler* msgHandler);
@@ -255,7 +262,8 @@ public:
 
     // Sets the position of this Window, relative to its parent.
     void SetPosition(RECT rect);
-    void SetPosition(int x, int y, int width, int height, LPARAM extra = 0);
+    void SetPosition(float x, float y, float width, float height, LPARAM extra = 0);
+    void SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, RelatedNumber height, LPARAM extra = 0);
 
     // Sets the text of this window.
     void SetText(LPCWSTR text);
@@ -338,6 +346,10 @@ protected:
 
     // Settings.
     Settings* mSettings;
+
+    //
+    D2D1_SIZE_F mSize;
+    D2D1_POINT_2F mPosition;
 
 private:
     // The child window the mouse is currently over.

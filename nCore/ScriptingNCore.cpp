@@ -64,8 +64,8 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
             return;
         }
 
-        int x = args[1].As<Number>()->Int32Value();
-        int y = args[2].As<Number>()->Int32Value();
+        float x = (float)args[1].As<Number>()->Value();
+        float y = (float)args[2].As<Number>()->Value();
         
         if (args.Length() == 3)
         {
@@ -285,8 +285,8 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         {
             return;
         }
-
-        args.GetReturnValue().Set(window->GetDrawingSettings()->x);
+        
+        args.GetReturnValue().Set(window->GetPosition().x);
     }), PropertyAttribute::ReadOnly);
 
     //
@@ -309,8 +309,8 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         {
             return;
         }
-
-        args.GetReturnValue().Set(window->GetDrawingSettings()->y);
+        
+        args.GetReturnValue().Set(window->GetPosition().y);
     }), PropertyAttribute::ReadOnly);
 
     //
@@ -334,7 +334,7 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
             return;
         }
 
-        args.GetReturnValue().Set(window->GetDrawingSettings()->height);
+        args.GetReturnValue().Set(window->GetSize().height);
     }), PropertyAttribute::ReadOnly);
 
     //
@@ -357,8 +357,8 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
         {
             return;
         }
-
-        args.GetReturnValue().Set(window->GetDrawingSettings()->width);
+        
+        args.GetReturnValue().Set(window->GetSize().width);
     }), PropertyAttribute::ReadOnly);
 
     return handleScope.Close(nCore);

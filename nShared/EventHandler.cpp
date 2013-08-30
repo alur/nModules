@@ -113,7 +113,8 @@ void EventHandler::LoadSettings(bool /* bIsRefresh */)
 /// <summary>
 /// Parses a click line.
 /// </summary>
-EventHandler::ClickData EventHandler::ParseLine(LPCTSTR szLine) {
+EventHandler::ClickData EventHandler::ParseLine(LPCTSTR szLine)
+{
     // !nDeskOn <type> <mods> <action>
     // !nDeskOn <type> <mods> <left> <top> <right> <bottom> <action>
     TCHAR szToken[MAX_LINE_LENGTH];
@@ -136,28 +137,29 @@ EventHandler::ClickData EventHandler::ParseLine(LPCTSTR szLine) {
     cData.area.top = LONG_MIN; cData.area.bottom = LONG_MAX;
 
     // Check if we have 4 valid coordinates followed by some action
-    int left, top, width, height;
+    RelatedNumber left, top, width, height;
     if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
-    if (!ParseCoordinate(szToken, &left)) return cData;
+    if (!ParseRelated(szToken, &left)) return cData;
 
     if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
-    if (!ParseCoordinate(szToken, &top)) return cData;
+    if (!ParseRelated(szToken, &top)) return cData;
 
     if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
-    if (!ParseCoordinate(szToken, &width)) return cData;
+    if (!ParseRelated(szToken, &width)) return cData;
 
     if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
-    if (!ParseCoordinate(szToken, &height)) return cData;
+    if (!ParseRelated(szToken, &height)) return cData;
 
     // If these are all valid coordinates
-    cData.area.left = left;
-    cData.area.right =  left + width;
-    cData.area.top = top;
-    cData.area.bottom = top + height;
+    // TODO::Fix evaluations, or rather don't eval here, for resize purposes
+    cData.area.left = (LONG)left.Evaluate(0);
+    cData.area.right =  cData.area.left + (LONG)width.Evaluate(0);
+    cData.area.top = (LONG)top.Evaluate(0);
+    cData.area.bottom = cData.area.top + (LONG)height.Evaluate(0);
 
     // Then the rest is the action
     StringCchCopy(cData.action, sizeof(cData.action), pszNext);

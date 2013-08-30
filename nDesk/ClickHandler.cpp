@@ -139,19 +139,19 @@ ClickHandler::ClickData ClickHandler::ParseLine(LPCTSTR szLine) {
     int left, top, width, height;
     if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
-    if (!ParseCoordinate(szToken, &left)) return cData;
+    left = _ttoi(szToken);
 
     if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
-    if (!ParseCoordinate(szToken, &top)) return cData;
+    top = _ttoi(szToken);
 
     if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
-    if (!ParseCoordinate(szToken, &width)) return cData;
+    width = _ttoi(szToken);
 
     if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
-    if (!ParseCoordinate(szToken, &height)) return cData;
+    height = _ttoi(szToken);
 
     // If these are all valid coordinates
     cData.area.left = left;

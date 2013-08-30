@@ -226,11 +226,9 @@ void IconTile::SetIcon() {
     D2D1_RECT_F pos;
     HRESULT hr;
 
-    WindowSettings *drawingSettings = mWindow->GetDrawingSettings();
-
     pos.top = 0;
     pos.bottom = pos.top + mTileSettings.mIconSize;
-    pos.left = (drawingSettings->width - (float)mTileSettings.mIconSize)/2;
+    pos.left = (mWindow->GetSize().width - (float)mTileSettings.mIconSize)/2;
     pos.right = pos.left + mTileSettings.mIconSize;
 
     // First, lets try IThumbnailProvider
