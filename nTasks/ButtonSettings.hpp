@@ -38,8 +38,10 @@ public:
     WindowSettings mWindowSettings;
     StateRender<TaskButton::State> mStateRender;
 
-    WindowSettings mProgressWindowSettings;
-    //StateRender<ProgressBar::State> mProgressStateRender;
+    RelatedNumber mProgressX;
+    RelatedNumber mProgressY;
+    RelatedNumber mProgressWidth;
+    RelatedNumber mProgressHeight;
 
     //
 public:

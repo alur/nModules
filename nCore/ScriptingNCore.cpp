@@ -122,8 +122,8 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
             return;
         }
 
-        int width = args[1].As<Number>()->Int32Value();
-        int height = args[2].As<Number>()->Int32Value();
+        float width = (float)args[1].As<Number>()->Value();
+        float height = (float)args[2].As<Number>()->Value();
         
         if (args.Length() == 3)
         {
@@ -180,10 +180,10 @@ Handle<ObjectTemplate> Scripting::NCore::Initialize(Isolate *isolate)
             return;
         }
         
-        int x = args[1].As<Number>()->Int32Value();
-        int y = args[2].As<Number>()->Int32Value();
-        int width = args[3].As<Number>()->Int32Value();
-        int height = args[4].As<Number>()->Int32Value();
+        float x = (float)args[1].As<Number>()->Value();
+        float y = (float)args[2].As<Number>()->Value();
+        float width = (float)args[3].As<Number>()->Value();
+        float height = (float)args[4].As<Number>()->Value();
         
         if (args.Length() == 5)
         {

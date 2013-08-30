@@ -35,7 +35,7 @@ IconTile::IconTile(Drawable* parent, PCITEMID_CHILD item, IShellFolder2* shellFo
 
     mWindow->Initialize(mTileSettings.mTileWindowSettings, &mTileSettings.mTileStateRender);
     mWindow->SetText(name);
-    mWindow->Resize(width, height);
+    mWindow->Resize((float)width, (float)height);
 
     SetIcon();
 
@@ -124,13 +124,13 @@ bool IconTile::IsInRect(D2D1_RECT_F rect)
 }
 
 
-void IconTile::Select(bool repaint)
+void IconTile::Select()
 {
     mTileSettings.mTileStateRender.ActivateState(State::Selected, mWindow);
 }
 
 
-void IconTile::Deselect(bool repaint)
+void IconTile::Deselect()
 {
     mTileSettings.mTileStateRender.ClearState(State::Selected, mWindow);
 }
@@ -149,7 +149,7 @@ int IconTile::GetPositionID() {
 
 void IconTile::SetPosition(int id, int x, int y) {
     mPositionID = id;
-    mWindow->Move(x, y);
+    mWindow->Move((float)x, (float)y);
 }
 
 

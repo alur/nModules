@@ -266,7 +266,7 @@ void IconGroup::AddIcon(PCITEMID_CHILD pidl) {
     }
     
     int iconPosition = GetIconPosition(pidl);
-    RECT pos = mLayoutSettings.RectFromID(iconPosition, mTileWidth, mTileHeight, mWindow->GetSize().width, mWindow->GetSize().height);
+    RECT pos = mLayoutSettings.RectFromID(iconPosition, mTileWidth, mTileHeight, int(mWindow->GetSize().width + 0.5f), int(mWindow->GetSize().height + 0.5f));
 
     IconTile *icon = new IconTile(this, pidl, mWorkingFolder, mTileWidth, mTileHeight, mTileSettings);
     icon->SetPosition(iconPosition, (int)pos.left, (int)pos.top);
@@ -396,9 +396,11 @@ HRESULT IconGroup::GetFolderPath(LPWSTR buf, UINT cchBuf) {
 /// <summary>
 /// Deselects all items.
 /// </summary>
-void IconGroup::DeselectAll() {
-    for (IconTile *tile : mIcons) {
-        tile->Deselect(false);
+void IconGroup::DeselectAll()
+{
+    for (IconTile *tile : mIcons)
+    {
+        tile->Deselect();
     }
     mWindow->Repaint();
 }
@@ -407,9 +409,11 @@ void IconGroup::DeselectAll() {
 /// <summary>
 /// Deselects all items.
 /// </summary>
-void IconGroup::SelectAll() {
-    for (IconTile *tile : mIcons) {
-        tile->Select(false);
+void IconGroup::SelectAll()
+{
+    for (IconTile *tile : mIcons)
+    {
+        tile->Select();
     }
     mWindow->Repaint();
 }

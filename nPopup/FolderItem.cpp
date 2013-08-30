@@ -60,7 +60,7 @@ nPopup::FolderItem::~FolderItem()
 int nPopup::FolderItem::GetDesiredWidth(int maxWidth)
 {
     SIZE s;
-    mWindow->GetDesiredSize(maxWidth, mWindow->GetSize().height, &s);
+    mWindow->GetDesiredSize(maxWidth, (int)mWindow->GetSize().height, &s);
     return s.cx;
 }
 

@@ -132,7 +132,7 @@ void TaskButton::SetProgressValue(USHORT /* progress */)
 /// <summary>
 /// Moves and resizes the taaskbutton.
 /// </summary>
-void TaskButton::Reposition(UINT x, UINT y, UINT width, UINT height)
+void TaskButton::Reposition(FLOAT x, FLOAT y, FLOAT width, FLOAT height)
 {
     mWindow->SetPosition(x, y, width, height);
 }

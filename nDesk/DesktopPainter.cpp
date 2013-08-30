@@ -57,10 +57,10 @@ DesktopPainter::DesktopPainter(HWND hWnd) : Window(hWnd, _T("nDesk"), g_pClickHa
 
     WindowSettings defaults;
     WindowSettings windowSettings;
-    defaults.width = g_pMonitorInfo->m_virtualDesktop.width;
-    defaults.height = g_pMonitorInfo->m_virtualDesktop.height;
-    defaults.x = g_pMonitorInfo->m_virtualDesktop.rect.left;
-    defaults.y = g_pMonitorInfo->m_virtualDesktop.rect.top;
+    defaults.width = (float)g_pMonitorInfo->m_virtualDesktop.width;
+    defaults.height = (float)g_pMonitorInfo->m_virtualDesktop.height;
+    defaults.x = (float)g_pMonitorInfo->m_virtualDesktop.rect.left;
+    defaults.y = (float)g_pMonitorInfo->m_virtualDesktop.rect.top;
     windowSettings.Load(mSettings, &defaults);
 
     Initialize(windowSettings, &mStateRender);

@@ -85,7 +85,7 @@ void State::DiscardDeviceResources()
 }
 
 
-void State::Paint(ID2D1RenderTarget* renderTarget, WindowData *windowData, Window *window)
+void State::Paint(ID2D1RenderTarget* renderTarget, WindowData *windowData)
 {
     if (mBrushes[BrushType::Background].brush)
     {

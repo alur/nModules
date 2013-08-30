@@ -205,7 +205,7 @@ public:
         StateWindowData<StateEnum> *data;
         data = decltype(data)(windowData);
 
-        mStates[data->currentState].Paint(renderTarget, &data->data[data->currentState], data->window);
+        mStates[data->currentState].Paint(renderTarget, &data->data[data->currentState]);
     }
 
     

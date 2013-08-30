@@ -162,52 +162,59 @@ void Popup::Show(int x, int y) {
 }
 
 
-void Popup::Size() {
+void Popup::Size()
+{
     // Work out the desired item 
     int itemWidth = mSettings->GetInt(_T("Width"), 200) - this->padding.left - this->padding.right;
     int maxItemWidth = this->maxWidth - this->padding.left - this->padding.right;
     int height = this->padding.top;
     int width;
-    for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
-        (*iter)->Position(this->padding.left, height);
-        height += (*iter)->GetHeight() + this->itemSpacing;
-        itemWidth = max(itemWidth, (*iter)->GetDesiredWidth(maxItemWidth));
+    for (PopupItem *item : this->items)
+    {
+        item->Position(this->padding.left, height);
+        height += item->GetHeight() + this->itemSpacing;
+        itemWidth = max(itemWidth, item->GetDesiredWidth(maxItemWidth));
     }
     width = itemWidth + this->padding.left + this->padding.right;
     height += this->padding.bottom - this->itemSpacing;
     MonitorInfo* monInfo = mWindow->GetMonitorInformation();
 
     // We've excceeded the max height, split the popup into columns.
-    if (height > monInfo->m_virtualDesktop.height) {
+    if (height > monInfo->m_virtualDesktop.height)
+    {
         int columns = (height - this->padding.top - this->padding.bottom)/(monInfo->m_virtualDesktop.height - this->padding.top - this->padding.bottom) + 1;
         int columnWidth = width;
         width = columnWidth * columns + this->itemSpacing*(columns - 1);
         height = this->padding.top;
         int column = 0;
         int rowHeight = 0;
-        for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
-            (*iter)->Position(this->padding.left + (columnWidth + this->itemSpacing) * column, height);
-            rowHeight = max((*iter)->GetHeight() + this->itemSpacing, rowHeight);
+        for (PopupItem *item : this->items)
+        {
+            item->Position(this->padding.left + (columnWidth + this->itemSpacing) * column, height);
+            rowHeight = max(item->GetHeight() + this->itemSpacing, rowHeight);
             column++;
-            if (column == columns) {
+            if (column == columns)
+            {
                 height += rowHeight;
                 rowHeight = 0;
                 column = 0;
             }
         }
-        if (column != 0) {
+        if (column != 0)
+        {
             height += rowHeight;
         }
         height += this->padding.bottom - this->itemSpacing;
     }
 
     // Size all items properly
-    for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
-        (*iter)->SetWidth(itemWidth);
+    for (PopupItem *item : this->items)
+    {
+        item->SetWidth(itemWidth);
     }
 
     // Size the main window
-    mWindow->Resize(width, height);
+    mWindow->Resize((float)width, (float)height);
     this->sized = true;
 }
 
@@ -238,24 +245,28 @@ void Popup::Show(LPRECT position, Popup* owner) {
     }
 
 
-    if (this->expandLeft) {
-        x = position->left - mWindow->GetSize().width;
-        if (x < limits.left) {
+    if (this->expandLeft)
+    {
+        x = position->left - (int)mWindow->GetSize().width;
+        if (x < limits.left)
+        {
             this->expandLeft = false;
             x = this->owner ? position->right : limits.left;
         }
     }
-    else {
+    else
+    {
         x = position->right;
-        if (x > limits.right - mWindow->GetSize().width) {
+        if (x > limits.right - mWindow->GetSize().width)
+        {
             this->expandLeft = true;
-            x = (this->owner ? position->left : limits.right) - mWindow->GetSize().width;
+            x = (this->owner ? position->left : limits.right) - int(mWindow->GetSize().width + 0.5f);
         }
     }
 
-    y = max<float>(limits.top, min<float>(limits.bottom - mWindow->GetSize().height, position->top));
+    y = max<int>(limits.top, min<int>(limits.bottom - int(mWindow->GetSize().height + 0.5f), position->top));
 
-    mWindow->Move(x, y);
+    mWindow->Move((float)x, (float)y);
 
     mWindow->Show();
     SetWindowPos(mWindow->GetWindowHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);

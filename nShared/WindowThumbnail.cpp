@@ -94,26 +94,26 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position)
             switch (this->position)
             {
                 case TOP:
-                    mWindow->SetPosition(position->left, position->top - 1, position->right - position->left, 1);
+                    mWindow->SetPosition((float)position->left, (float)position->top - 1, (float)position->right - (float)position->left, 1);
                     break;
 
                 case BOTTOM:
-                    mWindow->SetPosition(position->left, position->bottom, position->right - position->left, 1);
+                    mWindow->SetPosition((float)position->left, (float)position->bottom, (float)position->right - (float)position->left, 1);
                     break;
 
                 case LEFT:
-                    mWindow->SetPosition(position->left, position->bottom, 1, position->bottom - position->top);
+                    mWindow->SetPosition((float)position->left, (float)position->bottom, 1, (float)position->bottom - (float)position->top);
                     break;
 
                 case RIGHT:
-                    mWindow->SetPosition(position->right, position->bottom, 1, position->bottom - position->top);
+                    mWindow->SetPosition((float)position->right, (float)position->bottom, 1, (float)position->bottom - (float)position->top);
                     break;
             }
-            mWindow->SetAnimation(x, y, width, height, mAnimationDuration, Easing::Type::Sine);
+            mWindow->SetAnimation((float)x, (float)y, (float)width, (float)height, mAnimationDuration, Easing::Type::Sine);
         }
         else
         {
-            mWindow->SetPosition(x, y, width, height);
+            mWindow->SetPosition((float)x, (float)y, (float)width, (float)height);
         }
 
         DWM_THUMBNAIL_PROPERTIES properties;

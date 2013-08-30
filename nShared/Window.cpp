@@ -1420,7 +1420,7 @@ void Window::SetMouseCapture(MessageHandler *captureHandler)
 /// <param name="rect">The new position of the window.</param>
 void Window::SetPosition(RECT rect)
 {
-    SetPosition(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+    SetPosition((float)rect.left, (float)rect.top, (float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
 }
 
 
@@ -1594,7 +1594,6 @@ void Window::SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, 
             HRESULT hr = this->renderTarget->Resize(D2D1::SizeU(UINT32(mSize.width + 0.5f), UINT32(mSize.height + 0.5f)));
             assert(SUCCEEDED(hr));
         }
-        TRACE("%d", int(mPosition.y + 0.5f) + int(mSize.height + 0.5f));
     }
     else if(mParent)
     {
@@ -1675,7 +1674,7 @@ void Window::SizeToText(int maxWidth, int maxHeight, int minWidth, int minHeight
     GetDesiredSize(maxWidth, maxHeight, &s);
     s.cx = std::max(s.cx, (long)minWidth);
     s.cy = std::max(s.cy, (long)minHeight);
-    this->SetPosition(mPosition.x, mPosition.y, s.cx, s.cy);
+    this->SetPosition(mPosition.x, mPosition.y, (float)s.cx, (float)s.cy);
 }
 
 

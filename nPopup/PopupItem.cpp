@@ -36,19 +36,19 @@ PopupItem::~PopupItem()
 
 void PopupItem::Position(int x, int y)
 {
-    mWindow->Move(x, y);
+    mWindow->Move((float)x, (float)y);
 }
 
 
 int PopupItem::GetHeight()
 {
-    return mWindow->GetSize().height;
+    return (int)(mWindow->GetSize().height + 0.5f);
 }
 
 
 void PopupItem::SetWidth(int width)
 {
-    mWindow->Resize(width, mWindow->GetSize().height);
+    mWindow->Resize((float)width, mWindow->GetSize().height);
 }
 
 

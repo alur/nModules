@@ -42,7 +42,7 @@ public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
 public:
-    void Reposition(UINT x, UINT y, UINT width, UINT height);
+    void Reposition(FLOAT x, FLOAT y, FLOAT width, FLOAT height);
 
     void Activate();
     void Deactivate();

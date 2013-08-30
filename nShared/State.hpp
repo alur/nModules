@@ -140,7 +140,7 @@ public:
     // IPainter
 public:
     void DiscardDeviceResources();
-    void Paint(ID2D1RenderTarget* renderTarget, WindowData *windowData, class Window *window);
+    void Paint(ID2D1RenderTarget* renderTarget, WindowData *windowData);
     void PaintText(ID2D1RenderTarget* renderTarget, WindowData *windowData, class Window *window);
     HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget);
     void UpdatePosition(D2D1_RECT_F position, WindowData *windowData);

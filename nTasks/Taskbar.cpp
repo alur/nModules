@@ -32,7 +32,7 @@ Taskbar::Taskbar(LPCTSTR name) : Drawable(name)
     mStateRender.Load(initData, mSettings);
 
     WindowSettings drawableDefaults, windowSettings;
-    drawableDefaults.width = GetSystemMetrics(SM_CXSCREEN);
+    drawableDefaults.width = (float)GetSystemMetrics(SM_CXSCREEN);
     drawableDefaults.height = 36;
     drawableDefaults.registerWithCore = true;
     windowSettings.Load(mSettings, &drawableDefaults);
@@ -178,7 +178,7 @@ void Taskbar::Relayout()
     Window::UpdateLock lock(mWindow);
     D2D1_SIZE_F const *size = &mWindow->GetSize();
 
-    int spacePerLine, lines, buttonSize, x0, y0, xdir, ydir;
+    float spacePerLine, lines, buttonSize, x0, y0, xdir, ydir;
 
     if (mButtonMap.size() == 0)
     {
@@ -190,8 +190,8 @@ void Taskbar::Relayout()
     default:
     case LayoutSettings::StartPosition::TopLeft:
         {
-            x0 = mLayoutSettings.mPadding.left;
-            y0 = mLayoutSettings.mPadding.top;
+            x0 = (float)mLayoutSettings.mPadding.left;
+            y0 = (float)mLayoutSettings.mPadding.top;
             xdir = 1;
             ydir = 1;
         }
@@ -199,8 +199,8 @@ void Taskbar::Relayout()
 
     case LayoutSettings::StartPosition::TopRight:
         {
-            x0 = size->width - mLayoutSettings.mPadding.right;
-            y0 = mLayoutSettings.mPadding.top;
+            x0 = size->width - (float)mLayoutSettings.mPadding.right;
+            y0 = (float)mLayoutSettings.mPadding.top;
             xdir = -1;
             ydir = 1;
         }
@@ -208,8 +208,8 @@ void Taskbar::Relayout()
 
     case LayoutSettings::StartPosition::BottomLeft:
         {
-            x0 = mLayoutSettings.mPadding.left;
-            y0 = size->height - mLayoutSettings.mPadding.bottom;
+            x0 = (float)mLayoutSettings.mPadding.left;
+            y0 = size->height - (float)mLayoutSettings.mPadding.bottom;
             xdir = 1;
             ydir = -1;
         }
@@ -217,8 +217,8 @@ void Taskbar::Relayout()
 
     case LayoutSettings::StartPosition::BottomRight:
         {
-            x0 = size->width - mLayoutSettings.mPadding.right;
-            y0 = size->height - mLayoutSettings.mPadding.bottom;
+            x0 = size->width - (float)mLayoutSettings.mPadding.right;
+            y0 = size->height - (float)mLayoutSettings.mPadding.bottom;
             xdir = -1;
             ydir = -1;
         }
@@ -230,7 +230,7 @@ void Taskbar::Relayout()
         spacePerLine = size->width - mLayoutSettings.mPadding.left - mLayoutSettings.mPadding.right;
         lines = (size->height + mLayoutSettings.mRowSpacing - mLayoutSettings.mPadding.top - mLayoutSettings.mPadding.bottom)/(mLayoutSettings.mRowSpacing + mButtonHeight);
         // We need to consider that buttons can't be split between multiple lines.
-        buttonSize = (int)min(mButtonMaxWidth, min(spacePerLine * lines / (int)mButtonMap.size(), spacePerLine / (int)ceil(mButtonMap.size() / (float)lines)) - mLayoutSettings.mColumnSpacing);
+        buttonSize = min((float)mButtonMaxWidth, min(spacePerLine * lines / (float)mButtonMap.size(), spacePerLine / ceil(mButtonMap.size() / (float)lines)) - mLayoutSettings.mColumnSpacing);
         if (ydir == -1)
         {
             y0 -= mButtonHeight;
@@ -240,10 +240,10 @@ void Taskbar::Relayout()
             x0 -= buttonSize;
         }
 
-        int x = x0, y = y0;
+        float x = x0, y = y0;
         for (ButtonList::const_iterator iter = mButtonList.begin(); iter != mButtonList.end(); ++iter)
         {
-            (*iter)->Reposition(x, y, buttonSize, mButtonHeight);
+            (*iter)->Reposition(x, y, buttonSize, (float)mButtonHeight);
             x += xdir*(buttonSize + mLayoutSettings.mColumnSpacing);
             if (x < mLayoutSettings.mPadding.left || x > size->width - mLayoutSettings.mPadding.right - buttonSize)
             {
@@ -257,7 +257,7 @@ void Taskbar::Relayout()
     {
         spacePerLine = size->height - mLayoutSettings.mPadding.top - mLayoutSettings.mPadding.bottom;
         lines = (size->width + mLayoutSettings.mColumnSpacing - mLayoutSettings.mPadding.left - mLayoutSettings.mPadding.right)/(mLayoutSettings.mColumnSpacing + mButtonWidth);
-        buttonSize = (int)min(mButtonMaxHeight, min(spacePerLine * lines / (int)mButtonMap.size(), spacePerLine / (int)ceil(mButtonMap.size() / (float)lines)) - mLayoutSettings.mRowSpacing);
+        buttonSize = min((float)mButtonMaxHeight, min(spacePerLine * lines / (float)mButtonMap.size(), spacePerLine / ceil(mButtonMap.size() / (float)lines)) - mLayoutSettings.mRowSpacing);
         if (ydir == -1)
         {
             y0 -= buttonSize;
@@ -267,10 +267,10 @@ void Taskbar::Relayout()
             x0 -= mButtonWidth;
         }
 
-        int x = x0, y = y0;
+        float x = x0, y = y0;
         for (ButtonList::const_iterator iter = mButtonList.begin(); iter != mButtonList.end(); ++iter)
         {
-            (*iter)->Reposition(x, y, mButtonWidth, buttonSize);
+            (*iter)->Reposition(x, y, (float)mButtonWidth, buttonSize);
             y += ydir*(buttonSize + mLayoutSettings.mRowSpacing);
             if (y < mLayoutSettings.mPadding.top || y > size->height - mLayoutSettings.mPadding.bottom - buttonSize)
             {

@@ -48,10 +48,10 @@ void Tooltip::Show(LPCWSTR text, LPRECT position)
     MonitorInfo* monInfo = mWindow->GetMonitorInformation();
 
     mWindow->Move(
-        std::min<float>(std::max<float>(monInfo->m_virtualDesktop.rect.left, position->left + (position->right - position->left)/2.0f - mWindow->GetSize().width/2),
-            monInfo->m_virtualDesktop.rect.right - mWindow->GetSize().width),
-        std::min<float>(std::max<float>(monInfo->m_virtualDesktop.rect.top, position->top - mWindow->GetSize().height - 5),
-            monInfo->m_virtualDesktop.rect.bottom - mWindow->GetSize().height));
+        std::min<float>(std::max<float>((float)monInfo->m_virtualDesktop.rect.left, (float)position->left + ((float)position->right - (float)position->left)/2.0f - mWindow->GetSize().width/2),
+            (float)monInfo->m_virtualDesktop.rect.right - mWindow->GetSize().width),
+        std::min<float>(std::max<float>((float)monInfo->m_virtualDesktop.rect.top, (float)position->top - mWindow->GetSize().height - 5),
+            (float)monInfo->m_virtualDesktop.rect.bottom - mWindow->GetSize().height));
 
     mWindow->Show();
 }

@@ -34,17 +34,21 @@ ContainerItem::ContainerItem(Drawable* parent, LPCTSTR prefix)
 }
 
 
-ContainerItem::~ContainerItem() {
+ContainerItem::~ContainerItem()
+{
 }
 
 
-int ContainerItem::GetDesiredWidth(int maxWidth) {
-    return min<float>(maxWidth, mWindow->GetSize().width);
+int ContainerItem::GetDesiredWidth(int maxWidth)
+{
+    return min<int>(maxWidth, (int)mWindow->GetSize().width);
 }
 
 
-LRESULT ContainerItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
-    switch (msg) {
+LRESULT ContainerItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID)
+{
+    switch (msg)
+    {
     case WM_MOUSEMOVE:
         {
             mStateRender.ActivateState(State::Hover, mWindow);

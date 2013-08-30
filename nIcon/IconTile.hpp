@@ -64,8 +64,8 @@ public:
     void ClearGhost();
 
     //
-    void Select(bool repaint = true);
-    void Deselect(bool repaint = true);
+    void Select();
+    void Deselect();
     bool IsInRect(D2D1_RECT_F rect);
 
 private:
