@@ -1140,6 +1140,10 @@ HRESULT Window::ReCreateDeviceResources()
             {
                 return S_FALSE;
             }
+            if (!mParent->renderTarget)
+            {
+                return S_FALSE;
+            }
             this->renderTarget = mParent->renderTarget;
         }
 

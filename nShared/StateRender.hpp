@@ -251,6 +251,7 @@ public:
 
     HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) override
     {
+        assert(renderTarget != nullptr);
         if (mDeviceRefCount++ == 0)
         {
             for (State &state : mStates)
