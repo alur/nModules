@@ -252,15 +252,20 @@ public:
     HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) override
     {
         assert(renderTarget != nullptr);
-        if (mDeviceRefCount++ == 0)
+        HRESULT hr = S_OK;
+
+        if (mDeviceRefCount == 0)
         {
             for (State &state : mStates)
             {
-                state.ReCreateDeviceResources(renderTarget);
+                RETURNONFAIL(hr, state.ReCreateDeviceResources(renderTarget));
             }
         }
+        
+        // The resources are already created, or we succeeded.
+        ++mDeviceRefCount;
 
-        return S_OK;
+        return hr;
     }
 
 

@@ -166,36 +166,43 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget)
         {
         case Type::SolidColor:
             {
-                renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->brushSettings->color->Evaluate()), (ID2D1SolidColorBrush**)&this->brush);
+                hr = renderTarget->CreateSolidColorBrush(Color::ARGBToD2D(this->brushSettings->color->Evaluate()), (ID2D1SolidColorBrush**)&this->brush);
             }
             break;
 
         case Type::LinearGradient:
             {
                 ID2D1GradientStopCollection* stops;
-                renderTarget->CreateGradientStopCollection(this->gradientStops, this->gradientStopCount, &stops);
-                renderTarget->CreateLinearGradientBrush(
-                    D2D1::LinearGradientBrushProperties(this->gradientStart, this->gradientEnd),
-                    stops, reinterpret_cast<ID2D1LinearGradientBrush**>(&this->brush));
-                stops->Release();
+                hr = renderTarget->CreateGradientStopCollection(this->gradientStops, this->gradientStopCount, &stops);
+                if (SUCCEEDED(hr))
+                {
+                    hr = renderTarget->CreateLinearGradientBrush(
+                        D2D1::LinearGradientBrushProperties(this->gradientStart, this->gradientEnd),
+                        stops, reinterpret_cast<ID2D1LinearGradientBrush**>(&this->brush));
+                    stops->Release();
+                }
             }
             break;
 
         case Type::RadialGradient:
             {
                 ID2D1GradientStopCollection* stops;
-                renderTarget->CreateGradientStopCollection(this->gradientStops, this->gradientStopCount, &stops);
-                renderTarget->CreateRadialGradientBrush(
-                    D2D1::RadialGradientBrushProperties(this->gradientCenter, this->gradientOriginOffset,
-                    this->brushSettings->gradientRadiusX, this->brushSettings->gradientRadiusY),
-                    stops, reinterpret_cast<ID2D1RadialGradientBrush**>(&this->brush));
-                stops->Release();
+                hr = renderTarget->CreateGradientStopCollection(this->gradientStops, this->gradientStopCount, &stops);
+                if (SUCCEEDED(hr))
+                {
+                    hr = renderTarget->CreateRadialGradientBrush(
+                        D2D1::RadialGradientBrushProperties(this->gradientCenter, this->gradientOriginOffset,
+                        this->brushSettings->gradientRadiusX, this->brushSettings->gradientRadiusY),
+                        stops, reinterpret_cast<ID2D1RadialGradientBrush**>(&this->brush));
+                    stops->Release();
+                }
             }
             break;
 
         case Type::Image:
             {
-                if (SUCCEEDED(hr = LoadImageFile(renderTarget, this->brushSettings->image, &this->brush))) {
+                if (SUCCEEDED(hr = LoadImageFile(renderTarget, this->brushSettings->image, &this->brush)))
+                {
                     this->brush->SetOpacity(this->brushSettings->imageOpacity);
                 }
             }

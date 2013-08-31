@@ -127,13 +127,15 @@ void State::PaintText(ID2D1RenderTarget* renderTarget, WindowData *windowData, W
 
 HRESULT State::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget)
 {
+    HRESULT hr = S_OK;
+
     for (Brush & brush : mBrushes)
     {
-        brush.ReCreate(renderTarget);
+        RETURNONFAIL(hr, brush.ReCreate(renderTarget));
     }
 
     //this->drawingArea.rect = mBackBrush.brushPosition;
-    return S_OK;
+    return hr;
 }
 
 
