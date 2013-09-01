@@ -7,5 +7,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-void LoadSettings();
-void CreateLabel(LPCTSTR labelName);
+static void LoadSettings();
+static void DestroyLabels();
+static void CreateLabel(LPCTSTR labelName);

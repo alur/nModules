@@ -113,7 +113,7 @@ HRESULT DesktopPainter::ReCreateDeviceResources()
 {
     HRESULT hr = S_OK;
 
-    if (!this->renderTarget)
+    if (!mRenderTarget)
     {
         Window::ReCreateDeviceResources();
         UpdateWallpaper(true);
@@ -251,10 +251,10 @@ void DesktopPainter::Resize()
         m_TransitionEffect->Resize();
     }
 
-    if (this->renderTarget)
+    if (mRenderTarget)
     {
         // Resize the render target
-        renderTarget->Resize(D2D1::SizeU(g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height));
+        mRenderTarget->Resize(D2D1::SizeU(g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height));
 
         UpdateWallpaper(true);
     }
@@ -322,7 +322,7 @@ void DesktopPainter::Redraw()
 /// </summary>
 void DesktopPainter::Paint(D2D1_RECT_F *rect)
 {
-    renderTarget->FillRectangle(rect, m_pWallpaperBrush);
+    mRenderTarget->FillRectangle(rect, m_pWallpaperBrush);
 }
 
 
@@ -337,11 +337,11 @@ void DesktopPainter::TransitionStart()
 
     while (m_pOldWallpaperBrush != nullptr)
     {
-        this->renderTarget->BeginDraw();
+        mRenderTarget->BeginDraw();
         bool inAnimation = true;
         PaintComposite();
         PaintChildren(inAnimation, &this->m_TransitionSettings.WPRect);
-        this->renderTarget->EndDraw();
+        mRenderTarget->EndDraw();
     }
     Redraw();
 }
@@ -367,7 +367,7 @@ void DesktopPainter::PaintComposite()
 {
     float progress = std::min(1.0f, float(GetTickCount() - this->transitionStartTime)/(this->m_TransitionSettings.iTime));
 
-    m_TransitionEffect->Paint(renderTarget, progress);
+    m_TransitionEffect->Paint(mRenderTarget, progress);
 
     // We are done with the transition, let go of the old wallpaper
     if (progress >= 1.0f)
@@ -402,12 +402,12 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
                     if (SUCCEEDED(ReCreateDeviceResources()))
                     {
-                        this->renderTarget->BeginDraw();
+                        mRenderTarget->BeginDraw();
 
                         D2D1_RECT_F d2dUpdateRect = D2D1::RectF(
                             (FLOAT)updateRect.left, (FLOAT)updateRect.top, (FLOAT)updateRect.right, (FLOAT)updateRect.bottom);
 
-                        this->renderTarget->PushAxisAlignedClip(d2dUpdateRect, D2D1_ANTIALIAS_MODE_ALIASED);
+                        mRenderTarget->PushAxisAlignedClip(d2dUpdateRect, D2D1_ANTIALIAS_MODE_ALIASED);
 
                         // m_pOldWallpaperBrush being non zero indicates that we are in the middle of a transition
                         if (this->m_pOldWallpaperBrush != nullptr)
@@ -421,7 +421,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         
                         PaintChildren(inAnimation, &d2dUpdateRect);
 
-                        this->renderTarget->PopAxisAlignedClip();
+                        mRenderTarget->PopAxisAlignedClip();
                 
                         // Paint actual owned/child windows.
                         //EnumChildWindows(hWnd, [] (HWND hwnd, LPARAM) -> BOOL
@@ -431,7 +431,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         //}, 0);
 
                         // If EndDraw fails we need to recreate all device-dependent resources
-                        if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET)
+                        if (mRenderTarget->EndDraw() == D2DERR_RECREATE_TARGET)
                         {
                             DiscardDeviceResources();
                         }
@@ -506,7 +506,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush)
     iWallpaperStyle = _ttoi(szTemp);
 
     // Create a bitmap the size of the virtual screen
-    renderTarget->CreateCompatibleRenderTarget(&pBitmapRender);
+    mRenderTarget->CreateCompatibleRenderTarget(&pBitmapRender);
 
     // Start rendering the wallpaper
     pBitmapRender->BeginDraw();
@@ -531,7 +531,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush)
             // Convert it to a D2D1 bitmap
             pWICFactory->CreateFormatConverter(&pConverter);
             pConverter->Initialize(pSource, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.f, WICBitmapPaletteTypeMedianCut);
-            renderTarget->CreateBitmapFromWicBitmap(pConverter, 0, &pBitmap);
+            mRenderTarget->CreateBitmapFromWicBitmap(pConverter, 0, &pBitmap);
 
             // The x/y points where we should start tiling the image
             int xInitial = -g_pMonitorInfo->m_virtualDesktop.rect.left + (int)floor((float)g_pMonitorInfo->m_virtualDesktop.rect.left/cxWallpaper)*cxWallpaper;
@@ -626,7 +626,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush)
             // Convert it to a D2D1 bitmap
             pWICFactory->CreateFormatConverter(&pConverter);
             pConverter->Initialize(pScaler, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.f, WICBitmapPaletteTypeMedianCut);
-            renderTarget->CreateBitmapFromWicBitmap(pConverter, 0, &pBitmap);
+            mRenderTarget->CreateBitmapFromWicBitmap(pConverter, 0, &pBitmap);
 
             if (iWallpaperStyle == 22)
             {
@@ -710,7 +710,7 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush)
     pBitmapRender->EndDraw();
 
     pBitmapRender->GetBitmap(&pBitmap);
-    renderTarget->CreateBitmapBrush(pBitmap, ppBitmapBrush);
+    mRenderTarget->CreateBitmapBrush(pBitmap, ppBitmapBrush);
     //(*ppBitmapBrush)->SetTransform(D2D1::Matrix3x2F::Translation(g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.rect.top))
 
     SAFERELEASE(pBitmap);

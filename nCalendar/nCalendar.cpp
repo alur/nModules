@@ -117,10 +117,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// </summary>
 void LoadSettings()
 {
-    LiteStep::IterateOverLineTokens(_T("*nCalendar"), [] (LPCTSTR calendarName) -> void
-    {
-        CreateCalendar(calendarName);
-    });
+    LiteStep::IterateOverLineTokens(_T("*nCalendar"), CreateCalendar);
 }
 
 /// <summary>

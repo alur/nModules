@@ -68,17 +68,8 @@ void quitModule(HINSTANCE /* hDllInstance */)
     LiteStep::RemoveBangCommand(_T("!nTaskTestWindow"));
 
     TestWindow::DestroyAll();
-
-    // Stop the window manager
     WindowManager::Stop();
-
-    // Remove all taskbars
-    for (TaskbarMap::value_type taskbar : gTaskbars)
-    {
-        delete taskbar.second;
-    }
-    gTaskbars.clear();
-
+    DestroyTaskbars();
     gLSModule.DeInitalize();
 }
 
@@ -148,6 +139,11 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_REFRESH:
         {
+            WindowManager::Stop();
+            DestroyTaskbars();
+            WindowManager::Start();
+            LoadSettings();
+            WindowManager::AddExisting();
         }
         return 0;
 
@@ -182,6 +178,19 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         return WindowManager::ShellMessage(window, message, wParam, lParam);
     }
     return DefWindowProc(window, message, wParam, lParam);
+}
+
+
+/// <summary>
+/// Destroys all taskbars.
+/// </summary>
+void DestroyTaskbars()
+{
+    for (TaskbarMap::value_type taskbar : gTaskbars)
+    {
+        delete taskbar.second;
+    }
+    gTaskbars.clear();
 }
 
 

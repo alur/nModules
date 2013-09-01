@@ -48,7 +48,7 @@ Window::Window(Settings* settings, MessageHandler* msgHandler)
     , msgHandler(msgHandler)
     , parsedText(nullptr)
     , mParent(nullptr)
-    , renderTarget(nullptr)
+    , mRenderTarget(nullptr)
     , mSettings(settings)
     , text(nullptr)
     , visible(nullptr)
@@ -219,7 +219,7 @@ Window::~Window()
 
     if (!mIsChild)
     {
-        SAFERELEASE(this->renderTarget);
+        SAFERELEASE(mRenderTarget);
         SAFEDELETE(this->monitorInfo);
     }
 
@@ -284,7 +284,7 @@ Window::OVERLAY Window::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap, int zOr
 Window::OVERLAY Window::AddOverlay(D2D1_RECT_F position, IWICBitmapSource* source, int zOrder)
 {
     Overlay *overlay = new Overlay(position, this->drawingArea, source, zOrder);
-    overlay->ReCreateDeviceResources(this->renderTarget);
+    overlay->ReCreateDeviceResources(mRenderTarget);
 
     OVERLAY iter;
     for (iter = this->overlays.begin(); iter != this->overlays.end() && iter->GetZOrder() < overlay->GetZOrder(); ++iter);
@@ -300,7 +300,7 @@ Window::OVERLAY Window::AddOverlay(D2D1_RECT_F position, IWICBitmapSource* sourc
 Window::PAINTER Window::AddPostPainter(IPainter* painter)
 {
     PAINTER ret = this->postPainters.insert(this->postPainters.end(), painter);
-    ret->ReCreateDeviceResources(this->renderTarget);
+    ret->ReCreateDeviceResources(mRenderTarget);
     ret->UpdatePosition(this->drawingArea);
 
     return ret;
@@ -315,7 +315,7 @@ Window::PAINTER Window::AddPostPainter(IPainter* painter)
 Window::PAINTER Window::AddPrePainter(IPainter* painter)
 {
     PAINTER ret = this->prePainters.insert(this->prePainters.end(), painter);
-    ret->ReCreateDeviceResources(this->renderTarget);
+    ret->ReCreateDeviceResources(mRenderTarget);
     ret->UpdatePosition(this->drawingArea);
 
     return ret;
@@ -397,11 +397,11 @@ void Window::DiscardDeviceResources()
 {
     if (!mIsChild)
     {
-        SAFERELEASE(this->renderTarget);
+        SAFERELEASE(mRenderTarget);
     }
     else
     {
-        this->renderTarget = nullptr;
+        mRenderTarget = nullptr;
     }
     
     for (IPainter *painter : this->prePainters)
@@ -531,7 +531,7 @@ D2D1_RECT_F Window::GetDrawingRect()
 
 ID2D1RenderTarget *Window::GetRenderTarget()
 {
-    return this->renderTarget;
+    return mRenderTarget;
 }
 
 
@@ -717,16 +717,16 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
                     D2D1_RECT_F d2dUpdateRect = D2D1::RectF(
                         (FLOAT)updateRect.left, (FLOAT)updateRect.top, (FLOAT)updateRect.right, (FLOAT)updateRect.bottom);
 
-                    this->renderTarget->BeginDraw();
-                    this->renderTarget->PushAxisAlignedClip(&d2dUpdateRect, D2D1_ANTIALIAS_MODE_ALIASED);
-                    this->renderTarget->Clear();
+                    mRenderTarget->BeginDraw();
+                    mRenderTarget->PushAxisAlignedClip(&d2dUpdateRect, D2D1_ANTIALIAS_MODE_ALIASED);
+                    mRenderTarget->Clear();
 
                     Paint(inAnimation, &d2dUpdateRect);
 
-                    this->renderTarget->PopAxisAlignedClip();
+                    mRenderTarget->PopAxisAlignedClip();
 
                     // If EndDraw fails we need to recreate all device-dependent resources
-                    if (this->renderTarget->EndDraw() == D2DERR_RECREATE_TARGET)
+                    if (mRenderTarget->EndDraw() == D2DERR_RECREATE_TARGET)
                     {
                         DiscardDeviceResources();
                     }
@@ -958,19 +958,19 @@ void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
     UpdateLock lock(this);
     if (this->visible && Math::RectIntersectArea(updateRect, &this->drawingArea) > 0)
     {
-        this->renderTarget->PushAxisAlignedClip(this->drawingArea, D2D1_ANTIALIAS_MODE_ALIASED);
+        mRenderTarget->PushAxisAlignedClip(this->drawingArea, D2D1_ANTIALIAS_MODE_ALIASED);
 
         // Paint the active state's background.
-        mStateRender->Paint(this->renderTarget, mWindowData);
+        mStateRender->Paint(mRenderTarget, mWindowData);
         
         // Pre painters.
         for (IPainter *painter : this->prePainters)
         {
-            painter->Paint(this->renderTarget);
+            painter->Paint(mRenderTarget);
         }
 
         // Paint the active state's text.
-        mStateRender->PaintText(this->renderTarget, mWindowData);
+        mStateRender->PaintText(mRenderTarget, mWindowData);
 
         // Paint all overlays.
         PaintOverlays(updateRect);
@@ -981,7 +981,7 @@ void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
         // Post painters.
         for (IPainter *painter : this->postPainters)
         {
-            painter->Paint(this->renderTarget);
+            painter->Paint(mRenderTarget);
         }
         
         inAnimation |= mAnimating;
@@ -990,7 +990,7 @@ void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
             Animate();
         }
         
-        this->renderTarget->PopAxisAlignedClip();
+        mRenderTarget->PopAxisAlignedClip();
     }
 }
 
@@ -1016,7 +1016,7 @@ void Window::PaintOverlays(D2D1_RECT_F *updateRect)
 
     for (Overlay *overlay : this->overlays)
     {
-        overlay->Paint(this->renderTarget);
+        overlay->Paint(mRenderTarget);
     }
 }
 
@@ -1110,7 +1110,7 @@ HRESULT Window::ReCreateDeviceResources()
 {
     HRESULT hr = S_OK;
 
-    if (!this->renderTarget)
+    if (!mRenderTarget)
     {
         if (!mIsChild)
         {
@@ -1126,45 +1126,45 @@ HRESULT Window::ReCreateDeviceResources()
                         PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)
                     ),
                     HwndRenderTargetProperties(this->window, D2D1::SizeU((UINT32)mSize.width, (UINT32)mSize.height)),
-                    &this->renderTarget
+                    &mRenderTarget
                 );
                 if (SUCCEEDED(hr))
                 {
-                    this->renderTarget->SetTextAntialiasMode(mWindowSettings.textAntiAliasMode);
+                    mRenderTarget->SetTextAntialiasMode(mWindowSettings.textAntiAliasMode);
                 }
             }
         }
         else
         {
-            if (!mParent)
+            if (!mParent) // We are a child with a missing parent
             {
                 return S_FALSE;
             }
-            if (!mParent->renderTarget)
+            if (!mParent->mRenderTarget) // We are a child of a parent who either failed to create the render target, or is missing its parent.
             {
                 return S_FALSE;
             }
-            this->renderTarget = mParent->renderTarget;
+            mRenderTarget = mParent->mRenderTarget;
         }
 
         if (SUCCEEDED(hr))
         {
             for (IPainter *painter : this->prePainters)
             {
-                painter->ReCreateDeviceResources(this->renderTarget);
+                painter->ReCreateDeviceResources(mRenderTarget);
             }
 
-            mStateRender->ReCreateDeviceResources(this->renderTarget);
+            mStateRender->ReCreateDeviceResources(mRenderTarget);
             mStateRender->UpdatePosition(this->drawingArea, mWindowData);
 
             for (Overlay *overlay : this->overlays)
             {
-                overlay->ReCreateDeviceResources(this->renderTarget);
+                overlay->ReCreateDeviceResources(mRenderTarget);
             }
     
             for (IPainter *painter : this->postPainters)
             {
-                painter->ReCreateDeviceResources(this->renderTarget);
+                painter->ReCreateDeviceResources(mRenderTarget);
             }
 
             // Recreate resources for all children as well.
@@ -1459,14 +1459,14 @@ bool Window::UpdateDWMColor(ARGB newColor)
     // It's important that ret is on the right hand side, to prevent short-circuiting
     for (IPainter *painter : this->prePainters)
     {
-        ret = painter->UpdateDWMColor(newColor, this->renderTarget) || ret;
+        ret = painter->UpdateDWMColor(newColor, mRenderTarget) || ret;
     }
 
-    ret = mStateRender->UpdateDWMColor(newColor, this->renderTarget) || ret;
+    ret = mStateRender->UpdateDWMColor(newColor, mRenderTarget) || ret;
     
     for (IPainter *painter : this->postPainters) 
     {
-        ret = painter->UpdateDWMColor(newColor, this->renderTarget) || ret;
+        ret = painter->UpdateDWMColor(newColor, mRenderTarget) || ret;
     }
 
     if (ret)
@@ -1593,9 +1593,9 @@ void Window::SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, 
     {
         SetWindowPos(this->window, 0, int(mPosition.x + 0.5f), int(mPosition.y + 0.5f), int(mSize.width + 0.5f), int(mSize.height + 0.5f), SWP_NOZORDER | SWP_NOACTIVATE);
         this->drawingArea = D2D1::RectF(0, 0, mSize.width, mSize.height);
-        if (this->renderTarget)
+        if (mRenderTarget)
         {
-            HRESULT hr = this->renderTarget->Resize(D2D1::SizeU(UINT32(mSize.width + 0.5f), UINT32(mSize.height + 0.5f)));
+            HRESULT hr = mRenderTarget->Resize(D2D1::SizeU(UINT32(mSize.width + 0.5f), UINT32(mSize.height + 0.5f)));
             assert(SUCCEEDED(hr));
         }
     }

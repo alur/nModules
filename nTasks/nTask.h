@@ -7,5 +7,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-void LoadSettings();
-void CreateTaskbar(LPCTSTR taskbarName);
+static void LoadSettings();
+static void DestroyTaskbars();
+static void CreateTaskbar(LPCTSTR taskbarName);

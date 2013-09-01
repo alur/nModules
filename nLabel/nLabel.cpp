@@ -56,13 +56,9 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
 /// <summary>
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
-void quitModule(HINSTANCE /* instance */) {
-    // Remove all labels
-    for (auto label : gTopLevelLabels)
-    {
-        delete label.second;
-    }
-    
+void quitModule(HINSTANCE /* instance */)
+{
+    DestroyLabels();
     gLSModule.DeInitalize();
 }
 
@@ -74,7 +70,8 @@ void quitModule(HINSTANCE /* instance */) {
 /// <param name="message">The type of message.</param>
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
-LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
+{
     switch(message) {
     case WM_CREATE:
         {
@@ -108,6 +105,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_REFRESH:
         {
+            DestroyLabels();
+            LoadSettings();
         }
         return 0;
     }
@@ -116,14 +115,24 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
 
 /// <summary>
+/// Destroys all labels.
+/// </summary>
+void DestroyLabels()
+{
+    for (auto label : gTopLevelLabels)
+    {
+        delete label.second;
+    }
+    gTopLevelLabels.clear();
+}
+
+
+/// <summary>
 /// Reads through the .rc files and creates labels.
 /// </summary>
 void LoadSettings()
 {
-    LiteStep::IterateOverLineTokens(_T("*nLabel"), [] (LPCTSTR labelName) -> void
-    {
-        CreateLabel(labelName);
-    });
+    LiteStep::IterateOverLineTokens(_T("*nLabel"), CreateLabel);
 }
 
 

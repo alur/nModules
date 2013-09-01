@@ -53,12 +53,7 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
 /// </summary>
 EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */)
 {
-    for (auto item : gClocks)
-    {
-        delete item.second;
-    }
-    gClocks.clear();
-
+    DestroyClocks();
     gLSModule.DeInitalize();
 }
 
@@ -88,6 +83,8 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_REFRESH:
         {
+            DestroyClocks();
+            LoadSettings();
         }
         return 0;
 
@@ -114,14 +111,24 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
 
 /// <summary>
+/// Destroys all clocks.
+/// </summary>
+void DestroyClocks()
+{
+    for (auto item : gClocks)
+    {
+        delete item.second;
+    }
+    gClocks.clear();
+}
+
+
+/// <summary>
 /// Reads through the .rc files and creates clocks.
 /// </summary>
 void LoadSettings()
 {
-    LiteStep::IterateOverLineTokens(_T("*nClock"), [] (LPCTSTR clockName) -> void
-    {
-        CreateClock(clockName);
-    });
+    LiteStep::IterateOverLineTokens(_T("*nClock"), CreateClock);
 }
 
 

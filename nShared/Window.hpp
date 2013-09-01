@@ -317,7 +317,7 @@ protected:
     void PaintChildren(bool &inAnimation, D2D1_RECT_F *updateRect);
 
     // The render target to draw to.
-    ID2D1HwndRenderTarget* renderTarget;
+    ID2D1HwndRenderTarget *mRenderTarget;
 
     // Discards device-dependent stuff.
     void DiscardDeviceResources();

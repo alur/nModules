@@ -7,5 +7,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-void LoadSettings();
-void CreateClock(LPCTSTR clockName);
+static void LoadSettings();
+static void DestroyClocks();
+static void CreateClock(LPCTSTR clockName);
