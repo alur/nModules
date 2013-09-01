@@ -11,12 +11,36 @@
 #include "../Utilities/Math.h"
 #include <algorithm>
 #include "LiteralColorVal.hpp"
+#include <unordered_map>
+
 
 using namespace Math;
 
+std::hash<std::tstring> a;
+
+struct noCaseHash
+{
+    size_t operator()(const std::tstring & x) const
+    {
+        std::hash<std::tstring> a;
+        std::tstring copy(x);
+        std::transform(copy.begin(), copy.end(), copy.begin(), _totlower);
+        return a(copy);
+    }
+
+    bool operator()(const std::tstring & a, const std::tstring & b) const
+    {
+        return _tcsicmp(a.c_str(), b.c_str()) == 0;
+    }
+};
+
+typedef std::unordered_map<std::tstring, ARGB, noCaseHash, noCaseHash> ColorMap;
+
+
 namespace Color {
     // Predefined colors. These contain all the CSS3 named colors, and some extras.
-    KnownColor knownColors[] = {
+    static ColorMap namedColors =
+    {
         { _T("AliceBlue"),              0xFFF0F8FF },
         { _T("Almond"),                 0xFFEFDECD },
         { _T("AntiqueBrass"),           0xFFCD9575 },
@@ -265,8 +289,7 @@ namespace Color {
         { _T("Wisteria"),               0xFFCDA4DE },
         { _T("Yellow"),                 0xFFFFFF00 },
         { _T("YellowGreen"),            0xFF9ACD32 },
-        { _T("YellowOrange"),           0xFFFFAE42 },
-        { nullptr,                      NULL       }
+        { _T("YellowOrange"),           0xFFFFAE42 }
     };
 }
 
@@ -297,11 +320,17 @@ ARGB Color::D2DToARGB(D2D_COLOR_F d2d)
 
 
 /// <summary>
-/// Returns a null terminated list of known colors.
+/// Retrives the ARGB value of a named color.
 /// </summary>
-Color::LPKNOWNCOLOR Color::GetKnownColors()
+bool Color::GetNamedColor(LPCTSTR name, LPARGB color)
 {
-    return Color::knownColors;
+    ColorMap::const_iterator iter = namedColors.find(name);
+    if (iter != namedColors.end())
+    {
+        *color = iter->second;
+        return true;
+    }
+    return false;
 }
 
 

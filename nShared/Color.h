@@ -70,13 +70,9 @@ namespace Color
     IColorVal* Parse(LPCTSTR colorString, const IColorVal* defaultValue);
     std::unique_ptr<IColorVal> Create(ARGB value);
 
-    // Holds a known color
-    typedef struct KnownColor
-    {
-        LPCTSTR name;
-        ARGB color;
-    } *LPKNOWNCOLOR;
+    //
+    bool GetNamedColor(LPCTSTR name, LPARGB color);
 
     // Returns the null-terminated list of known colors
-    LPKNOWNCOLOR GetKnownColors();
+    // GetKnownColors();
 }

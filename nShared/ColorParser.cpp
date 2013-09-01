@@ -462,13 +462,11 @@ bool ParseColor(LPCTSTR color, IColorVal **target)
     }
 
     // Check if it's a named color
-    for (auto knownColor = Color::GetKnownColors(); knownColor->name != nullptr; ++knownColor)
+    ARGB argb;
+    if (Color::GetNamedColor(color, &argb))
     {
-        if (_tcsicmp(color, knownColor->name) == 0)
-        {
-            *target = new LiteralColorVal(knownColor->color);
-            return true;
-        }
+        *target = new LiteralColorVal(argb);
+        return true;
     }
 
     return false;
