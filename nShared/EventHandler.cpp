@@ -131,6 +131,12 @@ EventHandler::ClickData EventHandler::ParseLine(LPCTSTR szLine)
     LiteStep::GetToken(pszNext, szToken, &pszNext, false);
     cData.mods = ModsFromString(szToken);
 
+    if (pszNext == nullptr)
+    {
+        cData.type = UNKNOWN;
+        return cData;
+    }
+
     // Guess that the rest is an action for now
     StringCchCopy(cData.action, sizeof(cData.action), pszNext);
     cData.area.left = LONG_MIN; cData.area.right = LONG_MAX;
