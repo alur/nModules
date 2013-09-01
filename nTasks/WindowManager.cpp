@@ -63,13 +63,13 @@ namespace WindowManager
     WindowMap windowMap;
 
     // Information about the current monitor layout.
-    MonitorInfo* g_pMonitorInfo = nullptr;
+    MonitorInfo gMonitorInfo;
 
     // True if the windowmanager is running.
     bool isStarted = false;
 
     // True if we havent added existing windows yet.
-    bool initalizing = true;
+    bool initializing = true;
 }
 
 
@@ -79,11 +79,8 @@ namespace WindowManager
 void WindowManager::Start()
 {
     // Check that we aren't already running
-    assert(!isStarted);
+    ASSERT(!isStarted);
     isStarted = true;
-
-    // Initalize our monitorinfo class
-    g_pMonitorInfo = new MonitorInfo();
 
     // Get the currently active window
     SetActive(GetForegroundWindow());
@@ -107,16 +104,16 @@ void WindowManager::Start()
 void WindowManager::Stop()
 {
     // Check that we are currently running
-    assert(isStarted);
+    ASSERT(isStarted);
 
     // Clean up
     SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)gLSModule.GetMessageWindow(), (LPARAM)gWMMessages);
     KillTimer(gLSModule.GetMessageWindow(), TIMER_CHECKMONITOR);
     KillTimer(gLSModule.GetMessageWindow(), TIMER_MAINTENANCE);
-    delete g_pMonitorInfo;
     activeWindow = nullptr;
     windowMap.clear();
     isStarted = false;
+    initializing = true;
 }
 
 
@@ -126,7 +123,7 @@ void WindowManager::Stop()
 void WindowManager::AddWindow(HWND hWnd)
 {
     // Check that we are currently running
-    assert(isStarted);
+    ASSERT(isStarted);
 
     // If we should add this window to the taskbars
     if (IsTaskbarWindow(hWnd))
@@ -144,12 +141,12 @@ void WindowManager::AddWindow(HWND hWnd)
         
         // Get information about the window
         WindowInformation &wndInfo = windowMap[hWnd];
-        wndInfo.uMonitor = g_pMonitorInfo->MonitorFromHWND(hWnd);
+        wndInfo.uMonitor = gMonitorInfo.MonitorFromHWND(hWnd);
 
         // Add it to any taskbar that wants it
         for (TaskbarMap::value_type taskbar : gTaskbars)
         {
-            TaskButton *taskButton = taskbar.second->AddTask(hWnd, wndInfo.uMonitor, initalizing);
+            TaskButton *taskButton = taskbar.second->AddTask(hWnd, wndInfo.uMonitor, initializing);
 
             // If the taskbar created a button for this window
             if (taskButton != nullptr)
@@ -172,7 +169,7 @@ void WindowManager::AddWindow(HWND hWnd)
 void WindowManager::MonitorChanged(HWND hWnd, UINT monitor)
 {
     // Check that we are currently running
-    assert(isStarted);
+    ASSERT(isStarted);
 
     WindowMap::iterator iter = windowMap.find(hWnd);
     if (iter != windowMap.end())
@@ -226,7 +223,7 @@ void WindowManager::MonitorChanged(HWND hWnd, UINT monitor)
 void WindowManager::SetActive(HWND hWnd)
 {
     // Check that we are currently running
-    assert(isStarted);
+    ASSERT(isStarted);
 
     // Remove the active flag from the previously active buttons
     WindowMap::iterator iter = windowMap.find(activeWindow);
@@ -279,7 +276,7 @@ void WindowManager::MarkAsMinimized(HWND hWnd)
 void WindowManager::RemoveWindow(HWND hWnd)
 {
     // Check that we are currently running
-    assert(isStarted);
+    ASSERT(isStarted);
 
     WindowMap::iterator iter = windowMap.find(hWnd);
     if (iter != windowMap.end())
@@ -315,7 +312,7 @@ void WindowManager::RemoveWindow(HWND hWnd)
 void WindowManager::UpdateWindow(HWND hWnd, LPARAM lParam)
 {
     // Check that we are currently running
-    assert(isStarted);
+    ASSERT(isStarted);
 
     WindowMap::const_iterator iter = windowMap.find(hWnd);
     if (iter != windowMap.end())
@@ -357,7 +354,7 @@ void WindowManager::UpdateWindow(HWND hWnd, LPARAM lParam)
 LRESULT WindowManager::GetMinRect(HWND hWnd, LPPOINTS lpPoints) 
 {
     // Check that we are currently running
-    assert(isStarted);
+    ASSERT(isStarted);
 
     WindowMap::const_iterator iter = windowMap.find(hWnd);
     if (iter != windowMap.end() && !iter->second.buttons.empty())
@@ -378,7 +375,7 @@ void WindowManager::UpdateWindowMonitors()
     vector<HWND> mods;
     for (WindowMap::iterator iter = windowMap.begin(); iter != windowMap.end(); iter++)
     {
-        int monitor = g_pMonitorInfo->MonitorFromHWND(iter->first);
+        int monitor = gMonitorInfo.MonitorFromHWND(iter->first);
         if ((UINT)monitor != iter->second.uMonitor)
         {
             mods.push_back(iter->first);
@@ -396,7 +393,7 @@ void WindowManager::UpdateWindowMonitors()
 
         for (HWND hwnd : mods)
         {
-            MonitorChanged(hwnd, g_pMonitorInfo->MonitorFromHWND(hwnd));
+            MonitorChanged(hwnd, gMonitorInfo.MonitorFromHWND(hwnd));
         }
         
         // Clear update locks
@@ -479,14 +476,14 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         // Windows 8+ A window has moved to a different monitor
     case LM_MONITORCHANGED:
         {
-            MonitorChanged((HWND)wParam, g_pMonitorInfo->MonitorFromHWND((HWND)wParam));
+            MonitorChanged((HWND)wParam, gMonitorInfo.MonitorFromHWND((HWND)wParam));
         }
         return 0;
 
         // The display layout has changed.
     case WM_DISPLAYCHANGE:
         {
-            g_pMonitorInfo->Update();
+            gMonitorInfo.Update();
             UpdateWindowMonitors();
         }
         return 0;
@@ -531,7 +528,7 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
     case WM_ADDED_EXISTING:
         {
             // Relayout all taskbars.
-            initalizing = false;
+            initializing = false;
             for (auto taskbar : gTaskbars)
             {
                 taskbar.second->Relayout();
@@ -741,7 +738,7 @@ void WindowManager::AddExisting()
 void WindowManager::RunWindowMaintenance()
 {
     // Check that we are currently running
-    assert(isStarted);
+    ASSERT(isStarted);
 
     // Prevent all taskbars from painting during the update.
     std::vector<Window::UpdateLock*> updateLocks(gTaskbars.size());

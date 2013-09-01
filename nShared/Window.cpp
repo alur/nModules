@@ -1512,7 +1512,7 @@ void Window::UpdateParentVariables()
 /// </summary>
 void Window::SetParent(Window *newParent)
 {
-    assert(mParent == nullptr);
+    ASSERT(mParent == nullptr);
     
     mParent = newParent;
     mParent->children.push_back(this);
@@ -1595,8 +1595,7 @@ void Window::SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, 
         this->drawingArea = D2D1::RectF(0, 0, mSize.width, mSize.height);
         if (mRenderTarget)
         {
-            HRESULT hr = mRenderTarget->Resize(D2D1::SizeU(UINT32(mSize.width + 0.5f), UINT32(mSize.height + 0.5f)));
-            assert(SUCCEEDED(hr));
+            VERIFY_HR(mRenderTarget->Resize(D2D1::SizeU(UINT32(mSize.width + 0.5f), UINT32(mSize.height + 0.5f))));
         }
     }
     else if(mParent)

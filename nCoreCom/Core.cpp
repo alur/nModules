@@ -95,6 +95,6 @@ bool nCore::Initialized()
 /// </summary>
 VERSION nCore::GetCoreVersion()
 {
-    assert(nCore::Initialized());
+    ASSERT(nCore::Initialized());
     return FUNC_VAR_NAME(GetCoreVersion)();
 }

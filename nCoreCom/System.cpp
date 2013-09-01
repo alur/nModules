@@ -69,62 +69,62 @@ void nCore::System::_DeInit()
 
 IParsedText* nCore::System::ParseText(LPCWSTR text)
 {
-    assert(nCore::Initialized());
+    ASSERT(nCore::Initialized());
     return FUNC_VAR_NAME(ParseText)(text);
 }
 
 
 BOOL nCore::System::RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic)
 {
-    assert(nCore::Initialized());
+    ASSERT(nCore::Initialized());
     return FUNC_VAR_NAME(RegisterDynamicTextFunction)(name, numArgs, formatter, dynamic);
 }
 
 
 BOOL nCore::System::UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs)
 {
-    assert(nCore::Initialized());
+    ASSERT(nCore::Initialized());
     return FUNC_VAR_NAME(UnRegisterDynamicTextFunction)(name, numArgs);
 }
 
 
 BOOL nCore::System::DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs)
 {
-    assert(nCore::Initialized());
+    ASSERT(nCore::Initialized());
     return FUNC_VAR_NAME(DynamicTextChangeNotification)(name, numArgs);
 }
 
 
 void nCore::System::RegisterWindow(LPCTSTR prefix, LPVOID window)
 {
-    assert(nCore::Initialized());
+    ASSERT(nCore::Initialized());
     FUNC_VAR_NAME(RegisterWindow)(prefix, window);
 }
 
 
 void nCore::System::UnRegisterWindow(LPCTSTR prefix)
 {
-    assert(nCore::Initialized());
+    ASSERT(nCore::Initialized());
     FUNC_VAR_NAME(UnRegisterWindow)(prefix);
 }
 
 
 Window *nCore::System::FindRegisteredWindow(LPCTSTR prefix)
 {
-    assert(nCore::Initialized());
+    ASSERT(nCore::Initialized());
     return FUNC_VAR_NAME(FindRegisteredWindow)(prefix);
 }
 
 
 void nCore::System::AddWindowRegistrationListener(LPCTSTR prefix, Window *listener)
 {
-    assert(nCore::Initialized());
+    ASSERT(nCore::Initialized());
     FUNC_VAR_NAME(AddWindowRegistrationListener)(prefix, listener);
 }
 
 
 void nCore::System::RemoveWindowRegistrationListener(LPCTSTR prefix, Window *listener)
 {
-    assert(nCore::Initialized());
+    ASSERT(nCore::Initialized());
     FUNC_VAR_NAME(RemoveWindowRegistrationListener)(prefix, listener);
 }

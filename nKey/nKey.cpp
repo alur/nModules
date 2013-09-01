@@ -65,6 +65,8 @@ void quitModule(HINSTANCE /* instance */)
     {
         UnregisterHotKey(gWindow, hotkey.first);
     }
+    
+    gLSModule.DeInitalize();
 }
 
 

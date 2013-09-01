@@ -7,12 +7,18 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include <assert.h>
+#include "../nShared/BuildOptions.h"
 
-#define ASSERT assert
+extern "C" _CRTIMP void __cdecl _wassert(_In_z_ const wchar_t * _Message, _In_z_ const wchar_t *_File, _In_ unsigned _Line);
+
+#if defined(BUILDOPTIONS_ASSERTS) || defined(_DEBUG)
+#   define ASSERT(_Expression) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(#_Expression), _CRT_WIDE(__FILE__), __LINE__), 0) )
+#else
+#   define ASSERT 
+#endif
 
 // Verify works like assert in debug, but executes the command even in release mode.
-#if defined(_DEBUG)
+#if defined(BUILDOPTIONS_ASSERTS) || defined(_DEBUG)
 #   define VERIFY(f)     ASSERT(f)
 #   define VERIFY_HR(f)  ASSERT(SUCCEEDED(f))
 #else

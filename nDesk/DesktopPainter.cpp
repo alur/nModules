@@ -211,7 +211,7 @@ TransitionEffect* DesktopPainter::TransitionEffectFromType(TransitionType transi
 /// </summary>
 void DesktopPainter::SetTransitionTime(int iTransitionTime)
 {
-    assert(iTransitionTime >= 0);
+    ASSERT(iTransitionTime >= 0);
     m_TransitionSettings.iTime = iTransitionTime;
 }
 

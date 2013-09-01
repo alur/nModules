@@ -84,7 +84,7 @@ TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout)
 {
     if (monitor == mMonitor || mMonitor == 0xFFFFFFFF)
     {
-        assert(mButtonMap.find(hWnd) == mButtonMap.end());
+        ASSERT(mButtonMap.find(hWnd) == mButtonMap.end());
 
         TaskButton* pButton = new TaskButton(this, hWnd, mButtonSettings);
         mButtonMap[hWnd] = mButtonList.insert(mButtonList.end(), pButton);

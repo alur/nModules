@@ -158,7 +158,7 @@ RelatedNumber LiteStep::GetPrefixedRCRelatedNumber(LPCTSTR prefix, LPCTSTR keyNa
 bool LiteStep::GetPrefixedRCString(LPCTSTR prefix, LPCTSTR keyName, LPTSTR buffer, LPCTSTR defaultValue, size_t cchBuffer)
 {
     // This is bad, since the first thing GetRCString does is to set *buffer = '\0'
-    assert(buffer != defaultValue);
+    ASSERT(buffer != defaultValue);
 
     TCHAR prefixedKey[MAX_RCCOMMAND];
     StringCchPrintf(prefixedKey, _countof(prefixedKey), _T("%s%s"), prefix, keyName);

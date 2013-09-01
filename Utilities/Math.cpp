@@ -81,7 +81,7 @@ float Math::Lerp(float a, float b, float weight)
 float Math::WrappingLerp(float a, float b, float weight, float minValue, float maxValue)
 {
     // Assume that a and b are both within [minValue, maxValue].
-    assert(a >= minValue && a <= maxValue && b >= minValue && b <= maxValue);
+    ASSERT(a >= minValue && a <= maxValue && b >= minValue && b <= maxValue);
 
     // Ensure that a <= b, to simplify life
     if (a > b) {

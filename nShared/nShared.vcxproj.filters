@@ -108,6 +108,7 @@
     </ClInclude>
     <ClInclude Include="RelatedNumber.hpp" />
     <ClInclude Include="RelatedRect.hpp" />
+    <ClInclude Include="BuildOptions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Easing.cpp" />

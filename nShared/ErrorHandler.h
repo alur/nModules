@@ -21,6 +21,7 @@ namespace ErrorHandler
     };
 
     void Error(Level level, LPCTSTR format, ...);
+    void ErrorHR(Level level, HRESULT hr, LPCTSTR format = nullptr, ...);
     void SetLevel(Level level);
     void Initialize(LPCTSTR moduleName);
 }

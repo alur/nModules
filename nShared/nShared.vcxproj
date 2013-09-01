@@ -32,6 +32,7 @@
     <ClInclude Include="Brush.hpp" />
     <ClInclude Include="BrushBangs.h" />
     <ClInclude Include="BrushSettings.hpp" />
+    <ClInclude Include="BuildOptions.h" />
     <ClInclude Include="ChildDrawable.hpp" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Coordinate.hpp" />

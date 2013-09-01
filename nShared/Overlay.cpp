@@ -43,7 +43,7 @@ HRESULT Overlay::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
     this->renderTarget = renderTarget;
 
     if (renderTarget != NULL && this->source != NULL) {
-        assert(this->brush == NULL);
+        ASSERT(this->brush == NULL);
 
         // Create our helper objects.
         hr = Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));

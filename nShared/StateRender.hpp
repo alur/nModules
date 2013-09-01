@@ -96,7 +96,7 @@ public:
     /// </summary>
     void ClearState(StateEnum state, Window *window)
     {
-        assert(state != StateEnum::Base);
+        ASSERT(state != StateEnum::Base);
 
         StateWindowData<StateEnum> *data;
         data = decltype(data)(window->GetWindowData());
@@ -251,7 +251,7 @@ public:
 
     HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) override
     {
-        assert(renderTarget != nullptr);
+        ASSERT(renderTarget != nullptr);
         HRESULT hr = S_OK;
 
         if (mDeviceRefCount == 0)

@@ -38,12 +38,12 @@ BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */)
 /// <param name="version">The version of the module, used for handling LM_GETREVID.</param>
 LSModule::LSModule(LPCTSTR moduleName, LPCTSTR author, VERSION version)
 {
-    this->author = _tcsdup(author);
+    this->author = author;
     this->drawableClass = 0;
     this->instance = instance;
     this->messageHandler = nullptr;
     this->messageHandlerClass = 0;
-    this->moduleName = _tcsdup(moduleName);
+    this->moduleName = moduleName;
     this->parent = parent;
     this->version = version;
 
@@ -56,31 +56,6 @@ LSModule::LSModule(LPCTSTR moduleName, LPCTSTR author, VERSION version)
 /// </summary>
 LSModule::~LSModule()
 {
-    // Destroy the message handler.
-    if (this->messageHandler != nullptr)
-    {
-        DestroyWindow(this->messageHandler);
-        this->messageHandler = nullptr;
-    }
-
-    // Unregister window classes.
-    if (this->messageHandlerClass != 0)
-    {
-        UnregisterClass((LPCTSTR)this->messageHandlerClass, this->instance);
-        this->messageHandlerClass = 0;
-    }
-    if (this->drawableClass != 0)
-    {
-        UnregisterClass((LPCTSTR)this->drawableClass, this->instance);
-        this->drawableClass = 0;
-    }
-
-    // Free allocated strings.
-    free((LPVOID)this->moduleName);
-    free((LPVOID)this->author);
-
-    // Disconnect from the core
-    nCore::Disconnect();
 }
 
 
@@ -95,11 +70,16 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
 {
     WNDCLASSEX wc;
     TCHAR className[MAX_PATH];
+    HRESULT hr;
 
     this->parent = parent;
     this->instance = instance;
 
-    CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+    if (FAILED(hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE)))
+    {
+        ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()), L"Failed to initialize COM.");
+        return 1;
+    }
 
     // Register the messageHandler window class
     StringCchPrintf(className, _countof(className), _T("LS%sMessageHandler"), this->moduleName);
@@ -111,15 +91,18 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
     MessageHandler::FixWindowClass(&wc);
 
     // Fix up custom window classes
-    if (customMessageClass) {
+    if (customMessageClass)
+    {
         MessageHandler::FixWindowClass(customMessageClass);
     }
-    if (customDrawableClass) {
+    if (customDrawableClass)
+    {
         MessageHandler::FixWindowClass(customDrawableClass);
     }
 
     if ((this->messageHandlerClass = RegisterClassEx(customMessageClass == NULL ? &wc : customMessageClass)) == 0)
     {
+        ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()), L"Failed to register the message handler class.");
         return false;
     }
 
@@ -130,6 +113,7 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
 
     if ((this->drawableClass = RegisterClassEx(customDrawableClass == NULL ? &wc : customDrawableClass)) == 0)
     {
+        ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()), L"Failed to register the drawable window class.");
         return false;
     }
 
@@ -137,6 +121,7 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
     if ((this->messageHandler = MessageHandler::CreateMessageWindowEx(WS_EX_TOOLWINDOW,
         (LPCTSTR)this->messageHandlerClass, _T(""), WS_POPUP, 0, 0, 0, 0, this->parent, NULL, this->instance, this)) == NULL)
     {
+        ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()), L"Failed to register the LiteStep message window.");
         return false;
     }
     SetWindowLongPtr(this->messageHandler, GWLP_USERDATA, MAGIC_DWORD);
@@ -155,6 +140,34 @@ void LSModule::DeInitalize()
 
     //
     CoUninitialize();
+
+    // Destroy the message handler.
+    if (this->messageHandler != nullptr)
+    {
+        DestroyWindow(this->messageHandler);
+        this->messageHandler = nullptr;
+    }
+
+    // Unregister window classes.
+    if (this->messageHandlerClass != 0)
+    {
+        if (UnregisterClass((LPCTSTR)this->messageHandlerClass, this->instance) == FALSE)
+        {
+            ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()), L"Failed to unregister the message handler class.");
+        }
+        this->messageHandlerClass = 0;
+    }
+    if (this->drawableClass != 0)
+    {
+        if (UnregisterClass((LPCTSTR)this->drawableClass, this->instance) == FALSE)
+        {
+            ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()), L"Failed to unregister the drawable window class.");
+        }
+        this->drawableClass = 0;
+    }
+
+    // Disconnect from the core
+    nCore::Disconnect();
 }
 
 
