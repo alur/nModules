@@ -14,6 +14,10 @@
 #include "../nCoreCom/Core.h"
 #include "../Utilities/StringUtils.h"
 #include <algorithm>
+#include "ErrorHandler.h"
+#include <Shlwapi.h>
+
+#pragma comment(lib, "shlwapi.lib")
 
 
 Brush::Brush()
@@ -204,6 +208,13 @@ HRESULT Brush::ReCreate(ID2D1RenderTarget* renderTarget)
                 if (SUCCEEDED(hr = LoadImageFile(renderTarget, this->brushSettings->image, &this->brush)))
                 {
                     this->brush->SetOpacity(this->brushSettings->imageOpacity);
+                }
+                else
+                {
+                    // Happens a bit too much...
+                    //ErrorHandler::ErrorHR(ErrorHandler::Level::Warning, hr, L"Failed to load %s", this->brushSettings->image);
+                    // It's cool.
+                    hr = S_FALSE;
                 }
             }
             break;
@@ -514,6 +525,10 @@ HRESULT Brush::LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2
         SAFERELEASE(wicBitmap);
         SAFERELEASE(bitmap);
         SAFERELEASE(converter);
+    }
+    else if (!PathFileExists(image))
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
     }
 
     return hr;

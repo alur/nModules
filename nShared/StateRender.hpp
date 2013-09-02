@@ -165,7 +165,7 @@ public:
             {
                 mDependentStates[depState].push_back(state);
             }
-            mStates[state].Load(&initData[state].defaults, initData[state].prefix, stateSettings);
+            mStates[state].Load(&initData[state].defaults, stateSettings);
         }
     }
 

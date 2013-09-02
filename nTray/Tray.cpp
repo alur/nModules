@@ -96,14 +96,14 @@ void Tray::LoadSettings(bool /* IsRefresh */)
     WindowSettings *drawingSettings = mWindow->GetDrawingSettings();
 
     // TODO::FIX ME!
-    mTargetSize = D2D1::SizeU(
-        (UINT32)drawingSettings->width.Evaluate(0),
-        (UINT32)drawingSettings->height.Evaluate(0)
+    mTargetSize = D2D1::SizeF(
+        drawingSettings->width.Evaluate(0),
+        drawingSettings->height.Evaluate(0)
     );
 
-    mTargetPosition = D2D1::Point2U(
-        (UINT32)drawingSettings->x.Evaluate(0),
-        (UINT32)drawingSettings->y.Evaluate(0)
+    mTargetPosition = D2D1::Point2F(
+        drawingSettings->x.Evaluate(0),
+        drawingSettings->y.Evaluate(0)
     );
 
     mOverflowAction = mSettings->GetEnum<OverflowAction>(_T("OverflowAction"),
@@ -356,8 +356,8 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM
             // lParam is 1 when the size change is due to OverflowAction
             if (lParam == 1)
             {
+                LiteStep::LSExecute(nullptr, mOnResize, 0);
             }
-            LiteStep::LSExecute(nullptr, mOnResize, 0);
         }
         return 0;
 

@@ -48,7 +48,7 @@ public:
     class Settings
     {
     public:
-        explicit Settings();
+        Settings();
 
         // Loads the actual settings.
         void Load(::Settings* settings, Settings* defaults);
@@ -131,7 +131,7 @@ public:
     virtual ~State();
 
 public:
-    void Load(Settings* defaultSettings, LPCTSTR prefix, ::Settings *settings);
+    void Load(Settings* defaultSettings, ::Settings *settings);
     Settings* GetSettings();
         
     // Gets the "desired" size for a given width and height.

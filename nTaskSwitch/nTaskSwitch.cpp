@@ -59,7 +59,7 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
 /// <summary>
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
-void quitModule(HINSTANCE /* instance */)
+EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */)
 {
     delete gTaskSwitcher;
 

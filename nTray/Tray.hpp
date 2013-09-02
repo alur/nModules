@@ -153,10 +153,10 @@ private:
     bool mNoTooltips;
 
     // The size that the tray should be when it's not overflowing
-    D2D1_SIZE_U mTargetSize;
+    D2D1_SIZE_F mTargetSize;
 
     // The position where the tray should be when it's not overflowing
-    D2D1_POINT_2U mTargetPosition;
+    D2D1_POINT_2F mTargetPosition;
 
     //
     OverflowAction mOverflowAction;

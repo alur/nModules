@@ -18,6 +18,7 @@
 #include "Factories.h"
 #include "Color.h"
 #include "MessageHandler.hpp"
+#include "ErrorHandler.h"
 #include "../Utilities/StringUtils.h"
 #include "../Utilities/Math.h"
 
@@ -712,7 +713,7 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
             if (GetUpdateRect(window, &updateRect, FALSE) != FALSE)
             {
                 ValidateRect(this->window, nullptr);
-                if (SUCCEEDED(ReCreateDeviceResources()))
+                if (ReCreateDeviceResources() == S_OK)
                 {
                     D2D1_RECT_F d2dUpdateRect = D2D1::RectF(
                         (FLOAT)updateRect.left, (FLOAT)updateRect.top, (FLOAT)updateRect.right, (FLOAT)updateRect.bottom);
@@ -1151,26 +1152,26 @@ HRESULT Window::ReCreateDeviceResources()
         {
             for (IPainter *painter : this->prePainters)
             {
-                painter->ReCreateDeviceResources(mRenderTarget);
+                RETURNONFAIL(hr, painter->ReCreateDeviceResources(mRenderTarget));
             }
 
-            mStateRender->ReCreateDeviceResources(mRenderTarget);
+            RETURNONFAIL(hr, mStateRender->ReCreateDeviceResources(mRenderTarget));
             mStateRender->UpdatePosition(this->drawingArea, mWindowData);
 
             for (Overlay *overlay : this->overlays)
             {
-                overlay->ReCreateDeviceResources(mRenderTarget);
+                RETURNONFAIL(hr, overlay->ReCreateDeviceResources(mRenderTarget));
             }
     
             for (IPainter *painter : this->postPainters)
             {
-                painter->ReCreateDeviceResources(mRenderTarget);
+                RETURNONFAIL(hr, painter->ReCreateDeviceResources(mRenderTarget));
             }
 
             // Recreate resources for all children as well.
             for (Window *child : this->children)
             {
-                child->ReCreateDeviceResources();
+                RETURNONFAIL(hr, child->ReCreateDeviceResources());
             }
         }
     }

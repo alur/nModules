@@ -9,7 +9,6 @@
 #include <strsafe.h>
 #include "WindowSettings.hpp"
 #include "../Utilities/StringUtils.h"
-#include <map>
 #include "../Utilities/Unordered1To1Map.hpp"
 
 

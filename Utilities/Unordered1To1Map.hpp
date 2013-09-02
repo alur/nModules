@@ -93,8 +93,8 @@ public:
 public:
     value_type * Insert(value_type value)
     {
-        assert(mSetA.find(&value.a) == mSetA.end());
-        assert(mSetB.find(&value.b) == mSetB.end());
+        //assert(mSetA.find(&value.a) == mSetA.end());
+        //assert(mSetB.find(&value.b) == mSetB.end());
 
         mData.emplace_front(value);
         mData.begin()->iter = mData.begin();

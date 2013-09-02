@@ -60,7 +60,7 @@ void State::UpdatePosition(D2D1_RECT_F position, WindowData *windowData)
 }
 
 
-void State::Load(Settings* defaultSettings, LPCTSTR prefix, ::Settings *settings)
+void State::Load(Settings* defaultSettings, ::Settings *settings)
 {
     ASSERT(!this->settings);
     this->settings = settings;
