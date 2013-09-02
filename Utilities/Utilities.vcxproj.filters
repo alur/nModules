@@ -16,6 +16,7 @@
     <ClInclude Include="FileIterator.hpp" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="CRC32.h" />
+    <ClInclude Include="Unordered1To1Map.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StringUtils.cpp" />

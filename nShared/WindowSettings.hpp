@@ -15,11 +15,7 @@
 class WindowSettings
 {
 public:
-    explicit WindowSettings();
-    virtual ~WindowSettings();
-    
-    WindowSettings(const WindowSettings &wndSettings);
-    WindowSettings& operator=(const WindowSettings &wndSettings);
+    WindowSettings();
 
     // Loads the actual settings.
     void Load(Settings* settings, WindowSettings* defaults);
@@ -44,11 +40,11 @@ public:
     // True if the window should start hidden. Default: false
     bool hidden;
 
-    // True to register this drawable with the core. Ignores .RC settings. Default: False
+    // True to register this drawable with the core. Not read from RC files. Default: false
     bool registerWithCore;
 
     // The text to display. Default: "" (blank)
-    LPWSTR text;
+    TCHAR text[MAX_LINE_LENGTH];
 
     // How to anti-alias the text.
     D2D1_TEXT_ANTIALIAS_MODE textAntiAliasMode;

@@ -23,7 +23,7 @@ LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSIO
 const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED, LM_FULLSCREENDEACTIVATED, 0 };
 
 // All current clocks
-map<tstring, Clock*> gClocks;
+map<tstring, Clock> gClocks;
 
 
 /// <summary>
@@ -90,18 +90,18 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_FULLSCREENACTIVATED:
         {
-            for (auto group : gClocks)
+            for (auto &item : gClocks)
             {
-                group.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+                item.second.GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
             }
         }
         return 0;
 
     case LM_FULLSCREENDEACTIVATED:
         {
-            for (auto group : gClocks)
+            for (auto &item : gClocks)
             {
-                group.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+                item.second.GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
             }
         }
         return 0;
@@ -115,10 +115,6 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// </summary>
 void DestroyClocks()
 {
-    for (auto item : gClocks)
-    {
-        delete item.second;
-    }
     gClocks.clear();
 }
 
@@ -140,7 +136,11 @@ void CreateClock(LPCTSTR clockName)
 {
     if (gClocks.find(clockName) == gClocks.end())
     {
-        gClocks[clockName] = new Clock(clockName);
+        gClocks.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(clockName),
+            std::forward_as_tuple(clockName)
+        );
     }
     else
     {

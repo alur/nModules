@@ -51,7 +51,8 @@ Balloon::Balloon(LPCTSTR prefix, Settings* parentSettings, UINT clickedMessage, 
     WindowSettings closeBtnSettings;
     closeBtnDefaults.width = 16;
     closeBtnDefaults.height = 16;
-    closeBtnDefaults.text = _wcsdup(L"X");
+    closeBtnDefaults.text[0] = L'X';
+    closeBtnDefaults.text[1] = L'\0';
     closeBtnSettings.Load(mCloseBtnSettings, &closeBtnDefaults);
     mCloseBtnWindow->Initialize(closeBtnSettings, &mCloseBtnStates);
     if (!closeBtnSettings.hidden)

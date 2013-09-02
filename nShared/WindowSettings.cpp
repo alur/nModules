@@ -10,90 +10,35 @@
 #include "WindowSettings.hpp"
 #include "../Utilities/StringUtils.h"
 #include <map>
+#include "../Utilities/Unordered1To1Map.hpp"
 
 
-/// <summary>
-/// Initalizes the class to all default settings.
-/// </summary>
-WindowSettings::WindowSettings()
+// String < -- > D2D1_TEXT_ANTIALIAS_MODE
+static Unordered1To1Map<D2D1_TEXT_ANTIALIAS_MODE, std::tstring> textAntiAliasModeMap =
 {
-    this->alwaysOnTop = false;
-    this->blurBehind = false;
-    this->clickThrough = false;
-    this->evaluateText = false;
-    this->height = RelatedNumber(100);
-    this->hidden = false;
-    this->registerWithCore = false;
-    this->text = _wcsdup(L"");
-    this->textAntiAliasMode = D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
-    this->width = RelatedNumber(100);
-    this->x = RelatedNumber(0);
-    this->y = RelatedNumber(0);
-}
-
-
-/// <summary>
-/// Copy constructor
-/// </summary>
-WindowSettings::WindowSettings(const WindowSettings &wndSettings)
-{
-    memcpy(this, &wndSettings, sizeof(wndSettings));
-    this->text = _wcsdup(this->text);
-}
-
-
-/// <summary>
-/// Assignment operator
-/// </summary>
-WindowSettings &WindowSettings::operator=(const WindowSettings &wndSettings)
-{
-    memcpy(this, &wndSettings, sizeof(wndSettings));
-    this->text = _wcsdup(this->text);
-    return *this;
-}
-
-
-/// <summary>
-/// Destructor.
-/// </summary>
-WindowSettings::~WindowSettings()
-{
-    free(this->text);
-}
-
-
-static std::map<D2D1_TEXT_ANTIALIAS_MODE, LPCTSTR> textAntiAliasModeMap = {
     { D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE, _T("ClearType") },
     { D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE, _T("GrayScale") },
     { D2D1_TEXT_ANTIALIAS_MODE_ALIASED,   _T("Aliased")   }
 };
 
 
-template <typename T>
-static T GetValue(LPCTSTR string, std::map<T, LPCTSTR> map, T defValue)
+/// <summary>
+/// Initalizes the class to all default settings.
+/// </summary>
+WindowSettings::WindowSettings()
+    : alwaysOnTop(false)
+    , blurBehind(false)
+    , clickThrough(false)
+    , evaluateText(false)
+    , height(100)
+    , hidden(false)
+    , registerWithCore(false)
+    , textAntiAliasMode(D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE)
+    , width(100)
+    , x(0)
+    , y(0)
 {
-    for (auto &x : map)
-    {
-        if (_tcsicmp(string, x.second) == 0)
-        {
-            return x.first;
-        }
-    }
-    return defValue;
-}
-
-
-template <typename T>
-static LPCTSTR GetName(T value, std::map<T, LPCTSTR> map)
-{
-    for (auto &x : map)
-    {
-        if (x.first == value)
-        {
-            return x.second;
-        }
-    }
-    return _T("");
+    *text = _T('\0');
 }
 
 
@@ -116,8 +61,8 @@ void WindowSettings::Load(Settings* settings, WindowSettings* defaults)
     this->hidden = settings->GetBool(_T("Hidden"), defaults->hidden);
     this->registerWithCore = defaults->registerWithCore;
     settings->GetString(_T("Text"), buf, _countof(buf), defaults->text);
-    this->text = StringUtils::ReallocOverwrite(this->text, buf);
-    settings->GetString(_T("TextAntiAliasMode"), buf, _countof(buf), GetName(defaults->textAntiAliasMode, textAntiAliasModeMap));
+    StringCchCopy(this->text, _countof(this->text), buf);
+    settings->GetString(_T("TextAntiAliasMode"), buf, _countof(buf), textAntiAliasModeMap.FindByA(defaults->textAntiAliasMode)->b.c_str());
     this->textAntiAliasMode = ParseAntiAliasMode(buf);
     this->width = settings->GetRelatedNumber(_T("Width"), defaults->width);
     this->x = settings->GetRelatedNumber(_T("X"), defaults->x);
@@ -125,7 +70,15 @@ void WindowSettings::Load(Settings* settings, WindowSettings* defaults)
 }
 
 
+/// <summary>
+/// Parses 
+/// </summary>
 D2D1_TEXT_ANTIALIAS_MODE WindowSettings::ParseAntiAliasMode(LPCTSTR str)
 {
-    return GetValue(str, textAntiAliasModeMap, D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE);
+    auto item = textAntiAliasModeMap.FindByB(str);
+    if (item != nullptr)
+    {
+        return item->a;
+    }
+    return D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
 }

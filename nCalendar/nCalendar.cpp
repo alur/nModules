@@ -22,7 +22,7 @@ LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSIO
 const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED, LM_FULLSCREENDEACTIVATED, 0 };
 
 // All current clocks
-map<tstring, Calendar*> gCalendars;
+std::map<tstring, Calendar> gCalendars;
 
 
 /// <summary>
@@ -52,10 +52,6 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
 /// </summary>
 void quitModule(HINSTANCE /* instance */)
 {
-    for (auto item : gCalendars)
-    {
-        delete item.second;
-    }
     gCalendars.clear();
 
     gLSModule.DeInitalize();
@@ -92,18 +88,18 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_FULLSCREENACTIVATED:
         {
-            for (auto calendar : gCalendars)
+            for (auto &item : gCalendars)
             {
-                calendar.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+                item.second.GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
             }
         }
         return 0;
 
     case LM_FULLSCREENDEACTIVATED:
         {
-            for (auto calendar : gCalendars)
+            for (auto &item : gCalendars)
             {
-                calendar.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+                item.second.GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
             }
         }
         return 0;
@@ -128,7 +124,11 @@ void CreateCalendar(LPCTSTR calendarName)
 {
     if (gCalendars.find(calendarName) == gCalendars.end())
     {
-        gCalendars[calendarName] = new Calendar(calendarName);
+        gCalendars.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(calendarName),
+            std::forward_as_tuple(calendarName)
+        );
     }
     else
     {

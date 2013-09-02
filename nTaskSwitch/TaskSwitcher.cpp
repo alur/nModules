@@ -69,7 +69,6 @@ void TaskSwitcher::LoadSettings()
     defaults.y = 200;
     defaults.width = float(primaryMonitor.workAreaWidth*0.6f);
     defaults.height = 600;
-    defaults.text = _wcsdup(L"Test");
     windowSettings.Load(mSettings, &defaults);
 
     mWindow->Initialize(windowSettings, &mStateRender);

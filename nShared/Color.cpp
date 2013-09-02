@@ -12,6 +12,7 @@
 #include <algorithm>
 #include "LiteralColorVal.hpp"
 #include <unordered_map>
+#include <functional>
 
 
 using namespace Math;

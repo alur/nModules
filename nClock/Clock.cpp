@@ -45,7 +45,10 @@ Clock::Clock(LPCTSTR clockName) : Drawable(clockName)
 /// </summary>
 Clock::~Clock()
 {
-    mWindow->ClearCallbackTimer(mUpdateTimer);
+    if (mUpdateTimer != 0)
+    {
+        mWindow->ClearCallbackTimer(mUpdateTimer);
+    }
 }
 
 

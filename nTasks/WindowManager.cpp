@@ -408,7 +408,8 @@ void WindowManager::UpdateWindowMonitors()
 /// <summary>
 /// Processes shell hook messages.
 /// </summary>
-LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
     switch (uMsg)
     {
         // A window is being minimized or restored, the system needs the coordinates of
