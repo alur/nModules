@@ -36,6 +36,7 @@ void ClockHand::Paint(ID2D1RenderTarget *renderTarget)
 
     renderTarget->SetTransform(currentTransform*D2D1::Matrix3x2F::Rotation(mRotation)*D2D1::Matrix3x2F::Translation(mCenterPoint));
 
+    mBrush.brush->SetTransform(mBrushWindowData.brushTransform);
     renderTarget->FillRectangle(mHandRect, mBrush.brush);
 
     renderTarget->SetTransform(currentTransform);
