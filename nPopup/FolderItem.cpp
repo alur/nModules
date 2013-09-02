@@ -10,6 +10,7 @@
 #include "FolderItem.hpp"
 #include "../nShared/LSModule.hpp"
 #include "Popup.hpp"
+#include "ContentPopup.hpp"
 
 
 nPopup::FolderItem::FolderItem(Drawable* parent, Popup* popup, LPCTSTR title)
@@ -40,7 +41,7 @@ nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, HI
 }
 
 
-nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, std::function<Popup*(LPVOID)> popupCreator, LPVOID creationData)
+nPopup::FolderItem::FolderItem(Drawable* parent, LPCTSTR title, std::function<Popup*(CreationData*)> popupCreator, CreationData* creationData)
     : FolderItem(parent, nullptr, title)
 {
     mPopupCreator = popupCreator;
@@ -98,6 +99,20 @@ LRESULT nPopup::FolderItem::HandleMessage(HWND window, UINT msg, WPARAM wParam, 
 void nPopup::FolderItem::ClosingPopup()
 {
     ((Popup*)mParent)->mPopupSettings.mFolderStateRender.ClearState(State::Open, mWindow);
+}
+
+
+void nPopup::FolderItem::AddPath(LPCTSTR path)
+{
+    if (mPopup)
+    {
+        ((ContentPopup*) mPopup)->AddPath(path);
+    }
+    else if (mCreationData)
+    {
+        mCreationData->paths.emplace_back();
+        StringCchCopy(mCreationData->paths.back(), MAX_PATH, path);
+    }
 }
 
 

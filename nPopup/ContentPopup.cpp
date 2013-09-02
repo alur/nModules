@@ -282,31 +282,23 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
                 if (iter != this->items.end())
                 {
                     item = NULL;
-                    //((ContentPopup*)((nPopup::FolderItem*)*iter)->GetPopup())->AddPath(command);
+                    ((nPopup::FolderItem*)*iter)->AddPath(command);
                 }
                 else
                 {
                     if (this->dynamic)
                     {
-                        struct CreationData
+                        item = new nPopup::FolderItem(this, name, [] (nPopup::FolderItem::CreationData* data) -> Popup*
                         {
-                            CreationData(LPCTSTR command, LPCTSTR name, LPCTSTR prefix)
+                            ContentPopup *popup = new ContentPopup(data->command, true, data->name, nullptr, data->prefix);
+
+                            for (auto path : data->paths)
                             {
-                                StringCchCopy(this->command, _countof(this->command), command);
-                                StringCchCopy(this->name, _countof(this->name), name);
-                                StringCchCopy(this->prefix, _countof(this->prefix), prefix);
+                                popup->AddPath(path);
                             }
 
-                            TCHAR command[MAX_LINE_LENGTH];
-                            TCHAR name[MAX_PATH];
-                            TCHAR prefix[MAX_RCCOMMAND];
-                        };
-
-                        item = new nPopup::FolderItem(this, name, [] (LPVOID param) -> Popup*
-                        {
-                            CreationData* data = (CreationData*) param;
-                            return new ContentPopup(data->command, true, data->name, nullptr, data->prefix);
-                        }, new CreationData(command, name, mSettings->GetPrefix()));
+                            return popup;
+                        }, new nPopup::FolderItem::CreationData(command, name, mSettings->GetPrefix()));
                     }
                     else
                     {

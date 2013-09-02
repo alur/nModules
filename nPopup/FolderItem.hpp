@@ -25,10 +25,26 @@ namespace nPopup
             Count
         };
 
+        // Used for lazy child popup creation
+        struct CreationData
+        {
+            CreationData(LPCTSTR command, LPCTSTR name, LPCTSTR prefix)
+            {
+                StringCchCopy(this->command, _countof(this->command), command);
+                StringCchCopy(this->name, _countof(this->name), name);
+                StringCchCopy(this->prefix, _countof(this->prefix), prefix);
+            }
+
+            std::list<TCHAR[MAX_PATH]> paths;
+            TCHAR command[MAX_LINE_LENGTH];
+            TCHAR name[MAX_PATH];
+            TCHAR prefix[MAX_RCCOMMAND];
+        };
+
     public:
         explicit FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, LPCTSTR customIcon = nullptr);
         explicit FolderItem(Drawable* parent, LPCTSTR title, Popup* popup, HICON customIcon);
-        explicit FolderItem(Drawable* parent, LPCTSTR title, std::function<Popup*(LPVOID)> popupCreator, LPVOID creationData);
+        explicit FolderItem(Drawable* parent, LPCTSTR title, std::function<Popup*(CreationData*)> popupCreator, CreationData* creationData);
         virtual ~FolderItem();
 
     private:
@@ -40,11 +56,12 @@ namespace nPopup
         void ClosingPopup();
         int GetDesiredWidth(int maxWidth);
         Popup* GetPopup();
+        void AddPath(LPCTSTR path);
 
     private:
         Popup *mPopup;
         LPCTSTR mTitle;
-        std::function<Popup*(LPVOID)> mPopupCreator;
-        LPVOID mCreationData;
+        std::function<Popup*(CreationData*)> mPopupCreator;
+        CreationData *mCreationData;
     };
 }

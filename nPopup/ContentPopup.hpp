@@ -33,13 +33,14 @@ public:
     //
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
+    //
+    void AddPath(LPCTSTR path);
+
 protected:
     void PreShow() override;
     virtual void PostClose() override;
 
 private:
-    //
-    void AddPath(LPCTSTR path);
 
     //
     void LoadContent();
