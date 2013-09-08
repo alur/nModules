@@ -56,15 +56,15 @@ void DbgTraceWindowMessage(LPCSTR prefix, UINT msg, WPARAM wParam, LPARAM lParam
 {
     if (msg < WM_USER)
     {
-        TRACE("[%s] WM_%.4X(%.8X, %.8X)", prefix, msg, wParam, lParam);
+        TRACE("[%s] WM_%.4X(%p, %p)", prefix, msg, wParam, lParam);
     }
     else if (msg >= WM_USER && msg <= (WM_APP-1))
     {
-        TRACE("[%s] WM_USER+%u(%.8X, %.8X)", prefix, msg - WM_USER, wParam, lParam);
+        TRACE("[%s] WM_USER+%u(%p, %p)", prefix, msg - WM_USER, wParam, lParam);
     }
     else if (msg >= WM_APP && msg <= (MAXINTATOM-1))
     {
-        TRACE("[%s] WM_APP+%u(%.8X, %.8X)", prefix, msg - WM_APP, wParam, lParam);
+        TRACE("[%s] WM_APP+%u(%p, %p)", prefix, msg - WM_APP, wParam, lParam);
     }
     else if (msg >= MAXINTATOM)
     {
@@ -73,11 +73,11 @@ void DbgTraceWindowMessage(LPCSTR prefix, UINT msg, WPARAM wParam, LPARAM lParam
         // GetClipboardFormatName retrieves the name of registered window messages too!
         if (GetClipboardFormatName(msg, msgName, _countof(msgName)) > 0)
         {
-            TRACE("[%s] WM_'%s'(%.8X, %.8X)", prefix, msgName, wParam, lParam);
+            TRACE("[%s] WM_'%s'(%p, %p)", prefix, msgName, wParam, lParam);
         }
         else
         {
-            TRACE("[%s] WM_%.8X(%.8X, %.8X)", prefix, msg, wParam, lParam);
+            TRACE("[%s] WM_%.8X(%p, %p)", prefix, msg, wParam, lParam);
         }
     }
 }

@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Brush.hpp"
+#include "IStateWindowData.hpp"
 
 class IBrushOwner
 {

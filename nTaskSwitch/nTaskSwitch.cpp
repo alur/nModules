@@ -21,10 +21,16 @@ LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSIO
 // The messages we want from the core
 const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
-//
+// 
+UINT (WINAPI *DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown);
+
+// 
+HWND gDesktopWindow;
+
+// 
 TaskSwitcher *gTaskSwitcher;
 
-//
+// 
 #define HOTKEY_ALTTAB 1
 #define HOTKEY_SHIFTALTTAB 2
 
@@ -43,6 +49,14 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
     {
         return 1;
     }
+
+    //
+    DwmpActivateLivePreview = (UINT (WINAPI *)(UINT, HWND, HWND, UINT))GetProcAddress(GetModuleHandleW(L"DWMAPI.DLL"), (LPCSTR)0x71);
+    if (!DwmpActivateLivePreview)
+    {
+        return 1;
+    }
+    gDesktopWindow = FindWindowW(L"DesktopBackgroundClass", nullptr);
 
     // Load settings
     LoadSettings();

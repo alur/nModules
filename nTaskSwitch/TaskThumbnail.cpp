@@ -16,36 +16,31 @@
 #include "../Utilities/Math.h"
 #include <shellapi.h>
 
-static HWND desktopWindow = nullptr;
-static UINT (*DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown) = nullptr;
+// 
+extern UINT (WINAPI *DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown);
 
+// 
+extern HWND gDesktopWindow;
+
+//
 extern LSModule gLSModule;
 
 
 TaskThumbnail::TaskThumbnail(
     Drawable* parent,
     HWND targetWindow,
-    int x,
-    int y,
-    int width,
-    int height,
+    float x,
+    float y,
+    float width,
+    float height,
     ThumbnailSettings& thumbnailSettings
 )
     : Drawable(parent, L"Task")
     , mThumbnailSettings(thumbnailSettings)
     , mTargetWindow(targetWindow)
 {
-    if (DwmpActivateLivePreview == nullptr)
-    {
-        DwmpActivateLivePreview = (UINT (*)(UINT, HWND, HWND, UINT))GetProcAddress(GetModuleHandleW(L"DWMAPI.DLL"), (LPCSTR)0x71);
-    }
-    if (desktopWindow == nullptr)
-    {
-        desktopWindow = FindWindowW(L"DesktopBackgroundClass", nullptr);
-    }
-
     mWindow->Initialize(mThumbnailSettings.mWindowSettings, &mThumbnailSettings.mStateRender);
-    mWindow->SetPosition((float)x, (float)y, (float)width, (float)height);
+    mWindow->SetPosition(x, y, width, height);
     mWindow->Show();
 
     DwmRegisterThumbnail(mWindow->GetWindowHandle(), targetWindow, &mThumbnail);
@@ -55,7 +50,7 @@ TaskThumbnail::TaskThumbnail(
     properties.dwFlags = DWM_TNP_SOURCECLIENTAREAONLY;
     properties.fSourceClientAreaOnly = FALSE;
     
-    if (targetWindow == desktopWindow)
+    if (targetWindow == gDesktopWindow)
     {
         properties.dwFlags |= DWM_TNP_RECTSOURCE;
         MonitorInfo* monInfo = mWindow->GetMonitorInformation();
@@ -70,7 +65,7 @@ TaskThumbnail::TaskThumbnail(
 
     //
     SIZE sourceSize;
-    if (targetWindow == desktopWindow)
+    if (targetWindow == gDesktopWindow)
     {
         MonitorInfo* monInfo = mWindow->GetMonitorInformation();
         sourceSize.cx = monInfo->m_monitors[0].width;
@@ -88,20 +83,20 @@ TaskThumbnail::TaskThumbnail(
     sourceSize.cx = long(sourceSize.cx*scale);
     sourceSize.cy = long(sourceSize.cy*scale);
 
-    int horizontalOffset = (width - mThumbnailSettings.mThumbnailMargins.left - mThumbnailSettings.mThumbnailMargins.right - sourceSize.cx)/2;
-    int verticalOffset = (height - mThumbnailSettings.mThumbnailMargins.top - mThumbnailSettings.mThumbnailMargins.bottom - sourceSize.cy)/2;
+    int horizontalOffset = int((width - mThumbnailSettings.mThumbnailMargins.left - mThumbnailSettings.mThumbnailMargins.right - sourceSize.cx)/2);
+    int verticalOffset = int((height - mThumbnailSettings.mThumbnailMargins.top - mThumbnailSettings.mThumbnailMargins.bottom - sourceSize.cy)/2);
 
     properties.dwFlags = DWM_TNP_VISIBLE | DWM_TNP_RECTDESTINATION;
     properties.fVisible = TRUE;
-    properties.rcDestination.bottom = y + height - mThumbnailSettings.mThumbnailMargins.bottom - verticalOffset;
-    properties.rcDestination.top = y + mThumbnailSettings.mThumbnailMargins.top + verticalOffset;
-    properties.rcDestination.left = x + mThumbnailSettings.mThumbnailMargins.left + horizontalOffset;
-    properties.rcDestination.right = x + width - mThumbnailSettings.mThumbnailMargins.right - horizontalOffset;
+    properties.rcDestination.bottom = LONG(y + height) - mThumbnailSettings.mThumbnailMargins.bottom - verticalOffset;
+    properties.rcDestination.top = LONG(y) + mThumbnailSettings.mThumbnailMargins.top + verticalOffset;
+    properties.rcDestination.left = LONG(x) + mThumbnailSettings.mThumbnailMargins.left + horizontalOffset;
+    properties.rcDestination.right = LONG(x + width) - mThumbnailSettings.mThumbnailMargins.right - horizontalOffset;
 
     DwmUpdateThumbnailProperties(mThumbnail, &properties);
 
     //
-    this->iconOverlayWindow = gLSModule.CreateDrawableWindow(mSettings, this);
+    mIconOverlayWindow = gLSModule.CreateDrawableWindow(mSettings, this);
 
     StateRender<IconState>::InitData iconInitData;
     iconInitData[IconState::Base].defaults.brushSettings[::State::BrushType::Background].color = Color::Create(0x00000000);
@@ -109,12 +104,12 @@ TaskThumbnail::TaskThumbnail(
     
     RECT r;
     mWindow->GetScreenRect(&r);
-    this->iconOverlayWindow->Initialize(mThumbnailSettings.mIconWindowSettings, &mIconStateRender);
-    this->iconOverlayWindow->SetPosition(float(r.right - 32 - horizontalOffset - mThumbnailSettings.mThumbnailMargins.right + 4),
+    mIconOverlayWindow->Initialize(mThumbnailSettings.mIconWindowSettings, &mIconStateRender);
+    mIconOverlayWindow->SetPosition(float(r.right - 32 - horizontalOffset - mThumbnailSettings.mThumbnailMargins.right + 4),
         float(r.bottom - 32 - verticalOffset - mThumbnailSettings.mThumbnailMargins.bottom + 4), 32, 32);
 
-    SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-    SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+    SetWindowPos(mIconOverlayWindow->GetWindowHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+    SetWindowPos(mIconOverlayWindow->GetWindowHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 
     UpdateIcon();
 }
@@ -136,23 +131,23 @@ void TaskThumbnail::UpdateIconPosition()
 {
     RECT r;
     mWindow->GetScreenRect(&r);
-    this->iconOverlayWindow->SetPosition((float)r.right - 32, (float)r.bottom - 32, 32, 32);
+    mIconOverlayWindow->SetPosition((float)r.right - 32, (float)r.bottom - 32, 32, 32);
 
-    SetWindowPos(this->iconOverlayWindow->GetWindowHandle(), HWND_TOP,
+    SetWindowPos(mIconOverlayWindow->GetWindowHandle(), HWND_TOP,
         0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 }
 
 
 TaskThumbnail::~TaskThumbnail()
 {
-    delete this->iconOverlayWindow;
+    delete mIconOverlayWindow;
     DwmUnregisterThumbnail(mThumbnail);
 }
 
 
 void TaskThumbnail::Activate()
 {
-    if (mTargetWindow == desktopWindow)
+    if (mTargetWindow == gDesktopWindow)
     {
         LiteStep::LSExecute(nullptr, L"!MinimizeWindows", SW_NORMAL);
     }
@@ -224,8 +219,8 @@ void TaskThumbnail::SetIcon(HICON icon)
     pos.left = 0;
     pos.top = 0;
 
-    this->iconOverlayWindow->AddOverlay(pos, icon);
-    this->iconOverlayWindow->Show();
+    mIconOverlayWindow->AddOverlay(pos, icon);
+    mIconOverlayWindow->Show();
 }
 
 
@@ -234,9 +229,9 @@ void TaskThumbnail::SetIcon(HICON icon)
 /// </summary>
 void TaskThumbnail::UpdateIcon()
 {
-    if (mTargetWindow != desktopWindow)
+    if (mTargetWindow != gDesktopWindow)
     {
-        this->requestedIcon = ICON_BIG;
+        mRequestedIcon = ICON_BIG;
         SendMessageCallbackW(mTargetWindow, WM_GETICON, ICON_BIG, NULL, UpdateIconCallback, (ULONG_PTR)this);
     }
     else
@@ -267,18 +262,18 @@ void CALLBACK TaskThumbnail::UpdateIconCallback(HWND hWnd, UINT uMsg, ULONG_PTR 
         {
             taskThumbnail->SetIcon((HICON)lResult);
         }
-        else switch (taskThumbnail->requestedIcon)
+        else switch (taskThumbnail->mRequestedIcon)
         {
         case ICON_BIG:
             {
-                taskThumbnail->requestedIcon = ICON_SMALL;
+                taskThumbnail->mRequestedIcon = ICON_SMALL;
                 SendMessageCallbackW(hWnd, WM_GETICON, ICON_SMALL, 0, UpdateIconCallback, dwData);
             }
             break;
 
         case ICON_SMALL:
             {
-                taskThumbnail->requestedIcon = ICON_SMALL2;
+                taskThumbnail->mRequestedIcon = ICON_SMALL2;
                 SendMessageCallbackW(hWnd, WM_GETICON, ICON_SMALL2, 0, UpdateIconCallback, dwData);
             }
             break;
@@ -287,7 +282,8 @@ void CALLBACK TaskThumbnail::UpdateIconCallback(HWND hWnd, UINT uMsg, ULONG_PTR 
             {
                 HICON hIcon;
                 hIcon = (HICON)GetClassLongPtrW(hWnd, GCLP_HICON);
-                if (!hIcon) {
+                if (!hIcon)
+                {
                     hIcon = (HICON)GetClassLongPtrW(hWnd, GCLP_HICONSM);
                 }
                 taskThumbnail->SetIcon(hIcon);

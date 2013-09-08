@@ -485,7 +485,12 @@ void Window::FullscreenDeactivated(HMONITOR monitor)
 
 IBrushOwner *Window::GetBrushOwner(LPCTSTR name)
 {
-    return mBrushOwners[name];
+    auto owner = mBrushOwners.find(name);
+    if (owner != mBrushOwners.end())
+    {
+        return owner->second;
+    }
+    return GetState(name);
 }
 
 
@@ -588,7 +593,7 @@ HWND Window::GetWindowHandle()
 /// </summary>
 State *Window::GetState(LPCTSTR stateName)
 {
-    return nullptr;
+    return mStateRender->GetState(stateName);
 }
 
 

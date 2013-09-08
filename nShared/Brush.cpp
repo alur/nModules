@@ -17,16 +17,17 @@
 #include "ErrorHandler.h"
 #include <Shlwapi.h>
 
-#pragma comment(lib, "shlwapi.lib")
-
 
 Brush::Brush()
+    : brush(nullptr)
+    , brushSettings(nullptr)
+    , brushType(Type::SolidColor)
+    , gradientStopColors(nullptr)
+    , gradientStopCount(0)
+    , gradientStops(nullptr)
+    , mTransformTimeStamp(0)
+    , scalingMode(ImageScalingMode::Center)
 {
-    this->brushType = Type::SolidColor;
-    this->brush = nullptr;
-    this->gradientStops = nullptr;
-    this->gradientStopColors = nullptr;
-    this->gradientStopCount = 0;
 }
 
 
@@ -439,14 +440,20 @@ void Brush::UpdatePosition(D2D1_RECT_F position, WindowData *windowData)
 
     if (this->brush)
     {
-        if (this->brushType == Type::Image)
-        {
-            ScaleImage(windowData);
-        }
-        else
-        {
-            windowData->brushTransform = D2D1::Matrix3x2F::Translation(windowData->position.left, windowData->position.top);
-        }
+        UpdateTransform(windowData);
+    }
+}
+
+
+void Brush::UpdateTransform(WindowData *windowData)
+{
+    if (this->brushType == Type::Image)
+    {
+        ScaleImage(windowData);
+    }
+    else
+    {
+        windowData->brushTransform = D2D1::Matrix3x2F::Translation(windowData->position.left, windowData->position.top);
     }
 }
 
@@ -560,8 +567,18 @@ void Brush::SetImage(ID2D1RenderTarget *renderTarget, LPCTSTR path)
             SAFERELEASE(this->brush);
             this->brush = tempBrush;
             this->brush->SetOpacity(this->brushSettings->imageOpacity);
-            //ScaleImage(windowData);
+            mTransformTimeStamp = GetTickCount64();
         }
+    }
+}
+
+
+void Brush::CheckTransforms(WindowData *wndData)
+{
+    if (wndData->transformComputationTime != mTransformTimeStamp)
+    {
+        UpdateTransform(wndData);
+        wndData->transformComputationTime = mTransformTimeStamp;
     }
 }
 

@@ -131,7 +131,7 @@ public:
     virtual ~State();
 
 public:
-    void Load(Settings* defaultSettings, ::Settings *settings);
+    void Load(Settings* defaultSettings, ::Settings *settings, LPCTSTR name);
     Settings* GetSettings();
         
     // Gets the "desired" size for a given width and height.
@@ -187,7 +187,4 @@ private:
 
     // Defines how the text is formatted.
     IDWriteTextFormat* textFormat;
-
-    //
-    LPCSTR stateName;
 };

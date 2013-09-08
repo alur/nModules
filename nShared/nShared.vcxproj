@@ -232,7 +232,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;shlwapi.lib</AdditionalDependencies>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
@@ -251,7 +251,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;shlwapi.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -282,7 +282,7 @@
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;shlwapi.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -313,7 +313,7 @@
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;shlwapi.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -342,7 +342,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;shlwapi.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -372,7 +372,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;shlwapi.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>

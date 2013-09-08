@@ -33,7 +33,7 @@ public:
     };
 
 public:
-    explicit TaskThumbnail(Drawable* parent, HWND targetWindow, int x, int y, int width, int height, ThumbnailSettings& thumbnailSettings);
+    explicit TaskThumbnail(Drawable* parent, HWND targetWindow, float x, float y, float width, float height, ThumbnailSettings& thumbnailSettings);
     virtual ~TaskThumbnail();
 
 public:
@@ -68,7 +68,7 @@ private:
     StateRender<TaskThumbnail::IconState> mIconStateRender;
 
     HTHUMBNAIL mThumbnail;
-    WPARAM requestedIcon;
+    WPARAM mRequestedIcon;
 
-    Window* iconOverlayWindow;
+    Window* mIconOverlayWindow;
 };

@@ -60,10 +60,11 @@ void State::UpdatePosition(D2D1_RECT_F position, WindowData *windowData)
 }
 
 
-void State::Load(Settings* defaultSettings, ::Settings *settings)
+void State::Load(Settings* defaultSettings, ::Settings *settings, LPCTSTR name)
 {
     ASSERT(!this->settings);
     this->settings = settings;
+    mName = name;
 
     mStateSettings.Load(this->settings, defaultSettings);
     
@@ -101,7 +102,6 @@ void State::Paint(ID2D1RenderTarget* renderTarget, WindowData *windowData)
         else
         {
             mBrushes[BrushType::Background].brush->SetTransform(windowData->brushData[BrushType::Background].brushTransform);
-            //mBrushes[BrushType::Background].brush->SetTransform(D2D1::Matrix3x2F::Identity());
             renderTarget->FillRoundedRectangle(windowData->drawingArea, mBrushes[BrushType::Background].brush);
         }
     }

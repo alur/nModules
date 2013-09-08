@@ -35,7 +35,7 @@ float Easing::Transform(float progress, Type easingType)
     }
 }
 
-
+ 
 /// <summary>
 /// Parses a string into an easing.
 /// </summary>

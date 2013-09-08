@@ -47,6 +47,9 @@ public:
 
         // If we are in Edges scaling mode, the transforms used for the various edges.
         EnumArray<D2D1_MATRIX_3X2_F, EdgeType> imageEdgeTransforms;
+
+        // The last the time the brush position and transforms was computed.
+        ULONGLONG transformComputationTime;
     };
 
 public:
@@ -74,6 +77,9 @@ public:
 
     HRESULT LoadImageFile(ID2D1RenderTarget *renderTarget, LPCTSTR image, ID2D1Brush **brush);
 
+private:
+    void UpdateTransform(WindowData *windowData);
+
 public:
     bool IsImageEdgeBrush() const;
     D2D1_RECT_F *GetImageEdgeRectAndScaleBrush(EdgeType edgeType, WindowData *windowData);
@@ -83,6 +89,7 @@ public:
     void SetColor(const IColorVal *color); 
     void SetImage(ID2D1RenderTarget *renderTarget, LPCTSTR path); 
     BrushSettings *GetBrushSettings();
+    void CheckTransforms(WindowData *wndData);
 
 private:
     // The type of brush this is.
@@ -131,6 +138,9 @@ private:
 
     // The number of gradient stops we have.
     UINT gradientStopCount;
+
+    // The last time a change which requires the transforms to be recomputed occured.
+    ULONGLONG mTransformTimeStamp;
 
     union
     {

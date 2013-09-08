@@ -149,6 +149,22 @@ public:
 
     
     /// <summary>
+    /// 
+    /// </summary>
+    State *GetState(LPCTSTR name)
+    {
+        for (State &state : mStates)
+        {
+            if (_tcsicmp(name, state.mName) == 0)
+            {
+                return &state;
+            }
+        }
+        return nullptr;
+    }
+    
+
+    /// <summary>
     /// Toggles the specified state.
     /// </summary>
     void Load(InitData &initData, Settings *baseSettings)
@@ -165,7 +181,7 @@ public:
             {
                 mDependentStates[depState].push_back(state);
             }
-            mStates[state].Load(&initData[state].defaults, stateSettings);
+            mStates[state].Load(&initData[state].defaults, stateSettings, initData[state].prefix);
         }
     }
 

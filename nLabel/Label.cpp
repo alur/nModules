@@ -74,6 +74,7 @@ void Label::LoadSettings(bool /* isRefresh */)
 
 LRESULT WINAPI Label::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LPVOID)
 {
+    //DbgTraceWindowMessage("Label ", uMsg, wParam, lParam);
     if (uMsg == WM_MOUSEMOVE)
     {
         mStateRender.ActivateState(States::Hover, mWindow);

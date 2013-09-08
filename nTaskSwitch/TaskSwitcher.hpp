@@ -28,6 +28,7 @@ public:
     explicit TaskSwitcher();
     virtual ~TaskSwitcher();
     
+public:
     void Hide();
 
     void HandleAltTab();
@@ -35,6 +36,7 @@ public:
 
     void HoveringOverTask(TaskThumbnail* task);
 
+public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
 private:
@@ -52,20 +54,22 @@ private:
     //
     // Settings
 private:
-    int windowsPerRow; // How many windows there should be per row.
-    int peekDelay; // When the taskswitcher has been inactive for this many ms; put it in peek mode.
+    int mWindowsPerRow; // How many windows there should be per row.
+    int mPeekDelay; // When the taskswitcher has been inactive for this many ms; put it in peek mode.
 
-    int taskWidth;
-    int taskHeight;
+private:
+    // The size of each task thumbnail.
+    D2D1_SIZE_F mTaskSize;
 
-    bool peeking;
-    UINT_PTR peekTimer;
+    // True if we have entered peek mode.
+    bool mPeeking;
+    UINT_PTR mPeekTimer;
 
-    vector<TaskThumbnail*> shownWindows;
-    int selectedWindow;
-    TaskThumbnail* hoveredThumbnail;
+    vector<TaskThumbnail*> mShownWindows;
+    int mSelectedWindow;
+    TaskThumbnail* mHoveredThumbnail;
 
-    LayoutSettings layoutSettings;
+    LayoutSettings mLayoutSettings;
 
     StateRender<State> mStateRender;
     ThumbnailSettings mThumbnailSettings;
