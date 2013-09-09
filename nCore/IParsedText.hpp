@@ -8,7 +8,7 @@
 #pragma once
 
 // Function which parses dynamic text functions.
-typedef BOOL (__cdecl * FORMATTINGPROC)(LPCWSTR name, UCHAR numArgs, LPWSTR* args, LPWSTR dest, size_t cchDest);
+typedef size_t (__cdecl * FORMATTINGPROC)(LPCWSTR name, UCHAR numArgs, LPWSTR* args, LPWSTR dest, size_t cchDest);
 
 class IParsedText
 {

@@ -18,7 +18,7 @@ const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
     LM_FULLSCREENDEACTIVATED, 0 };
 
 // All current icon groups
-static map<wstring, IconGroup*> gIconGroups;
+static map<wstring, IconGroup> gIconGroups;
 
 // The LiteStep module class
 LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
@@ -29,12 +29,15 @@ static HWND nextClipboardViewer;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */) {
-    if (!gLSModule.Initialize(parent, instance)) {
+EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */)
+{
+    if (!gLSModule.Initialize(parent, instance))
+    {
         return 1;
     }
 
-    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION))) {
+    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION)))
+    {
         return 1;
     }
 
@@ -51,11 +54,9 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
 /// <summary>
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
-void quitModule(HINSTANCE /* instance */) {
+EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */)
+{
     // Remove all groups
-    for (auto group : gIconGroups) {
-        delete group.second;
-    }
     gIconGroups.clear();
 
     gLSModule.DeInitalize();
@@ -71,8 +72,10 @@ void quitModule(HINSTANCE /* instance */) {
 /// <param name="message">The type of message.</param>
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
-LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
-    switch(message) {
+LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch(message)
+    {
     case WM_CREATE:
         {
             SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
@@ -88,8 +91,9 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case WM_DRAWCLIPBOARD:
         {
-            for (auto group : gIconGroups) {
-                group.second->HandleClipboardChange();
+            for (auto &item : gIconGroups)
+            {
+                item.second.HandleClipboardChange();
             }
             SendMessage(nextClipboardViewer, message, wParam, lParam);
         }
@@ -98,24 +102,30 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case WM_CHANGECBCHAIN:
         {
             if (HWND(wParam) == nextClipboardViewer)
+            {
                 nextClipboardViewer = (HWND)lParam;
+            }
             else if (nextClipboardViewer != nullptr)
+            {
                 SendMessage(nextClipboardViewer, message, wParam, lParam);
+            }
         }
         return 0;
 
     case LM_FULLSCREENACTIVATED:
         {
-            for (auto group : gIconGroups) {
-                group.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+            for (auto &item : gIconGroups)
+            {
+                item.second.GetWindow()->FullscreenActivated((HMONITOR)wParam, (HWND)lParam);
             }
         }
         return 0;
 
     case LM_FULLSCREENDEACTIVATED:
         {
-            for (auto group : gIconGroups) {
-                group.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+            for (auto item : gIconGroups)
+            {
+                item.second.GetWindow()->FullscreenDeactivated((HMONITOR)wParam);
             }
         }
         return 0;
@@ -155,7 +165,11 @@ void CreateGroup(LPCTSTR groupName)
 {
     if (gIconGroups.find(groupName) == gIconGroups.end())
     {
-        gIconGroups[groupName] = new IconGroup(groupName);
+        gIconGroups.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(groupName),
+            std::forward_as_tuple(groupName)
+        );
     }
     else
     {

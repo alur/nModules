@@ -111,7 +111,7 @@ ParsedText::~ParsedText()
         if (token->type == EXPRESSION)
         {
             token->proc->second.users.erase(this);
-            for (int i = 0; i < token->proc->first.second; ++i)
+            for (int i = 0; i < token->proc->first.numArgs; ++i)
             {
                 free(token->args[i]);
             }
@@ -161,27 +161,29 @@ bool ParsedText::Evaluate(LPWSTR dest, size_t cchDest)
 {
     dest[0] = L'\0';
 
-    for (list<Token>::iterator token = this->tokens.begin(); token != this->tokens.end(); ++token)
+    for (Token &token : this->tokens)
     {
-        switch (token->type)
+        switch (token.type)
         {
         case TEXT:
             {
-                StringCchCatW(dest, cchDest, token->text);
+                StringCchCopyExW(dest, cchDest, token.text, &dest, &cchDest, 0);
             }
             break;
 
         case EXPRESSION:
             {
-                if (token->proc->second.proc != nullptr)
+                if (token.proc->second.proc != nullptr)
                 {
-                    token->proc->second.proc(L"", (UCHAR)token->proc->first.second, token->args, dest, cchDest); 
+                    size_t cchCopied = token.proc->second.proc(L"", token.proc->first.numArgs, token.args, dest, cchDest);
+                    dest += cchCopied;
+                    cchDest -= cchCopied;
                 }
                 else
                 {
-                    StringCchCatW(dest, cchDest, L"[");
-                    StringCchCatW(dest, cchDest, token->text);
-                    StringCchCatW(dest, cchDest, L"]");
+                    StringCchCopyExW(dest, cchDest, L"[", &dest, &cchDest, 0);
+                    StringCchCopyExW(dest, cchDest, token.text, &dest, &cchDest, 0);
+                    StringCchCopyExW(dest, cchDest, L"]", &dest, &cchDest, 0);
                 }
             }
             break;

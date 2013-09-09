@@ -11,9 +11,9 @@
 #include <list>
 #include <map>
 #include <set>
+#include <unordered_map>
 
 using std::list;
-using std::map;
 using std::wstring;
 using std::set;
 using std::pair;
@@ -35,8 +35,33 @@ struct FormatterData
     set<IParsedText*> users;
 };
 
+// ID for a function
+struct FunctionID
+{
+    FunctionID(wstring name, UCHAR numArgs)
+        : name(name), numArgs(numArgs)
+    {
+    }
+    wstring name;
+    UCHAR numArgs;
+};
+
+// ID comparator
+struct FuncIDCmp
+{
+    bool operator()(FunctionID const & a, FunctionID const & b)
+    {
+        return a.numArgs == b.numArgs && wcscmp(a.name.c_str(), b.name.c_str()) == 0;
+    }
+
+    size_t operator()(FunctionID const & a)
+    {
+        return std::hash<wstring>()(a.name) ^ std::hash<UCHAR>()(a.numArgs);
+    }
+};
+
 // The map type used to store the dynamic text functions.
-typedef map<pair<wstring, UCHAR>, FormatterData> FUNCMAP;
+typedef std::unordered_map<FunctionID, FormatterData, FuncIDCmp, FuncIDCmp> FUNCMAP;
 
 
 class ParsedText : public IParsedText

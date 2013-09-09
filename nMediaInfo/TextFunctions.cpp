@@ -9,7 +9,7 @@
 #include "TextFunctions.h"
 #include "../nCoreCom/Core.h"
 
-#define TEXTFUNCTION(x) BOOL __cdecl x(LPCWSTR /* name */, UCHAR /* numArgs */, LPWSTR* /* args */, LPWSTR dest, size_t cchDest)
+#define TEXTFUNCTION(x) size_t __cdecl x(LPCWSTR /* name */, UCHAR /* numArgs */, LPWSTR* /* args */, LPWSTR dest, size_t cchDest)
 #define IPC_GETLISTPOS 125
 #define IPC_GETPLAYLISTFILEW 214
 #define IPC_GET_EXTENDED_FILE_INFOW_HOOKABLE 3027
@@ -155,17 +155,23 @@ void TextFunctions::_Update()
 
 TEXTFUNCTION(TextFunctions::MusicTrackTitle)
 {
-    return SUCCEEDED(StringCchCatW(dest, cchDest, trackTitle));
+    size_t rem;
+    StringCchCopyExW(dest, cchDest, trackTitle, nullptr, &rem, 0);
+    return cchDest - rem;
 }
 
 
 TEXTFUNCTION(TextFunctions::MusicTrackArtist)
 {
-    return SUCCEEDED(StringCchCatW(dest, cchDest, trackArtist));
+    size_t rem;
+    StringCchCopyExW(dest, cchDest, trackArtist, nullptr, &rem, 0);
+    return cchDest - rem;
 }
 
 
 TEXTFUNCTION(TextFunctions::MusicAlbumTitle)
 {
-    return SUCCEEDED(StringCchCatW(dest, cchDest, albumTitle));
+    size_t rem;
+    StringCchCopyExW(dest, cchDest, albumTitle, nullptr, &rem, 0);
+    return cchDest - rem;
 }

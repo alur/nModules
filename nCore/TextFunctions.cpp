@@ -12,21 +12,30 @@
 #include <ctime>
 
 
+static size_t __cdecl Time(LPCWSTR /* name */, UCHAR numArgs, LPWSTR* args, LPWSTR dest, size_t cchDest)
+{
+    time_t t = time(0);
+    struct tm now;
+
+    localtime_s(&now, &t);
+
+    return wcsftime(dest, cchDest, numArgs == 0 ? L"%H:%M" : args[0], &now);
+}
+
+
 void TextFunctions::_Register()
 {
     RegisterDynamicTextFunction(L"Time", 0, Time, true);
     RegisterDynamicTextFunction(L"Time", 1, Time, true);
 
-    RegisterDynamicTextFunction(L"WindowTitle", 1, [] (LPCWSTR /* name */, UCHAR /* numArgs */, LPWSTR* args, LPWSTR dest, size_t cchDest) -> BOOL
+    RegisterDynamicTextFunction(L"WindowTitle", 1, [] (LPCWSTR /* name */, UCHAR /* numArgs */, LPWSTR* args, LPWSTR dest, size_t cchDest) -> size_t
     {
         HWND window = FindWindowW(args[0], nullptr);
-        LPWSTR end = wcschr(dest, L'\0');
         if (window)
         {
-            GetWindowTextW(window, end, int(cchDest - (end - dest)));
-            return true;
+            return GetWindowTextW(window, dest, (int)cchDest);
         }
-        return false;
+        return 0;
     }, true);
 }
 
@@ -36,17 +45,4 @@ void TextFunctions::_Unregister()
     UnRegisterDynamicTextFunction(L"Time", 0);
     UnRegisterDynamicTextFunction(L"Time", 1);
     UnRegisterDynamicTextFunction(L"WindowTitle", 1);
-}
-
-
-TEXTFUNCTION(TextFunctions::Time)
-{
-    WCHAR date[1024];
-    time_t t = time(0);
-    struct tm now;
-
-    localtime_s(&now, &t);
-
-    wcsftime(date, 1024, numArgs == 0 ? L"%H:%M" : args[0], &now);
-    return SUCCEEDED(StringCchCatW(dest, cchDest, date));
 }

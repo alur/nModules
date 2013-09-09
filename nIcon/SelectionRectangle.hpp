@@ -11,7 +11,8 @@
 #include "../nShared/IPainter.hpp"
 #include "../nShared/Brush.hpp"
 
-class SelectionRectangle : public IPainter {
+class SelectionRectangle : public IPainter
+{
     // Constructor/Destructor
 public:
     explicit SelectionRectangle();

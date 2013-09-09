@@ -8,23 +8,50 @@
 #include "../nShared/LiteStep.h"
 #include "../nShared/Window.hpp"
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <functional>
+#include <algorithm>
+#include <ctype.h>
 
-using std::map;
+
+using std::unordered_map;
 using std::wstring;
 
-struct STRICmp : std::binary_function<wstring, wstring, bool>
+
+struct wstring_nocase
 {
-    bool operator()(const wstring &s1, const wstring &s2) const
+    wstring_nocase(LPCWSTR str)
+        : str(str)
     {
-        return _wcsicmp(s1.c_str(), s2.c_str()) > 0;
+        std::transform(this->str.begin(), this->str.end(), this->str.begin(), ::towlower);
     }
+    std::wstring str;
 };
 
+namespace std
+{
+    template<>
+    struct hash<wstring_nocase>
+    {
+        size_t operator()(wstring_nocase const & s) const
+        {
+            return hash<wstring>()(s.str);
+        }
+    };
 
-static map<wstring, Window*, STRICmp> registeredWindows;
-static map<wstring, list<Window*>, STRICmp> registrationListeners;
+    template<>
+    struct equal_to<wstring_nocase>
+    {
+        bool operator()(wstring_nocase const & s1, wstring_nocase const & s2) const
+        {
+            return std::equal_to<wstring>()(s1.str, s2.str);
+        }
+    };
+}
+
+
+static unordered_map<wstring_nocase, Window*> registeredWindows;
+static unordered_map<wstring_nocase, list<Window*>> registrationListeners;
 
 
 EXPORT_CDECL(void) RegisterWindow(LPCWSTR prefix, Window *window)
