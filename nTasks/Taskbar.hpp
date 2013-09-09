@@ -31,8 +31,8 @@ public:
 
     // Private Typedefs
 private:
-    typedef std::list<TaskButton*> ButtonList;
-    typedef std::map<HWND, ButtonList::const_iterator> ButtonMap;
+    typedef std::list<TaskButton> ButtonList;
+    typedef std::map<HWND, ButtonList::iterator> ButtonMap;
 
     enum class States
     {

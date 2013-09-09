@@ -20,6 +20,7 @@
 #include "Constants.h"
 #include <VersionHelpers.h>
 #include <thread>
+#include <algorithm>
 
 
 using std::vector;
@@ -27,7 +28,7 @@ using std::thread;
 
 
 // All current taskbars
-extern map<tstring, Taskbar*> gTaskbars;
+extern TaskbarMap gTaskbars;
 
 extern LSModule gLSModule;
 
@@ -144,9 +145,9 @@ void WindowManager::AddWindow(HWND hWnd)
         wndInfo.uMonitor = gMonitorInfo.MonitorFromHWND(hWnd);
 
         // Add it to any taskbar that wants it
-        for (TaskbarMap::value_type taskbar : gTaskbars)
+        for (TaskbarMap::value_type &taskbar : gTaskbars)
         {
-            TaskButton *taskButton = taskbar.second->AddTask(hWnd, wndInfo.uMonitor, initializing);
+            TaskButton *taskButton = taskbar.second.AddTask(hWnd, wndInfo.uMonitor, initializing);
 
             // If the taskbar created a button for this window
             if (taskButton != nullptr)
@@ -178,10 +179,10 @@ void WindowManager::MonitorChanged(HWND hWnd, UINT monitor)
         GetWindowTextW(hWnd, title, _countof(title));
         iter->second.uMonitor = monitor;
 
-        for (TaskbarMap::value_type taskbar : gTaskbars)
+        for (TaskbarMap::value_type &taskbar : gTaskbars)
         {
             TaskButton *out;
-            if (taskbar.second->MonitorChanged(hWnd, monitor, &out))
+            if (taskbar.second.MonitorChanged(hWnd, monitor, &out))
             {
                 if (out != nullptr)
                 {
@@ -195,17 +196,13 @@ void WindowManager::MonitorChanged(HWND hWnd, UINT monitor)
                 }
             }
             else
-            { 
+            {
                 if (out != nullptr)
                 {
-                    for (vector<TaskButton*>::iterator iter3 = iter->second.buttons.begin(); iter3 != iter->second.buttons.end(); iter3++)
+                    iter->second.buttons.remove_if([out] (TaskButton *btn)
                     {
-                        if (*iter3 == out)
-                        {
-                            iter->second.buttons.erase(iter3);
-                            break;
-                        }
-                    }
+                        return btn == out;
+                    });
                 }
             }
         }
@@ -282,9 +279,9 @@ void WindowManager::RemoveWindow(HWND hWnd)
     if (iter != windowMap.end())
     {
         // Remove all buttons
-        for (TaskbarMap::iterator iter2 = gTaskbars.begin(); iter2 != gTaskbars.end(); iter2++)
+        for (TaskbarMap::value_type &taskbar : gTaskbars)
         {
-            iter2->second->RemoveTask(hWnd);
+            taskbar.second.RemoveTask(hWnd);
         }
 
         if (iter->second.hOverlayIcon != nullptr)
@@ -359,7 +356,7 @@ LRESULT WindowManager::GetMinRect(HWND hWnd, LPPOINTS lpPoints)
     WindowMap::const_iterator iter = windowMap.find(hWnd);
     if (iter != windowMap.end() && !iter->second.buttons.empty())
     {
-        iter->second.buttons[0]->GetMinRect(lpPoints);
+        iter->second.buttons.front()->GetMinRect(lpPoints);
         return 1;
     }
     return 0;
@@ -371,36 +368,31 @@ LRESULT WindowManager::GetMinRect(HWND hWnd, LPPOINTS lpPoints)
 /// </summary>
 void WindowManager::UpdateWindowMonitors()
 {
-    // TODO::Don't call MonitorFromHWND twice for windows that have changed
-    vector<HWND> mods;
-    for (WindowMap::iterator iter = windowMap.begin(); iter != windowMap.end(); iter++)
+    list<std::pair<HWND, UINT> > mods;
+    for (WindowMap::value_type &val : windowMap)
     {
-        int monitor = gMonitorInfo.MonitorFromHWND(iter->first);
-        if ((UINT)monitor != iter->second.uMonitor)
+        UINT monitor = gMonitorInfo.MonitorFromHWND(val.first);
+        if (monitor != val.second.uMonitor)
         {
-            mods.push_back(iter->first);
+            mods.emplace_back(val.first, monitor);
         }
     }
     if (!mods.empty())
     {
         // Prevent all taskbars from painting during the update.
-        std::vector<Window::UpdateLock*> updateLocks(gTaskbars.size());
-        int i = 0;
-        for (auto taskbar : gTaskbars)
+        std::list<Window::UpdateLock> updateLocks;
+        for (auto &taskbar : gTaskbars)
         {
-            updateLocks[i++] = new Window::UpdateLock(taskbar.second->GetWindow());
+            updateLocks.emplace_back(taskbar.second.GetWindow());
         }
 
-        for (HWND hwnd : mods)
+        for (std::pair<HWND, UINT> &mod : mods)
         {
-            MonitorChanged(hwnd, gMonitorInfo.MonitorFromHWND(hwnd));
+            MonitorChanged(mod.first, mod.second);
         }
         
         // Clear update locks
-        for (Window::UpdateLock *updateLock : updateLocks)
-        {
-            delete updateLock;
-        }
+        updateLocks.clear();
     }
 }
 
@@ -530,9 +522,9 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         {
             // Relayout all taskbars.
             initializing = false;
-            for (auto taskbar : gTaskbars)
+            for (auto &taskbar : gTaskbars)
             {
-                taskbar.second->Relayout();
+                taskbar.second.Relayout();
             }
         }
         return 0;
@@ -744,9 +736,9 @@ void WindowManager::RunWindowMaintenance()
     // Prevent all taskbars from painting during the update.
     std::vector<Window::UpdateLock*> updateLocks(gTaskbars.size());
     int i = 0;
-    for (auto taskbar : gTaskbars)
+    for (auto &taskbar : gTaskbars)
     {
-        updateLocks[i++] = new Window::UpdateLock(taskbar.second->GetWindow());
+        updateLocks[i++] = new Window::UpdateLock(taskbar.second.GetWindow());
     }
     
     vector<HWND> removals;

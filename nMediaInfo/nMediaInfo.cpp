@@ -13,6 +13,7 @@
 #include "CoverArt.hpp"
 #include "Bangs.h"
 #include "Version.h"
+#include "../nShared/ErrorHandler.h"
 
 using std::map;
 
@@ -27,7 +28,7 @@ UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
 UINT WinampSongChangeMsg = 0;
 
 //
-map<wstring, CoverArt*> gCoverArt;
+map<wstring, CoverArt> gCoverArt;
 
 
 /// <summary>
@@ -66,10 +67,6 @@ void quitModule(HINSTANCE /* instance */)
     TextFunctions::_UnRegister();
     Bangs::_Unregister();
 
-    for (auto &coverArt : gCoverArt)
-    {
-        delete coverArt.second;
-    }
     gCoverArt.clear();
 
     gLSModule.DeInitalize();
@@ -108,7 +105,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         {
             for (auto &coverart : gCoverArt)
             {
-                coverart.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+                coverart.second.GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
             }
         }
         return 0;
@@ -117,7 +114,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         {
             for (auto &coverart : gCoverArt)
             {
-                coverart.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+                coverart.second.GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
             }
         }
         return 0;
@@ -136,10 +133,28 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// </summary>
 void LoadSettings()
 {
-    LiteStep::IterateOverLineTokens(_T("*nCoverArt"), [](LPCTSTR token) -> void
+    LiteStep::IterateOverLineTokens(_T("*nCoverArt"), CreateCoverart);
+}
+
+
+/// <summary>
+/// Loads settings.
+/// </summary>
+void CreateCoverart(LPCTSTR name)
+{
+    if (gCoverArt.find(name) == gCoverArt.end())
     {
-        gCoverArt.insert(gCoverArt.begin(), std::pair<wstring, CoverArt*>(token, new CoverArt(token)));
-    });
+        gCoverArt.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(name),
+            std::forward_as_tuple(name)
+        );
+    }
+    else
+    {
+        ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("Attempt to (re)create the already existing CoverArt %s!"), name);
+    }
+
 }
 
 
@@ -159,7 +174,7 @@ void Update()
         TextFunctions::_Update();
         for (auto &coverArt : gCoverArt)
         {
-            coverArt.second->Update();
+            coverArt.second.Update();
         }
         open = true;
     }

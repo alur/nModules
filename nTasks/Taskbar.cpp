@@ -48,10 +48,7 @@ Taskbar::Taskbar(LPCTSTR name) : Drawable(name)
 Taskbar::~Taskbar()
 {
     // Remove all buttons
-    for (auto button : mButtonList)
-    {
-        delete button;
-    }
+    mButtonList.clear();
 
     SAFEDELETE(mThumbnail);
 }
@@ -86,12 +83,12 @@ TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout)
     {
         ASSERT(mButtonMap.find(hWnd) == mButtonMap.end());
 
-        TaskButton* pButton = new TaskButton(this, hWnd, mButtonSettings);
-        mButtonMap[hWnd] = mButtonList.insert(mButtonList.end(), pButton);
+        mButtonList.emplace_back(this, hWnd, mButtonSettings);
+        mButtonMap[hWnd] = --mButtonList.end();
 
         if (hWnd == GetForegroundWindow())
         {
-            pButton->Activate();
+            mButtonList.back().Activate();
         }
 
         if (!noLayout)
@@ -99,7 +96,7 @@ TaskButton* Taskbar::AddTask(HWND hWnd, UINT monitor, bool noLayout)
             Relayout();
         }
 
-        return pButton;
+        return &mButtonList.back();
     }
 
     return nullptr;
@@ -122,7 +119,6 @@ void Taskbar::RemoveTask(ButtonMap::iterator iter)
 {
     if (iter != mButtonMap.end())
     {
-        delete *iter->second;
         mButtonList.erase(iter->second);
         mButtonMap.erase(iter);
         Relayout();
@@ -153,7 +149,7 @@ bool Taskbar::MonitorChanged(HWND hWnd, UINT monitor, TaskButton** pOut)
     {
         if (iter != mButtonMap.end())
         {
-            *pOut = *iter->second;
+            *pOut = &*iter->second;
             RemoveTask(iter);
         }
         return false;
@@ -241,16 +237,16 @@ void Taskbar::Relayout()
         }
 
         float x = x0, y = y0;
-        for (ButtonList::const_iterator iter = mButtonList.begin(); iter != mButtonList.end(); ++iter)
+        for (TaskButton &button : mButtonList)
         {
-            (*iter)->Reposition(x, y, buttonSize, (float)mButtonHeight);
+            button.Reposition(x, y, buttonSize, (float)mButtonHeight);
             x += xdir*(buttonSize + mLayoutSettings.mColumnSpacing);
             if (x < mLayoutSettings.mPadding.left || x > size->width - mLayoutSettings.mPadding.right - buttonSize)
             {
                 x = x0;
                 y += ydir*(mButtonHeight + mLayoutSettings.mRowSpacing);
             }
-            (*iter)->Show();
+            button.Show();
         }
     }
     else
@@ -268,16 +264,16 @@ void Taskbar::Relayout()
         }
 
         float x = x0, y = y0;
-        for (ButtonList::const_iterator iter = mButtonList.begin(); iter != mButtonList.end(); ++iter)
+        for (TaskButton &button : mButtonList)
         {
-            (*iter)->Reposition(x, y, (float)mButtonWidth, buttonSize);
+            button.Reposition(x, y, (float)mButtonWidth, buttonSize);
             y += ydir*(buttonSize + mLayoutSettings.mRowSpacing);
             if (y < mLayoutSettings.mPadding.top || y > size->height - mLayoutSettings.mPadding.bottom - buttonSize)
             {
                 y = y0;
                 x += xdir*(mButtonWidth + mLayoutSettings.mColumnSpacing);
             }
-            (*iter)->Show();
+            button.Show();
         }
     }
 

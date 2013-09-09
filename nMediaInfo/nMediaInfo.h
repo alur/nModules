@@ -7,5 +7,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-void LoadSettings();
-void Update();
+static void LoadSettings();
+static void Update();
+static void CreateCoverart(LPCTSTR name);

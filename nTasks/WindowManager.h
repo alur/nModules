@@ -8,9 +8,10 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 
 //
-typedef std::map<std::tstring, Taskbar*> TaskbarMap;
+typedef std::map<std::tstring, Taskbar> TaskbarMap;
 
 namespace WindowManager
 {
@@ -35,7 +36,7 @@ namespace WindowManager
         UINT uMonitor;
 
         // Pointers to the buttons that represent this window
-        std::vector<TaskButton*> buttons;
+        std::list<TaskButton*> buttons;
 
         // The main icon of the window
         HICON hIcon;
@@ -51,7 +52,7 @@ namespace WindowManager
     };
 
     // Some helpful typedefs
-    typedef std::map<HWND, WindowInformation> WindowMap;
+    typedef std::unordered_map<HWND, WindowInformation> WindowMap;
 
     void Start();
     void Stop();

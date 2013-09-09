@@ -19,6 +19,10 @@ public:
     explicit IDrawable(IDrawable *parent, LPCTSTR prefix, bool independent = false);
     explicit IDrawable(LPCTSTR prefix, LPSettings parentSettings);
 
+private:
+    explicit IDrawable(const IDrawable &) /* = deleted */;
+    IDrawable & operator = (const IDrawable &) /* = deleted */;
+
 protected:
     ~IDrawable();
 

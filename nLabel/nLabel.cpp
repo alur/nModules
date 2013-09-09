@@ -25,7 +25,7 @@ UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
 
 // All the top-level labels we currently have loaded.
 // These do not include overlay labels
-map<tstring, Label*> gTopLevelLabels;
+map<tstring, Label> gTopLevelLabels;
 
 // All the labels we currently have loaded. Labels add and remove themselfs from this list.
 map<tstring, Label*> gAllLabels;
@@ -56,7 +56,7 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
 /// <summary>
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
-void quitModule(HINSTANCE /* instance */)
+EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */)
 {
     DestroyLabels();
     gLSModule.DeInitalize();
@@ -72,7 +72,8 @@ void quitModule(HINSTANCE /* instance */)
 /// <param name="lParam">lParam</param>
 LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch(message) {
+    switch(message)
+    {
     case WM_CREATE:
         {
             SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
@@ -89,7 +90,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         {
             for (auto &label : gTopLevelLabels)
             {
-                label.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+                label.second.GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
             }
         }
         return 0;
@@ -98,7 +99,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         {
             for (auto &label : gTopLevelLabels)
             {
-                label.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+                label.second.GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
             }
         }
         return 0;
@@ -119,10 +120,6 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// </summary>
 void DestroyLabels()
 {
-    for (auto label : gTopLevelLabels)
-    {
-        delete label.second;
-    }
     gTopLevelLabels.clear();
 }
 
@@ -143,7 +140,11 @@ void CreateLabel(LPCTSTR labelName)
 {
     if (gAllLabels.find(labelName) == gAllLabels.end())
     {
-        gTopLevelLabels[labelName] = new Label(labelName);
+        gTopLevelLabels.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(labelName),
+            std::forward_as_tuple(labelName)
+        );
     }
     else
     {

@@ -51,7 +51,7 @@ namespace std
 
 
 static unordered_map<wstring_nocase, Window*> registeredWindows;
-static unordered_map<wstring_nocase, list<Window*>> registrationListeners;
+static unordered_map<wstring_nocase, list<Window*> > registrationListeners;
 
 
 EXPORT_CDECL(void) RegisterWindow(LPCWSTR prefix, Window *window)

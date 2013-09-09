@@ -123,7 +123,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         {
             for (auto &taskbar : gTaskbars)
             {
-                taskbar.second->GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+                taskbar.second.GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
             }
         }
         return 0;
@@ -132,7 +132,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         {
             for (auto &taskbar : gTaskbars)
             {
-                taskbar.second->GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+                taskbar.second.GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
             }
         }
         return 0;
@@ -186,10 +186,6 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// </summary>
 void DestroyTaskbars()
 {
-    for (TaskbarMap::value_type taskbar : gTaskbars)
-    {
-        delete taskbar.second;
-    }
     gTaskbars.clear();
 }
 
@@ -210,7 +206,11 @@ void CreateTaskbar(LPCTSTR taskbarName)
 {
     if (gTaskbars.find(taskbarName) == gTaskbars.end())
     {
-        gTaskbars[taskbarName] = new Taskbar(taskbarName);
+        gTaskbars.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(taskbarName),
+            std::forward_as_tuple(taskbarName)
+            );
     }
     else
     {
