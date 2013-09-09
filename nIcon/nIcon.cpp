@@ -123,7 +123,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case LM_FULLSCREENDEACTIVATED:
         {
-            for (auto item : gIconGroups)
+            for (auto &item : gIconGroups)
             {
                 item.second.GetWindow()->FullscreenDeactivated((HMONITOR)wParam);
             }
