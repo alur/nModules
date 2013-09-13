@@ -224,7 +224,7 @@ void Taskbar::Relayout()
     if (mLayoutSettings.mPrimaryDirection == LayoutSettings::Direction::Horizontal)
     {
         spacePerLine = size->width - mLayoutSettings.mPadding.left - mLayoutSettings.mPadding.right;
-        lines = (size->height + mLayoutSettings.mRowSpacing - mLayoutSettings.mPadding.top - mLayoutSettings.mPadding.bottom)/(mLayoutSettings.mRowSpacing + mButtonHeight);
+        lines = floorf((size->height + mLayoutSettings.mRowSpacing - mLayoutSettings.mPadding.top - mLayoutSettings.mPadding.bottom)/(mLayoutSettings.mRowSpacing + mButtonHeight));
         // We need to consider that buttons can't be split between multiple lines.
         buttonSize = min((float)mButtonMaxWidth, min(spacePerLine * lines / (float)mButtonMap.size(), spacePerLine / ceil(mButtonMap.size() / (float)lines)) - mLayoutSettings.mColumnSpacing);
         if (ydir == -1)
@@ -241,7 +241,7 @@ void Taskbar::Relayout()
         {
             button.Reposition(x, y, buttonSize, (float)mButtonHeight);
             x += xdir*(buttonSize + mLayoutSettings.mColumnSpacing);
-            if (x < mLayoutSettings.mPadding.left || x > size->width - mLayoutSettings.mPadding.right - buttonSize)
+            if (x < mLayoutSettings.mPadding.left || x > size->width - mLayoutSettings.mPadding.right - buttonSize + 1.0f)
             {
                 x = x0;
                 y += ydir*(mButtonHeight + mLayoutSettings.mRowSpacing);
@@ -252,7 +252,7 @@ void Taskbar::Relayout()
     else
     {
         spacePerLine = size->height - mLayoutSettings.mPadding.top - mLayoutSettings.mPadding.bottom;
-        lines = (size->width + mLayoutSettings.mColumnSpacing - mLayoutSettings.mPadding.left - mLayoutSettings.mPadding.right)/(mLayoutSettings.mColumnSpacing + mButtonWidth);
+        lines = floorf((size->width + mLayoutSettings.mColumnSpacing - mLayoutSettings.mPadding.left - mLayoutSettings.mPadding.right)/(mLayoutSettings.mColumnSpacing + mButtonWidth));
         buttonSize = min((float)mButtonMaxHeight, min(spacePerLine * lines / (float)mButtonMap.size(), spacePerLine / ceil(mButtonMap.size() / (float)lines)) - mLayoutSettings.mRowSpacing);
         if (ydir == -1)
         {
@@ -268,7 +268,7 @@ void Taskbar::Relayout()
         {
             button.Reposition(x, y, (float)mButtonWidth, buttonSize);
             y += ydir*(buttonSize + mLayoutSettings.mRowSpacing);
-            if (y < mLayoutSettings.mPadding.top || y > size->height - mLayoutSettings.mPadding.bottom - buttonSize)
+            if (y < mLayoutSettings.mPadding.top || y > size->height - mLayoutSettings.mPadding.bottom - buttonSize + 1.0f)
             {
                 y = y0;
                 x += xdir*(mButtonWidth + mLayoutSettings.mColumnSpacing);
