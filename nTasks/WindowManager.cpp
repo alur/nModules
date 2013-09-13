@@ -591,6 +591,7 @@ void WindowManager::SetIcon(HWND hWnd, HICON hIcon)
         {
             DestroyIcon(window->second.hIcon);
         }
+
         window->second.hIcon = CopyIcon(hIcon);
     }
 }

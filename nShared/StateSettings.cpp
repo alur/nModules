@@ -9,49 +9,56 @@
 #include <strsafe.h>
 #include "State.hpp"
 #include "../Utilities/Unordered1To1Map.hpp"
+#include "../Utilities/StringUtils.h"
 
 
-static Unordered1To1Map<DWRITE_READING_DIRECTION, std::tstring> readingDirectionMap =
+// TODO::This should work in 2013 RTM.
+// template <typename SettingType>
+// typedef Unordered1To1Map<SettingType, std::tstring, std::hash<SettingType>, noCaseComparator, std::equal_to<SettingType>, noCaseComparator> SettingMap;
+#define SETTINGMAP(T) Unordered1To1Map<T, std::tstring, std::hash<T>, noCaseComparator, std::equal_to<T>, noCaseComparator>
+
+
+static SETTINGMAP(DWRITE_READING_DIRECTION) readingDirectionMap =
 {
     { DWRITE_READING_DIRECTION_LEFT_TO_RIGHT, _T("LeftToRight") },
     { DWRITE_READING_DIRECTION_RIGHT_TO_LEFT, _T("RightToLeft") }
 };
 
-static Unordered1To1Map<DWRITE_WORD_WRAPPING, std::tstring> wordWrappingMap =
+static SETTINGMAP(DWRITE_WORD_WRAPPING) wordWrappingMap =
 {
     { DWRITE_WORD_WRAPPING_NO_WRAP, _T("NoWrap") },
     { DWRITE_WORD_WRAPPING_WRAP,    _T("Wrap")   }
 };
 
-static Unordered1To1Map<DWRITE_FONT_STYLE, std::tstring> fontStyleMap =
+static SETTINGMAP(DWRITE_FONT_STYLE) fontStyleMap =
 {
     { DWRITE_FONT_STYLE_NORMAL,  _T("Normal")     },
     { DWRITE_FONT_STYLE_OBLIQUE, _T("Oblique")    },
     { DWRITE_FONT_STYLE_ITALIC,  _T("Italic")     }
 };
 
-static Unordered1To1Map<DWRITE_TEXT_ALIGNMENT, std::tstring> textAlignmentMap =
+static SETTINGMAP(DWRITE_TEXT_ALIGNMENT) textAlignmentMap =
 {
     { DWRITE_TEXT_ALIGNMENT_LEADING,  _T("Left")   },
     { DWRITE_TEXT_ALIGNMENT_CENTER,   _T("Center") },
     { DWRITE_TEXT_ALIGNMENT_TRAILING, _T("Right")  }
 };
 
-static Unordered1To1Map<DWRITE_PARAGRAPH_ALIGNMENT, std::tstring> paragraphAlignmentMap =
+static SETTINGMAP(DWRITE_PARAGRAPH_ALIGNMENT) paragraphAlignmentMap =
 {
     { DWRITE_PARAGRAPH_ALIGNMENT_NEAR,     _T("Top")     },
     { DWRITE_PARAGRAPH_ALIGNMENT_CENTER,   _T("Middle")  },
     { DWRITE_PARAGRAPH_ALIGNMENT_FAR,      _T("Bottom")  }
 };
 
-static Unordered1To1Map<DWRITE_TRIMMING_GRANULARITY, std::tstring> trimmingGranularityMap =
+static SETTINGMAP(DWRITE_TRIMMING_GRANULARITY) trimmingGranularityMap =
 {
     { DWRITE_TRIMMING_GRANULARITY_CHARACTER,    _T("Character") },
     { DWRITE_TRIMMING_GRANULARITY_WORD,         _T("Word")      },
     { DWRITE_TRIMMING_GRANULARITY_NONE,         _T("None")      }
 };
 
-static Unordered1To1Map<DWRITE_FONT_STRETCH, std::tstring> fontStretchMap =
+static SETTINGMAP(DWRITE_FONT_STRETCH) fontStretchMap =
 {
     { DWRITE_FONT_STRETCH_NORMAL,           _T("Normal")          },
     { DWRITE_FONT_STRETCH_ULTRA_CONDENSED,  _T("Ultra Condensed") },
@@ -65,7 +72,7 @@ static Unordered1To1Map<DWRITE_FONT_STRETCH, std::tstring> fontStretchMap =
     { DWRITE_FONT_STRETCH_ULTRA_EXPANDED,   _T("Ultra Expanded")  }
 };
 
-static Unordered1To1Map<DWRITE_FONT_WEIGHT, std::tstring> fontWeightMap =
+static SETTINGMAP(DWRITE_FONT_WEIGHT) fontWeightMap =
 {
     { DWRITE_FONT_WEIGHT_THIN,         _T("Thin")         },
     { DWRITE_FONT_WEIGHT_EXTRA_LIGHT,  _T("Extra Light")  },

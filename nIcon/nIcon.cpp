@@ -154,6 +154,8 @@ void LoadSettings()
 /// </summary>
 void Refresh()
 {
+    gIconGroups.clear();
+    LoadSettings();
 }
 
 

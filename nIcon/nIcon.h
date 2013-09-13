@@ -7,6 +7,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-void LoadSettings();
-void Refresh();
-void CreateGroup(LPCTSTR groupName);
+static void LoadSettings();
+static void Refresh();
+static void CreateGroup(LPCTSTR groupName);

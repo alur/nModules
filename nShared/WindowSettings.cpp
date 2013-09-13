@@ -12,8 +12,13 @@
 #include "../Utilities/Unordered1To1Map.hpp"
 
 
+// TODO::This should work in 2013 RTM.
+// template <typename SettingType>
+// typedef Unordered1To1Map<SettingType, std::tstring, std::hash<SettingType>, noCaseComparator, std::equal_to<SettingType>, noCaseComparator> SettingMap;
+#define SETTINGMAP(T) Unordered1To1Map<T, std::tstring, std::hash<T>, noCaseComparator, std::equal_to<T>, noCaseComparator>
+
 // String < -- > D2D1_TEXT_ANTIALIAS_MODE
-static Unordered1To1Map<D2D1_TEXT_ANTIALIAS_MODE, std::tstring> textAntiAliasModeMap =
+static SETTINGMAP(D2D1_TEXT_ANTIALIAS_MODE) textAntiAliasModeMap =
 {
     { D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE, _T("ClearType") },
     { D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE, _T("GrayScale") },

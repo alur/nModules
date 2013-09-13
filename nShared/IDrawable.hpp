@@ -21,7 +21,7 @@ public:
 
 private:
     explicit IDrawable(const IDrawable &) /* = deleted */;
-    IDrawable & operator = (const IDrawable &) /* = deleted */;
+    IDrawable & operator = (const IDrawable &) /* = delete */;
 
 protected:
     ~IDrawable();

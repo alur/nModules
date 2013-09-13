@@ -9,6 +9,7 @@
 #include "Color.h"
 #include "IColorVal.hpp"
 #include "../Utilities/Math.h"
+#include "../Utilities/StringUtils.h"
 #include <algorithm>
 #include "LiteralColorVal.hpp"
 #include <unordered_map>
@@ -17,25 +18,8 @@
 
 using namespace Math;
 
-std::hash<std::tstring> a;
 
-struct noCaseHash
-{
-    size_t operator()(const std::tstring & x) const
-    {
-        std::hash<std::tstring> a;
-        std::tstring copy(x);
-        std::transform(copy.begin(), copy.end(), copy.begin(), _totlower);
-        return a(copy);
-    }
-
-    bool operator()(const std::tstring & a, const std::tstring & b) const
-    {
-        return _tcsicmp(a.c_str(), b.c_str()) == 0;
-    }
-};
-
-typedef std::unordered_map<std::tstring, ARGB, noCaseHash, noCaseHash> ColorMap;
+typedef std::unordered_map<std::tstring, ARGB, noCaseComparator, noCaseComparator> ColorMap;
 
 
 namespace Color {
