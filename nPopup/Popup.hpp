@@ -66,7 +66,7 @@ protected:
     virtual void PostClose() = 0;
 
     //
-    void Size();
+    void Size(LPRECT limits);
 
     //
     vector<PopupItem*> items;

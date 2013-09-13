@@ -74,7 +74,20 @@ void Popup::AddItem(PopupItem* item) {
     this->items.push_back(item);
     this->sized = false;
     if (mWindow->IsVisible()) {
-        Size();
+        /*MonitorInfo* monInfo = mWindow->GetMonitorInformation();
+        RECT limits = monInfo->m_virtualDesktop.rect;
+
+        if (this->confineToMonitor && this->confineToWorkArea) {
+            limits = monInfo->m_monitors.at(monInfo->MonitorFromRECT(position)).workArea;
+        }
+        else if (this->confineToMonitor) {
+            limits = monInfo->m_monitors.at(monInfo->MonitorFromRECT(position)).rect;
+        }
+        else if (this->confineToWorkArea) {
+            limits = monInfo->m_monitors.at(monInfo->MonitorFromRECT(position)).workArea;
+        }
+
+        Size();*/
         mWindow->Repaint();
     }
 }
@@ -162,7 +175,7 @@ void Popup::Show(int x, int y) {
 }
 
 
-void Popup::Size()
+void Popup::Size(LPRECT limits)
 {
     // Work out the desired item 
     int itemWidth = mSettings->GetInt(_T("Width"), 200) - this->padding.left - this->padding.right;
@@ -177,12 +190,11 @@ void Popup::Size()
     }
     width = itemWidth + this->padding.left + this->padding.right;
     height += this->padding.bottom - this->itemSpacing;
-    MonitorInfo* monInfo = mWindow->GetMonitorInformation();
 
     // We've excceeded the max height, split the popup into columns.
-    if (height > monInfo->m_virtualDesktop.height)
+    if (height > limits->bottom - limits->top)
     {
-        int columns = (height - this->padding.top - this->padding.bottom)/(monInfo->m_virtualDesktop.height - this->padding.top - this->padding.bottom) + 1;
+        int columns = (height - this->padding.top - this->padding.bottom)/(limits->bottom - limits->top - this->padding.top - this->padding.bottom) + 1;
         int columnWidth = width;
         width = columnWidth * columns + this->itemSpacing*(columns - 1);
         height = this->padding.top;
@@ -226,10 +238,6 @@ void Popup::Show(LPRECT position, Popup* owner) {
 
     MonitorInfo* monInfo = mWindow->GetMonitorInformation();
 
-    if (!this->sized) {
-        Size();
-    }
-
     int x, y;
     RECT limits = monInfo->m_virtualDesktop.rect;
 
@@ -244,6 +252,9 @@ void Popup::Show(LPRECT position, Popup* owner) {
         limits = monInfo->m_monitors.at(monInfo->MonitorFromRECT(position)).workArea;
     }
 
+    if (!this->sized) {
+        Size(&limits);
+    }
 
     if (this->expandLeft)
     {
