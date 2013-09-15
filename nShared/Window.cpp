@@ -1703,6 +1703,7 @@ void Window::SetText(LPCWSTR text)
     else
     {
         this->text = StringUtils::ReallocOverwrite(const_cast<LPWSTR>(this->text), text);
+        mStateRender->UpdateText(mWindowData);
     }
 }
 
