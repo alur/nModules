@@ -320,17 +320,17 @@ bool CoverArt::SetCoverFromFolder(LPCWSTR filePath)
     IWICBitmapFrameDecode *source = nullptr;
     HRESULT hr = E_FAIL;
 
-    StringCchCopyW(folderPath, sizeof(folderPath), filePath);
+    StringCchCopyW(folderPath, _countof(folderPath), filePath);
     PathRemoveFileSpecW(folderPath);
 
     // Check each covername
     WCHAR artPath[MAX_PATH];
     for (auto &canidate : mFolderCanidates)
     {
-        StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, canidate.c_str());
+        StringCchPrintfW(artPath, _countof(artPath), L"%s\\%s", folderPath, canidate.c_str());
         for (auto &file : FileIterator(artPath))
         {
-            StringCchPrintfW(artPath, sizeof(artPath), L"%s\\%s", folderPath, file.cFileName);
+            StringCchPrintfW(artPath, _countof(artPath), L"%s\\%s", folderPath, file.cFileName);
 
             hr = Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
             if (SUCCEEDED(hr))
