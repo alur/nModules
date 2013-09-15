@@ -8,10 +8,13 @@
 #pragma once
 
 #include "../Utilities/Common.h"
-#include <map>
+#include <unordered_map>
 
 class IconCache
 {
+public:
+    typedef UINT32 Hash;
+
 private:
     struct CacheItem
     {
@@ -30,15 +33,15 @@ private:
         HICON icon;
     };
 
-    typedef std::map<UINT32, CacheItem> CacheMap;
+    typedef std::unordered_map<Hash, CacheItem> CacheMap;
 
 private:
     CacheMap mIconCache;
 
 public:
-    UINT32 ComputeHash(LPWSTR path, int id);
+    Hash ComputeHash(LPWSTR path, int id);
 
-    HICON GetIcon(UINT32 iconHash);
-    void StoreIcon(UINT32 iconHash, HICON icon);
-    void ReleaseIcon(UINT32 iconHash);
+    HICON GetIcon(Hash iconHash);
+    void StoreIcon(Hash iconHash, HICON icon);
+    void ReleaseIcon(Hash iconHash);
 };

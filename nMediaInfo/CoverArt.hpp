@@ -35,7 +35,9 @@ private:
 
 public:
     void Update();
+    void SetSource(IWICBitmapSource *source);
 
+public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID) override;
 
 private:

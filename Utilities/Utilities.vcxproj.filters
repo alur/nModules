@@ -15,8 +15,8 @@
     <ClInclude Include="UIDGenerator.hpp" />
     <ClInclude Include="FileIterator.hpp" />
     <ClInclude Include="Error.h" />
-    <ClInclude Include="CRC32.h" />
     <ClInclude Include="Unordered1To1Map.hpp" />
+    <ClInclude Include="CRC.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StringUtils.cpp" />
@@ -30,5 +30,6 @@
     <ClCompile Include="FileIteratorIterator.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="CRC32.cpp" />
+    <ClCompile Include="CRC64.cpp" />
   </ItemGroup>
 </Project>

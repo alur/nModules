@@ -14,6 +14,8 @@
 #include "Bangs.h"
 #include "Version.h"
 #include "../nShared/ErrorHandler.h"
+#include <atomic>
+#include <thread>
 
 using std::map;
 
@@ -52,8 +54,8 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */)
     LoadSettings();
 
     TextFunctions::_Register();
-    TextFunctions::_Update();
     Bangs::_Register();
+    Update();
 
     return 0;
 }
@@ -98,6 +100,18 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case WM_DESTROY:
         {
             SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
+        }
+        return 0;
+
+    case WindowMessages::WM_TEXTUPDATENOTIFY:
+        {
+            TextFunctions::_UpdateNotify();
+        }
+        return 0;
+
+    case WindowMessages::WM_COVERARTUPDATE:
+        {
+            ((CoverArt*)wParam)->SetSource((IWICBitmapSource*)lParam);
         }
         return 0;
 
@@ -163,19 +177,22 @@ void CreateCoverart(LPCTSTR name)
 /// </summary>
 void Update()
 {
-    static bool open = true;
+    // Set while 
+    static std::atomic_flag closed = ATOMIC_FLAG_INIT;
 
-    if (open)
+    if (!closed.test_and_set())
     {
-        // Winamp will spam a lot of Update messages on every track change, and they go through asynchronously.
-        // I was unable to solve this with either mutexes or critical sections for some reason. (maybe it's not a threading problem?).
-        // This solution seems to work good though, and comes with added benefit of usually ignoring the extra messages.
-        open = false;
-        TextFunctions::_Update();
-        for (auto &coverArt : gCoverArt)
+        std::thread([] ()
         {
-            coverArt.second.Update();
-        }
-        open = true;
+            TextFunctions::_Update();
+            SendMessage(gLSModule.GetMessageWindow(), WindowMessages::WM_TEXTUPDATENOTIFY, 0, 0);
+
+            for (auto &coverArt : gCoverArt)
+            {
+                coverArt.second.Update();
+            }
+
+            closed.clear();
+        }).detach();
     }
 }

@@ -6,10 +6,13 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "IconCache.hpp"
-#include "../Utilities/CRC32.h"
+#include "../Utilities/CRC.h"
 
 
-UINT32 IconCache::ComputeHash(LPWSTR path, int id)
+/// <summary>
+/// Computes the hash of a particular icon.
+/// </summary>
+IconCache::Hash IconCache::ComputeHash(LPWSTR path, int id)
 {
     struct IconData
     {
@@ -25,7 +28,14 @@ UINT32 IconCache::ComputeHash(LPWSTR path, int id)
 }
 
 
-HICON IconCache::GetIcon(UINT32 iconHash)
+/// <summary>
+/// Retrieves the icon with a particular hash.
+/// </summary>
+/// <remarks>
+/// If this function returns an icon, a corresponding call to ReleaseIcon must be made.
+/// </remarks>
+/// <returns>The icon, or nullptr if the icon is not found.</returns>
+HICON IconCache::GetIcon(Hash iconHash)
 {
     CacheMap::iterator iter = mIconCache.find(iconHash);
     if (iter != mIconCache.end())
@@ -37,13 +47,19 @@ HICON IconCache::GetIcon(UINT32 iconHash)
 }
 
 
-void IconCache::StoreIcon(UINT32 iconHash, HICON icon)
+/// <summary>
+/// Stores the specified icon in the cache.
+/// </summary>
+void IconCache::StoreIcon(Hash iconHash, HICON icon)
 {
     mIconCache[iconHash] = CacheItem(icon);
 }
 
 
-void IconCache::ReleaseIcon(UINT32 iconHash)
+/// <summary>
+/// Releases a reference to the icon with the specified hash.
+/// </summary>
+void IconCache::ReleaseIcon(Hash iconHash)
 {
     CacheMap::iterator iter = mIconCache.find(iconHash);
     if (iter != mIconCache.end())

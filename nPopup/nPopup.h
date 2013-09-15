@@ -7,31 +7,33 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-enum POPUPLINETYPE {
-    POPUPLINETYPE_ENDNEW,
-    POPUPLINETYPE_ENDFOLDER,
-    POPUPLINETYPE_NEW,
-    POPUPLINETYPE_FOLDER,
-    POPUPLINETYPE_SEPARATOR,
-    POPUPLINETYPE_INFO,
-    POPUPLINETYPE_COMMAND,
-    POPUPLINETYPE_CONTENT,
-    POPUPLINETYPE_CONTENTPATH,
-    POPUPLINETYPE_CONTENTPATHDYNAMIC,
-    POPUPLINETYPE_INVALID,
-    POPUPLINETYPE_CONTAINER
+enum class PopupLineType
+{
+    EndNew, // ~New
+    EndFolder, // ~Folder
+    New, // !New
+    Folder, // Folder
+    Separator, // !Separator
+    Info, // !Info
+    Command, // Anything
+    Content, // Retrieves its items from an external source
+    ContentPath, // Retrieves its items from a path
+    ContentPathDynamic, // Retrieves its items from a path, reloading the items each time it is opened
+    Invalid, // An invalid line
+    Container
 };
 
-enum POPUPLEVEL {
-    POPUPLEVEL_ROOT,
-    POPUPLEVEL_NEW,
-    POPUPLEVEL_FOLDER
+enum class PopupLevel
+{
+    Root,
+    New,
+    Folder
 };
 
-POPUPLINETYPE ProcessPopupLine(LPCTSTR line, ContentPopup::ContentSource* source, LPTSTR title, UINT cchTitle,
+static PopupLineType ProcessPopupLine(LPCTSTR line, ContentPopup::ContentSource* source, LPTSTR title, UINT cchTitle,
     LPTSTR command, UINT cchCommand, LPTSTR icon, UINT cchIcon, LPTSTR prefix, UINT cchPrefix);
 
-void LoadSettings();
-void LoadPopups();
-bool LoadPopup(LPVOID f, POPUPLEVEL level, Popup** out, LPCTSTR parentPrefix);
+static void LoadSettings();
+static void LoadPopups();
+static bool LoadPopup(LPVOID f, PopupLevel level, Popup** out, LPCTSTR parentPrefix);
 void __cdecl HandlePopupBang(HWND owner, LPCTSTR bang, LPCTSTR args);

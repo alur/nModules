@@ -241,7 +241,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
-    <ClInclude Include="CRC32.h" />
+    <ClInclude Include="CRC.h" />
     <ClInclude Include="Debugging.h" />
     <ClInclude Include="EnumArray.hpp" />
     <ClInclude Include="Error.h" />
@@ -259,6 +259,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CRC32.cpp" />
+    <ClCompile Include="CRC64.cpp" />
     <ClCompile Include="Debugging.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="FileIterator.cpp" />

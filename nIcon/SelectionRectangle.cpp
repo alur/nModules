@@ -27,7 +27,7 @@ SelectionRectangle::~SelectionRectangle()
 
 /// <summary>
 ///
-/// </summary>
+/// </summary>w
 void SelectionRectangle::Paint(ID2D1RenderTarget *renderTarget)
 {
     if (!mHidden)

@@ -10,6 +10,8 @@
 #include "../nShared/Factories.h"
 #include "../Utilities/FileIterator.hpp"
 #include "../Utilities/StringUtils.h"
+#include "../nShared/LSModule.hpp"
+#include "nMediaInfo.h"
 
 #include <Shlwapi.h>
 #include <strsafe.h>
@@ -24,6 +26,9 @@
 
 #define IPC_GETLISTPOS 125
 #define IPC_GETPLAYLISTFILEW 214
+
+
+extern LSModule gLSModule;
 
 
 /// <summary>
@@ -44,7 +49,7 @@ CoverArt::CoverArt(LPCTSTR name) : Drawable(name)
     mWindow->Initialize(windowSettings, &mStateRender);
 
     LoadSettings();
-    Update();
+    //Update();
 
     mWindow->Show();
 }
@@ -199,6 +204,12 @@ LRESULT WINAPI CoverArt::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 }
 
 
+void CoverArt::SetSource(IWICBitmapSource *source)
+{
+    mCoverArt->SetSource(source);
+}
+
+
 /// <summary>
 /// Tries to set the cover based on the Tags of the specified file.
 /// </summary>
@@ -233,7 +244,7 @@ bool CoverArt::SetCoverFromTag(LPCWSTR filePath)
             }
             if (SUCCEEDED(hr))
             {
-                mCoverArt->SetSource(source);
+                SendMessage(gLSModule.GetMessageWindow(), WM_COVERARTUPDATE, (WPARAM)this, (LPARAM)source);
             }
 
             SAFERELEASE(decoder);
@@ -333,7 +344,7 @@ bool CoverArt::SetCoverFromFolder(LPCWSTR filePath)
             }
             if (SUCCEEDED(hr))
             {
-                mCoverArt->SetSource(source);
+                SendMessage(gLSModule.GetMessageWindow(), WM_COVERARTUPDATE, (WPARAM)this, (LPARAM)source);
             }
 
             SAFERELEASE(decoder);
@@ -370,11 +381,11 @@ void CoverArt::SetDefaultCover()
     }
     if (SUCCEEDED(hr))
     {
-        mCoverArt->SetSource(source);
+        SendMessage(gLSModule.GetMessageWindow(), WM_COVERARTUPDATE, (WPARAM)this, (LPARAM)source);
     }
     else
     {
-        mCoverArt->SetSource(nullptr);
+        SendMessage(gLSModule.GetMessageWindow(), WM_COVERARTUPDATE, (WPARAM)this, (LPARAM)nullptr);
     }
 
     SAFERELEASE(decoder);
