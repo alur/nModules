@@ -189,8 +189,6 @@ void CoverArt::Update()
             SetDefaultCover();
         }
     }
-
-    mWindow->Repaint();
 }
 
 
@@ -207,6 +205,7 @@ LRESULT WINAPI CoverArt::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 void CoverArt::SetSource(IWICBitmapSource *source)
 {
     mCoverArt->SetSource(source);
+    mWindow->Repaint();
 }
 
 
