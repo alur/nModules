@@ -31,6 +31,19 @@ public:
 
     struct WindowData
     {
+        WindowData()
+            : textLayout(nullptr)
+        {
+        }
+
+        ~WindowData()
+        {
+            if (textLayout != nullptr)
+            {
+                textLayout->Release();
+            }
+        }
+
         // The area we draw text in
         D2D1_RECT_F textArea;
 
@@ -45,6 +58,9 @@ public:
 
         // Per-brush window data.
         EnumArray<Brush::WindowData, BrushType> brushData;
+
+        //
+        IDWriteTextLayout *textLayout;
     };
 
 public:

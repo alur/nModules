@@ -51,6 +51,12 @@ void State::UpdatePosition(D2D1_RECT_F position, WindowData *windowData)
     windowData->textArea.left += mStateSettings.textOffsetLeft;
     windowData->textArea.right -= mStateSettings.textOffsetRight;
 
+    if (windowData->textLayout)
+    {
+        windowData->textLayout->SetMaxHeight(windowData->textArea.bottom - windowData->textArea.top);
+        windowData->textLayout->SetMaxWidth(windowData->textArea.right - windowData->textArea.left);
+    }
+
     // Adjust the drawing area to account for the outline.
     windowData->drawingArea.rect.left += mStateSettings.outlineWidth / 2.0f;
     windowData->drawingArea.rect.right -= mStateSettings.outlineWidth / 2.0f;
@@ -124,21 +130,23 @@ void State::PaintText(ID2D1RenderTarget* renderTarget, WindowData *windowData, W
         renderTarget->SetTransform(Matrix3x2F::Rotation(mStateSettings.textRotation, windowData->textRotationOrigin));
         mBrushes[BrushType::Text].brush->SetTransform(windowData->brushData[BrushType::Text].brushTransform);
 
-        IDWriteTextLayout *layout;
-        IDWriteFactory *dwFactory;
-
-        if (SUCCEEDED(Factories::GetDWriteFactory((LPVOID*) &dwFactory)))
+        // TODO::Avoid re-creation of the layout here.
+        if (!windowData->textLayout)
         {
-            if (SUCCEEDED(dwFactory->CreateTextLayout(window->GetText(), lstrlenW(window->GetText()), textFormat,
-                windowData->textArea.right - windowData->textArea.left,
-                windowData->textArea.bottom - windowData->textArea.top, &layout)))
+            IDWriteFactory *dwFactory;
+            if (SUCCEEDED(Factories::GetDWriteFactory((LPVOID*) &dwFactory)))
             {
-                layout->Draw(renderTarget, mTextRender, windowData->textArea.left, windowData->textArea.top);
-                layout->Release();
+                dwFactory->CreateTextLayout(window->GetText(), lstrlenW(window->GetText()), textFormat,
+                    windowData->textArea.right - windowData->textArea.left,
+                    windowData->textArea.bottom - windowData->textArea.top, &windowData->textLayout);
             }
         }
 
-        renderTarget->DrawText(window->GetText(), lstrlenW(window->GetText()), this->textFormat, windowData->textArea, mBrushes[BrushType::Text].brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+        if (windowData->textLayout)
+        {
+            windowData->textLayout->Draw(renderTarget, mTextRender, windowData->textArea.left, windowData->textArea.top);
+        }
+
         renderTarget->SetTransform(Matrix3x2F::Identity());
     }
 }

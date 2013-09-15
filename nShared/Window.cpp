@@ -1735,5 +1735,6 @@ void Window::UpdateText()
     {
         this->text = StringUtils::ReallocOverwrite(const_cast<LPWSTR>(this->text), mWindowSettings.text);
     }
+    mStateRender->UpdateText(mWindowData);
     Repaint();
 }

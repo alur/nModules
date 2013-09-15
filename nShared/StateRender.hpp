@@ -296,4 +296,15 @@ public:
 
         return ret;
     }
+
+    void UpdateText(IStateWindowData *windowData) override
+    {
+        StateWindowData<StateEnum> *data;
+        data = decltype(data)(windowData);
+        
+        for (StateEnum state = StateEnum::Base; state != StateEnum::Count; EnumIncrement(state))
+        {
+            SAFERELEASE(data->data[state].textLayout);
+        }
+    }
 };

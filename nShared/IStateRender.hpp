@@ -22,4 +22,5 @@ public:
     virtual void DiscardDeviceResources() = 0;
     virtual HRESULT ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) = 0;
     virtual bool UpdateDWMColor(ARGB newColor, ID2D1RenderTarget* renderTarget) = 0;
+    virtual void UpdateText(IStateWindowData *windowData) = 0;
 };
