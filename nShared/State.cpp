@@ -17,6 +17,9 @@ using namespace D2D1;
 
 
 State::State()
+    : settings(nullptr)
+    , textFormat(nullptr)
+    , mTextRender(new StateTextRender(this))
 {
     this->settings = nullptr;
     this->textFormat = nullptr;
@@ -28,6 +31,7 @@ State::~State()
     DiscardDeviceResources();
     SAFEDELETE(this->settings);
     SAFERELEASE(this->textFormat);
+    SAFERELEASE(mTextRender);
 }
 
 
@@ -119,6 +123,21 @@ void State::PaintText(ID2D1RenderTarget* renderTarget, WindowData *windowData, W
     {
         renderTarget->SetTransform(Matrix3x2F::Rotation(mStateSettings.textRotation, windowData->textRotationOrigin));
         mBrushes[BrushType::Text].brush->SetTransform(windowData->brushData[BrushType::Text].brushTransform);
+
+        IDWriteTextLayout *layout;
+        IDWriteFactory *dwFactory;
+
+        if (SUCCEEDED(Factories::GetDWriteFactory((LPVOID*) &dwFactory)))
+        {
+            if (SUCCEEDED(dwFactory->CreateTextLayout(window->GetText(), lstrlenW(window->GetText()), textFormat,
+                windowData->textArea.right - windowData->textArea.left,
+                windowData->textArea.bottom - windowData->textArea.top, &layout)))
+            {
+                layout->Draw(renderTarget, mTextRender, windowData->textArea.left, windowData->textArea.top);
+                layout->Release();
+            }
+        }
+
         renderTarget->DrawText(window->GetText(), lstrlenW(window->GetText()), this->textFormat, windowData->textArea, mBrushes[BrushType::Text].brush, D2D1_DRAW_TEXT_OPTIONS_CLIP);
         renderTarget->SetTransform(Matrix3x2F::Identity());
     }
@@ -306,9 +325,9 @@ Brush* State::GetBrush(LPCTSTR brushName)
     {
         return &mBrushes[BrushType::Outline];
     }
-    else if (_tcsicmp(brushName, _T("TextOutline")) == 0)
+    else if (_tcsicmp(brushName, _T("TextStroke")) == 0)
     {
-        return &mBrushes[BrushType::TextOutline];
+        return &mBrushes[BrushType::TextStroke];
     }
 
     return nullptr;

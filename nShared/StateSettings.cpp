@@ -110,6 +110,7 @@ State::Settings::Settings()
     , textOffsetRight(0.0f)
     , textOffsetTop(0.0f)
     , textRotation(0.0f)
+    , textStrokeWidth(0.0f)
     , textTrimmingGranularity(DWRITE_TRIMMING_GRANULARITY_CHARACTER)
     , textVerticalAlign(DWRITE_PARAGRAPH_ALIGNMENT_NEAR)
     , wordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP)
@@ -158,6 +159,8 @@ void State::Settings::Load(::Settings* settings, Settings* defaults)
     this->textOffsetRight = settings->GetFloat(_T("TextOffsetRight"), defaults->textOffsetRight);
     this->textOffsetTop = settings->GetFloat(_T("TextOffsetTop"), defaults->textOffsetTop);
     this->textRotation = settings->GetFloat(_T("TextRotation"), defaults->textRotation);
+
+    this->textStrokeWidth = settings->GetFloat(_T("TextStrokeWidth"), defaults->textStrokeWidth);
     
     settings->GetString(_T("TextTrimmingGranularity"), buffer, _countof(buffer), trimmingGranularityMap.FindByA(defaults->textTrimmingGranularity)->b.c_str());
     this->textTrimmingGranularity = ParseTrimmingGranularity(buffer);
@@ -177,8 +180,8 @@ void State::Settings::Load(::Settings* settings, Settings* defaults)
     ::Settings* textSettings = settings->CreateChild(_T("Font"));
     this->brushSettings[State::BrushType::Text].Load(textSettings, &defaults->brushSettings[State::BrushType::Text]);
 
-    ::Settings* textOutlineSettings = textSettings->CreateChild(_T("Outline"));
-    this->brushSettings[State::BrushType::TextOutline].Load(textOutlineSettings, &defaults->brushSettings[State::BrushType::TextOutline]);
+    ::Settings* textOutlineSettings = textSettings->CreateChild(_T("Stroke"));
+    this->brushSettings[State::BrushType::TextStroke].Load(textOutlineSettings, &defaults->brushSettings[State::BrushType::TextStroke]);
     
     delete outlineSettings;
     delete textSettings;

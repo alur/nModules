@@ -109,6 +109,9 @@
     <ClInclude Include="RelatedNumber.hpp" />
     <ClInclude Include="RelatedRect.hpp" />
     <ClInclude Include="BuildOptions.h" />
+    <ClInclude Include="StateTextRender.hpp">
+      <Filter>States</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Easing.cpp" />
@@ -198,5 +201,8 @@
     </ClCompile>
     <ClCompile Include="RelatedNumber.cpp" />
     <ClCompile Include="RelatedRect.cpp" />
+    <ClCompile Include="StateTextRender.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

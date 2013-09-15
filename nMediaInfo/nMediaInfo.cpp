@@ -177,7 +177,7 @@ void CreateCoverart(LPCTSTR name)
 /// </summary>
 void Update()
 {
-    // Set while 
+    // Set while the updater thread is running.
     static std::atomic_flag closed = ATOMIC_FLAG_INIT;
 
     if (!closed.test_and_set())

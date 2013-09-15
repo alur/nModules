@@ -144,7 +144,7 @@ void AddPopup(Popup* popup)
 /// </summary>
 void LoadPopups()
 {
-    LPVOID f = LiteStep::LCOpen(NULL);
+    LPVOID f = LiteStep::LCOpen(nullptr);
     Popup* popup;
 
     // Add pre-defined popups
@@ -216,7 +216,7 @@ bool LoadPopup(LPVOID f, PopupLevel level, Popup** out, LPCTSTR parentPrefix)
             else
             {
                 TRACE("Invalid popup line at the root level: %ls", line);
-                *out = NULL;
+                *out = nullptr;
                 return true;
             }
         }
@@ -224,7 +224,7 @@ bool LoadPopup(LPVOID f, PopupLevel level, Popup** out, LPCTSTR parentPrefix)
         {
         case PopupLineType::Folder:
             {
-                Popup* popup = new FolderPopup(title, NULL, prefix[0] == L'\0' ? parentPrefix : prefix);
+                Popup* popup = new FolderPopup(title, nullptr, prefix[0] == L'\0' ? parentPrefix : prefix);
                 LoadPopup(f, PopupLevel::Folder, &popup, prefix[0] == L'\0' ? parentPrefix : prefix);
                 (*out)->AddItem(new nPopup::FolderItem(*out, title, popup, icon));
             }
@@ -344,7 +344,7 @@ PopupLineType ProcessPopupLine(LPCTSTR line, ContentPopup::ContentSource* source
     TCHAR token[MAX_LINE_LENGTH];
     LPCTSTR linePointer = line;
 
-    LiteStep::GetToken(linePointer, NULL, &linePointer, FALSE); // Drop *Popup
+    LiteStep::GetToken(linePointer, nullptr, &linePointer, FALSE); // Drop *Popup
     
     // The first token will be ~Folder, ~New, !Separator, !Info, !Container, .icon=, or a title.
     LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
@@ -412,7 +412,7 @@ PopupLineType ProcessPopupLine(LPCTSTR line, ContentPopup::ContentSource* source
                 return PopupLineType::Invalid;
             }
 
-
+            //
             PopupLineType type;
 
             if (_tcsicmp(token, _T("!New")) == 0)

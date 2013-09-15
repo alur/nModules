@@ -12,17 +12,20 @@ class State;
 #include "Brush.hpp"
 #include "IPainter.hpp"
 #include "IBrushOwner.hpp"
+#include "StateTextRender.hpp"
 #include "Window.hpp"
 
 class State : public IBrushOwner
 {
+    friend class StateTextRender;
+
 public:
     enum class BrushType
     {
         Background = 0,
         Outline,
         Text,
-        TextOutline,
+        TextStroke,
         Count
     };
 
@@ -116,6 +119,9 @@ public:
         // Text rotation. Default: 0
         float textRotation;
 
+        // Text stroke width. Default: 0
+        float textStrokeWidth;
+
         // The trimming setting. None, Character, Word. Default: Character
         DWRITE_TRIMMING_GRANULARITY textTrimmingGranularity;
 
@@ -187,4 +193,6 @@ private:
 
     // Defines how the text is formatted.
     IDWriteTextFormat* textFormat;
+
+    StateTextRender *mTextRender;
 };

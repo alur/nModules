@@ -42,6 +42,7 @@
     <ClInclude Include="RelatedNumber.hpp" />
     <ClInclude Include="RelatedRect.hpp" />
     <ClInclude Include="StateRender.hpp" />
+    <ClInclude Include="StateTextRender.hpp" />
     <ClInclude Include="StateWindowData.hpp" />
     <ClInclude Include="WindowBangs.h" />
     <ClInclude Include="WindowSettings.hpp" />
@@ -85,6 +86,7 @@
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="RelatedNumber.cpp" />
     <ClCompile Include="RelatedRect.cpp" />
+    <ClCompile Include="StateTextRender.cpp" />
     <ClCompile Include="WindowBangs.cpp" />
     <ClCompile Include="WindowSettings.cpp" />
     <ClCompile Include="WindowDropTarget.cpp" />

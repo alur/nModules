@@ -22,9 +22,11 @@ void TileSettings::Load(Settings *settings)
     for (auto &stateInitData : tileInitData)
     {
         stateInitData.defaults.brushSettings[::State::BrushType::Background].color = Color::Create(0x00000000);
+        stateInitData.defaults.brushSettings[::State::BrushType::TextStroke].color = Color::Create(0xAA454545);
         stateInitData.defaults.wordWrapping = DWRITE_WORD_WRAPPING_WRAP;
         stateInitData.defaults.textAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
         stateInitData.defaults.textOffsetTop = (float)mIconSize;
+        stateInitData.defaults.textStrokeWidth = 1.5f;
     }
 
     tileInitData[IconTile::State::Hover].prefix = L"Hover";
