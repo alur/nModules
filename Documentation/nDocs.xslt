@@ -321,7 +321,7 @@
   </xsl:template>
 
   <xsl:template match="a">
-    <a href="{@href}">
+    <a href="{@href}" target="{@target}">
       <xsl:value-of select="."/>
     </a>
   </xsl:template>

@@ -5,7 +5,7 @@
   <title>Window</title>
   <tableofcontents/>
 	<description>
-	  Almost everything that is drawn in the nModules is a Window. A window is...
+	  Almost everything that is drawn in the nModules is a Window. All windows have all of the following settings.
 	</description>
 
   <section>
@@ -169,7 +169,7 @@
       <name>Text</name>
       <type>Text</type>
       <description>
-        The ...
+        The text that is shown on this Window.
       </description>
     </setting>
     
@@ -215,100 +215,40 @@
     <description>
       These are setting used to position the Window.
     </description>
-
-    <setting>
-      <name>AnchorBottom</name>
-      <type>Boolean</type>
-      <default>False</default>
-      <description>
-      </description>
-      <note class="red">This is a planned setting, and is not yet implemented.</note>
-    </setting>
-    
-    <setting>
-      <name>AnchorLeft</name>
-      <type>Boolean</type>
-      <default>False</default>
-      <description>
-      </description>
-      <note class="red">This is a planned setting, and is not yet implemented.</note>
-    </setting>
-
-    <setting>
-      <name>AnchorRight</name>
-      <type>Boolean</type>
-      <default>False</default>
-      <description>
-      </description>
-      <note class="red">This is a planned setting, and is not yet implemented.</note>
-    </setting>
-    
-    <setting>
-      <name>AnchorTop</name>
-      <type>Boolean</type>
-      <default>False</default>
-      <description>
-      </description>
-      <note class="red">This is a planned setting, and is not yet implemented.</note>
-    </setting>
-    
-    <setting>
-      <name>CoordinateOrigin</name>
-      <type>Enumeration</type>
-      <default>TopLeft</default>
-      <description>
-      </description>
-      <enumeration>
-        <title>Values</title>
-        <value>
-          <name>TopLeft</name>
-          <description>The text is renderd using ClearType anti aliasing.</description>
-        </value>
-        <value>
-          <name>TopRight</name>
-          <description>The text is renderd using GrayScale anti aliasing.</description>
-        </value>
-        <value>
-          <name>BottomLeft</name>
-          <description>The text is renderd using ClearType anti aliasing.</description>
-        </value>
-        <value>
-          <name>BottomRight</name>
-          <description>The text is renderd using GrayScale anti aliasing.</description>
-        </value>
-      </enumeration>
-      <note class="red">This is a planned setting, and is not yet implemented.</note>
-    </setting>
     
     <setting>
       <name>X</name>
-      <type>Integer</type>
+      <type>RelationalValue</type>
       <default>0</default>
       <description>
+        The horizontal position of the top-left corner of this Window, relative to the parent.
       </description>
     </setting>
     
     <setting>
       <name>Y</name>
-      <type>Integer</type>
+      <type>RelationalValue</type>
       <default>0</default>
       <description>
+        The vertical position of the top-left corner of this Window, relative to the parent.
       </description>
     </setting>
   
     <setting>
       <name>Width</name>
-      <type>Integer</type>
+      <type>RelationalValue</type>
       <default>100</default>
       <description>
+        The width of this Window, relative to the parent.
       </description>
     </setting>
     
     <setting>
       <name>Height</name>
-      <type>Integer</type>
+      <type>RelationalValue</type>
       <default>100</default>
       <description>
+        The height of this Window, relative to the parent.
       </description>
     </setting>
   </section>

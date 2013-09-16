@@ -36,11 +36,11 @@
       <code>
         <multisetting name="nClock">ClockOne ClockTwo ClockThree</multisetting>
       </code>
-      
-      It is also possible to create and destroy clocks at runtime, using the
+
+      <!--It is also possible to create and destroy clocks at runtime, using the
       <bangref>nClockCreate</bangref> and <bangref>nClockDestroy</bangref> bangs,
       or the <scriptfunc>nClock.Create</scriptfunc> and
-      <scriptfunc>nClock.Destroy</scriptfunc> functions.
+      <scriptfunc>nClock.Destroy</scriptfunc> functions.-->
     </description>
   </section>
 
@@ -58,6 +58,7 @@
       <description>
         When this is set to true, the HourHand will make one lap every 24 hours, instead of every 12 hours.
       </description>
+      <!--
       <bangs>
         <bang>
           <name>nClockSet24HourDial</name>
@@ -93,6 +94,7 @@
         You can read or set this setting by calling the
         <scriptfunc>nClock.24HourDial</scriptfunc> function.
       </scripting>
+      -->
     </setting>
 
     <setting>
@@ -102,6 +104,7 @@
       <description>
         Specifies how often the hands will move, in milliseconds.
       </description>
+      <!--
       <bangs>
         You can change the update rate by calling the <bangref>nClockSetUpdateRate</bangref> bang.
       </bangs>
@@ -109,6 +112,7 @@
         You can read or set the update rate by calling the
         <scriptfunc>nClock.UpdateRate</scriptfunc> function.
       </scripting>
+      -->
     </setting>
   </section>
 
@@ -125,6 +129,7 @@
       <description>
         How long this hand is.
       </description>
+      <!--
       <bangs>
         You can change the hand length by using the <bangref>nClockSetHandLength</bangref> bang.
       </bangs>
@@ -132,6 +137,7 @@
         You can read or set the hand length by calling the
         <scriptfunc>nClock.Hand.Length</scriptfunc> function.
       </scripting>
+      -->
     </setting>
 
     <setting>
@@ -141,6 +147,7 @@
       <description>
         Where the hand begins, relative to the center of the clock.
       </description>
+      <!--
       <bangs>
         You can change the hand offset by using the
         <bangref>nClockSetHandOffset</bangref> bang.
@@ -149,6 +156,7 @@
         You can read or set the hand offset by calling the
         <scriptfunc>nClock.Hand.Offset</scriptfunc> function.
       </scripting>
+      -->
     </setting>
 
     <setting>
@@ -158,6 +166,7 @@
       <description>
         How thick the clock hand is.
       </description>
+      <!--
       <bangs>
         You can change the hand thickness by using the
         <bangref>nClockSetHandThickness</bangref> bang.
@@ -166,6 +175,7 @@
         You can read or set the hand thickness by calling the
         <scriptfunc>nClock.Hand.Thickness</scriptfunc> function.
       </scripting>
+      -->
     </setting>
 
     <setting>
@@ -175,6 +185,7 @@
       <description>
         When this is set to true, this hand will move between clock ticks smoothly, rather than jumping to the closest clock tick.
       </description>
+      <!--
       <bangs>
         You can change this setting by using the
         <bangref>nClockSetSmoothMovement</bangref> bang.
@@ -183,9 +194,11 @@
         You can read or set the hand thickness by calling the
         <scriptfunc>nClock.Hand.SmoothMovement</scriptfunc> function.
       </scripting>
+      -->
     </setting>
   </section>
 
+  <!--
   <section>
     <title>Bangs</title>
     <description>
@@ -328,7 +341,8 @@
       </parameters>
     </bang>
   </section>
-
+  -->
+  <!--
   <section>
     <title>Scripting</title>
     <description>
@@ -361,13 +375,16 @@
       </scriptfunc>
     </scriptfuncs>
   </section>
+  -->
 
+  <!--
   <section>
     <title>Events</title>
     <description>
       nClock will trigger events with the groupname nClock.
     </description>
   </section>
+  -->
 
   <section>
     <title>Sample Configuration</title>

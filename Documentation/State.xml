@@ -5,13 +5,399 @@
   <title>State</title>
   <tableofcontents/>
   <description>
-	Description of this page
+	  A State of a Window. All Windows contain a base state, and generally some additional states.
   </description>
 
   <section>
-    <title>Behavior</title>
+    <title>Brushes</title>
     <description>
-      These are setting which affect the behavior of their Window.
+      All States have the following 4 brushes.
+      <enumeration>
+        <title></title>
+        <value>
+          <name>(stateName)</name>
+          <description>Used to render the state background.</description>
+        </value>
+        <value>
+          <name>(stateName)Outline</name>
+          <description>Used to render the state outline.</description>
+        </value>
+        <value>
+          <name>(stateName)Font</name>
+          <description>Used to render the font.</description>
+        </value>
+        <value>
+          <name>(stateName)FontStroke</name>
+          <description>Used to render the font stroke.</description>
+        </value>
+      </enumeration>
     </description>
+  </section>
+  
+  <section>
+    <title>Background</title>
+    <description>
+      Settings that modify the window background.
+    </description>
+
+    <setting>
+      <name>CornerRadiusX</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The X radius to draw corners with.
+      </description>
+    </setting>
+    
+    <setting>
+      <name>CornerRadiusY</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The Y radius to draw corners with.
+      </description>
+    </setting>
+    
+  </section>
+  
+  <section>
+    <title>Outline</title>
+    <description>
+      Settings that modify the background outline.
+    </description>
+
+    <setting>
+      <name>OutlineWidth</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The width of background outline.
+      </description>
+    </setting>
+    
+  </section>
+  
+  <section>
+    <title>Text</title>
+    <description>
+      Settings related to text rendering.
+    </description>
+
+    <setting>
+      <name>Font</name>
+      <type>String</type>
+      <default>Arial</default>
+      <description>
+        The font to use.
+      </description>
+    </setting>
+    
+    <setting>
+      <name>FontSize</name>
+      <type>Float</type>
+      <default>12</default>
+      <description>
+        The font size.
+      </description>
+    </setting>
+    
+    <setting>
+      <name>FontStretch</name>
+      <type>Enumeration</type>
+      <default>Normal</default>
+      <description>
+        How stretched out the font is.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>Ultra Condensed</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Extra Condensed</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Condensed</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Semi Condensed</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Normal</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Medium</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Semi Expanded</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Expanded</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Extra Expanded</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Ultra Expanded</name>
+          <description></description>
+        </value>
+      </enumeration>
+    </setting>
+    
+    <setting>
+      <name>FontStyle</name>
+      <type>Enumeration</type>
+      <default>Normal</default>
+      <description>
+        The font style.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>Normal</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Oblique</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Italic</name>
+          <description></description>
+        </value>
+      </enumeration>
+    </setting>
+
+    <setting>
+      <name>FontWeight</name>
+      <type>Enumeration</type>
+      <default>Normal</default>
+      <description>
+        The weight of the font.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>Thin</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Extra Light</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Ultra Light</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Light</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Semi Light</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Normal</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Regular</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Medium</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Semi Bold</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Bold</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Extra Bold</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Ultra Bold</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Black</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Heavy</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Extra Black</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Ultra Black</name>
+          <description></description>
+        </value>
+      </enumeration>
+    </setting>
+    
+    <setting>
+      <name>ReadingDirection</name>
+      <type>Enumeration</type>
+      <default>LeftToRight</default>
+      <description>
+        Specifies the direction in which reading progresses.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>LeftToRight</name>
+          <description></description>
+        </value>
+        <value>
+          <name>RightToLeft</name>
+          <description></description>
+        </value>
+      </enumeration>
+    </setting>
+    
+    <setting>
+      <name>TextAlign</name>
+      <type>Enumeration</type>
+      <default>Left</default>
+      <description>
+        The horizontal alignment of the text.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>Left</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Center</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Right</name>
+          <description></description>
+        </value>
+      </enumeration>
+    </setting>
+    
+    <setting>
+      <name>TextOffset</name>
+      <type>Rectangle</type>
+      <default>0 0 0 0</default>
+      <description>
+        The offsets of the text rectangle from the Window edges.
+      </description>
+    </setting>
+    
+    <setting>
+      <name>TextRotation</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        Text rotation, in degrees.
+      </description>
+    </setting>
+
+    <setting>
+      <name>TextTrimmingGranularity</name>
+      <type>Enumeration</type>
+      <default>Word</default>
+      <description>
+        When text needs to be cut of due to size constraints, how much to cut off.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>None</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Character</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Word</name>
+          <description></description>
+        </value>
+      </enumeration>
+    </setting>
+    
+    <setting>
+      <name>TextVerticalAlign</name>
+      <type>Enumeration</type>
+      <default>Top</default>
+      <description>
+        The vertical alignment of the text.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>Top</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Middle</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Bottom</name>
+          <description></description>
+        </value>
+      </enumeration>
+    </setting>
+    
+    <setting>
+      <name>WordWrapping</name>
+      <type>Enumeration</type>
+      <default>NoWrap</default>
+      <description>
+        Defines how to wrap text when necessary.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>Wrap</name>
+          <description>Indicates that words are broken across lines to avoid text overflowing the layout box.</description>
+        </value>
+        <value>
+          <name>NoWrap</name>
+          <description>Indicates that words are kept within the same line even when it overflows the layout box.</description>
+        </value>
+      </enumeration>
+    </setting>
+  </section>
+  
+  <section>
+    <title>FontStroke</title>
+    <description>
+      Settings that modify the font stroke.
+    </description>
+
+    <setting>
+      <name>FontStrokeWidth</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The width of the font stroke.
+      </description>
+    </setting>
+    
   </section>
 </page>

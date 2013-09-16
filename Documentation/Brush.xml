@@ -5,13 +5,319 @@
   <title>Brush</title>
   <tableofcontents/>
   <description>
-	Description of this page
+	  All drawing in the nModules is done with Brushes.
   </description>
 
   <section>
-    <title>Behavior</title>
+    <title>General</title>
     <description>
-      These are setting which affect the behavior of their Window.
+      General Settings
     </description>
+
+    <setting>
+      <name>BrushType</name>
+      <type>Enumeration</type>
+      <default>SolidColor</default>
+      <description>
+        Specifies what type of brush this is.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>SolidColor</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Image</name>
+          <description></description>
+        </value>
+        <value>
+          <name>LinearGradient</name>
+          <description></description>
+        </value>
+        <value>
+          <name>RadialGradient</name>
+          <description></description>
+        </value>
+      </enumeration>
+    </setting>
+  </section>
+
+  <section>
+    <title>SolidColor</title>
+    <description>
+      A simple brush that just draw a single color.
+    </description>
+
+    <setting>
+      <name>Color</name>
+      <type>Color</type>
+      <default>Black</default>
+      <description>
+        The color to draw with.
+      </description>
+    </setting>
+  </section>
+  
+  <section>
+    <title>Gradient</title>
+    <description>
+      Settings shared by both the RadialGradient and LinearGradient brush types.
+    </description>
+
+    <setting>
+      <name>GradientColors</name>
+      <type>Color List</type>
+      <default>Black</default>
+      <description>
+        The colors to use along the gradient, as a space-separated list.
+        <p>
+          Sample:<br/>
+          <code>
+            <singlesetting name="GradientColors" type="Color List">"#7FFF SetAlpha(Spin(DWMColor,180),128) #A00F"</singlesetting>
+          </code>
+        </p>
+      </description>
+    </setting>
+    
+    <setting>
+      <name>GradientStops</name>
+      <type>Float List</type>
+      <default>0.0</default>
+      <description>
+        Where the color changes along the gradient, as a list of values in the range [0, 1].
+        <p>
+          Sample:<br/>
+          <code>
+            <singlesetting name="GradientStops" type="Float List">"0.0 0.5 1.0"</singlesetting>
+          </code>
+        </p>
+      </description>
+    </setting>
+  </section>
+  
+  <section>
+    <title>LinearGradient</title>
+    <description>
+      Settings used by the linear gradient brush. These settings essentially let you specify the gradient, as shown on 
+      <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd756651%28v=vs.85%29.aspx#more_about_gradient_stops" target="_blank">
+        MSDN
+      </a>.
+    </description>
+
+    <setting>
+      <name>GradientStartX</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The X coordinate within the drawn object where the gradient starts.
+      </description>
+    </setting>
+    
+    <setting>
+      <name>GradientEndX</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The X coordinate within the drawn object where the gradient ends.
+      </description>
+    </setting>
+    
+    <setting>
+      <name>GradientStartY</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The Y coordinate within the drawn object where the gradient starts.
+      </description>
+    </setting>
+
+    <setting>
+      <name>GradientEndY</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The Y coordinate within the drawn object where the gradient ends.
+      </description>
+    </setting>
+  </section>
+  
+  <section>
+    <title>RadialGradient</title>
+    <description>
+      Settings used by the radial gradient brush. These settings essentially let you specify the gradient, as shown on
+      <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd756651%28v=vs.85%29.aspx#more_about_gradient_stops" target="_blank">
+        MSDN
+      </a>.
+    </description>
+
+    <setting>
+      <name>GradientCenterX</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The X coordinate where the gradient is centered at.
+      </description>
+    </setting>
+
+    <setting>
+      <name>GradientCenterY</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The Y coordinate where the gradient is centered at.
+      </description>
+    </setting>
+
+    <setting>
+      <name>GradientRadiusX</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The X radius of the gradient.
+      </description>
+    </setting>
+
+    <setting>
+      <name>GradientRadiusY</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The Y radius of the gradient.
+      </description>
+    </setting>
+    
+    <setting>
+      <name>GradientOriginOffsetX</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The X offset of the gradient origin, from the gradient center.
+      </description>
+    </setting>
+    
+    <setting>
+      <name>GradientOriginOffsetY</name>
+      <type>Float</type>
+      <default>0</default>
+      <description>
+        The Y offset of the gradient origin, from the gradient center.
+      </description>
+    </setting>
+  </section>
+
+
+  <section>
+    <title>Image</title>
+    <description>
+      Settings used by the image brush.
+    </description>
+
+    <setting>
+      <name>Alpha</name>
+      <type>Integer</type>
+      <default>255</default>
+      <description>
+        This images own alpha channel is multiplied by this value in order to determine the final alpha value. Range [0, 255].
+      </description>
+    </setting>
+    
+    <setting>
+      <name>Image</name>
+      <type>File</type>
+      <default>""</default>
+      <description>
+        The image to draw with.
+      </description>
+    </setting>
+    
+    <setting>
+      <name>ImageScalingMode</name>
+      <type>Enumeration</type>
+      <default>Center</default>
+      <description>
+        How to scale the image.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>Center</name>
+          <description>Center the image in the area we are drawing in, without scaling it.</description>
+        </value>
+        <value>
+          <name>Tile</name>
+          <description>Tile the image.</description>
+        </value>
+        <value>
+          <name>Fit</name>
+          <description>Scale the image such that it covers the entire area we are drawing in, in at least one dimension, without overflowing.</description>
+        </value>
+        <value>
+          <name>Fill</name>
+          <description>Scale the image such that it covers the entire area we are drawing in.</description>
+        </value>
+        <value>
+          <name>Edges</name>
+          <description>Scales the image to cover the entire area we draw in, without stretching the borders of the image.</description>
+        </value>
+      </enumeration>
+    </setting>
+    
+    <setting>
+      <name>Image</name>
+      <type>OffsetRectangle</type>
+      <default>0 0 0 0</default>
+      <description>
+        When using the Edges scaling mode, what the image edges are.
+      </description>
+    </setting>
+    
+    <setting>
+      <name>TilingModeX</name>
+      <type>Enumeration</type>
+      <default>Wrap</default>
+      <description>
+        How to tile in the X direction.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>Mirror</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Clamp</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Wrap</name>
+          <description></description>
+        </value>
+      </enumeration>
+    </setting>
+
+    <setting>
+      <name>TilingModeY</name>
+      <type>Enumeration</type>
+      <default>Wrap</default>
+      <description>
+        How to tile in the Y direction.
+      </description>
+      <enumeration>
+        <title>Values</title>
+        <value>
+          <name>Mirror</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Clamp</name>
+          <description></description>
+        </value>
+        <value>
+          <name>Wrap</name>
+          <description></description>
+        </value>
+      </enumeration>
+    </setting>
   </section>
 </page>
