@@ -227,6 +227,24 @@ HRESULT StateTextRender::DrawGlyphRun(
                 );
         }
 
+        ID2D1StrokeStyle* strokeStyle = nullptr;
+        if (SUCCEEDED(hr))
+        {
+            d2dFactory->CreateStrokeStyle(
+                D2D1::StrokeStyleProperties(
+                    D2D1_CAP_STYLE_FLAT,
+                    D2D1_CAP_STYLE_FLAT,
+                    D2D1_CAP_STYLE_SQUARE,
+                    D2D1_LINE_JOIN_BEVEL,
+                    5.0f,
+                    D2D1_DASH_STYLE_SOLID,
+                    0.0f
+                ),
+                nullptr,
+                0,
+                &strokeStyle);
+        }
+
         if (SUCCEEDED(hr))
         {
 
@@ -237,7 +255,8 @@ HRESULT StateTextRender::DrawGlyphRun(
                 renderTarget->DrawGeometry(
                     pTransformedGeometry,
                     mState->mBrushes[State::BrushType::TextStroke].brush,
-                    strokeWidth
+                    strokeWidth,
+                    strokeStyle
                     );
             }
 
@@ -249,10 +268,11 @@ HRESULT StateTextRender::DrawGlyphRun(
                 );*/
         }
     
-        d2dFactory->Release();
+        SAFERELEASE(strokeStyle);
         SAFERELEASE(pPathGeometry);
         SAFERELEASE(sink);
         SAFERELEASE(pTransformedGeometry);
+        d2dFactory->Release();
     }
 
     // TODO::Figure out how to replicate the quality of D2Ds DrawGlyphRun!
