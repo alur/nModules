@@ -171,7 +171,7 @@ HRESULT StateTextRender::DrawGlyphRun(
 
     // Since the fill looks horrid anyways, only do this if we are
     // going to stroke, and fill using D2D's DrawGlyphRun
-    if (mState->mStateSettings.textStrokeWidth > 0.0f)
+    if (mState->mStateSettings.fontStrokeWidth > 0.0f)
     {
         // Get our D2D factory
         ID2D1Factory *d2dFactory;
@@ -248,7 +248,7 @@ HRESULT StateTextRender::DrawGlyphRun(
         if (SUCCEEDED(hr))
         {
 
-            float strokeWidth = mState->mStateSettings.textStrokeWidth;
+            float strokeWidth = mState->mStateSettings.fontStrokeWidth;
             if (strokeWidth != 0.0f)
             {
                 // Draw the outline of the glyph run
@@ -327,7 +327,7 @@ HRESULT StateTextRender::DrawStrikethrough(
 
     auto renderTarget = ((ID2D1RenderTarget*) clientDrawingContext);
 
-    renderTarget->DrawRectangle(rect, mState->mBrushes[State::BrushType::TextStroke].brush, mState->mStateSettings.textStrokeWidth);
+    renderTarget->DrawRectangle(rect, mState->mBrushes[State::BrushType::TextStroke].brush, mState->mStateSettings.fontStrokeWidth);
     renderTarget->FillRectangle(rect, mState->mBrushes[State::BrushType::Text].brush);
 
     return S_OK;
@@ -356,7 +356,7 @@ HRESULT StateTextRender::DrawUnderline(
 
     auto renderTarget = ((ID2D1RenderTarget*) clientDrawingContext);
 
-    renderTarget->DrawRectangle(rect, mState->mBrushes[State::BrushType::TextStroke].brush, mState->mStateSettings.textStrokeWidth);
+    renderTarget->DrawRectangle(rect, mState->mBrushes[State::BrushType::TextStroke].brush, mState->mStateSettings.fontStrokeWidth);
     renderTarget->FillRectangle(rect, mState->mBrushes[State::BrushType::Text].brush);
 
     return S_OK;

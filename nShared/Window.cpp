@@ -153,6 +153,20 @@ Window::Window(HWND /* parent */, LPCTSTR windowClass, HINSTANCE instance, Setti
     ZeroMemory(&m, sizeof(m));
     m.cyTopHeight = INT_MAX;
     DwmExtendFrameIntoClientArea(this->window, &m);
+
+    // It is possible that we have a parent set. This will either be "VirtualDesktop", or "Monitor[0-9]+"
+    TCHAR parent[MAX_RCCOMMAND];
+    mSettings->GetString(_T("Parent"), parent, _countof(parent), _T(""));
+    {
+        if (_tcsnicmp(parent, L"Monitor", _countof(L"Monitor") - 1) == 0)
+        {
+
+        }
+        else // VirtualDesktop
+        {
+
+        }
+    }
 }
 
 

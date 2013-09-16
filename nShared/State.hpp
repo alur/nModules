@@ -136,7 +136,7 @@ public:
         float textRotation;
 
         // Text stroke width. Default: 0
-        float textStrokeWidth;
+        float fontStrokeWidth;
 
         // The trimming setting. None, Character, Word. Default: Character
         DWRITE_TRIMMING_GRANULARITY textTrimmingGranularity;

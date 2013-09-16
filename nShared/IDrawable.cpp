@@ -9,6 +9,7 @@
 #include "Drawable.hpp"
 #include "LSModule.hpp"
 #include "../nCoreCom/Core.h"
+#include <algorithm>
 
 
 extern LSModule gLSModule;
@@ -26,13 +27,30 @@ IDrawable::IDrawable(LPCTSTR prefix)
     TCHAR parentPrefix[MAX_RCCOMMAND];
     mSettings->GetString(_T("Parent"), parentPrefix, _countof(parentPrefix), _T(""));
 
-    if (*parentPrefix != _T('\0'))
+    auto isInt = [] (LPCWSTR s) -> bool
+    { 
+        do
+        {
+            if (!iswdigit(*s))
+            {
+                return false;
+            }
+        }
+        while (*++s != _T('\0'));
+
+        return true;
+    };
+
+    if (*parentPrefix == _T('\0')
+        || _tcsicmp(parentPrefix, L"VirtualDesktop") == 0
+        || (_tcsnicmp(parentPrefix, L"Monitor", _countof(L"Monitor") - 1) == 0 && isInt(parentPrefix + _countof(L"Monitor") - 1))
+        )
     {
-        mWindow = new Window(parentPrefix, mSettings, this);
+        mWindow = gLSModule.CreateDrawableWindow(mSettings, this);
     }
     else
     {
-        mWindow = gLSModule.CreateDrawableWindow(mSettings, this);
+        mWindow = new Window(parentPrefix, mSettings, this);
     }
 
     mEventHandler = new EventHandler(mSettings);

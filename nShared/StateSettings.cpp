@@ -100,6 +100,7 @@ State::Settings::Settings()
     , cornerRadiusY(0.0f)
     , fontSize(12.0f)
     , fontStretch(DWRITE_FONT_STRETCH_NORMAL)
+    , fontStrokeWidth(0.0f)
     , fontStyle(DWRITE_FONT_STYLE_NORMAL)
     , fontWeight(DWRITE_FONT_WEIGHT_NORMAL)
     , outlineWidth(0.0f)
@@ -110,7 +111,6 @@ State::Settings::Settings()
     , textOffsetRight(0.0f)
     , textOffsetTop(0.0f)
     , textRotation(0.0f)
-    , textStrokeWidth(0.0f)
     , textTrimmingGranularity(DWRITE_TRIMMING_GRANULARITY_CHARACTER)
     , textVerticalAlign(DWRITE_PARAGRAPH_ALIGNMENT_NEAR)
     , wordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP)
@@ -160,7 +160,7 @@ void State::Settings::Load(::Settings* settings, Settings* defaults)
     this->textOffsetTop = settings->GetFloat(_T("TextOffsetTop"), defaults->textOffsetTop);
     this->textRotation = settings->GetFloat(_T("TextRotation"), defaults->textRotation);
 
-    this->textStrokeWidth = settings->GetFloat(_T("TextStrokeWidth"), defaults->textStrokeWidth);
+    this->fontStrokeWidth = settings->GetFloat(_T("FontStrokeWidth"), defaults->fontStrokeWidth);
     
     settings->GetString(_T("TextTrimmingGranularity"), buffer, _countof(buffer), trimmingGranularityMap.FindByA(defaults->textTrimmingGranularity)->b.c_str());
     this->textTrimmingGranularity = ParseTrimmingGranularity(buffer);
