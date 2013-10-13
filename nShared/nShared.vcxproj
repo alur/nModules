@@ -44,6 +44,7 @@
     <ClInclude Include="StateRender.hpp" />
     <ClInclude Include="StateTextRender.hpp" />
     <ClInclude Include="StateWindowData.hpp" />
+    <ClInclude Include="StrokeSettings.hpp" />
     <ClInclude Include="WindowBangs.h" />
     <ClInclude Include="WindowSettings.hpp" />
     <ClInclude Include="DWMColorVal.hpp" />
