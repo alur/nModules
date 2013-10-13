@@ -42,16 +42,6 @@
 #include "unicode.h"
 #include "utils.h"
 
-#ifdef _MSC_VER
-namespace std {
-
-// Usually defined in math.h, but not in MSVC.
-// Abstracted to work
-int isfinite(double value);
-
-}  // namespace std
-#endif
-
 namespace v8 {
 
 namespace preparser {
