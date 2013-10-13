@@ -54,7 +54,7 @@ int isnan(double x);
 int isless(double x, double y);
 int isgreater(double x, double y);
 //int fpclassify(double x);
-int signbit(double x);
+//int signbit(double x);
 
 }  // namespace std
 

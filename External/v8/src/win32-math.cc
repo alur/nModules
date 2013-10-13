@@ -75,7 +75,7 @@ int isgreater(double x, double y) {
 
 
 // Classify floating point number - usually defined in math.h
-int fpclassify(double x) {
+/*int fpclassify(double x) {
   // Use the MS-specific _fpclass() for classification.
   int flags = _fpclass(x);
 
@@ -89,18 +89,18 @@ int fpclassify(double x) {
   // All cases should be covered by the code above.
   ASSERT(flags & (_FPCLASS_SNAN | _FPCLASS_QNAN));
   return FP_NAN;
-}
+}*/
 
 
 // Test sign - usually defined in math.h
-int signbit(double x) {
+/*int signbit(double x) {
   // We need to take care of the special case of both positive
   // and negative versions of zero.
   if (x == 0)
     return _fpclass(x) & _FPCLASS_NZ;
   else
     return x < 0;
-}
+}*/
 
 }  // namespace std
 
