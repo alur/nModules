@@ -21,7 +21,7 @@ private:
 
     // IDWriteTextRender
 public:
-    HRESULT DrawGlyphRun(
+    HRESULT STDMETHODCALLTYPE DrawGlyphRun(
         LPVOID clientDrawingContext,
         FLOAT baselineOriginX,
         FLOAT baselineOriginY,
@@ -31,7 +31,7 @@ public:
         LPUNKNOWN clientDrawingEffect
     ) override;
 
-    HRESULT DrawInlineObject(
+    HRESULT STDMETHODCALLTYPE DrawInlineObject(
         LPVOID clientDrawingContext,
         FLOAT originX,
         FLOAT originY,
@@ -41,7 +41,7 @@ public:
         LPUNKNOWN clientDrawingEffect
     ) override;
 
-    HRESULT DrawStrikethrough(
+    HRESULT STDMETHODCALLTYPE DrawStrikethrough(
         LPVOID clientDrawingContext,
         FLOAT baselineOriginX,
         FLOAT baselineOriginY,
@@ -49,7 +49,7 @@ public:
         LPUNKNOWN clientDrawingEffect
     ) override;
 
-    HRESULT DrawUnderline(
+    HRESULT STDMETHODCALLTYPE DrawUnderline(
         LPVOID clientDrawingContext,
         FLOAT baselineOriginX,
         FLOAT baselineOriginY,
@@ -59,26 +59,26 @@ public:
 
     // IDWritePixelSnapping
 public:
-    HRESULT GetCurrentTransform(
+    HRESULT STDMETHODCALLTYPE GetCurrentTransform(
         LPVOID clientDrawingContext,
         DWRITE_MATRIX * transform
     ) override;
 
-    HRESULT GetPixelsPerDip(
+    HRESULT STDMETHODCALLTYPE GetPixelsPerDip(
         LPVOID clientDrawingContext,
         PFLOAT pixelsPerDip
     ) override;
 
-    HRESULT IsPixelSnappingDisabled(
+    HRESULT STDMETHODCALLTYPE IsPixelSnappingDisabled(
         LPVOID clientDrawingContext,
         LPBOOL isDisabled
     ) override;
 
     // IUnknown
 public:
-    ULONG AddRef() override;
-    ULONG Release() override;
-    HRESULT QueryInterface(REFIID riid, void **ppvObject) override;
+    ULONG STDMETHODCALLTYPE AddRef() override;
+    ULONG STDMETHODCALLTYPE Release() override;
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppvObject) override;
 
 private:
     ULONG mRefCount;
