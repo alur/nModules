@@ -423,7 +423,7 @@ bool ParseColor(LPCTSTR color, IColorVal **target)
             }
 
             // strtof does not seem to set endptr properly, due to a bug in the std. Should be fixed by 2013 RTM.
-            float value = (float)_tcstod(val3, &endPtr);
+            float value = _tcstof(val3, &endPtr);
 
             if (*endPtr != '\0')
             {

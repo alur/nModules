@@ -308,7 +308,7 @@ bool LiteStep::ParseRelated(LPCTSTR relatedString, RelatedNumber *result)
     while (*relatedString)
     {
         // strtof is broken (doesn't set endptr).
-        float number = (float)_tcstod(relatedString, const_cast<LPTSTR*>(&relatedString));
+        float number = _tcstof(relatedString, const_cast<LPTSTR*>(&relatedString));
         if (*relatedString == _T('%'))
         {
             percentage += number;

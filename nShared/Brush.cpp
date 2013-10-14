@@ -140,7 +140,7 @@ void Brush::LoadGradientStops()
         LPTSTR endPtr;
 
         IColorVal *color = ParseColor(colorToken, defaultColor.get());
-        stop = (float)_tcstod(stopToken, &endPtr);
+        stop = _tcstof(stopToken, &endPtr);
 
         this->gradientStops = (D2D1_GRADIENT_STOP*)realloc(this->gradientStops, ++this->gradientStopCount*sizeof(D2D1_GRADIENT_STOP));
         this->gradientStopColors = (IColorVal**)realloc(this->gradientStopColors, this->gradientStopCount*sizeof(IColorVal*));
