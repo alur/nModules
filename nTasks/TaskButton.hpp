@@ -36,7 +36,8 @@ public:
     explicit TaskButton(Drawable *parent, HWND hWnd, ButtonSettings &buttonSettings);
     virtual ~TaskButton();
 
-    TaskButton& operator=(const TaskButton &) /* = deleted */;
+    TaskButton(const TaskButton &) = delete;
+    TaskButton& operator=(const TaskButton &) = delete;
 
 public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);

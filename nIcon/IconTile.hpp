@@ -28,7 +28,8 @@ public:
     virtual ~IconTile();
 
 private:
-    IconTile & operator=(const IconTile &) /*= deleted*/;
+    IconTile(const IconTile &) = delete;
+    IconTile & operator=(const IconTile &) = delete;
 
 public:
     HRESULT CompareID(PCITEMID_CHILD id);

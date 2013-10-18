@@ -37,7 +37,8 @@ public:
     virtual ~TaskThumbnail();
 
 public:
-    TaskThumbnail & operator=(const TaskThumbnail &) /* = deleted */;
+    TaskThumbnail(const TaskThumbnail &) = delete;
+    TaskThumbnail & operator=(const TaskThumbnail &) = delete;
 
 public:
     LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
