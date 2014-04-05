@@ -140,6 +140,11 @@ void TaskSwitcher::HandleAltShiftTab()
 
 void TaskSwitcher::Hide()
 {
+    if (!mWindow->IsVisible())
+    {
+        return;
+    }
+
     if (mPeekTimer != 0)
     {
         mWindow->ClearCallbackTimer(mPeekTimer);
