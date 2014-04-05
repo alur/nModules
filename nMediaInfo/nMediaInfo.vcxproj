@@ -127,6 +127,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <AdditionalIncludeDirectories>$(SolutionDir)/External/TagLib/xm;$(SolutionDir)/External/TagLib/it;$(SolutionDir)/External/TagLib/s3m;$(SolutionDir)/External/TagLib/mod;$(SolutionDir)/External/TagLib/riff/wav;$(SolutionDir)/External/TagLib/riff/aiff;$(SolutionDir)/External/TagLib/riff;$(SolutionDir)/External/TagLib/trueaudio;$(SolutionDir)/External/TagLib/wavpack;$(SolutionDir)/External/TagLib/ape;$(SolutionDir)/External/TagLib/mpeg/id3v1;$(SolutionDir)/External/TagLib/mpeg/id3v2/frames;$(SolutionDir)/External/TagLib/mpeg/id3v2;$(SolutionDir)/External/TagLib/ogg/speex;$(SolutionDir)/External/TagLib/ogg/vobris;$(SolutionDir)/External/TagLib/mp4;$(SolutionDir)/External/TagLib/mpc;$(SolutionDir)/External/TagLib/flac;$(SolutionDir)/External/TagLib/ogg/flac;$(SolutionDir)/External/TagLib/ogg;$(SolutionDir)/External/TagLib/mpeg;$(SolutionDir)/External/TagLib/asf;$(SolutionDir)/External/TagLib/toolkit;$(SolutionDir)/External/TagLib</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -141,6 +142,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <AdditionalIncludeDirectories>$(SolutionDir)/External/TagLib/xm;$(SolutionDir)/External/TagLib/it;$(SolutionDir)/External/TagLib/s3m;$(SolutionDir)/External/TagLib/mod;$(SolutionDir)/External/TagLib/riff/wav;$(SolutionDir)/External/TagLib/riff/aiff;$(SolutionDir)/External/TagLib/riff;$(SolutionDir)/External/TagLib/trueaudio;$(SolutionDir)/External/TagLib/wavpack;$(SolutionDir)/External/TagLib/ape;$(SolutionDir)/External/TagLib/mpeg/id3v1;$(SolutionDir)/External/TagLib/mpeg/id3v2/frames;$(SolutionDir)/External/TagLib/mpeg/id3v2;$(SolutionDir)/External/TagLib/ogg/speex;$(SolutionDir)/External/TagLib/ogg/vobris;$(SolutionDir)/External/TagLib/mp4;$(SolutionDir)/External/TagLib/mpc;$(SolutionDir)/External/TagLib/flac;$(SolutionDir)/External/TagLib/ogg/flac;$(SolutionDir)/External/TagLib/ogg;$(SolutionDir)/External/TagLib/mpeg;$(SolutionDir)/External/TagLib/asf;$(SolutionDir)/External/TagLib/toolkit;$(SolutionDir)/External/TagLib</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -163,9 +165,10 @@
       <OmitFramePointers>true</OmitFramePointers>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <SDLCheck>true</SDLCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PreprocessorDefinitions>NDEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -190,9 +193,10 @@
       <OmitFramePointers>true</OmitFramePointers>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <SDLCheck>true</SDLCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PreprocessorDefinitions>NDEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -216,9 +220,10 @@
       <OmitFramePointers>true</OmitFramePointers>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <SDLCheck>true</SDLCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PreprocessorDefinitions>NDEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -242,10 +247,11 @@
       <OmitFramePointers>true</OmitFramePointers>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <SDLCheck>true</SDLCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PreprocessorDefinitions>NDEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>false</GenerateDebugInformation>

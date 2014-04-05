@@ -41,8 +41,6 @@
     <ClInclude Include="Overlay.hpp" />
     <ClInclude Include="Settings.hpp" />
     <ClInclude Include="Version.h" />
-    <ClInclude Include="Coordinate.hpp" />
-    <ClInclude Include="Length.hpp" />
     <ClInclude Include="Brush.hpp">
       <Filter>Brushes</Filter>
     </ClInclude>
@@ -137,8 +135,6 @@
     <ClCompile Include="Tooltip.cpp">
       <Filter>Drawables</Filter>
     </ClCompile>
-    <ClCompile Include="Coordinate.cpp" />
-    <ClCompile Include="Length.cpp" />
     <ClCompile Include="Brush.cpp">
       <Filter>Brushes</Filter>
     </ClCompile>
