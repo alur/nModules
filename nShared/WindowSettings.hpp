@@ -10,7 +10,6 @@
 #include <d2d1.h>
 #include <dwrite.h>
 #include "Settings.hpp"
-#include "Length.hpp"
 
 class WindowSettings
 {
