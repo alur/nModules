@@ -6,9 +6,11 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
+#include "../Utilities/StringUtils.h"
 #include "../nShared/LSModule.hpp"
 #include <strsafe.h>
 #include <map>
+#include <unordered_map>
 #include "Popup.hpp"
 #include "PopupItem.hpp"
 #include "SeparatorItem.hpp"
@@ -30,7 +32,7 @@ LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSIO
 UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
 // All root level popups
-vector<Popup*> rootPopups;
+std::unordered_map<LPCTSTR, Popup*, CStringComparatorNoCase, CStringComparatorNoCase> rootPopups;
 
 
 /// <summary>
@@ -60,10 +62,10 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
 /// </summary>
 EXPORT_CDECL(void) quitModule(HINSTANCE /* hDllInstance */)
 {
-    for (Popup *popup : rootPopups)
+    for (auto & popup : rootPopups)
     {
-        LiteStep::RemoveBangCommand(popup->GetBang());
-        delete popup;
+        LiteStep::RemoveBangCommand(popup.second->GetBang());
+        delete popup.second;
     }
     LiteStep::RemoveBangCommand(TEXT("!PopupDynamicFolder"));
     gLSModule.DeInitalize();
@@ -107,15 +109,10 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// </summary>
 void __cdecl HandlePopupBang(HWND /* owner */, LPCTSTR bang, LPCTSTR /* args */)
 {
-    for (vector<Popup*>::const_iterator iter = rootPopups.begin(); iter != rootPopups.end(); ++iter)
+    auto popup = rootPopups.find(bang);
+    if (popup != rootPopups.end())
     {
-        if (_tcsicmp(bang, (*iter)->GetBang()) == 0)
-        {
-            Popup* popup = *iter;
-            popup->Show();
-
-            break;
-        }
+        popup->second->Show();
     }
 }
 
@@ -134,7 +131,7 @@ void LoadSettings()
 /// </summary>
 void AddPopup(Popup* popup)
 {
-    rootPopups.push_back(popup);
+    rootPopups[popup->GetBang()] = popup;
     LiteStep::AddBangCommandEx(popup->GetBang(), HandlePopupBang);
 }
 
