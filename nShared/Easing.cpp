@@ -6,8 +6,20 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "Easing.h"
+#include "../Utilities/UnorderedMap.hpp"
 #include <cmath>
 #include <tchar.h>
+
+
+/// <summary>
+/// Easing Name -> Easing::Type
+/// </summary>
+static const UnorderedCaselessCStringMap<Easing::Type> sStringToEasing({
+    { _T("Cubic"), Easing::Type::Cubic },
+    { _T("Sine"), Easing::Type::Sine },
+    { _T("Bounce"), Easing::Type::Bounce },
+    { _T("Linear"), Easing::Type::Linear }
+});
 
 
 /// <summary>
@@ -35,14 +47,11 @@ float Easing::Transform(float progress, Type easingType)
     }
 }
 
- 
+
 /// <summary>
 /// Parses a string into an easing.
 /// </summary>
 Easing::Type Easing::EasingFromString(LPCTSTR str)
 {
-    if (_tcsicmp(str, _T("Cubic"))) return Type::Cubic;
-    if (_tcsicmp(str, _T("Sine"))) return Type::Sine;
-    if (_tcsicmp(str, _T("Bounce"))) return Type::Bounce;
-    return Type::Linear;
+    return sStringToEasing.Get(str, Type::Linear);
 }

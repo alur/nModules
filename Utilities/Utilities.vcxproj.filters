@@ -17,6 +17,7 @@
     <ClInclude Include="Error.h" />
     <ClInclude Include="Unordered1To1Map.hpp" />
     <ClInclude Include="CRC.h" />
+    <ClInclude Include="UnorderedMap.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StringUtils.cpp" />

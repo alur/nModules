@@ -15,6 +15,6 @@ public:
     virtual ~FolderPopup();
 
 protected:
-    void PreShow();
-    void PostClose();
+    void PreShow() override;
+    void PostClose() override;
 };

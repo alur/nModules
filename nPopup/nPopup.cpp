@@ -6,7 +6,7 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
-#include "../Utilities/StringUtils.h"
+#include "../Utilities/UnorderedMap.hpp"
 #include "../nShared/LSModule.hpp"
 #include <strsafe.h>
 #include <map>
@@ -32,7 +32,7 @@ LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSIO
 UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
 // All root level popups
-std::unordered_map<LPCTSTR, Popup*, CStringComparatorNoCase, CStringComparatorNoCase> rootPopups;
+static UnorderedCaselessCStringMap<Popup*> rootPopups;
 
 
 /// <summary>
@@ -109,10 +109,10 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// </summary>
 void __cdecl HandlePopupBang(HWND /* owner */, LPCTSTR bang, LPCTSTR /* args */)
 {
-    auto popup = rootPopups.find(bang);
-    if (popup != rootPopups.end())
+    Popup * popup = rootPopups.Get(bang, nullptr);
+    if (popup != nullptr)
     {
-        popup->second->Show();
+        popup->Show();
     }
 }
 
@@ -131,7 +131,7 @@ void LoadSettings()
 /// </summary>
 void AddPopup(Popup* popup)
 {
-    rootPopups[popup->GetBang()] = popup;
+    rootPopups.Emplace(popup->GetBang(), popup);
     LiteStep::AddBangCommandEx(popup->GetBang(), HandlePopupBang);
 }
 

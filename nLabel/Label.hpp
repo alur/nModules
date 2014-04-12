@@ -8,19 +8,24 @@
 #pragma once
 
 #include "../nShared/Drawable.hpp"
-#include "../nShared/Window.hpp"
 #include "../nShared/StateRender.hpp"
+#include "../nShared/Window.hpp"
 
+#include <forward_list>
+#include <unordered_map>
 
 class Label : public Drawable
 {
 public:
     explicit Label(LPCTSTR name);
-    explicit Label(LPCTSTR name, Drawable* parent);
+    explicit Label(LPCTSTR name, Drawable * parent);
     virtual ~Label();
-    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
+    // IDrawable
 private:
+    LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID) override;
+
+public:
     enum class States
     {
         Base = 0,
@@ -30,10 +35,10 @@ private:
 
 private:
     void Initalize();
-    void LoadSettings(bool isRefresh = false);
+    void LoadOverlays();
 
+private:
     StateRender<States> mStateRender;
     
-    list<Label*> mOverlays;
-    map<wstring, Label*>::iterator mAllLabelsIter;
+    std::forward_list<Label> mOverlays;
 };

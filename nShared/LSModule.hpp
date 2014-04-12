@@ -14,9 +14,6 @@
 #include "Drawable.hpp"
 
 
-using namespace std;
-
-
 // Functions which all modules must implement.
 LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 EXPORT_CDECL(int) initModuleEx(HWND parent, HINSTANCE instance, LPCSTR path);

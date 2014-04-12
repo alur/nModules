@@ -64,13 +64,13 @@ private:
     bool loaded;
 
     // If the source is a folder, the path to it.
-    list<LPCTSTR> paths;
+    std::list<LPCTSTR> paths;
 
     // What to retrive the popup contents from.
     ContentSource source;
 
     // Message, SHChangeNofityRegister return value, IShellFolder
-    typedef map<UINT, std::pair<ULONG, IShellFolder*> > WATCHFOLDERMAP;
+    typedef std::map<UINT, std::pair<ULONG, IShellFolder *>> WATCHFOLDERMAP;
 
     // Folders which this popup is watching for changes.
     WATCHFOLDERMAP watchedFolders;

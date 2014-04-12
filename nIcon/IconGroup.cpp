@@ -682,10 +682,10 @@ void IconGroup::EndRectangleSelection(D2D1_POINT_2U point) {
     mWindow->Repaint(&mSelectionRectagle.GetRect());
 
     D2D1_RECT_F rect = D2D1::RectF(
-        float(min(mRectangleStart.x, point.x)),
-        float(min(mRectangleStart.y, point.y)),
-        float(max(mRectangleStart.x, point.x)),
-        float(max(mRectangleStart.y, point.y))
+        float(std::min(mRectangleStart.x, point.x)),
+        float(std::min(mRectangleStart.y, point.y)),
+        float(std::max(mRectangleStart.x, point.x)),
+        float(std::max(mRectangleStart.y, point.y))
     );
 
     for (IconTile *tile : mIcons) {
@@ -707,10 +707,10 @@ void IconGroup::EndRectangleSelection(D2D1_POINT_2U point) {
 /// </summary>
 void IconGroup::MoveRectangleSelection(D2D1_POINT_2U point) {
     D2D1_RECT_F rect = D2D1::RectF(
-        float(min(mRectangleStart.x, point.x)),
-        float(min(mRectangleStart.y, point.y)),
-        float(max(mRectangleStart.x, point.x)),
-        float(max(mRectangleStart.y, point.y))
+        float(std::min(mRectangleStart.x, point.x)),
+        float(std::min(mRectangleStart.y, point.y)),
+        float(std::max(mRectangleStart.x, point.x)),
+        float(std::max(mRectangleStart.y, point.y))
     );
 
     mWindow->Repaint(&mSelectionRectagle.GetRect());

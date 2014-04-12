@@ -14,16 +14,12 @@
 #include "../Utilities/Math.h"
 
 
-Popup::Popup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Drawable(prefix) {
-    if (bang != NULL) {
-        this->bang = _tcsdup(bang);
-    }
-    else {
-        this->bang = NULL;
-    }
-    this->openChild = NULL;
-    this->owner = NULL;
-
+Popup::Popup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix)
+    : Drawable(prefix)
+    , bang(bang != nullptr ? _tcsdup(bang) : nullptr)
+    , openChild(nullptr)
+    , owner(nullptr)
+{
     this->itemSpacing = mSettings->GetInt(_T("ItemSpacing"), 2);
     this->maxWidth = mSettings->GetInt(_T("MaxWidth"), 300);
     this->noIcons = mSettings->GetBool(_T("NoIcons"), false);
@@ -59,21 +55,25 @@ Popup::Popup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Drawable(prefix) {
 }
 
 
-Popup::~Popup() {
-    for (vector<PopupItem*>::const_iterator iter = this->items.begin(); iter != this->items.end(); iter++) {
-        delete *iter;
+Popup::~Popup()
+{
+    for (PopupItem * item : this->items)
+    {
+        delete item;
     }
-    this->items.clear();
-    if (this->bang != NULL) {
+    if (this->bang != nullptr)
+    {
         free((LPVOID)this->bang);
     }
 }
 
 
-void Popup::AddItem(PopupItem* item) {
+void Popup::AddItem(PopupItem* item)
+{
     this->items.push_back(item);
     this->sized = false;
-    if (mWindow->IsVisible()) {
+    if (mWindow->IsVisible())
+    {
         /*MonitorInfo* monInfo = mWindow->GetMonitorInformation();
         RECT limits = monInfo->m_virtualDesktop.rect;
 
@@ -93,28 +93,34 @@ void Popup::AddItem(PopupItem* item) {
 }
 
 
-void Popup::RemoveItem(PopupItem* /* item */) {
+void Popup::RemoveItem(PopupItem* /* item */)
+{
 }
 
 
-void Popup::CloseChild(bool closing) {
-    if (this->openChild != NULL) {
-        if (!closing) {
+void Popup::CloseChild(bool closing)
+{
+    if (this->openChild != nullptr)
+    {
+        if (!closing)
+        {
             SetFocus(mWindow->GetWindowHandle());
             SetActiveWindow(mWindow->GetWindowHandle());
         }
 
-        this->openChild->owner = NULL;
+        this->openChild->owner = nullptr;
         ((nPopup::FolderItem*)this->childItem)->ClosingPopup();
         this->openChild->Close();
-        this->childItem = NULL;
-        this->openChild = NULL;
+        this->childItem = nullptr;
+        this->openChild = nullptr;
     }
 }
 
 
-void Popup::OpenChild(Popup* child, LPRECT position, PopupItem* childItem) {
-    if (child != this->openChild) {
+void Popup::OpenChild(Popup* child, LPRECT position, PopupItem* childItem)
+{
+    if (child != this->openChild)
+    {
         CloseChild();
         this->openChild = child;
         this->childItem = childItem;
@@ -128,12 +134,14 @@ void Popup::OpenChild(Popup* child, LPRECT position, PopupItem* childItem) {
 }
 
 
-LPCTSTR Popup::GetBang() {
+LPCTSTR Popup::GetBang()
+{
     return this->bang;
 }
 
 
-bool Popup::CheckFocus(HWND newActive, __int8 direction) {
+bool Popup::CheckFocus(HWND newActive, __int8 direction)
+{
     if (mWindow->GetWindowHandle() == newActive || this->mouseOver)
         return true;
     return direction & 1 && this->owner && this->owner->CheckFocus(newActive, 1)
@@ -148,26 +156,28 @@ void Popup::Close()
     CloseChild(true);
     //PostClose();
     this->mouseOver = false;
-    if (this->owner != NULL)
+    if (this->owner != nullptr)
     {
-        this->owner->openChild = NULL;
+        this->owner->openChild = nullptr;
         ((nPopup::FolderItem*)this->owner->childItem)->ClosingPopup();
-        this->owner->childItem = NULL;
+        this->owner->childItem = nullptr;
         Popup* owner = this->owner;
-        this->owner = NULL;
+        this->owner = nullptr;
         owner->Close();
     }
 }
 
 
-void Popup::Show() {
+void Popup::Show()
+{
     POINT pt;
     GetCursorPos(&pt);
     Show(pt.x, pt.y);
 }
 
 
-void Popup::Show(int x, int y) {
+void Popup::Show(int x, int y)
+{
     RECT r;
     r.left = x - 1; r.right = x + 1;
     r.top = y - 1; r.bottom = y + 1;
@@ -186,7 +196,7 @@ void Popup::Size(LPRECT limits)
     {
         item->Position(this->padding.left, height);
         height += item->GetHeight() + this->itemSpacing;
-        itemWidth = max(itemWidth, item->GetDesiredWidth(maxItemWidth));
+        itemWidth = std::max(itemWidth, item->GetDesiredWidth(maxItemWidth));
     }
     width = itemWidth + this->padding.left + this->padding.right;
     height += this->padding.bottom - this->itemSpacing;
@@ -203,7 +213,7 @@ void Popup::Size(LPRECT limits)
         for (PopupItem *item : this->items)
         {
             item->Position(this->padding.left + (columnWidth + this->itemSpacing) * column, height);
-            rowHeight = max(item->GetHeight() + this->itemSpacing, rowHeight);
+            rowHeight = std::max(item->GetHeight() + this->itemSpacing, rowHeight);
             column++;
             if (column == columns)
             {
@@ -231,9 +241,10 @@ void Popup::Size(LPRECT limits)
 }
 
 
-void Popup::Show(LPRECT position, Popup* owner) {
+void Popup::Show(LPRECT position, Popup* owner)
+{
     this->owner = owner;
-    SetParent(mWindow->GetWindowHandle(), NULL);
+    SetParent(mWindow->GetWindowHandle(), nullptr);
     PreShow();
 
     MonitorInfo* monInfo = mWindow->GetMonitorInformation();
@@ -275,7 +286,7 @@ void Popup::Show(LPRECT position, Popup* owner) {
         }
     }
 
-    y = max<int>(limits.top, min<int>(limits.bottom - int(mWindow->GetSize().height + 0.5f), position->top));
+    y = std::max<int>(limits.top, std::min<int>(limits.bottom - int(mWindow->GetSize().height + 0.5f), position->top));
 
     mWindow->Move((float)x, (float)y);
 
@@ -286,7 +297,8 @@ void Popup::Show(LPRECT position, Popup* owner) {
 }
 
 
-LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
+LRESULT Popup::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID)
+{
     switch (msg)
     {
     case Window::WM_HIDDEN:

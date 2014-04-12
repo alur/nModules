@@ -12,6 +12,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include <functional>
 #include <initializer_list>
 
 
@@ -74,6 +75,15 @@ public:
         {
             *element++ = initalizer;
         }
+    }
+
+    
+    /// <summary>
+    /// Callback constructor.
+    /// </summary>
+    explicit EnumArray(std::function<void (EnumArray<ElementType, IndexType> &)> init)
+    {
+        init(*this);
     }
 
 public:

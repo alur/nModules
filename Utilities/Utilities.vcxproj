@@ -261,6 +261,7 @@
     <ClInclude Include="StringUtils.h" />
     <ClInclude Include="UIDGenerator.hpp" />
     <ClInclude Include="Unordered1To1Map.hpp" />
+    <ClInclude Include="UnorderedMap.hpp" />
     <ClInclude Include="Versioning.h" />
   </ItemGroup>
   <ItemGroup>

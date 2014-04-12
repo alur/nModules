@@ -35,6 +35,7 @@ namespace LiteStep
     void IterateOverLines(LPCTSTR keyName, std::function<void (LPCTSTR line)> callback);
     void IterateOverTokens(LPCTSTR line, std::function<void (LPCTSTR token)> callback);
     void IterateOverLineTokens(LPCTSTR keyName, std::function<void (LPCTSTR token)> callback);
+    void IterateOverCommandLineTokens(LPCTSTR prefix, LPCTSTR keyName, std::function<void (LPCTSTR token)> callback);
 
     // Parsing functions
     bool ParseBool(LPCTSTR boolString);

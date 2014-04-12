@@ -226,7 +226,7 @@ void Taskbar::Relayout()
         spacePerLine = size->width - mLayoutSettings.mPadding.left - mLayoutSettings.mPadding.right;
         lines = floorf((size->height + mLayoutSettings.mRowSpacing - mLayoutSettings.mPadding.top - mLayoutSettings.mPadding.bottom)/(mLayoutSettings.mRowSpacing + mButtonHeight));
         // We need to consider that buttons can't be split between multiple lines.
-        buttonSize = min((float)mButtonMaxWidth, min(spacePerLine * lines / (float)mButtonMap.size(), spacePerLine / ceil(mButtonMap.size() / (float)lines)) - mLayoutSettings.mColumnSpacing);
+        buttonSize = std::min((float)mButtonMaxWidth, std::min(spacePerLine * lines / (float)mButtonMap.size(), spacePerLine / ceil(mButtonMap.size() / (float)lines)) - mLayoutSettings.mColumnSpacing);
         if (ydir == -1)
         {
             y0 -= mButtonHeight;
@@ -253,7 +253,7 @@ void Taskbar::Relayout()
     {
         spacePerLine = size->height - mLayoutSettings.mPadding.top - mLayoutSettings.mPadding.bottom;
         lines = floorf((size->width + mLayoutSettings.mColumnSpacing - mLayoutSettings.mPadding.left - mLayoutSettings.mPadding.right)/(mLayoutSettings.mColumnSpacing + mButtonWidth));
-        buttonSize = min((float)mButtonMaxHeight, min(spacePerLine * lines / (float)mButtonMap.size(), spacePerLine / ceil(mButtonMap.size() / (float)lines)) - mLayoutSettings.mRowSpacing);
+        buttonSize = std::min((float)mButtonMaxHeight, std::min(spacePerLine * lines / (float)mButtonMap.size(), spacePerLine / ceil(mButtonMap.size() / (float)lines)) - mLayoutSettings.mRowSpacing);
         if (ydir == -1)
         {
             y0 -= buttonSize;

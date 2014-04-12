@@ -70,7 +70,7 @@ public:
         Settings();
 
         // Loads the actual settings.
-        void Load(::Settings* settings, Settings* defaults);
+        void Load(const ::Settings * settings, const Settings * defaults);
     
     public:
         static DWRITE_FONT_STRETCH ParseFontStretch(LPCTSTR string);
@@ -153,8 +153,8 @@ public:
     virtual ~State();
 
 public:
-    void Load(Settings* defaultSettings, ::Settings *settings, LPCTSTR name);
-    Settings* GetSettings();
+    void Load(const Settings * defaultSettings, const ::Settings * settings, LPCTSTR name);
+    const Settings * GetSettings();
         
     // Gets the "desired" size for a given width and height.
     void GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size, class Window *window);
@@ -191,7 +191,7 @@ public:
     LPCTSTR mName;
 
     // Settings.
-    ::Settings* settings;
+    const ::Settings * settings;
 
 private:
     // Creates the text format for this state.

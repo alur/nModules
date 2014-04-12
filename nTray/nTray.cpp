@@ -15,7 +15,7 @@
 
 
 using std::map;
-using std::string;
+using std::tstring;
 
 
 #define TIMER_INIT_COMPLETED 1

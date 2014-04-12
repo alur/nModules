@@ -9,21 +9,22 @@
 #include "FolderPopup.hpp"
 
 
-FolderPopup::FolderPopup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix) : Popup(title, bang, prefix) {
-
+FolderPopup::FolderPopup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix)
+    : Popup(title, bang, prefix)
+{
 }
 
 
-FolderPopup::~FolderPopup() {
-
+FolderPopup::~FolderPopup()
+{
 }
 
 
-void FolderPopup::PreShow() {
-
+void FolderPopup::PreShow()
+{
 }
 
 
-void FolderPopup::PostClose() {
-
+void FolderPopup::PostClose()
+{
 }

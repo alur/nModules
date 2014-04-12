@@ -5,76 +5,41 @@
  *  Maintains a list of drawables.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#include "../Utilities/StringUtils.h"
+
 #include "../nShared/LiteStep.h"
 #include "../nShared/Window.hpp"
-#include <string>
-#include <unordered_map>
-#include <functional>
+
 #include <algorithm>
 #include <ctype.h>
+#include <functional>
 
 
-using std::unordered_map;
-using std::wstring;
+static StringKeyedMaps<std::wstring, Window *>::UnorderedMap sRegisteredWindows;
+static StringKeyedMaps<std::wstring, std::list<Window *>>::UnorderedMap sRegistrationListeners;
 
 
-struct wstring_nocase
+EXPORT_CDECL(void) RegisterWindow(LPCWSTR prefix, Window * window)
 {
-    wstring_nocase(LPCWSTR str)
-        : str(str)
-    {
-        std::transform(this->str.begin(), this->str.end(), this->str.begin(), ::towlower);
-    }
-    std::wstring str;
-};
-
-namespace std
-{
-    template<>
-    struct hash<wstring_nocase>
-    {
-        size_t operator()(wstring_nocase const & s) const
-        {
-            return hash<wstring>()(s.str);
-        }
-    };
-
-    template<>
-    struct equal_to<wstring_nocase>
-    {
-        bool operator()(wstring_nocase const & s1, wstring_nocase const & s2) const
-        {
-            return std::equal_to<wstring>()(s1.str, s2.str);
-        }
-    };
-}
-
-
-static unordered_map<wstring_nocase, Window*> registeredWindows;
-static unordered_map<wstring_nocase, list<Window*> > registrationListeners;
-
-
-EXPORT_CDECL(void) RegisterWindow(LPCWSTR prefix, Window *window)
-{
-    registeredWindows[prefix] = window;
-    for (auto listener : registrationListeners[prefix])
+    sRegisteredWindows[prefix] = window;
+    for (auto listener : sRegistrationListeners[prefix])
     {
         listener->SetParent(window);
     }
-    registrationListeners[prefix].clear();
+    sRegistrationListeners[prefix].clear();
 }
 
 
 EXPORT_CDECL(void) UnRegisterWindow(LPCWSTR prefix)
 {
-    registeredWindows.erase(prefix);
+    sRegisteredWindows.erase(prefix);
 }
 
 
 EXPORT_CDECL(Window*) FindRegisteredWindow(LPCWSTR prefix)
 {
-    auto iter = registeredWindows.find(prefix);
-    if (iter != registeredWindows.end())
+    auto iter = sRegisteredWindows.find(prefix);
+    if (iter != sRegisteredWindows.end())
     {
         return iter->second;
     }
@@ -82,13 +47,13 @@ EXPORT_CDECL(Window*) FindRegisteredWindow(LPCWSTR prefix)
 }
 
 
-EXPORT_CDECL(void) AddWindowRegistrationListener(LPCWSTR prefix, Window *listener)
+EXPORT_CDECL(void) AddWindowRegistrationListener(LPCWSTR prefix, Window * listener)
 {
-    registrationListeners[prefix].push_back(listener);
+    sRegistrationListeners[prefix].push_back(listener);
 }
 
 
-EXPORT_CDECL(void) RemoveWindowRegistrationListener(LPCWSTR prefix, Window *listener)
+EXPORT_CDECL(void) RemoveWindowRegistrationListener(LPCWSTR prefix, Window * listener)
 {
-    registrationListeners[prefix].remove(listener);
+    sRegistrationListeners[prefix].remove(listener);
 }

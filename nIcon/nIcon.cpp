@@ -13,12 +13,16 @@
 #include "Version.h"
 
 
+using std::map;
+using std::tstring;
+
+
 // The messages we want from the core
 const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
     LM_FULLSCREENDEACTIVATED, 0 };
 
 // All current icon groups
-static map<wstring, IconGroup> gIconGroups;
+static map<tstring, IconGroup> gIconGroups;
 
 // The LiteStep module class
 LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));

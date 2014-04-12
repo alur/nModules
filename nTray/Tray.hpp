@@ -117,10 +117,10 @@ private:
 
 private:
     // Balloons queued up to be displayed.
-    list<BalloonData> queuedBalloons;
+    std::list<BalloonData> queuedBalloons;
 
     //
-    list<IconID> mHiddenIconIDs;
+    std::list<IconID> mHiddenIconIDs;
 
     // Loads .rc settings for this tray.
     void LoadSettings(bool isRefresh = false);

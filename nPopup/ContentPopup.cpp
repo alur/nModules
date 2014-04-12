@@ -53,7 +53,7 @@ ContentPopup::~ContentPopup()
     }
     this->watchedFolders.clear();
 
-    for (list<LPCTSTR>::const_iterator iter = this->paths.begin(); iter != this->paths.end(); ++iter)
+    for (std::list<LPCTSTR>::const_iterator iter = this->paths.begin(); iter != this->paths.end(); ++iter)
     {
         free((LPVOID)*iter);
     }
@@ -132,7 +132,7 @@ void ContentPopup::LoadContent()
         break;
     
     case PATH:
-        for (list<LPCTSTR>::const_iterator iter = paths.begin(); iter != paths.end(); ++iter)
+        for (std::list<LPCTSTR>::const_iterator iter = paths.begin(); iter != paths.end(); ++iter)
         {
             LoadPath(*iter);
         }
@@ -313,10 +313,10 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
             }
             time += watch.Clock();
 
-            if (!this->noIcons && item != NULL)
+            if (!this->noIcons && item != nullptr)
             {
                 // Get the IExtractIcon interface for this item.
-                hr = targetFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&itemID, IID_IExtractIconW, NULL, reinterpret_cast<LPVOID*>(&extractIcon));
+                hr = targetFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *)&itemID, IID_IExtractIconW, nullptr, reinterpret_cast<LPVOID*>(&extractIcon));
 
                 if (SUCCEEDED(hr))
                 {
@@ -324,7 +324,7 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
                 }
             }
 
-            if (item != NULL)
+            if (item != nullptr)
             {
                 AddItem(item);
             }

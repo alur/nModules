@@ -87,8 +87,8 @@ private:
     //
     RECT padding;
 
-    //
-    LPCTSTR bang;
+    // The bang command used to open this popup, if it's a root popup. This pointer is also stored in rootpopup.
+    const LPCTSTR bang;
 
     // True if the popup is already sized properly.
     bool sized;

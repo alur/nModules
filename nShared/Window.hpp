@@ -30,17 +30,12 @@
 #include <set>
 
 
-using std::vector;
-using std::list;
-using std::map;
-
-
 class Window : MessageHandler, IDropTarget
 {
     // typedefs
 public:
-    typedef PointerIterator<list<Overlay*>::iterator, Overlay> OVERLAY;
-    typedef PointerIterator<list<IPainter*>::iterator, IPainter> PAINTER;
+    typedef PointerIterator<std::list<Overlay*>::iterator, Overlay> OVERLAY;
+    typedef PointerIterator<std::list<IPainter*>::iterator, IPainter> PAINTER;
 
 public:
     friend class UpdateLock;
@@ -381,7 +376,7 @@ private:
     RelatedRect mAnimationTarget;
 
     // The children of this Window.
-    list<Window*> children;
+    std::list<Window*> children;
 
     // The area we draw in.
     D2D1_RECT_F drawingArea;
@@ -408,7 +403,7 @@ private:
     MonitorInfo* monitorInfo;
 
     // All current overlays.
-    list<Overlay*> overlays;
+    std::list<Overlay*> overlays;
 
     // The Window which is this windows parent.
     Window *mParent;
@@ -417,10 +412,10 @@ private:
     IParsedText* parsedText;
 
     // Painters called after children and overlays are painted.
-    list<IPainter*> postPainters;
+    std::list<IPainter*> postPainters;
 
     // Painters called before children and overlays are painted.
-    list<IPainter*> prePainters;
+    std::list<IPainter*> prePainters;
 
     // Timer ID generator.
     UIDGenerator<UINT_PTR>* timerIDs;

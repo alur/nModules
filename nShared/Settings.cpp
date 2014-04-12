@@ -29,7 +29,7 @@ Settings::Settings(LPCTSTR prefix)
 /// Creates a deep copy of the specified group.
 /// </summary>
 /// <param name="settings">The settings to copy.</param>
-Settings::Settings(LPSettings settings)
+Settings::Settings(LPCSettings settings)
 {
     StringCchCopy(mPrefix, _countof(mPrefix), settings->mPrefix);
     if (settings->mGroup != nullptr)
@@ -90,7 +90,7 @@ LPSettings Settings::CreateChild(LPCTSTR prefix) const
 /// Appends the specified prefix to the end of the group list. Essentially, lets these
 /// settings fall back to that group as a default.
 /// </summary>
-void Settings::AppendGroup(LPSettings group)
+void Settings::AppendGroup(LPCSettings group)
 {
     LPSettings tail;
     for (tail = this; tail->mGroup != nullptr; tail = tail->mGroup.get());
@@ -414,7 +414,7 @@ void Settings::SetString(LPCTSTR key, LPCTSTR value) const
 /// </summary>
 /// <param name="key">The key to read.</param>
 /// <param name="defaultValue">The default x/y/width/height, if not specified.</param>
-RECT Settings::GetRect(LPCTSTR key, LPRECT defaultValue) const
+RECT Settings::GetRect(LPCTSTR key, LPCRECT defaultValue) const
 {
     return GetRect(key, defaultValue->left, defaultValue->top, defaultValue->right - defaultValue->left, defaultValue->bottom - defaultValue->top);
 }
@@ -451,7 +451,7 @@ RECT Settings::GetRect(LPCTSTR key, LONG defX, LONG defY, LONG defWidth, LONG de
 /// </summary>
 /// <param name="key">The key to set.</param>
 /// <param name="value">The source RECT.</param>
-void Settings::SetRect(LPCTSTR key, LPRECT value) const
+void Settings::SetRect(LPCTSTR key, LPCRECT value) const
 {
     TCHAR xKey[MAX_RCCOMMAND], yKey[MAX_RCCOMMAND], widthKey[MAX_RCCOMMAND], heightKey[MAX_RCCOMMAND];
     StringCchPrintf(xKey, _countof(xKey), _T("%sX"), key);
@@ -471,7 +471,7 @@ void Settings::SetRect(LPCTSTR key, LPRECT value) const
 /// </summary>
 /// <param name="key">The key to read.</param>
 /// <param name="defaultValue">The default value.</param>
-RECT Settings::GetOffsetRect(LPCTSTR key, LPRECT defaultValue) const
+RECT Settings::GetOffsetRect(LPCTSTR key, LPCRECT defaultValue) const
 {
     return GetOffsetRect(key, defaultValue->left, defaultValue->top, defaultValue->right, defaultValue->bottom);
 }
@@ -508,7 +508,7 @@ RECT Settings::GetOffsetRect(LPCTSTR key, LONG defLeft, LONG defTop, LONG defRig
 /// </summary>
 /// <param name="key">The key to set.</param>
 /// <param name="value">The source RECT.</param>
-void Settings::SetOffsetRect(LPCTSTR key, LPRECT value) const
+void Settings::SetOffsetRect(LPCTSTR key, LPCRECT value) const
 {
     TCHAR leftKey[MAX_RCCOMMAND], topKey[MAX_RCCOMMAND], rightKey[MAX_RCCOMMAND], bottomKey[MAX_RCCOMMAND];
     StringCchPrintf(leftKey, _countof(leftKey), _T("%sLeft"), key);
@@ -528,7 +528,7 @@ void Settings::SetOffsetRect(LPCTSTR key, LPRECT value) const
 /// </summary>
 /// <param name="key">The key to read.</param>
 /// <param name="defaultValue">The default value.</param>
-D2D1_RECT_F Settings::GetOffsetRectF(LPCTSTR key, D2D1_RECT_F *defaultValue) const
+D2D1_RECT_F Settings::GetOffsetRectF(LPCTSTR key, const D2D1_RECT_F * defaultValue) const
 {
     TCHAR leftKey[MAX_RCCOMMAND], topKey[MAX_RCCOMMAND], rightKey[MAX_RCCOMMAND], bottomKey[MAX_RCCOMMAND];
     StringCchPrintf(leftKey, _countof(leftKey), _T("%sLeft"), key);
@@ -547,10 +547,11 @@ D2D1_RECT_F Settings::GetOffsetRectF(LPCTSTR key, D2D1_RECT_F *defaultValue) con
 
 
 /// <summary>
-/// 
+/// Iterates over lines of the form *PrefixKey.
 /// </summary>
-/// <param name="key"></param>
-void Settings::IterateOverStars(LPCTSTR key, function<void (LPCTSTR token)> callback) const
+/// <param name="key">Key of the lines to iterate over.</param>
+/// <param name="callback">Function to call for each line.</param>
+void Settings::IterateOverCommandLines(LPCTSTR key, function<void (LPCTSTR line)> callback) const
 {
     TCHAR keyPrefix[MAX_RCCOMMAND];
 

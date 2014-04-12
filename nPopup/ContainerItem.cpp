@@ -13,6 +13,9 @@
 #include "../Utilities/Math.h"
 
 
+using std::min;
+
+
 ContainerItem::ContainerItem(Drawable* parent, LPCTSTR prefix)
     : PopupItem(parent, prefix, PopupItem::Type::Container, true)
 {

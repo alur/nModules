@@ -214,6 +214,23 @@ void LiteStep::IterateOverLineTokens(LPCTSTR keyName, function<void (LPCTSTR tok
 
 
 /// <summary>
+/// Iterates over all tokens in all lines with the specified key name.
+/// </summary>
+/// <param name="prefix">Key-prefix of the lines to iterate over.</param>
+/// <param name="keyName">Key of the lines to iterate over.</param>
+/// <param name="callback">Callback function to be called for each token.</param>
+void LiteStep::IterateOverCommandLineTokens(LPCTSTR prefix, LPCTSTR keyName, function<void (LPCTSTR token)> callback)
+{
+    TCHAR key[MAX_RCCOMMAND];
+    StringCchPrintf(key, _countof(key), _T("*%s%s"), prefix, keyName);
+    IterateOverLines(key, [callback] (LPCTSTR line) -> void
+    {
+        IterateOverTokens(line, callback);
+    });
+}
+
+
+/// <summary>
 /// Parses a boolean from a configuration string.
 /// </summary>
 /// <param name="boolString">The string to parse.</param>

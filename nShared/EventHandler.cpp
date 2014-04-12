@@ -106,7 +106,7 @@ void EventHandler::HandleMessage(HWND, UINT msg, WPARAM wParam, LPARAM /* lParam
 /// </summary>
 void EventHandler::LoadSettings(bool /* bIsRefresh */)
 {
-    this->settings->IterateOverStars(_T("On"), std::bind(&EventHandler::AddHandler, this, std::placeholders::_1));
+    this->settings->IterateOverCommandLines(_T("On"), std::bind(&EventHandler::AddHandler, this, std::placeholders::_1));
 }
 
 

@@ -15,6 +15,9 @@
 #include "Version.h"
 
 
+using std::tstring;
+
+
 // The LSModule class
 LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 

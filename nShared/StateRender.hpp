@@ -167,7 +167,7 @@ public:
     /// <summary>
     /// Toggles the specified state.
     /// </summary>
-    void Load(InitData &initData, Settings *baseSettings)
+    void Load(const InitData & initData, Settings * baseSettings)
     {
         for (StateEnum state = StateEnum::Base; state != StateEnum::Count; EnumIncrement(state))
         {

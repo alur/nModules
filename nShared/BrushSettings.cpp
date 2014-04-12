@@ -81,7 +81,7 @@ BrushSettings::~BrushSettings()
 /// <summary>
 /// Loads settings from an RC file using the specified defaults.
 /// </summary>
-void BrushSettings::Load(Settings* settings, BrushSettings* defaults)
+void BrushSettings::Load(const Settings * settings, const BrushSettings * defaults)
 {
     TCHAR buf[MAX_LINE_LENGTH];
 

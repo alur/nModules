@@ -2,7 +2,7 @@
  *  Unordered1To1Map.hpp
  *  The nModules Project
  *
- *  A hash-based 1-to-1 map
+ *  A hash-based 1-to-1 map.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
@@ -13,49 +13,30 @@
 #include <unordered_set>
 
 template<
-    class TypeA,
-    class TypeB,
-    class TypeAHash = std::hash<TypeA>,
-    class TypeBHash = std::hash<TypeB>,
-    class TypeAEqual = std::equal_to<TypeA>,
-    class TypeBEqual = std::equal_to<TypeB>
+    typename TypeA,
+    typename TypeB,
+    typename AHash = std::hash<TypeA>,
+    typename BHash = std::hash<TypeB>,
+    typename AEqual = std::equal_to<TypeA>,
+    typename BEqual = std::equal_to<TypeB>
 >
 class Unordered1To1Map
 {
 public:
-    struct value_type
-    {
-        value_type(TypeA a, TypeB b)
-            : a(a)
-            , b(b)
-        {
-        }
-
-        TypeA a;
-        TypeB b;
-    };
+    typedef typename std::pair<TypeA, TypeB> ValueType;
+    typedef typename std::forward_list<ValueType>::iterator iterator;
 
 private:
-    struct listItem
-    {
-        listItem(value_type value)
-            : value(value)
-        {
-        }
-        value_type value;
-        typename std::forward_list<listItem>::iterator iter;
-    };
-
     struct acmp
     {
         bool operator()(const TypeA * x, const TypeA * y) const
         {
-            return TypeAEqual()(*x, *y);
+            return AEqual()(*x, *y);
         }
 
         size_t operator()(const TypeA * x) const
         {
-            return TypeAHash()(*x);
+            return AHash()(*x);
         }
     };
 
@@ -63,69 +44,68 @@ private:
     {
         bool operator()(const TypeB * x, const TypeB * y) const
         {
-            return TypeBEqual()(*x, *y);
+            return BEqual()(*x, *y);
         }
 
         size_t operator()(const TypeB * x) const
         {
-            return TypeBHash()(*x);
+            return BHash()(*x);
         }
     };
 
 private:
-    std::forward_list<listItem> mData;
-    std::unordered_set<TypeA*, acmp, acmp> mSetA;      // A -> Data
-    std::unordered_set<TypeB*, bcmp, bcmp> mSetB;      // B -> Data
+    std::forward_list<ValueType> mData;
+    std::unordered_set<TypeA *, acmp, acmp> mSetA;      // A -> Data
+    std::unordered_set<TypeB *, bcmp, bcmp> mSetB;      // B -> Data
 
 public:
     Unordered1To1Map()
     {
     }
 
-    Unordered1To1Map(std::initializer_list<value_type> init)
+    explicit Unordered1To1Map(const std::initializer_list<ValueType> & init)
+        : mData(std::forward<const std::initializer_list<ValueType> &>(init))
     {
-        for (const value_type & value : init)
+        for (ValueType & value : mData)
         {
-            Insert(value);
+            mSetA.insert(&value.first);
+            mSetB.insert(&value.second);
         }
     }
 
 public:
-    value_type * Insert(value_type value)
+    /*template<typename ... Args>
+    ValueType & Insert(Args && ... args)
     {
-        //assert(mSetA.find(&value.a) == mSetA.end());
-        //assert(mSetB.find(&value.b) == mSetB.end());
+        mData.emplace_front(std::forward<Args>(args)...);
 
-        mData.emplace_front(value);
-        mData.begin()->iter = mData.begin();
-        mSetA.insert(&mData.begin()->value.a);
-        mSetB.insert(&mData.begin()->value.b);
+        ValueType & value = mData.begin();
+        mSetA.insert(&value.first);
+        mSetB.insert(&value.second);
 
-        return &mData.begin()->value;
-    }
+        return value;
+    }*/
 
 public:
-    // Finds a pair based on the 1st value
-    value_type * FindByA(TypeA a)
+    const TypeB GetByA(TypeA a, TypeB default) const
     {
         auto iter = mSetA.find(&a);
         if (iter != mSetA.end())
         {
-            return (value_type*)((byte*)*iter - offsetof(value_type, a));
+            return ((ValueType*)((byte*)*iter - offsetof(ValueType, first)))->second;
         }
 
-        return nullptr;
+        return default;
     }
 
-    // Finds a pair based on the 2nd value
-    value_type * FindByB(TypeB b)
+    const TypeA GetByB(TypeB b, TypeA default) const
     {
         auto iter = mSetB.find(&b);
         if (iter != mSetB.end())
         {
-            return (value_type*)((byte*)*iter - offsetof(value_type, b));
+            return ((ValueType*)((byte*)*iter - offsetof(ValueType, second)))->first;
         }
 
-        return nullptr;
+        return default;
     }
 };

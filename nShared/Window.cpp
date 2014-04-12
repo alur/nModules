@@ -24,6 +24,7 @@
 
 
 using namespace D2D1;
+using std::map;
 
 
 /// <summary>
@@ -160,11 +161,9 @@ Window::Window(HWND /* parent */, LPCTSTR windowClass, HINSTANCE instance, Setti
     {
         if (_tcsnicmp(parent, L"Monitor", _countof(L"Monitor") - 1) == 0)
         {
-
         }
         else // VirtualDesktop
         {
-
         }
     }
 }

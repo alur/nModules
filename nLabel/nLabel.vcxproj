@@ -257,7 +257,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Label.hpp" />
-    <ClInclude Include="nLabel.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>

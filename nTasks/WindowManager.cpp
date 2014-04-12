@@ -368,7 +368,7 @@ LRESULT WindowManager::GetMinRect(HWND hWnd, LPPOINTS lpPoints)
 /// </summary>
 void WindowManager::UpdateWindowMonitors()
 {
-    list<std::pair<HWND, UINT> > mods;
+    std::list<std::pair<HWND, UINT>> mods;
     for (WindowMap::value_type &val : windowMap)
     {
         UINT monitor = gMonitorInfo.MonitorFromHWND(val.first);

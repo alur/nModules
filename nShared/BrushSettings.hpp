@@ -16,11 +16,11 @@ class BrushSettings
 {
 public:
     explicit BrushSettings();
-    explicit BrushSettings(const BrushSettings &source);
+    explicit BrushSettings(const BrushSettings & source);
     virtual ~BrushSettings();
 
     // Loads the actual settings.
-    void Load(Settings* settings, BrushSettings* defaults);
+    void Load(const Settings * settings, const BrushSettings * defaults);
 
     // The type of brush to use. SolidColor, LinearGradient, RadialGradient, Image. Default: SolidColor
     TCHAR brushType[32];

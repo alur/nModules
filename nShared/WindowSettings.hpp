@@ -15,9 +15,11 @@ class WindowSettings
 {
 public:
     WindowSettings();
+    WindowSettings(void init(WindowSettings &));
 
+public:
     // Loads the actual settings.
-    void Load(Settings* settings, WindowSettings* defaults);
+    void Load(const Settings * settings, const WindowSettings * defaults);
 
     D2D1_TEXT_ANTIALIAS_MODE ParseAntiAliasMode(LPCTSTR mode);
 

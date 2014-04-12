@@ -12,25 +12,25 @@
 #include <memory>
 
 class Settings;
-typedef Settings *LPSettings;
-typedef const Settings *LPCSettings;
+typedef Settings * LPSettings;
+typedef const Settings * LPCSettings;
 
 class Settings
 {
 public:
     explicit Settings(LPCTSTR prefix);
-    explicit Settings(LPSettings settings);
+    explicit Settings(LPCSettings settings);
     
 private:
 	explicit Settings(LPCTSTR prefix, LPCTSTR prefixTrail[]);
 
 public:
     LPSettings CreateChild(LPCTSTR prefix) const;
-    void AppendGroup(LPSettings group);
+    void AppendGroup(LPCSettings group);
     LPCTSTR GetPrefix() const;
     
 private:
-    // Creates the Settings* for this settings group.
+    // Creates the Settings * for this settings group.
 	LPSettings GreateGroup(LPCTSTR prefixTrail[]);
 
     // Basic getters and setters
@@ -56,16 +56,17 @@ public:
     
     // More advanced getters and setters
 public:
-    RECT GetRect(LPCTSTR key, LPRECT defaultValue) const;
+    RECT GetRect(LPCTSTR key, LPCRECT defaultValue) const;
     RECT GetRect(LPCTSTR key, LONG defX, LONG defY, LONG defWidth, LONG defHeight) const;
-    void SetRect(LPCTSTR key, LPRECT value) const;
+    void SetRect(LPCTSTR key, LPCRECT value) const;
     
-    RECT GetOffsetRect(LPCTSTR key, LPRECT defaultValue) const;
+    RECT GetOffsetRect(LPCTSTR key, LPCRECT defaultValue) const;
     RECT GetOffsetRect(LPCTSTR key, LONG defLeft, LONG defTop, LONG defRight, LONG defBottom) const;
-    void SetOffsetRect(LPCTSTR key, LPRECT value) const;
-    D2D1_RECT_F GetOffsetRectF(LPCTSTR key, D2D1_RECT_F *defaultValue) const;
+    void SetOffsetRect(LPCTSTR key, LPCRECT value) const;
+    D2D1_RECT_F GetOffsetRectF(LPCTSTR key, const D2D1_RECT_F * defaultValue) const;
 
-    void IterateOverStars(LPCTSTR key, std::function<void (LPCTSTR token)> callback) const;
+    void IterateOverCommandLines(LPCTSTR key, std::function<void (LPCTSTR line)> callback) const;
+    void IterateOverCommandTokens(LPCTSTR key, std::function<void (LPCTSTR token)> callback) const;
 
     ///
     ///
@@ -86,7 +87,7 @@ public:
     /// 
     /// </summary>
     template <typename Type>
-    Type GetEnum(LPCTSTR key, std::initializer_list<EnumItem<Type> > map, Type defaultValue)
+    Type GetEnum(LPCTSTR key, std::initializer_list<EnumItem<Type>> map, Type defaultValue)
     {
         TCHAR settingValue[MAX_LINE_LENGTH];
         GetString(key, settingValue, _countof(settingValue), nullptr);

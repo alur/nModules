@@ -19,7 +19,7 @@
 using namespace Math;
 
 
-typedef std::unordered_map<std::tstring, ARGB, noCaseComparator, noCaseComparator> ColorMap;
+typedef StringKeyedMaps<LPCTSTR, ARGB>::UnorderedMap ColorMap;
 
 
 namespace Color {
