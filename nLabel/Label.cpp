@@ -15,12 +15,10 @@
 #include <unordered_map>
 
 
-using std::pair;
-using std::tstring;
-using std::unordered_map;
+using std::wstring;
 
 
-extern StringKeyedMaps<tstring, Label*>::UnorderedMap gAllLabels;
+extern StringKeyedMaps<wstring, Label*>::UnorderedMap gAllLabels;
 
 
 // Default settings for labels.
@@ -33,7 +31,7 @@ static const WindowSettings gLabelDefaults([] (WindowSettings & defaults)
 // StateRender initialization information.
 static const StateRender<Label::States>::InitData gInitData([] (StateRender<Label::States>::InitData & initData)
 {
-    initData[Label::States::Hover].prefix = _T("Hover");
+    initData[Label::States::Hover].prefix = L"Hover";
 });
 
 
@@ -41,7 +39,7 @@ static const StateRender<Label::States>::InitData gInitData([] (StateRender<Labe
 /// Constructor for top-level labels.
 /// </summary>
 /// <param name="name">The RC settings prefix of the label.</param>
-Label::Label(LPCTSTR name)
+Label::Label(LPCWSTR name)
     : Drawable(name)
 {
     Initalize();
@@ -53,7 +51,7 @@ Label::Label(LPCTSTR name)
 /// </summary>
 /// <param name="name">The RC settings prefix of the label.</param>
 /// <param name="parent">The overlay label's parent.</param>
-Label::Label(LPCTSTR name, Drawable * parent)
+Label::Label(LPCWSTR name, Drawable * parent)
     : Drawable(parent, name, true)
 {
     Initalize();
@@ -109,7 +107,7 @@ void Label::Initalize()
     windowSettings.Load(mSettings, &gLabelDefaults);
     mWindow->Initialize(windowSettings, &mStateRender);
     
-    LiteStep::IterateOverCommandLineTokens(mSettings->GetPrefix(), TEXT("OverlayLabel"), [this] (LPCTSTR name) -> void
+    LiteStep::IterateOverCommandLineTokens(mSettings->GetPrefix(), L"OverlayLabel", [this] (LPCWSTR name) -> void
     {
         mOverlays.emplace_front(name, this);
     });

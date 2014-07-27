@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Manages the JavaScript API.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "../External/v8/include/v8.h"
@@ -39,7 +39,7 @@ static void RunCode(LPCWSTR code, void (*callback)(Handle<Value>), LPCWSTR fileN
 
     // Create a string containing the JavaScript source code.
     Handle<String> source = String::New(CAST(code));
-    
+
     // Compile the source code.
     TryCatch tryCatch;
     Handle<Script> script;
@@ -76,7 +76,7 @@ static void RunCode(LPCWSTR code, void (*callback)(Handle<Value>), LPCWSTR fileN
         }
         return;
     }
-  
+
     // Run the script to get the result.
     Handle<Value> result = script->Run();
     if (result.IsEmpty())
@@ -103,8 +103,8 @@ static void RunCode(LPCWSTR code, void (*callback)(Handle<Value>), LPCWSTR fileN
             }
         }
         return;
-    } 
-    
+    }
+
     if (callback)
     {
         callback(result);
@@ -129,7 +129,6 @@ static void InitV8()
     global->Set(String::New(CAST(L"nCore")), Scripting::NCore::Initialize(isolate), PropertyAttribute::ReadOnly);
     //global->Set(String::New(CAST(L"dump_var")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
     //{
-    
     //}));
 
     // Create a new context.
@@ -163,7 +162,7 @@ void Scripting::Initialize()
     });
 
     // Load script files
-    LiteStep::IterateOverLineTokens(_T("*nIncludeScript"), [] (LPCTSTR file)
+    LiteStep::IterateOverLineTokens(L"*nIncludeScript", [] (LPCTSTR file)
     {
         std::wifstream t(file);
         std::wstring str;
@@ -188,7 +187,7 @@ void Scripting::Shutdown()
     LiteStep::RemoveBangCommand(L"!nAlertScript");
     LiteStep::RemoveBangCommand(L"!nExecScript");
     LSCore::Shutdown();
-    
+
     // Dispose of our context, killing all JS data
     gScriptingContext.Dispose();
 }

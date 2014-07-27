@@ -12,7 +12,7 @@
 
 
 // All existing functions.
-FUNCMAP functionMap;
+FunctionMap functionMap;
 
 
 /// <summary>
@@ -20,15 +20,15 @@ FUNCMAP functionMap;
 /// </summary>
 /// <param name="name">The name of the funtion to find.</param>
 /// <param name="numArgs">The number of arguments in the function to find.</param>
-FUNCMAP::iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs)
+FunctionMap::iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs)
 {
-    FUNCMAP::iterator ret = functionMap.find(FUNCMAP::key_type(name, numArgs));
+    FunctionMap::iterator ret = functionMap.find(FunctionMap::key_type(name, numArgs));
     if (ret == functionMap.end())
     {
         FormatterData d;
         d.dynamic = true;
         d.proc = nullptr;
-        return functionMap.insert(FUNCMAP::value_type(FUNCMAP::key_type(wstring(name), numArgs), d)).first;
+        return functionMap.insert(FunctionMap::value_type(FunctionMap::key_type(std::wstring(name), numArgs), d)).first;
     }
     return ret;
 }
@@ -43,7 +43,7 @@ FUNCMAP::iterator FindDynamicTextFunction(LPCWSTR name, UCHAR numArgs)
 /// <param name="dynamic">True if the value this function returns may change over time.</param.
 EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic)
 {
-    FUNCMAP::iterator iter = FindDynamicTextFunction(name, numArgs);
+    FunctionMap::iterator iter = FindDynamicTextFunction(name, numArgs);
     iter->second.proc = formatter;
     iter->second.dynamic = dynamic;
     return FALSE;
@@ -70,7 +70,7 @@ EXPORT_CDECL(BOOL) UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs)
 /// <param name="numArgs">The number of arguments in the function which changed.</param>
 EXPORT_CDECL(BOOL) DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs)
 {
-    FUNCMAP::iterator iter = FindDynamicTextFunction(name, numArgs);
+    FunctionMap::iterator iter = FindDynamicTextFunction(name, numArgs);
     for (IParsedText *user: iter->second.users)
     {
         ((ParsedText*)user)->DataChanged();
@@ -197,7 +197,7 @@ bool ParsedText::Evaluate(LPWSTR dest, size_t cchDest)
 /// <summary>
 /// Pushes a token onto the end.
 /// </summary>
-void ParsedText::AddToken(TokenType type, FUNCMAP::iterator proc, LPCWSTR str, LPWSTR* args)
+void ParsedText::AddToken(TokenType type, FunctionMap::iterator proc, LPCWSTR str, LPWSTR* args)
 {
     Token t;
     t.type = type;

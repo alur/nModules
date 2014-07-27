@@ -13,6 +13,8 @@ typedef DWORD ARGB;
 class IColorVal
 {
 public:
+    virtual ~IColorVal() {};
+
     // Returns true if this ColorVal does not depend on any variables.
     virtual bool IsConstant() const = 0;
 

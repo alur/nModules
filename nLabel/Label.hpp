@@ -17,8 +17,8 @@
 class Label : public Drawable
 {
 public:
-    explicit Label(LPCTSTR name);
-    explicit Label(LPCTSTR name, Drawable * parent);
+    explicit Label(LPCWSTR name);
+    explicit Label(LPCWSTR name, Drawable * parent);
     virtual ~Label();
 
     // IDrawable
@@ -35,7 +35,6 @@ public:
 
 private:
     void Initalize();
-    void LoadOverlays();
 
 private:
     StateRender<States> mStateRender;

@@ -266,7 +266,6 @@
     <ClInclude Include="IconCache.hpp" />
     <ClInclude Include="InfoItem.hpp" />
     <ClInclude Include="PopupSettings.hpp" />
-    <ClInclude Include="nPopup.h" />
     <ClInclude Include="Popup.hpp" />
     <ClInclude Include="PopupItem.hpp" />
     <ClInclude Include="SeparatorItem.hpp" />

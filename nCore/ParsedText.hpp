@@ -8,14 +8,13 @@
 #pragma once
 
 #include "IParsedText.hpp"
+
 #include <list>
 #include <map>
-#include <set>
 #include <unordered_map>
+#include <unordered_set>
 
 using std::list;
-using std::wstring;
-using std::set;
 using std::pair;
 
 EXPORT_CDECL(BOOL) RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter, bool dynamic);
@@ -25,24 +24,24 @@ EXPORT_CDECL(BOOL) DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs);
 // All data used for a dynamic text function.
 struct FormatterData
 {
-    // Callback function, or NULL if this function is not registered at this point.
+    // Callback function, or nullptr if this function is not registered at this point.
     FORMATTINGPROC proc;
 
     // True if this function is dynamic.
     bool dynamic;
     
     // All IParsedText objects which currently use this function.
-    set<IParsedText*> users;
+    std::unordered_set<IParsedText*> users;
 };
 
 // ID for a function
 struct FunctionID
 {
-    FunctionID(wstring name, UCHAR numArgs)
+    FunctionID(std::wstring name, UCHAR numArgs)
         : name(name), numArgs(numArgs)
     {
     }
-    wstring name;
+    std::wstring name;
     UCHAR numArgs;
 };
 
@@ -56,12 +55,12 @@ struct FuncIDCmp
 
     size_t operator()(FunctionID const & a)
     {
-        return std::hash<wstring>()(a.name) ^ std::hash<UCHAR>()(a.numArgs);
+        return std::hash<std::wstring>()(a.name) ^ std::hash<UCHAR>()(a.numArgs);
     }
 };
 
 // The map type used to store the dynamic text functions.
-typedef std::unordered_map<FunctionID, FormatterData, FuncIDCmp, FuncIDCmp> FUNCMAP;
+typedef std::unordered_map<FunctionID, FormatterData, FuncIDCmp, FuncIDCmp> FunctionMap;
 
 
 class ParsedText : public IParsedText
@@ -87,14 +86,14 @@ private:
     struct Token
     {
         TokenType type;
-        FUNCMAP::iterator proc;
+        FunctionMap::iterator proc;
         LPCWSTR text;
         LPWSTR* args;
     };
 
     // Parses text and pushes its tokens onto the end of the string.
     void Parse(LPCWSTR text);
-    void AddToken(TokenType type, FUNCMAP::iterator proc, LPCWSTR text, LPWSTR* args);
+    void AddToken(TokenType type, FunctionMap::iterator proc, LPCWSTR text, LPWSTR* args);
 
     list<Token> tokens;
     LPCWSTR text;

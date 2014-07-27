@@ -5,9 +5,12 @@
  *  Handles communication with nCore.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../Utilities/Common.h"
 #include "Core.h"
 #include "CoreComHelpers.h"
+
+#include "../nShared/ResultCodes.h"
+
+#include "../Utilities/Common.h"
 
 using namespace nCore;
 
@@ -15,9 +18,8 @@ using namespace nCore;
 static bool gInitialized = false;
 
 // Pointers to the functions in the core.
-namespace nCore
-{
-    DECL_FUNC_VAR(GetCoreVersion);
+namespace nCore {
+  DECL_FUNC_VAR(GetCoreVersion);
 }
 
 
@@ -26,57 +28,51 @@ namespace nCore
 /// </summary>
 /// <param name="minVersion">The minimum core version.</param>
 /// <returns>S_OK if the core is succefully initalized.</returns>
-HRESULT nCore::Connect(VERSION minVersion)
-{
-    HWND coreHWnd = FindWindow(_T("LSnCore"), nullptr);
+HRESULT nCore::Connect(VERSION minVersion) {
+  HWND coreWindow = FindWindow(TEXT("LSnCore"), nullptr);
 
-    if (!coreHWnd)
-    {
-        return E_FAIL;
-    }
+  if (coreWindow == nullptr) {
+    return E_NCORECOM_CORE_NOT_FOUND;
+  }
     
-    gInitialized = false;
+  gInitialized = false;
 
-    HMODULE hCoreInstance = (HMODULE)GetWindowLongPtr(coreHWnd, GWLP_USERDATA);
+  HMODULE hCoreInstance = (HMODULE)GetWindowLongPtr(coreWindow, GWLP_USERDATA);
     
-    INIT_FUNC(GetCoreVersion);
+  INIT_FUNC(GetCoreVersion);
 
-    // Should check the version here
-    VERSION coreVersion = FUNC_VAR_NAME(GetCoreVersion)();
-    // The major version must be the same
-    if (GetMajorVersion(minVersion) != GetMajorVersion(coreVersion))
-    {
-        return E_FAIL;
-    }
-    // The minor version must be >=
-    if (GetMinorVersion(minVersion) > GetMinorVersion(coreVersion))
-    {
-        return E_FAIL;
-    }
-    // If the minor version ==, the patch version must be >=
-    if (GetMinorVersion(minVersion) == GetMinorVersion(coreVersion) && GetPatchVersion(minVersion) > GetPatchVersion(minVersion))
-    {
-        return E_FAIL;
-    }
+  VERSION coreVersion = FUNC_VAR_NAME(GetCoreVersion)();
+  // The major version must be the same
+  if (GetMajorVersion(minVersion) != GetMajorVersion(coreVersion)) {
+    return E_NCORECOM_MAJOR_VERSION;
+  }
+  // The minor version must be >=
+  if (GetMinorVersion(minVersion) > GetMinorVersion(coreVersion)) {
+    return E_NCORECOM_MINOR_VERSION;
+  }
+  // If the minor version ==, the patch version must be >=
+  if (GetMinorVersion(minVersion) == GetMinorVersion(coreVersion) &&
+      GetPatchVersion(minVersion) > GetPatchVersion(minVersion)) {
+    return E_NCORECOM_PATCH_VERSION;
+  }
     
-    HRESULT hr = S_OK;
+  HRESULT hr = S_OK;
 
-    RETURNONFAIL(hr, System::_Init(hCoreInstance));
+  RETURNONFAIL(hr, System::_Init(hCoreInstance));
 
-    gInitialized = true;
+  gInitialized = true;
 
-    return hr;
+  return hr;
 }
 
 
 /// <summary>
 /// Disconnects from the core.
 /// </summary>
-void nCore::Disconnect()
-{
-    System::_DeInit();
-    FUNC_VAR_NAME(GetCoreVersion) = nullptr;
-    gInitialized = false;
+void nCore::Disconnect() {
+  System::_DeInit();
+  FUNC_VAR_NAME(GetCoreVersion) = nullptr;
+  gInitialized = false;
 }
 
 
@@ -84,17 +80,15 @@ void nCore::Disconnect()
 /// Returns true when the core is initalized.
 /// </summary>
 /// <returns>True if the core is initalized.</returns>
-bool nCore::Initialized()
-{
-    return gInitialized;
+bool nCore::Initialized() {
+  return gInitialized;
 }
 
 
 /// <summary>
 /// Retrives the version of the loaded core.
 /// </summary>
-VERSION nCore::GetCoreVersion()
-{
-    ASSERT(nCore::Initialized());
-    return FUNC_VAR_NAME(GetCoreVersion)();
+VERSION nCore::GetCoreVersion() {
+  ASSERT(nCore::Initialized());
+  return FUNC_VAR_NAME(GetCoreVersion)();
 }

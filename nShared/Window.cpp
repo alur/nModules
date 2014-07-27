@@ -191,7 +191,6 @@ Window::Window(Window* parent, Settings* settings, MessageHandler* msgHandler)
 Window::~Window()
 {
     this->initialized = false;
-
     if (mParent)
     {
         mParent->RemoveChild(this);
@@ -235,8 +234,11 @@ Window::~Window()
     {
         SAFERELEASE(mRenderTarget);
         SAFEDELETE(this->monitorInfo);
+        SAFEDELETE(this->timerIDs);
+        SAFEDELETE(this->userMsgIDs);
     }
 
+    SAFEDELETE(mWindowData);
     SAFEDELETE(mSettings);
     free((LPVOID)this->text);
 }

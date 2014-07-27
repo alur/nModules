@@ -1,73 +1,55 @@
-// //////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 // CRC32.cpp
 // Copyright (c) 2011-2013 Stephan Brumme. All rights reserved.
 // see http://create.stephan-brumme.com/disclaimer.html
 //
+// Changes:
 // Moved the CRC table up and removed the test code.
 // Removed all crc functions save for crc32_slice8.
 // Renamed crc32_slice8 to crc32.
+// Calling _byteswap_ulong for swap.
 //
+#include "Hashing.h"
 
-// g++ -o Crc32 Crc32.cpp -O3 -march=native -mtune=native
-
+#include <stdint.h>
 #include <stdlib.h>
+
 
 // define endianess and some integer data types
 #ifdef _MSC_VER
-  typedef unsigned __int8  uint8_t;
-  typedef unsigned __int32 uint32_t;
-  typedef          __int32  int32_t;
   #define __LITTLE_ENDIAN 1234
   #define __BIG_ENDIAN    4321
   #define __BYTE_ORDER    __LITTLE_ENDIAN
 #else
-  // uint8_t, uint32_t, in32_t
-  #include <stdint.h>
   // defines __BYTE_ORDER as __LITTLE_ENDIAN or __BIG_ENDIAN
-#include <endian.h>
+  #include <endian.h>
 #endif
 
 /// zlib's CRC32 polynomial
-const uint32_t Polynomial = 0xEDB88320;
-
-/// swap endianess
-static inline uint32_t swap(uint32_t x)
-{
-#if defined(__GNUC__) || defined(__clang__)
-  return __builtin_bswap32(x);
-#else
-  return (x >> 24) |
-        ((x >>  8) & 0x0000FF00) |
-        ((x <<  8) & 0x00FF0000) |
-         (x << 24);
-#endif
-}
+static const uint32_t gPolynomial = 0xEDB88320;
 
 /// look-up table, already declared above
-static const uint32_t Crc32Lookup[8][256] =
-{
-  //// same algorithm as crc32_bitwise
-  //for (int i = 0; i <= 0xFF; i++)
-  //{
-  //  uint32_t crc = i;
-  //  for (int j = 0; j < 8; j++)
-  //    crc = (crc >> 1) ^ ((crc & 1) * Polynomial);
-  //  Crc32Lookup[0][i] = crc;
-  //}
-  //// ... and the following slicing-by-8 algorithm (from Intel):
-  //// http://www.intel.com/technology/comms/perfnet/download/CRC_generators.pdf
-  //// http://sourceforge.net/projects/slicing-by-8/
-  //for (int i = 0; i <= 0xFF; i++)
-  //{
-  //  Crc32Lookup[1][i] = (Crc32Lookup[0][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[0][i] & 0xFF];
-  //  Crc32Lookup[2][i] = (Crc32Lookup[1][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[1][i] & 0xFF];
-  //  Crc32Lookup[3][i] = (Crc32Lookup[2][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[2][i] & 0xFF];
-
-  //  Crc32Lookup[4][i] = (Crc32Lookup[3][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[3][i] & 0xFF];
-  //  Crc32Lookup[5][i] = (Crc32Lookup[4][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[4][i] & 0xFF];
-  //  Crc32Lookup[6][i] = (Crc32Lookup[5][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[5][i] & 0xFF];
-  //  Crc32Lookup[7][i] = (Crc32Lookup[6][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[6][i] & 0xFF];
-  //}
+static const uint32_t gCrc32Lookup[8][256] = {
+  // // same algorithm as crc32_bitwise
+  // for (int i = 0; i <= 0xFF; i++) {
+  //   uint32_t crc = i;
+  //   for (int j = 0; j < 8; j++)
+  //     crc = (crc >> 1) ^ ((crc & 1) * Polynomial);
+  //   Crc32Lookup[0][i] = crc;
+  // }
+  // // ... and the following slicing-by-8 algorithm (from Intel):
+  // // http://www.intel.com/technology/comms/perfnet/download/CRC_generators.pdf
+  // // http://sourceforge.net/projects/slicing-by-8/
+  // for (int i = 0; i <= 0xFF; i++) {
+  //   Crc32Lookup[1][i] = (Crc32Lookup[0][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[0][i] & 0xFF];
+  //   Crc32Lookup[2][i] = (Crc32Lookup[1][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[1][i] & 0xFF];
+  //   Crc32Lookup[3][i] = (Crc32Lookup[2][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[2][i] & 0xFF];
+  //
+  //   Crc32Lookup[4][i] = (Crc32Lookup[3][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[3][i] & 0xFF];
+  //   Crc32Lookup[5][i] = (Crc32Lookup[4][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[4][i] & 0xFF];
+  //   Crc32Lookup[6][i] = (Crc32Lookup[5][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[5][i] & 0xFF];
+  //   Crc32Lookup[7][i] = (Crc32Lookup[6][i] >> 8) ^ Crc32Lookup[0][Crc32Lookup[6][i] & 0xFF];
+  // }
   { 0x00000000,0x77073096,0xEE0E612C,0x990951BA,0x076DC419,0x706AF48F,0xE963A535,0x9E6495A3,
     0x0EDB8832,0x79DCB8A4,0xE0D5E91E,0x97D2D988,0x09B64C2B,0x7EB17CBD,0xE7B82D07,0x90BF1D91,
     0x1DB71064,0x6AB020F2,0xF3B97148,0x84BE41DE,0x1ADAD47D,0x6DDDE4EB,0xF4D4B551,0x83D385C7,
@@ -100,7 +82,6 @@ static const uint32_t Crc32Lookup[8][256] =
     0xAED16A4A,0xD9D65ADC,0x40DF0B66,0x37D83BF0,0xA9BCAE53,0xDEBB9EC5,0x47B2CF7F,0x30B5FFE9,
     0xBDBDF21C,0xCABAC28A,0x53B39330,0x24B4A3A6,0xBAD03605,0xCDD70693,0x54DE5729,0x23D967BF,
     0xB3667A2E,0xC4614AB8,0x5D681B02,0x2A6F2B94,0xB40BBE37,0xC30C8EA1,0x5A05DF1B,0x2D02EF8D },
-
   { 0x00000000,0x191B3141,0x32366282,0x2B2D53C3,0x646CC504,0x7D77F445,0x565AA786,0x4F4196C7,
     0xC8D98A08,0xD1C2BB49,0xFAEFE88A,0xE3F4D9CB,0xACB54F0C,0xB5AE7E4D,0x9E832D8E,0x87981CCF,
     0x4AC21251,0x53D92310,0x78F470D3,0x61EF4192,0x2EAED755,0x37B5E614,0x1C98B5D7,0x05838496,
@@ -133,7 +114,6 @@ static const uint32_t Crc32Lookup[8][256] =
     0x96A779E4,0x8FBC48A5,0xA4911B66,0xBD8A2A27,0xF2CBBCE0,0xEBD08DA1,0xC0FDDE62,0xD9E6EF23,
     0x14BCE1BD,0x0DA7D0FC,0x268A833F,0x3F91B27E,0x70D024B9,0x69CB15F8,0x42E6463B,0x5BFD777A,
     0xDC656BB5,0xC57E5AF4,0xEE530937,0xF7483876,0xB809AEB1,0xA1129FF0,0x8A3FCC33,0x9324FD72 },
-
   { 0x00000000,0x01C26A37,0x0384D46E,0x0246BE59,0x0709A8DC,0x06CBC2EB,0x048D7CB2,0x054F1685,
     0x0E1351B8,0x0FD13B8F,0x0D9785D6,0x0C55EFE1,0x091AF964,0x08D89353,0x0A9E2D0A,0x0B5C473D,
     0x1C26A370,0x1DE4C947,0x1FA2771E,0x1E601D29,0x1B2F0BAC,0x1AED619B,0x18ABDFC2,0x1969B5F5,
@@ -166,7 +146,6 @@ static const uint32_t Crc32Lookup[8][256] =
     0xA7F18118,0xA633EB2F,0xA4755576,0xA5B73F41,0xA0F829C4,0xA13A43F3,0xA37CFDAA,0xA2BE979D,
     0xB5C473D0,0xB40619E7,0xB640A7BE,0xB782CD89,0xB2CDDB0C,0xB30FB13B,0xB1490F62,0xB08B6555,
     0xBBD72268,0xBA15485F,0xB853F606,0xB9919C31,0xBCDE8AB4,0xBD1CE083,0xBF5A5EDA,0xBE9834ED },
-
   { 0x00000000,0xB8BC6765,0xAA09C88B,0x12B5AFEE,0x8F629757,0x37DEF032,0x256B5FDC,0x9DD738B9,
     0xC5B428EF,0x7D084F8A,0x6FBDE064,0xD7018701,0x4AD6BFB8,0xF26AD8DD,0xE0DF7733,0x58631056,
     0x5019579F,0xE8A530FA,0xFA109F14,0x42ACF871,0xDF7BC0C8,0x67C7A7AD,0x75720843,0xCDCE6F26,
@@ -199,7 +178,6 @@ static const uint32_t Crc32Lookup[8][256] =
     0x13CB69D7,0xAB770EB2,0xB9C2A15C,0x017EC639,0x9CA9FE80,0x241599E5,0x36A0360B,0x8E1C516E,
     0x866616A7,0x3EDA71C2,0x2C6FDE2C,0x94D3B949,0x090481F0,0xB1B8E695,0xA30D497B,0x1BB12E1E,
     0x43D23E48,0xFB6E592D,0xE9DBF6C3,0x516791A6,0xCCB0A91F,0x740CCE7A,0x66B96194,0xDE0506F1 },
-
   { 0x00000000,0x3D6029B0,0x7AC05360,0x47A07AD0,0xF580A6C0,0xC8E08F70,0x8F40F5A0,0xB220DC10,
     0x30704BC1,0x0D106271,0x4AB018A1,0x77D03111,0xC5F0ED01,0xF890C4B1,0xBF30BE61,0x825097D1,
     0x60E09782,0x5D80BE32,0x1A20C4E2,0x2740ED52,0x95603142,0xA80018F2,0xEFA06222,0xD2C04B92,
@@ -232,7 +210,6 @@ static const uint32_t Crc32Lookup[8][256] =
     0x18A48C1E,0x25C4A5AE,0x6264DF7E,0x5F04F6CE,0xED242ADE,0xD044036E,0x97E479BE,0xAA84500E,
     0x4834505D,0x755479ED,0x32F4033D,0x0F942A8D,0xBDB4F69D,0x80D4DF2D,0xC774A5FD,0xFA148C4D,
     0x78441B9C,0x4524322C,0x028448FC,0x3FE4614C,0x8DC4BD5C,0xB0A494EC,0xF704EE3C,0xCA64C78C },
-
   { 0x00000000,0xCB5CD3A5,0x4DC8A10B,0x869472AE,0x9B914216,0x50CD91B3,0xD659E31D,0x1D0530B8,
     0xEC53826D,0x270F51C8,0xA19B2366,0x6AC7F0C3,0x77C2C07B,0xBC9E13DE,0x3A0A6170,0xF156B2D5,
     0x03D6029B,0xC88AD13E,0x4E1EA390,0x85427035,0x9847408D,0x531B9328,0xD58FE186,0x1ED33223,
@@ -265,7 +242,6 @@ static const uint32_t Crc32Lookup[8][256] =
     0xFA1799EF,0x314B4A4A,0xB7DF38E4,0x7C83EB41,0x6186DBF9,0xAADA085C,0x2C4E7AF2,0xE712A957,
     0x15921919,0xDECECABC,0x585AB812,0x93066BB7,0x8E035B0F,0x455F88AA,0xC3CBFA04,0x089729A1,
     0xF9C19B74,0x329D48D1,0xB4093A7F,0x7F55E9DA,0x6250D962,0xA90C0AC7,0x2F987869,0xE4C4ABCC },
-
   { 0x00000000,0xA6770BB4,0x979F1129,0x31E81A9D,0xF44F2413,0x52382FA7,0x63D0353A,0xC5A73E8E,
     0x33EF4E67,0x959845D3,0xA4705F4E,0x020754FA,0xC7A06A74,0x61D761C0,0x503F7B5D,0xF64870E9,
     0x67DE9CCE,0xC1A9977A,0xF0418DE7,0x56368653,0x9391B8DD,0x35E6B369,0x040EA9F4,0xA279A240,
@@ -298,7 +274,6 @@ static const uint32_t Crc32Lookup[8][256] =
     0x304FE870,0x9638E3C4,0xA7D0F959,0x01A7F2ED,0xC400CC63,0x6277C7D7,0x539FDD4A,0xF5E8D6FE,
     0x647E3AD9,0xC209316D,0xF3E12BF0,0x55962044,0x90311ECA,0x3646157E,0x07AE0FE3,0xA1D90457,
     0x579174BE,0xF1E67F0A,0xC00E6597,0x66796E23,0xA3DE50AD,0x05A95B19,0x34414184,0x92364A30 },
-
   { 0x00000000,0xCCAA009E,0x4225077D,0x8E8F07E3,0x844A0EFA,0x48E00E64,0xC66F0987,0x0AC50919,
     0xD3E51BB5,0x1F4F1B2B,0x91C01CC8,0x5D6A1C56,0x57AF154F,0x9B0515D1,0x158A1232,0xD92012AC,
     0x7CBB312B,0xB01131B5,0x3E9E3656,0xF23436C8,0xF8F13FD1,0x345B3F4F,0xBAD438AC,0x767E3832,
@@ -334,46 +309,65 @@ static const uint32_t Crc32Lookup[8][256] =
 };
 
 
-/// compute CRC32 (Slicing-by-8 algorithm)
-uint32_t crc32(const void* data, size_t length, uint32_t previousCrc32 = 0)
-{
-  uint32_t crc = ~previousCrc32; // same as previousCrc32 ^ 0xFFFFFFFF
-  const uint32_t* current = (const uint32_t*) data;
+/// <summary>
+/// Swaps the endian of the number.
+/// </summary>
+static inline uint32_t Swap(uint32_t x) {
+#if defined(__GNUC__) || defined(__clang__)
+  return __builtin_bswap32(x);
+#elif defined(_MSC_VER)
+  return _byteswap_ulong(x);
+#else
+  return (x >> 24) | ((x >>  8) & 0x0000FF00) | ((x <<  8) & 0x00FF0000) | (x << 24);
+#endif
+}
+
+
+/// <summary>
+/// Computes the CRC32 of the data.
+/// </summary>
+/// <param name="data">The data to compute the CRC for.</param>
+/// <param name="length">The number of bytes of data.</param>
+/// <param name="previous">
+/// If the CRC is being calculated piecewise, the CRC of the previous pieces.
+/// </param>
+uint32_t Hashing::Crc32(const void * data, size_t length, uint32_t previous) {
+  uint32_t crc = ~previous; // same as previousCrc32 ^ 0xFFFFFFFF
+  const uint32_t * current = (const uint32_t*)data;
 
   // process eight bytes at once (Slicing-by-8)
-  while (length >= 8)
-  {
+  while (length >= 8) {
 #if __BYTE_ORDER == __BIG_ENDIAN
-    uint32_t one = *current++ ^ swap(crc);
+    uint32_t one = *current++ ^ Swap(crc);
     uint32_t two = *current++;
-    crc  = Crc32Lookup[0][ two      & 0xFF] ^
-           Crc32Lookup[1][(two>> 8) & 0xFF] ^
-           Crc32Lookup[2][(two>>16) & 0xFF] ^
-           Crc32Lookup[3][(two>>24) & 0xFF] ^
-           Crc32Lookup[4][ one      & 0xFF] ^
-           Crc32Lookup[5][(one>> 8) & 0xFF] ^
-           Crc32Lookup[6][(one>>16) & 0xFF] ^
-           Crc32Lookup[7][(one>>24) & 0xFF];
+    crc = gCrc32Lookup[0][ two        & 0xFF] ^
+          gCrc32Lookup[1][(two >>  8) & 0xFF] ^
+          gCrc32Lookup[2][(two >> 16) & 0xFF] ^
+          gCrc32Lookup[3][(two >> 24) & 0xFF] ^
+          gCrc32Lookup[4][ one        & 0xFF] ^
+          gCrc32Lookup[5][(one >>  8) & 0xFF] ^
+          gCrc32Lookup[6][(one >> 16) & 0xFF] ^
+          gCrc32Lookup[7][(one >> 24) & 0xFF];
 #else
     uint32_t one = *current++ ^ crc;
     uint32_t two = *current++;
-    crc  = Crc32Lookup[0][(two>>24) & 0xFF] ^
-           Crc32Lookup[1][(two>>16) & 0xFF] ^
-           Crc32Lookup[2][(two>> 8) & 0xFF] ^
-           Crc32Lookup[3][ two      & 0xFF] ^
-           Crc32Lookup[4][(one>>24) & 0xFF] ^
-           Crc32Lookup[5][(one>>16) & 0xFF] ^
-           Crc32Lookup[6][(one>> 8) & 0xFF] ^
-           Crc32Lookup[7][ one      & 0xFF];
+    crc = gCrc32Lookup[0][(two >> 24) & 0xFF] ^
+          gCrc32Lookup[1][(two >> 16) & 0xFF] ^
+          gCrc32Lookup[2][(two >>  8) & 0xFF] ^
+          gCrc32Lookup[3][ two        & 0xFF] ^
+          gCrc32Lookup[4][(one >> 24) & 0xFF] ^
+          gCrc32Lookup[5][(one >> 16) & 0xFF] ^
+          gCrc32Lookup[6][(one >>  8) & 0xFF] ^
+          gCrc32Lookup[7][ one        & 0xFF];
 #endif
-
     length -= 8;
   }
 
-  const uint8_t* currentChar = (const uint8_t*) current;
-  // remaining 1 to 7 bytes (standard algorithm)
-  while (length-- > 0)
-    crc = (crc >> 8) ^ Crc32Lookup[0][(crc & 0xFF) ^ *currentChar++];
+  const uint8_t * currentChar = (const uint8_t*) current;
 
-  return ~crc; // same as crc ^ 0xFFFFFFFF
+  // remaining 1 to 7 bytes (standard algorithm)
+  while (length-- > 0) {
+    crc = (crc >> 8) ^ gCrc32Lookup[0][(crc & 0xFF) ^ *currentChar++];
+  }
+  return ~crc;
 }

@@ -9,9 +9,8 @@
 
 #include "Common.h"
 
-inline HRESULT HrGetLastError()
-{
-    return HRESULT_FROM_WIN32(GetLastError());
+inline HRESULT HrGetLastError() {
+  return HRESULT_FROM_WIN32(GetLastError());
 }
 
 HRESULT DescriptionFromHR(HRESULT hr, LPTSTR buf, size_t cchBuf);

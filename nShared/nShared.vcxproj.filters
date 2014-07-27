@@ -113,6 +113,7 @@
     <ClInclude Include="StrokeSettings.hpp">
       <Filter>States</Filter>
     </ClInclude>
+    <ClInclude Include="ResultCodes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Easing.cpp" />

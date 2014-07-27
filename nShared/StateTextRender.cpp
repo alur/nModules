@@ -13,7 +13,7 @@
 /// Constructor
 /// </summary>
 StateTextRender::StateTextRender(State *state)
-    : mRefCount(0)
+    : mRefCount(1)
     , mState(state)
 {
 }

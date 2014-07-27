@@ -6,7 +6,6 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
-#include <strsafe.h>
 #include "nCore.h"
 #include "../nCoreCom/Core.h"
 #include "../nShared/ErrorHandler.h"
@@ -20,22 +19,24 @@
 #include "Version.h"
 #include "Scripting.h"
 
+#include <strsafe.h>
+
 
 // The messages we want from the core
-UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
-HWND ghWndMsgHandler;
+static const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
+static HWND ghWndMsgHandler;
 
 // Class pointers
-MonitorInfo *g_pMonitorInfo;
+MonitorInfo * g_pMonitorInfo;
 
 // Constants
-LPCTSTR gMsgHandler = _T("LSnCore");
+static const LPCWSTR gMsgHandler = L"LSnCore";
 
 // When the [time] text function should send out change notifications.
 UINT_PTR timeTimer;
 
 // 
-EXPORT_CDECL(Window*) FindRegisteredWindow(LPCTSTR prefix);
+EXPORT_CDECL(Window*) FindRegisteredWindow(LPCWSTR prefix);
 
 
 /// <summary>
@@ -48,10 +49,21 @@ EXPORT_CDECL(VERSION) GetCoreVersion()
 
 
 /// <summary>
-/// Called by the core when this module is loaded.
+/// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* path */)
+/// <param name="parent"></param>
+/// <param name="instance">Handle to this module's instance.</param>
+/// <param name="path">Path to the LiteStep directory.</param>
+/// <returns>0 on success, non-zero on error.</returns>
+/// <remarks>
+/// If this function returns non-zero, the module will be unloaded immediately, without
+/// going through quitModule.
+/// </remarks>
+int initModuleW(HWND parent, HINSTANCE instance, LPCWSTR path)
 {
+    UNREFERENCED_PARAMETER(parent);
+    UNREFERENCED_PARAMETER(path);
+
     // Initialize
     if (!CreateMainWindow(instance))
     {
@@ -66,9 +78,9 @@ int initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* path */)
     nCore::Connect(MakeVersion(MODULE_VERSION));
 
     // Register window bangs
-    WindowBangs::Register(_T("n"), FindRegisteredWindow);
-    StateBangs::Register(_T("n"), FindRegisteredWindow);
-    BrushBangs::Register(_T("n"), FindRegisteredWindow);
+    WindowBangs::Register(L"n", FindRegisteredWindow);
+    StateBangs::Register(L"n", FindRegisteredWindow);
+    BrushBangs::Register(L"n", FindRegisteredWindow);
 
     // Start the scripting manager
     Scripting::Initialize();
@@ -78,64 +90,65 @@ int initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* path */)
 
 
 /// <summary>
-/// Called by the core when this module is about to be unloaded.
+/// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
-void quitModule(HINSTANCE hDllInstance)
+/// <param name="instance">Handle to this module's instance.</param>
+void quitModule(HINSTANCE instance)
 {
     Scripting::Shutdown();
 
-    WindowBangs::UnRegister(_T("n"));
-    StateBangs::UnRegister(_T("n"));
-    BrushBangs::UnRegister(_T("n"));
+    WindowBangs::UnRegister(L"n");
+    StateBangs::UnRegister(L"n");
+    BrushBangs::UnRegister(L"n");
 
     // Deinitalize
     if (ghWndMsgHandler)
     {
         KillTimer(ghWndMsgHandler, timeTimer);
-        SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)ghWndMsgHandler, (LPARAM)gLSMessages);
+        SendMessageW(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)ghWndMsgHandler, (LPARAM)gLSMessages);
         DestroyWindow(ghWndMsgHandler);
     }
 
     TextFunctions::_Unregister();
 
-    UnregisterClass(gMsgHandler, hDllInstance);
+    UnregisterClassW(gMsgHandler, instance);
 }
 
 
 /// <summary>
 /// Creates the main message handler.
 /// </summary>
-/// <param name="hDllInstance">The instance to attach this message handler to.</param>
-bool CreateMainWindow(HINSTANCE hDllInstance)
+/// <param name="instance">The instance to attach this message handler to.</param>
+bool CreateMainWindow(HINSTANCE instance)
 {
-    WNDCLASSEX wc;
-    ZeroMemory(&wc, sizeof(WNDCLASSEX));
-    wc.cbSize = sizeof(WNDCLASSEX);
+    WNDCLASSEXW wc;
+    ZeroMemory(&wc, sizeof(WNDCLASSEXW));
+    wc.cbSize = sizeof(WNDCLASSEXW);
     wc.lpfnWndProc = MainProc;
-    wc.hInstance = hDllInstance;
+    wc.hInstance = instance;
     wc.lpszClassName = gMsgHandler;
     wc.style = CS_NOCLOSE;
 
-    if (!RegisterClassEx(&wc))
+    if (!RegisterClassExW(&wc))
     {
-        ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("Failed to register nCore's window class!"));
+        ErrorHandler::Error(ErrorHandler::Level::Critical, L"Failed to register nCore's window class!");
         return false;
     }
 
-    ghWndMsgHandler = CreateWindowEx(WS_EX_TOOLWINDOW, gMsgHandler, _T(""),
-        WS_POPUP|WS_CLIPSIBLINGS|WS_CLIPCHILDREN,
-        0, 0, 0, 0, NULL, NULL, hDllInstance, NULL);
+    ghWndMsgHandler = CreateWindowExW(WS_EX_TOOLWINDOW, gMsgHandler, L"",
+        WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+        0, 0, 0, 0, nullptr, nullptr, instance, nullptr);
 
     if (!ghWndMsgHandler)
     {
-        ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("Failed to create nCore's message handler!"));
-        UnregisterClass(gMsgHandler, hDllInstance);
+        ErrorHandler::Error(ErrorHandler::Level::Critical, L"Failed to create nCore's message handler!");
+        UnregisterClassW(gMsgHandler, instance);
         return false;
     }
 
     // Let other modules get the instance using FindWindow + GetWindowLongPtr()
-    SetWindowLongPtr(ghWndMsgHandler, GWLP_USERDATA, (LONG_PTR)hDllInstance);
-    SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)ghWndMsgHandler, (LPARAM)gLSMessages);
+    SetWindowLongPtrW(ghWndMsgHandler, GWLP_USERDATA, (LONG_PTR)instance);
+    SendMessageW(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)ghWndMsgHandler, (LPARAM)gLSMessages);
 
     return true;
 }
@@ -155,11 +168,11 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case LM_GETREVID:
         {
             size_t length;
-            StringCchPrintf((LPTSTR)lParam, 64, TEXT("%s: "), _T(MODULE_NAME));
-			length = lstrlen((LPTSTR)lParam);
-            GetVersionString(MakeVersion(MODULE_VERSION), (LPTSTR)lParam + length, 64 - length, false);
+            StringCchPrintfW((LPWSTR)lParam, 64, L"%s: ", TEXT(MODULE_NAME));
+			length = lstrlenW((LPWSTR)lParam);
+            GetVersionString(MakeVersion(MODULE_VERSION), (LPWSTR)lParam + length, 64 - length, false);
             
-            if (SUCCEEDED(StringCchLength((LPTSTR)lParam, 64, &length)))
+            if (SUCCEEDED(StringCchLengthW((LPWSTR)lParam, 64, &length)))
             {
                 return length;
             }
@@ -184,5 +197,5 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
         return 0;
     }
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+    return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }

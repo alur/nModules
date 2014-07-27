@@ -13,7 +13,7 @@ class UnaryColorVal : public IColorVal
 {
 public:
     explicit UnaryColorVal(ARGB (*func)(ARGB, long), IColorVal*, long);
-    virtual ~UnaryColorVal();
+    ~UnaryColorVal();
 
 public:
     bool IsConstant() const override;

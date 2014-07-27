@@ -6,7 +6,7 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "IconCache.hpp"
-#include "../Utilities/CRC.h"
+#include "../Utilities/Hashing.h"
 
 
 /// <summary>
@@ -14,17 +14,16 @@
 /// </summary>
 IconCache::Hash IconCache::ComputeHash(LPWSTR path, int id)
 {
-    struct IconData
+    struct
     {
         WCHAR path[256];
         int id;
-    };
-    IconData data;
-    ZeroMemory(&data, sizeof(IconData));
+    } data;
+    ZeroMemory(&data, sizeof(data));
     StringCchCopy(data.path, _countof(data.path), path);
     data.id = id;
 
-    return crc32(&data, sizeof(data));
+    return Hashing::Crc32(&data, sizeof(data));
 }
 
 

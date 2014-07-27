@@ -7,6 +7,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "../Utilities/Common.h"
+
 namespace ErrorHandler
 {
     /// <summary>

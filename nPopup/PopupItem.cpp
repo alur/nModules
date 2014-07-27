@@ -172,6 +172,7 @@ void PopupItem::SetIcon(IExtractIconW* extractIcon) {
 
                 if (icon != nullptr)
                 {
+                    mHasIcon = true;
                     iconCache.StoreIcon(mIconHash, icon);
                 }
             }

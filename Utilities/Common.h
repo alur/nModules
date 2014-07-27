@@ -33,10 +33,11 @@
 #include "Debugging.h"
 #include <string>
 
+// TODO(Erik): Remove tstring and move everything to wstring.
 namespace std {
 #if defined(_UNICODE)
-    typedef wstring tstring;
+  typedef wstring tstring;
 #else
-    typedef string tstring;
+  typedef string tstring;
 #endif
 }

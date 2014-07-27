@@ -252,7 +252,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="nKey.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>

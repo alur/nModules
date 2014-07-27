@@ -36,18 +36,17 @@ BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */)
 /// <param name="moduleName">The name of this module, used for handling LM_GETREVID and window classes.</param>
 /// <param name="author">Name of the author(s), used for handling LM_GETREVID.</param>
 /// <param name="version">The version of the module, used for handling LM_GETREVID.</param>
-LSModule::LSModule(LPCTSTR moduleName, LPCTSTR author, VERSION version)
-{
-    this->author = author;
-    this->drawableClass = 0;
-    this->instance = instance;
-    this->messageHandler = nullptr;
-    this->messageHandlerClass = 0;
-    this->moduleName = moduleName;
-    this->parent = parent;
-    this->version = version;
+LSModule::LSModule(LPCTSTR moduleName, LPCTSTR author, VERSION version) {
+  this->author = author;
+  this->drawableClass = 0;
+  this->instance = instance;
+  this->messageHandler = nullptr;
+  this->messageHandlerClass = 0;
+  this->moduleName = moduleName;
+  this->parent = parent;
+  this->version = version;
 
-    ErrorHandler::Initialize(moduleName);
+  ErrorHandler::Initialize(moduleName);
 }
 
 
@@ -66,6 +65,13 @@ LSModule::~LSModule()
 /// <param name="instance">The instance of this module.</param>
 /// <param name="customMessageClass">Custom window class to use for the message handler.</param>
 /// <param name="customDrawableClass">Custom window class to use for the drawable window.</param>
+/**
+ * Meow?
+ * Said the cat
+ *
+ * @param parent The parent
+ * @param instance
+ */
 bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMessageClass, PWNDCLASSEX customDrawableClass)
 {
     WNDCLASSEX wc;

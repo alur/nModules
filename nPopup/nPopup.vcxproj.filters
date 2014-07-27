@@ -17,7 +17,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Version.h" />
-    <ClInclude Include="nPopup.h" />
     <ClInclude Include="CommandItem.hpp">
       <Filter>Items</Filter>
     </ClInclude>

@@ -35,6 +35,7 @@
     <ClInclude Include="BuildOptions.h" />
     <ClInclude Include="ChildDrawable.hpp" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="ResultCodes.h" />
     <ClInclude Include="IDrawable.hpp" />
     <ClInclude Include="Drawable.hpp" />
     <ClInclude Include="IStateRender.hpp" />

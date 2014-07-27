@@ -18,10 +18,10 @@
 #include <unordered_map>
 
 
-using std::tstring;
+using std::wstring;
 
 
-static void CreateLabel(LPCTSTR labelName);
+static void CreateLabel(LPCWSTR labelName);
 static void DestroyLabels();
 static void LoadSettings();
 
@@ -35,17 +35,17 @@ static UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
 
 // All the top-level labels we currently have loaded.
 // These do not include overlay labels.
-static StringKeyedMaps<tstring, Label>::UnorderedMap gTopLevelLabels;
+static StringKeyedMaps<wstring, Label>::UnorderedMap gTopLevelLabels;
 
 // All the labels we currently have loaded. Labels add and remove themselves from this list.
-StringKeyedMaps<tstring, Label*>::UnorderedMap gAllLabels;
+StringKeyedMaps<wstring, Label*>::UnorderedMap gAllLabels;
 
 
 /// <summary>
 /// Creates a new label.
 /// </summary>
 /// <param name="labelName">The RC settings prefix of the label to create.</param>
-void CreateLabel(LPCTSTR labelName)
+void CreateLabel(LPCWSTR labelName)
 {
     if (gAllLabels.find(labelName) == gAllLabels.end())
     {
@@ -59,7 +59,7 @@ void CreateLabel(LPCTSTR labelName)
     {
         ErrorHandler::Error(
             ErrorHandler::Level::Critical,
-            TEXT("Attempt to (re)create the already existing label %s!"),
+            L"Attempt to (re)create the already existing label %s!",
             labelName
         );
     }
@@ -112,7 +112,7 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR path)
 /// </summary>
 void LoadSettings()
 {
-    LiteStep::IterateOverLineTokens(TEXT("*nLabel"), CreateLabel);
+    LiteStep::IterateOverLineTokens(L"*nLabel", CreateLabel);
 }
 
 

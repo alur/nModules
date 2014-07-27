@@ -247,7 +247,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
-    <ClInclude Include="CRC.h" />
+    <ClInclude Include="Hashing.h" />
     <ClInclude Include="Debugging.h" />
     <ClInclude Include="EnumArray.hpp" />
     <ClInclude Include="Error.h" />

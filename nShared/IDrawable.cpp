@@ -28,7 +28,7 @@ IDrawable::IDrawable(LPCTSTR prefix)
     mSettings->GetString(_T("Parent"), parentPrefix, _countof(parentPrefix), _T(""));
 
     auto isInt = [] (LPCWSTR s) -> bool
-    { 
+    {
         do
         {
             if (!iswdigit(*s))

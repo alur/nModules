@@ -293,7 +293,7 @@ void WindowManager::RemoveWindow(HWND hWnd)
     }
     else
     {
-        TRACE("RemoveWindow called with invalid HWND: %u", hWnd);
+        //TRACE("RemoveWindow called with invalid HWND: %u", hWnd);
     }
 
     if (activeWindow == hWnd)
