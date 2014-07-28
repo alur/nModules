@@ -6,3 +6,4 @@ bin
 *.aps
 *.dat
 /Documentation/*.chm
+/tools/builds

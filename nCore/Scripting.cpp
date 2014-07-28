@@ -19,38 +19,22 @@ using namespace v8;
 
 
 //
-Persistent<Context> gScriptingContext;
+Persistent<Context> gContext;
 
 
 /// <summary>
-/// Executes a piece of JavaScript.
+/// Executes a piece of JavaScript code in the global context.
 /// </summary>
 static void RunCode(LPCWSTR code, void (*callback)(Handle<Value>), LPCWSTR fileName = nullptr)
 {
-    // Get the default Isolate created at startup.
-    Isolate* isolate = Isolate::GetCurrent();
+    Isolate * isolate = Isolate::GetCurrent();
+    HandleScope handleScope(isolate);
+    Context::Scope contextScope(isolate, gContext);
 
-    // Create a stack-allocated handle scope.
-    HandleScope handle_scope(isolate);
-
-    // Enter the created context for compiling and
-    // running the hello world script.
-    Context::Scope context_scope(isolate, gScriptingContext);
-
-    // Create a string containing the JavaScript source code.
-    Handle<String> source = String::New(CAST(code));
-
-    // Compile the source code.
     TryCatch tryCatch;
-    Handle<Script> script;
-    if (fileName)
-    {
-        script = Script::Compile(source, String::New(CAST(fileName)));
-    }
-    else
-    {
-        script = Script::Compile(source);
-    }
+    Handle<Script> script = fileName ?
+        Script::Compile(String::New(CAST(code)), String::New(CAST(fileName))) :
+        Script::Compile(String::New(CAST(code)));
 
     if (script.IsEmpty())
     {
@@ -64,12 +48,11 @@ static void RunCode(LPCWSTR code, void (*callback)(Handle<Value>), LPCWSTR fileN
             }
             else
             {
-                String::Value fileName(message->GetScriptResourceName());
-                int lineNum = message->GetLineNumber();
-
                 WCHAR msg[MAX_LINE_LENGTH];
 
-                StringCchPrintfW(msg, _countof(msg), L"%s\nLine %d of %s", *exception, lineNum, *fileName);
+                String::Value fileName(message->GetScriptResourceName());
+                StringCchPrintfW(msg, _countof(msg), L"%s\nLine %d of %s", *exception,
+                    message->GetLineNumber(), *fileName);
 
                 MessageBox(nullptr, msg, L"nScript Error", MB_OK);
             }
@@ -117,25 +100,16 @@ static void RunCode(LPCWSTR code, void (*callback)(Handle<Value>), LPCWSTR fileN
 /// </summary>
 static void InitV8()
 {
-    // Get the default Isolate created at startup.
-    Isolate* isolate = Isolate::GetCurrent();
+    Isolate * isolate = Isolate::GetCurrent();
+    HandleScope handleScope(isolate);
 
-    // Create a stack-allocated handle scope.
-    HandleScope handle_scope(isolate);
-
-    //
     Handle<ObjectTemplate> global = ObjectTemplate::New();
-    global->Set(String::New(CAST(L"LiteStep")), Scripting::LSCore::Initialize(isolate), PropertyAttribute::ReadOnly);
-    global->Set(String::New(CAST(L"nCore")), Scripting::NCore::Initialize(isolate), PropertyAttribute::ReadOnly);
-    //global->Set(String::New(CAST(L"dump_var")), FunctionTemplate::New([] (const FunctionCallbackInfo<Value> &args) -> void
-    //{
-    //}));
+    global->Set(String::New(CAST(L"LiteStep")),
+        Scripting::LSCore::Initialize(isolate), PropertyAttribute::ReadOnly);
+    global->Set(String::New(CAST(L"nCore")),
+        Scripting::NCore::Initialize(isolate), PropertyAttribute::ReadOnly);
 
-    // Create a new context.
-    Handle<Context> context = Context::New(isolate, nullptr, global);
-
-    // Create a Persistent handle to the context.
-    gScriptingContext.Reset(isolate, context);
+    gContext.Reset(isolate, Context::New(isolate, nullptr, global));
 }
 
 
@@ -189,5 +163,5 @@ void Scripting::Shutdown()
     LSCore::Shutdown();
 
     // Dispose of our context, killing all JS data
-    gScriptingContext.Dispose();
+    gContext.Dispose();
 }

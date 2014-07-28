@@ -169,7 +169,7 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             size_t length;
             StringCchPrintfW((LPWSTR)lParam, 64, L"%s: ", TEXT(MODULE_NAME));
-			length = lstrlenW((LPWSTR)lParam);
+            length = lstrlenW((LPWSTR)lParam);
             GetVersionString(MakeVersion(MODULE_VERSION), (LPWSTR)lParam + length, 64 - length, false);
             
             if (SUCCEEDED(StringCchLengthW((LPWSTR)lParam, 64, &length)))
