@@ -14,14 +14,15 @@
     <title>Requirements</title>
     <description>
       <ul>
-        <li>Windows Vista, Windows 7, or Windows 8.</li>
+        <li>Windows Vista, Windows 7, Windows 8, or Windows 8.1.</li>
         <li>
           <a href="http://www.microsoft.com/en-us/download/details.aspx?id=39315">
             The Visual Studio 2013 C++ Reditributable.
           </a>
         </li>
         <li>
-          The <a href="http://www.microsoft.com/en-us/download/details.aspx?id=30679">2013-08-04 0.25.0 LiteStep alpha build</a>, or newer. Latest is recommended.
+          The <a href="http://www.microsoft.com/en-us/download/details.aspx?id=30679">
+          2013-08-04 0.25.0 LiteStep alpha build</a>, or newer. Latest is recommended.
         </li>
         <li>
           Note that the latest 0.25.0 alphas require 

@@ -258,10 +258,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="nTray.h" />
     <ClInclude Include="Tray.hpp" />
     <ClInclude Include=".\TrayManager.h" />
     <ClInclude Include="TrayIcon.hpp" />
+    <ClInclude Include="Types.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>

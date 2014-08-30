@@ -1,81 +1,84 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Tray.cpp
- *  The nModules Project
- *
- *  Implementation of the Tray class. Handles layout of the tray buttons.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../nShared/LiteStep.h"
-#include "../nShared/LSModule.hpp"
+//-------------------------------------------------------------------------------------------------
+// /nTray/Tray.cpp
+// The nModules Project
+//
+// Implementation of the Tray class. Handles layout of the tray buttons, and renders the tray
+// background.
+//-------------------------------------------------------------------------------------------------
 #include "Tray.hpp"
 #include "TrayIcon.hpp"
-#include "../Utilities/Process.h"
+
+#include "../nShared/LiteStep.h"
+#include "../nShared/LSModule.hpp"
+
 #include "../Utilities/GUID.h"
 #include "../Utilities/Math.h"
-#include <shellapi.h>
-#include <Mmsystem.h>
+#include "../Utilities/Process.h"
+
 #include <map>
+#include <Mmsystem.h>
+#include <shellapi.h>
 
+extern HWND ghWndTrayNotify;
+extern bool gInitPhase;
 
-extern HWND g_hWndTrayNotify;
-extern bool g_InitPhase;
+// Default settings for labels.
+static const WindowSettings sWindowDefaults([] (WindowSettings &defaults) {
+  defaults.registerWithCore = true;
+});
+
+// StateRender initialization information.
+static const StateRender<Tray::States>::InitData sInitData;
 
 
 /// <summary>
 /// Constructor
 /// </summary>
-Tray::Tray(LPCTSTR name) : Drawable(name)
+Tray::Tray(LPCTSTR name)
+  : Drawable(name)
+  , mBalloon(L"Balloon", mSettings, mWindow->RegisterUserMessage(this), this)
+  , mHideBalloons(false)
+  , mNoTooltips(false)
+  , mTooltip(L"Tooltip", mSettings)
 {
-    this->balloonClickedMessage = mWindow->RegisterUserMessage(this);
-    this->tooltip = new Tooltip(L"Tooltip", mSettings);
-    this->balloon = new Balloon(L"Balloon", mSettings, this->balloonClickedMessage, this);
+  mOnResize[0] = L'\0';
+  mStateRender.Load(sInitData, mSettings);
 
-    mOnResize[0] = _T('\0');
+  WindowSettings windowSettings;
+  windowSettings.Load(mSettings, &sWindowDefaults);
 
-    StateRender<States>::InitData initData;
-    mStateRender.Load(initData, mSettings);
+  mWindow->Initialize(windowSettings, &mStateRender);
+  mWindow->Show();
 
-    WindowSettings defaults, windowSettings;
-    defaults.registerWithCore = true;
-    windowSettings.Load(mSettings, &defaults);
+  this->balloonTimer = 0;
 
-    mWindow->Initialize(windowSettings, &mStateRender);
-    mWindow->Show();
+  LoadSettings();
 
-    this->balloonTimer = 0;
-
-    LoadSettings();
-
-    this->infoIcon = LoadIcon(NULL, IDI_INFORMATION);
-    this->warningIcon = LoadIcon(NULL, IDI_WARNING);
-    this->errorIcon = LoadIcon(NULL, IDI_ERROR);
-    this->activeBalloonIcon = nullptr;
+  this->infoIcon = LoadIcon(NULL, IDI_INFORMATION);
+  this->warningIcon = LoadIcon(NULL, IDI_WARNING);
+  this->errorIcon = LoadIcon(NULL, IDI_ERROR);
+  this->activeBalloonIcon = nullptr;
 }
 
 
 /// <summary>
 /// Destructor
 /// </summary>
-Tray::~Tray()
-{
-    // Remove all icons
-    for (TrayIcon *icon : this->icons)
-    {
-        delete icon;
-    }
-    this->icons.clear();
+Tray::~Tray() {
+  // Remove all icons
+  for (TrayIcon *icon : this->icons) {
+      delete icon;
+  }
+  this->icons.clear();
 
-    if (this->balloonClickedMessage != 0)
-    {
-        mWindow->ReleaseUserMessage(this->balloonClickedMessage);
-    }
+  if (this->balloonClickedMessage != 0)
+  {
+      mWindow->ReleaseUserMessage(this->balloonClickedMessage);
+  }
 
-    SAFEDELETE(this->tooltip);
-    SAFEDELETE(this->balloon);
-
-    DestroyIcon(this->infoIcon);
-    DestroyIcon(this->warningIcon);
-    DestroyIcon(this->errorIcon);
+  DestroyIcon(this->infoIcon);
+  DestroyIcon(this->warningIcon);
+  DestroyIcon(this->errorIcon);
 }
 
 
@@ -126,11 +129,11 @@ void Tray::LoadSettings(bool /* IsRefresh */)
         GUID guid;
         if (GUIDFromStringW(line, &guid) != FALSE)
         {
-            mHiddenIconIDs.push_back(IconID(guid));
+            mHiddenIconIDs.push_back(IconId(guid));
         }
         else
         {
-            mHiddenIconIDs.push_back(IconID(line));
+            mHiddenIconIDs.push_back(IconId(line));
         }
     });
 
@@ -159,7 +162,7 @@ TrayIcon* Tray::AddIcon(LiteStep::LPLSNOTIFYICONDATA NID)
         TrayIcon* icon = new TrayIcon(this, NID, mIconWindowSettings, &mIconStates);
         this->icons.push_back(icon);
         icon->Show();
-        if (!g_InitPhase)
+        if (!gInitPhase)
         {
             Relayout();
         }
@@ -184,11 +187,11 @@ bool Tray::WantIcon(LiteStep::LPLSNOTIFYICONDATA NID)
     WCHAR processName[MAX_PATH];
     GetProcessName(NID->hWnd, false, processName, _countof(processName));
     
-    for (IconID &iconID : mHiddenIconIDs)
+    for (IconId &iconID : mHiddenIconIDs)
     {
         switch (iconID.type)
         {
-        case IconID::Type::GUID:
+        case IconId::Type::GUID:
             {
                 if ((NID->uFlags & NIF_GUID) == NIF_GUID && NID->guidItem == iconID.guid)
                 {
@@ -197,7 +200,7 @@ bool Tray::WantIcon(LiteStep::LPLSNOTIFYICONDATA NID)
             }
             break;
 
-        case IconID::Type::Process:
+        case IconId::Type::Process:
             {
                 if (_wcsicmp(processName, iconID.process) == 0)
                 {
@@ -265,7 +268,7 @@ void Tray::Relayout()
         {
             int iconsPerColumn = mLayoutSettings.ItemsPerColumn(mIconSize, (int)size.height);
             int requiredColumns = (int)(this->icons.size() + iconsPerColumn - 1) / iconsPerColumn; // ceil(y/x) = floor((y + x - 1)/x)
-            int requiredWidth = std::max((mIconSize + mLayoutSettings.mColumnSpacing) * requiredColumns +
+            int requiredWidth = std::max((mIconSize + mLayoutSettings.mColumnSpacing) * requiredColumns -
                 mLayoutSettings.mColumnSpacing + mLayoutSettings.mPadding.left + mLayoutSettings.mPadding.right,
                 (long)mTargetSize.width);
 
@@ -286,7 +289,7 @@ void Tray::Relayout()
     case OverflowAction::SizeDown:
         int iconsPerRow = mLayoutSettings.ItemsPerRow(mIconSize, (int)size.width);
         int requiredRows = (int)(this->icons.size() + iconsPerRow - 1) / iconsPerRow; // ceil(y/x) = floor((y + x - 1)/x)
-        int requiredHeight = std::max((mIconSize + mLayoutSettings.mRowSpacing) * requiredRows +
+        int requiredHeight = std::max((mIconSize + mLayoutSettings.mRowSpacing) * requiredRows -
             mLayoutSettings.mRowSpacing + mLayoutSettings.mPadding.top + mLayoutSettings.mPadding.bottom,
             (long)mTargetSize.height);
 
@@ -321,11 +324,11 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM
     {
     case WM_MOUSEMOVE:
         {
-            if (IsWindow(g_hWndTrayNotify))
+            if (IsWindow(ghWndTrayNotify))
             {
                 RECT r;
                 mWindow->GetScreenRect(&r);
-                MoveWindow(g_hWndTrayNotify, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
+                MoveWindow(ghWndTrayNotify, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
             }
         }
         return 0;
@@ -390,84 +393,79 @@ void Tray::InitCompleted()
 /// <summary>
 /// Shows the specified tooltip for this tray.
 /// </summary>
-void Tray::ShowTip(LPCWSTR text, LPRECT position)
-{
-    if (!mNoTooltips)
-    {
-        this->tooltip->Show(text, position);
-    }
+void Tray::ShowTip(LPCWSTR text, LPRECT position) {
+  if (!mNoTooltips) {
+    mTooltip.Show(text, position);
+  }
 }
 
 
 /// <summary>
 /// Hides the tooltip for this tray.
 /// </summary>
-void Tray::HideTip()
-{
-    this->tooltip->Hide();
+void Tray::HideTip() {
+  mTooltip.Hide();
 }
 
 
 /// <summary>
 /// Enqueues a balloon.
 /// </summary>
-void Tray::EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD infoFlags, HICON balloonIcon, bool realTime)
+void Tray::EnqueueBalloon(TrayIcon *icon, LPCWSTR infoTitle, LPCWSTR info, DWORD infoFlags,
+  HICON balloonIcon, bool realTime)
 {
-    // Get the user notification state.
-    QUERY_USER_NOTIFICATION_STATE state;
-    SHQueryUserNotificationState(&state);
+  // Get the user notification state.
+  QUERY_USER_NOTIFICATION_STATE state;
+  SHQueryUserNotificationState(&state);
 
-    // Realtime balloons are discarded unless they can be shown imediately.
-    if (mHideBalloons || realTime && (this->balloonTimer != 0 || state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME))
-    {
-        return;
-    }
+  // Realtime balloons are discarded unless they can be shown imediately.
+  if (mHideBalloons || realTime &&
+    (this->balloonTimer != 0 || state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME))
+  {
+    return;
+  }
 
-    if (!mWindow->IsVisible())
-    {
-        return;
-    }
+  if (!mWindow->IsVisible()) {
+    return;
+  }
 
-    BalloonData data;
-    data.icon = icon;
-    data.infoTitle = _wcsdup(infoTitle);
-    data.info = _wcsdup(info);
-    data.infoFlags = infoFlags;
-    data.balloonIcon = balloonIcon;
+  BalloonData data;
+  data.icon = icon;
+  data.infoTitle = _wcsdup(infoTitle);
+  data.info = _wcsdup(info);
+  data.infoFlags = infoFlags;
+  data.balloonIcon = balloonIcon;
 
-    this->queuedBalloons.push_back(data);
+  this->queuedBalloons.push_back(data);
 
-    if (this->balloonTimer == 0)
-    {
-        ShowNextBalloon();
-    }
+  if (this->balloonTimer == 0) {
+    ShowNextBalloon();
+  }
 }
 
 
 /// <summary>
 /// Dismisses a balloon notification prematurely.
 /// </summary>
-void Tray::DismissBalloon(UINT message)
-{
-    // Reset the timer.
-    SetTimer(mWindow->GetWindowHandle(), this->balloonTimer, this->balloonTime, NULL);
+void Tray::DismissBalloon(UINT message) {
+  // Reset the timer.
+  SetTimer(mWindow->GetWindowHandle(), this->balloonTimer, this->balloonTime, NULL);
 
-    this->balloon->Hide();
-    this->activeBalloonIcon->SendCallback(message, NULL, NULL);
-    this->activeBalloonIcon = NULL;
+  mBalloon.Hide();
+  this->activeBalloonIcon->SendCallback(message, NULL, NULL);
+  this->activeBalloonIcon = NULL;
 
-    ShowNextBalloon();
+  ShowNextBalloon();
 }
 
 
 /// <summary>
 /// Hides the current balloon and shows the next balloon in the queue.
 /// </summary>
-void Tray::ShowNextBalloon()
-{
+void Tray::ShowNextBalloon() {
     if (this->activeBalloonIcon != NULL)
     {
-        this->balloon->Hide();
+        mBalloon.Hide();
         this->activeBalloonIcon->SendCallback(NIN_BALLOONTIMEOUT, NULL, NULL);
         this->activeBalloonIcon = NULL;
     }
@@ -554,7 +552,7 @@ void Tray::ShowNextBalloon()
 
     this->activeBalloonIcon = d.icon;
 
-    this->balloon->Show(d.infoTitle, d.info, icon, &iconSize, &targetPosition);
+    mBalloon.Show(d.infoTitle, d.info, icon, &iconSize, &targetPosition);
 
     // Free memory
     free((LPVOID)d.infoTitle);

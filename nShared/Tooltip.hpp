@@ -11,33 +11,37 @@
 #include "StateRender.hpp"
 #include "Window.hpp"
 
-class Tooltip : public Drawable
-{
+class Tooltip : public Drawable {
 public:
-    enum class States
-    {
-        Base = 0,
-        Count
-    };
+  enum class States {
+    Base,
+    Count
+  };
+
+  enum class Placement {
+    Left,
+    Top,
+    Right,
+    Bottom,
+    Count
+  };
 
 public:
-    explicit Tooltip(LPCTSTR prefix, Settings* parentSettings);
-    virtual ~Tooltip();
+  Tooltip(LPCTSTR prefix, Settings * parentSettings);
 
 public:
-    void Show(LPCWSTR text, LPRECT position);
-    void Hide();
+  void Show(LPCWSTR text, LPRECT position);
+  void Hide();
+
+  // MessageHandler
+public:
+  LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID);
 
 private:
-    void LoadSettings();
+  int mMaxWidth;
+  int mMaxHeight;
+  float mOffset;
+  Placement mPlacement;
 
-    // MessageHandler
-public:
-    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID);
-
-private:
-    int mMaxWidth;
-    int mMaxHeight;
-
-    StateRender<States> mStateRender;
+  StateRender<States> mStateRender;
 };

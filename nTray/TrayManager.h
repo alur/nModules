@@ -1,48 +1,41 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TrayManager.h
- *  The nModules Project
- *
- *  Keeps track of the system tray icons and notifies the trays of changes.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nTray/TrayManager.h
+// The nModules Project
+//
+// Keeps track of the system tray icons and notifies the trays of changes.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 #include "TrayIcon.hpp"
+#include "Types.h"
+
+#include <map>
 #include <vector>
 
-using std::vector;
-using std::string;
+namespace TrayManager {
+  struct Icon {
+    std::map<Tray*, TrayIcon*> trayIcons;
+    IconData data;
+  };
 
-namespace TrayManager
-{
-    typedef struct TRAYICONDATA
-    {
-        vector<TrayIcon*>* icons;
-        GUID guidItem;
-        UINT uID;
-        HWND hwnd;
-    } *LPTRAYICONDATA;
+  typedef std::vector<Icon>::iterator IconIter;
 
-    typedef vector<LPTRAYICONDATA>::iterator TRAYICONDATAITER;
-    typedef map<std::tstring, Tray*>::const_iterator TRAYSCITER;
+  void Stop();
+  void GetScreenRect(IconIter, LPRECT);
 
-    void Stop();
-    void GetScreenRect(TRAYICONDATAITER icon, LPRECT rect);
+  IconIter FindIcon(GUID);
+  IconIter FindIcon(HWND, UINT id);
+  IconIter FindIcon(LiteStep::LPLSNOTIFYICONDATA);
+  IconIter FindIcon(LiteStep::LPSYSTRAYINFOEVENT);
 
-    TRAYICONDATAITER FindIcon(GUID guid);
-    TRAYICONDATAITER FindIcon(HWND hWnd, UINT uID);
-    TRAYICONDATAITER FindIcon(LiteStep::LPLSNOTIFYICONDATA pNID);
-    TRAYICONDATAITER FindIcon(LiteStep::LPSYSTRAYINFOEVENT pSTE);
-    
-    void AddIcon(LiteStep::LPLSNOTIFYICONDATA pNID);
-    void DeleteIcon(LiteStep::LPLSNOTIFYICONDATA pNID);
-    void ModifyIcon(LiteStep::LPLSNOTIFYICONDATA pNID);
-    void SetFocus(LiteStep::LPLSNOTIFYICONDATA pNID);
-    void SetVersion(LiteStep::LPLSNOTIFYICONDATA pNID);
+  void AddIcon(LiteStep::LPLSNOTIFYICONDATA);
+  void DeleteIcon(LiteStep::LPLSNOTIFYICONDATA);
+  void ModifyIcon(LiteStep::LPLSNOTIFYICONDATA);
+  void SetFocus(LiteStep::LPLSNOTIFYICONDATA);
+  void SetVersion(LiteStep::LPLSNOTIFYICONDATA);
 
-    void ListIconIDS();
+  void ListIconIDS();
+  void InitCompleted();
 
-    void InitCompleted();
-    
-    LRESULT ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  LRESULT ShellMessage(HWND, UINT message, WPARAM, LPARAM);
 }

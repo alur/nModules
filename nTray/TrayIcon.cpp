@@ -13,9 +13,7 @@
 #include "Windowsx.h"
 #include <shellapi.h>
 
-
 extern LSModule gLSModule;
-extern HWND g_hWndTrayNotify;
 
 
 /// <summary>
