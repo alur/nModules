@@ -228,12 +228,17 @@ void Tray::Relayout() {
       mIconLayout.mColumnSpacing + mIconLayout.mPadding.left + mIconLayout.mPadding.right,
       (long)mTargetSize.width);
 
+    int i = 0;
+    for (auto icon : mIcons) {
+      icon->Reposition(mIconLayout.RectFromID(i++, mIconSize, mIconSize, requiredWidth, (int)mTargetSize.height));
+    }
+
     if (size.width != requiredWidth) {
       mWindow->SetPosition(
         float(mOverflowAction == OverflowAction::SizeRight ? mTargetPosition.x : mTargetPosition.x - (requiredWidth - mTargetSize.width)),
-        (float)mTargetPosition.y,
+        mTargetPosition.y,
         (float)requiredWidth,
-        (float)mTargetSize.height,
+        mTargetSize.height,
         1
         );
       }
@@ -248,22 +253,22 @@ void Tray::Relayout() {
       mIconLayout.mRowSpacing + mIconLayout.mPadding.top + mIconLayout.mPadding.bottom,
       (long)mTargetSize.height);
 
+    int i = 0;
+    for (auto icon : mIcons) {
+      icon->Reposition(mIconLayout.RectFromID(i++, mIconSize, mIconSize, (int)mTargetSize.width, requiredHeight));
+    }
+
     if (size.height != requiredHeight) {
       mWindow->SetPosition(
-        (float)mTargetPosition.x,
+        mTargetPosition.x,
         float(mOverflowAction == OverflowAction::SizeDown ? mTargetPosition.y : mTargetPosition.y - (requiredHeight - mTargetSize.height)),
-        (float)mTargetSize.width,
+        mTargetSize.width,
         (float)requiredHeight,
         1
         );
       }
     }
     break;
-  }
-
-  int i = 0;
-  for (auto icon : mIcons) {
-    icon->Reposition(mIconLayout.RectFromID(i++, mIconSize, mIconSize, (int)size.width, (int)size.height));
   }
 }
 

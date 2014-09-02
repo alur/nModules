@@ -202,24 +202,23 @@ void TrayManager::Stop() {
 LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
   case LM_SYSTRAY:
-    switch ((DWORD)wParam)
-    {
+    switch ((DWORD)wParam) {
     case NIM_ADD:
       AddIcon((LPLSNOTIFYICONDATA)lParam);
       break;
-            
+
     case NIM_DELETE:
       DeleteIcon((LPLSNOTIFYICONDATA)lParam);
       break;
-            
+
     case NIM_MODIFY:
       ModifyIcon(LPLSNOTIFYICONDATA(lParam));
       break;
-            
+
     case NIM_SETFOCUS:
       SetFocus((LPLSNOTIFYICONDATA)lParam);
       break;
-            
+
     case NIM_SETVERSION:
       SetVersion((LPLSNOTIFYICONDATA)lParam);
       break;
