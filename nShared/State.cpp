@@ -172,6 +172,7 @@ bool State::UpdateDWMColor(ARGB newColor, ID2D1RenderTarget *renderTarget)
     ret = mBrushes[BrushType::Background].UpdateDWMColor(newColor, renderTarget) || ret;
     ret = mBrushes[BrushType::Outline].UpdateDWMColor(newColor, renderTarget) || ret;
     ret = mBrushes[BrushType::Text].UpdateDWMColor(newColor, renderTarget) || ret;
+    ret = mBrushes[BrushType::TextStroke].UpdateDWMColor(newColor, renderTarget) || ret;
 
     return ret;
 }
