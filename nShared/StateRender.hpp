@@ -162,12 +162,15 @@ public:
         }
         return nullptr;
     }
+
+
+    void Load(Settings *baseSettings) {
+      const InitData initData;
+      Load(initData, baseSettings);
+    }
     
 
-    /// <summary>
-    /// Toggles the specified state.
-    /// </summary>
-    void Load(const InitData & initData, Settings * baseSettings)
+    void Load(const InitData & initData, Settings *baseSettings)
     {
         for (StateEnum state = StateEnum::Base; state != StateEnum::Count; EnumIncrement(state))
         {

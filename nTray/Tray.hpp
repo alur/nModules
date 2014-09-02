@@ -7,6 +7,7 @@
 #pragma once
 
 #include "TrayIcon.hpp"
+#include "Types.h"
 
 #include "../nShared/Balloon.hpp"
 #include "../nShared/LayoutSettings.hpp"
@@ -14,6 +15,7 @@
 #include "../nShared/Tooltip.hpp"
 #include "../nShared/Window.hpp"
 
+#include <forward_list>
 #include <map>
 #include <strsafe.h>
 
@@ -26,28 +28,21 @@ public:
 
 public:
   explicit Tray(LPCTSTR);
-  virtual ~Tray();
+  ~Tray();
 
 public:
-  TrayIcon* AddIcon(LiteStep::LPLSNOTIFYICONDATA);
-
-  // Removes the specified icon from this tray, if it exists.
+  TrayIcon *AddIcon(IconData&);
   void RemoveIcon(TrayIcon*);
 
-  // Handles window messages for the tray.
-  LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
-
-  // Should be called when the initalization phase is done -- repaint the tray.
   void InitCompleted();
-
-  // Shows the trays tooltip.
   void ShowTip(LPCWSTR text, LPRECT position);
-
-  // Hides the trays tooltip.
   void HideTip();
+  void EnqueueBalloon(TrayIcon*, LPCWSTR infoTitle, LPCWSTR info, DWORD infoFlags,
+    HICON balloonIcon, bool realTime);
 
-  // Enques a balloon tip for display.
-  void EnqueueBalloon(TrayIcon* icon, LPCWSTR infoTitle, LPCWSTR info, DWORD infoFlags, HICON balloonIcon, bool realTime);
+  // IMessageHandler
+public:
+  LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
 private:
   // Dismisses a balloon notification prematurely.
@@ -57,7 +52,7 @@ private:
   void ShowNextBalloon();
 
   // Returns true if we should display the given icon.
-  bool WantIcon(LiteStep::LPLSNOTIFYICONDATA);
+  bool WantIcon(IconData&);
 
 private:
   enum class OverflowAction {
@@ -100,6 +95,11 @@ private:
   };
 
 private:
+  void LoadSettings();
+  void Relayout();
+  vector<TrayIcon*>::iterator FindIcon(TrayIcon*);
+
+private:
   StateRender<States> mStateRender;
   StateRender<TrayIcon::States> mIconStates;
 
@@ -108,36 +108,13 @@ private:
 private:
   Balloon mBalloon;
   Tooltip mTooltip;
+  vector<TrayIcon*> mIcons;
 
   // Balloons queued up to be displayed.
-  std::list<BalloonData> queuedBalloons;
+  std::list<BalloonData> mQueuedBalloons;
 
-  //
-  std::list<IconId> mHiddenIconIDs;
-
-  // Loads .rc settings for this tray.
-  void LoadSettings(bool isRefresh = false);
-
-  // Positions all tray icons properly.
-  void Relayout();
-
-  // Finds the specified icon in the tray.
-  vector<TrayIcon*>::const_iterator FindIcon(TrayIcon* icon);
-
-  // The tray icons.
-  vector<TrayIcon*> icons;
-
-  // The size of the icons.
-  int mIconSize;
-
-  // Defines how the tray icons should be layed out.
-  LayoutSettings mLayoutSettings;
-
-  // True if we should hide balloons.
-  bool mHideBalloons;
-
-  //
-  bool mNoTooltips;
+  // The active balloon icon.
+  TrayIcon *mActiveBalloonIcon;
 
   // The size that the tray should be when it's not overflowing
   D2D1_SIZE_F mTargetSize;
@@ -145,29 +122,29 @@ private:
   // The position where the tray should be when it's not overflowing
   D2D1_POINT_2F mTargetPosition;
 
-  //
-  OverflowAction mOverflowAction;
-
-  TCHAR mOnResize[MAX_LINE_LENGTH];
-
-  // Number of milliseconds to show balloons.
-  int balloonTime;
-
   // Fires when we should hide the current balloon, and possibly show the next one.
-  UINT_PTR balloonTimer;
+  UINT_PTR mBalloonTimer;
 
   // Standard balloon icons.
-  HICON infoIcon, warningIcon, errorIcon;
+  HICON mInfoIcon, mWarningIcon, mErrorIcon;
+
+
+  // Settings
+private:
+  std::forward_list<IconId> mIconBlacklist;
+  int mIconSize;
+  LayoutSettings mIconLayout;
+  bool mHideBalloons;
+  bool mNoTooltips;
+  TCHAR mOnResize[MAX_LINE_LENGTH];
+  OverflowAction mOverflowAction;
+
+  // Number of milliseconds to show balloons.
+  int mBalloonTime;
 
   // If true, don't play any notification sounds.
-  bool noNotificationSounds;
+  bool mNoNotificationSounds;
 
   // The sound to play when showing new notifications.
-  WCHAR notificationSound[128];
-
-  // Message sent by the balloon when it is clicked.
-  UINT balloonClickedMessage;
-
-  // The active balloon icon.
-  TrayIcon* activeBalloonIcon;
+  WCHAR mNotificationSound[MAX_PATH];
 };

@@ -27,8 +27,9 @@ static const WindowSettings sWindowDefaults([] (WindowSettings &defaults) {
   defaults.registerWithCore = true;
 });
 
-// StateRender initialization information.
-static const StateRender<Tray::States>::InitData sInitData;
+static const StateRender<TrayIcon::States>::InitData sIconInitData([] (StateRender<TrayIcon::States>::InitData &initData) {
+  initData[TrayIcon::States::Base].defaults.brushSettings[State::BrushType::Background].color = Color::Create(0x00000000);
+});
 
 
 /// <summary>
@@ -37,12 +38,14 @@ static const StateRender<Tray::States>::InitData sInitData;
 Tray::Tray(LPCTSTR name)
   : Drawable(name)
   , mBalloon(L"Balloon", mSettings, mWindow->RegisterUserMessage(this), this)
+  , mBalloonTimer(0)
   , mHideBalloons(false)
   , mNoTooltips(false)
+  , mActiveBalloonIcon(nullptr)
   , mTooltip(L"Tooltip", mSettings)
 {
   mOnResize[0] = L'\0';
-  mStateRender.Load(sInitData, mSettings);
+  mStateRender.Load(mSettings);
 
   WindowSettings windowSettings;
   windowSettings.Load(mSettings, &sWindowDefaults);
@@ -50,14 +53,11 @@ Tray::Tray(LPCTSTR name)
   mWindow->Initialize(windowSettings, &mStateRender);
   mWindow->Show();
 
-  this->balloonTimer = 0;
-
   LoadSettings();
 
-  this->infoIcon = LoadIcon(NULL, IDI_INFORMATION);
-  this->warningIcon = LoadIcon(NULL, IDI_WARNING);
-  this->errorIcon = LoadIcon(NULL, IDI_ERROR);
-  this->activeBalloonIcon = nullptr;
+  mInfoIcon = LoadIcon(NULL, IDI_INFORMATION);
+  mWarningIcon = LoadIcon(NULL, IDI_WARNING);
+  mErrorIcon = LoadIcon(NULL, IDI_ERROR);
 }
 
 
@@ -66,317 +66,254 @@ Tray::Tray(LPCTSTR name)
 /// </summary>
 Tray::~Tray() {
   // Remove all icons
-  for (TrayIcon *icon : this->icons) {
-      delete icon;
-  }
-  this->icons.clear();
-
-  if (this->balloonClickedMessage != 0)
-  {
-      mWindow->ReleaseUserMessage(this->balloonClickedMessage);
+  for (TrayIcon *icon : mIcons) {
+    delete icon;
   }
 
-  DestroyIcon(this->infoIcon);
-  DestroyIcon(this->warningIcon);
-  DestroyIcon(this->errorIcon);
+  if (mBalloon.GetClickedMessage() != 0) {
+    mWindow->ReleaseUserMessage(mBalloon.GetClickedMessage());
+  }
+
+  DestroyIcon(mInfoIcon);
+  DestroyIcon(mWarningIcon);
+  DestroyIcon(mErrorIcon);
 }
 
 
 /// <summary>
 /// Loads settings from LiteStep's RC files.
 /// </summary>
-void Tray::LoadSettings(bool /* IsRefresh */)
-{
-    LayoutSettings layoutDefaults;
-    mLayoutSettings.Load(mSettings, &layoutDefaults);
+void Tray::LoadSettings() {
+  mIconLayout.Load(mSettings);
 
-    mNoTooltips = mSettings->GetBool(_T("NoTooltips"), false);
-    mHideBalloons = mSettings->GetBool(_T("HideBalloons"), false);
-    this->balloonTime = mSettings->GetInt(_T("BalloonTime"), 7000);
-    this->noNotificationSounds = mSettings->GetBool(_T("NoNotificationSounds"), false);
-    mSettings->GetString(_T("NotificationSound"), this->notificationSound, 128, _T("Notification.Default"));
+  mNoTooltips = mSettings->GetBool(L"NoTooltips", false);
+  mHideBalloons = mSettings->GetBool(L"HideBalloons", false);
+  mBalloonTime = mSettings->GetInt(L"BalloonTime", 7000);
+  mNoNotificationSounds = mSettings->GetBool(L"NoNotificationSounds", false);
+  mSettings->GetString(L"NotificationSound", mNotificationSound, _countof(mNotificationSound),
+    L"Notification.Default");
 
-    WindowSettings *drawingSettings = mWindow->GetDrawingSettings();
+  WindowSettings *drawingSettings = mWindow->GetDrawingSettings();
 
-    // TODO::FIX ME!
-    mTargetSize = D2D1::SizeF(
-        drawingSettings->width.Evaluate(0),
-        drawingSettings->height.Evaluate(0)
-    );
+  // TODO::FIX ME!
+  mTargetSize = D2D1::SizeF(
+    drawingSettings->width.Evaluate(0),
+    drawingSettings->height.Evaluate(0)
+  );
 
-    mTargetPosition = D2D1::Point2F(
-        drawingSettings->x.Evaluate(0),
-        drawingSettings->y.Evaluate(0)
-    );
+  mTargetPosition = D2D1::Point2F(
+    drawingSettings->x.Evaluate(0),
+    drawingSettings->y.Evaluate(0)
+  );
 
-    mOverflowAction = mSettings->GetEnum<OverflowAction>(_T("OverflowAction"),
-    {
-        { OverflowAction::None,      _T("None")      },
-        { OverflowAction::SizeDown,  _T("SizeDown")  },
-        { OverflowAction::SizeLeft,  _T("SizeLeft")  },
-        { OverflowAction::SizeRight, _T("SizeRight") },
-        { OverflowAction::SizeUp,    _T("SizeUp")    }
-    }, OverflowAction::None);
+  mOverflowAction = mSettings->GetEnum<OverflowAction>(L"OverflowAction", {
+    { OverflowAction::None,      L"None"      },
+    { OverflowAction::SizeDown,  L"SizeDown"  },
+    { OverflowAction::SizeLeft,  L"SizeLeft"  },
+    { OverflowAction::SizeRight, L"SizeRight" },
+    { OverflowAction::SizeUp,    L"SizeUp"    }
+  }, OverflowAction::None);
 
-    mSettings->GetLine(_T("OnResize"), mOnResize, _countof(mOnResize), nullptr);
+  mSettings->GetLine(L"OnResize", mOnResize, _countof(mOnResize), nullptr);
 
-    // Load hidden icons
-    TCHAR keyName[MAX_RCCOMMAND];
-    StringCchPrintf(keyName, _countof(keyName), _T("*%sHide"), mSettings->GetPrefix());
-    LiteStep::IterateOverLines(keyName, [this] (LPCWSTR line) -> void
-    {
-        // Try to parse it as a GUID, if that fails assume it's a process.
-        GUID guid;
-        if (GUIDFromStringW(line, &guid) != FALSE)
-        {
-            mHiddenIconIDs.push_back(IconId(guid));
-        }
-        else
-        {
-            mHiddenIconIDs.push_back(IconId(line));
-        }
-    });
+  mSettings->IterateOverCommandLines(L"Hide", [this] (LPCWSTR line) -> void {
+    // Try to parse it as a GUID, if that fails assume it's a process.
+    GUID guid;
+    if (GUIDFromStringW(line, &guid) != FALSE) {
+      mIconBlacklist.emplace_front(guid);
+    } else {
+      mIconBlacklist.emplace_front(line);
+    }
+  });
 
-    // Load icon settings
-    Settings* iconSettings = mSettings->CreateChild(_T("Icon"));
-    mIconSize = iconSettings->GetInt(_T("Size"), 16);
-
-    StateRender<TrayIcon::States>::InitData iconInitData;
-    iconInitData[TrayIcon::States::Base].defaults.brushSettings[State::BrushType::Background].color = Color::Create(0x00000000);
-    mIconStates.Load(iconInitData, iconSettings);
-
-    WindowSettings iconDefaults;
-    mIconWindowSettings.Load(iconSettings, &iconDefaults);
-    
-    delete iconSettings;
+  // Load icon settings
+  Settings *iconSettings = mSettings->CreateChild(L"Icon");
+  mIconSize = iconSettings->GetInt(L"Size", 16);
+  mIconStates.Load(sIconInitData, iconSettings);
+  mIconWindowSettings.Load(iconSettings);
+  delete iconSettings;
 }
 
 
 /// <summary>
 /// Adds the specified icon to this tray.
 /// </summary>
-TrayIcon* Tray::AddIcon(LiteStep::LPLSNOTIFYICONDATA NID)
-{
-    if (WantIcon(NID))
-    {
-        TrayIcon* icon = new TrayIcon(this, NID, mIconWindowSettings, &mIconStates);
-        this->icons.push_back(icon);
-        icon->Show();
-        if (!gInitPhase)
-        {
-            Relayout();
-        }
-        return icon;
-    }
+TrayIcon *Tray::AddIcon(IconData &iconData) {
+  if (!WantIcon(iconData)) {
     return nullptr;
+  }
+  TrayIcon *icon = new TrayIcon(this, iconData, mIconWindowSettings, &mIconStates);
+  mIcons.push_back(icon);
+  icon->Show();
+  if (!gInitPhase) {
+    Relayout();
+  }
+  return icon;
 }
 
 
 /// <summary>
 /// Returns true if this tray wants the specified icon.
 /// </summary>
-bool Tray::WantIcon(LiteStep::LPLSNOTIFYICONDATA NID)
-{
-    // We could block/accept based on 4 things.
-    // 1. Process name
-    // 2. GUID -- if specified
-    // 3. Window Class
-    // 4. Window Text
+bool Tray::WantIcon(IconData &iconData) {
+  // We could block/accept based on 4 things.
+  // 1. Process name
+  // 2. GUID -- if specified
+  // 3. Window Class
+  // 4. Window Text
 
-    // 1. Process name
-    WCHAR processName[MAX_PATH];
-    GetProcessName(NID->hWnd, false, processName, _countof(processName));
+  // 1. Process name
+  WCHAR processName[MAX_PATH];
+  GetProcessName(iconData.window, false, processName, _countof(processName));
     
-    for (IconId &iconID : mHiddenIconIDs)
-    {
-        switch (iconID.type)
-        {
-        case IconId::Type::GUID:
-            {
-                if ((NID->uFlags & NIF_GUID) == NIF_GUID && NID->guidItem == iconID.guid)
-                {
-                    return false;
-                }
-            }
-            break;
+  for (IconId &iconId : mIconBlacklist) {
+    switch (iconId.type) {
+    case IconId::Type::GUID:
+      if ((iconData.flags & NIF_GUID) == NIF_GUID && iconData.guid == iconId.guid) {
+        return false;
+      }
+      break;
 
-        case IconId::Type::Process:
-            {
-                if (_wcsicmp(processName, iconID.process) == 0)
-                {
-                    return false;
-                }
-            }
-            break;
-        }
+    case IconId::Type::Process:
+      if (_wcsicmp(processName, iconId.process) == 0) {
+        return false;
+      }
+      break;
     }
+  }
 
-    return true;
+  return true;
 }
 
 
 /// <summary>
 /// Finds the specified icon.
 /// </summary>
-vector<TrayIcon*>::const_iterator Tray::FindIcon(TrayIcon* pIcon)
-{
-    for (vector<TrayIcon*>::const_iterator iter = this->icons.begin(); iter != this->icons.end(); iter++)
-    {
-        if ((*iter) == pIcon)
-        {
-            return iter;
-        }
-    }
-    return this->icons.end();
+vector<TrayIcon*>::iterator Tray::FindIcon(TrayIcon *icon) {
+  return std::find(mIcons.begin(), mIcons.end(), icon);
 }
 
 
 /// <summary>
 /// Removes the specified icon from this tray, if it is in it.
 /// </summary>
-void Tray::RemoveIcon(TrayIcon* pIcon)
-{
-    vector<TrayIcon*>::const_iterator icon = FindIcon(pIcon);
-    if (icon != this->icons.end())
-    {
-        this->icons.erase(icon);
+void Tray::RemoveIcon(TrayIcon *pIcon) {
+  vector<TrayIcon*>::const_iterator icon = FindIcon(pIcon);
+  if (icon != mIcons.end()) {
+    mIcons.erase(icon);
         
-        if (pIcon == this->activeBalloonIcon)
-        {
-            DismissBalloon(NIN_BALLOONHIDE);
-        }
-        delete pIcon;
-
-        Relayout();
+    if (pIcon == mActiveBalloonIcon) {
+      DismissBalloon(NIN_BALLOONHIDE);
     }
+    delete pIcon;
+
+    Relayout();
+  }
 }
 
 
 /// <summary>
 /// Repositions/Resizes all icons.
 /// </summary>
-void Tray::Relayout()
-{
-    Window::UpdateLock lock(mWindow);
+void Tray::Relayout() {
+  Window::UpdateLock lock(mWindow);
+  D2D1_SIZE_F const &size = mWindow->GetSize();
 
-    D2D1_SIZE_F const & size = mWindow->GetSize();
+  switch (mOverflowAction) {
+  case OverflowAction::SizeRight:
+  case OverflowAction::SizeLeft: {
+    int iconsPerColumn = mIconLayout.ItemsPerColumn(mIconSize, (int)size.height);
+    int requiredColumns = (int)(mIcons.size() + iconsPerColumn - 1) / iconsPerColumn; // ceil(y/x) = floor((y + x - 1)/x)
+    int requiredWidth = std::max((mIconSize + mIconLayout.mColumnSpacing) * requiredColumns -
+      mIconLayout.mColumnSpacing + mIconLayout.mPadding.left + mIconLayout.mPadding.right,
+      (long)mTargetSize.width);
 
-    switch (mOverflowAction)
-    {
-    case OverflowAction::SizeRight:
-    case OverflowAction::SizeLeft:
-        {
-            int iconsPerColumn = mLayoutSettings.ItemsPerColumn(mIconSize, (int)size.height);
-            int requiredColumns = (int)(this->icons.size() + iconsPerColumn - 1) / iconsPerColumn; // ceil(y/x) = floor((y + x - 1)/x)
-            int requiredWidth = std::max((mIconSize + mLayoutSettings.mColumnSpacing) * requiredColumns -
-                mLayoutSettings.mColumnSpacing + mLayoutSettings.mPadding.left + mLayoutSettings.mPadding.right,
-                (long)mTargetSize.width);
-
-            if (size.width != requiredWidth)
-            {
-                mWindow->SetPosition(
-                    float(mOverflowAction == OverflowAction::SizeRight ? mTargetPosition.x : mTargetPosition.x - (requiredWidth - mTargetSize.width)),
-                    (float)mTargetPosition.y,
-                    (float)requiredWidth,
-                    (float)mTargetSize.height,
-                    1
-                );
-            }
-        }
-        break;
-
-    case OverflowAction::SizeUp:
-    case OverflowAction::SizeDown:
-        int iconsPerRow = mLayoutSettings.ItemsPerRow(mIconSize, (int)size.width);
-        int requiredRows = (int)(this->icons.size() + iconsPerRow - 1) / iconsPerRow; // ceil(y/x) = floor((y + x - 1)/x)
-        int requiredHeight = std::max((mIconSize + mLayoutSettings.mRowSpacing) * requiredRows -
-            mLayoutSettings.mRowSpacing + mLayoutSettings.mPadding.top + mLayoutSettings.mPadding.bottom,
-            (long)mTargetSize.height);
-
-        if (size.height != requiredHeight)
-        {
-            mWindow->SetPosition(
-                (float)mTargetPosition.x,
-                float(mOverflowAction == OverflowAction::SizeDown ? mTargetPosition.y : mTargetPosition.y - (requiredHeight - mTargetSize.height)),
-                (float)mTargetSize.width,
-                (float)requiredHeight,
-                1
-            );
-        }
-        break;
+    if (size.width != requiredWidth) {
+      mWindow->SetPosition(
+        float(mOverflowAction == OverflowAction::SizeRight ? mTargetPosition.x : mTargetPosition.x - (requiredWidth - mTargetSize.width)),
+        (float)mTargetPosition.y,
+        (float)requiredWidth,
+        (float)mTargetSize.height,
+        1
+        );
+      }
     }
+    break;
 
-    int i = 0;
-    for (auto icon : this->icons)
-    {
-        icon->Reposition(mLayoutSettings.RectFromID(i++, mIconSize, mIconSize, (int)size.width, (int)size.height));
+  case OverflowAction::SizeUp:
+  case OverflowAction::SizeDown: {
+    int iconsPerRow = mIconLayout.ItemsPerRow(mIconSize, (int)size.width);
+    int requiredRows = (int)(mIcons.size() + iconsPerRow - 1) / iconsPerRow; // ceil(y/x) = floor((y + x - 1)/x)
+    int requiredHeight = std::max((mIconSize + mIconLayout.mRowSpacing) * requiredRows -
+      mIconLayout.mRowSpacing + mIconLayout.mPadding.top + mIconLayout.mPadding.bottom,
+      (long)mTargetSize.height);
+
+    if (size.height != requiredHeight) {
+      mWindow->SetPosition(
+        (float)mTargetPosition.x,
+        float(mOverflowAction == OverflowAction::SizeDown ? mTargetPosition.y : mTargetPosition.y - (requiredHeight - mTargetSize.height)),
+        (float)mTargetSize.width,
+        (float)requiredHeight,
+        1
+        );
+      }
     }
+    break;
+  }
+
+  int i = 0;
+  for (auto icon : mIcons) {
+    icon->Reposition(mIconLayout.RectFromID(i++, mIconSize, mIconSize, (int)size.width, (int)size.height));
+  }
 }
 
 
 /// <summary>
 /// Handles window events for the tray.
 /// </summary>
-LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam, LPVOID)
-{
+LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
     mEventHandler->HandleMessage(wnd, message, wParam, lParam);
-    switch (message)
-    {
+    switch (message) {
     case WM_MOUSEMOVE:
-        {
-            if (IsWindow(ghWndTrayNotify))
-            {
-                RECT r;
-                mWindow->GetScreenRect(&r);
-                MoveWindow(ghWndTrayNotify, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
-            }
-        }
-        return 0;
+      if (IsWindow(ghWndTrayNotify)) {
+        RECT r;
+        mWindow->GetScreenRect(&r);
+        MoveWindow(ghWndTrayNotify, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
+      }
+      return 0;
 
     case WM_TIMER:
-        {
-            if (this->balloonTimer == wParam)
-            {
-                ShowNextBalloon();
-            }
-        }
-        return 0;
+      if (mBalloonTimer == wParam) {
+        ShowNextBalloon();
+      }
+      return 0;
 
     case Window::WM_TOPPARENTLOST:
-        {
-        }
-        return 0;
+      mBalloon.SetClickedMessage(0);
+      return 0;
 
     case Window::WM_NEWTOPPARENT:
-        {
-        }
-        return 0;
+      mBalloon.SetClickedMessage(mWindow->RegisterUserMessage(this));
+      return 0;
 
     case Window::WM_SIZECHANGE:
-        {
-            mSettings->SetInt(L"CurrentWidth", LOWORD(wParam));
-            mSettings->SetInt(L"CurrentHeight", HIWORD(wParam));
-            // lParam is 1 when the size change is due to OverflowAction
-            if (lParam == 1)
-            {
-                LiteStep::LSExecute(nullptr, mOnResize, 0);
-            }
-        }
-        return 0;
+      mSettings->SetInt(L"CurrentWidth", LOWORD(wParam));
+      mSettings->SetInt(L"CurrentHeight", HIWORD(wParam));
+      // lParam is 1 when the size change is due to OverflowAction
+      if (lParam == 1) {
+        LiteStep::LSExecute(nullptr, mOnResize, 0);
+      }
+      return 0;
 
     default:
-        {
-            if (message == this->balloonClickedMessage)
-            {
-                // wParam is 0 if the dialog was clicked. 1 if the x was clicked.
-                if (wParam == 0)
-                {
-                    this->activeBalloonIcon->SendCallback(NIN_BALLOONUSERCLICK, 0, 0);
-                }
-                DismissBalloon(NIN_BALLOONHIDE);
-            }
+      if (message == mBalloon.GetClickedMessage()) {
+        // wParam is 0 if the dialog was clicked. 1 if the x was clicked.
+        if (wParam == 0) {
+          mActiveBalloonIcon->SendCallback(NIN_BALLOONUSERCLICK, 0, 0);
         }
-        return DefWindowProc(wnd, message, wParam, lParam);
+        DismissBalloon(NIN_BALLOONHIDE);
+      }
+      return DefWindowProc(wnd, message, wParam, lParam);
     }
 }
 
@@ -384,9 +321,8 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM
 /// <summary>
 /// Called when the init phase has ended.
 /// </summary>
-void Tray::InitCompleted()
-{
-    Relayout();
+void Tray::InitCompleted() {
+  Relayout();
 }
 
 
@@ -420,7 +356,7 @@ void Tray::EnqueueBalloon(TrayIcon *icon, LPCWSTR infoTitle, LPCWSTR info, DWORD
 
   // Realtime balloons are discarded unless they can be shown imediately.
   if (mHideBalloons || realTime &&
-    (this->balloonTimer != 0 || state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME))
+    (mBalloonTimer != 0 || state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME))
   {
     return;
   }
@@ -436,9 +372,9 @@ void Tray::EnqueueBalloon(TrayIcon *icon, LPCWSTR infoTitle, LPCWSTR info, DWORD
   data.infoFlags = infoFlags;
   data.balloonIcon = balloonIcon;
 
-  this->queuedBalloons.push_back(data);
+  mQueuedBalloons.push_back(data);
 
-  if (this->balloonTimer == 0) {
+  if (mBalloonTimer == 0) {
     ShowNextBalloon();
   }
 }
@@ -449,11 +385,11 @@ void Tray::EnqueueBalloon(TrayIcon *icon, LPCWSTR infoTitle, LPCWSTR info, DWORD
 /// </summary>
 void Tray::DismissBalloon(UINT message) {
   // Reset the timer.
-  SetTimer(mWindow->GetWindowHandle(), this->balloonTimer, this->balloonTime, NULL);
+  SetTimer(mWindow->GetWindowHandle(), mBalloonTimer, mBalloonTime, NULL);
 
   mBalloon.Hide();
-  this->activeBalloonIcon->SendCallback(message, NULL, NULL);
-  this->activeBalloonIcon = NULL;
+  mActiveBalloonIcon->SendCallback(message, NULL, NULL);
+  mActiveBalloonIcon = nullptr;
 
   ShowNextBalloon();
 }
@@ -463,98 +399,78 @@ void Tray::DismissBalloon(UINT message) {
 /// Hides the current balloon and shows the next balloon in the queue.
 /// </summary>
 void Tray::ShowNextBalloon() {
-    if (this->activeBalloonIcon != NULL)
-    {
-        mBalloon.Hide();
-        this->activeBalloonIcon->SendCallback(NIN_BALLOONTIMEOUT, NULL, NULL);
-        this->activeBalloonIcon = NULL;
-    }
+  if (mActiveBalloonIcon != nullptr) {
+    mBalloon.Hide();
+    mActiveBalloonIcon->SendCallback(NIN_BALLOONTIMEOUT, NULL, NULL);
+    mActiveBalloonIcon = nullptr;
+  }
 
-    // Get the user notification state.
-    QUERY_USER_NOTIFICATION_STATE state;
-    SHQueryUserNotificationState(&state);
+  // Get the user notification state.
+  QUERY_USER_NOTIFICATION_STATE state;
+  SHQueryUserNotificationState(&state);
     
-    // If we are not accepting notifications at this time, we should wait.
-    if (state != 0 && state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME)
-    {
-        if (this->balloonTimer == 0)
-        {
-            this->balloonTimer = mWindow->SetCallbackTimer(this->balloonTime, this);
-        }
-        return;
+  // If we are not accepting notifications at this time, we should wait.
+  if (state != 0 && state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME) {
+    if (mBalloonTimer == 0) {
+      mBalloonTimer = mWindow->SetCallbackTimer(mBalloonTime, this);
+    }
+    return;
+  }
+
+  // Get the balloon to display.
+  BalloonData d;
+  // Discard balloons for icons which have gone away, or if we are in quiet mode.
+  do {
+    // If there are no more balloons
+    if (mQueuedBalloons.empty()) {
+      mWindow->ClearCallbackTimer(mBalloonTimer);
+      mBalloonTimer = 0;
+      return;
     }
 
-    // Get the balloon to display.
-    BalloonData d;
-    // Discard balloons for icons which have gone away, or if we are in quiet mode.
-    do
-    {
-        // If there are no more balloons
-        if (this->queuedBalloons.empty())
-        {
-            mWindow->ClearCallbackTimer(this->balloonTimer);
-            this->balloonTimer = 0;
-
-            return;
-        }
-
-        d = *(this->queuedBalloons.begin());
-        this->queuedBalloons.pop_front();
+    d = *mQueuedBalloons.begin();
+    mQueuedBalloons.pop_front();
         
-        // TODO::Maybe we should permit balloons for icons which have gone away.
-    } while(FindIcon(d.icon) == this->icons.end() || state == QUNS_QUIET_TIME && (d.infoFlags & NIIF_RESPECT_QUIET_TIME) == NIIF_RESPECT_QUIET_TIME);
+    // TODO::Maybe we should permit balloons for icons which have gone away.
+  } while(FindIcon(d.icon) == mIcons.end() || state == QUNS_QUIET_TIME &&
+    (d.infoFlags & NIIF_RESPECT_QUIET_TIME) == NIIF_RESPECT_QUIET_TIME);
 
-    //
-    SIZE iconSize;
-    if ((d.infoFlags & NIIF_LARGE_ICON) == NIIF_LARGE_ICON)
-    {
-        iconSize.cx = GetSystemMetrics(SM_CXICON);
-        iconSize.cy = GetSystemMetrics(SM_CYICON);
-    }
-    else
-    {
-        iconSize.cx = GetSystemMetrics(SM_CXSMICON);
-        iconSize.cy = GetSystemMetrics(SM_CYSMICON);
-    }
+  SIZE iconSize;
+  if ((d.infoFlags & NIIF_LARGE_ICON) == NIIF_LARGE_ICON) {
+    iconSize.cx = GetSystemMetrics(SM_CXICON);
+    iconSize.cy = GetSystemMetrics(SM_CYICON);
+  } else {
+    iconSize.cx = GetSystemMetrics(SM_CXSMICON);
+    iconSize.cy = GetSystemMetrics(SM_CYSMICON);
+  }
 
-    // 
-    HICON icon = NULL;
-    if ((d.infoFlags & 0x3) == NIIF_INFO)
-    {
-        icon = this->infoIcon;
-    }
-    else if ((d.infoFlags & 0x3) == NIIF_WARNING)
-    {
-        icon = this->warningIcon;
-    }
-    else if ((d.infoFlags & 0x3) == NIIF_ERROR)
-    {
-        icon = this->errorIcon;
-    }
-    else if ((d.infoFlags & NIIF_USER) == NIIF_USER && d.balloonIcon != NULL)
-    {
-        icon = d.balloonIcon;
-    }
+  HICON icon = NULL;
+  if ((d.infoFlags & 0x3) == NIIF_INFO) {
+    icon = mInfoIcon;
+  } else if ((d.infoFlags & 0x3) == NIIF_WARNING) {
+    icon = mWarningIcon;
+  } else if ((d.infoFlags & 0x3) == NIIF_ERROR) {
+    icon = mErrorIcon;
+  } else if ((d.infoFlags & NIIF_USER) == NIIF_USER && d.balloonIcon != NULL) {
+    icon = d.balloonIcon;
+  }
     
-    if (this->balloonTimer == 0)
-    {
-        this->balloonTimer = mWindow->SetCallbackTimer(this->balloonTime, this);
-
-        if ((d.infoFlags & NIIF_NOSOUND) != NIIF_NOSOUND && !this->noNotificationSounds)
-        {
-            PlaySoundW(this->notificationSound, NULL, SND_ALIAS | SND_ASYNC | SND_SYSTEM | SND_NODEFAULT);
-        }
+  if (mBalloonTimer == 0) {
+    mBalloonTimer = mWindow->SetCallbackTimer(mBalloonTime, this);
+    if ((d.infoFlags & NIIF_NOSOUND) != NIIF_NOSOUND && !mNoNotificationSounds) {
+      PlaySoundW(mNotificationSound, NULL, SND_ALIAS | SND_ASYNC | SND_SYSTEM | SND_NODEFAULT);
     }
+  }
 
-    //
-    RECT targetPosition;
-    d.icon->GetScreenRect(&targetPosition);
+  //
+  RECT targetPosition;
+  d.icon->GetScreenRect(&targetPosition);
 
-    this->activeBalloonIcon = d.icon;
+  mActiveBalloonIcon = d.icon;
 
-    mBalloon.Show(d.infoTitle, d.info, icon, &iconSize, &targetPosition);
+  mBalloon.Show(d.infoTitle, d.info, icon, &iconSize, &targetPosition);
 
-    // Free memory
-    free((LPVOID)d.infoTitle);
-    free((LPVOID)d.info);
+  // Free memory
+  free((LPVOID)d.infoTitle);
+  free((LPVOID)d.info);
 }

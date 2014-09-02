@@ -1,17 +1,18 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TrayIcon.cpp
- *  The nModules Project
- *
- *  Implementation of the TrayIcon class. A single icon in the tray.
- *   
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../nShared/LiteStep.h"
-#include <strsafe.h>
-#include "../nShared/LSModule.hpp"
+//-------------------------------------------------------------------------------------------------
+// /nTray/TrayIcon.cpp
+// The nModules Project
+//
+// Implementation of the TrayIcon class. A single icon in the tray.
+//-------------------------------------------------------------------------------------------------
 #include "Tray.hpp"
 #include "TrayIcon.hpp"
-#include "Windowsx.h"
+
+#include "../nShared/LiteStep.h"
+#include "../nShared/LSModule.hpp"
+
 #include <shellapi.h>
+#include <strsafe.h>
+#include <Windowsx.h>
 
 extern LSModule gLSModule;
 
@@ -19,271 +20,158 @@ extern LSModule gLSModule;
 /// <summary>
 /// Constructor
 /// </summary>
-TrayIcon::TrayIcon
-(
-    Drawable* parent,
-    LiteStep::LPLSNOTIFYICONDATA pNID,
-    WindowSettings &wndSettings,
-    StateRender<States> *stateRender
-)
-    : Drawable(parent, _T("Icon"))
-    , mStateRender(stateRender)
+TrayIcon::TrayIcon(Drawable *parent, IconData &iconData, WindowSettings &wndSettings,
+  StateRender<States> *stateRender)
+  : Drawable(parent, L"Icon")
+  , mIconData(iconData)
+  , mIconSize(mSettings->GetInt(L"Size", 16))
+  , mShowingTip(false)
 {
-    // Init
-    this->callbackID = 0;
-    this->callbackMessage = 0xFFFFFFFF;
-    this->callbackWindow = nullptr;
-    this->icon = nullptr;
-    this->iconSize = 0;
-    this->showingTip =  false;
-    this->showTip = false;
-    this->version = 0;
-    this->guid = GUID_NULL;
-    this->flags = 0;
-    this->tip[0] = L'\0';
-
-    mWindow->Initialize(wndSettings, stateRender);
-    this->showingTip = false;
-
-    //
-    LoadSettings();
-
-    //
-    HandleAdd(pNID);
-}
-
-
-/// <summary>
-/// Destructor
-/// </summary>
-TrayIcon::~TrayIcon()
-{
-}
-
-
-/// <summary>
-/// Loads RC settings.
-/// </summary>
-void TrayIcon::LoadSettings(bool /* bIsRefresh */)
-{
-    this->iconSize = mSettings->GetInt(_T("Size"), 16);
+  mWindow->Initialize(wndSettings, stateRender);
 }
 
 
 /// <summary>
 /// Shows the trayicon.
 /// </summary>
-void TrayIcon::Show()
-{
-    mWindow->Show();
-}
-
-
-/// <summary>
-/// Handles NIM_ADD.
-/// </summary>
-void TrayIcon::HandleAdd(LiteStep::LPLSNOTIFYICONDATA pNID)
-{
-    this->callbackWindow = pNID->hWnd;
-    this->callbackID = pNID->uID;
-    GetWindowThreadProcessId(pNID->hWnd, &mProcessID);
-    HandleModify(pNID);
+void TrayIcon::Show() {
+  mWindow->Show();
 }
 
 
 /// <summary>
 /// Handles NIM_MODIFY.
 /// </summary>
-void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID)
-{
-    if ((pNID->uFlags & NIF_MESSAGE) == NIF_MESSAGE)
-    {
-        this->callbackMessage = pNID->uCallbackMessage;
+void TrayIcon::HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID) {
+  if ((pNID->uFlags & NIF_ICON) == NIF_ICON) {
+    UpdateIcon();
+  }
+  if ((pNID->uFlags & NIF_TIP) == NIF_TIP) {
+    if (mShowingTip) {
+      if (mIconData.tip[0] != L'\0') {
+        RECT r;
+        mWindow->GetScreenRect(&r);
+        ((Tray*)mParent)->ShowTip(mIconData.tip, &r);
+      } else {
+        ((Tray*)mParent)->HideTip();
+      }
     }
-    if ((pNID->uFlags & NIF_ICON) == NIF_ICON)
-    {
-        SetIcon(pNID->hIcon);
+  }
+
+  // TODO::NIF_STATE
+
+  if ((pNID->uFlags & NIF_INFO) == NIF_INFO) {
+    // uTimeout is only valid on 2000 and XP, so we can safely ignore it.
+    if (*pNID->szInfo != L'\0' || *pNID->szInfoTitle != L'\0') {
+      ((Tray*)mParent)->EnqueueBalloon(this, pNID->szInfoTitle, pNID->szInfo, pNID->dwInfoFlags,
+        pNID->hBalloonIcon, (pNID->uFlags & NIF_REALTIME) == NIF_REALTIME);
     }
-    if ((pNID->uFlags & NIF_TIP) == NIF_TIP)
-    {
-        StringCchCopy(this->tip, TRAY_MAX_TIP_LENGTH, pNID->szTip);
-        if (this->showingTip)
-        {
-            if (this->tip[0] != L'\0')
-            {
-                RECT r;
-                mWindow->GetScreenRect(&r);
-                ((Tray*)mParent)->ShowTip(this->tip, &r);
-            }
-            else
-            {
-                ((Tray*)mParent)->HideTip();
-            }
-        }
-    }
-
-    if ((this->flags & NIF_GUID) != NIF_GUID && (pNID->uFlags & NIF_GUID) == NIF_GUID)
-    {
-        this->flags &= NIF_GUID;
-        this->guid = pNID->guidItem;
-    }
-
-    // TODO::NIF_STATE
-
-    if ((pNID->uFlags & NIF_INFO) == NIF_INFO)
-    {
-        WCHAR info[TRAY_MAX_INFO_LENGTH], infoTitle[TRAY_MAX_INFOTITLE_LENGTH];
-
-        // uTimeout is only valid on 2000 and XP, so we can safely ignore it.
-        StringCchCopy(info, TRAY_MAX_INFO_LENGTH, pNID->szInfo);
-        StringCchCopy(infoTitle, TRAY_MAX_INFOTITLE_LENGTH, pNID->szInfoTitle);
-
-        if (*info != L'\0' || *infoTitle != L'\0')
-        {
-            ((Tray*)mParent)->EnqueueBalloon(this, infoTitle, info, pNID->dwInfoFlags, pNID->hBalloonIcon, (pNID->uFlags & NIF_REALTIME) == NIF_REALTIME);
-        }
-    }
-
-    this->showTip = true;
-}
-
-
-/// <summary>
-/// Handles NIM_SETVERSION.
-/// </summary>
-void TrayIcon::HandleSetVersion(LiteStep::LPLSNOTIFYICONDATA pNID)
-{
-    this->version = pNID->uVersion;
+  }
 }
 
 
 /// <summary>
 /// Updates the icon.
 /// </summary>
-void TrayIcon::SetIcon(HICON icon)
-{
-    if (this->icon != icon)
-    {
-        this->icon = icon;
-        mWindow->ClearOverlays();
-        D2D1_RECT_F f;
-        f.bottom = (float)this->iconSize; f.top = 0; f.left = 0; f.right = (float)this->iconSize;
-        this->iconOverlay = mWindow->AddOverlay(f, this->icon);
-        mWindow->Repaint();
-    }
+void TrayIcon::UpdateIcon() {
+  mWindow->ClearOverlays();
+  D2D1_RECT_F f = D2D1::RectF(0.0f, 0.0f, (float)mIconSize, (float)mIconSize);
+  mIconOverlay = mWindow->AddOverlay(f, mIconData.icon);
+  mWindow->Repaint();
 }
 
 
 /// <summary>
 /// Repositions the icon.
 /// </summary>
-void TrayIcon::Reposition(RECT rect)
-{
-    mWindow->SetPosition(rect);
+void TrayIcon::Reposition(RECT rect) {
+  mWindow->SetPosition(rect);
 }
 
 
 /// <summary>
 /// Repositions the icon.
 /// </summary>
-void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height)
-{
-    mWindow->SetPosition((float)x, (float)y, (float)width, (float)height);
+void TrayIcon::Reposition(UINT x, UINT y, UINT width, UINT height) {
+  mWindow->SetPosition((float)x, (float)y, (float)width, (float)height);
 }
 
 
 /// <summary>
 /// Gets the screen coordinate rect of this tray icon.
 /// </summary>
-void TrayIcon::GetScreenRect(LPRECT rect)
-{
-    mWindow->GetScreenRect(rect);
+void TrayIcon::GetScreenRect(LPRECT rect) {
+  mWindow->GetScreenRect(rect);
 }
 
 
 /// <summary>
 /// Sends a message to the owner of the icon.
 /// </summary>
-void TrayIcon::SendCallback(UINT message, WPARAM /* wParam */, LPARAM /* lParam */)
-{
-    if (this->version >= NOTIFYICON_VERSION_4)
-    {
-        RECT r;
-        mWindow->GetScreenRect(&r);
-        PostMessage(this->callbackWindow, this->callbackMessage, (WPARAM)MAKEWPARAM(r.left, r.top), (LPARAM)MAKELPARAM(message, this->callbackID));
-    }
-    else
-    {
-        PostMessage(this->callbackWindow, this->callbackMessage, (WPARAM)this->callbackID, (LPARAM)message);
-    }
+void TrayIcon::SendCallback(UINT message, WPARAM /* wParam */, LPARAM /* lParam */) {
+  WPARAM wParam;
+  LPARAM lParam;
+  if (mIconData.version >= NOTIFYICON_VERSION_4) {
+    RECT r;
+    mWindow->GetScreenRect(&r);
+    wParam = MAKEWPARAM(r.left, r.top);
+    lParam = MAKELPARAM(message, mIconData.id);
+  } else {
+    wParam = WPARAM(mIconData.id);
+    lParam = LPARAM(message);
+  }
+  PostMessage(mIconData.window, mIconData.callbackMessage, wParam, lParam);
 }
 
 
 /// <summary>
 /// Handles window messages for the icon's window.
 /// </summary>
-LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID)
-{
-    if (message >= WM_MOUSEFIRST && message <= WM_MOUSELAST && this->showTip)
-    {
-        if (message == WM_MOUSEMOVE && !this->showingTip)
-        {
-            if (!IsWindow(this->callbackWindow))
-            {
-                // The icon went away...
-                LiteStep::LSNOTIFYICONDATA lsNID;
-                lsNID.cbSize = sizeof(lsNID);
-                lsNID.hWnd = this->callbackWindow;
-                lsNID.uID = this->callbackID;
-                lsNID.guidItem = this->guid;
-                lsNID.uFlags = this->flags & NIF_GUID;
-                SendMessage(gLSModule.GetMessageWindow(), LM_SYSTRAY, NIM_DELETE, (LPARAM)&lsNID);
-                return 0;
-            }
-            this->showingTip = true;
-            if (this->tip[0] != _T('\0'))
-            {
-                RECT r;
-                mWindow->GetScreenRect(&r);
-                ((Tray*)mParent)->ShowTip(this->tip, &r);
-            }
-        }
+LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
+  if (message >= WM_MOUSEFIRST && message <= WM_MOUSELAST) {
+    if (message == WM_MOUSEMOVE && !mShowingTip) {
+      if (!IsWindow(mIconData.window)) {
+        // The icon went away...
+        LiteStep::LSNOTIFYICONDATA lsNID;
+        lsNID.cbSize = sizeof(lsNID);
+        lsNID.hWnd = mIconData.window;
+        lsNID.uID = mIconData.id;
+        lsNID.guidItem = mIconData.guid;
+        lsNID.uFlags = mIconData.flags;
+        SendMessage(gLSModule.GetMessageWindow(), LM_SYSTRAY, NIM_DELETE, (LPARAM)&lsNID);
+        return 0;
+      }
 
-        if (message == WM_RBUTTONDOWN || message == WM_LBUTTONDOWN)
-        {
-            ((Tray*)mParent)->HideTip();
-        }
+      mShowingTip = true;
+      if (mIconData.tip[0] != L'\0') {
+        RECT r;
+        mWindow->GetScreenRect(&r);
+        ((Tray*)mParent)->ShowTip(mIconData.tip, &r);
+      }
+    }
 
-        AllowSetForegroundWindow(mProcessID);
+    if (message == WM_RBUTTONDOWN || message == WM_LBUTTONDOWN) {
+      ((Tray*)mParent)->HideTip();
+    }
 
-        if (this->version >= NOTIFYICON_VERSION_4)
-        {
-            if (message == WM_RBUTTONUP)
-            {
-                SendCallback(WM_CONTEXTMENU, wParam, lParam);
-            }
-            else if (message == WM_LBUTTONUP)
-            {
-                SendCallback(NIN_SELECT, wParam, lParam);
-            }
-            else
-            {
-                SendCallback(message, wParam, lParam);
-            }
-        }
-        else
-        {
-            SendCallback(message, wParam, lParam);
-        }
+    AllowSetForegroundWindow(mIconData.processId);
+
+    if (mIconData.version >= NOTIFYICON_VERSION_4) {
+      if (message == WM_RBUTTONUP) {
+        SendCallback(WM_CONTEXTMENU, wParam, lParam);
+      } else if (message == WM_LBUTTONUP) {
+        SendCallback(NIN_SELECT, wParam, lParam);
+      } else {
+        SendCallback(message, wParam, lParam);
+      }
+    } else {
+      SendCallback(message, wParam, lParam);
     }
-    else if (message == WM_MOUSELEAVE)
-    {
-        ((Tray*)mParent)->HideTip();
-        this->showingTip = false;
-    }
-    else
-    {
-        return DefWindowProc(window, message, wParam, lParam);
-    }
-    return 0;
+  } else if (message == WM_MOUSELEAVE) {
+    ((Tray*)mParent)->HideTip();
+    mShowingTip = false;
+  } else {
+    return DefWindowProc(window, message, wParam, lParam);
+  }
+  return 0;
 }

@@ -1,68 +1,49 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  TrayIcon.hpp
- *  The nModules Project
- *
- *  Declaration of the TrayIcon class.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nTray/TrayIcon.hpp
+// The nModules Project
+//
+// An icon inside a tray.
+//-------------------------------------------------------------------------------------------------
 #pragma once
+
+#include "Types.h"
 
 #include "../nShared/Drawable.hpp"
 #include "../nShared/StateRender.hpp"
 #include "../nShared/Window.hpp"
 
-class TrayIcon : public Drawable
-{
+class TrayIcon : public Drawable {
 public:
-    enum class States
-    {
-        Base = 0,
-        Count
-    };
+  enum class States {
+    Base = 0,
+    Count
+  };
 
 public:
-    explicit TrayIcon(
-        Drawable* parent,
-        LiteStep::LPLSNOTIFYICONDATA pNID,
-        WindowSettings &wndSettings,
-        StateRender<States> *stateRender
-    );
-    virtual ~TrayIcon();
-    
-    void Reposition(RECT rect);
-    void Reposition(UINT x, UINT y, UINT width, UINT height);
-    void Show();
+  TrayIcon(Drawable *parent, IconData&, WindowSettings&, StateRender<States>*);
 
-    void LoadSettings(bool isRefresh = false);
-    LRESULT WINAPI HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, LPVOID Window);
-    void SendCallback(UINT message, WPARAM wParam, LPARAM lParam);
-    void GetScreenRect(LPRECT rect);
+public:
+  void Reposition(RECT);
+  void Reposition(UINT x, UINT y, UINT width, UINT height);
+  void Show();
 
-    void SetIcon(HICON icon);
+  void SendCallback(UINT message, WPARAM wParam, LPARAM lParam);
+  void GetScreenRect(LPRECT rect);
 
-    void HandleAdd(LiteStep::LPLSNOTIFYICONDATA pNID);
-    void HandleModify(LiteStep::LPLSNOTIFYICONDATA pNID);
-    void HandleSetVersion(LiteStep::LPLSNOTIFYICONDATA pNID);
+  void HandleModify(LiteStep::LPLSNOTIFYICONDATA);
 
 private:
-    //
-    int iconSize;
-    bool showingTip;
+  void UpdateIcon();
 
-    bool showTip; // True if we should show the tooltip
+public:
+  LRESULT WINAPI HandleMessage(HWND, UINT, WPARAM, LPARAM, LPVOID);
 
-    StateRender<States> *mStateRender;
+  // Settings
+private:
+  int mIconSize;
+  IconData &mIconData;
 
-    Window::OVERLAY iconOverlay;
-
-    // Tray data
-    WCHAR tip[TRAY_MAX_TIP_LENGTH];
-    UINT version;
-    HICON icon;
-    HWND callbackWindow;
-    UINT callbackID;
-    UINT callbackMessage;
-    GUID guid;
-    DWORD flags;
-    DWORD mProcessID;
+private:
+  bool mShowingTip;
+  Window::OVERLAY mIconOverlay;
 };

@@ -63,28 +63,26 @@ WindowSettings::WindowSettings(void init(WindowSettings &))
 /// <summary>
 /// Loads settings from an RC file using the specified defaults.
 /// </summary>
-void WindowSettings::Load(const Settings * settings, const WindowSettings * defaults)
-{
-    WCHAR buf[MAX_LINE_LENGTH];
-    if (!defaults)
-    {
-        defaults = this;
-    }
+void WindowSettings::Load(const Settings *settings, const WindowSettings *defaults) {
+  WCHAR buf[MAX_LINE_LENGTH];
+  if (!defaults) {
+    defaults = this;
+  }
 
-    this->alwaysOnTop = settings->GetBool(_T("AlwaysOnTop"), defaults->alwaysOnTop);
-    this->blurBehind = settings->GetBool(_T("BlurBehind"), defaults->blurBehind);
-    this->clickThrough = settings->GetBool(_T("ClickThrough"), defaults->clickThrough);
-    this->evaluateText = defaults->evaluateText;
-    this->height = settings->GetRelatedNumber(_T("Height"), defaults->height);
-    this->hidden = settings->GetBool(_T("Hidden"), defaults->hidden);
-    this->registerWithCore = defaults->registerWithCore;
-    settings->GetString(_T("Text"), buf, _countof(buf), defaults->text);
-    StringCchCopy(this->text, _countof(this->text), buf);
-    settings->GetString(_T("TextAntiAliasMode"), buf, _countof(buf), textAntiAliasModeMap.GetByA(defaults->textAntiAliasMode, _T("ClearType")));
-    this->textAntiAliasMode = ParseAntiAliasMode(buf);
-    this->width = settings->GetRelatedNumber(_T("Width"), defaults->width);
-    this->x = settings->GetRelatedNumber(_T("X"), defaults->x);
-    this->y = settings->GetRelatedNumber(_T("Y"), defaults->y);
+  this->alwaysOnTop = settings->GetBool(_T("AlwaysOnTop"), defaults->alwaysOnTop);
+  this->blurBehind = settings->GetBool(_T("BlurBehind"), defaults->blurBehind);
+  this->clickThrough = settings->GetBool(_T("ClickThrough"), defaults->clickThrough);
+  this->evaluateText = defaults->evaluateText;
+  this->height = settings->GetRelatedNumber(_T("Height"), defaults->height);
+  this->hidden = settings->GetBool(_T("Hidden"), defaults->hidden);
+  this->registerWithCore = defaults->registerWithCore;
+  settings->GetString(_T("Text"), buf, _countof(buf), defaults->text);
+  StringCchCopy(this->text, _countof(this->text), buf);
+  settings->GetString(_T("TextAntiAliasMode"), buf, _countof(buf), textAntiAliasModeMap.GetByA(defaults->textAntiAliasMode, _T("ClearType")));
+  this->textAntiAliasMode = ParseAntiAliasMode(buf);
+  this->width = settings->GetRelatedNumber(_T("Width"), defaults->width);
+  this->x = settings->GetRelatedNumber(_T("X"), defaults->x);
+  this->y = settings->GetRelatedNumber(_T("Y"), defaults->y);
 }
 
 

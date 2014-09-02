@@ -19,7 +19,7 @@ public:
 
 public:
     // Loads the actual settings.
-    void Load(const Settings * settings, const WindowSettings * defaults);
+    void Load(const Settings *settings, const WindowSettings *defaults = nullptr);
 
     D2D1_TEXT_ANTIALIAS_MODE ParseAntiAliasMode(LPCTSTR mode);
 

@@ -12,32 +12,31 @@
 
 #include "../Utilities/Process.h"
 
+#include <list>
+#include <map>
 #include <shellapi.h>
 #include <Shlwapi.h>
-#include <vector>
 
-using std::vector;
-using TrayManager::IconIter;
+using LiteStep::LPLSNOTIFYICONDATA;
+
+struct Icon {
+  IconData data;
+  std::map<Tray*, TrayIcon*> instances;
+};
 
 extern TrayMap gTrays;
 
-static vector<TrayManager::Icon> sCurrentIcons;
-
-
-/// <summary>
-/// Stops the tray manager. 
-/// </summary>
-void TrayManager::Stop() {
-  sCurrentIcons.clear();
-}
+static std::list<Icon> sCurrentIcons;
+typedef decltype(sCurrentIcons.begin()) IconIterator;
 
 
 /// <summary>
 /// Gets the screen rect of an icon.
 /// </summary>
-void TrayManager::GetScreenRect(IconIter icon, LPRECT rect) {
-  if (icon->trayIcons.size() > 0) {
-    icon->trayIcons[0]->GetScreenRect(rect);
+static void GetScreenRect(IconIterator icon, LPRECT rect) {
+  if (icon->instances.size() > 0) {
+    // TODO(Erik): Lets pick which one we return based on which tray last had focus?
+    icon->instances.begin()->second->GetScreenRect(rect);
   } else {
     // We could define a rectangle for icons that arent included anywhere, instead of just zeroing.
     ZeroMemory(rect, sizeof(RECT));
@@ -48,9 +47,9 @@ void TrayManager::GetScreenRect(IconIter icon, LPRECT rect) {
 /// <summary>
 /// Finds a matching icon.
 /// </summary>
-IconIter TrayManager::FindIcon(GUID guid) {
-  for (IconIter iter = sCurrentIcons.begin(); iter != sCurrentIcons.end(); ++iter) {
-    if (iter->data.guidItem == guid) {
+static IconIterator FindIcon(GUID guid) {
+  for (IconIterator iter = sCurrentIcons.begin(); iter != sCurrentIcons.end(); ++iter) {
+    if (iter->data.guid == guid) {
       return iter;
     }
   }
@@ -61,9 +60,9 @@ IconIter TrayManager::FindIcon(GUID guid) {
 /// <summary>
 /// Finds a matching icon.
 /// </summary>
-IconIter TrayManager::FindIcon(HWND hWnd, UINT uID) {
-  for (IconIter iter = sCurrentIcons.begin(); iter != sCurrentIcons.end(); ++iter) {
-    if (iter->data.hwnd == hWnd && iter->data.uID == uID) {
+static IconIterator FindIcon(HWND hWnd, UINT uID) {
+  for (IconIterator iter = sCurrentIcons.begin(); iter != sCurrentIcons.end(); ++iter) {
+    if (iter->data.window == hWnd && iter->data.id == uID) {
       return iter;
     }
   }
@@ -74,7 +73,7 @@ IconIter TrayManager::FindIcon(HWND hWnd, UINT uID) {
 /// <summary>
 /// Finds a matching icon.
 /// </summary>
-IconIter TrayManager::FindIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
+static IconIterator FindIcon(LPLSNOTIFYICONDATA pNID) {
   // There are 2 ways to identify an icon. Same guidItem, or same HWND and same uID.
   if ((pNID->uFlags & NIF_GUID) == NIF_GUID) {
     // uID & hWnd is ignored if guidItem is set
@@ -87,9 +86,9 @@ IconIter TrayManager::FindIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
 /// <summary>
 /// Finds a matching icon in g_currentIcons.
 /// </summary>
-IconIter TrayManager::FindIcon(LiteStep::LPSYSTRAYINFOEVENT pSTE) {
+static IconIterator FindIcon(LiteStep::LPSYSTRAYINFOEVENT pSTE) {
   // There are 2 ways to identify an icon. Same guidItem, or same HWND and same uID.
-  IconIter ret = FindIcon(pSTE->guidItem);
+  IconIterator ret = FindIcon(pSTE->guidItem);
   if (ret == sCurrentIcons.end()) {
     ret = FindIcon(pSTE->hWnd, pSTE->uID);
   }
@@ -97,25 +96,43 @@ IconIter TrayManager::FindIcon(LiteStep::LPSYSTRAYINFOEVENT pSTE) {
 }
 
 
+static void UpdateIconData(IconData &iconData, LPLSNOTIFYICONDATA pNID) {
+  if ((pNID->uFlags & NIF_MESSAGE) == NIF_MESSAGE) {
+    iconData.callbackMessage = pNID->uCallbackMessage;
+    iconData.flags &= NIF_MESSAGE;
+  }
+  if ((pNID->uFlags & NIF_ICON) == NIF_ICON) {
+    iconData.icon = pNID->hIcon;
+    iconData.flags &= NIF_ICON;
+  }
+  if ((pNID->uFlags & NIF_TIP) == NIF_TIP) {
+    StringCchCopy(iconData.tip, TRAY_MAX_TIP_LENGTH, pNID->szTip);
+    iconData.flags &= NIF_TIP;
+  }
+  if ((iconData.flags & NIF_GUID) != NIF_GUID && (pNID->uFlags & NIF_GUID) == NIF_GUID) {
+    iconData.guid = pNID->guidItem;
+    iconData.flags &= NIF_GUID;
+  }
+}
+
+
 /// <summary>
 /// Adds the specified icon to the trays, if it isn't already added.
 /// </summary>
-void TrayManager::AddIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
+static void AddIcon(LPLSNOTIFYICONDATA pNID) {
   if (FindIcon(pNID) == sCurrentIcons.end()) {
     sCurrentIcons.emplace_back();
-    Icon &iconData = sCurrentIcons.back();
-    iconData.data.hwnd = pNID->hWnd;
-    iconData.data.uID = pNID->uID;
-    if ((NIF_GUID & pNID->uFlags) == NIF_GUID) {
-      iconData.data.guidItem = pNID->guidItem;
-    } else {
-      iconData.data.guidItem = GUID_NULL;
-    }
+    Icon &icon = sCurrentIcons.back();
+    icon.data.window = pNID->hWnd;
+    icon.data.id = pNID->uID;
+    GetWindowThreadProcessId(pNID->hWnd, &icon.data.processId);
+    UpdateIconData(icon.data, pNID);
 
     for (TrayMap::value_type &tray : gTrays) {
-      TrayIcon *icon = tray.second.AddIcon(pNID);
-      if (icon != nullptr) {
-        iconData.trayIcons[&tray.second] = icon;
+      TrayIcon *instance = tray.second.AddIcon(icon.data);
+      if (instance != nullptr) {
+        icon.instances[&tray.second] = instance;
+        instance->HandleModify(pNID);
       }
     }
   }
@@ -125,13 +142,13 @@ void TrayManager::AddIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
 /// <summary>
 /// Deletes the specified icon from all trays, if it exists.
 /// </summary>
-void TrayManager::DeleteIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
-  IconIter iconData = FindIcon(pNID);
-  if (iconData != sCurrentIcons.end()) {
-    for (auto icon : iconData->trayIcons) {
-      icon.first->RemoveIcon(icon.second);
+static void DeleteIcon(LPLSNOTIFYICONDATA pNID) {
+  IconIterator icon = FindIcon(pNID);
+  if (icon != sCurrentIcons.end()) {
+    for (auto instance : icon->instances) {
+      instance.first->RemoveIcon(instance.second);
     }
-    sCurrentIcons.erase(iconData);
+    sCurrentIcons.erase(icon);
   }
 }
 
@@ -139,14 +156,16 @@ void TrayManager::DeleteIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
 /// <summary>
 /// Modifies an existing icon.
 /// </summary>
-void TrayManager::ModifyIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
-  IconIter iconData = FindIcon(pNID);
-  if (iconData != sCurrentIcons.end()) {
-    for (auto icon : iconData->trayIcons) {
-      icon.second->HandleModify(pNID);
+static void ModifyIcon(LPLSNOTIFYICONDATA pNID) {
+  IconIterator icon = FindIcon(pNID);
+  if (icon != sCurrentIcons.end()) {
+    UpdateIconData(icon->data, pNID);
+    for (auto instance : icon->instances) {
+      instance.second->HandleModify(pNID);
     }
   } else {
     TRACE("Tried to modify non-existing icon");
+    // TODO(Erik): Figure out what explorer does in this case.
   }
 }
 
@@ -154,20 +173,26 @@ void TrayManager::ModifyIcon(LiteStep::LPLSNOTIFYICONDATA pNID) {
 /// <summary>
 /// Returns the focus to one of the trays.
 /// </summary>
-void TrayManager::SetFocus(LiteStep::LPLSNOTIFYICONDATA /* pNID */) {
+static void SetFocus(LPLSNOTIFYICONDATA /* pNID */) {
 }
 
 
 /// <summary>
 /// Changes the version of an existing tray icon.
 /// </summary>
-void TrayManager::SetVersion(LiteStep::LPLSNOTIFYICONDATA pNID) {
-  IconIter iconData = FindIcon(pNID);
-  if (iconData != sCurrentIcons.end()) {
-    for (auto icon : iconData->trayIcons) {
-      icon.second->HandleSetVersion(pNID);
-    }
+static void SetVersion(LPLSNOTIFYICONDATA pNID) {
+  IconIterator icon = FindIcon(pNID);
+  if (icon != sCurrentIcons.end()) {
+    icon->data.version = pNID->uVersion;
   }
+}
+
+
+/// <summary>
+/// Stops the tray manager. 
+/// </summary>
+void TrayManager::Stop() {
+  sCurrentIcons.clear();
 }
 
 
@@ -180,23 +205,23 @@ LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
     switch ((DWORD)wParam)
     {
     case NIM_ADD:
-      AddIcon((LiteStep::LPLSNOTIFYICONDATA)lParam);
+      AddIcon((LPLSNOTIFYICONDATA)lParam);
       break;
             
     case NIM_DELETE:
-      DeleteIcon((LiteStep::LPLSNOTIFYICONDATA)lParam);
+      DeleteIcon((LPLSNOTIFYICONDATA)lParam);
       break;
             
     case NIM_MODIFY:
-      ModifyIcon((LiteStep::LPLSNOTIFYICONDATA)lParam);
+      ModifyIcon(LPLSNOTIFYICONDATA(lParam));
       break;
             
     case NIM_SETFOCUS:
-      SetFocus((LiteStep::LPLSNOTIFYICONDATA)lParam);
+      SetFocus((LPLSNOTIFYICONDATA)lParam);
       break;
             
     case NIM_SETVERSION:
-      SetVersion((LiteStep::LPLSNOTIFYICONDATA)lParam);
+      SetVersion((LPLSNOTIFYICONDATA)lParam);
       break;
 
     default:
@@ -207,7 +232,7 @@ LRESULT TrayManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
   case LM_SYSTRAYINFOEVENT: {
       LiteStep::LPSYSTRAYINFOEVENT lpSTE = (LiteStep::LPSYSTRAYINFOEVENT)wParam;
-      IconIter icon = FindIcon(lpSTE);
+      IconIterator icon = FindIcon(lpSTE);
       if (icon == sCurrentIcons.end()) {
         return FALSE;
       }
@@ -254,23 +279,23 @@ void TrayManager::ListIconIDS() {
   for (auto &iconData : sCurrentIcons) {
     WCHAR buffer[MAX_PATH];
 
-    if (SUCCEEDED(GetProcessName(iconData.data.hwnd, false, buffer, _countof(buffer)))) {
+    if (SUCCEEDED(GetProcessName(iconData.data.window, false, buffer, _countof(buffer)))) {
       StringCchCatW(iconIDs, _countof(iconIDs), L"Process Name: \t");
       StringCchCatW(iconIDs, _countof(iconIDs), buffer);
     }
 
-    if (GetClassNameW(iconData.data.hwnd, buffer, _countof(buffer)) != 0) {
+    if (GetClassNameW(iconData.data.window, buffer, _countof(buffer)) != 0) {
       StringCchCatW(iconIDs, _countof(iconIDs), L"\nWindow Class: \t");
       StringCchCatW(iconIDs, _countof(iconIDs), buffer);
     }
 
-    if (GetWindowTextW(iconData.data.hwnd, buffer, _countof(buffer)) != 0) {
+    if (GetWindowTextW(iconData.data.window, buffer, _countof(buffer)) != 0) {
       StringCchCatW(iconIDs, _countof(iconIDs), L"\nWindow Text: \t");
       StringCchCatW(iconIDs, _countof(iconIDs), buffer);
     }
 
-    if (iconData.data.guidItem != GUID_NULL) {
-      StringFromGUID2(iconData.data.guidItem, buffer, _countof(buffer));
+    if (iconData.data.guid != GUID_NULL) {
+      StringFromGUID2(iconData.data.guid, buffer, _countof(buffer));
       StringCchCatW(iconIDs, _countof(iconIDs), L"\nGUID: \t\t");
       StringCchCatW(iconIDs, _countof(iconIDs), buffer);
     }
