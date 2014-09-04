@@ -12,14 +12,11 @@
 #include <ctime>
 
 
-static size_t __cdecl Time(LPCWSTR /* name */, UCHAR numArgs, LPWSTR* args, LPWSTR dest, size_t cchDest)
-{
-    time_t t = time(0);
-    struct tm now;
-
-    localtime_s(&now, &t);
-
-    return wcsftime(dest, cchDest, numArgs == 0 ? L"%H:%M" : args[0], &now);
+static size_t __cdecl Time(LPCWSTR /* name */, UCHAR numArgs, LPWSTR *args, LPWSTR dest, size_t cchDest) {
+  std::time_t t = std::time(nullptr);
+  std::tm now;
+  localtime_s(&now, &t);
+  return std::wcsftime(dest, cchDest, numArgs == 0 ? L"%H:%M" : args[0], &now);
 }
 
 
