@@ -60,8 +60,10 @@ private:
 
     //
     void LoadSettings();
+    void Init();
 
 private:
+  UINT_PTR mInitTimer;
     //
     LayoutSettings mLayoutSettings;
 

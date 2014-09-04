@@ -83,10 +83,8 @@ IconGroup::IconGroup(LPCTSTR prefix)
     mWindow->Show();
 
     mChangeNotifyMsg = mWindow->RegisterUserMessage(this);
-    
-    WCHAR path[MAX_PATH];
-    mSettings->GetString(_T("Folder"), path, _countof(path), _T("Desktop"));
-    SetFolder(path);
+
+    mInitTimer = mWindow->SetCallbackTimer(100, this);
 }
 
 
@@ -94,6 +92,10 @@ IconGroup::IconGroup(LPCTSTR prefix)
 /// Destructor
 /// </summary>
 IconGroup::~IconGroup() {
+  if (mInitTimer) {
+    mWindow->ClearCallbackTimer(mInitTimer);
+  }
+
     if (mChangeNotifyUID != 0) {
         SHChangeNotifyDeregister(mChangeNotifyUID);
     }
@@ -109,6 +111,13 @@ IconGroup::~IconGroup() {
 
     SAFERELEASE(mWorkingFolder);
     SAFERELEASE(mRootFolder);
+}
+
+
+void IconGroup::Init() {
+  WCHAR path[MAX_PATH];
+  mSettings->GetString(_T("Folder"), path, _countof(path), _T("Desktop"));
+  SetFolder(path);
 }
 
 
@@ -948,6 +957,16 @@ LRESULT WINAPI IconGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
                 }
             }
             break;
+
+        case WM_TIMER:
+        {
+          if (wParam == mInitTimer) {
+            mWindow->ClearCallbackTimer(mInitTimer);
+            mInitTimer = 0;
+            Init();
+          }
+        }
+          break;
 
         case WM_LBUTTONUP:
         case WM_RBUTTONUP:
