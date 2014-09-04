@@ -72,7 +72,7 @@ static Brush *FindBrush(LPCTSTR *args, int numArgs, Window *&window)
 }
 
 
-static struct BangItem
+static const struct BangItem
 {
     BangItem(LPCTSTR name, LiteStep::BANGCOMMANDPROC proc)
     {

@@ -14,9 +14,9 @@
 namespace WindowBangs
 {
     // Specified by the module during _Register. Used to map names -> drawables.
-    Window* (*drawableFinder)(LPCTSTR) = nullptr;
+    static Window* (*drawableFinder)(LPCTSTR) = nullptr;
 
-    BangItem BangMap[] =
+    static const BangItem BangMap[] =
     {
         { _T("Hide"),                       Hide                       },
         { _T("Show"),                       Show                       },

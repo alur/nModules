@@ -41,7 +41,7 @@ static const InitData sStateInitData([](InitData & initData) {
 Tooltip::Tooltip(LPCTSTR prefix, Settings * parentSettings) : Drawable(prefix, parentSettings) {
   mMaxHeight = mSettings->GetInt(L"MaxHeight", 100);
   mMaxWidth = mSettings->GetInt(L"MaxWidth", 300);
-  mOffset = mSettings->GetInt(L"Offset", 5);
+  mOffset = mSettings->GetFloat(L"Offset", 5);
   mPlacement = mSettings->GetEnum<Placement>(L"Placement", {
       { Placement::Left, L"Left" },
       { Placement::Top, L"Top" },
