@@ -137,7 +137,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Bangs.h" />
-    <ClInclude Include="nWallpaper.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
