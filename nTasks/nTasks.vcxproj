@@ -109,26 +109,6 @@
     <Import Project="..\BuildProperties\Module.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_AVX|Win32'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_AVX|x64'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>C:\LiteStep32\debug\modules\</OutDir>
-    <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
-    <TargetName>$(ProjectName)-0.6.5</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IntDir>bin\$(Configuration)_$(Platform)\</IntDir>
-    <OutDir>C:\LiteStep64\debug\modules\</OutDir>
-    <TargetName>$(ProjectName)-0.6.5</TargetName>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Link>
       <AdditionalDependencies>Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>

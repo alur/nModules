@@ -205,42 +205,42 @@
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;shlwapi.lib</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;shlwapi.lib</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;shlwapi.lib</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_AVX|Win32'">
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;shlwapi.lib</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;shlwapi.lib</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_AVX|x64'">
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)libs\$(PlatformArchitecture)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>dwrite.lib;dwmapi.lib;d2d1.lib;lsapi.lib;Windowscodecs.lib;shlwapi.lib</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4006,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
