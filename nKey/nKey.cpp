@@ -157,7 +157,8 @@ static void LoadVKeyTable() {
     errno_t result = _wfopen_s(&file, path, L"rt, ccs=UTF-8");
     if (result == 0) {
       while (fgetws(line, _countof(line), file) != nullptr) {
-        if (line[0] == L';') {
+        LPCWSTR firstChar = &line[wcsspn(line, L" \t\n\r")];
+        if (*firstChar == L';' || *firstChar == L'\0') {
           continue;
         }
         if (LiteStep::LCTokenize(line, tokens, 2, nullptr) == 2) {
@@ -168,7 +169,7 @@ static void LoadVKeyTable() {
             ErrorHandler::Error(ErrorHandler::Level::Warning,
               L"Invalid line in nKeyVKTable.\n%ls", line);
           }
-        } else if (line[0] != L'\n') {
+        } else {
           ErrorHandler::Error(ErrorHandler::Level::Warning,
             L"Invalid line in nKeyVKTable.\n%ls", line);
         }
@@ -176,7 +177,7 @@ static void LoadVKeyTable() {
       fclose(file);
     } else {
       ErrorHandler::Error(ErrorHandler::Level::Warning,
-        L"Unable to open nKeyVKTable, %ls.\n%ls", _wcserror(result), path);
+        L"Unable to open nKeyVKTable, %ls\n%ls", _wcserror(result), path);
     }
   }
 }
