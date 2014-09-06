@@ -4,6 +4,7 @@
 //
 // nKey entry points.
 //-------------------------------------------------------------------------------------------------
+#define _CRT_SECURE_NO_WARNINGS
 #include "Version.h"
 
 #include "../nShared/ErrorHandler.h"
@@ -21,7 +22,7 @@ typedef StringKeyedMaps<std::wstring, UINT, CaseSensitive>::UnorderedMap VKMap;
 static void LoadSettings();
 static void LoadHotKeys();
 static void LoadVKeyTable();
-static bool AddHotkey(UINT mods, UINT key, LPCWSTR command);
+static std::pair<bool, LPCWSTR> AddHotkey(UINT mods, UINT key, LPCWSTR command);
 static UINT ParseMods(LPCWSTR mods);
 static UINT ParseKey(LPCWSTR key);
 
@@ -123,20 +124,20 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// <summary>
 /// Adds a hotkey.
 /// </summary>
-static bool AddHotkey(UINT mods, UINT key, LPCWSTR command) {
+static std::pair<bool, LPCWSTR> AddHotkey(UINT mods, UINT key, LPCWSTR command) {
   if (mods == -1 || key == -1) {
-    return false; // Invalid mods or key
+    return std::make_pair(false, L"Invalid modifiers or key.");
   }
 
   // Register the hotkey
   if (RegisterHotKey(gLSModule.GetMessageWindow(), gId, mods, key) == FALSE) {
-    return false; // Failed to register, probably already taken.
+    return std::make_pair(false, L"Failed to register the hotkey. Probably already taken.");
   }
 
   // Add the hotkey definition to the map
   gHotKeys[gId++] = command;
 
-  return true;
+  return std::make_pair(true, nullptr);
 }
 
 
@@ -150,19 +151,31 @@ static void LoadVKeyTable() {
   LPWSTR endPtr;
   UINT vkey;
 
-  LiteStep::GetRCLineW(L"nKeyVKTable", path, _countof(path), L"");
-  if (_wfopen_s(&file, path, L"r") == 0) {
-    while (fgetws(line, _countof(line), file) != nullptr) {
-      if (LiteStep::LCTokenizeW(line, tokens, 2, nullptr) == 2) {
-        vkey = wcstoul(code, &endPtr, 0);
-        if (code[0] != L'\0' && *endPtr == L'\0') {
-          gVKCodes[name] = vkey;
+  if (LiteStep::GetRCLine(L"nKeyVKTable", path, _countof(path), L"") != 0) {
+    errno_t result = _wfopen_s(&file, path, L"r");
+    if (result == 0) {
+      while (fgetws(line, _countof(line), file) != nullptr) {
+        if (line[0] == ';') {
+          continue;
+        }
+        if (LiteStep::LCTokenize(line, tokens, 2, nullptr) == 2) {
+          vkey = wcstoul(code, &endPtr, 0);
+          if (*code != L'\0' && *endPtr == L'\0') {
+            gVKCodes[name] = vkey;
+          } else {
+            ErrorHandler::Error(ErrorHandler::Level::Warning,
+              L"Invalid line in nKeyVKTable.\n%ls", line);
+          }
+        } else if (line[0] != L'\n') {
+          ErrorHandler::Error(ErrorHandler::Level::Warning,
+            L"Invalid line in nKeyVKTable.\n%ls", line);
         }
       }
+      fclose(file);
+    } else {
+      ErrorHandler::Error(ErrorHandler::Level::Warning,
+        L"Unable to open nKeyVKTable, %ls.\n%ls", file, _wcserror(result));
     }
-    fclose(file);
-  } else {
-    // Failed to open the file
   }
 }
 
@@ -180,7 +193,11 @@ static void LoadHotKeys() {
 
     // ParseMods expects szMods to be all lowercase.
     _wcslwr_s(mods, _countof(mods));
-    AddHotkey(ParseMods(mods), ParseKey(key), command);
+    std::pair<bool, LPCWSTR> result = AddHotkey(ParseMods(mods), ParseKey(key), command);
+    if (!result.first) {
+      ErrorHandler::Error(ErrorHandler::Level::Warning,
+        L"Error while registering hotkey %ls %ls.\n%ls", mods, key, result.second);
+    }
   }
 
   LiteStep::LCClose(f);
