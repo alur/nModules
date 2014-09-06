@@ -107,7 +107,6 @@
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
     <ClInclude Include="nStartMenu.h" />
-    <ClInclude Include="StartMenu.hpp" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
@@ -115,7 +114,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nStartMenu.cpp" />
-    <ClCompile Include="StartMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nCoreCom\nCoreCom.vcxproj">

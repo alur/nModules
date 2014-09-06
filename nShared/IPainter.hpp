@@ -6,6 +6,8 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
+
+#include "../Utilities/Common.h"
 #include <d2d1.h>
 #include "Color.h"
 

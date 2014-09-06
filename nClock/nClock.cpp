@@ -1,60 +1,55 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nClock.cpp
- *  The nModules Project
- *
- *  Main .cpp file for the nClock module.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../nShared/LiteStep.h"
-#include "../nShared/ErrorHandler.h"
-#include "../nShared/LSModule.hpp"
+//-------------------------------------------------------------------------------------------------
+// /nClock/nClock.cpp
+// The nModules Project
+//
+// nClock entry points.
+//-------------------------------------------------------------------------------------------------
 #include "Clock.hpp"
-#include "nClock.h"
 #include "Version.h"
-#include <map>
 
-using std::map;
-using std::tstring;
+#include "../nShared/ErrorHandler.h"
+#include "../nShared/LiteStep.h"
+#include "../nShared/LSModule.hpp"
+
+#include <string>
+#include <unordered_map>
 
 // The LSModule class
 LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
-const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED, LM_FULLSCREENDEACTIVATED, 0 };
+static const UINT sLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
+  LM_FULLSCREENDEACTIVATED, 0 };
 
 // All current clocks
-map<tstring, Clock> gClocks;
+std::unordered_map<std::wstring, Clock> gClocks;
 
+static void LoadSettings();
+static void DestroyClocks();
+static void CreateClock(LPCWSTR clockName);
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */)
-{
-    if (!gLSModule.Initialize(parent, instance))
-    {
-        return 1;
-    }
-    
-    if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION)))
-    {
-        return 1;
-    }
+EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */) {
+  if (!gLSModule.Initialize(parent, instance)) {
+    return 1;
+  }
+  if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION))) {
+    return 1;
+  }
+  LoadSettings();
 
-    // Load settings
-    LoadSettings();
-
-    return 0;
+  return 0;
 }
 
 
 /// <summary>
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
-EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */)
-{
-    DestroyClocks();
-    gLSModule.DeInitalize();
+EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */) {
+  DestroyClocks();
+  gLSModule.DeInitalize();
 }
 
 
@@ -65,66 +60,52 @@ EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */)
 /// <param name="message">The type of message.</param>
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
-LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch(message)
-    {
-    case WM_CREATE:
-        {
-            SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
-        }
-        return 0;
+LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+  using LiteStep::GetLitestepWnd;
 
-    case WM_DESTROY:
-        {
-            SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
-        }
-        return 0;
+  switch(message) {
+  case WM_CREATE:
+    SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)sLSMessages);
+    return 0;
 
-    case LM_REFRESH:
-        {
-            DestroyClocks();
-            LoadSettings();
-        }
-        return 0;
+  case WM_DESTROY:
+    SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)sLSMessages);
+    return 0;
 
-    case LM_FULLSCREENACTIVATED:
-        {
-            for (auto &item : gClocks)
-            {
-                item.second.GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
-            }
-        }
-        return 0;
+  case LM_REFRESH:
+    DestroyClocks();
+    LoadSettings();
+    return 0;
 
-    case LM_FULLSCREENDEACTIVATED:
-        {
-            for (auto &item : gClocks)
-            {
-                item.second.GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
-            }
-        }
-        return 0;
+  case LM_FULLSCREENACTIVATED:
+    for (auto &item : gClocks) {
+      item.second.GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
     }
-    return DefWindowProc(window, message, wParam, lParam);
+    return 0;
+
+  case LM_FULLSCREENDEACTIVATED:
+    for (auto &item : gClocks) {
+      item.second.GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+    }
+    return 0;
+  }
+  return DefWindowProc(window, message, wParam, lParam);
 }
 
 
 /// <summary>
 /// Destroys all clocks.
 /// </summary>
-void DestroyClocks()
-{
-    gClocks.clear();
+void DestroyClocks() {
+  gClocks.clear();
 }
 
 
 /// <summary>
 /// Reads through the .rc files and creates clocks.
 /// </summary>
-void LoadSettings()
-{
-    LiteStep::IterateOverLineTokens(_T("*nClock"), CreateClock);
+void LoadSettings() {
+  LiteStep::IterateOverLineTokens(L"*nClock", CreateClock);
 }
 
 
@@ -132,18 +113,13 @@ void LoadSettings()
 /// Creates a new clock with the specified name.
 /// </summary>
 /// <param name="clockName">The name of the clock to create.</param>
-void CreateClock(LPCTSTR clockName)
-{
-    if (gClocks.find(clockName) == gClocks.end())
-    {
-        gClocks.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(clockName),
-            std::forward_as_tuple(clockName)
-        );
-    }
-    else
-    {
-        ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("Attempt to (re)create the already existing clock %s!"), clockName);
-    }
+void CreateClock(LPCWSTR clockName) {
+  using std::piecewise_construct;
+  using std::forward_as_tuple;
+  if (gClocks.find(clockName) == gClocks.end()) {
+    gClocks.emplace(piecewise_construct, forward_as_tuple(clockName), forward_as_tuple(clockName));
+  } else {
+    ErrorHandler::Error(ErrorHandler::Level::Critical,
+      L"Attempt to (re)create the already existing clock %s!", clockName);
+  }
 }

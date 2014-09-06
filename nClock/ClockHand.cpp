@@ -1,27 +1,21 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  ClockHand.hpp
- *  The nModules Project
- *
- *  A hand on a clock.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nClock/ClockHand.cpp
+// The nModules Project
+//
+// A hand on a clock.
+//-------------------------------------------------------------------------------------------------
 #include "ClockHand.hpp"
+
+static const BrushSettings sBrushDefaults([] (BrushSettings &defaults) {
+  defaults.color = Color::Create(0xFF77FFEE);
+});
 
 
 /// <summary>
 /// Constructor
 /// </summary>
-ClockHand::ClockHand()
-{
-    mCenterPoint = D2D1::SizeF(0, 0);
-}
-
-
-/// <summary>
-/// Destructor
-/// </summary>
-ClockHand::~ClockHand()
-{
+ClockHand::ClockHand() {
+  mCenterPoint = D2D1::SizeF(0, 0);
 }
 
 
@@ -29,17 +23,18 @@ ClockHand::~ClockHand()
 /// IPaintable::Paint
 /// Paints the hand to the render target.
 /// </summary>
-void ClockHand::Paint(ID2D1RenderTarget *renderTarget)
-{
-    D2D1_MATRIX_3X2_F currentTransform;
-    renderTarget->GetTransform(&currentTransform);
+void ClockHand::Paint(ID2D1RenderTarget *renderTarget) {
+  using D2D1::Matrix3x2F;
 
-    renderTarget->SetTransform(currentTransform*D2D1::Matrix3x2F::Rotation(mRotation)*D2D1::Matrix3x2F::Translation(mCenterPoint));
+  D2D1_MATRIX_3X2_F currentTransform;
+  renderTarget->GetTransform(&currentTransform);
+  renderTarget->SetTransform(
+    currentTransform * Matrix3x2F::Rotation(mRotation) * Matrix3x2F::Translation(mCenterPoint));
 
-    mBrush.brush->SetTransform(mBrushWindowData.brushTransform);
-    renderTarget->FillRectangle(mHandRect, mBrush.brush);
+  mBrush.brush->SetTransform(mBrushWindowData.brushTransform);
+  renderTarget->FillRectangle(mHandRect, mBrush.brush);
 
-    renderTarget->SetTransform(currentTransform);
+  renderTarget->SetTransform(currentTransform);
 }
 
 
@@ -47,9 +42,8 @@ void ClockHand::Paint(ID2D1RenderTarget *renderTarget)
 /// IPaintable::DiscardDeviceResources
 /// Releases all D2D resources.
 /// </summary>
-void ClockHand::DiscardDeviceResources()
-{
-    mBrush.Discard();
+void ClockHand::DiscardDeviceResources() {
+  mBrush.Discard();
 }
 
 
@@ -57,14 +51,12 @@ void ClockHand::DiscardDeviceResources()
 /// IPaintable::ReCreateDeviceResources
 /// (Re)Creates all D2D resources.
 /// </summary>
-HRESULT ClockHand::ReCreateDeviceResources(ID2D1RenderTarget *renderTarget)
-{
-    HRESULT hr = mBrush.ReCreate(renderTarget);
-    if (SUCCEEDED(hr))
-    {
-        mBrush.UpdatePosition(mHandRect, &mBrushWindowData);
-    }
-    return hr;
+HRESULT ClockHand::ReCreateDeviceResources(ID2D1RenderTarget *renderTarget) {
+  HRESULT hr = mBrush.ReCreate(renderTarget);
+  if (SUCCEEDED(hr)) {
+    mBrush.UpdatePosition(mHandRect, &mBrushWindowData);
+  }
+  return hr;
 }
 
 
@@ -72,67 +64,59 @@ HRESULT ClockHand::ReCreateDeviceResources(ID2D1RenderTarget *renderTarget)
 /// IPaintable::UpdatePosition
 /// Called when the parent has moved.
 /// </summary>
-void ClockHand::UpdatePosition(D2D1_RECT_F parentPosition)
-{
-    mCenterPoint = D2D1::SizeF(
-        (parentPosition.left + parentPosition.right) / 2.0f,
-        (parentPosition.top + parentPosition.bottom) / 2.0f
-        );
+void ClockHand::UpdatePosition(D2D1_RECT_F parentPosition) {
+  mCenterPoint = D2D1::SizeF(
+      (parentPosition.left + parentPosition.right) / 2.0f,
+      (parentPosition.top + parentPosition.bottom) / 2.0f);
 }
 
 
 /// <summary>
 /// IPaintable::UpdateDWMColor
-/// Called when the DWM color has changed. Returns true if this Paintable is currently using the DWM color.
+/// Called when the DWM color has changed. Returns true if this Paintable is currently using the
+/// DWM color.
 /// </summary>
-bool ClockHand::UpdateDWMColor(ARGB newColor, ID2D1RenderTarget* renderTarget)
-{
-    return mBrush.UpdateDWMColor(newColor, renderTarget);
+bool ClockHand::UpdateDWMColor(ARGB newColor, ID2D1RenderTarget *renderTarget) {
+  return mBrush.UpdateDWMColor(newColor, renderTarget);
 }
 
 
 /// <summary>
 /// Initializes this clock hand.
 /// </summary>
-void ClockHand::Initialize(Settings *clockSettings, LPCTSTR prefix, float maxValue)
-{
-    Settings *settings = clockSettings->CreateChild(prefix);
+void ClockHand::Initialize(Settings *clockSettings, LPCTSTR prefix, float maxValue) {
+  Settings *settings = clockSettings->CreateChild(prefix);
 
-    mSmoothMovement = settings->GetBool(_T("SmoothMovement"), false);
-    mMaxValue = maxValue;
+  mSmoothMovement = settings->GetBool(_T("SmoothMovement"), false);
+  mMaxValue = maxValue;
 
-    BrushSettings brushDefaults;
-    brushDefaults.color = Color::Create(0xFF77FFEE);
-    mBrushSettings.Load(settings, &brushDefaults);
-    mBrush.Load(&mBrushSettings);
+  mBrushSettings.Load(settings, &sBrushDefaults);
+  mBrush.Load(&mBrushSettings);
 
-    float length = settings->GetFloat(_T("Length"), 50);
-    float thickness = settings->GetFloat(_T("Thickness"), 3);
-    float offset = settings->GetFloat(_T("Offset"), 0);
+  float length = settings->GetFloat(_T("Length"), 50);
+  float thickness = settings->GetFloat(_T("Thickness"), 3);
+  float offset = settings->GetFloat(_T("Offset"), 0);
 
-    mHandRect.left = offset;
-    mHandRect.top = -thickness / 2.0f;
-    mHandRect.bottom = mHandRect.top + thickness;
-    mHandRect.right = mHandRect.left + length;
+  mHandRect.left = offset;
+  mHandRect.top = -thickness / 2.0f;
+  mHandRect.bottom = mHandRect.top + thickness;
+  mHandRect.right = mHandRect.left + length;
 
-    delete settings;
+  delete settings;
 }
 
 
 /// <summary>
 /// Sets the rotation of the clock hand.
 /// </summary>
-void ClockHand::SetValue(float value)
-{
-    if (value > mMaxValue)
-    {
-        value -= mMaxValue;
-    }
+void ClockHand::SetValue(float value) {
+  if (value > mMaxValue) {
+    value -= mMaxValue;
+  }
 
-    if (!mSmoothMovement)
-    {
-        value = floorf(value);
-    }
+  if (!mSmoothMovement) {
+    value = floorf(value);
+  }
 
-    mRotation = value * 360.0f / mMaxValue - 90.0f;
+  mRotation = value * 360.0f / mMaxValue - 90.0f;
 }

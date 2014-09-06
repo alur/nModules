@@ -32,7 +32,7 @@ namespace Bangs
         LiteStep::BANGCOMMANDPROC handler;
     };
 
-    BangItem bangMap[] =
+    static const BangItem bangMap[] =
     {
         // Skips to the previous track
         BangItem(_T("!MediaPrevious"), [] (HWND, LPCTSTR)
@@ -103,7 +103,7 @@ namespace Bangs
     /// </summary>
     void _Register()
     {
-        for (BangItem &bangItem : bangMap)
+        for (const BangItem &bangItem : bangMap)
         {
             LiteStep::AddBangCommand(bangItem.name, bangItem.handler);
         }
@@ -115,7 +115,7 @@ namespace Bangs
     /// </summary>
     void _Unregister()
     {
-        for (BangItem &bangItem : bangMap)
+        for (const BangItem &bangItem : bangMap)
         {
             LiteStep::RemoveBangCommand(bangItem.name);
         }

@@ -1,44 +1,41 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Clock.hpp
- *  The nModules Project
- *
- *  A clock.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nClock/Clock.hpp
+// The nModules Project
+//
+// A clock.
+//-------------------------------------------------------------------------------------------------
 #pragma once
+
+#include "ClockHand.hpp"
 
 #include "../nShared/Drawable.hpp"
 #include "../nShared/StateRender.hpp"
-#include "ClockHand.hpp"
 
-class Clock : public Drawable
-{
+class Clock : public Drawable {
 private:
-    enum class States
-    {
-        Base = 0,
-        Count
-    };
+  enum class States {
+    Base,
+    Count
+  };
 
 public:
-    explicit Clock(LPCWSTR prefix);
-    virtual ~Clock();
+  explicit Clock(LPCWSTR prefix);
+  ~Clock();
 
-    // MessageHandler
 public:
-    LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) override;
+  void UpdateHands();
 
-    //
+  // MessageHandler
 public:
-    void UpdateHands();
+  LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) override;
 
 private:
-    StateRender<States> mStateRender;
+  StateRender<States> mStateRender;
 
-    UINT_PTR mUpdateTimer;
-    bool mUse24HourDial;
+  UINT_PTR mUpdateTimer;
+  bool mUse24HourDial;
 
-    ClockHand mSecondHand;
-    ClockHand mMinuteHand;
-    ClockHand mHourHand;
+  ClockHand mSecondHand;
+  ClockHand mMinuteHand;
+  ClockHand mHourHand;
 };

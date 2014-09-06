@@ -10,23 +10,20 @@
 #include "../nShared/Drawable.hpp"
 #include "../nShared/StateRender.hpp"
 
-class Calendar : public Drawable
-{
+class Calendar : public Drawable {
 private:
-    enum class State
-    {
-        Base = 0,
-        Count
-    };
+  enum class State {
+    Base,
+    Count
+  };
 
 public:
-    explicit Calendar(LPCWSTR calendarName);
-    ~Calendar();
+  explicit Calendar(LPCWSTR calendarName);
     
-    // MessageHandler
+  // MessageHandler
 public:
-    LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) override;
+  LRESULT WINAPI HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) override;
 
 private:
-    StateRender<State> mStateRender;
+  StateRender<State> mStateRender;
 };

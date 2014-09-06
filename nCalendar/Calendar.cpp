@@ -14,30 +14,17 @@
 Calendar::Calendar(LPCWSTR calendarName)
     : Drawable(calendarName)
 {
-    // Load state settings
-    StateRender<State>::InitData initData;
-    mStateRender.Load(initData, mSettings);
+  WindowSettings windowSettings;
+  windowSettings.Load(mSettings);
+  mStateRender.Load(mSettings);
 
-    //
-    WindowSettings windowSettings;
-    windowSettings.Load(mSettings, nullptr);
-
-    mWindow->Initialize(windowSettings, &mStateRender);
-}
-
-
-/// <summary>
-/// Destructor
-/// </summary>
-Calendar::~Calendar()
-{
+  mWindow->Initialize(windowSettings, &mStateRender);
 }
 
 
 /// <summary>
 /// Handles window messages
 /// </summary>
-LRESULT WINAPI Calendar::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID)
-{
-    return DefWindowProc(window, msg, wParam, lParam);
+LRESULT WINAPI Calendar::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID) {
+  return DefWindowProc(window, msg, wParam, lParam);
 }

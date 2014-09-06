@@ -67,6 +67,11 @@ BrushSettings::BrushSettings(const BrushSettings &source)
 }
 
 
+BrushSettings::BrushSettings(void init(BrushSettings &)) : BrushSettings() {
+  init(*this);
+}
+
+
 /// <summary>
 /// Destructor.
 /// </summary>

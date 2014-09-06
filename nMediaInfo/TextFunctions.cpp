@@ -148,11 +148,10 @@ void TextFunctions::_Update()
 }
 
 
-void TextFunctions::_UpdateNotify()
-{
-    nCore::System::DynamicTextChangeNotification(L"MusicTrackTitle", 0);
-    nCore::System::DynamicTextChangeNotification(L"MusicTrackArtist", 0);
-    nCore::System::DynamicTextChangeNotification(L"MusicAlbumTitle", 0);
+void TextFunctions::_UpdateNotify() {
+  nCore::System::DynamicTextChangeNotification(L"MusicTrackTitle", 0);
+  nCore::System::DynamicTextChangeNotification(L"MusicTrackArtist", 0);
+  nCore::System::DynamicTextChangeNotification(L"MusicAlbumTitle", 0);
 }
 
 

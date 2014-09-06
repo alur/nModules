@@ -108,7 +108,6 @@
   <ItemGroup>
     <ClInclude Include="Clock.hpp" />
     <ClInclude Include="ClockHand.hpp" />
-    <ClInclude Include="nClock.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>

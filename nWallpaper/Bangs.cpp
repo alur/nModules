@@ -45,7 +45,7 @@ static const BangItem bangMap[] = {
     if (styleValue == nullptr) {
       // Assume that the first token is the wallpaper file
     }
-    // !SetWallpaper c:\users\erik\desktop\wallpaper-2839632.jpg
+
     SHSetValue(HKEY_CURRENT_USER, L"Control Panel\\Desktop", L"Wallpaper", REG_SZ, token1, (DWORD)wcslen(token1)*sizeof(wchar_t));
     SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETDESKWALLPAPER, 0);
   }),
