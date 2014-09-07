@@ -99,19 +99,19 @@ static IconIterator FindIcon(LiteStep::LPSYSTRAYINFOEVENT pSTE) {
 static void UpdateIconData(IconData &iconData, LPLSNOTIFYICONDATA pNID) {
   if ((pNID->uFlags & NIF_MESSAGE) == NIF_MESSAGE) {
     iconData.callbackMessage = pNID->uCallbackMessage;
-    iconData.flags &= NIF_MESSAGE;
+    iconData.flags |= NIF_MESSAGE;
   }
   if ((pNID->uFlags & NIF_ICON) == NIF_ICON) {
     iconData.icon = pNID->hIcon;
-    iconData.flags &= NIF_ICON;
+    iconData.flags |= NIF_ICON;
   }
   if ((pNID->uFlags & NIF_TIP) == NIF_TIP) {
     StringCchCopy(iconData.tip, TRAY_MAX_TIP_LENGTH, pNID->szTip);
-    iconData.flags &= NIF_TIP;
+    iconData.flags |= NIF_TIP;
   }
   if ((iconData.flags & NIF_GUID) != NIF_GUID && (pNID->uFlags & NIF_GUID) == NIF_GUID) {
     iconData.guid = pNID->guidItem;
-    iconData.flags &= NIF_GUID;
+    iconData.flags |= NIF_GUID;
   }
 }
 
