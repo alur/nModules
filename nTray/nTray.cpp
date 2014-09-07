@@ -15,7 +15,7 @@
 #include <string>
 #include <unordered_map>
 
-#define TIMER_INIT_COMPLETED 1
+#define WM_GOT_INITIAL_TRAY_ICONS WM_USER
 
 // The messages we want from the core
 const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, LM_SYSTRAYINFOEVENT,
@@ -72,7 +72,8 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
   LoadSettings();
 
   // Let the core know that we want the system tray icons
-  ghWndTrayNotify = (HWND)SendMessage(LiteStep::GetLitestepWnd(), LM_SYSTRAYREADY, NULL, NULL);
+  ghWndTrayNotify = (HWND)SendMessage(LiteStep::GetLitestepWnd(), LM_SYSTRAYREADY, 0, 0);
+  PostMessage(gLSModule.GetMessageWindow(), WM_GOT_INITIAL_TRAY_ICONS, 0, 0);
 
   // Register a bang for printing tray info
   LiteStep::AddBangCommand(L"!nTrayListIconIDs", [] (HWND, LPCTSTR) -> void {
@@ -106,7 +107,6 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
   switch(message) {
   case WM_CREATE:
-    SetTimer(window, TIMER_INIT_COMPLETED, 100, NULL);
     SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
     return 0;
 
@@ -129,14 +129,9 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     }
     return 0;
 
-  case WM_TIMER:
-    switch (wParam) {
-    case TIMER_INIT_COMPLETED:
-      KillTimer(window, TIMER_INIT_COMPLETED);
-      gInitPhase = false;
-      TrayManager::InitCompleted();
-      return 0;
-    }
+  case WM_GOT_INITIAL_TRAY_ICONS:
+    gInitPhase = false;
+    TrayManager::InitCompleted();
     return 0;
 
   case LM_SYSTRAY:

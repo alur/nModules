@@ -7,34 +7,32 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include <vector>
 #include "../Utilities/Common.h"
+
+#include <vector>
 
 using std::vector;
 
 class MonitorInfo {
 public:
-    struct Monitor
-    {
-        RECT rect;
-        RECT workArea;
-        int width;
-        int height;
-        int workAreaWidth;
-        int workAreaHeight;
-    };
+  struct Monitor {
+    RECT rect;
+    RECT workArea;
+    int width;
+    int height;
+    int workAreaWidth;
+    int workAreaHeight;
+  };
 
-    MonitorInfo();
+  MonitorInfo();
 
-    void Update();
-    UINT MonitorFromHWND(HWND hWnd) const;
-    UINT MonitorFromRECT(LPRECT rect) const;
+  void Update();
+  UINT MonitorFromHWND(HWND hWnd) const;
+  UINT MonitorFromRECT(LPRECT rect) const;
 
-    // Every monitor
-    vector<Monitor> m_monitors;
+  // Every monitor
+  vector<Monitor> m_monitors;
 
-    // The virtual desktop
-    Monitor m_virtualDesktop;
-
-private:
+  // The virtual desktop
+  Monitor m_virtualDesktop;
 };

@@ -144,8 +144,8 @@ TrayIcon *Tray::AddIcon(IconData &iconData) {
   }
   TrayIcon *icon = new TrayIcon(this, iconData, mIconWindowSettings, &mIconStates);
   mIcons.push_back(icon);
-  icon->Show();
   if (!gInitPhase) {
+    icon->Show();
     Relayout();
   }
   return icon;
@@ -277,49 +277,49 @@ void Tray::Relayout() {
 /// Handles window events for the tray.
 /// </summary>
 LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam, LPVOID) {
-    mEventHandler->HandleMessage(wnd, message, wParam, lParam);
-    switch (message) {
-    case WM_MOUSEMOVE:
-      if (IsWindow(ghWndTrayNotify)) {
-        RECT r;
-        mWindow->GetScreenRect(&r);
-        MoveWindow(ghWndTrayNotify, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
-      }
-      return 0;
-
-    case WM_TIMER:
-      if (mBalloonTimer == wParam) {
-        ShowNextBalloon();
-      }
-      return 0;
-
-    case Window::WM_TOPPARENTLOST:
-      mBalloon.SetClickedMessage(0);
-      return 0;
-
-    case Window::WM_NEWTOPPARENT:
-      mBalloon.SetClickedMessage(mWindow->RegisterUserMessage(this));
-      return 0;
-
-    case Window::WM_SIZECHANGE:
-      mSettings->SetInt(L"CurrentWidth", LOWORD(wParam));
-      mSettings->SetInt(L"CurrentHeight", HIWORD(wParam));
-      // lParam is 1 when the size change is due to OverflowAction
-      if (lParam == 1) {
-        LiteStep::LSExecute(nullptr, mOnResize, 0);
-      }
-      return 0;
-
-    default:
-      if (message == mBalloon.GetClickedMessage()) {
-        // wParam is 0 if the dialog was clicked. 1 if the x was clicked.
-        if (wParam == 0) {
-          mActiveBalloonIcon->SendCallback(NIN_BALLOONUSERCLICK, 0, 0);
-        }
-        DismissBalloon(NIN_BALLOONHIDE);
-      }
-      return DefWindowProc(wnd, message, wParam, lParam);
+  mEventHandler->HandleMessage(wnd, message, wParam, lParam);
+  switch (message) {
+  case WM_MOUSEMOVE:
+    if (IsWindow(ghWndTrayNotify)) {
+      RECT r;
+      mWindow->GetScreenRect(&r);
+      MoveWindow(ghWndTrayNotify, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
     }
+    return 0;
+
+  case WM_TIMER:
+    if (mBalloonTimer == wParam) {
+      ShowNextBalloon();
+    }
+    return 0;
+
+  case Window::WM_TOPPARENTLOST:
+    mBalloon.SetClickedMessage(0);
+    return 0;
+
+  case Window::WM_NEWTOPPARENT:
+    mBalloon.SetClickedMessage(mWindow->RegisterUserMessage(this));
+    return 0;
+
+  case Window::WM_SIZECHANGE:
+    mSettings->SetInt(L"CurrentWidth", LOWORD(wParam));
+    mSettings->SetInt(L"CurrentHeight", HIWORD(wParam));
+    // lParam is 1 when the size change is due to OverflowAction
+    if (lParam == 1) {
+      LiteStep::LSExecute(nullptr, mOnResize, 0);
+    }
+    return 0;
+
+  default:
+    if (message == mBalloon.GetClickedMessage()) {
+      // wParam is 0 if the dialog was clicked. 1 if the x was clicked.
+      if (wParam == 0) {
+        mActiveBalloonIcon->SendCallback(NIN_BALLOONUSERCLICK, 0, 0);
+      }
+      DismissBalloon(NIN_BALLOONHIDE);
+    }
+    return DefWindowProc(wnd, message, wParam, lParam);
+  }
 }
 
 
@@ -327,7 +327,11 @@ LRESULT WINAPI Tray::HandleMessage(HWND wnd, UINT message, WPARAM wParam, LPARAM
 /// Called when the init phase has ended.
 /// </summary>
 void Tray::InitCompleted() {
+  Window::UpdateLock lock(mWindow);
   Relayout();
+  for (TrayIcon *icon : mIcons) {
+    icon->Show();
+  }
 }
 
 
