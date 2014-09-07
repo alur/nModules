@@ -8,6 +8,7 @@
 #include "Core.h"
 #include "CoreComHelpers.h"
 
+#include "../nShared/LiteStep.h"
 #include "../nShared/ResultCodes.h"
 
 #include "../Utilities/Common.h"
@@ -29,16 +30,16 @@ namespace nCore {
 /// <param name="minVersion">The minimum core version.</param>
 /// <returns>S_OK if the core is succefully initalized.</returns>
 HRESULT nCore::Connect(VERSION minVersion) {
-  HWND coreWindow = FindWindow(TEXT("LSnCore"), nullptr);
+  HWND coreWindow = FindWindowEx(LiteStep::GetLitestepWnd(), nullptr, L"LSnCore", nullptr);
 
   if (coreWindow == nullptr) {
     return E_NCORECOM_CORE_NOT_FOUND;
   }
-    
+
   gInitialized = false;
 
   HMODULE hCoreInstance = (HMODULE)GetWindowLongPtr(coreWindow, GWLP_USERDATA);
-    
+
   INIT_FUNC(GetCoreVersion);
 
   VERSION coreVersion = FUNC_VAR_NAME(GetCoreVersion)();
@@ -55,7 +56,7 @@ HRESULT nCore::Connect(VERSION minVersion) {
       GetPatchVersion(minVersion) > GetPatchVersion(minVersion)) {
     return E_NCORECOM_PATCH_VERSION;
   }
-    
+
   HRESULT hr = S_OK;
 
   RETURNONFAIL(hr, System::_Init(hCoreInstance));

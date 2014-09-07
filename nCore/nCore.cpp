@@ -135,9 +135,8 @@ bool CreateMainWindow(HINSTANCE instance)
         return false;
     }
 
-    ghWndMsgHandler = CreateWindowExW(WS_EX_TOOLWINDOW, gMsgHandler, L"",
-        WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-        0, 0, 0, 0, nullptr, nullptr, instance, nullptr);
+    ghWndMsgHandler = CreateWindowExW(WS_EX_TOOLWINDOW, gMsgHandler, L"", WS_CHILD,
+        0, 0, 0, 0, LiteStep::GetLitestepWnd(), nullptr, instance, nullptr);
 
     if (!ghWndMsgHandler)
     {
