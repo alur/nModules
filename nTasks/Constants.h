@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Constants.h
- *  The nModules Project
- *
- *  Window messages and timer constants.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nTask/Constants.h
+// The nModules Project
+//
+// Window messages and timer constants.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 #define TIMER_ADD_EXISTING 1

@@ -16,8 +16,8 @@
 class Label : public Drawable {
 public:
   explicit Label(LPCWSTR name);
-  explicit Label(LPCWSTR name, Drawable * parent);
-  virtual ~Label();
+  Label(LPCWSTR name, Drawable * parent);
+  ~Label();
 
   // IDrawable
 private:

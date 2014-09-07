@@ -6,14 +6,47 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "ButtonSettings.hpp"
+#include "TaskButton.hpp"
+
+static const StateRender<TaskButton::State>::InitData sInitData(
+  [] (StateRender<TaskButton::State>::InitData &initData)
+{
+  // Common defaults
+  for (auto &x : initData) {
+    x.defaults.brushSettings[State::BrushType::Background].color = Color::Create(0x00000000);
+    x.defaults.textOffsetLeft = 36;
+    x.defaults.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
+  }
+
+  using State = TaskButton::State;
+  initData[State::Active].prefix = L"Active";
+  initData[State::Hover].prefix = L"Hover";
+  initData[State::Flashing].prefix = L"Flashing";
+  initData[State::Minimized].prefix = L"Minimized";
+
+  initData[State::ActiveHover].prefix = L"ActiveHover";
+  initData[State::ActiveHover].base = State::Active;
+  initData[State::ActiveHover].dependencies = { State::Active, State::Hover };
+  initData[State::FlashingHover].prefix = L"FlashingHover";
+  initData[State::FlashingHover].base = State::Flashing;
+  initData[State::FlashingHover].dependencies = { State::Flashing, State::Hover };
+  initData[State::MinimizedFlashing].prefix = L"MinimizedFlashing";
+  initData[State::MinimizedFlashing].base = State::Flashing;
+  initData[State::MinimizedFlashing].dependencies = { State::Flashing, State::Minimized };
+  initData[State::MinimizedFlashingHover].prefix = L"MinimizedFlashingHover";
+  initData[State::MinimizedFlashingHover].base = State::FlashingHover;
+  initData[State::MinimizedFlashingHover].dependencies = { State::MinimizedFlashing,
+    State::MinimizedHover };
+  initData[State::MinimizedHover].prefix = L"MinimizedHover";
+  initData[State::MinimizedHover].base = State::Hover;
+  initData[State::MinimizedHover].dependencies = { State::Minimized, State::Hover };
+});
 
 
 /// <summary>
 /// Loads these button settings from the settings file.
 /// </summary>
-void ButtonSettings::Load(Settings *buttonSettings)
-{
-    //
+void ButtonSettings::Load(Settings *buttonSettings) {
     mUseFlashing = buttonSettings->GetBool(_T("UseFlashing"), true);
     mFlashInterval = buttonSettings->GetInt(_T("FlashInterval"), 500);
     mNoIcons = buttonSettings->GetBool(_T("NoIcons"), false);
@@ -35,41 +68,7 @@ void ButtonSettings::Load(Settings *buttonSettings)
         iconX + iconSize + overlayIconOffsetX,
         iconY + iconSize + overlayIconOffsetY);
 
-    //
-    StateRender<TaskButton::State>::InitData initData;
-
-    // Common defaults
-    for (auto &x : initData)
-    {
-        //
-        x.defaults.brushSettings[State::BrushType::Background].color = Color::Create(0x00000000);
-        x.defaults.textOffsetLeft = 36;
-        x.defaults.textVerticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
-    }
-
-    //
-    initData[TaskButton::State::Active].prefix = _T("Active");
-    initData[TaskButton::State::Hover].prefix = _T("Hover");
-    initData[TaskButton::State::Flashing].prefix = _T("Flashing");
-    initData[TaskButton::State::Minimized].prefix = _T("Minimized");
-
-    initData[TaskButton::State::ActiveHover].prefix = _T("ActiveHover");
-    initData[TaskButton::State::ActiveHover].base = TaskButton::State::Active;
-    initData[TaskButton::State::ActiveHover].dependencies = { TaskButton::State::Active, TaskButton::State::Hover };
-    initData[TaskButton::State::FlashingHover].prefix = _T("FlashingHover");
-    initData[TaskButton::State::FlashingHover].base = TaskButton::State::Flashing;
-    initData[TaskButton::State::FlashingHover].dependencies = { TaskButton::State::Flashing, TaskButton::State::Hover };
-    initData[TaskButton::State::MinimizedFlashing].prefix = _T("MinimizedFlashing");
-    initData[TaskButton::State::MinimizedFlashing].base = TaskButton::State::Flashing;
-    initData[TaskButton::State::MinimizedFlashing].dependencies = { TaskButton::State::Flashing, TaskButton::State::Minimized };
-    initData[TaskButton::State::MinimizedFlashingHover].prefix = _T("MinimizedFlashingHover");
-    initData[TaskButton::State::MinimizedFlashingHover].base = TaskButton::State::FlashingHover;
-    initData[TaskButton::State::MinimizedFlashingHover].dependencies = { TaskButton::State::MinimizedFlashing, TaskButton::State::MinimizedHover };
-    initData[TaskButton::State::MinimizedHover].prefix = _T("MinimizedHover");
-    initData[TaskButton::State::MinimizedHover].base = TaskButton::State::Hover;
-    initData[TaskButton::State::MinimizedHover].dependencies = { TaskButton::State::Minimized, TaskButton::State::Hover };
-
-    mStateRender.Load(initData, buttonSettings);
+    mStateRender.Load(sInitData, buttonSettings);
 
     //
     mWindowSettings.Load(buttonSettings, nullptr);

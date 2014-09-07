@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nStartMenu.rc
- *  The nModules Project
- *
- *  Version information for nStartMenu.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nStartMenu/nStartMenu.rc
+// The nModules Project
+//
+// Version information for nStartMenu.
+//-------------------------------------------------------------------------------------------------
 #include "Version.h"
 
 1 VERSIONINFO
@@ -13,24 +12,24 @@ PRODUCTVERSION MODULE_VERSION
 FILEOS 0x4
 FILETYPE 0x2
 {
-    BLOCK "StringFileInfo"
-    {
-	    BLOCK "04090000"
-	    {
-            VALUE "Comments", "https://code.google.com/p/n-modules/"
-            VALUE "CompanyName", MODULE_AUTHOR
-            VALUE "FileDescription", MODULE_NAME " LiteStep module"
-            VALUE "FileVersion", MODULE_VERSION_STR
-            VALUE "InternalName", MODULE_NAME
-            VALUE "LegalCopyright", "Copyright © 2012 - 2013"
-            VALUE "OriginalFilename", MODULE_NAME ".dll"
-            VALUE "ProductName", MODULE_NAME
-            VALUE "ProductVersion", MODULE_VERSION_STR
-	    }
-    }
+	BLOCK "StringFileInfo"
+	{
+		BLOCK "04090000"
+		{
+			VALUE "Comments", "https://code.google.com/p/n-modules/"
+			VALUE "CompanyName", MODULE_AUTHOR
+			VALUE "FileDescription", MODULE_NAME " LiteStep module"
+			VALUE "FileVersion", MODULE_VERSION_STR
+			VALUE "InternalName", MODULE_NAME
+			VALUE "LegalCopyright", "Copyright © 2012 - 2014"
+			VALUE "OriginalFilename", MODULE_NAME ".dll"
+			VALUE "ProductName", MODULE_NAME
+			VALUE "ProductVersion", MODULE_VERSION_STR
+		}
+	}
 
-    BLOCK "VarFileInfo"
-    {
-	    VALUE "Translation", 0x0409 0x0000
-    }
+	BLOCK "VarFileInfo"
+	{
+		VALUE "Translation", 0x0409 0x0000
+	}
 }

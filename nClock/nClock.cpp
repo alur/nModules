@@ -114,10 +114,12 @@ void LoadSettings() {
 /// </summary>
 /// <param name="clockName">The name of the clock to create.</param>
 void CreateClock(LPCWSTR clockName) {
-  using std::piecewise_construct;
-  using std::forward_as_tuple;
   if (gClocks.find(clockName) == gClocks.end()) {
-    gClocks.emplace(piecewise_construct, forward_as_tuple(clockName), forward_as_tuple(clockName));
+    gClocks.emplace(
+      std::piecewise_construct,
+      std::forward_as_tuple(clockName),
+      std::forward_as_tuple(clockName)
+    );
   } else {
     ErrorHandler::Error(ErrorHandler::Level::Critical,
       L"Attempt to (re)create the already existing clock %s!", clockName);

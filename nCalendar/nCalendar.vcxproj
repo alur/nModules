@@ -110,7 +110,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Calendar.hpp" />
-    <ClInclude Include="nCalendar.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>

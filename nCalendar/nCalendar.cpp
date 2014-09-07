@@ -1,12 +1,10 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nCalendar.cpp
- *  The nModules Project
- *
- *  Main .cpp file for the nCalendar module.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nCalendar/nCalendar.cpp
+// The nModules Project
+//
+// LiteStep entry points for nCalendar.
+//-------------------------------------------------------------------------------------------------
 #include "Calendar.hpp"
-#include "nCalendar.h"
 #include "Version.h"
 
 #include "../nShared/ErrorHandler.h"
@@ -21,10 +19,46 @@
 LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
-const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED, LM_FULLSCREENDEACTIVATED, 0 };
+const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
+  LM_FULLSCREENDEACTIVATED, 0 };
 
-// All current clocks
+// All current calendars
 std::map<std::wstring, Calendar> gCalendars;
+
+
+
+/// <summary>
+/// Reads through the .rc files and creates calendars.
+/// </summary>
+static void Unload() {
+  gCalendars.clear();
+}
+
+
+/// <summary>
+/// Creates a new calendar with the specified name.
+/// </summary>
+/// <param name="calendarName">The name of the calendar to create.</param>
+static void CreateCalendar(LPCTSTR calendarName) {
+  if (gCalendars.find(calendarName) == gCalendars.end()) {
+    gCalendars.emplace(
+      std::piecewise_construct,
+      std::forward_as_tuple(calendarName),
+      std::forward_as_tuple(calendarName)
+      );
+  } else {
+    ErrorHandler::Error(ErrorHandler::Level::Critical,
+      L"Attempt to (re)create the already existing calendar %s!", calendarName);
+  }
+}
+
+
+/// <summary>
+/// Reads through the .rc files and creates calendars.
+/// </summary>
+static void LoadSettings() {
+  LiteStep::IterateOverLineTokens(L"*nCalendar", CreateCalendar);
+}
 
 
 /// <summary>
@@ -47,7 +81,7 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
-  gCalendars.clear();
+  Unload();
   gLSModule.DeInitalize();
 }
 
@@ -62,65 +96,29 @@ void quitModule(HINSTANCE /* instance */) {
 LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
   switch(message) {
   case WM_CREATE:
-      {
-          SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
-      }
-      return 0;
+    SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
+    return 0;
 
   case WM_DESTROY:
-      {
-          SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
-      }
-      return 0;
+    SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
+    return 0;
 
   case LM_REFRESH:
-      {
-      }
-      return 0;
+    Unload();
+    LoadSettings();
+    return 0;
 
   case LM_FULLSCREENACTIVATED:
-      {
-          for (auto &item : gCalendars)
-          {
-              item.second.GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
-          }
-      }
-      return 0;
+    for (auto &item : gCalendars) {
+      item.second.GetWindow()->FullscreenActivated((HMONITOR) wParam, (HWND) lParam);
+    }
+    return 0;
 
   case LM_FULLSCREENDEACTIVATED:
-      {
-          for (auto &item : gCalendars)
-          {
-              item.second.GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
-          }
-      }
-      return 0;
+    for (auto &item : gCalendars) {
+      item.second.GetWindow()->FullscreenDeactivated((HMONITOR) wParam);
+    }
+    return 0;
   }
   return DefWindowProc(window, message, wParam, lParam);
-}
-
-
-/// <summary>
-/// Reads through the .rc files and creates calendars.
-/// </summary>
-void LoadSettings() {
-  LiteStep::IterateOverLineTokens(L"*nCalendar", CreateCalendar);
-}
-
-
-/// <summary>
-/// Creates a new calendar with the specified name.
-/// </summary>
-/// <param name="calendarName">The name of the calendar to create.</param>
-void CreateCalendar(LPCTSTR calendarName) {
-  if (gCalendars.find(calendarName) == gCalendars.end()) {
-    gCalendars.emplace(
-      std::piecewise_construct,
-      std::forward_as_tuple(calendarName),
-      std::forward_as_tuple(calendarName)
-    );
-  } else {
-    ErrorHandler::Error(ErrorHandler::Level::Critical,
-      L"Attempt to (re)create the already existing calendar %s!", calendarName);
-  }
 }

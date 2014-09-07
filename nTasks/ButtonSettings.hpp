@@ -5,6 +5,12 @@
  *  Contains all the settings used by button for a particular taskbar.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nClock/Clock.hpp
+// The nModules Project
+//
+// A clock.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 class ButtonSettings;
@@ -12,38 +18,33 @@ class ButtonSettings;
 #include "TaskButton.hpp"
 #include "ProgressBar.hpp"
 
-class ButtonSettings
-{
-    // Button Specific settings
+class ButtonSettings {
+  // Button Specific settings
 public:
-    bool mUseFlashing;
-    int mFlashInterval;
-    bool mNoIcons;
+  bool mUseFlashing;
+  int mFlashInterval;
+  bool mNoIcons;
 
-    float mIconSize;
-    float mIconX;
-    float mIconY;
-    D2D1_RECT_F mIconRect;
+  float mIconSize;
+  float mIconX;
+  float mIconY;
+  D2D1_RECT_F mIconRect;
 
-    float mOverlayIconSize;
-    float mOverlayIconOffsetX;
-    float mOverlayIconOffsetY;
-    D2D1_RECT_F mOverlayIconRect;
+  float mOverlayIconSize;
+  float mOverlayIconOffsetX;
+  float mOverlayIconOffsetY;
+  D2D1_RECT_F mOverlayIconRect;
+
+  // Window settings
+public:
+  WindowSettings mWindowSettings;
+  StateRender<TaskButton::State> mStateRender;
+
+  RelatedNumber mProgressX;
+  RelatedNumber mProgressY;
+  RelatedNumber mProgressWidth;
+  RelatedNumber mProgressHeight;
 
 public:
-
-
-    // Window settings
-public:
-    WindowSettings mWindowSettings;
-    StateRender<TaskButton::State> mStateRender;
-
-    RelatedNumber mProgressX;
-    RelatedNumber mProgressY;
-    RelatedNumber mProgressWidth;
-    RelatedNumber mProgressHeight;
-
-    //
-public:
-    void Load(Settings *settings);
+  void Load(Settings *settings);
 };

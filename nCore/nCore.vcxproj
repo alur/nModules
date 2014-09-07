@@ -142,6 +142,7 @@
     <ClInclude Include="IParsedText.hpp" />
     <ClInclude Include="nCore.h" />
     <ClInclude Include="ParsedText.hpp" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Scripting.h" />
     <ClInclude Include="ScriptingEvents.h" />
     <ClInclude Include="ScriptingHelpers.h" />
@@ -161,6 +162,7 @@
     <ClCompile Include="WindowRegistrar.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="JSConsole.rc" />
     <ResourceCompile Include="nCore.rc" />
   </ItemGroup>
   <ItemGroup>

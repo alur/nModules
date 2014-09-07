@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  nPopup.rc
- *  The nModules Project
- *
- *  Version information for nPopup.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nPopup/nPopup.rc
+// The nModules Project
+//
+// Version information for nPopup.
+//-------------------------------------------------------------------------------------------------
 #include "Version.h"
 
 1 VERSIONINFO
@@ -22,7 +21,7 @@ FILETYPE 0x2
 			VALUE "FileDescription", MODULE_NAME " LiteStep module"
 			VALUE "FileVersion", MODULE_VERSION_STR
 			VALUE "InternalName", MODULE_NAME
-			VALUE "LegalCopyright", "Copyright © 2012 - 2013"
+			VALUE "LegalCopyright", "Copyright © 2012 - 2014"
 			VALUE "OriginalFilename", MODULE_NAME ".dll"
 			VALUE "ProductName", MODULE_NAME
 			VALUE "ProductVersion", MODULE_VERSION_STR
