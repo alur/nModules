@@ -24,11 +24,11 @@ public:
         int workAreaHeight;
     };
 
-    explicit MonitorInfo();
-    virtual ~MonitorInfo();
+    MonitorInfo();
+
     void Update();
-    UINT MonitorFromHWND(HWND hWnd);
-    UINT MonitorFromRECT(LPRECT rect);
+    UINT MonitorFromHWND(HWND hWnd) const;
+    UINT MonitorFromRECT(LPRECT rect) const;
 
     // Every monitor
     vector<Monitor> m_monitors;

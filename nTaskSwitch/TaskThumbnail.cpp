@@ -15,6 +15,7 @@
 #include "../Utilities/StopWatch.hpp"
 #include "../Utilities/Math.h"
 #include <shellapi.h>
+#include "../nCoreCom/Core.h"
 
 // 
 extern UINT (WINAPI *DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown);
@@ -52,13 +53,13 @@ TaskThumbnail::TaskThumbnail(
     
     if (targetWindow == gDesktopWindow)
     {
-        properties.dwFlags |= DWM_TNP_RECTSOURCE;
-        MonitorInfo* monInfo = mWindow->GetMonitorInformation();
-        properties.rcSource = monInfo->m_monitors[0].rect;
-        properties.rcSource.bottom -= monInfo->m_virtualDesktop.rect.top;
-        properties.rcSource.top -= monInfo->m_virtualDesktop.rect.top;
-        properties.rcSource.left -= monInfo->m_virtualDesktop.rect.left;
-        properties.rcSource.right -= monInfo->m_virtualDesktop.rect.left;
+      properties.dwFlags |= DWM_TNP_RECTSOURCE;
+      MonitorInfo &monInfo = nCore::System::FetchMonitorInfo();
+      properties.rcSource = monInfo.m_monitors[0].rect;
+      properties.rcSource.bottom -= monInfo.m_virtualDesktop.rect.top;
+      properties.rcSource.top -= monInfo.m_virtualDesktop.rect.top;
+      properties.rcSource.left -= monInfo.m_virtualDesktop.rect.left;
+      properties.rcSource.right -= monInfo.m_virtualDesktop.rect.left;
     }
     
     DwmUpdateThumbnailProperties(mThumbnail, &properties);
@@ -67,9 +68,9 @@ TaskThumbnail::TaskThumbnail(
     SIZE sourceSize;
     if (targetWindow == gDesktopWindow)
     {
-        MonitorInfo* monInfo = mWindow->GetMonitorInformation();
-        sourceSize.cx = monInfo->m_monitors[0].width;
-        sourceSize.cy = monInfo->m_monitors[0].height;
+      MonitorInfo &monInfo = nCore::System::FetchMonitorInfo();
+      sourceSize.cx = monInfo.m_monitors[0].width;
+      sourceSize.cy = monInfo.m_monitors[0].height;
     }
     else
     {

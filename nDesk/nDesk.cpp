@@ -36,7 +36,7 @@ LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSIO
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path */) {
+EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* path */) {
     WNDCLASSEX wc;
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
     wc.cbSize = sizeof(WNDCLASSEX);
@@ -55,7 +55,7 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
     g_pClickHandler = new ClickHandler();
     g_pDesktopPainter = nullptr; // Initialized on WM_CREATE
     
-    if (!gLSModule.Initialize(parent, instance, &wc, nullptr)) {
+    if (!gLSModule.Initialize(nullptr, instance, &wc, nullptr)) {
         delete g_pMonitorInfo;
         delete g_pClickHandler;
         return 1;

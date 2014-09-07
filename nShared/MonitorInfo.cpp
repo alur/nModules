@@ -17,22 +17,14 @@ BOOL CALLBACK EnumMonitorsCallback(HMONITOR, HDC, LPRECT, LPARAM);
 /// Creates a new instance of the MonitorInfo class.
 /// </summary>
 MonitorInfo::MonitorInfo() {
-    Update();
-}
-
-
-/// <summary>
-/// Destroys this instance of the MonitorInfo class.
-/// </summary>
-MonitorInfo::~MonitorInfo() {
-    this->m_monitors.clear();
+  Update();
 }
 
 
 /// <summary>
 /// Returns the monitor which contains the biggest area of the specified window.
 /// </summary>
-UINT MonitorInfo::MonitorFromHWND(HWND hWnd) {
+UINT MonitorInfo::MonitorFromHWND(HWND hWnd) const {
     WINDOWINFO wndInfo;
     WINDOWPLACEMENT wp;
     RECT wndRect;
@@ -57,7 +49,7 @@ UINT MonitorInfo::MonitorFromHWND(HWND hWnd) {
 /// <summary>
 /// Returns the monitor which contains the biggest area of the specified window.
 /// </summary>
-UINT MonitorInfo::MonitorFromRECT(LPRECT rect) {
+UINT MonitorInfo::MonitorFromRECT(LPRECT rect) const {
     int maxArea = 0;
     int area = 0;
     UINT monitor = UINT(-1);

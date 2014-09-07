@@ -5,8 +5,12 @@
  *  A general balloon popup window.
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../Utilities/Common.h"
 #include "Balloon.hpp"
+
+#include "../nCoreCom/Core.h"
+
+#include "../Utilities/Common.h"
+
 #include <algorithm>
 
 
@@ -168,12 +172,12 @@ void Balloon::Show(LPCWSTR title, LPCWSTR text, HICON icon, LPSIZE iconSize, LPR
   mCloseBtnWindow->Move(mWindow->GetSize().width - 20, 4);
 
   // Show it centerd on x, 5 px above, while forcing it to stay on the virtual desktop
-  MonitorInfo *monInfo = mWindow->GetMonitorInformation();
+  MonitorInfo &monInfo = nCore::System::FetchMonitorInfo();
   mWindow->Move(
-    std::min<float>(std::max<float>((float)monInfo->m_virtualDesktop.rect.left, (float)targetPosition->left - mWindow->GetSize().width/2.0f),
-        (float)monInfo->m_virtualDesktop.rect.right - mWindow->GetSize().width),
-    std::min<float>(std::max<float>((float)monInfo->m_virtualDesktop.rect.top, (float)targetPosition->top - mWindow->GetSize().height - 5.0f),
-        (float)monInfo->m_virtualDesktop.rect.bottom - mWindow->GetSize().height));
+    std::min<float>(std::max<float>((float)monInfo.m_virtualDesktop.rect.left, (float)targetPosition->left - mWindow->GetSize().width/2.0f),
+        (float)monInfo.m_virtualDesktop.rect.right - mWindow->GetSize().width),
+    std::min<float>(std::max<float>((float)monInfo.m_virtualDesktop.rect.top, (float)targetPosition->top - mWindow->GetSize().height - 5.0f),
+        (float)monInfo.m_virtualDesktop.rect.bottom - mWindow->GetSize().height));
 
   mWindow->Show();
 }

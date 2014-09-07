@@ -17,7 +17,6 @@
 #include <list>
 #include <map>
 #include "../Utilities/UIDGenerator.hpp"
-#include "MonitorInfo.hpp"
 #include "Easing.h"
 #include "../nCore/IParsedText.hpp"
 #include "IPainter.hpp"
@@ -162,9 +161,6 @@ public:
 
     // Returns the current drawing settings.
     WindowSettings *GetDrawingSettings();
-
-    // Returns a MonitorInfo class which will be kept up-to-date for the duration of this windows lifetime.
-    MonitorInfo *GetMonitorInformation();
 
     // Gets the "desired" size for a given width and height.
     void GetDesiredSize(int maxWidth, int maxHeight, LPSIZE size);
@@ -398,9 +394,6 @@ private:
 
     // The object which should handle mouse event messages.
     MessageHandler* msgHandler;
-
-    // MonitorInfo...
-    MonitorInfo* monitorInfo;
 
     // All current overlays.
     std::list<Overlay*> overlays;

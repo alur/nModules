@@ -15,7 +15,7 @@ using std::max;
 /// <summary>
 /// Returns the area of the rectangle.
 /// </summary>
-int Math::RectArea(LPRECT rect)
+int Math::RectArea(LPCRECT rect)
 {
     return (rect->right - rect->left)*(rect->bottom - rect->top);
 }
@@ -24,7 +24,7 @@ int Math::RectArea(LPRECT rect)
 /// <summary>
 /// Returns the size of the overlapping area between the two rectangles.
 /// </summary>
-int Math::RectIntersectArea(LPRECT rect1, LPRECT rect2)
+int Math::RectIntersectArea(LPCRECT rect1, LPCRECT rect2)
 {
     return max(0L, min(rect1->right, rect2->right) - max(rect1->left, rect2->left))*max(0L, min(rect1->bottom, rect2->bottom) - max(rect1->top, rect2->top));
 }
@@ -50,7 +50,7 @@ float Math::RectIntersectArea(D2D1_RECT_F rect1, D2D1_RECT_F rect2)
 /// <summary>
 /// Returns the size of the overlapping area between the two rectangles.
 /// </summary>
-int Math::RectUnionArea(LPRECT rect1, LPRECT rect2)
+int Math::RectUnionArea(LPCRECT rect1, LPCRECT rect2)
 {
     return RectArea(rect1) + RectArea(rect2) - RectIntersectArea(rect1, rect2);
 }
@@ -59,7 +59,7 @@ int Math::RectUnionArea(LPRECT rect1, LPRECT rect2)
 /// <summary>
 /// Returns the size of the area which is not within the overlap of the two rectangles.
 /// </summary>
-int Math::RectNonOverlappArea(LPRECT rect1, LPRECT rect2)
+int Math::RectNonOverlappArea(LPCRECT rect1, LPCRECT rect2)
 {
     return RectArea(rect1) + RectArea(rect2) - 2*RectIntersectArea(rect1, rect2);
 }

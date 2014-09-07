@@ -27,7 +27,7 @@ static const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 static HWND ghWndMsgHandler;
 
 // Class pointers
-MonitorInfo * g_pMonitorInfo;
+MonitorInfo gMonitorInfo;
 
 // Constants
 static const LPCWSTR gMsgHandler = L"LSnCore";
@@ -45,6 +45,14 @@ EXPORT_CDECL(Window*) FindRegisteredWindow(LPCWSTR prefix);
 EXPORT_CDECL(VERSION) GetCoreVersion()
 {
     return MakeVersion(MODULE_VERSION);
+}
+
+
+/// <summary>
+/// Gets current monitor information.
+/// </summary>
+EXPORT_CDECL(MonitorInfo&) FetchMonitorInfo() {
+  return gMonitorInfo;
 }
 
 
@@ -70,7 +78,6 @@ int initModuleW(HWND parent, HINSTANCE instance, LPCWSTR path)
         return 1;
     }
 
-    g_pMonitorInfo = new MonitorInfo();
     TextFunctions::_Register();
     timeTimer = SetTimer(ghWndMsgHandler, 1, 1000, nullptr);
 
@@ -135,8 +142,8 @@ bool CreateMainWindow(HINSTANCE instance)
         return false;
     }
 
-    ghWndMsgHandler = CreateWindowExW(WS_EX_TOOLWINDOW, gMsgHandler, L"", WS_CHILD,
-        0, 0, 0, 0, LiteStep::GetLitestepWnd(), nullptr, instance, nullptr);
+    ghWndMsgHandler = CreateWindowExW(WS_EX_TOOLWINDOW, gMsgHandler, L"", WS_POPUP,
+        0, 0, 0, 0, nullptr, nullptr, instance, nullptr);
 
     if (!ghWndMsgHandler)
     {
@@ -184,6 +191,16 @@ LRESULT WINAPI MainProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
         }
         return 0;
+
+    case WM_SETTINGCHANGE:
+      if (wParam == SPI_SETWORKAREA) {
+        gMonitorInfo.Update();
+      }
+      return 0;
+
+    case WM_DISPLAYCHANGE:
+      gMonitorInfo.Update();
+      return 0;
 
     case WM_TIMER:
         {

@@ -11,6 +11,7 @@
 #include "../nShared/LSModule.hpp"
 #include <Shlwapi.h>
 #include "../nShared/DWMColorVal.hpp"
+#include "../nCoreCom/Core.h"
 
 
 // 
@@ -46,8 +47,7 @@ void TaskSwitcher::LoadSettings()
     // LivePreview_ms doesn't seem to have any effect on explorer in Windows 8, but lets use it as the deault value anyway.
     mPeekDelay = mSettings->GetInt(L"PeekDelay", SHRegGetIntW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AltTab\\LivePreview_ms", 1000));
 
-    MonitorInfo::Monitor primaryMonitor;
-    primaryMonitor = mWindow->GetMonitorInformation()->m_monitors[0];
+    MonitorInfo::Monitor &primaryMonitor = nCore::System::FetchMonitorInfo().m_monitors[0];
 
     mThumbnailSettings.Load(mSettings);
 
@@ -201,9 +201,10 @@ void TaskSwitcher::Show(int delta)
 
     float height = mLayoutSettings.mPadding.top + mLayoutSettings.mPadding.bottom + ((int)mShownWindows.size() - 1) / mWindowsPerRow * (mTaskSize.height + mLayoutSettings.mRowSpacing) + mTaskSize.height;
 
+    MonitorInfo::Monitor &primaryMonitor = nCore::System::FetchMonitorInfo().m_monitors[0];
     mWindow->SetPosition(
         mWindow->GetDrawingSettings()->x,
-        mWindow->GetMonitorInformation()->m_monitors[0].workAreaHeight/2.0f - height/2.0f + (float)mWindow->GetMonitorInformation()->m_monitors[0].workArea.top,
+        primaryMonitor.workAreaHeight / 2.0f - height / 2.0f + (float)primaryMonitor.workArea.top,
         mWindow->GetDrawingSettings()->width, 
         height);
 

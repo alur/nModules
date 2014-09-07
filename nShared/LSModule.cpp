@@ -125,7 +125,7 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
 
     // Create the main window.
     if ((this->messageHandler = MessageHandler::CreateMessageWindowEx(WS_EX_TOOLWINDOW,
-        (LPCTSTR)this->messageHandlerClass, _T(""), WS_POPUP, 0, 0, 0, 0, this->parent, NULL, this->instance, this)) == NULL)
+        (LPCTSTR)this->messageHandlerClass, L"", this->parent ? WS_CHILD : WS_POPUP, 0, 0, 0, 0, this->parent, NULL, this->instance, this)) == NULL)
     {
         ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()), L"Failed to register the LiteStep message window.");
         return false;
@@ -230,7 +230,7 @@ LRESULT WINAPI LSModule::HandleMessage(HWND window, UINT message, WPARAM wParam,
             size_t length;
             LSModule* lsModule = (LSModule*)GetWindowLongPtr(window, 0);
             StringCchPrintf((LPTSTR)lParam, 64, _T("%s: "), lsModule->moduleName);
-			length = _tcslen((LPTSTR)lParam);
+            length = _tcslen((LPTSTR)lParam);
             GetVersionString(lsModule->version, (LPTSTR)lParam + length, 64 - length, false);
             
             if (SUCCEEDED(StringCchLength((LPTSTR)lParam, 64, &length))) {

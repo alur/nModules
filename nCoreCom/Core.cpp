@@ -30,7 +30,7 @@ namespace nCore {
 /// <param name="minVersion">The minimum core version.</param>
 /// <returns>S_OK if the core is succefully initalized.</returns>
 HRESULT nCore::Connect(VERSION minVersion) {
-  HWND coreWindow = FindWindowEx(LiteStep::GetLitestepWnd(), nullptr, L"LSnCore", nullptr);
+  HWND coreWindow = FindWindowEx(nullptr, nullptr, L"LSnCore", nullptr);
 
   if (coreWindow == nullptr) {
     return E_NCORECOM_CORE_NOT_FOUND;

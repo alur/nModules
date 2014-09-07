@@ -10,6 +10,7 @@
 #include <dwmapi.h>
 #include <algorithm>
 #include "../Utilities/Math.h"
+#include "../nCoreCom/Core.h"
 
 using std::min;
 using std::max;
@@ -51,6 +52,8 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position)
     {
         int x, y, width, height, maxWidth, maxHeight;
         double scale;
+        MonitorInfo &monitorInfo = nCore::System::FetchMonitorInfo();
+        MonitorInfo::Monitor monitor = monitorInfo.m_monitors[monitorInfo.MonitorFromRECT(position)];
         switch (this->position)
         {
         default:
@@ -66,7 +69,6 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position)
                 y = this->position == BOTTOM ? position->bottom + this->distanceFromButton : position->top - height - this->distanceFromButton;
 
                 // Ensure that the entire preview is on the same monitor as the button.
-                MonitorInfo::Monitor monitor = mWindow->GetMonitorInformation()->m_monitors[mWindow->GetMonitorInformation()->MonitorFromRECT(position)];
                 x = CLAMP(monitor.rect.left, (long)x, monitor.rect.right - width);
             }
             break;
@@ -83,7 +85,6 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position)
                 x = this->position == LEFT ? position->left - width - this->distanceFromButton : position->right + this->distanceFromButton;
 
                 // Ensure that the entire preview is on the same monitor as the button.
-                MonitorInfo::Monitor monitor = mWindow->GetMonitorInformation()->m_monitors[mWindow->GetMonitorInformation()->MonitorFromRECT(position)];
                 y = CLAMP(monitor.rect.top, (long)y, monitor.rect.bottom - height);
             }
             break;

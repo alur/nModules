@@ -12,6 +12,7 @@
 #include "../nShared/MonitorInfo.hpp"
 #include "FolderItem.hpp"
 #include "../Utilities/Math.h"
+#include "../nCoreCom/Core.h"
 
 
 Popup::Popup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix)
@@ -247,20 +248,20 @@ void Popup::Show(LPRECT position, Popup* owner)
     SetParent(mWindow->GetWindowHandle(), nullptr);
     PreShow();
 
-    MonitorInfo* monInfo = mWindow->GetMonitorInformation();
+    MonitorInfo &monInfo = nCore::System::FetchMonitorInfo();
 
     int x, y;
-    RECT limits = monInfo->m_virtualDesktop.rect;
+    RECT limits = monInfo.m_virtualDesktop.rect;
 
     if (this->confineToMonitor && this->confineToWorkArea) {
-        limits = monInfo->m_monitors.at(monInfo->MonitorFromRECT(position)).workArea;
+        limits = monInfo.m_monitors.at(monInfo.MonitorFromRECT(position)).workArea;
     }
     else if (this->confineToMonitor) {
-        limits = monInfo->m_monitors.at(monInfo->MonitorFromRECT(position)).rect;
+        limits = monInfo.m_monitors.at(monInfo.MonitorFromRECT(position)).rect;
     }
     else if (this->confineToWorkArea) {
         // TODO::Shouldn't confine to the monitor here.
-        limits = monInfo->m_monitors.at(monInfo->MonitorFromRECT(position)).workArea;
+        limits = monInfo.m_monitors.at(monInfo.MonitorFromRECT(position)).workArea;
     }
 
     if (!this->sized) {

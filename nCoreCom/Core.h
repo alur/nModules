@@ -23,10 +23,10 @@ namespace nCore {
 
   namespace System {
     //
-    MonitorInfo * FetchMonitorInfo();
+    MonitorInfo &FetchMonitorInfo();
 
     // Dynamic Text Service
-    IParsedText * ParseText(LPCWSTR text);
+    IParsedText *ParseText(LPCWSTR text);
     BOOL RegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs, FORMATTINGPROC formatter,
       bool dynamic);
     BOOL UnRegisterDynamicTextFunction(LPCWSTR name, UCHAR numArgs);
@@ -35,7 +35,7 @@ namespace nCore {
     // Window Registrar
     void RegisterWindow(LPCTSTR prefix, LPVOID window);
     void UnRegisterWindow(LPCTSTR prefix);
-    Window * FindRegisteredWindow(LPCTSTR prefix);
+    Window *FindRegisteredWindow(LPCTSTR prefix);
     void AddWindowRegistrationListener(LPCTSTR prefix, Window * listener);
     void RemoveWindowRegistrationListener(LPCTSTR prefix, Window * listener);
 

@@ -13,6 +13,8 @@
 // Pointers to functions in the core. Initalized by _Init, reset by _DeInit.
 namespace nCore {
   namespace System {
+    DECL_FUNC_VAR(FetchMonitorInfo);
+
     DECL_FUNC_VAR(ParseText);
     DECL_FUNC_VAR(RegisterDynamicTextFunction);
     DECL_FUNC_VAR(UnRegisterDynamicTextFunction);
@@ -32,6 +34,8 @@ namespace nCore {
 /// </summary>
 /// <returns>True if the core is succefully initalized.</returns>
 HRESULT nCore::System::_Init(HMODULE hCoreInstance) {
+  INIT_FUNC(FetchMonitorInfo);
+
   INIT_FUNC(ParseText);
   INIT_FUNC(RegisterDynamicTextFunction);
   INIT_FUNC(UnRegisterDynamicTextFunction);
@@ -51,6 +55,8 @@ HRESULT nCore::System::_Init(HMODULE hCoreInstance) {
 /// Disconnects from the core
 /// </summary>
 void nCore::System::_DeInit() {
+  FUNC_VAR_NAME(FetchMonitorInfo) = nullptr;
+
   FUNC_VAR_NAME(ParseText) = nullptr;
   FUNC_VAR_NAME(RegisterDynamicTextFunction) = nullptr;
   FUNC_VAR_NAME(UnRegisterDynamicTextFunction) = nullptr;
@@ -116,4 +122,10 @@ void nCore::System::AddWindowRegistrationListener(LPCTSTR prefix, Window *listen
 void nCore::System::RemoveWindowRegistrationListener(LPCTSTR prefix, Window *listener) {
   ASSERT(nCore::Initialized());
   FUNC_VAR_NAME(RemoveWindowRegistrationListener)(prefix, listener);
+}
+
+
+MonitorInfo &nCore::System::FetchMonitorInfo() {
+  ASSERT(nCore::Initialized());
+  return FUNC_VAR_NAME(FetchMonitorInfo)();
 }

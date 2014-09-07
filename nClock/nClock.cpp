@@ -28,6 +28,7 @@ static void LoadSettings();
 static void DestroyClocks();
 static void CreateClock(LPCWSTR clockName);
 
+
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>

@@ -60,7 +60,6 @@ Window::Window(Settings* settings, MessageHandler* msgHandler)
     , mNeedsUpdate(false)
     , timerIDs(nullptr)
     , userMsgIDs(nullptr)
-    , monitorInfo(nullptr)
     , window(nullptr)
     , mCoveredByFullscreen(false)
     , mWindowData(nullptr)
@@ -79,7 +78,6 @@ Window::Window(Settings* settings, MessageHandler* msgHandler)
 Window::Window(HWND window, LPCTSTR prefix, MessageHandler *msgHandler)
     : Window(new Settings(prefix), msgHandler)
 {
-    this->monitorInfo = new MonitorInfo();
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
     this->userMsgIDs = new UIDGenerator<UINT>(WM_FIRSTREGISTERED);
     this->window = window;
@@ -111,7 +109,6 @@ Window::Window(LPCTSTR parent, Settings *settings, MessageHandler *msgHandler)
     if (mParent)
     {
         mParent->children.push_back(this);
-        this->monitorInfo = mParent->monitorInfo;
         this->window = mParent->window;
     }
     else
@@ -132,7 +129,6 @@ Window::Window(LPCTSTR parent, Settings *settings, MessageHandler *msgHandler)
 Window::Window(HWND /* parent */, LPCTSTR windowClass, HINSTANCE instance, Settings* settings, MessageHandler* msgHandler)
     : Window(new Settings(settings), msgHandler)
 {
-    this->monitorInfo = new MonitorInfo();
     this->timerIDs = new UIDGenerator<UINT_PTR>(1);
     this->userMsgIDs = new UIDGenerator<UINT>(WM_FIRSTREGISTERED);
 
@@ -178,7 +174,6 @@ Window::Window(HWND /* parent */, LPCTSTR windowClass, HINSTANCE instance, Setti
 Window::Window(Window* parent, Settings* settings, MessageHandler* msgHandler)
     : Window(new Settings(settings), msgHandler)
 {
-    this->monitorInfo = parent->monitorInfo;
     mParent = parent;
     mIsChild = true;
     this->window = parent->window;
@@ -233,7 +228,6 @@ Window::~Window()
     if (!mIsChild)
     {
         SAFERELEASE(mRenderTarget);
-        SAFEDELETE(this->monitorInfo);
         SAFEDELETE(this->timerIDs);
         SAFEDELETE(this->userMsgIDs);
     }
@@ -532,16 +526,6 @@ WindowSettings* Window::GetDrawingSettings()
 
 
 /// <summary>
-/// Returns an up-to-date MonitorInfo class.
-/// </summary>
-/// <returns>An up-to-date MonitorInfo class.</returns>
-MonitorInfo* Window::GetMonitorInformation()
-{
-    return this->monitorInfo;
-}
-
-
-/// <summary>
 ///
 /// </summary>
 D2D1_RECT_F Window::GetDrawingRect()
@@ -786,25 +770,6 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
             {
                 return iter->second->HandleMessage(window, msg, wParam, lParam, this);
             }
-        }
-        return 0;
-
-    case WM_SETTINGCHANGE:
-        {
-            switch (wParam)
-            {
-            case SPI_SETWORKAREA:
-                {
-                    this->monitorInfo->Update();
-                }
-                break;
-            }
-        }
-        return 0;
-
-    case WM_DISPLAYCHANGE:
-        {
-            this->monitorInfo->Update();
         }
         return 0;
 
@@ -1512,12 +1477,10 @@ void Window::UpdateParentVariables()
 {
     if (mParent)
     {
-        this->monitorInfo = mParent->monitorInfo;
         this->window = mParent->window;
     }
     else
     {
-        this->monitorInfo = nullptr;
         this->window = nullptr;
     }
 
@@ -1590,8 +1553,9 @@ void Window::SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, 
     D2D1_SIZE_F parentSize = D2D1::SizeF(0, 0);
     if (!mIsChild)
     {
-        // TODO::Fix
-        parentSize = D2D1::SizeF((FLOAT)monitorInfo->m_monitors[0].width, (FLOAT)monitorInfo->m_monitors[0].height);
+      // TODO::Fix
+      MonitorInfo &monitorInfo = nCore::System::FetchMonitorInfo();
+      parentSize = D2D1::SizeF((FLOAT)monitorInfo.m_monitors[0].width, (FLOAT)monitorInfo.m_monitors[0].height);
     }
     else if (mParent)
     {
