@@ -2,18 +2,17 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="Version.h" />
-    <ClInclude Include="IconGroup.hpp" />
-    <ClInclude Include="IconTile.hpp" />
-    <ClInclude Include="nIcon.h" />
     <ClInclude Include="SelectionRectangle.hpp" />
     <ClInclude Include="TileSettings.hpp" />
+    <ClInclude Include="Tile.hpp" />
+    <ClInclude Include="TileGroup.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SelectionRectangle.cpp" />
-    <ClCompile Include="IconGroup.cpp" />
-    <ClCompile Include="IconTile.cpp" />
     <ClCompile Include="nIcon.cpp" />
     <ClCompile Include="TileSettings.cpp" />
+    <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="TileGroup.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include=".\nIcon.rc" />

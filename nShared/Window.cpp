@@ -1554,7 +1554,7 @@ void Window::SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, 
     if (!mIsChild)
     {
       // TODO::Fix
-      MonitorInfo &monitorInfo = nCore::System::FetchMonitorInfo();
+      MonitorInfo &monitorInfo = nCore::FetchMonitorInfo();
       parentSize = D2D1::SizeF((FLOAT)monitorInfo.m_monitors[0].width, (FLOAT)monitorInfo.m_monitors[0].height);
     }
     else if (mParent)

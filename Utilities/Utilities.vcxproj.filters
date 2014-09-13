@@ -18,6 +18,8 @@
     <ClInclude Include="Unordered1To1Map.hpp" />
     <ClInclude Include="UnorderedMap.hpp" />
     <ClInclude Include="Hashing.h" />
+    <ClInclude Include="DoubleNullStringList.hpp" />
+    <ClInclude Include="CommonD2D.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StringUtils.cpp" />
@@ -32,5 +34,6 @@
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="CRC32.cpp" />
     <ClCompile Include="CRC64.cpp" />
+    <ClCompile Include="DoubleNullStringList.cpp" />
   </ItemGroup>
 </Project>

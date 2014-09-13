@@ -101,6 +101,8 @@
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
     <ClInclude Include="Common.h" />
+    <ClInclude Include="CommonD2D.h" />
+    <ClInclude Include="DoubleNullStringList.hpp" />
     <ClInclude Include="Hashing.h" />
     <ClInclude Include="Debugging.h" />
     <ClInclude Include="EnumArray.hpp" />
@@ -122,6 +124,7 @@
     <ClCompile Include="CRC32.cpp" />
     <ClCompile Include="CRC64.cpp" />
     <ClCompile Include="Debugging.cpp" />
+    <ClCompile Include="DoubleNullStringList.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="FileIterator.cpp" />
     <ClCompile Include="FileIteratorIterator.cpp" />

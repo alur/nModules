@@ -4,11 +4,16 @@
     <Filter Include="Scripting">
       <UniqueIdentifier>{035bab73-c7cb-4ee5-b7dc-bc53ece9fa4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Services">
+      <UniqueIdentifier>{eff62284-6292-49ba-b5af-96d575bb0211}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services\FileSystemLoader">
+      <UniqueIdentifier>{74f7e9c2-8992-4716-9b99-32eed8d7c5b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Version.h" />
     <ClInclude Include="IParsedText.hpp" />
-    <ClInclude Include="nCore.h" />
     <ClInclude Include="ParsedText.hpp" />
     <ClInclude Include="TextFunctions.h" />
     <ClInclude Include="Scripting.h">
@@ -27,6 +32,13 @@
       <Filter>Scripting</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="FileSystemLoader.h">
+      <Filter>Services\FileSystemLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystemLoaderResponseHandler.hpp">
+      <Filter>Services\FileSystemLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreMessages.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowRegistrar.cpp" />
@@ -44,6 +56,9 @@
     </ClCompile>
     <ClCompile Include="ScriptingEvents.cpp">
       <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystemLoader.cpp">
+      <Filter>Services\FileSystemLoader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

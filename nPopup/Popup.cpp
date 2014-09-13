@@ -248,7 +248,7 @@ void Popup::Show(LPRECT position, Popup* owner)
     SetParent(mWindow->GetWindowHandle(), nullptr);
     PreShow();
 
-    MonitorInfo &monInfo = nCore::System::FetchMonitorInfo();
+    MonitorInfo &monInfo = nCore::FetchMonitorInfo();
 
     int x, y;
     RECT limits = monInfo.m_virtualDesktop.rect;

@@ -11,11 +11,10 @@
 #include <dwrite.h>
 #include "Settings.hpp"
 
-class WindowSettings
-{
+class WindowSettings {
 public:
     WindowSettings();
-    WindowSettings(void init(WindowSettings &));
+    explicit WindowSettings(void init(WindowSettings &));
 
 public:
     // Loads the actual settings.

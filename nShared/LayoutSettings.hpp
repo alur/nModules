@@ -27,6 +27,7 @@ public:
 
 public:
   LayoutSettings();
+  explicit LayoutSettings(void init(LayoutSettings&));
 
 public:
   // Loads the actual settings.

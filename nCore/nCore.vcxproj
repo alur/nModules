@@ -139,8 +139,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CoreMessages.h" />
+    <ClInclude Include="FileSystemLoader.h" />
+    <ClInclude Include="FileSystemLoaderResponseHandler.hpp" />
     <ClInclude Include="IParsedText.hpp" />
-    <ClInclude Include="nCore.h" />
     <ClInclude Include="ParsedText.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Scripting.h" />
@@ -152,6 +154,7 @@
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FileSystemLoader.cpp" />
     <ClCompile Include="nCore.cpp" />
     <ClCompile Include="ParsedText.cpp" />
     <ClCompile Include="Scripting.cpp" />

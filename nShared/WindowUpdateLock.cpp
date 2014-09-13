@@ -8,7 +8,7 @@
 #include "Window.hpp"
 
 
-Window::UpdateLock::UpdateLock(Window * window)
+Window::UpdateLock::UpdateLock(Window *window)
     : mWindow(window)
     , mLocked(true)
 {

@@ -450,7 +450,7 @@ private:
     bool mCoveredByFullscreen;
 
     // 
-    std::map<std::tstring, IBrushOwner*> mBrushOwners;
+    std::map<std::wstring, IBrushOwner*> mBrushOwners;
 
     // All currently active locks.
     std::set<UpdateLock*> mActiveLocks;

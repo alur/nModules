@@ -15,14 +15,13 @@ class Settings;
 typedef Settings * LPSettings;
 typedef const Settings * LPCSettings;
 
-class Settings
-{
+class Settings {
 public:
-    explicit Settings(LPCTSTR prefix);
-    explicit Settings(LPCSettings settings);
+  explicit Settings(LPCTSTR prefix);
+  explicit Settings(LPCSettings settings);
     
 private:
-	explicit Settings(LPCTSTR prefix, LPCTSTR prefixTrail[]);
+  explicit Settings(LPCTSTR prefix, LPCTSTR prefixTrail[]);
 
 public:
     LPSettings CreateChild(LPCTSTR prefix) const;
@@ -30,8 +29,8 @@ public:
     LPCTSTR GetPrefix() const;
     
 private:
-    // Creates the Settings * for this settings group.
-	LPSettings GreateGroup(LPCTSTR prefixTrail[]);
+  // Creates the Settings * for this settings group.
+  LPSettings GreateGroup(LPCTSTR prefixTrail[]);
 
     // Basic getters and setters
 public:

@@ -12,8 +12,11 @@
 
 // Pointers to functions in the core. Initalized by _Init, reset by _DeInit.
 namespace nCore {
+  DECL_FUNC_VAR(FetchMonitorInfo);
+
+  DECL_FUNC_VAR(LoadFolder);
+
   namespace System {
-    DECL_FUNC_VAR(FetchMonitorInfo);
 
     DECL_FUNC_VAR(ParseText);
     DECL_FUNC_VAR(RegisterDynamicTextFunction);
@@ -36,6 +39,8 @@ namespace nCore {
 HRESULT nCore::System::_Init(HMODULE hCoreInstance) {
   INIT_FUNC(FetchMonitorInfo);
 
+  INIT_FUNC(LoadFolder);
+
   INIT_FUNC(ParseText);
   INIT_FUNC(RegisterDynamicTextFunction);
   INIT_FUNC(UnRegisterDynamicTextFunction);
@@ -56,6 +61,8 @@ HRESULT nCore::System::_Init(HMODULE hCoreInstance) {
 /// </summary>
 void nCore::System::_DeInit() {
   FUNC_VAR_NAME(FetchMonitorInfo) = nullptr;
+
+  FUNC_VAR_NAME(LoadFolder) = nullptr;
 
   FUNC_VAR_NAME(ParseText) = nullptr;
   FUNC_VAR_NAME(RegisterDynamicTextFunction) = nullptr;
@@ -95,7 +102,7 @@ BOOL nCore::System::DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs) {
 }
 
 
-void nCore::System::RegisterWindow(LPCTSTR prefix, LPVOID window) {
+void nCore::System::RegisterWindow(LPCTSTR prefix, Window *window) {
   ASSERT(nCore::Initialized());
   FUNC_VAR_NAME(RegisterWindow)(prefix, window);
 }
@@ -107,7 +114,7 @@ void nCore::System::UnRegisterWindow(LPCTSTR prefix) {
 }
 
 
-Window *nCore::System::FindRegisteredWindow(LPCTSTR prefix) {
+class Window *nCore::System::FindRegisteredWindow(LPCTSTR prefix) {
   ASSERT(nCore::Initialized());
   return FUNC_VAR_NAME(FindRegisteredWindow)(prefix);
 }
@@ -125,7 +132,13 @@ void nCore::System::RemoveWindowRegistrationListener(LPCTSTR prefix, Window *lis
 }
 
 
-MonitorInfo &nCore::System::FetchMonitorInfo() {
+MonitorInfo &nCore::FetchMonitorInfo() {
   ASSERT(nCore::Initialized());
   return FUNC_VAR_NAME(FetchMonitorInfo)();
+}
+
+
+UINT64 nCore::LoadFolder(LoadFolderRequest &request, FileSystemLoaderResponseHandler *handler) {
+  ASSERT(nCore::Initialized());
+  return FUNC_VAR_NAME(LoadFolder)(request, handler);
 }

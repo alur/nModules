@@ -29,6 +29,11 @@ LayoutSettings::LayoutSettings() {
 }
 
 
+LayoutSettings::LayoutSettings(void init(LayoutSettings&)) : LayoutSettings() {
+  init(*this);
+}
+
+
 /// <summary>
 /// Loads settings from an RC file using the specified defaults.
 /// </summary>

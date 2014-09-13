@@ -109,16 +109,15 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
-    <ClInclude Include="IconTile.hpp" />
-    <ClInclude Include="IconGroup.hpp" />
-    <ClInclude Include="nIcon.h" />
+    <ClInclude Include="Tile.hpp" />
+    <ClInclude Include="TileGroup.hpp" />
     <ClInclude Include="SelectionRectangle.hpp" />
     <ClInclude Include="TileSettings.hpp" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="IconTile.cpp" />
-    <ClCompile Include="IconGroup.cpp" />
+    <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="TileGroup.cpp" />
     <ClCompile Include="nIcon.cpp" />
     <ClCompile Include="SelectionRectangle.cpp" />
     <ClCompile Include="TileSettings.cpp" />

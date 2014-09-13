@@ -16,7 +16,7 @@
 /// <param name="previous">
 /// If the CRC is being calculated piecewise, the CRC of the previous pieces.
 /// </param>
-uint64_t Hashing::Crc64(const void* data, size_t length, uint64_t crc) {
+uint64_t Hashing::Crc64(const void *data, size_t length, uint64_t crc) {
   crc = ~crc;
 
   if (length > 4) {

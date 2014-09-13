@@ -459,10 +459,10 @@ void Settings::SetRect(LPCTSTR key, LPCRECT value) const
     StringCchPrintf(widthKey, _countof(widthKey), _T("%sWidth"), key);
     StringCchPrintf(heightKey, _countof(heightKey), _T("%sHeight"), key);
 
-	SetInt(xKey, value->left);
-	SetInt(yKey, value->top);
-	SetInt(widthKey, value->right - value->left);
-	SetInt(heightKey, value->bottom - value->top);
+  SetInt(xKey, value->left);
+  SetInt(yKey, value->top);
+  SetInt(widthKey, value->right - value->left);
+  SetInt(heightKey, value->bottom - value->top);
 }
 
 
@@ -516,10 +516,10 @@ void Settings::SetOffsetRect(LPCTSTR key, LPCRECT value) const
     StringCchPrintf(rightKey, _countof(rightKey), _T("%sRight"), key);
     StringCchPrintf(bottomKey, _countof(bottomKey), _T("%sBottom"), key);
 
-	SetInt(leftKey, value->left);
-	SetInt(topKey, value->top);
-	SetInt(rightKey, value->right);
-	SetInt(bottomKey, value->bottom);
+  SetInt(leftKey, value->left);
+  SetInt(topKey, value->top);
+  SetInt(rightKey, value->right);
+  SetInt(bottomKey, value->bottom);
 }
 
 

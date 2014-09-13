@@ -66,7 +66,7 @@ void Tooltip::Show(LPCWSTR text, LPRECT position) {
   mWindow->SizeToText(mMaxWidth, mMaxHeight);
 
   // Show it centerd on x, 5 px above, while forcing it to stay on the virtual desktop
-  MonitorInfo &monInfo = nCore::System::FetchMonitorInfo();
+  MonitorInfo &monInfo = nCore::FetchMonitorInfo();
 
   mWindow->Move(
       std::min<float>(std::max<float>((float)monInfo.m_virtualDesktop.rect.left, (float)position->left + ((float)position->right - (float)position->left)/2.0f - mWindow->GetSize().width/2),

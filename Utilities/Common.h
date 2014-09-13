@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Common.h
- *  The nModules Project
- *
- *  Common header used for including windows.h
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/Common.h
+// The nModules Project
+//
+// Common header used for including windows.h
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 #if defined(_WINDOWS_) || defined(_WINDOWS_H)
@@ -18,12 +17,12 @@
 #define NTDDI_VERSION   NTDDI_WINBLUE
 
 // Window header options
-#define WIN32_LEAN_AND_MEAN
-#define STRICT
-#define NOCRYPT
-#define NOMINMAX
 #define NOCOMM
+#define NOCRYPT
 #define NOMCX
+#define NOMINMAX
+#define STRICT
+#define WIN32_LEAN_AND_MEAN
 
 #include <Windows.h>
 #include <stdlib.h>
@@ -32,12 +31,3 @@
 #include "Macros.h"
 #include "Debugging.h"
 #include <string>
-
-// TODO(Erik): Remove tstring and move everything to wstring.
-namespace std {
-#if defined(_UNICODE)
-  typedef wstring tstring;
-#else
-  typedef string tstring;
-#endif
-}

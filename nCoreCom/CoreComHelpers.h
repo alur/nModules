@@ -13,7 +13,7 @@
 #include "../Utilities/Common.h"
 
 // Used for initalizing a core function
-#define FUNC_VAR_NAME(func) _p ## func
+#define FUNC_VAR_NAME(func) _sp ## func
 #define INIT_FUNC(func) \
   FUNC_VAR_NAME(func) = decltype(FUNC_VAR_NAME(func))(GetProcAddress(hCoreInstance,#func)); \
   if (FUNC_VAR_NAME(func) == nullptr) return E_NCORECOM_FUNC_INIT;

@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Core.cpp
- *  The nModules Project
- *
- *  Handles communication with nCore.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nCoreCom/Core.cpp
+// The nModules Project
+//
+// Handles communication with nCore.
+//-------------------------------------------------------------------------------------------------
 #include "Core.h"
 #include "CoreComHelpers.h"
 
@@ -13,10 +12,8 @@
 
 #include "../Utilities/Common.h"
 
-using namespace nCore;
-
 // Set to true when the core is succesfully initalized.
-static bool gInitialized = false;
+static bool sInitialized = false;
 
 // Pointers to the functions in the core.
 namespace nCore {
@@ -32,11 +29,11 @@ namespace nCore {
 HRESULT nCore::Connect(VERSION minVersion) {
   HWND coreWindow = FindWindowEx(nullptr, nullptr, L"LSnCore", nullptr);
 
+  ASSERT(!sInitialized);
+
   if (coreWindow == nullptr) {
     return E_NCORECOM_CORE_NOT_FOUND;
   }
-
-  gInitialized = false;
 
   HMODULE hCoreInstance = (HMODULE)GetWindowLongPtr(coreWindow, GWLP_USERDATA);
 
@@ -61,7 +58,7 @@ HRESULT nCore::Connect(VERSION minVersion) {
 
   RETURNONFAIL(hr, System::_Init(hCoreInstance));
 
-  gInitialized = true;
+  sInitialized = true;
 
   return hr;
 }
@@ -73,7 +70,7 @@ HRESULT nCore::Connect(VERSION minVersion) {
 void nCore::Disconnect() {
   System::_DeInit();
   FUNC_VAR_NAME(GetCoreVersion) = nullptr;
-  gInitialized = false;
+  sInitialized = false;
 }
 
 
@@ -82,7 +79,7 @@ void nCore::Disconnect() {
 /// </summary>
 /// <returns>True if the core is initalized.</returns>
 bool nCore::Initialized() {
-  return gInitialized;
+  return sInitialized;
 }
 
 

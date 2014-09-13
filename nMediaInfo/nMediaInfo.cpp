@@ -36,9 +36,9 @@ map<wstring, CoverArt> gCoverArt;
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
 /// </summary>
-int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */)
+EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* path */)
 {
-    if (!gLSModule.Initialize(parent, instance))
+    if (!gLSModule.Initialize(nullptr, instance))
     {
         return 1;
     }
@@ -64,7 +64,7 @@ int initModuleEx(HWND parent, HINSTANCE instance, LPCSTR /* path */)
 /// <summary>
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
-void quitModule(HINSTANCE /* instance */)
+EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */)
 {
     TextFunctions::_UnRegister();
     Bangs::_Unregister();

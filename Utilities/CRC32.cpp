@@ -26,10 +26,10 @@
 #endif
 
 /// zlib's CRC32 polynomial
-static const uint32_t gPolynomial = 0xEDB88320;
+static const uint32_t sPolynomial = 0xEDB88320;
 
 /// look-up table, already declared above
-static const uint32_t gCrc32Lookup[8][256] = {
+static const uint32_t sCrc32Lookup[8][256] = {
   // // same algorithm as crc32_bitwise
   // for (int i = 0; i <= 0xFF; i++) {
   //   uint32_t crc = i;
@@ -331,7 +331,7 @@ static inline uint32_t Swap(uint32_t x) {
 /// <param name="previous">
 /// If the CRC is being calculated piecewise, the CRC of the previous pieces.
 /// </param>
-uint32_t Hashing::Crc32(const void * data, size_t length, uint32_t previous) {
+uint32_t Hashing::Crc32(const void *data, size_t length, uint32_t previous) {
   uint32_t crc = ~previous; // same as previousCrc32 ^ 0xFFFFFFFF
   const uint32_t * current = (const uint32_t*)data;
 
@@ -340,25 +340,25 @@ uint32_t Hashing::Crc32(const void * data, size_t length, uint32_t previous) {
 #if __BYTE_ORDER == __BIG_ENDIAN
     uint32_t one = *current++ ^ Swap(crc);
     uint32_t two = *current++;
-    crc = gCrc32Lookup[0][ two        & 0xFF] ^
-          gCrc32Lookup[1][(two >>  8) & 0xFF] ^
-          gCrc32Lookup[2][(two >> 16) & 0xFF] ^
-          gCrc32Lookup[3][(two >> 24) & 0xFF] ^
-          gCrc32Lookup[4][ one        & 0xFF] ^
-          gCrc32Lookup[5][(one >>  8) & 0xFF] ^
-          gCrc32Lookup[6][(one >> 16) & 0xFF] ^
-          gCrc32Lookup[7][(one >> 24) & 0xFF];
+    crc = sCrc32Lookup[0][ two        & 0xFF] ^
+          sCrc32Lookup[1][(two >>  8) & 0xFF] ^
+          sCrc32Lookup[2][(two >> 16) & 0xFF] ^
+          sCrc32Lookup[3][(two >> 24) & 0xFF] ^
+          sCrc32Lookup[4][ one        & 0xFF] ^
+          sCrc32Lookup[5][(one >>  8) & 0xFF] ^
+          sCrc32Lookup[6][(one >> 16) & 0xFF] ^
+          sCrc32Lookup[7][(one >> 24) & 0xFF];
 #else
     uint32_t one = *current++ ^ crc;
     uint32_t two = *current++;
-    crc = gCrc32Lookup[0][(two >> 24) & 0xFF] ^
-          gCrc32Lookup[1][(two >> 16) & 0xFF] ^
-          gCrc32Lookup[2][(two >>  8) & 0xFF] ^
-          gCrc32Lookup[3][ two        & 0xFF] ^
-          gCrc32Lookup[4][(one >> 24) & 0xFF] ^
-          gCrc32Lookup[5][(one >> 16) & 0xFF] ^
-          gCrc32Lookup[6][(one >>  8) & 0xFF] ^
-          gCrc32Lookup[7][ one        & 0xFF];
+    crc = sCrc32Lookup[0][(two >> 24) & 0xFF] ^
+          sCrc32Lookup[1][(two >> 16) & 0xFF] ^
+          sCrc32Lookup[2][(two >>  8) & 0xFF] ^
+          sCrc32Lookup[3][ two        & 0xFF] ^
+          sCrc32Lookup[4][(one >> 24) & 0xFF] ^
+          sCrc32Lookup[5][(one >> 16) & 0xFF] ^
+          sCrc32Lookup[6][(one >>  8) & 0xFF] ^
+          sCrc32Lookup[7][ one        & 0xFF];
 #endif
     length -= 8;
   }
@@ -367,7 +367,7 @@ uint32_t Hashing::Crc32(const void * data, size_t length, uint32_t previous) {
 
   // remaining 1 to 7 bytes (standard algorithm)
   while (length-- > 0) {
-    crc = (crc >> 8) ^ gCrc32Lookup[0][(crc & 0xFF) ^ *currentChar++];
+    crc = (crc >> 8) ^ sCrc32Lookup[0][(crc & 0xFF) ^ *currentChar++];
   }
   return ~crc;
 }

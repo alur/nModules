@@ -11,41 +11,38 @@
 /// <summary>
 ///
 /// </summary>
-SelectionRectangle::SelectionRectangle()
-{
-    mHidden = true;
+SelectionRectangle::SelectionRectangle() {
+  mHidden = true;
 }
 
 
 /// <summary>
 ///
 /// </summary>
-SelectionRectangle::~SelectionRectangle()
-{
+SelectionRectangle::~SelectionRectangle() {
 }
 
 
 /// <summary>
 ///
 /// </summary>w
-void SelectionRectangle::Paint(ID2D1RenderTarget *renderTarget)
-{
-    if (!mHidden)
+void SelectionRectangle::Paint(ID2D1RenderTarget *renderTarget) {
+  if (!mHidden)
+  {
+    if (mBackBrush.IsImageEdgeBrush())
     {
-        if (mBackBrush.IsImageEdgeBrush())
-        {
-            for (Brush::EdgeType type = Brush::EdgeType(0); type != Brush::EdgeType::Count;
-                type = Brush::EdgeType(std::underlying_type<Brush::EdgeType>::type(type) + 1))
-            {
-                renderTarget->FillRectangle(mBackBrush.GetImageEdgeRectAndScaleBrush(type, &mBackBrushWindowData), mBackBrush.brush);
-            }
-        }
-        else
-        {
-            renderTarget->FillRoundedRectangle(mRect, mBackBrush.brush);
-        }
-        renderTarget->DrawRoundedRectangle(mRect, mOutlineBrush.brush, mOutlineWidth);
+      for (Brush::EdgeType type = Brush::EdgeType(0); type != Brush::EdgeType::Count;
+          type = Brush::EdgeType(std::underlying_type<Brush::EdgeType>::type(type) + 1))
+      {
+        renderTarget->FillRectangle(mBackBrush.GetImageEdgeRectAndScaleBrush(type, &mBackBrushWindowData), mBackBrush.brush);
+      }
     }
+    else
+    {
+      renderTarget->FillRoundedRectangle(mRect, mBackBrush.brush);
+    }
+    renderTarget->DrawRoundedRectangle(mRect, mOutlineBrush.brush, mOutlineWidth);
+  }
 }
 
 

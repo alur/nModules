@@ -11,7 +11,7 @@
 #include <unordered_map>
 
 //
-typedef std::map<std::tstring, Taskbar> TaskbarMap;
+typedef std::map<std::wstring, Taskbar> TaskbarMap;
 
 namespace WindowManager
 {
