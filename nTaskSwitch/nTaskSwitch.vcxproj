@@ -139,7 +139,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="nTaskSwitch.h" />
     <ClInclude Include="TaskSwitcher.hpp" />
     <ClInclude Include="TaskThumbnail.hpp" />
     <ClInclude Include="ThumbnailSettings.hpp" />

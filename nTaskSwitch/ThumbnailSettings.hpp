@@ -1,28 +1,26 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  ThumbnailSettings.hpp
- *  The nModules Project
- *
- *  Contains all the settings used by button for a particular thumbnail.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nTaskSwitch/ThumbnailSettings.hpp
+// The nModules Project
+//
+// Contains all the settings used by button for a particular thumbnail.
+//-------------------------------------------------------------------------------------------------
 #pragma once
-
-class ThumbnailSettings;
 
 #include "TaskThumbnail.hpp"
 
-class ThumbnailSettings
-{
+#include "../nShared/Settings.hpp"
+
+class ThumbnailSettings {
 public:
-    RECT mThumbnailMargins;
+  RECT mThumbnailMargins;
     
-    // Window settings
+  // Window settings
 public:
-    WindowSettings mWindowSettings;
-    StateRender<TaskThumbnail::State> mStateRender;
+  WindowSettings mWindowSettings;
+  StateRender<TaskThumbnail::State> mStateRender;
 
-    WindowSettings mIconWindowSettings;
+  WindowSettings mIconWindowSettings;
 
 public:
-    void Load(Settings *settings);
+  void Load(Settings *settings);
 };

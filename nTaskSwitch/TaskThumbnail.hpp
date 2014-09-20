@@ -7,12 +7,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "../Utilities/Common.h"
-#include <dwmapi.h>
 #include "../nShared/Drawable.hpp"
 #include "../nShared/StateRender.hpp"
-#include "ThumbnailSettings.hpp"
 #include "../nShared/Window.hpp"
+
+#include "../Utilities/Common.h"
+
+#include <dwmapi.h>
 
 class TaskThumbnail : public Drawable
 {
@@ -33,7 +34,7 @@ public:
     };
 
 public:
-    explicit TaskThumbnail(Drawable* parent, HWND targetWindow, float x, float y, float width, float height, ThumbnailSettings& thumbnailSettings);
+    explicit TaskThumbnail(Drawable* parent, HWND targetWindow, float x, float y, float width, float height, class ThumbnailSettings &thumbnailSettings);
     virtual ~TaskThumbnail();
 
 public:
@@ -63,7 +64,7 @@ private:
     static void CALLBACK UpdateIconCallback(HWND hWnd, UINT uMsg, ULONG_PTR dwData, LRESULT lResult);
 
 private:
-    ThumbnailSettings& mThumbnailSettings;
+    class ThumbnailSettings &mThumbnailSettings;
 
     // Since the icons are independent top-level windows, they can not share this.
     StateRender<TaskThumbnail::IconState> mIconStateRender;
@@ -71,5 +72,5 @@ private:
     HTHUMBNAIL mThumbnail;
     WPARAM mRequestedIcon;
 
-    Window* mIconOverlayWindow;
+    Window *mIconOverlayWindow;
 };

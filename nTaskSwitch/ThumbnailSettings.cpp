@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  ThumbnailSettings.cpp
- *  The nModules Project
- *
- *  Contains all the settings used by button for a particular thumbnail.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nTaskSwitch/ThumbnailSettings.hpp
+// The nModules Project
+//
+// Contains all the settings used by button for a particular thumbnail.
+//-------------------------------------------------------------------------------------------------
 #include "ThumbnailSettings.hpp"
 
 

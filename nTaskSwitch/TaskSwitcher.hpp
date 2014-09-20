@@ -7,13 +7,17 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include <dwmapi.h>
+#include "TaskThumbnail.hpp"
+#include "ThumbnailSettings.hpp"
+
+#include "../Utilities/Common.h"
+
 #include "../nShared/Drawable.hpp"
+#include "../nShared/LayoutSettings.hpp"
 #include "../nShared/StateRender.hpp"
 #include "../nShared/Window.hpp"
-#include "../nShared/LayoutSettings.hpp"
-#include "ThumbnailSettings.hpp"
-#include "TaskThumbnail.hpp"
+
+#include <dwmapi.h>
 
 class TaskSwitcher : public Drawable
 {

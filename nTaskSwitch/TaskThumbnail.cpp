@@ -17,13 +17,8 @@
 #include <shellapi.h>
 #include "../nCoreCom/Core.h"
 
-// 
-extern UINT (WINAPI *DwmpActivateLivePreview)(UINT onOff, HWND hWnd, HWND topMost, UINT unknown);
 
-// 
 extern HWND gDesktopWindow;
-
-//
 extern LSModule gLSModule;
 
 
