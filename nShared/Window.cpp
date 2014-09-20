@@ -1109,7 +1109,9 @@ HRESULT Window::ReCreateDeviceResources()
                 hr = pD2DFactory->CreateHwndRenderTarget(
                     RenderTargetProperties(
                         D2D1_RENDER_TARGET_TYPE_DEFAULT,
-                        PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)
+                        PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
+                        96.0f,
+                        96.0f
                     ),
                     HwndRenderTargetProperties(this->window, D2D1::SizeU((UINT32)mSize.width, (UINT32)mSize.height)),
                     &mRenderTarget
