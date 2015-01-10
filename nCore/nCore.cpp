@@ -90,7 +90,9 @@ static LRESULT WINAPI MainProc(HWND window, UINT message, WPARAM wParam, LPARAM 
   case WM_SETTINGCHANGE:
     if (wParam == SPI_SETWORKAREA) {
       gMonitorInfo.Update();
+      SendCoreMessage(NCORE_DISPLAYCHANGE, wParam, lParam);
     }
+    SendCoreMessage(NCORE_SETTINGCHANGE, wParam, lParam);
     return 0;
 
   case WM_DISPLAYCHANGE:

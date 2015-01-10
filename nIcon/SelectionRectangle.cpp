@@ -12,8 +12,7 @@ SelectionRectangle::SelectionRectangle() {
 }
 
 
-SelectionRectangle::~SelectionRectangle() {
-}
+SelectionRectangle::~SelectionRectangle() {}
 
 
 void SelectionRectangle::Paint(ID2D1RenderTarget *renderTarget) {
@@ -70,7 +69,7 @@ void SelectionRectangle::Init(Settings *parentSettings) {
   Settings *outlineSettings = settings->CreateChild(L"Outline");
   mRect.radiusX = settings->GetFloat(L"CornerRadiusX", 0.0f);
   mRect.radiusY = settings->GetFloat(L"CornerRadiusY", 0.0f);
-  mOutlineWidth = outlineSettings->GetFloat(L"Width",  0.5f);
+  mOutlineWidth = outlineSettings->GetFloat(L"Width", 0.5f);
 
   BrushSettings backDefaults;
   backDefaults.color = Color::Create(0x887777EE);

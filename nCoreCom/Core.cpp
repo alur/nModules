@@ -18,6 +18,8 @@ static bool sInitialized = false;
 // Pointers to the functions in the core.
 namespace nCore {
   DECL_FUNC_VAR(GetCoreVersion);
+  DECL_FUNC_VAR(RegisterForCoreMessages);
+  DECL_FUNC_VAR(UnregisterForCoreMessages);
 }
 
 
@@ -54,6 +56,9 @@ HRESULT nCore::Connect(VERSION minVersion) {
     return E_NCORECOM_PATCH_VERSION;
   }
 
+  INIT_FUNC(RegisterForCoreMessages);
+  INIT_FUNC(UnregisterForCoreMessages);
+
   HRESULT hr = S_OK;
 
   RETURNONFAIL(hr, System::_Init(hCoreInstance));
@@ -89,4 +94,16 @@ bool nCore::Initialized() {
 VERSION nCore::GetCoreVersion() {
   ASSERT(nCore::Initialized());
   return FUNC_VAR_NAME(GetCoreVersion)();
+}
+
+
+void nCore::RegisterForCoreMessages(HWND hwnd, const UINT messages[]) {
+  ASSERT(nCore::Initialized());
+  FUNC_VAR_NAME(RegisterForCoreMessages)(hwnd, messages);
+}
+
+
+void nCore::UnregisterForCoreMessages(HWND hwnd, const UINT messages[]) {
+  ASSERT(nCore::Initialized());
+  FUNC_VAR_NAME(UnregisterForCoreMessages)(hwnd, messages);
 }

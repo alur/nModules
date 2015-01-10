@@ -11,3 +11,4 @@
 
 // nCore -> Modules
 #define NCORE_DISPLAYCHANGE                         0x9000
+#define NCORE_SETTINGCHANGE                         0x9001

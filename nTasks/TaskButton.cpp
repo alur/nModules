@@ -13,6 +13,7 @@
 #include "TaskButton.hpp"
 #include <shellapi.h>
 
+extern BOOL gActiveWindowTracking;
 
 /// <summary>
 /// Constructor
@@ -252,6 +253,14 @@ void TaskButton::ToggleState(State state)
 }
 
 
+void TaskButton::MoveMouseToWindow() {
+  WINDOWPLACEMENT placement;
+  RECT &rect = placement.rcNormalPosition;
+  GetWindowPlacement(mWatchedWindow, &placement);
+  SetCursorPos((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
+}
+
+
 /// <summary>
 /// Handles window messages for this button.
 /// </summary>
@@ -266,6 +275,9 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
                 BringWindowToTop(mWatchedWindow);
                 PostMessage(mWatchedWindow, WM_SYSCOMMAND, SC_RESTORE, 0);
                 SetForegroundWindow(mWatchedWindow);
+                if (gActiveWindowTracking != FALSE) {
+                  MoveMouseToWindow();
+                }
             }
             else if (GetForegroundWindow() == mWatchedWindow)
             {
@@ -275,6 +287,9 @@ LRESULT WINAPI TaskButton::HandleMessage(HWND window, UINT message, WPARAM wPara
             else
             {
                 SetForegroundWindow(mWatchedWindow);
+                if (gActiveWindowTracking != FALSE) {
+                  MoveMouseToWindow();
+                }
             }
             ((Taskbar*)mParent)->HideThumbnail();
         }

@@ -25,10 +25,15 @@ LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSIO
 // The messages we want from the core
 const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
     LM_FULLSCREENDEACTIVATED, 0 };
+const UINT sCoreMessages[] = { NCORE_DISPLAYCHANGE, NCORE_SETTINGCHANGE, 0 };
 
 // All the taskbars we currently have loaded
 TaskbarMap gTaskbars;
 
+// Set to whether or not windows are activated by hovering over them. In this
+// mode we should automatically move the mouse cursor to the center of the
+// window when activated.
+BOOL gActiveWindowTracking = FALSE;
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
@@ -44,6 +49,9 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
     {
         return 1;
     }
+    nCore::RegisterForCoreMessages(gLSModule.GetMessageWindow(), sCoreMessages);
+
+    SystemParametersInfo(SPI_GETACTIVEWINDOWTRACKING, 0, &gActiveWindowTracking, 0);
 
     // Load settings
     LoadSettings();
@@ -94,6 +102,12 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
             SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
         }
         return 0;
+
+    case NCORE_SETTINGCHANGE:
+      if (wParam == SPI_SETACTIVEWINDOWTRACKING) {
+        SystemParametersInfo(SPI_GETACTIVEWINDOWTRACKING, 0, &gActiveWindowTracking, 0);
+      }
+      return 0;
 
     case WM_DESTROY:
         {

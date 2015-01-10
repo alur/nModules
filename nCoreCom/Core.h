@@ -25,6 +25,9 @@ namespace nCore {
   VERSION GetCoreVersion();
   MonitorInfo &FetchMonitorInfo();
 
+  void RegisterForCoreMessages(HWND hwnd, const UINT messages[]);
+  void UnregisterForCoreMessages(HWND hwnd, const UINT messages[]);
+
   // FileSystemLoader
   UINT64 LoadFolder(LoadFolderRequest&, FileSystemLoaderResponseHandler*);
 

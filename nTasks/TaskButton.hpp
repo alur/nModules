@@ -64,6 +64,9 @@ public:
     void ToggleState(State state);
 
 private:
+  void MoveMouseToWindow();
+
+private:
     //
     ButtonSettings &mButtonSettings;
 
