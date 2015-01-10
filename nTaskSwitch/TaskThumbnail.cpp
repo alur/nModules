@@ -50,11 +50,11 @@ TaskThumbnail::TaskThumbnail(
     {
       properties.dwFlags |= DWM_TNP_RECTSOURCE;
       MonitorInfo &monInfo = nCore::FetchMonitorInfo();
-      properties.rcSource = monInfo.m_monitors[0].rect;
-      properties.rcSource.bottom -= monInfo.m_virtualDesktop.rect.top;
-      properties.rcSource.top -= monInfo.m_virtualDesktop.rect.top;
-      properties.rcSource.left -= monInfo.m_virtualDesktop.rect.left;
-      properties.rcSource.right -= monInfo.m_virtualDesktop.rect.left;
+      properties.rcSource = monInfo.GetMonitor(0).rect;
+      properties.rcSource.bottom -= monInfo.GetVirtualDesktop().rect.top;
+      properties.rcSource.top -= monInfo.GetVirtualDesktop().rect.top;
+      properties.rcSource.left -= monInfo.GetVirtualDesktop().rect.left;
+      properties.rcSource.right -= monInfo.GetVirtualDesktop().rect.left;
     }
     
     DwmUpdateThumbnailProperties(mThumbnail, &properties);
@@ -64,8 +64,8 @@ TaskThumbnail::TaskThumbnail(
     if (targetWindow == gDesktopWindow)
     {
       MonitorInfo &monInfo = nCore::FetchMonitorInfo();
-      sourceSize.cx = monInfo.m_monitors[0].width;
-      sourceSize.cy = monInfo.m_monitors[0].height;
+      sourceSize.cx = monInfo.GetMonitor(0).width;
+      sourceSize.cy = monInfo.GetMonitor(0).height;
     }
     else
     {

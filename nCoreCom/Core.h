@@ -7,8 +7,9 @@
 //-------------------------------------------------------------------------------------------------
 #pragma once
 
-#include "../nCore/IParsedText.hpp"
+#include "../nCore/CoreMessages.h"
 #include "../nCore/FileSystemLoader.h"
+#include "../nCore/IParsedText.hpp"
 
 #include "../nShared/MonitorInfo.hpp"
 

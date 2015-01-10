@@ -82,7 +82,6 @@ void ErrorHandler::ErrorHR(Level level, HRESULT hr, LPCTSTR format, ...)
 
     if (gErrorLevel >= level)
     {
-
         *message = _T('\0');
 
         if (format != nullptr)

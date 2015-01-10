@@ -1,17 +1,14 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  MonitorInfo.hpp
- *  The nModules Project
- *
- *  Function declarations for the MonitorInfo class.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nShared/MonitorInfo.hpp
+// The nModules Project
+//
+// Provides information about the current monitor configuration.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 #include "../Utilities/Common.h"
 
 #include <vector>
-
-using std::vector;
 
 class MonitorInfo {
 public:
@@ -24,15 +21,26 @@ public:
     int workAreaHeight;
   };
 
+public:
   MonitorInfo();
 
+public:
   void Update();
   UINT MonitorFromHWND(HWND hWnd) const;
-  UINT MonitorFromRECT(LPRECT rect) const;
+  UINT MonitorFromRECT(RECT rect) const;
 
+  UINT GetMonitorCount() const;
+  const Monitor &GetMonitor(UINT id) const;
+  const std::vector<Monitor> &GetMonitors() const;
+  const Monitor &GetVirtualDesktop() const;
+
+private:
+  static BOOL CALLBACK EnumMonitorsCallback(HMONITOR, HDC, LPRECT, LPARAM);
+
+private:
   // Every monitor
-  vector<Monitor> m_monitors;
+  std::vector<Monitor> mMonitors;
 
   // The virtual desktop
-  Monitor m_virtualDesktop;
+  Monitor mVirtualDesktop;
 };

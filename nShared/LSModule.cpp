@@ -20,13 +20,11 @@
 /// <param name="module">A handle to the DLL module.</param>
 /// <param name="reasonForCall">The reason code that indicates why the DLL entry-point function is being called.</param>
 /// <returns>TRUE on success, FALSE on failure.</returns>
-BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */)
-{
-    if (reasonForCall == DLL_PROCESS_ATTACH)
-    {
-        DisableThreadLibraryCalls((HINSTANCE)module);
-    }
-    return TRUE;
+BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */) {
+  if (reasonForCall == DLL_PROCESS_ATTACH) {
+    DisableThreadLibraryCalls((HINSTANCE)module);
+  }
+  return TRUE;
 }
 
 

@@ -25,7 +25,7 @@
 #include "../Utilities/StopWatch.hpp"
 #include "IBrushOwner.hpp"
 #include "IStateRender.hpp"
-#include "RelatedRect.hpp"
+#include "Rect.hpp"
 #include <set>
 
 
@@ -207,7 +207,7 @@ public:
 
     // Moves this window.
     void Move(float x, float y);
-    void Move(RelatedNumber x, RelatedNumber y);
+    void Move(Distance x, Distance y);
 
     //
     void PopUpdateLock(UpdateLock *lock);
@@ -231,13 +231,13 @@ public:
 
     // Resizes the window.
     void Resize(float width, float height);
-    void Resize(RelatedNumber width, RelatedNumber height);
+    void Resize(Distance width, Distance height);
 
     //
     void SetAlwaysOnTop(bool value);
 
     // Performs an animation.
-    void SetAnimation(RelatedNumber x, RelatedNumber y, RelatedNumber width, RelatedNumber height, int duration, Easing::Type easing);
+    void SetAnimation(Distance x, Distance y, Distance width, Distance height, int duration, Easing::Type easing);
 
     // Registers a timer
     UINT_PTR SetCallbackTimer(UINT elapse, MessageHandler* msgHandler);
@@ -261,7 +261,7 @@ public:
     void SetPosition(RECT rect);
     void SetPosition(D2D1_RECT_F rect);
     void SetPosition(float x, float y, float width, float height, LPARAM extra = 0);
-    void SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, RelatedNumber height, LPARAM extra = 0);
+    void SetPosition(Distance x, Distance y, Distance width, Distance height, LPARAM extra = 0);
 
     // Sets the text of this window.
     void SetText(LPCWSTR text);
@@ -363,13 +363,13 @@ private:
     float mAnimationDuration;
 
     // If we are currently doing an animation, the position at the start of the animation.
-    RelatedRect mAnimationStart;
+    Rect mAnimationStart;
 
     // If we are currently doing an animation, how far along we are.
     StopWatch mAnimationClock;
 
     // If we are currently doing an animation, the position target of the animation.
-    RelatedRect mAnimationTarget;
+    Rect mAnimationTarget;
 
     // The children of this Window.
     std::list<Window*> children;

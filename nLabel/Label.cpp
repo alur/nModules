@@ -42,7 +42,7 @@ Label::Label(LPCWSTR name) : Drawable(name) {
 /// </summary>
 /// <param name="name">The RC settings prefix of the label.</param>
 /// <param name="parent">The overlay label's parent.</param>
-Label::Label(LPCWSTR name, Drawable * parent) : Drawable(parent, name, true) {
+Label::Label(LPCWSTR name, Drawable *parent) : Drawable(parent, name, true) {
   Initalize();
 }
 

@@ -15,7 +15,6 @@
 #include "../nCoreCom/Core.h"
 #include <algorithm>
 
-extern MonitorInfo *g_pMonitorInfo;
 extern ClickHandler *g_pClickHandler;
 extern DesktopPainter *g_pDesktopPainter;
 
@@ -33,7 +32,7 @@ namespace Bangs {
     BangItem bangMap[] = {
         // Sets the work area.
         BangItem(_T("SetWorkArea"), [] (HWND, LPCTSTR args) {
-            WorkArea::ParseLine(g_pMonitorInfo, args);
+            WorkArea::ParseLine(&nCore::FetchMonitorInfo(), args);
             SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
         }),
         

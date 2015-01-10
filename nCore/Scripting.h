@@ -3,12 +3,11 @@
  *  The nModules Project
  *
  *  Manages the JavaScript API.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-namespace Scripting
-{
-    void Initialize();
-    void Shutdown();
+namespace Scripting {
+  void Initialize();
+  void Shutdown();
 }

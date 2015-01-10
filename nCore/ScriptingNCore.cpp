@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Manages the nCore Object.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "../External/v8/include/v8.h"
@@ -142,8 +142,7 @@ static void PositionWindow(const FunctionCallbackInfo<Value> & args) {
 
   if (args.Length() == 5) {
     window->SetPosition(x, y, width, height);
-    if (window->IsChild())
-    {
+    if (window->IsChild()) {
       window->Repaint();
     }
   } else {

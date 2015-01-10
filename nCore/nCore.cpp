@@ -41,6 +41,7 @@ UINT_PTR timeTimer;
 // Service functions
 EXPORT_CDECL(Window*) FindRegisteredWindow(LPCWSTR prefix);
 extern void LoadCompleted(UINT64 id, LPVOID result);
+extern void SendCoreMessage(UINT message, WPARAM, LPARAM);
 
 
 /// <summary>
@@ -94,6 +95,7 @@ static LRESULT WINAPI MainProc(HWND window, UINT message, WPARAM wParam, LPARAM 
 
   case WM_DISPLAYCHANGE:
     gMonitorInfo.Update();
+    SendCoreMessage(NCORE_DISPLAYCHANGE, wParam, lParam);
     return 0;
 
   case WM_TIMER:

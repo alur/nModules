@@ -24,39 +24,36 @@ EXPORT_CDECL(BOOL) DynamicTextChangeNotification(LPCWSTR name, UCHAR numArgs);
 // All data used for a dynamic text function.
 struct FormatterData
 {
-    // Callback function, or nullptr if this function is not registered at this point.
-    FORMATTINGPROC proc;
+  // Callback function, or nullptr if this function is not registered at this point.
+  FORMATTINGPROC proc;
 
-    // True if this function is dynamic.
-    bool dynamic;
-    
-    // All IParsedText objects which currently use this function.
-    std::unordered_set<IParsedText*> users;
+  // True if this function is dynamic.
+  bool dynamic;
+
+  // All IParsedText objects which currently use this function.
+  std::unordered_set<IParsedText*> users;
 };
 
 // ID for a function
 struct FunctionID
 {
-    FunctionID(std::wstring name, UCHAR numArgs)
-        : name(name), numArgs(numArgs)
-    {
-    }
-    std::wstring name;
-    UCHAR numArgs;
+  FunctionID(std::wstring name, UCHAR numArgs)
+    : name(name), numArgs(numArgs) {
+  }
+  std::wstring name;
+  UCHAR numArgs;
 };
 
 // ID comparator
 struct FuncIDCmp
 {
-    bool operator()(FunctionID const & a, FunctionID const & b)
-    {
-        return a.numArgs == b.numArgs && wcscmp(a.name.c_str(), b.name.c_str()) == 0;
-    }
+  bool operator()(FunctionID const & a, FunctionID const & b) const {
+    return a.numArgs == b.numArgs && wcscmp(a.name.c_str(), b.name.c_str()) == 0;
+  }
 
-    size_t operator()(FunctionID const & a)
-    {
-        return std::hash<std::wstring>()(a.name) ^ std::hash<UCHAR>()(a.numArgs);
-    }
+  size_t operator()(FunctionID const & a) const {
+    return std::hash<std::wstring>()(a.name) ^ std::hash<UCHAR>()(a.numArgs);
+  }
 };
 
 // The map type used to store the dynamic text functions.
@@ -66,43 +63,43 @@ typedef std::unordered_map<FunctionID, FormatterData, FuncIDCmp, FuncIDCmp> Func
 class ParsedText : public IParsedText
 {
 public:
-    explicit ParsedText(LPCWSTR text);
-    virtual ~ParsedText();
+  explicit ParsedText(LPCWSTR text);
+  virtual ~ParsedText();
 
-    bool Evaluate(LPWSTR dest, size_t cchDest);
-    bool IsDynamic();
-    void SetChangeHandler(void (*handler)(LPVOID), LPVOID data);
-    void Release();
+  bool Evaluate(LPWSTR dest, size_t cchDest);
+  bool IsDynamic();
+  void SetChangeHandler(void(*handler)(LPVOID), LPVOID data);
+  void Release();
 
-    void DataChanged();
+  void DataChanged();
 
 private:
-    enum TokenType
-    {
-        TEXT,
-        EXPRESSION
-    };
+  enum TokenType
+  {
+    TEXT,
+    EXPRESSION
+  };
 
-    struct Token
-    {
-        TokenType type;
-        FunctionMap::iterator proc;
-        LPCWSTR text;
-        LPWSTR* args;
-    };
-
-    // Parses text and pushes its tokens onto the end of the string.
-    void Parse(LPCWSTR text);
-    void AddToken(TokenType type, FunctionMap::iterator proc, LPCWSTR text, LPWSTR* args);
-
-    list<Token> tokens;
+  struct Token
+  {
+    TokenType type;
+    FunctionMap::iterator proc;
     LPCWSTR text;
+    LPWSTR* args;
+  };
 
-    // Data sent to the callback function.
-    LPVOID data;
+  // Parses text and pushes its tokens onto the end of the string.
+  void Parse(LPCWSTR text);
+  void AddToken(TokenType type, FunctionMap::iterator proc, LPCWSTR text, LPWSTR* args);
 
-    // Callback function -- called when a change occurs.
-    void (*changeHandler)(LPVOID);
+  list<Token> tokens;
+  LPCWSTR text;
+
+  // Data sent to the callback function.
+  LPVOID data;
+
+  // Callback function -- called when a change occurs.
+  void(*changeHandler)(LPVOID);
 };
 
 

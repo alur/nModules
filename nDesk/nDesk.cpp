@@ -6,7 +6,6 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
-#include "nDesk.h"
 #include "../nCoreCom/Core.h"
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/LSModule.hpp"
@@ -26,7 +25,6 @@ UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 
 // Class pointers
 DesktopPainter *g_pDesktopPainter;
-MonitorInfo *g_pMonitorInfo;
 ClickHandler *g_pClickHandler;
 
 // The LSModule class
@@ -51,21 +49,19 @@ EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* 
     }
 
     // Initialize
-    g_pMonitorInfo = new MonitorInfo();
     g_pClickHandler = new ClickHandler();
     g_pDesktopPainter = nullptr; // Initialized on WM_CREATE
     
     if (!gLSModule.Initialize(nullptr, instance, &wc, nullptr)) {
-        delete g_pMonitorInfo;
         delete g_pClickHandler;
         return 1;
     }
 
     SetParent(g_pDesktopPainter->GetWindow(), GetDesktopWindow());
     SetWindowLongPtr(g_pDesktopPainter->GetWindow(), GWL_STYLE, GetWindowLongPtr(g_pDesktopPainter->GetWindow(), GWL_STYLE) | WS_CHILD | WS_CLIPCHILDREN);
-    SetWindowPos(g_pDesktopPainter->GetWindow(), HWND_BOTTOM, g_pMonitorInfo->m_virtualDesktop.rect.left,
-        g_pMonitorInfo->m_virtualDesktop.rect.top, g_pMonitorInfo->m_virtualDesktop.width,
-        g_pMonitorInfo->m_virtualDesktop.height, SWP_NOACTIVATE | SWP_NOSENDCHANGING);
+    SetWindowPos(g_pDesktopPainter->GetWindow(), HWND_BOTTOM, nCore::FetchMonitorInfo().GetVirtualDesktop().rect.left,
+      nCore::FetchMonitorInfo().GetVirtualDesktop().rect.top, nCore::FetchMonitorInfo().GetVirtualDesktop().width,
+      nCore::FetchMonitorInfo().GetVirtualDesktop().height, SWP_NOACTIVATE | SWP_NOSENDCHANGING);
     ShowWindow(g_pDesktopPainter->GetWindow(), SW_SHOWNOACTIVATE);
     BOOL excludeFromPeek = TRUE;
     DwmSetWindowAttribute(g_pDesktopPainter->GetWindow(), DWMWA_EXCLUDED_FROM_PEEK, &excludeFromPeek, sizeof(BOOL));
@@ -77,8 +73,8 @@ EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* 
     nDesk::Settings::Load();
 
     // Reset the work area for all monitors
-    WorkArea::ResetWorkAreas(g_pMonitorInfo);
-    WorkArea::LoadSettings(g_pMonitorInfo);
+    WorkArea::ResetWorkAreas(&nCore::FetchMonitorInfo());
+    WorkArea::LoadSettings(&nCore::FetchMonitorInfo());
 
     /*const CLSID CLSID_Test = {0xff609cc7, 0xd34d, 0x4049, {0xa1, 0xaa, 0x22, 0x93, 0x51, 0x7f, 0xfc, 0xc6}};
     IExecuteCommand *iec;
@@ -138,7 +134,7 @@ EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* 
 /// </summary>
 void quitModule(HINSTANCE /* instance */) {
     // Reset the work area for all monitors
-    WorkArea::ResetWorkAreas(g_pMonitorInfo);
+    WorkArea::ResetWorkAreas(&nCore::FetchMonitorInfo());
 
     // Unregister bangs
     Bangs::_Unregister();
@@ -146,7 +142,6 @@ void quitModule(HINSTANCE /* instance */) {
     // Delete global classes
     if (g_pDesktopPainter) delete g_pDesktopPainter;
     if (g_pClickHandler) delete g_pClickHandler;
-    if (g_pMonitorInfo) delete g_pMonitorInfo;
 
     //
     gLSModule.DeInitalize();
@@ -179,7 +174,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case LM_REFRESH:
         {
             g_pClickHandler->Refresh();
-            WorkArea::LoadSettings(g_pMonitorInfo, true);
+            WorkArea::LoadSettings(&nCore::FetchMonitorInfo(), true);
             nDesk::Settings::Load();
         }
         return 0;
@@ -196,19 +191,19 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
             c->hwndInsertAfter = HWND_BOTTOM;
             c->flags &= ~SWP_HIDEWINDOW;
             c->flags |= SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOMOVE | SWP_SHOWWINDOW;
-            c->x = g_pMonitorInfo->m_virtualDesktop.rect.left;
-            c->y = g_pMonitorInfo->m_virtualDesktop.rect.top;
-            c->cx = g_pMonitorInfo->m_virtualDesktop.width;
-            c->cy = g_pMonitorInfo->m_virtualDesktop.height;
+            c->x = nCore::FetchMonitorInfo().GetVirtualDesktop().rect.left;
+            c->y = nCore::FetchMonitorInfo().GetVirtualDesktop().rect.top;
+            c->cx = nCore::FetchMonitorInfo().GetVirtualDesktop().width;
+            c->cy = nCore::FetchMonitorInfo().GetVirtualDesktop().height;
         }
         return 0;
 
-    case WM_DISPLAYCHANGE:
+    case NCORE_DISPLAYCHANGE:
         {
-            g_pMonitorInfo->Update();
+            // TODO::Ensure 
             g_pDesktopPainter->Resize();
             nDesk::Settings::OnResolutionChange();
-            WorkArea::LoadSettings(g_pMonitorInfo);
+            WorkArea::LoadSettings(&nCore::FetchMonitorInfo());
             InvalidateRect(nullptr, nullptr, TRUE);
         }
         break;

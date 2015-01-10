@@ -251,17 +251,15 @@ void Popup::Show(LPRECT position, Popup* owner)
     MonitorInfo &monInfo = nCore::FetchMonitorInfo();
 
     int x, y;
-    RECT limits = monInfo.m_virtualDesktop.rect;
+    RECT limits = monInfo.GetVirtualDesktop().rect;
 
     if (this->confineToMonitor && this->confineToWorkArea) {
-        limits = monInfo.m_monitors.at(monInfo.MonitorFromRECT(position)).workArea;
-    }
-    else if (this->confineToMonitor) {
-        limits = monInfo.m_monitors.at(monInfo.MonitorFromRECT(position)).rect;
-    }
-    else if (this->confineToWorkArea) {
-        // TODO::Shouldn't confine to the monitor here.
-        limits = monInfo.m_monitors.at(monInfo.MonitorFromRECT(position)).workArea;
+      limits = monInfo.GetMonitor(monInfo.MonitorFromRECT(*position)).workArea;
+    } else if (this->confineToMonitor) {
+      limits = monInfo.GetMonitor(monInfo.MonitorFromRECT(*position)).rect;
+    } else if (this->confineToWorkArea) {
+      // TODO::Shouldn't confine to the monitor here.
+      limits = monInfo.GetMonitor(monInfo.MonitorFromRECT(*position)).workArea;
     }
 
     if (!this->sized) {

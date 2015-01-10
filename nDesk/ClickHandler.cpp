@@ -15,8 +15,6 @@
 
 #include "ClickHandler.hpp"
 
-extern MonitorInfo * g_pMonitorInfo;
-
 
 /// <summary>
 /// Creates a new instance of the ClickHandler class.
@@ -80,8 +78,8 @@ LRESULT ClickHandler::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM
     cData.mods = GET_KEYSTATE_WPARAM(wParam) & (4 | 8);
     // GET_X_LPARAM and GET_Y_LPARAM are relative to the desktop window.
     // cData.area is relative to the virual desktop.
-    cData.area.left = cData.area.right = GET_X_LPARAM(lParam) + g_pMonitorInfo->m_virtualDesktop.rect.left; 
-    cData.area.top = cData.area.bottom = GET_Y_LPARAM(lParam) + g_pMonitorInfo->m_virtualDesktop.rect.top;
+    cData.area.left = cData.area.right = GET_X_LPARAM(lParam) + nCore::FetchMonitorInfo().GetVirtualDesktop().rect.left;
+    cData.area.top = cData.area.bottom = GET_Y_LPARAM(lParam) + nCore::FetchMonitorInfo().GetVirtualDesktop().rect.top;
 
     for (vector<ClickData>::const_iterator iter = m_clickHandlers.begin(); iter != m_clickHandlers.end(); iter++) {
         if (Matches(cData, *iter)) {
@@ -140,7 +138,7 @@ ClickHandler::ClickData ClickHandler::ParseLine(LPCTSTR szLine) {
 
     // Guess that the rest is an action for now
     StringCchCopy(cData.action, sizeof(cData.action), pszNext);
-    cData.area = g_pMonitorInfo->m_virtualDesktop.rect;
+    cData.area = nCore::FetchMonitorInfo().GetVirtualDesktop().rect;
 
     // Check if we have 4 valid coordinates followed by some action
     int left, top, width, height;

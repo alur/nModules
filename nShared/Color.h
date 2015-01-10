@@ -7,8 +7,10 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include <d2d1.h>
 #include "IColorVal.hpp"
+
+#include "../Utilities/CommonD2D.h"
+
 #include <memory>
 
 // Color of the format AARRGGBB.

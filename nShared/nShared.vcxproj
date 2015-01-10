@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -35,12 +35,12 @@
     <ClInclude Include="BuildOptions.h" />
     <ClInclude Include="ChildDrawable.hpp" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="Distance.hpp" />
+    <ClInclude Include="Rect.hpp" />
     <ClInclude Include="ResultCodes.h" />
     <ClInclude Include="IDrawable.hpp" />
     <ClInclude Include="Drawable.hpp" />
     <ClInclude Include="IStateRender.hpp" />
-    <ClInclude Include="RelatedNumber.hpp" />
-    <ClInclude Include="RelatedRect.hpp" />
     <ClInclude Include="StateRender.hpp" />
     <ClInclude Include="StateTextRender.hpp" />
     <ClInclude Include="StateWindowData.hpp" />
@@ -81,10 +81,10 @@
     <ClCompile Include="ChildDrawable.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="ColorParser.cpp" />
+    <ClCompile Include="Distance.cpp" />
     <ClCompile Include="IDrawable.cpp" />
     <ClCompile Include="Drawable.cpp" />
-    <ClCompile Include="RelatedNumber.cpp" />
-    <ClCompile Include="RelatedRect.cpp" />
+    <ClCompile Include="Rect.cpp" />
     <ClCompile Include="StateTextRender.cpp" />
     <ClCompile Include="WindowBangs.cpp" />
     <ClCompile Include="WindowSettings.cpp" />
@@ -125,9 +125,7 @@
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
   </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>
-  </PropertyGroup>
+  <PropertyGroup Label="Globals" />
   <PropertyGroup Label="Globals">
     <ProjectGuid>{91B4220F-6589-4739-BCA7-3FF9F83FCE04}</ProjectGuid>
     <RootNamespace>nShared</RootNamespace>

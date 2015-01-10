@@ -34,8 +34,8 @@ public:
     // True to evaluate text strings. Not read from RC files. Default: false
     bool evaluateText;
 
-    // The height of the window. Default: 100
-    RelatedNumber height;
+    // The height of the window. Default: 100dip
+    Distance height;
 
     // True if the window should start hidden. Default: false
     bool hidden;
@@ -49,12 +49,12 @@ public:
     // How to anti-alias the text.
     D2D1_TEXT_ANTIALIAS_MODE textAntiAliasMode;
 
-    // The width of the window. Default: 100
-    RelatedNumber width;
+    // The width of the window. Default: 100dip
+    Distance width;
 
     // The x position of the window, relative to the parent. Default: 0
-    RelatedNumber x;
+    Distance x;
 
     // The y position of the window, relative to the parent. Default: 0
-    RelatedNumber y;
+    Distance y;
 };

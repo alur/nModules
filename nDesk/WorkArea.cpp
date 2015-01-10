@@ -36,16 +36,16 @@ void WorkArea::ParseLine(MonitorInfo *mInfo, LPCTSTR pszLine)
 
         if (monitor == UINT(-1))
         {
-            for (auto &monitor : mInfo->m_monitors)
+            for (auto &monitor : mInfo->GetMonitors())
             {
                 RECT r = { monitor.rect.left + left, monitor.rect.top + top, monitor.rect.right - right, monitor.rect.bottom - bottom };
                 SystemParametersInfoW(SPI_SETWORKAREA, 1, &r, 0);
             }
             return;
         }
-        else if (monitor < mInfo->m_monitors.size())
+        else if (monitor < mInfo->GetMonitorCount())
         {
-            RECT mRect = mInfo->m_monitors[monitor].rect;
+            RECT mRect = mInfo->GetMonitor(monitor).rect;
             RECT r = { mRect.left + left, mRect.top + top, mRect.right - right, mRect.bottom - bottom };
             SystemParametersInfoW(SPI_SETWORKAREA, 1, &r, 0);
             return;
@@ -74,8 +74,8 @@ void WorkArea::LoadSettings(MonitorInfo *mInfo, bool /* isRefresh */) {
 /// </summary>
 /// <param name="mInfo">A current MonitorInfo.</param>
 void WorkArea::ResetWorkAreas(MonitorInfo *mInfo) {
-    for (auto &monitor : mInfo->m_monitors) {
-        SystemParametersInfoW(SPI_SETWORKAREA, 1, &monitor.rect, 0);
-    }
-    SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
+  for (auto &monitor : mInfo->GetMonitors()) {
+    SystemParametersInfoW(SPI_SETWORKAREA, 1, const_cast<PRECT>(&monitor.rect), 0);
+  }
+  SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
 }

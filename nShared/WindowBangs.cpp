@@ -106,9 +106,9 @@ void WindowBangs::Move(HWND, LPCTSTR args)
     {
         Window* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
-            RelatedNumber x, y;
+          Distance x, y;
 
-            if (ParseRelated(xstr, &x) && ParseRelated(ystr, &y))
+          if (Distance::Parse(xstr, x) && Distance::Parse(ystr, y))
             {
                 if (numTokens == 3)
                 {
@@ -141,9 +141,9 @@ void WindowBangs::Size(HWND, LPCTSTR args)
     {
         Window* drawable = drawableFinder(prefix);
         if (drawable != nullptr) {
-            RelatedNumber width, height;
+            Distance width, height;
 
-            if (ParseRelated(widthstr, &width) && ParseRelated(heightstr, &height))
+            if (Distance::Parse(widthstr, width) && Distance::Parse(heightstr, height))
             {
                 if (numTokens == 3)
                 {
@@ -177,10 +177,10 @@ void WindowBangs::Position(HWND, LPCTSTR args) {
         Window* drawable = drawableFinder(prefix);
         if (drawable != nullptr)
         {
-            RelatedNumber width, height, x, y;
+          Distance width, height, x, y;
 
-            if (ParseRelated(widthstr, &width) && ParseRelated(heightstr, &height)
-                && ParseRelated(xstr, &x) && ParseRelated(ystr, &y))
+          if (Distance::Parse(widthstr, width) && Distance::Parse(heightstr, height)
+            && Distance::Parse(xstr, x) && Distance::Parse(ystr, y))
             {
                 if (numTokens == 5)
                 {

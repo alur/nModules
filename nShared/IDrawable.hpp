@@ -7,10 +7,10 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "EventHandler.hpp"
+#include "MessageHandler.hpp"
 #include "Settings.hpp"
 #include "Window.hpp"
-#include "MessageHandler.hpp"
-#include "EventHandler.hpp"
 
 class IDrawable : public MessageHandler
 {

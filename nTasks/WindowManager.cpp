@@ -21,6 +21,7 @@
 #include <VersionHelpers.h>
 #include <thread>
 #include <algorithm>
+#include "../nCoreCom/Core.h"
 
 
 using std::vector;
@@ -62,9 +63,6 @@ namespace WindowManager
 
     // Contains all current top-level windows.
     WindowMap windowMap;
-
-    // Information about the current monitor layout.
-    MonitorInfo gMonitorInfo;
 
     // True if the windowmanager is running.
     bool isStarted = false;
@@ -142,7 +140,7 @@ void WindowManager::AddWindow(HWND hWnd)
         
         // Get information about the window
         WindowInformation &wndInfo = windowMap[hWnd];
-        wndInfo.uMonitor = gMonitorInfo.MonitorFromHWND(hWnd);
+        wndInfo.uMonitor = nCore::FetchMonitorInfo().MonitorFromHWND(hWnd);
 
         // Add it to any taskbar that wants it
         for (TaskbarMap::value_type &taskbar : gTaskbars)
@@ -371,7 +369,7 @@ void WindowManager::UpdateWindowMonitors()
     std::list<std::pair<HWND, UINT>> mods;
     for (WindowMap::value_type &val : windowMap)
     {
-        UINT monitor = gMonitorInfo.MonitorFromHWND(val.first);
+        UINT monitor = nCore::FetchMonitorInfo().MonitorFromHWND(val.first);
         if (monitor != val.second.uMonitor)
         {
             mods.emplace_back(val.first, monitor);
@@ -469,14 +467,14 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         // Windows 8+ A window has moved to a different monitor
     case LM_MONITORCHANGED:
         {
-            MonitorChanged((HWND)wParam, gMonitorInfo.MonitorFromHWND((HWND)wParam));
+            MonitorChanged((HWND)wParam, nCore::FetchMonitorInfo().MonitorFromHWND((HWND)wParam));
         }
         return 0;
 
         // The display layout has changed.
-    case WM_DISPLAYCHANGE:
+    case NCORE_DISPLAYCHANGE:
         {
-            gMonitorInfo.Update();
+            // TODO:: Ensure this is called after the core updates its monitor info.
             UpdateWindowMonitors();
         }
         return 0;

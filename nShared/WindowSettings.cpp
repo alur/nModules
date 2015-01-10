@@ -46,7 +46,7 @@ WindowSettings::WindowSettings()
     , x(0)
     , y(0)
 {
-    *text = _T('\0');
+    *text = L'\0';
 }
 
 
@@ -73,16 +73,16 @@ void WindowSettings::Load(const Settings *settings, const WindowSettings *defaul
   this->blurBehind = settings->GetBool(_T("BlurBehind"), defaults->blurBehind);
   this->clickThrough = settings->GetBool(_T("ClickThrough"), defaults->clickThrough);
   this->evaluateText = defaults->evaluateText;
-  this->height = settings->GetRelatedNumber(_T("Height"), defaults->height);
+  this->height = settings->GetDistance(_T("Height"), defaults->height);
   this->hidden = settings->GetBool(_T("Hidden"), defaults->hidden);
   this->registerWithCore = defaults->registerWithCore;
   settings->GetString(_T("Text"), buf, _countof(buf), defaults->text);
   StringCchCopy(this->text, _countof(this->text), buf);
   settings->GetString(_T("TextAntiAliasMode"), buf, _countof(buf), textAntiAliasModeMap.GetByA(defaults->textAntiAliasMode, _T("ClearType")));
   this->textAntiAliasMode = ParseAntiAliasMode(buf);
-  this->width = settings->GetRelatedNumber(_T("Width"), defaults->width);
-  this->x = settings->GetRelatedNumber(_T("X"), defaults->x);
-  this->y = settings->GetRelatedNumber(_T("Y"), defaults->y);
+  this->width = settings->GetDistance(_T("Width"), defaults->width);
+  this->x = settings->GetDistance(_T("X"), defaults->x);
+  this->y = settings->GetDistance(_T("Y"), defaults->y);
 }
 
 

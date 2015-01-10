@@ -19,7 +19,6 @@
 #include <assert.h>
 #include <algorithm>
 
-extern MonitorInfo * g_pMonitorInfo;
 extern ClickHandler * g_pClickHandler;
 
 using namespace D2D1;
@@ -57,10 +56,11 @@ DesktopPainter::DesktopPainter(HWND hWnd) : Window(hWnd, _T("nDesk"), g_pClickHa
 
     WindowSettings defaults;
     WindowSettings windowSettings;
-    defaults.width = (float)g_pMonitorInfo->m_virtualDesktop.width;
-    defaults.height = (float)g_pMonitorInfo->m_virtualDesktop.height;
-    defaults.x = (float)g_pMonitorInfo->m_virtualDesktop.rect.left;
-    defaults.y = (float)g_pMonitorInfo->m_virtualDesktop.rect.top;
+    const MonitorInfo::Monitor &virtualDesktop = nCore::FetchMonitorInfo().GetVirtualDesktop();
+    defaults.width = (float)virtualDesktop.width;
+    defaults.height = (float)virtualDesktop.height;
+    defaults.x = (float)virtualDesktop.rect.left;
+    defaults.y = (float)virtualDesktop.rect.top;
     windowSettings.Load(mSettings, &defaults);
 
     Initialize(windowSettings, &mStateRender);
@@ -238,39 +238,37 @@ void DesktopPainter::SetInvalidateAllOnUpdate(bool bValue)
 /// <summary>
 /// Should be called when the desktop has been resized.
 /// </summary>
-void DesktopPainter::Resize()
-{
-    // Resize the window
-    SetWindowPos(m_hWnd, HWND_BOTTOM, g_pMonitorInfo->m_virtualDesktop.rect.left, g_pMonitorInfo->m_virtualDesktop.rect.top,
-        g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height, SWP_NOACTIVATE|SWP_NOSENDCHANGING);
+void DesktopPainter::Resize() {
+  // Resize the window
+  const MonitorInfo::Monitor &virtualDesktop = nCore::FetchMonitorInfo().GetVirtualDesktop();
+  SetWindowPos(m_hWnd, HWND_BOTTOM, virtualDesktop.rect.left, virtualDesktop.rect.top,
+    virtualDesktop.width, virtualDesktop.height, SWP_NOACTIVATE | SWP_NOSENDCHANGING);
 
-    CalculateSizeDepdenentStuff();
+  CalculateSizeDepdenentStuff();
 
-    if (m_TransitionEffect)
-    {
-        m_TransitionEffect->Resize();
-    }
+  if (m_TransitionEffect) {
+    m_TransitionEffect->Resize();
+  }
 
-    if (mRenderTarget)
-    {
-        // Resize the render target
-        mRenderTarget->Resize(D2D1::SizeU(g_pMonitorInfo->m_virtualDesktop.width, g_pMonitorInfo->m_virtualDesktop.height));
+  if (mRenderTarget) {
+    // Resize the render target
+    mRenderTarget->Resize(D2D1::SizeU(virtualDesktop.width, virtualDesktop.height));
 
-        UpdateWallpaper(true);
-    }
+    UpdateWallpaper(true);
+  }
 }
 
 
 /// <summary>
 /// Should be called when the desktop has been resized, or during init.
 /// </summary>
-void DesktopPainter::CalculateSizeDepdenentStuff()
-{
-    // Update the virtual desktop rect
-    m_TransitionSettings.WPRect.top = 0;
-    m_TransitionSettings.WPRect.left = 0;
-    m_TransitionSettings.WPRect.bottom = (float)g_pMonitorInfo->m_virtualDesktop.height;
-    m_TransitionSettings.WPRect.right = (float)g_pMonitorInfo->m_virtualDesktop.width;
+void DesktopPainter::CalculateSizeDepdenentStuff() {
+  // Update the virtual desktop rect
+  m_TransitionSettings.WPRect.top = 0;
+  m_TransitionSettings.WPRect.left = 0;
+  const MonitorInfo::Monitor &virtualDesktop = nCore::FetchMonitorInfo().GetVirtualDesktop();
+  m_TransitionSettings.WPRect.bottom = (float)virtualDesktop.height;
+  m_TransitionSettings.WPRect.right = (float)virtualDesktop.width;
 }
 
 
@@ -526,6 +524,9 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush)
         UINT cxWallpaper, cyWallpaper;
         pSource->GetSize(&cxWallpaper, &cyWallpaper);
 
+        const MonitorInfo::Monitor &virtualDesktop = nCore::FetchMonitorInfo().GetVirtualDesktop();
+        const MonitorInfo::Monitor &primaryMonitor = nCore::FetchMonitorInfo().GetMonitor(0);
+
         if (bTileWallpaper)
         {
             // Convert it to a D2D1 bitmap
@@ -534,12 +535,12 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush)
             mRenderTarget->CreateBitmapFromWicBitmap(pConverter, 0, &pBitmap);
 
             // The x/y points where we should start tiling the image
-            int xInitial = -g_pMonitorInfo->m_virtualDesktop.rect.left + (int)floor((float)g_pMonitorInfo->m_virtualDesktop.rect.left/cxWallpaper)*cxWallpaper;
-            int yInitial = -g_pMonitorInfo->m_virtualDesktop.rect.top + (int)floor((float)g_pMonitorInfo->m_virtualDesktop.rect.top/cyWallpaper)*cyWallpaper;
+            int xInitial = -virtualDesktop.rect.left + (int)floor((float)virtualDesktop.rect.left / cxWallpaper)*cxWallpaper;
+            int yInitial = -virtualDesktop.rect.top + (int)floor((float)virtualDesktop.rect.top / cyWallpaper)*cyWallpaper;
             // Do the tiling
-            for (int x = xInitial; x < g_pMonitorInfo->m_virtualDesktop.width - g_pMonitorInfo->m_virtualDesktop.rect.left; x += cxWallpaper)
+            for (int x = xInitial; x < virtualDesktop.width - virtualDesktop.rect.left; x += cxWallpaper)
             {
-                for (int y = yInitial; y < g_pMonitorInfo->m_virtualDesktop.height - g_pMonitorInfo->m_virtualDesktop.rect.top; y += cyWallpaper)
+              for (int y = yInitial; y < virtualDesktop.height - virtualDesktop.rect.top; y += cyWallpaper)
                 {
                     D2D1_RECT_F f; f.top = (float)y; f.left = (float)x; f.right = (float)(x + cxWallpaper); f.bottom = (float)(y + cyWallpaper);
                     pBitmapRender->DrawBitmap(pBitmap, f);
@@ -555,58 +556,58 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush)
             {
             case 2: // Stretch
                 {
-                    WallpaperResX = g_pMonitorInfo->m_monitors[0].width;
-                    WallpaperResY = g_pMonitorInfo->m_monitors[0].height;
+              WallpaperResX = primaryMonitor.width;
+              WallpaperResY = primaryMonitor.height;
                 }
                 break;
 
             case 6: // Fit
                 {
-                    scaleX = (double)g_pMonitorInfo->m_monitors[0].width/cxWallpaper;
-                    scaleY = (double)g_pMonitorInfo->m_monitors[0].height/cyWallpaper;
+              scaleX = (double)primaryMonitor.width / cxWallpaper;
+              scaleY = (double)primaryMonitor.height / cyWallpaper;
                     if (scaleX > scaleY)
                     {
-                        WallpaperResY = g_pMonitorInfo->m_monitors[0].height;
+                      WallpaperResY = primaryMonitor.height;
                         WallpaperResX = (int)(scaleY*cxWallpaper);
                     }
                     else
                     {
                         WallpaperResY = (int)(scaleX*cyWallpaper);
-                        WallpaperResX = g_pMonitorInfo->m_monitors[0].width;
+                        WallpaperResX = primaryMonitor.width;
                     }
                 }
                 break;
 
             case 10: // Fill
                 {
-                    scaleX = (double)g_pMonitorInfo->m_monitors[0].width/cxWallpaper;   
-                    scaleY = (double)g_pMonitorInfo->m_monitors[0].height/cyWallpaper;
+              scaleX = (double)primaryMonitor.width / cxWallpaper;
+              scaleY = (double)primaryMonitor.height / cyWallpaper;
                     if (scaleX < scaleY)
                     {
-                        WallpaperResY = g_pMonitorInfo->m_monitors[0].height;
+                      WallpaperResY = primaryMonitor.height;
                         WallpaperResX = (int)(scaleY*cxWallpaper);
                     }
                     else
                     {
                         WallpaperResY = (int)(scaleX*cyWallpaper);
-                        WallpaperResX = g_pMonitorInfo->m_monitors[0].width;
+                        WallpaperResX = primaryMonitor.width;
                     }
                 }
                 break;
 
             case 22: // Span, essentially a fill over the virtual desktop
                 {
-                    scaleX = (double)g_pMonitorInfo->m_virtualDesktop.width/cxWallpaper;    
-                    scaleY = (double)g_pMonitorInfo->m_virtualDesktop.height/cyWallpaper;
+              scaleX = (double)virtualDesktop.width / cxWallpaper;
+              scaleY = (double)virtualDesktop.height / cyWallpaper;
                     if (scaleX < scaleY)
                     {
-                        WallpaperResY = g_pMonitorInfo->m_virtualDesktop.height;
+                      WallpaperResY = virtualDesktop.height;
                         WallpaperResX = (int)(scaleY*cxWallpaper);
                     }
                     else
                     {
                         WallpaperResY = (int)(scaleX*cyWallpaper);
-                        WallpaperResX = g_pMonitorInfo->m_virtualDesktop.width;
+                        WallpaperResX = virtualDesktop.width;
                     }
                 }
                 break;
@@ -628,74 +629,67 @@ HRESULT DesktopPainter::CreateWallpaperBrush(ID2D1BitmapBrush** ppBitmapBrush)
             pConverter->Initialize(pScaler, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.f, WICBitmapPaletteTypeMedianCut);
             mRenderTarget->CreateBitmapFromWicBitmap(pConverter, 0, &pBitmap);
 
-            if (iWallpaperStyle == 22)
-            {
-                // Center the stretched wallpaper on the virtual desktop
-                D2D1_RECT_F dest, source;
-                dest.left = 0;
-                dest.top = 0;
-                dest.right = (float)g_pMonitorInfo->m_virtualDesktop.width;
-                dest.bottom = (float)g_pMonitorInfo->m_virtualDesktop.height;
-                source = dest;
+            if (iWallpaperStyle == 22) {
+              // Center the stretched wallpaper on the virtual desktop
+              D2D1_RECT_F dest, source;
+              dest.left = 0;
+              dest.top = 0;
+              dest.right = (float)virtualDesktop.width;
+              dest.bottom = (float)virtualDesktop.height;
+              source = dest;
 
-                if (WallpaperResY == g_pMonitorInfo->m_virtualDesktop.height) {
-                    // Center by width
-                    source.left = (WallpaperResX - g_pMonitorInfo->m_virtualDesktop.width)/2.0f;
-                    source.right = (float)(source.left + g_pMonitorInfo->m_virtualDesktop.width);
+              if (WallpaperResY == virtualDesktop.height) {
+                // Center by width
+                source.left = (WallpaperResX - virtualDesktop.width) / 2.0f;
+                source.right = (float)(source.left + virtualDesktop.width);
+              } else {
+                // Center by height
+                source.top = (WallpaperResY - virtualDesktop.height) / 2.0f;
+                source.bottom = (float)(source.top + virtualDesktop.height);
+              }
+
+              pBitmapRender->DrawBitmap(pBitmap, dest, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, source);
+            } else for (const MonitorInfo::Monitor &monitor : nCore::FetchMonitorInfo().GetMonitors()) {
+                // Center the stretched wallpaper on all monitors
+                D2D1_RECT_F dest, source;
+
+                // Work out X coordinates and width
+                if (monitor.width > WallpaperResX)
+                {
+                  dest.left = (monitor.width - WallpaperResX) / 2.0f;
+                    dest.right = (float)(dest.left + WallpaperResX);
+                    source.left = 0.0f;
+                    source.right = (float)WallpaperResX;
                 }
-                else {
-                    // Center by height
-                    source.top = (WallpaperResY - g_pMonitorInfo->m_virtualDesktop.height)/2.0f;
-                    source.bottom = (float)(source.top + g_pMonitorInfo->m_virtualDesktop.height);
+                else
+                {
+                    dest.left = 0.0f;
+                    dest.right = (float)monitor.width;
+                    source.left = (WallpaperResX - monitor.width) / 2.0f;
+                    source.right = (float)(source.left + monitor.width);
                 }
+                dest.left += monitor.rect.left - virtualDesktop.rect.left;
+                dest.right += monitor.rect.left - virtualDesktop.rect.left;
+
+                // Work out Y coordinates and height
+                if (monitor.height > WallpaperResY)
+                {
+                  dest.top = (monitor.height - WallpaperResY) / 2.0f;
+                    dest.bottom = (float)(dest.top + WallpaperResY);
+                    source.top = 0.0f;
+                    source.bottom = (float)WallpaperResY;
+                }
+                else
+                {
+                    dest.top = 0.0f;
+                    dest.bottom = (float)monitor.height;
+                    source.top = (WallpaperResY - monitor.height) / 2.0f;
+                    source.bottom = (float)(source.top + monitor.height);
+                }
+                dest.top += monitor.rect.top - virtualDesktop.rect.top;
+                dest.bottom += monitor.rect.top - virtualDesktop.rect.top;
 
                 pBitmapRender->DrawBitmap(pBitmap, dest, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, source);
-            }
-            else
-            {
-                // Center the stretched wallpaper on all monitors
-                for (int i = 0; i < (int)g_pMonitorInfo->m_monitors.size(); i++)
-                {
-                    D2D1_RECT_F dest, source;
-
-                    // Work out X coordinates and width
-                    if (g_pMonitorInfo->m_monitors[i].width > WallpaperResX)
-                    {
-                        dest.left = (g_pMonitorInfo->m_monitors[i].width - WallpaperResX)/2.0f;
-                        dest.right = (float)(dest.left + WallpaperResX);
-                        source.left = 0.0f;
-                        source.right = (float)WallpaperResX;
-                    }
-                    else
-                    {
-                        dest.left = 0.0f;
-                        dest.right = (float)g_pMonitorInfo->m_monitors[i].width;
-                        source.left = (WallpaperResX - g_pMonitorInfo->m_monitors[i].width)/2.0f;
-                        source.right = (float)(source.left + g_pMonitorInfo->m_monitors[i].width);
-                    }
-                    dest.left += g_pMonitorInfo->m_monitors[i].rect.left - g_pMonitorInfo->m_virtualDesktop.rect.left;
-                    dest.right += g_pMonitorInfo->m_monitors[i].rect.left - g_pMonitorInfo->m_virtualDesktop.rect.left;
-
-                    // Work out Y coordinates and height
-                    if (g_pMonitorInfo->m_monitors[i].height > WallpaperResY)
-                    {
-                        dest.top = (g_pMonitorInfo->m_monitors[i].height - WallpaperResY)/2.0f;
-                        dest.bottom = (float)(dest.top + WallpaperResY);
-                        source.top = 0.0f;
-                        source.bottom = (float)WallpaperResY;
-                    }
-                    else
-                    {
-                        dest.top = 0.0f;
-                        dest.bottom = (float)g_pMonitorInfo->m_monitors[i].height;
-                        source.top = (WallpaperResY - g_pMonitorInfo->m_monitors[i].height)/2.0f;
-                        source.bottom = (float)(source.top + g_pMonitorInfo->m_monitors[i].height);
-                    }
-                    dest.top += g_pMonitorInfo->m_monitors[i].rect.top - g_pMonitorInfo->m_virtualDesktop.rect.top;
-                    dest.bottom += g_pMonitorInfo->m_monitors[i].rect.top - g_pMonitorInfo->m_virtualDesktop.rect.top;
-
-                    pBitmapRender->DrawBitmap(pBitmap, dest, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, source);
-                }
             }
         }
 

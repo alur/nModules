@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Manages the LiteStep object.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 

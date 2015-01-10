@@ -10,6 +10,7 @@
 #include <Windowsx.h>
 #include "EventHandler.hpp"
 #include "../nCoreCom/Core.h"
+#include "Distance.hpp"
 
 
 /// <summary>
@@ -143,22 +144,22 @@ EventHandler::ClickData EventHandler::ParseLine(LPCTSTR szLine)
     cData.area.top = LONG_MIN; cData.area.bottom = LONG_MAX;
 
     // Check if we have 4 valid coordinates followed by some action
-    RelatedNumber left, top, width, height;
+    Distance left, top, width, height;
     if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
-    if (!ParseRelated(szToken, &left)) return cData;
+    if (!Distance::Parse(szToken, left)) return cData;
 
     if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
-    if (!ParseRelated(szToken, &top)) return cData;
+    if (!Distance::Parse(szToken, top)) return cData;
 
     if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
-    if (!ParseRelated(szToken, &width)) return cData;
+    if (!Distance::Parse(szToken, width)) return cData;
 
     if (LiteStep::GetToken(pszNext, szToken, &pszNext, false) == FALSE) return cData;
     if (pszNext == NULL) return cData;
-    if (!ParseRelated(szToken, &height)) return cData;
+    if (!Distance::Parse(szToken, height)) return cData;
 
     // If these are all valid coordinates
     // TODO::Fix evaluations, or rather don't eval here, for resize purposes

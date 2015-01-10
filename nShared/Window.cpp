@@ -23,7 +23,6 @@
 #include "../Utilities/Math.h"
 
 
-using namespace D2D1;
 using std::map;
 
 
@@ -344,7 +343,7 @@ void Window::Animate()
         mAnimating = false;
     }
 
-    RelatedRect step;
+    Rect step;
     step.left = mAnimationStart.left + (mAnimationTarget.left - mAnimationStart.left)*progress;
     step.top = mAnimationStart.top + (mAnimationTarget.top - mAnimationStart.top)*progress;
     step.right = mAnimationStart.right + (mAnimationTarget.right - mAnimationStart.right)*progress;
@@ -930,7 +929,7 @@ void Window::Move(float x, float y)
 /// </summary>
 /// <param name="x">The x coordinate to move the window to. Relative to the parent.</param>
 /// <param name="y">The y coordinate to move the window to. Relative to the parent.</param>
-void Window::Move(RelatedNumber x, RelatedNumber y)
+void Window::Move(Distance x, Distance y)
 {
     SetPosition(x, y, mWindowSettings.width, mWindowSettings.height);
 }
@@ -1082,7 +1081,7 @@ void Window::Resize(float width, float height)
 /// </summary>
 /// <param name="width">The width to resize the window to.</param>
 /// <param name="height">The height to resize the window to.</param>
-void Window::Resize(RelatedNumber width, RelatedNumber height)
+void Window::Resize(Distance width, Distance height)
 {
     SetPosition(mWindowSettings.x, mWindowSettings.y, width, height);
 }
@@ -1107,13 +1106,13 @@ HRESULT Window::ReCreateDeviceResources()
             if (SUCCEEDED(hr))
             {
                 hr = pD2DFactory->CreateHwndRenderTarget(
-                    RenderTargetProperties(
+                    D2D1::RenderTargetProperties(
                         D2D1_RENDER_TARGET_TYPE_DEFAULT,
-                        PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
+                        D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
                         96.0f,
                         96.0f
                     ),
-                    HwndRenderTargetProperties(this->window, D2D1::SizeU((UINT32)mSize.width, (UINT32)mSize.height)),
+                    D2D1::HwndRenderTargetProperties(this->window, D2D1::SizeU((UINT32)mSize.width, (UINT32)mSize.height)),
                     &mRenderTarget
                 );
                 if (SUCCEEDED(hr))
@@ -1342,10 +1341,10 @@ void Window::SetAlwaysOnTop(bool value)
 /// <param name="height">The height to animate to.</param>
 /// <param name="duration">The number of milliseconds to complete the animation in.</param>
 /// <param name="easing">The easing to use.</param>
-void Window::SetAnimation(RelatedNumber x, RelatedNumber y, RelatedNumber width, RelatedNumber height, int duration, Easing::Type easing)
+void Window::SetAnimation(Distance x, Distance y, Distance width, Distance height, int duration, Easing::Type easing)
 {
-    mAnimationTarget = RelatedRect(x, y, x + width, y + height);
-    mAnimationStart = RelatedRect(mWindowSettings.x, mWindowSettings.y, mWindowSettings.x + mWindowSettings.width, mWindowSettings.y + mWindowSettings.height);
+    mAnimationTarget = Rect(x, y, x + width, y + height);
+    mAnimationStart = Rect(mWindowSettings.x, mWindowSettings.y, mWindowSettings.x + mWindowSettings.width, mWindowSettings.y + mWindowSettings.height);
     mAnimationEasing = easing;
     mAnimationClock.Clock();
     mAnimationDuration = duration / 1000.0f;
@@ -1520,14 +1519,8 @@ void Window::SetParent(Window *newParent)
 /// <param name="y">The y coordinate to move the window to. Relative to the parent.</param>
 /// <param name="width">The width to resize the window to.</param>
 /// <param name="height">The height to resize the window to.</param>
-void Window::SetPosition(float x, float y, float width, float height, LPARAM extra)
-{
-    SetPosition(
-        RelatedNumber(x),
-        RelatedNumber(y),
-        RelatedNumber(width),
-        RelatedNumber(height),
-        extra);
+void Window::SetPosition(float x, float y, float width, float height, LPARAM extra) {
+  SetPosition(Distance(x), Distance(y), Distance(width), Distance(height), extra);
 }
 
 
@@ -1538,99 +1531,85 @@ void Window::SetPosition(float x, float y, float width, float height, LPARAM ext
 /// <param name="y">The y coordinate to move the window to. Relative to the parent.</param>
 /// <param name="width">The width to resize the window to.</param>
 /// <param name="height">The height to resize the window to.</param>
-void Window::SetPosition(RelatedNumber x, RelatedNumber y, RelatedNumber width, RelatedNumber height, LPARAM extra)
-{
-    UpdateLock lock(this);
+void Window::SetPosition(Distance x, Distance y, Distance width, Distance height, LPARAM extra) {
+  UpdateLock lock(this);
 
-    // Invalidate the current area.
-    Repaint();
+  // Invalidate the current area.
+  Repaint();
 
-    // Update the drawing settings.
-    mWindowSettings.x = x;
-    mWindowSettings.y = y;
-    mWindowSettings.width = width;
-    mWindowSettings.height = height;
+  // Update the drawing settings.
+  mWindowSettings.x = x;
+  mWindowSettings.y = y;
+  mWindowSettings.width = width;
+  mWindowSettings.height = height;
 
-    // Determine the width and height of the parent
-    D2D1_SIZE_F parentSize = D2D1::SizeF(0, 0);
-    if (!mIsChild)
-    {
-      // TODO::Fix
-      MonitorInfo &monitorInfo = nCore::FetchMonitorInfo();
-      parentSize = D2D1::SizeF((FLOAT)monitorInfo.m_monitors[0].width, (FLOAT)monitorInfo.m_monitors[0].height);
+  // Determine the width and height of the parent
+  D2D1_SIZE_F parentSize = D2D1::SizeF(0, 0);
+  if (!mIsChild) {
+    // TODO(Erik): This should be based on the size of the monitor the window is on.
+    MonitorInfo &monitorInfo = nCore::FetchMonitorInfo();
+    const MonitorInfo::Monitor &primaryMonitor = monitorInfo.GetMonitor(0);
+    parentSize = D2D1::SizeF((FLOAT)primaryMonitor.width, (FLOAT)primaryMonitor.height);
+  } else if (mParent) {
+    parentSize = mParent->mSize;
+  }
+
+  D2D1_SIZE_F newSize = D2D1::SizeF(width.Evaluate(parentSize.width), height.Evaluate(parentSize.height));
+  D2D1_POINT_2F newPosition = D2D1::Point2F(x.Evaluate(parentSize.width), y.Evaluate(parentSize.height));
+
+  // 
+  bool isResize = newSize.height != mSize.height || newSize.width != mSize.width;
+  bool isMove = newPosition.x != mPosition.x || newPosition.y != mPosition.y;
+
+  // Update mSize and mPosition
+  mSize = newSize;
+  mPosition = newPosition;
+
+  // Position the window and/or set the backarea.
+  if (!mIsChild) {
+    SetWindowPos(this->window, 0, int(mPosition.x + 0.5f), int(mPosition.y + 0.5f), int(mSize.width + 0.5f), int(mSize.height + 0.5f), SWP_NOZORDER | SWP_NOACTIVATE);
+    this->drawingArea = D2D1::RectF(0, 0, mSize.width, mSize.height);
+    if (mRenderTarget) {
+      VERIFY_HR(mRenderTarget->Resize(D2D1::SizeU(UINT32(mSize.width + 0.5f), UINT32(mSize.height + 0.5f))));
     }
-    else if (mParent)
-    {
-        parentSize = mParent->mSize;
-    }
+  } else if(mParent) {
+    this->drawingArea = D2D1::RectF(
+      mParent->drawingArea.left + mPosition.x,
+      mParent->drawingArea.top + mPosition.y,
+      mParent->drawingArea.left + mPosition.x + mSize.width,
+      mParent->drawingArea.top + mPosition.y + mSize.height
+    );
+  }
 
-    D2D1_SIZE_F newSize = D2D1::SizeF(width.Evaluate(parentSize.width), height.Evaluate(parentSize.height));
-    D2D1_POINT_2F newPosition = D2D1::Point2F(x.Evaluate(parentSize.width), y.Evaluate(parentSize.height));
+  // Update all paintables.
+  mStateRender->UpdatePosition(this->drawingArea, mWindowData);
+  for (Overlay *overlay : this->overlays) {
+    overlay->UpdatePosition(this->drawingArea);
+  }
+  for (IPainter *painter : this->prePainters) {
+    painter->UpdatePosition(this->drawingArea);
+  }
+  for (IPainter *painter : this->postPainters) {
+    painter->UpdatePosition(this->drawingArea);
+  }
+  if (isResize || mIsChild) {
+    for (Window *child : this->children) {
+      child->Move(child->mWindowSettings.x, child->mWindowSettings.y);
+    }
+  }
 
-    // 
-    bool isResize = newSize.height != mSize.height || newSize.width != mSize.width;
-    bool isMove = newPosition.x != mPosition.x || newPosition.y != mPosition.y;
+  // Invalidate the new area.
+  Repaint();
 
-    // Update mSize and mPosition
-    mSize = newSize;
-    mPosition = newPosition;
+  //
+  if (isResize) {
+    this->msgHandler->HandleMessage(GetWindowHandle(), WM_SIZECHANGE, MAKEWPARAM(mSize.width, mSize.height), extra, this);
+  }
 
-    // Position the window and/or set the backarea.
-    if (!mIsChild)
-    {
-        SetWindowPos(this->window, 0, int(mPosition.x + 0.5f), int(mPosition.y + 0.5f), int(mSize.width + 0.5f), int(mSize.height + 0.5f), SWP_NOZORDER | SWP_NOACTIVATE);
-        this->drawingArea = D2D1::RectF(0, 0, mSize.width, mSize.height);
-        if (mRenderTarget)
-        {
-            VERIFY_HR(mRenderTarget->Resize(D2D1::SizeU(UINT32(mSize.width + 0.5f), UINT32(mSize.height + 0.5f))));
-        }
-    }
-    else if(mParent)
-    {
-        this->drawingArea = D2D1::RectF(
-            mParent->drawingArea.left + mPosition.x,
-            mParent->drawingArea.top + mPosition.y,
-            mParent->drawingArea.left + mPosition.x + mSize.width,
-            mParent->drawingArea.top + mPosition.y + mSize.height
-        );
-    }
-
-    // Update all paintables.
-    mStateRender->UpdatePosition(this->drawingArea, mWindowData);
-    for (Overlay *overlay : this->overlays)
-    {
-        overlay->UpdatePosition(this->drawingArea);
-    }
-    for (IPainter *painter : this->prePainters)
-    {
-        painter->UpdatePosition(this->drawingArea);
-    }
-    for (IPainter *painter : this->postPainters)
-    {
-        painter->UpdatePosition(this->drawingArea);
-    }
-    if (isResize || mIsChild)
-    {
-        for (Window *child : this->children)
-        {
-            child->Move(child->mWindowSettings.x, child->mWindowSettings.y);
-        }
-    }
-
-    // Invalidate the new area.
-    Repaint();
-
-    //
-    if (isResize)
-    {
-        this->msgHandler->HandleMessage(GetWindowHandle(), WM_SIZECHANGE, MAKEWPARAM(mSize.width, mSize.height), extra, this);
-    }
-
-    //
-    if (isMove)
-    {
-        this->msgHandler->HandleMessage(GetWindowHandle(), WM_POSITIONCHANGE, MAKEWPARAM(mPosition.x, mPosition.y), extra, this);
-    }
+  //
+  if (isMove) {
+    this->msgHandler->HandleMessage(GetWindowHandle(), WM_POSITIONCHANGE, MAKEWPARAM(mPosition.x, mPosition.y), extra, this);
+  }
 }
 
 

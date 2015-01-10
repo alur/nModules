@@ -1,9 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *  ScriptingLSCore.cpp
  *  The nModules Project
  *
  *  Manages the LiteStep object.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "../External/v8/include/v8.h"
@@ -32,7 +32,7 @@ static void ScriptBangThump(HWND, LPCTSTR bang, LPCTSTR params) {
     HandleScope handle_scope(isolate);
     Handle<Value> arg = String::New(CAST(params));
     Local<Function>::New(isolate, iter->second)
-        ->Call(Local<Context>::New(isolate, gContext)->Global(), 1, &arg);
+      ->Call(Local<Context>::New(isolate, gContext)->Global(), 1, &arg);
   }
 }
 
@@ -96,7 +96,7 @@ static void ListBangs(const FunctionCallbackInfo<Value> & args) {
   HandleScope handleScope(Isolate::GetCurrent());
 
   std::list<std::wstring> bangs;
-  LiteStep::EnumLSData(ELD_BANGS, (FARPROC)(LiteStep::ENUMBANGSPROC) [] (LPCWSTR bang, LPARAM list) -> BOOL {
+  LiteStep::EnumLSData(ELD_BANGS, (FARPROC)(LiteStep::ENUMBANGSPROC) [](LPCWSTR bang, LPARAM list) -> BOOL {
     ((std::list<std::wstring>*)list)->push_back(bang);
     return TRUE;
   }, (LPARAM)&bangs);
@@ -171,7 +171,7 @@ static void ListModules(const FunctionCallbackInfo<Value> & args) {
   HandleScope handleScope(Isolate::GetCurrent());
 
   std::list<std::wstring> modules;
-  LiteStep::EnumLSData(ELD_MODULES, (FARPROC)(LiteStep::ENUMMODULESPROC) [] (LPCWSTR location, DWORD, LPARAM list) -> BOOL {
+  LiteStep::EnumLSData(ELD_MODULES, (FARPROC)(LiteStep::ENUMMODULESPROC) [](LPCWSTR location, DWORD, LPARAM list) -> BOOL {
     ((std::list<std::wstring>*)list)->push_back(location);
     return TRUE;
   }, (LPARAM)&modules);
@@ -212,8 +212,8 @@ static void UnloadModule(const FunctionCallbackInfo<Value> & args) {
 Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate) {
   HandleScope handleScope(isolate);
 
-  #pragma push_macro("ADD_FUNC")
-  #define ADD_FUNC(object, name, func) (object)->Set(String::New(CAST(name)), \
+#pragma push_macro("ADD_FUNC")
+#define ADD_FUNC(object, name, func) (object)->Set(String::New(CAST(name)), \
     FunctionTemplate::New(func), PropertyAttribute::ReadOnly)
 
   Handle<ObjectTemplate> liteStep = ObjectTemplate::New();
@@ -240,7 +240,7 @@ Handle<ObjectTemplate> Scripting::LSCore::Initialize(Isolate *isolate) {
   ADD_FUNC(modules, L"Unload", UnloadModule);
   liteStep->Set(String::New(CAST(L"Modules")), modules, PropertyAttribute::ReadOnly);
 
-  #pragma pop_macro("ADD_FUNC")
+#pragma pop_macro("ADD_FUNC")
 
   return handleScope.Close(liteStep);
 }

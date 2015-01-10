@@ -40,10 +40,10 @@ public:
   WindowSettings mWindowSettings;
   StateRender<TaskButton::State> mStateRender;
 
-  RelatedNumber mProgressX;
-  RelatedNumber mProgressY;
-  RelatedNumber mProgressWidth;
-  RelatedNumber mProgressHeight;
+  Distance mProgressX;
+  Distance mProgressY;
+  Distance mProgressWidth;
+  Distance mProgressHeight;
 
 public:
   void Load(Settings *settings);

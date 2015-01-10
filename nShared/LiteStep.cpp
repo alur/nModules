@@ -128,17 +128,17 @@ UINT LiteStep::GetPrefixedRCMonitor(LPCTSTR prefix, LPCTSTR keyName, UINT defaul
 
 
 /// <summary>
-/// Retrives a RelatedNumber with a particular prefix from the LiteStep configuration.
+/// Retrives a Distance with a particular prefix from the LiteStep configuration.
 /// </summary>
 /// <param name="prefix">The prefix of the value to get.</param>
 /// <param name="keyName">Key of the value to get.</param>
 /// <param name="defaultValue">Default value, returned if the key is not specified.</param>
-RelatedNumber LiteStep::GetPrefixedRCRelatedNumber(LPCTSTR prefix, LPCTSTR keyName, RelatedNumber defaultValue)
+Distance LiteStep::GetPrefixedRCDistance(LPCTSTR prefix, LPCTSTR keyName, Distance defaultValue)
 {
     TCHAR numberString[MAX_LINE_LENGTH];
     GetPrefixedRCLine(prefix, keyName, numberString, nullptr, _countof(numberString));
-    RelatedNumber result;
-    if (ParseRelated(numberString, &result))
+    Distance result;
+    if (Distance::Parse(numberString, result))
     {
         return result;
     }
@@ -302,51 +302,4 @@ UINT LiteStep::ParseMonitor(LPCTSTR monitorString, UINT defaultValue)
 
     // Fall back to the default value
     return defaultValue;
-}
-
-
-/// <summary>
-/// Parses a RelatedNumber from a configuration string.
-/// </summary>
-/// <param name="relatedString">The string to parse.</param>
-/// <param name="result">If this is not null, and the function returns true, this will be set to the parsed related number.</param>
-/// <return>true if the string is valid related number.</return>
-bool LiteStep::ParseRelated(LPCTSTR relatedString, RelatedNumber *result)
-{
-    if (relatedString == nullptr || *relatedString == _T('\0'))
-    {
-        return false;
-    }
-
-    float constant = 0;
-    float percentage = 0;
-    
-    // Look at the string as a collection of tokens, delimited by + and -
-    while (*relatedString)
-    {
-        // strtof is broken (doesn't set endptr).
-        float number = _tcstof(relatedString, const_cast<LPTSTR*>(&relatedString));
-        if (*relatedString == _T('%'))
-        {
-            percentage += number;
-            ++relatedString;
-        }
-        else
-        {
-            constant += number;
-        }
-
-        // The next token has to be a +, -, or end of string.
-        if (*relatedString != _T('+') && *relatedString != _T('-') && *relatedString != _T('\0'))
-        {
-            return false;
-        }
-    }
-
-    if (result)
-    {
-        *result = RelatedNumber(constant, percentage / 100.0f);
-    }
-
-    return true;
 }

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -113,6 +113,7 @@
     <ClInclude Include="Math.h" />
     <ClInclude Include="PointerIterator.hpp" />
     <ClInclude Include="Process.h" />
+    <ClInclude Include="ShellHelper.h" />
     <ClInclude Include="StopWatch.hpp" />
     <ClInclude Include="StringUtils.h" />
     <ClInclude Include="UIDGenerator.hpp" />
@@ -131,6 +132,7 @@
     <ClCompile Include="GUID.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Process.cpp" />
+    <ClCompile Include="ShellHelper.cpp" />
     <ClCompile Include="StopWatch.cpp" />
     <ClCompile Include="StringUtils.cpp" />
     <ClCompile Include="Versioning.cpp" />

@@ -20,6 +20,7 @@
     <ClInclude Include="Hashing.h" />
     <ClInclude Include="DoubleNullStringList.hpp" />
     <ClInclude Include="CommonD2D.h" />
+    <ClInclude Include="ShellHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StringUtils.cpp" />
@@ -35,5 +36,6 @@
     <ClCompile Include="CRC32.cpp" />
     <ClCompile Include="CRC64.cpp" />
     <ClCompile Include="DoubleNullStringList.cpp" />
+    <ClCompile Include="ShellHelper.cpp" />
   </ItemGroup>
 </Project>

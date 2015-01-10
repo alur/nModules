@@ -345,14 +345,13 @@ void Settings::SetMonitor(LPCTSTR key, UINT value) const
 
 
 /// <summary>
-/// Get's a RelatedNumber from a prefixed RC value.
+/// Get's a Distance from a prefixed RC value.
 /// </summary>
 /// <param name="key">The RC setting to parse.</param>
 /// <param name="defaultValue">The default value to use, if the setting is invalid or unspecified.</param>
 /// <returns>The related number.</returns>
-RelatedNumber Settings::GetRelatedNumber(LPCTSTR key, RelatedNumber defaultValue) const
-{
-    return GetPrefixedRCRelatedNumber(mPrefix, key, mGroup != nullptr ? mGroup->GetRelatedNumber(key, defaultValue) : defaultValue);
+Distance Settings::GetDistance(LPCTSTR key, Distance defaultValue) const {
+  return GetPrefixedRCDistance(mPrefix, key, mGroup != nullptr ? mGroup->GetDistance(key, defaultValue) : defaultValue);
 }
 
 

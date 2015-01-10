@@ -104,8 +104,6 @@
     <ClInclude Include="StateWindowData.hpp">
       <Filter>States</Filter>
     </ClInclude>
-    <ClInclude Include="RelatedNumber.hpp" />
-    <ClInclude Include="RelatedRect.hpp" />
     <ClInclude Include="BuildOptions.h" />
     <ClInclude Include="StateTextRender.hpp">
       <Filter>States</Filter>
@@ -114,6 +112,8 @@
       <Filter>States</Filter>
     </ClInclude>
     <ClInclude Include="ResultCodes.h" />
+    <ClInclude Include="Distance.hpp" />
+    <ClInclude Include="Rect.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Easing.cpp" />
@@ -199,10 +199,10 @@
     <ClCompile Include="BrushSettings.cpp">
       <Filter>Brushes</Filter>
     </ClCompile>
-    <ClCompile Include="RelatedNumber.cpp" />
-    <ClCompile Include="RelatedRect.cpp" />
     <ClCompile Include="StateTextRender.cpp">
       <Filter>States</Filter>
     </ClCompile>
+    <ClCompile Include="Distance.cpp" />
+    <ClCompile Include="Rect.cpp" />
   </ItemGroup>
 </Project>

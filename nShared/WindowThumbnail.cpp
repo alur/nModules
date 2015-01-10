@@ -53,7 +53,8 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position)
         int x, y, width, height, maxWidth, maxHeight;
         double scale;
         MonitorInfo &monitorInfo = nCore::FetchMonitorInfo();
-        MonitorInfo::Monitor monitor = monitorInfo.m_monitors[monitorInfo.MonitorFromRECT(position)];
+        const MonitorInfo::Monitor &monitor = monitorInfo.GetMonitor(
+          monitorInfo.MonitorFromRECT(*position));
         switch (this->position)
         {
         default:

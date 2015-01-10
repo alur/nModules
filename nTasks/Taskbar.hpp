@@ -43,7 +43,7 @@ private:
     // Constructors and destructors
 public:
     explicit Taskbar(LPCTSTR);
-    virtual ~Taskbar();
+    ~Taskbar();
 
     // MessageHandler
 public:
@@ -55,8 +55,8 @@ public:
     void HideThumbnail();
 
     void LoadSettings(bool = false);
-    TaskButton* AddTask(HWND, UINT, bool);
-    bool MonitorChanged(HWND hWnd, UINT monitor, TaskButton** out);
+    TaskButton *AddTask(HWND, UINT, bool);
+    bool MonitorChanged(HWND hWnd, UINT monitor, TaskButton **out);
     void RemoveTask(HWND);
     void Relayout();
     void Repaint();
@@ -77,10 +77,10 @@ private:
     ButtonList mButtonList;
 
     // The maximum width of a taskbar button
-    int mButtonMaxWidth;
-    int mButtonMaxHeight;
-    int mButtonWidth;
-    int mButtonHeight;
+    Distance mButtonMaxWidth;
+    Distance mButtonMaxHeight;
+    Distance mButtonWidth;
+    Distance mButtonHeight;
 
     //
     StateRender<States> mStateRender;

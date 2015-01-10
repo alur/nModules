@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Version of this module.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 

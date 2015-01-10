@@ -6,4 +6,8 @@
 //-------------------------------------------------------------------------------------------------
 #pragma once
 
-#define NCORE_FILE_SYSTEM_LOAD_COMPLETE             1280
+// Internal nCore messages
+#define NCORE_FILE_SYSTEM_LOAD_COMPLETE             0x0500
+
+// nCore -> Modules
+#define NCORE_DISPLAYCHANGE                         0x9000

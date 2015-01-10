@@ -8,6 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include "../nShared/LSModule.hpp"
 #include "../nShared/ErrorHandler.h"
+#include "../nCoreCom/Core.h"
 #include "Constants.h"
 #include "nTask.h"
 #include "TestWindow.hpp"
@@ -156,7 +157,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case LM_WINDOWREPLACED:
     case LM_WINDOWREPLACING:
     case LM_MONITORCHANGED:
-    case WM_DISPLAYCHANGE:
+    case NCORE_DISPLAYCHANGE:
     case WM_ADDED_EXISTING:
     case LM_TASK_SETPROGRESSSTATE:
     case LM_TASK_SETPROGRESSVALUE:
@@ -173,9 +174,7 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
     case LM_TASK_THUMBBARADDBUTTONS:
     case LM_TASK_THUMBBARUPDATEBUTTONS:
     case LM_TASK_THUMBBARSETIMAGELIST:
-        {
-        }
-        return WindowManager::ShellMessage(window, message, wParam, lParam);
+      return WindowManager::ShellMessage(window, message, wParam, lParam);
     }
     return DefWindowProc(window, message, wParam, lParam);
 }

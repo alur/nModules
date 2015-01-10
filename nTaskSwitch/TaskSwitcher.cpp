@@ -46,7 +46,7 @@ void TaskSwitcher::LoadSettings() {
   mPeekDelay = mSettings->GetInt(L"PeekDelay", SHRegGetIntW(HKEY_CURRENT_USER,
     L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AltTab\\LivePreview_ms", 1000));
 
-  MonitorInfo::Monitor &primaryMonitor = nCore::FetchMonitorInfo().m_monitors[0];
+  const MonitorInfo::Monitor &primaryMonitor = nCore::FetchMonitorInfo().GetMonitor(0);
 
   mThumbnailSettings.Load(mSettings);
 
@@ -103,111 +103,95 @@ LRESULT WINAPI TaskSwitcher::HandleMessage(HWND window, UINT message, WPARAM wPa
 }
 
 
-void TaskSwitcher::HandleAltTab()
-{
-    if (mWindow->IsVisible())
-    {
-        UpdateActiveWindow(1);
-    }
-    else
-    {
-        Show(1);
-    }
+void TaskSwitcher::HandleAltTab() {
+  if (mWindow->IsVisible()) {
+    UpdateActiveWindow(1);
+  } else {
+    Show(1);
+  }
 }
 
 
-void TaskSwitcher::HandleAltShiftTab()
-{
-    if (mWindow->IsVisible())
-    {
-        UpdateActiveWindow(-1);
-    }
-    else
-    {
-        Show(-1);
-    }
+void TaskSwitcher::HandleAltShiftTab() {
+  if (mWindow->IsVisible()) {
+    UpdateActiveWindow(-1);
+  } else {
+    Show(-1);
+  }
 }
 
 
-void TaskSwitcher::Hide()
-{
-    if (!mWindow->IsVisible())
-    {
-        return;
+void TaskSwitcher::Hide() {
+  if (!mWindow->IsVisible()) {
+    return;
+  }
+
+  if (mPeekTimer != 0) {
+    mWindow->ClearCallbackTimer(mPeekTimer);
+    mPeekTimer = 0;
+  }
+  mPeeking = false;
+  mWindow->Hide();
+
+  if (mShownWindows.size() != 0) {
+    (mHoveredThumbnail ? mHoveredThumbnail : mShownWindows[mSelectedWindow])->Activate();
+
+    for (TaskThumbnail *thumbnail : mShownWindows) {
+      delete thumbnail;
     }
+    mShownWindows.clear(); 
+  }
 
-    if (mPeekTimer != 0)
-    {
-        mWindow->ClearCallbackTimer(mPeekTimer);
-        mPeekTimer = 0;
-    }
-    mPeeking = false;
-    mWindow->Hide();
-
-    if (mShownWindows.size() != 0)
-    {
-        (mHoveredThumbnail ? mHoveredThumbnail : mShownWindows[mSelectedWindow])->Activate();
-
-        for (vector<TaskThumbnail*>::iterator wnd = mShownWindows.begin(); wnd != mShownWindows.end(); ++wnd)
-        {
-            delete *wnd;
-        }
-        mShownWindows.clear(); 
-    }
-
-    DwmpActivateLivePreview(0, nullptr, nullptr, 1);
+  DwmpActivateLivePreview(0, nullptr, nullptr, 1);
 }
 
 
-void TaskSwitcher::AddWindow(HWND window)
-{
-    mShownWindows.push_back(new TaskThumbnail(
-        this,
-        window,
-        mLayoutSettings.mPadding.left + mShownWindows.size() % mWindowsPerRow * (mTaskSize.width + mLayoutSettings.mColumnSpacing),
-        mLayoutSettings.mPadding.top + (int)mShownWindows.size() / mWindowsPerRow * (mTaskSize.height + mLayoutSettings.mRowSpacing),
-        mTaskSize.width,
-        mTaskSize.height,
-        mThumbnailSettings
-    ));
+void TaskSwitcher::AddWindow(HWND window) {
+  mShownWindows.push_back(new TaskThumbnail(
+    this,
+    window,
+    mLayoutSettings.mPadding.left + mShownWindows.size() % mWindowsPerRow * (mTaskSize.width + mLayoutSettings.mColumnSpacing),
+    mLayoutSettings.mPadding.top + (int)mShownWindows.size() / mWindowsPerRow * (mTaskSize.height + mLayoutSettings.mRowSpacing),
+    mTaskSize.width,
+    mTaskSize.height,
+    mThumbnailSettings
+  ));
 }
 
 
-void TaskSwitcher::Show(int delta)
-{
-    Window::UpdateLock updateLock(mWindow);
+void TaskSwitcher::Show(int delta) {
+  Window::UpdateLock updateLock(mWindow);
 
-    mHoveredThumbnail = nullptr;
-    mSelectedWindow = 0;
-    mPeeking = false;
+  mHoveredThumbnail = nullptr;
+  mSelectedWindow = 0;
+  mPeeking = false;
 
-    SetActiveWindow(mWindow->GetWindowHandle());
-    SetForegroundWindow(mWindow->GetWindowHandle());
-    EnumDesktopWindows(nullptr, LoadWindowsCallback, (LPARAM)this);
+  SetActiveWindow(mWindow->GetWindowHandle());
+  SetForegroundWindow(mWindow->GetWindowHandle());
+  EnumDesktopWindows(nullptr, LoadWindowsCallback, (LPARAM)this);
 
-    if (gDesktopWindow) {
-      AddWindow(gDesktopWindow);
-    }
+  if (gDesktopWindow) {
+    AddWindow(gDesktopWindow);
+  }
 
-    float height = mLayoutSettings.mPadding.top + mLayoutSettings.mPadding.bottom + ((int)mShownWindows.size() - 1) / mWindowsPerRow * (mTaskSize.height + mLayoutSettings.mRowSpacing) + mTaskSize.height;
+  float height = mLayoutSettings.mPadding.top + mLayoutSettings.mPadding.bottom + ((int)mShownWindows.size() - 1) / mWindowsPerRow * (mTaskSize.height + mLayoutSettings.mRowSpacing) + mTaskSize.height;
 
-    MonitorInfo::Monitor &primaryMonitor = nCore::FetchMonitorInfo().m_monitors[0];
-    mWindow->SetPosition(
-        mWindow->GetDrawingSettings()->x,
-        primaryMonitor.workAreaHeight / 2.0f - height / 2.0f + (float)primaryMonitor.workArea.top,
-        mWindow->GetDrawingSettings()->width, 
-        height);
+  const MonitorInfo::Monitor &primaryMonitor = nCore::FetchMonitorInfo().GetMonitor(0);
+  mWindow->SetPosition(
+    mWindow->GetDrawingSettings()->x,
+    primaryMonitor.workAreaHeight / 2.0f - height / 2.0f + (float)primaryMonitor.workArea.top,
+    mWindow->GetDrawingSettings()->width, 
+    height);
 
-    mWindow->Show(SW_SHOWNORMAL);
+  mWindow->Show(SW_SHOWNORMAL);
     
-    for (auto &thumbnail : mShownWindows)
-    {
-        thumbnail->UpdateIconPosition();
-    }
+  for (auto &thumbnail : mShownWindows) {
+    thumbnail->UpdateIconPosition();
+  }
 
-    mPeekTimer = mWindow->SetCallbackTimer(mPeekDelay, this);
+  mPeekTimer = mWindow->SetCallbackTimer(mPeekDelay, this);
     
-    UpdateActiveWindow(delta);
+  UpdateActiveWindow(delta);
 }
 
 
@@ -225,29 +209,28 @@ BOOL CALLBACK TaskSwitcher::LoadWindowsCallback(HWND window, LPARAM taskSwitcher
 /// <summary>
 /// Determines if a window should be shown on the taskbar.
 /// </summary>
-bool TaskSwitcher::IsTaskbarWindow(HWND hWnd)
-{
-    // Make sure it's actually a window.
-    if (!IsWindow(hWnd))
-        return false;
+bool TaskSwitcher::IsTaskbarWindow(HWND hWnd) {
+  // Make sure it's actually a window.
+  if (!IsWindow(hWnd))
+    return false;
 
-    // And that it's visible
-    if (!IsWindowVisible(hWnd))
-        return false;
+  // And that it's visible
+  if (!IsWindowVisible(hWnd))
+    return false;
 
-    LONG_PTR exStyle = GetWindowLongPtrW(hWnd, GWL_EXSTYLE);
+  LONG_PTR exStyle = GetWindowLongPtrW(hWnd, GWL_EXSTYLE);
 
-    // Windows with the WS_EX_APPWINDOW style should always be shown
-    if ((exStyle & WS_EX_APPWINDOW) == WS_EX_APPWINDOW)
-        return true;
-    else if (GetParent(hWnd) != nullptr) // Windows with parents should not be shown
-        return false;
-    else if (::GetWindow(hWnd, GW_OWNER) != nullptr) // Windows with owners should not be shown
-        return false;
-    else if ((exStyle & WS_EX_TOOLWINDOW) == WS_EX_TOOLWINDOW) // Tool windows should not be shown on the taskbar
-        return false;
-
+  // Windows with the WS_EX_APPWINDOW style should always be shown
+  if ((exStyle & WS_EX_APPWINDOW) == WS_EX_APPWINDOW)
     return true;
+  else if (GetParent(hWnd) != nullptr) // Windows with parents should not be shown
+    return false;
+  else if (::GetWindow(hWnd, GW_OWNER) != nullptr) // Windows with owners should not be shown
+    return false;
+  else if ((exStyle & WS_EX_TOOLWINDOW) == WS_EX_TOOLWINDOW) // Tool windows should not be shown on the taskbar
+    return false;
+
+  return true;
 }
 
 

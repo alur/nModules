@@ -34,8 +34,8 @@ public:
     };
 
 public:
-    explicit TaskThumbnail(Drawable* parent, HWND targetWindow, float x, float y, float width, float height, class ThumbnailSettings &thumbnailSettings);
-    virtual ~TaskThumbnail();
+    TaskThumbnail(Drawable* parent, HWND targetWindow, float x, float y, float width, float height, class ThumbnailSettings &thumbnailSettings);
+    ~TaskThumbnail();
 
 public:
     TaskThumbnail(const TaskThumbnail &) = delete;
@@ -49,7 +49,7 @@ public:
 
     void Select();
     void Deselect();
-    
+
     void UpdateIconPosition();
 
     HWND mTargetWindow;
