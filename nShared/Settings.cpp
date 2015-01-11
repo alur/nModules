@@ -9,6 +9,8 @@
 #include "Settings.hpp"
 #include "ErrorHandler.h"
 
+#include <strsafe.h>
+
 using std::unique_ptr;
 using std::function;
 using namespace LiteStep;

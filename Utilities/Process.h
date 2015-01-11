@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Utilities for dealing with processes.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 

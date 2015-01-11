@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Debugging.h
- *  The nModules Project
- *
- *  Debugging macros and functions. Taken from the LiteStep core.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/Debugging.h
+// The nModules Project
+//
+// Debugging functions. Taken from the LiteStep core.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 #include "../nShared/BuildOptions.h"

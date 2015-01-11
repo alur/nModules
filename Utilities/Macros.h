@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Utility macros
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 

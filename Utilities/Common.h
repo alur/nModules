@@ -27,7 +27,5 @@
 #include <Windows.h>
 #include <stdlib.h>
 #include <tchar.h>
-#include <strsafe.h>
 #include "Macros.h"
 #include "Debugging.h"
-#include <string>

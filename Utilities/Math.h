@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Math functions
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
@@ -18,7 +18,7 @@ namespace Math {
   int RectIntersectArea(LPCRECT rect1, LPCRECT rect2);
   int RectUnionArea(LPCRECT rect1, LPCRECT rect2);
   int RectNonOverlappArea(LPCRECT rect1, LPCRECT rect2);
-    
+
   float RectIntersectArea(D2D1_RECT_F *rect1, D2D1_RECT_F *rect2);
   float RectIntersectArea(D2D1_RECT_F rect1, D2D1_RECT_F rect2);
 

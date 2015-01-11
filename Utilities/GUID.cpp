@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Utilities for dealing with GUIDs.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "Common.h"
 #include "GUID.h"
@@ -15,22 +15,19 @@
 /// <param name="guidString">The string to parse.</param>
 /// <param name="guid">Out, the parsed GUID.</param>
 /// <returns>FALSE if the parsing failed.</param>
-BOOL GUIDFromStringA(LPCSTR guidString, LPGUID guid)
-{
-    typedef BOOL (WINAPI* PROCTYPE)(LPCSTR, LPGUID);
-    static PROCTYPE proc = nullptr;
+BOOL GUIDFromStringA(LPCSTR guidString, LPGUID guid) {
+  typedef BOOL(WINAPI* PROCTYPE)(LPCSTR, LPGUID);
+  static PROCTYPE proc = nullptr;
 
-    if (proc == nullptr)
-    {
-        proc = (PROCTYPE)GetProcAddress(GetModuleHandle(_T("Shell32.dll")), (LPCSTR)703);
-    }
+  if (proc == nullptr) {
+    proc = (PROCTYPE)GetProcAddress(GetModuleHandle(_T("Shell32.dll")), (LPCSTR)703);
+  }
 
-    if (proc)
-    {
-        return proc(guidString, guid);
-    }
+  if (proc) {
+    return proc(guidString, guid);
+  }
 
-    return FALSE;
+  return FALSE;
 }
 
 
@@ -40,20 +37,17 @@ BOOL GUIDFromStringA(LPCSTR guidString, LPGUID guid)
 /// <param name="guidString">The string to parse.</param>
 /// <param name="guid">Out, the parsed GUID.</param>
 /// <returns>FALSE if the parsing failed.</param>
-BOOL GUIDFromStringW(LPCWSTR guidString, LPGUID guid)
-{
-    typedef BOOL (WINAPI* PROCTYPE)(LPCWSTR, LPGUID);
-    static PROCTYPE proc = nullptr;
+BOOL GUIDFromStringW(LPCWSTR guidString, LPGUID guid) {
+  typedef BOOL(WINAPI* PROCTYPE)(LPCWSTR, LPGUID);
+  static PROCTYPE proc = nullptr;
 
-    if (proc == nullptr)
-    {
-        proc = (PROCTYPE)GetProcAddress(GetModuleHandle(_T("Shell32.dll")), (LPCSTR)704);
-    }
+  if (proc == nullptr) {
+    proc = (PROCTYPE)GetProcAddress(GetModuleHandle(_T("Shell32.dll")), (LPCSTR)704);
+  }
 
-    if (proc)
-    {
-        return proc(guidString, guid);
-    }
+  if (proc) {
+    return proc(guidString, guid);
+  }
 
-    return FALSE;
+  return FALSE;
 }

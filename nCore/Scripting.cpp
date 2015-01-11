@@ -13,6 +13,7 @@
 #include <fstream>
 #include <streambuf>
 #include "ScriptingHelpers.h"
+#include <strsafe.h>
 
 
 using namespace v8;

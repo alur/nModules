@@ -9,6 +9,7 @@
 
 #include "PopupItem.hpp"
 //#include "Popup.hpp"
+#include <strsafe.h>
 
 class Popup;
 

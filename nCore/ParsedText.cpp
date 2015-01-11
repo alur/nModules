@@ -9,6 +9,7 @@
 #include "ParsedText.hpp"
 #include <regex>
 #include "../Utilities/StringUtils.h"
+#include <strsafe.h>
 
 
 // All existing functions.

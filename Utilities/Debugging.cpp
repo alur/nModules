@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Debugging.cpp
- *  The nModules Project
- *
- *  Debugging functions. Taken from the LiteStep core.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/Debugging.cpp
+// The nModules Project
+//
+// Debugging functions. Taken from the LiteStep core.
+//-------------------------------------------------------------------------------------------------
 #include "Common.h"
 
 #ifdef _DEBUG

@@ -7,6 +7,7 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
+#include <strsafe.h>
 #include <vector>
 
 class TestWindow

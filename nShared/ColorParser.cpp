@@ -12,6 +12,7 @@
 #include "LiteralColorVal.hpp"
 #include "UnaryColorVal.hpp"
 #include "../Utilities/Math.h"
+#include <strsafe.h>
 
 
 // Literal Color functions

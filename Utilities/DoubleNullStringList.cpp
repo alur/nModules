@@ -8,10 +8,8 @@
 
 
 DoubleNullStringList::DoubleNullStringList()
-  : mCchSize(2)
-  , mStringList((LPWSTR)calloc(2, sizeof(wchar_t)))
-{
-}
+: mCchSize(2)
+, mStringList((LPWSTR)calloc(2, sizeof(wchar_t))) {}
 
 
 DoubleNullStringList::~DoubleNullStringList() {
@@ -31,7 +29,7 @@ LPCWSTR DoubleNullStringList::GetStringList() const {
 
 void DoubleNullStringList::Push(LPCWSTR string) {
   size_t cchStrLen = wcslen(string) + 1;
-  mStringList = LPWSTR(realloc(mStringList, sizeof(wchar_t) * (mCchSize + cchStrLen)));
+  mStringList = LPWSTR(realloc(mStringList, sizeof(wchar_t)* (mCchSize + cchStrLen)));
   memcpy(&mStringList[mCchSize - 2], string, (cchStrLen)* sizeof(wchar_t));
   mCchSize += cchStrLen;
   mStringList[mCchSize - 2] = L'\0';

@@ -1,15 +1,14 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  EnumArray.hpp
- *  The nModules Project
- *
- *  Lets you easily create and manage an array based on a class enum.
- *
- *  There are three requirements:
- *  1. The first element in the enum class must be = 0.
- *  2. No other values may be specified.
- *  3. The last element of the enum must be Count.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/EnumArray.hpp
+// The nModules Project
+//
+// Lets you easily create and manage an array based on a class enum.
+//
+// There are three requirements :
+// 1. The first element in the enum class must be = 0.
+// 2. No other values may be specified.
+// 3. The last element of the enum must be Count.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 #include <functional>

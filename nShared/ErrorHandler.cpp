@@ -9,6 +9,8 @@
 #include "ErrorHandler.h"
 #include "../Utilities/Error.h"
 
+#include <strsafe.h>
+
 // The current global error level.
 static ErrorHandler::Level gErrorLevel = ErrorHandler::Level::Warning;
 static TCHAR gModuleName[64] = TEXT("");

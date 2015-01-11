@@ -6,8 +6,10 @@
  *  
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "IconCache.hpp"
+
 #include "../Utilities/Hashing.h"
 
+#include <strsafe.h>
 
 /// <summary>
 /// Computes the hash of a particular icon.

@@ -8,6 +8,7 @@
 #include "../nShared/LiteStep.h"
 #include "TextFunctions.h"
 #include "../nCoreCom/Core.h"
+#include <strsafe.h>
 
 #define TEXTFUNCTION(x) size_t __cdecl x(LPCWSTR /* name */, UCHAR /* numArgs */, LPWSTR* /* args */, LPWSTR dest, size_t cchDest)
 #define IPC_GETLISTPOS 125

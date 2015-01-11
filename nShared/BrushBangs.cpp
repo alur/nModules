@@ -7,7 +7,10 @@
 //--------------------------------------------------------------------------------------
 #include "BrushBangs.h"
 #include "LiteStep.h"
+
 #include "../nCoreCom/Core.h"
+
+#include <strsafe.h>
 
 // Used to map window name -> window
 static std::function<Window* (LPCTSTR)> windowFinder;
