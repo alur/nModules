@@ -8,7 +8,8 @@
 
 #include "../nShared/BuildOptions.h"
 
-extern "C" _CRTIMP void __cdecl _wassert(_In_z_ const wchar_t * _Message, _In_z_ const wchar_t *_File, _In_ unsigned _Line);
+extern "C" _CRTIMP void __cdecl _wassert(
+  _In_z_ const wchar_t * _Message, _In_z_ const wchar_t *_File, _In_ unsigned _Line);
 
 #if defined(BUILDOPTIONS_ASSERTS) || defined(_DEBUG)
 #define ASSERT(_Expression) (void)((!!(_Expression)) || \

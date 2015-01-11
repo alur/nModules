@@ -3,11 +3,11 @@
 *   The nModules Project
 *
 *   Function declarations for the DesktopPainter class.
-*   
+*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include <d2d1.h>
+#include "../Utilities/CommonD2D.h"
 #include "TransitionEffects.h"
 #include "../nShared/StateRender.hpp"
 #include "../nShared/Window.hpp"

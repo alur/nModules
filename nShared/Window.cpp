@@ -5,23 +5,26 @@
  *  A generic drawable window.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#include "Color.h"
+#include "ErrorHandler.h"
+#include "Factories.h"
 #include "LiteStep.h"
-#include <windowsx.h>
-#include <strsafe.h>
-#include "../nCoreCom/Core.h"
+#include "MessageHandler.hpp"
 #include "Window.hpp"
 #include "WindowSettings.hpp"
-#include <d2d1.h>
+
+#include "../nCoreCom/Core.h"
+
+#include "../Utilities/CommonD2D.h"
+#include "../Utilities/Math.h"
+#include "../Utilities/StringUtils.h"
+
+#include <algorithm>
 #include <dwmapi.h>
 #include <dwrite.h>
+#include <strsafe.h>
 #include <Wincodec.h>
-#include "Factories.h"
-#include "Color.h"
-#include "MessageHandler.hpp"
-#include "ErrorHandler.h"
-#include "../Utilities/StringUtils.h"
-#include "../Utilities/Math.h"
-#include <algorithm>
+#include <windowsx.h>
 
 
 using std::map;
@@ -31,9 +34,8 @@ using std::map;
 /// Constructor used to create a DrawableWindow for a pre-existing window. Used by nDesk.
 /// </summary>
 /// <param name="drawable">Pointer to the drawable which should be updated.</param>
-void Window::TextChangeHandler(LPVOID drawable)
-{
-    ((Window*)drawable)->UpdateText();
+void Window::TextChangeHandler(LPVOID drawable) {
+  ((Window*)drawable)->UpdateText();
 }
 
 
@@ -183,67 +185,57 @@ Window::Window(Window* parent, Settings* settings, MessageHandler* msgHandler)
 /// <summary>
 /// Destroys all children and frees allocated resources.
 /// </summary>
-Window::~Window()
-{
-    this->initialized = false;
-    if (mParent)
-    {
-        mParent->RemoveChild(this);
-    }
-    else if (mIsChild)
-    {
-        nCore::System::RemoveWindowRegistrationListener(mParentName, this);
-    }
+Window::~Window() {
+  this->initialized = false;
+  if (mParent) {
+    mParent->RemoveChild(this);
+  } else if (mIsChild) {
+    nCore::System::RemoveWindowRegistrationListener(mParentName, this);
+  }
 
-    // Clear all update locks, to prevent crashes
-    for (UpdateLock *lock : mActiveLocks)
-    {
-        lock->mLocked = false;
-    }
+  // Clear all update locks, to prevent crashes
+  for (UpdateLock *lock : mActiveLocks) {
+    lock->mLocked = false;
+  }
 
-    // Register with the core
-    if (mWindowSettings.registerWithCore)
-    {
-        nCore::System::UnRegisterWindow(mSettings->GetPrefix());
-    }
+  // Register with the core
+  if (mWindowSettings.registerWithCore) {
+    nCore::System::UnRegisterWindow(mSettings->GetPrefix());
+  }
 
-    if (!mIsChild && this->window)
-    {
-        DestroyWindow(this->window);
-    }
+  if (!mIsChild && this->window) {
+    DestroyWindow(this->window);
+  }
 
-    SAFERELEASE(this->parsedText);
+  SAFERELEASE(this->parsedText);
 
-    DiscardDeviceResources();
+  DiscardDeviceResources();
 
-    // Delete all overlays
-    ClearOverlays();
+  // Delete all overlays
+  ClearOverlays();
 
-    // Let the children know that we are vanishing
-    for (Window *child : this->children)
-    {
-        child->ParentLeft();
-    }
+  // Let the children know that we are vanishing
+  for (Window *child : this->children) {
+    child->ParentLeft();
+  }
 
-    if (!mIsChild)
-    {
-        SAFERELEASE(mRenderTarget);
-        SAFEDELETE(this->timerIDs);
-        SAFEDELETE(this->userMsgIDs);
-    }
+  if (!mIsChild) {
+    SAFERELEASE(mRenderTarget);
+    SAFEDELETE(this->timerIDs);
+    SAFEDELETE(this->userMsgIDs);
+  }
 
-    SAFEDELETE(mWindowData);
-    SAFEDELETE(mSettings);
-    free((LPVOID)this->text);
+  SAFEDELETE(mWindowData);
+  SAFEDELETE(mSettings);
+  free((LPVOID)this->text);
 }
 
 
 /// <summary>
 /// Adds a brush owner.
 /// </summary>
-void Window::AddBrushOwner(IBrushOwner *owner, LPCTSTR name)
-{
-    mBrushOwners[name] = owner;
+void Window::AddBrushOwner(IBrushOwner *owner, LPCTSTR name) {
+  mBrushOwners[name] = owner;
 }
 
 
@@ -253,16 +245,15 @@ void Window::AddBrushOwner(IBrushOwner *owner, LPCTSTR name)
 /// <param name="position">Where to place the overlay, relative to the parent.</param>
 /// <param name="icon">The icon to use as an overlay.</param>
 /// <returns>An object which can be used to modify/remove this overlay.</returns>
-Window::OVERLAY Window::AddOverlay(D2D1_RECT_F position, HICON icon, int zOrder)
-{
-    IWICBitmap *source = nullptr;
-    IWICImagingFactory *factory = nullptr;
+Window::OVERLAY Window::AddOverlay(D2D1_RECT_F position, HICON icon, int zOrder) {
+  IWICBitmap *source = nullptr;
+  IWICImagingFactory *factory = nullptr;
 
-    Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
+  Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
 
-    // Generate a WIC bitmap and call the overloaded AddOverlay function
-    factory->CreateBitmapFromHICON(icon, &source);
-    return AddOverlay(position, source, zOrder);
+  // Generate a WIC bitmap and call the overloaded AddOverlay function
+  factory->CreateBitmapFromHICON(icon, &source);
+  return AddOverlay(position, source, zOrder);
 }
 
 
@@ -272,16 +263,15 @@ Window::OVERLAY Window::AddOverlay(D2D1_RECT_F position, HICON icon, int zOrder)
 /// <param name="position">Where to place the overlay, relative to the parent.</param>
 /// <param name="bitmap">The bitmap to use as an overlay.</param>
 /// <returns>An object which can be used to modify/remove this overlay.</returns>
-Window::OVERLAY Window::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap, int zOrder)
-{
-    IWICBitmap *source = nullptr;
-    IWICImagingFactory *factory = nullptr;
-    
-    Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
+Window::OVERLAY Window::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap, int zOrder) {
+  IWICBitmap *source = nullptr;
+  IWICImagingFactory *factory = nullptr;
 
-    // Generate a WIC bitmap and call the overloaded AddOverlay function
-    factory->CreateBitmapFromHBITMAP(bitmap, nullptr, WICBitmapUseAlpha, &source);
-    return AddOverlay(position, source, zOrder);
+  Factories::GetWICFactory(reinterpret_cast<LPVOID*>(&factory));
+
+  // Generate a WIC bitmap and call the overloaded AddOverlay function
+  factory->CreateBitmapFromHBITMAP(bitmap, nullptr, WICBitmapUseAlpha, &source);
+  return AddOverlay(position, source, zOrder);
 }
 
 
@@ -291,14 +281,13 @@ Window::OVERLAY Window::AddOverlay(D2D1_RECT_F position, HBITMAP bitmap, int zOr
 /// <param name="position">Where to place the overlay, relative to the parent.</param>
 /// <param name="source">The bitmap to use as an overlay.</param>
 /// <returns>An object which can be used to modify/remove this overlay.</returns>
-Window::OVERLAY Window::AddOverlay(D2D1_RECT_F position, IWICBitmapSource* source, int zOrder)
-{
-    Overlay *overlay = new Overlay(position, this->drawingArea, source, zOrder);
-    overlay->ReCreateDeviceResources(mRenderTarget);
+Window::OVERLAY Window::AddOverlay(D2D1_RECT_F position, IWICBitmapSource *source, int zOrder) {
+  Overlay *overlay = new Overlay(position, this->drawingArea, source, zOrder);
+  overlay->ReCreateDeviceResources(mRenderTarget);
 
-    OVERLAY iter;
-    for (iter = this->overlays.begin(); iter != this->overlays.end() && iter->GetZOrder() < overlay->GetZOrder(); ++iter);
-    return this->overlays.insert(iter.mIter, overlay);
+  OVERLAY iter;
+  for (iter = this->overlays.begin(); iter != this->overlays.end() && iter->GetZOrder() < overlay->GetZOrder(); ++iter);
+  return this->overlays.insert(iter.mIter, overlay);
 }
 
 
@@ -307,13 +296,12 @@ Window::OVERLAY Window::AddOverlay(D2D1_RECT_F position, IWICBitmapSource* sourc
 /// </summary>
 /// <param name="painter">The painter.</param>
 /// <returns>An object which can be used to modify/remove this painter.</returns>
-Window::PAINTER Window::AddPostPainter(IPainter* painter)
-{
-    PAINTER ret = this->postPainters.insert(this->postPainters.end(), painter);
-    ret->ReCreateDeviceResources(mRenderTarget);
-    ret->UpdatePosition(this->drawingArea);
+Window::PAINTER Window::AddPostPainter(IPainter* painter) {
+  PAINTER ret = this->postPainters.insert(this->postPainters.end(), painter);
+  ret->ReCreateDeviceResources(mRenderTarget);
+  ret->UpdatePosition(this->drawingArea);
 
-    return ret;
+  return ret;
 }
 
 
@@ -411,7 +399,7 @@ void Window::DiscardDeviceResources()
     {
         mRenderTarget = nullptr;
     }
-    
+
     for (IPainter *painter : this->prePainters)
     {
         painter->DiscardDeviceResources();
@@ -453,7 +441,7 @@ void Window::EnableMouseForwarding()
 
 
 /// <summary>
-/// Should be called when a fullscreen window has 
+/// Should be called when a fullscreen window has
 /// </summary>
 void Window::FullscreenActivated(HMONITOR monitor, HWND fullscreenWindow)
 {
@@ -880,7 +868,7 @@ void Window::Initialize(WindowSettings &windowSettings, IStateRender *stateRende
         ::SetParent(this->window, nullptr);
         SetWindowPos(this->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
     }
-    
+
     // Set the text.
     SetText(mWindowSettings.text);
 
@@ -946,7 +934,7 @@ void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
 
         // Paint the active state's background.
         mStateRender->Paint(mRenderTarget, mWindowData);
-        
+
         // Pre painters.
         for (IPainter *painter : this->prePainters)
         {
@@ -967,13 +955,13 @@ void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
         {
             painter->Paint(mRenderTarget);
         }
-        
+
         inAnimation |= mAnimating;
         if (mAnimating && mIsChild)
         {
             Animate();
         }
-        
+
         mRenderTarget->PopAxisAlignedClip();
     }
 }
@@ -1013,8 +1001,8 @@ void Window::ParentLeft()
     mParent = nullptr;
     UpdateParentVariables();
     SendToAll(nullptr, WM_TOPPARENTLOST, 0, 0, this);
-    
-    if (*mParentName != '\0') 
+
+    if (*mParentName != '\0')
     {
         nCore::System::AddWindowRegistrationListener(mParentName, this);
     }
@@ -1147,7 +1135,7 @@ HRESULT Window::ReCreateDeviceResources()
             {
                 RETURNONFAIL(hr, overlay->ReCreateDeviceResources(mRenderTarget));
             }
-    
+
             for (IPainter *painter : this->postPainters)
             {
                 RETURNONFAIL(hr, painter->ReCreateDeviceResources(mRenderTarget));
@@ -1449,8 +1437,8 @@ bool Window::UpdateDWMColor(ARGB newColor)
     }
 
     ret = mStateRender->UpdateDWMColor(newColor, mRenderTarget) || ret;
-    
-    for (IPainter *painter : this->postPainters) 
+
+    for (IPainter *painter : this->postPainters)
     {
         ret = painter->UpdateDWMColor(newColor, mRenderTarget) || ret;
     }
@@ -1497,7 +1485,7 @@ void Window::UpdateParentVariables()
 void Window::SetParent(Window *newParent)
 {
     ASSERT(mParent == nullptr);
-    
+
     mParent = newParent;
     mParent->children.push_back(this);
 
@@ -1556,7 +1544,7 @@ void Window::SetPosition(Distance x, Distance y, Distance width, Distance height
   D2D1_SIZE_F newSize = D2D1::SizeF(width.Evaluate(parentSize.width), height.Evaluate(parentSize.height));
   D2D1_POINT_2F newPosition = D2D1::Point2F(x.Evaluate(parentSize.width), y.Evaluate(parentSize.height));
 
-  // 
+  //
   bool isResize = newSize.height != mSize.height || newSize.width != mSize.width;
   bool isMove = newPosition.x != mPosition.x || newPosition.y != mPosition.y;
 

@@ -3,16 +3,15 @@
  *  The nModules Project
  *
  *  Essentially, anything that needs to draw.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "../Utilities/Common.h"
+#include "../Utilities/CommonD2D.h"
 #include "WindowSettings.hpp"
 #include "State.hpp"
 #include "Overlay.hpp"
 #include "MessageHandler.hpp"
-#include <d2d1.h>
 #include <vector>
 #include <list>
 #include <map>
@@ -62,7 +61,7 @@ public:
         // calls to RegisterUserMessage and SetCallbackTimer are invalidated.
         WM_TOPPARENTLOST = WM_USER,
 
-        // Sent when the top-level parent has gone away. At this point, all 
+        // Sent when the top-level parent has gone away. At this point, all
         // calls to RegisterUserMessage and SetCallbackTimer are invalidated.
         // However, the receiver can now feel free to re-register with either
         // of those functions.
@@ -73,7 +72,7 @@ public:
         // LOWORD(wParam): new height
         // lParam: Custom value sent to resize
         WM_SIZECHANGE,
-        
+
         // Sent after the window has moved.
         // HIGHWORD(wParam): new x
         // LOWORD(wParam): new y
@@ -122,7 +121,7 @@ private:
     // Constructor used by CreateChild to create a child window.
     explicit Window(Window *parent, Settings *settings, MessageHandler *msgHandler);
 
-    // 
+    //
 public:
     void AddBrushOwner(IBrushOwner *owner, LPCTSTR name);
 
@@ -177,7 +176,7 @@ public:
 
     // Returns the screen-coordinate position of this window.
     void GetScreenRect(LPRECT rect);
-    
+
     //
     State *GetState(LPCTSTR stateName);
 
@@ -449,7 +448,7 @@ private:
     // True when there is a fullscreen window covering this label. Only valid when this is a top level window.
     bool mCoveredByFullscreen;
 
-    // 
+    //
     std::map<std::wstring, IBrushOwner*> mBrushOwners;
 
     // All currently active locks.

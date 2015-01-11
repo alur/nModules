@@ -11,10 +11,10 @@
 #include "DesktopPainter.hpp"
 #include "../nShared/MonitorInfo.hpp"
 #include "../nShared/Factories.h"
+#include "../Utilities/CommonD2D.h"
 #include "../Utilities/StopWatch.hpp"
 #include "../nCoreCom/Core.h"
 #include "ClickHandler.hpp"
-#include <d2d1.h>
 #include <wincodec.h>
 #include <assert.h>
 #include <algorithm>

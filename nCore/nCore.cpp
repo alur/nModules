@@ -70,18 +70,18 @@ EXPORT_CDECL(MonitorInfo&) FetchMonitorInfo() {
 static LRESULT WINAPI MainProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
   switch (message) {
   case LM_GETREVID:
-  {
-    size_t length;
-    StringCchPrintfW((LPWSTR)lParam, 64, L"%s: ", TEXT(MODULE_NAME));
-    length = lstrlenW((LPWSTR)lParam);
-    GetVersionString(MakeVersion(MODULE_VERSION), (LPWSTR)lParam + length, 64 - length, false);
+    {
+      size_t length;
+      StringCchPrintfW((LPWSTR)lParam, 64, L"%s: ", TEXT(MODULE_NAME));
+      length = lstrlenW((LPWSTR)lParam);
+      GetVersionString(MakeVersion(MODULE_VERSION), (LPWSTR)lParam + length, 64 - length, false);
 
-    if (SUCCEEDED(StringCchLengthW((LPWSTR)lParam, 64, &length))) {
-      return length;
+      if (SUCCEEDED(StringCchLengthW((LPWSTR)lParam, 64, &length))) {
+        return length;
+      }
+
+      lParam = NULL;
     }
-
-    lParam = NULL;
-  }
     return 0;
 
   case LM_REFRESH:

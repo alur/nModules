@@ -6,6 +6,8 @@
 //-------------------------------------------------------------------------------------------------
 #include "DoubleNullStringList.hpp"
 
+#include <stdlib.h>
+
 
 DoubleNullStringList::DoubleNullStringList()
   : mCchSize(2)

@@ -3,13 +3,15 @@
  *  The nModules Project
  *
  *  Settings used by Window.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include <d2d1.h>
-#include <dwrite.h>
 #include "Settings.hpp"
+
+#include "../Utilities/CommonD2D.h"
+
+#include <dwrite.h>
 
 class WindowSettings {
 public:

@@ -5,10 +5,12 @@
  *  An overlay for a drawable window. An image or an icon.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#include "Factories.h"
 #include "LiteStep.h"
 #include "Overlay.hpp"
-#include "Factories.h"
-#include <d2d1.h>
+
+#include "../Utilities/CommonD2D.h"
+
 #include <Wincodec.h>
 
 using namespace D2D1;

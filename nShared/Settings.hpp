@@ -8,7 +8,9 @@
 #pragma once
 
 #include "LiteStep.h"
-#include <d2d1.h>
+
+#include "../Utilities/CommonD2D.h"
+
 #include <memory>
 
 class Settings;

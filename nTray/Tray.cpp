@@ -166,7 +166,7 @@ bool Tray::WantIcon(IconData &iconData) {
   // 1. Process name
   WCHAR processName[MAX_PATH];
   GetProcessName(iconData.window, false, processName, _countof(processName));
-    
+
   for (IconId &iconId : mIconBlacklist) {
     switch (iconId.type) {
     case IconId::Type::GUID:
@@ -202,7 +202,7 @@ void Tray::RemoveIcon(TrayIcon *pIcon) {
   vector<TrayIcon*>::const_iterator icon = FindIcon(pIcon);
   if (icon != mIcons.end()) {
     mIcons.erase(icon);
-        
+
     if (pIcon == mActiveBalloonIcon) {
       DismissBalloon(NIN_BALLOONHIDE);
     }
@@ -418,7 +418,7 @@ void Tray::ShowNextBalloon() {
   // Get the user notification state.
   QUERY_USER_NOTIFICATION_STATE state;
   SHQueryUserNotificationState(&state);
-    
+
   // If we are not accepting notifications at this time, we should wait.
   if (state != 0 && state != QUNS_ACCEPTS_NOTIFICATIONS && state != QUNS_QUIET_TIME) {
     if (mBalloonTimer == 0) {
@@ -440,7 +440,7 @@ void Tray::ShowNextBalloon() {
 
     d = *mQueuedBalloons.begin();
     mQueuedBalloons.pop_front();
-        
+
     // TODO::Maybe we should permit balloons for icons which have gone away.
   } while(FindIcon(d.icon) == mIcons.end() || state == QUNS_QUIET_TIME &&
     (d.infoFlags & NIIF_RESPECT_QUIET_TIME) == NIIF_RESPECT_QUIET_TIME);
@@ -464,7 +464,7 @@ void Tray::ShowNextBalloon() {
   } else if ((d.infoFlags & NIIF_USER) == NIIF_USER && d.balloonIcon != nullptr) {
     icon = d.balloonIcon;
   }
-    
+
   if (mBalloonTimer == 0) {
     mBalloonTimer = mWindow->SetCallbackTimer(mBalloonTime, this);
     if ((d.infoFlags & NIIF_NOSOUND) != NIIF_NOSOUND && !mNoNotificationSounds) {
