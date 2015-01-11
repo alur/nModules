@@ -66,11 +66,11 @@ bool PopupItem::ParseDotIcon(LPCTSTR dotIcon)
     }
 
     // TODO::May cause problems with paths which include a comma.
-    LPTSTR index = (LPTSTR)_tcsrchr(dotIcon, L',');
+    LPTSTR index = (LPTSTR)wcsrchr(dotIcon, L',');
     int nIndex;
     if (index != NULL) {
         index++[0] = NULL;
-        nIndex = _ttoi(index);
+        nIndex = _wtoi(index);
     }
     else {
         nIndex = 0;
@@ -90,10 +90,10 @@ bool PopupItem::ParseDotIcon(LPCTSTR dotIcon)
 
 void PopupItem::AddIcon(HICON icon) {
     D2D1_RECT_F f;
-    f.top = this->iconSettings->GetFloat(_T("Y"), 2.0f);
-    f.bottom = f.top + this->iconSettings->GetFloat(_T("Size"), 16.0f);
-    f.left = this->iconSettings->GetFloat(_T("X"), 2.0f);
-    f.right = f.left + this->iconSettings->GetFloat(_T("Size"), 16.0f);
+    f.top = this->iconSettings->GetFloat(L"Y", 2.0f);
+    f.bottom = f.top + this->iconSettings->GetFloat(L"Size", 16.0f);
+    f.left = this->iconSettings->GetFloat(L"X", 2.0f);
+    f.right = f.left + this->iconSettings->GetFloat(L"Size", 16.0f);
     this->iconOverlay = mWindow->AddOverlay(f, icon);
 }
 

@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Custom HRESULT codes used by the nModules.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 

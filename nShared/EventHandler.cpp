@@ -107,7 +107,7 @@ void EventHandler::HandleMessage(HWND, UINT msg, WPARAM wParam, LPARAM /* lParam
 /// </summary>
 void EventHandler::LoadSettings(bool /* bIsRefresh */)
 {
-    this->settings->IterateOverCommandLines(_T("On"), std::bind(&EventHandler::AddHandler, this, std::placeholders::_1));
+    this->settings->IterateOverCommandLines(L"On", std::bind(&EventHandler::AddHandler, this, std::placeholders::_1));
 }
 
 
@@ -221,33 +221,33 @@ bool EventHandler::Matches(ClickData a, ClickData b) {
 /// Gets the clicktype from a user input string.
 /// </summary>
 EventHandler::EventType EventHandler::TypeFromString(LPCTSTR str) {
-    if (_tcsicmp(str, _T("WheelUp")) == 0) return WHEELUP;
-    if (_tcsicmp(str, _T("WheelDown")) == 0) return WHEELDOWN;
-    if (_tcsicmp(str, _T("WheelRight")) == 0) return WHEELRIGHT;
-    if (_tcsicmp(str, _T("WheelLeft")) == 0) return WHEELLEFT;
+    if (_wcsicmp(str, L"WheelUp") == 0) return WHEELUP;
+    if (_wcsicmp(str, L"WheelDown") == 0) return WHEELDOWN;
+    if (_wcsicmp(str, L"WheelRight") == 0) return WHEELRIGHT;
+    if (_wcsicmp(str, L"WheelLeft") == 0) return WHEELLEFT;
 
-    if (_tcsicmp(str, _T("LeftClickDown")) == 0) return LEFTDOWN;
-    if (_tcsicmp(str, _T("LeftClickUp")) == 0) return LEFTUP;
-    if (_tcsicmp(str, _T("LeftDoubleClick")) == 0) return LEFTDOUBLE;
+    if (_wcsicmp(str, L"LeftClickDown") == 0) return LEFTDOWN;
+    if (_wcsicmp(str, L"LeftClickUp") == 0) return LEFTUP;
+    if (_wcsicmp(str, L"LeftDoubleClick") == 0) return LEFTDOUBLE;
 
-    if (_tcsicmp(str, _T("MiddleClickDown")) == 0) return MIDDLEDOWN;
-    if (_tcsicmp(str, _T("MiddleClickUp")) == 0) return MIDDLEUP;
-    if (_tcsicmp(str, _T("MiddleDoubleClick")) == 0) return MIDDLEDOUBLE;
+    if (_wcsicmp(str, L"MiddleClickDown") == 0) return MIDDLEDOWN;
+    if (_wcsicmp(str, L"MiddleClickUp") == 0) return MIDDLEUP;
+    if (_wcsicmp(str, L"MiddleDoubleClick") == 0) return MIDDLEDOUBLE;
 
-    if (_tcsicmp(str, _T("RightClickDown")) == 0) return RIGHTDOWN;
-    if (_tcsicmp(str, _T("RightClickUp")) == 0) return RIGHTUP;
-    if (_tcsicmp(str, _T("RightDoubleClick")) == 0) return RIGHTDOUBLE;
+    if (_wcsicmp(str, L"RightClickDown") == 0) return RIGHTDOWN;
+    if (_wcsicmp(str, L"RightClickUp") == 0) return RIGHTUP;
+    if (_wcsicmp(str, L"RightDoubleClick") == 0) return RIGHTDOUBLE;
 
-    if (_tcsicmp(str, _T("X1ClickDown")) == 0) return X1DOWN;
-    if (_tcsicmp(str, _T("X1ClickUp")) == 0) return X1UP;
-    if (_tcsicmp(str, _T("X1DoubleClick")) == 0) return X1DOUBLE;
+    if (_wcsicmp(str, L"X1ClickDown") == 0) return X1DOWN;
+    if (_wcsicmp(str, L"X1ClickUp") == 0) return X1UP;
+    if (_wcsicmp(str, L"X1DoubleClick") == 0) return X1DOUBLE;
 
-    if (_tcsicmp(str, _T("X2ClickDown")) == 0) return X2DOWN;
-    if (_tcsicmp(str, _T("X2ClickUp")) == 0) return X2UP;
-    if (_tcsicmp(str, _T("X2DoubleClick")) == 0) return X2DOUBLE;
+    if (_wcsicmp(str, L"X2ClickDown") == 0) return X2DOWN;
+    if (_wcsicmp(str, L"X2ClickUp") == 0) return X2UP;
+    if (_wcsicmp(str, L"X2DoubleClick") == 0) return X2DOUBLE;
 
-    if (_tcsicmp(str, _T("Leave")) == 0) return LEAVE;
-    if (_tcsicmp(str, _T("Enter")) == 0) return ENTER;
+    if (_wcsicmp(str, L"Leave") == 0) return LEAVE;
+    if (_wcsicmp(str, L"Enter") == 0) return ENTER;
 
     return UNKNOWN;
 }
@@ -260,17 +260,17 @@ WORD EventHandler::ModsFromString(LPTSTR str) {
     WORD ret = 0x0000;
 
     LPTSTR context;
-    LPTSTR tok = _tcstok_s(str, _T("+"), &context);
+    LPTSTR tok = wcstok_s(str, L"+", &context);
     while (tok != NULL) {
-        if (_tcsicmp(tok, _T("ctrl")) == 0) ret |= MK_CONTROL;
-        else if (_tcsicmp(tok, _T("mouseleft")) == 0) ret |= MK_LBUTTON;
-        else if (_tcsicmp(tok, _T("mousemiddle")) == 0) ret |= MK_MBUTTON;
-        else if (_tcsicmp(tok, _T("mouseright")) == 0) ret |= MK_RBUTTON;
-        else if (_tcsicmp(tok, _T("shift")) == 0) ret |= MK_SHIFT;
-        else if (_tcsicmp(tok, _T("mousex1")) == 0) ret |= MK_XBUTTON1;
-        else if (_tcsicmp(tok, _T("mousex2")) == 0) ret |= MK_XBUTTON2;
-        else if (_tcsicmp(tok, _T("alt"))  == 0) ret |= MK_ALT;
-        tok = _tcstok_s(NULL, _T("+"), &context);
+        if (_wcsicmp(tok, L"ctrl") == 0) ret |= MK_CONTROL;
+        else if (_wcsicmp(tok, L"mouseleft") == 0) ret |= MK_LBUTTON;
+        else if (_wcsicmp(tok, L"mousemiddle") == 0) ret |= MK_MBUTTON;
+        else if (_wcsicmp(tok, L"mouseright") == 0) ret |= MK_RBUTTON;
+        else if (_wcsicmp(tok, L"shift") == 0) ret |= MK_SHIFT;
+        else if (_wcsicmp(tok, L"mousex1") == 0) ret |= MK_XBUTTON1;
+        else if (_wcsicmp(tok, L"mousex2") == 0) ret |= MK_XBUTTON2;
+        else if (_wcsicmp(tok, L"alt")  == 0) ret |= MK_ALT;
+        tok = wcstok_s(NULL, L"+", &context);
     }
 
     return ret;

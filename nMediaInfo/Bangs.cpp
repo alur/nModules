@@ -35,7 +35,7 @@ namespace Bangs
     static const BangItem bangMap[] =
     {
         // Skips to the previous track
-        BangItem(_T("!MediaPrevious"), [] (HWND, LPCTSTR)
+        BangItem(L"!MediaPrevious", [] (HWND, LPCTSTR)
         {
             HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
             if (WA2Window != nullptr)
@@ -45,7 +45,7 @@ namespace Bangs
         }),
 
         // Starts playing
-        BangItem(_T("!MediaPlay"), [] (HWND, LPCTSTR)
+        BangItem(L"!MediaPlay", [] (HWND, LPCTSTR)
         {
             HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
             if (WA2Window != nullptr)
@@ -55,7 +55,7 @@ namespace Bangs
         }),
         
         // Pauses the current track
-        BangItem(_T("!MediaPause"), [] (HWND, LPCTSTR)
+        BangItem(L"!MediaPause", [] (HWND, LPCTSTR)
         {
             HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
             if (WA2Window != nullptr)
@@ -65,7 +65,7 @@ namespace Bangs
         }),
 
         // Pauses the current track if currently playing. Plays if stoped.
-        BangItem(_T("!MediaPlayPause"), [] (HWND, LPCTSTR)
+        BangItem(L"!MediaPlayPause", [] (HWND, LPCTSTR)
         {
             HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
             if (WA2Window != nullptr)
@@ -77,7 +77,7 @@ namespace Bangs
         }),
 
         // Stops playing.
-        BangItem(_T("!MediaStop"), [] (HWND, LPCTSTR)
+        BangItem(L"!MediaStop", [] (HWND, LPCTSTR)
         {
             HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
             if (WA2Window != nullptr)
@@ -87,7 +87,7 @@ namespace Bangs
         }),
 
         // Skips to the next track.
-        BangItem(_T("!MediaNext"), [] (HWND, LPCTSTR)
+        BangItem(L"!MediaNext", [] (HWND, LPCTSTR)
         {
             HWND WA2Window = FindWindowW(L"Winamp v1.x", nullptr);
             if (WA2Window != nullptr)

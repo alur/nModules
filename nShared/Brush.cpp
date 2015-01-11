@@ -47,18 +47,18 @@ void Brush::Load(BrushSettings* settings)
 {
     this->brushSettings = settings;
 
-    if (_tcsicmp(this->brushSettings->brushType, _T("Image")) == 0)
+    if (_wcsicmp(this->brushSettings->brushType, L"Image") == 0)
     {
         this->brushType = Type::Image;
     }
-    else if (_tcsicmp(this->brushSettings->brushType, _T("LinearGradient")) == 0)
+    else if (_wcsicmp(this->brushSettings->brushType, L"LinearGradient") == 0)
     {
         this->brushType = Type::LinearGradient;
         this->gradientStart = D2D1::Point2F(this->brushSettings->gradientStartX, this->brushSettings->gradientStartY);
         this->gradientEnd = D2D1::Point2F(this->brushSettings->gradientEndX, this->brushSettings->gradientEndY);
         LoadGradientStops();
     }
-    else if (_tcsicmp(this->brushSettings->brushType, _T("RadialGradient")) == 0)
+    else if (_wcsicmp(this->brushSettings->brushType, L"RadialGradient") == 0)
     {
         this->brushType = Type::RadialGradient;
         this->gradientCenter = D2D1::Point2F(this->brushSettings->gradientCenterX, this->brushSettings->gradientCenterY);
@@ -70,23 +70,23 @@ void Brush::Load(BrushSettings* settings)
         this->brushType = Type::SolidColor;
     }
 
-    if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Tile")) == 0)
+    if (_wcsicmp(this->brushSettings->imageScalingMode, L"Tile") == 0)
     {
         this->scalingMode = ImageScalingMode::Tile;
     }
-    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Fit")) == 0)
+    else if (_wcsicmp(this->brushSettings->imageScalingMode, L"Fit") == 0)
     {
         this->scalingMode = ImageScalingMode::Fit;
     }
-    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Fill")) == 0)
+    else if (_wcsicmp(this->brushSettings->imageScalingMode, L"Fill") == 0)
     {
         this->scalingMode = ImageScalingMode::Fill;
     }
-    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Stretch")) == 0)
+    else if (_wcsicmp(this->brushSettings->imageScalingMode, L"Stretch") == 0)
     {
         this->scalingMode = ImageScalingMode::Stretch;
     }
-    else if (_tcsicmp(this->brushSettings->imageScalingMode, _T("Edges")) == 0)
+    else if (_wcsicmp(this->brushSettings->imageScalingMode, L"Edges") == 0)
     {
         this->scalingMode = ImageScalingMode::Edges;
     }
@@ -95,11 +95,11 @@ void Brush::Load(BrushSettings* settings)
         this->scalingMode = ImageScalingMode::Center;
     }
 
-    if (_tcsicmp(this->brushSettings->tilingModeX, _T("Mirror")) == 0)
+    if (_wcsicmp(this->brushSettings->tilingModeX, L"Mirror") == 0)
     {
         this->tileModeX = D2D1_EXTEND_MODE_MIRROR;
     }
-    else if (_tcsicmp(this->brushSettings->tilingModeX, _T("Clamp")) == 0)
+    else if (_wcsicmp(this->brushSettings->tilingModeX, L"Clamp") == 0)
     {
         this->tileModeX = D2D1_EXTEND_MODE_CLAMP;
     }
@@ -108,11 +108,11 @@ void Brush::Load(BrushSettings* settings)
         this->tileModeX = D2D1_EXTEND_MODE_WRAP;
     }
 
-    if (_tcsicmp(this->brushSettings->tilingModeY, _T("Mirror")) == 0)
+    if (_wcsicmp(this->brushSettings->tilingModeY, L"Mirror") == 0)
     {
         this->tileModeY = D2D1_EXTEND_MODE_MIRROR;
     }
-    else if (_tcsicmp(this->brushSettings->tilingModeY, _T("Clamp")) == 0)
+    else if (_wcsicmp(this->brushSettings->tilingModeY, L"Clamp") == 0)
     {
         this->tileModeY = D2D1_EXTEND_MODE_CLAMP;
     }
@@ -140,7 +140,7 @@ void Brush::LoadGradientStops()
         LPTSTR endPtr;
 
         IColorVal *color = ParseColor(colorToken, defaultColor.get());
-        stop = _tcstof(stopToken, &endPtr);
+        stop = wcstof(stopToken, &endPtr);
 
         this->gradientStops = (D2D1_GRADIENT_STOP*)realloc(this->gradientStops, ++this->gradientStopCount*sizeof(D2D1_GRADIENT_STOP));
         this->gradientStopColors = (IColorVal**)realloc(this->gradientStopColors, this->gradientStopCount*sizeof(IColorVal*));

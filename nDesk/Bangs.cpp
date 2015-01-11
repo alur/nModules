@@ -31,38 +31,38 @@ namespace Bangs {
 
     BangItem bangMap[] = {
         // Sets the work area.
-        BangItem(_T("SetWorkArea"), [] (HWND, LPCTSTR args) {
+        BangItem(L"SetWorkArea", [] (HWND, LPCTSTR args) {
             WorkArea::ParseLine(&nCore::FetchMonitorInfo(), args);
             SendNotifyMessage(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
         }),
         
         // Adds a click handler.
-        BangItem(_T("On"), [] (HWND, LPCTSTR args) {
+        BangItem(L"On", [] (HWND, LPCTSTR args) {
             g_pClickHandler->AddHandler(args);
         }),
 
         // Removes click handlers.
-        BangItem(_T("Off"), [] (HWND, LPCTSTR args) {
+        BangItem(L"Off", [] (HWND, LPCTSTR args) {
             g_pClickHandler->RemoveHandlers(args);
         }),
 
         // Sets the transition duration.
-        BangItem(_T("SetTransitionDuration"), [] (HWND, LPCTSTR args) {
-            g_pDesktopPainter->SetTransitionTime(_ttoi(args));
+        BangItem(L"SetTransitionDuration", [] (HWND, LPCTSTR args) {
+            g_pDesktopPainter->SetTransitionTime(_wtoi(args));
         }),
 
         // Sets the transition square size. Force it to be >= 2.
-        BangItem(_T("SetTransitionSquareSize"), [] (HWND, LPCTSTR args) {
-            g_pDesktopPainter->SetSquareSize(std::max(2, _ttoi(args)));
+        BangItem(L"SetTransitionSquareSize", [] (HWND, LPCTSTR args) {
+            g_pDesktopPainter->SetSquareSize(std::max(2, _wtoi(args)));
         }),
 
         // Sets the transition effect.
-        BangItem(_T("SetTransitionEffect"), [] (HWND, LPCTSTR args) {
+        BangItem(L"SetTransitionEffect", [] (HWND, LPCTSTR args) {
             g_pDesktopPainter->SetTransitionType(nDesk::Settings::TransitionTypeFromString(args));
         }),
 
         // Sets or clears the invalid all on update flag.
-        BangItem(_T("SetInvalidateAllOnUpdate"), [] (HWND, LPCTSTR args) {
+        BangItem(L"SetInvalidateAllOnUpdate", [] (HWND, LPCTSTR args) {
             g_pDesktopPainter->SetInvalidateAllOnUpdate(LiteStep::ParseBool(args));
         })
     };
@@ -76,7 +76,7 @@ void Bangs::_Register() {
     TCHAR bangName[64];
     for (auto &bang : bangMap)
     {
-        StringCchPrintf(bangName, _countof(bangName), _T("!nDesk%s"), bang.name);
+        StringCchPrintf(bangName, _countof(bangName), L"!nDesk%s", bang.name);
         LiteStep::AddBangCommand(bangName, bang.command);
     }
 }
@@ -89,7 +89,7 @@ void Bangs::_Unregister() {
     TCHAR bangName[64];
     for (auto &bang : bangMap)
     {
-        StringCchPrintf(bangName, _countof(bangName), _T("!nDesk%s"), bang.name);
+        StringCchPrintf(bangName, _countof(bangName), L"!nDesk%s", bang.name);
         LiteStep::RemoveBangCommand(bangName);
     }
 }

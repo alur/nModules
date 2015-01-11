@@ -47,21 +47,21 @@ static const StateRender<TaskButton::State>::InitData sInitData(
 /// Loads these button settings from the settings file.
 /// </summary>
 void ButtonSettings::Load(Settings *buttonSettings) {
-    mUseFlashing = buttonSettings->GetBool(_T("UseFlashing"), true);
-    mFlashInterval = buttonSettings->GetInt(_T("FlashInterval"), 500);
-    mNoIcons = buttonSettings->GetBool(_T("NoIcons"), false);
+    mUseFlashing = buttonSettings->GetBool(L"UseFlashing", true);
+    mFlashInterval = buttonSettings->GetInt(L"FlashInterval", 500);
+    mNoIcons = buttonSettings->GetBool(L"NoIcons", false);
 
     //
-    Settings *iconSettings = buttonSettings->CreateChild(_T("Icon"));
-    float iconSize = iconSettings->GetFloat(_T("Size"), 32);
-    float iconX = iconSettings->GetFloat(_T("X"), 2);
-    float iconY = iconSettings->GetFloat(_T("Y"), 2);
+    Settings *iconSettings = buttonSettings->CreateChild(L"Icon");
+    float iconSize = iconSettings->GetFloat(L"Size", 32);
+    float iconX = iconSettings->GetFloat(L"X", 2);
+    float iconY = iconSettings->GetFloat(L"Y", 2);
     mIconRect = D2D1::RectF(iconX, iconY, iconX + iconSize, iconY + iconSize);
 
     //
-    float overlayIconSize = iconSettings->GetFloat(_T("OverlaySize"), 16);
-    float overlayIconOffsetX = iconSettings->GetFloat(_T("OverlayOffsetX"), 1);
-    float overlayIconOffsetY = iconSettings->GetFloat(_T("OverlayOffsetY"), 1);
+    float overlayIconSize = iconSettings->GetFloat(L"OverlaySize", 16);
+    float overlayIconOffsetX = iconSettings->GetFloat(L"OverlayOffsetX", 1);
+    float overlayIconOffsetY = iconSettings->GetFloat(L"OverlayOffsetY", 1);
     mOverlayIconRect = D2D1::RectF(
         iconX + iconSize - overlayIconSize + overlayIconOffsetX,
         iconY + iconSize - overlayIconSize + overlayIconOffsetY,

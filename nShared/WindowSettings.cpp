@@ -24,9 +24,9 @@ using SettingMap = const Unordered1To1Map<
 // String < -- > D2D1_TEXT_ANTIALIAS_MODE
 static SettingMap<D2D1_TEXT_ANTIALIAS_MODE> textAntiAliasModeMap(
 {
-    { D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE, _T("ClearType") },
-    { D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE, _T("GrayScale") },
-    { D2D1_TEXT_ANTIALIAS_MODE_ALIASED,   _T("Aliased")   }
+    { D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE, L"ClearType" },
+    { D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE, L"GrayScale" },
+    { D2D1_TEXT_ANTIALIAS_MODE_ALIASED,   L"Aliased"   }
 });
 
 
@@ -69,20 +69,20 @@ void WindowSettings::Load(const Settings *settings, const WindowSettings *defaul
     defaults = this;
   }
 
-  this->alwaysOnTop = settings->GetBool(_T("AlwaysOnTop"), defaults->alwaysOnTop);
-  this->blurBehind = settings->GetBool(_T("BlurBehind"), defaults->blurBehind);
-  this->clickThrough = settings->GetBool(_T("ClickThrough"), defaults->clickThrough);
+  this->alwaysOnTop = settings->GetBool(L"AlwaysOnTop", defaults->alwaysOnTop);
+  this->blurBehind = settings->GetBool(L"BlurBehind", defaults->blurBehind);
+  this->clickThrough = settings->GetBool(L"ClickThrough", defaults->clickThrough);
   this->evaluateText = defaults->evaluateText;
-  this->height = settings->GetDistance(_T("Height"), defaults->height);
-  this->hidden = settings->GetBool(_T("Hidden"), defaults->hidden);
+  this->height = settings->GetDistance(L"Height", defaults->height);
+  this->hidden = settings->GetBool(L"Hidden", defaults->hidden);
   this->registerWithCore = defaults->registerWithCore;
-  settings->GetString(_T("Text"), buf, _countof(buf), defaults->text);
+  settings->GetString(L"Text", buf, _countof(buf), defaults->text);
   StringCchCopy(this->text, _countof(this->text), buf);
-  settings->GetString(_T("TextAntiAliasMode"), buf, _countof(buf), textAntiAliasModeMap.GetByA(defaults->textAntiAliasMode, _T("ClearType")));
+  settings->GetString(L"TextAntiAliasMode", buf, _countof(buf), textAntiAliasModeMap.GetByA(defaults->textAntiAliasMode, L"ClearType"));
   this->textAntiAliasMode = ParseAntiAliasMode(buf);
-  this->width = settings->GetDistance(_T("Width"), defaults->width);
-  this->x = settings->GetDistance(_T("X"), defaults->x);
-  this->y = settings->GetDistance(_T("Y"), defaults->y);
+  this->width = settings->GetDistance(L"Width", defaults->width);
+  this->x = settings->GetDistance(L"X", defaults->x);
+  this->y = settings->GetDistance(L"Y", defaults->y);
 }
 
 

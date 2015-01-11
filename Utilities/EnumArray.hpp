@@ -14,7 +14,6 @@
 #include <functional>
 #include <initializer_list>
 
-
 /// <summary>
 /// Increments the value of enumVal
 /// </summary>
@@ -22,7 +21,6 @@ template <typename EnumType>
 static EnumType EnumIncrement(EnumType &enumVal) {
   return enumVal = EnumType(std::underlying_type<EnumType>::type(enumVal) + 1);
 }
-
 
 /// <summary>
 /// Decrements the value of enumVal
@@ -32,16 +30,13 @@ static EnumType EnumDecrement(EnumType &enumVal) {
   return enumVal = EnumType(std::underlying_type<EnumType>::type(enumVal) - 1);
 }
 
-
 template<class ElementType, class IndexType>
 class EnumArray {
 public:
   /// <summary>
   /// Constructor
   /// </summary>
-  explicit EnumArray() {
-  }
-    
+  EnumArray() {}
 
   /// <summary>
   /// Constructor
@@ -55,7 +50,6 @@ public:
     va_end(list);
   }
 
-    
   /// <summary>
   /// Constructor
   /// </summary>
@@ -66,11 +60,10 @@ public:
     }
   }
 
-    
   /// <summary>
   /// Callback constructor.
   /// </summary>
-  explicit EnumArray(std::function<void (EnumArray<ElementType, IndexType> &)> init) {
+  explicit EnumArray(std::function<void(EnumArray<ElementType, IndexType> &)> init) {
     init(*this);
   }
 
@@ -82,14 +75,12 @@ public:
     return mArray[std::underlying_type<IndexType>::type(index)];
   }
 
-
   /// <summary>
   /// Retrives the element correspoding to the specified index.
   /// </summary>
   const ElementType &operator[] (IndexType index) const {
     return mArray[std::underlying_type<IndexType>::type(index)];
   }
-    
 
   /// <summary>
   /// Returns a pointer to the first element in the array.
@@ -97,7 +88,6 @@ public:
   ElementType *begin() {
     return &mArray[0];
   }
-    
 
   /// <summary>
   /// Returns a pointer to the one-past-last element in the array.
@@ -105,7 +95,6 @@ public:
   ElementType *end() {
     return &mArray[std::underlying_type<IndexType>::type(IndexType::Count)];
   }
-
 
   /// <summary>
   /// Sets every element in the array to some value.

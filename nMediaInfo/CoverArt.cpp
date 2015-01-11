@@ -162,7 +162,7 @@ void CoverArt::Update()
     WCHAR filePath[MAX_PATH];
 
     // Get Winamps HWND
-    if ((WA2Window = FindWindow(_T("Winamp v1.x"), nullptr)) == nullptr)
+    if ((WA2Window = FindWindow(L"Winamp v1.x", nullptr)) == nullptr)
     {
         return;
     }

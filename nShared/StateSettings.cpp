@@ -24,75 +24,75 @@ using SettingMap = const Unordered1To1Map<
 
 static SettingMap<DWRITE_READING_DIRECTION> readingDirectionMap(
 {
-    { DWRITE_READING_DIRECTION_LEFT_TO_RIGHT, _T("LeftToRight") },
-    { DWRITE_READING_DIRECTION_RIGHT_TO_LEFT, _T("RightToLeft") }
+    { DWRITE_READING_DIRECTION_LEFT_TO_RIGHT, L"LeftToRight" },
+    { DWRITE_READING_DIRECTION_RIGHT_TO_LEFT, L"RightToLeft" }
 });
 
 static SettingMap<DWRITE_WORD_WRAPPING> wordWrappingMap(
 {
-    { DWRITE_WORD_WRAPPING_NO_WRAP, _T("NoWrap") },
-    { DWRITE_WORD_WRAPPING_WRAP,    _T("Wrap")   }
+    { DWRITE_WORD_WRAPPING_NO_WRAP, L"NoWrap" },
+    { DWRITE_WORD_WRAPPING_WRAP,    L"Wrap"   }
 });
 
 static SettingMap<DWRITE_FONT_STYLE> fontStyleMap(
 {
-    { DWRITE_FONT_STYLE_NORMAL,  _T("Normal")     },
-    { DWRITE_FONT_STYLE_OBLIQUE, _T("Oblique")    },
-    { DWRITE_FONT_STYLE_ITALIC,  _T("Italic")     }
+    { DWRITE_FONT_STYLE_NORMAL,  L"Normal"     },
+    { DWRITE_FONT_STYLE_OBLIQUE, L"Oblique"    },
+    { DWRITE_FONT_STYLE_ITALIC,  L"Italic"     }
 });
 
 static SettingMap<DWRITE_TEXT_ALIGNMENT> textAlignmentMap(
 {
-    { DWRITE_TEXT_ALIGNMENT_LEADING,  _T("Left")   },
-    { DWRITE_TEXT_ALIGNMENT_CENTER,   _T("Center") },
-    { DWRITE_TEXT_ALIGNMENT_TRAILING, _T("Right")  }
+    { DWRITE_TEXT_ALIGNMENT_LEADING,  L"Left"   },
+    { DWRITE_TEXT_ALIGNMENT_CENTER,   L"Center" },
+    { DWRITE_TEXT_ALIGNMENT_TRAILING, L"Right"  }
 });
 
 static SettingMap<DWRITE_PARAGRAPH_ALIGNMENT> paragraphAlignmentMap(
 {
-    { DWRITE_PARAGRAPH_ALIGNMENT_NEAR,     _T("Top")     },
-    { DWRITE_PARAGRAPH_ALIGNMENT_CENTER,   _T("Middle")  },
-    { DWRITE_PARAGRAPH_ALIGNMENT_FAR,      _T("Bottom")  }
+    { DWRITE_PARAGRAPH_ALIGNMENT_NEAR,     L"Top"     },
+    { DWRITE_PARAGRAPH_ALIGNMENT_CENTER,   L"Middle"  },
+    { DWRITE_PARAGRAPH_ALIGNMENT_FAR,      L"Bottom"  }
 });
 
 static SettingMap<DWRITE_TRIMMING_GRANULARITY> trimmingGranularityMap(
 {
-    { DWRITE_TRIMMING_GRANULARITY_CHARACTER,    _T("Character") },
-    { DWRITE_TRIMMING_GRANULARITY_WORD,         _T("Word")      },
-    { DWRITE_TRIMMING_GRANULARITY_NONE,         _T("None")      }
+    { DWRITE_TRIMMING_GRANULARITY_CHARACTER,    L"Character" },
+    { DWRITE_TRIMMING_GRANULARITY_WORD,         L"Word"      },
+    { DWRITE_TRIMMING_GRANULARITY_NONE,         L"None"      }
 });
 
 static SettingMap<DWRITE_FONT_STRETCH> fontStretchMap(
 {
-    { DWRITE_FONT_STRETCH_NORMAL,           _T("Normal")          },
-    { DWRITE_FONT_STRETCH_ULTRA_CONDENSED,  _T("Ultra Condensed") },
-    { DWRITE_FONT_STRETCH_EXTRA_CONDENSED,  _T("Extra Condensed") },
-    { DWRITE_FONT_STRETCH_CONDENSED,        _T("Condensed")       },
-    { DWRITE_FONT_STRETCH_SEMI_CONDENSED,   _T("Semi Condensed")  },
-    { DWRITE_FONT_STRETCH_MEDIUM,           _T("Medium")          },
-    { DWRITE_FONT_STRETCH_SEMI_EXPANDED,    _T("Semi Expanded")   },
-    { DWRITE_FONT_STRETCH_EXPANDED,         _T("Expanded")        },
-    { DWRITE_FONT_STRETCH_EXTRA_EXPANDED,   _T("Extra Expanded")  },
-    { DWRITE_FONT_STRETCH_ULTRA_EXPANDED,   _T("Ultra Expanded")  }
+    { DWRITE_FONT_STRETCH_NORMAL,           L"Normal"          },
+    { DWRITE_FONT_STRETCH_ULTRA_CONDENSED,  L"Ultra Condensed" },
+    { DWRITE_FONT_STRETCH_EXTRA_CONDENSED,  L"Extra Condensed" },
+    { DWRITE_FONT_STRETCH_CONDENSED,        L"Condensed"       },
+    { DWRITE_FONT_STRETCH_SEMI_CONDENSED,   L"Semi Condensed"  },
+    { DWRITE_FONT_STRETCH_MEDIUM,           L"Medium"          },
+    { DWRITE_FONT_STRETCH_SEMI_EXPANDED,    L"Semi Expanded"   },
+    { DWRITE_FONT_STRETCH_EXPANDED,         L"Expanded"        },
+    { DWRITE_FONT_STRETCH_EXTRA_EXPANDED,   L"Extra Expanded"  },
+    { DWRITE_FONT_STRETCH_ULTRA_EXPANDED,   L"Ultra Expanded"  }
 });
 
 static SettingMap<DWRITE_FONT_WEIGHT> fontWeightMap(
 {
-    { DWRITE_FONT_WEIGHT_THIN,         _T("Thin")         },
-    { DWRITE_FONT_WEIGHT_EXTRA_LIGHT,  _T("Extra Light")  },
-    { DWRITE_FONT_WEIGHT_ULTRA_LIGHT,  _T("Ultra Light")  },
-    { DWRITE_FONT_WEIGHT_LIGHT,        _T("Light")        },
-    { DWRITE_FONT_WEIGHT_SEMI_LIGHT,   _T("Semi Light")   },
-    { DWRITE_FONT_WEIGHT_REGULAR,      _T("Regular")      },
-    { DWRITE_FONT_WEIGHT_MEDIUM,       _T("Medium")       },
-    { DWRITE_FONT_WEIGHT_SEMI_BOLD,    _T("Semi Bold")    },
-    { DWRITE_FONT_WEIGHT_BOLD,         _T("Bold")         },
-    { DWRITE_FONT_WEIGHT_EXTRA_BOLD,   _T("Extra Bold")   },
-    { DWRITE_FONT_WEIGHT_ULTRA_BOLD,   _T("Ultra Bold")   },
-    { DWRITE_FONT_WEIGHT_BLACK,        _T("Black")        },
-    { DWRITE_FONT_WEIGHT_HEAVY,        _T("Heavy")        },
-    { DWRITE_FONT_WEIGHT_EXTRA_BLACK,  _T("Extra Black")  },
-    { DWRITE_FONT_WEIGHT_ULTRA_BLACK,  _T("Ultra Black")  }
+    { DWRITE_FONT_WEIGHT_THIN,         L"Thin"         },
+    { DWRITE_FONT_WEIGHT_EXTRA_LIGHT,  L"Extra Light"  },
+    { DWRITE_FONT_WEIGHT_ULTRA_LIGHT,  L"Ultra Light"  },
+    { DWRITE_FONT_WEIGHT_LIGHT,        L"Light"        },
+    { DWRITE_FONT_WEIGHT_SEMI_LIGHT,   L"Semi Light"   },
+    { DWRITE_FONT_WEIGHT_REGULAR,      L"Regular"      },
+    { DWRITE_FONT_WEIGHT_MEDIUM,       L"Medium"       },
+    { DWRITE_FONT_WEIGHT_SEMI_BOLD,    L"Semi Bold"    },
+    { DWRITE_FONT_WEIGHT_BOLD,         L"Bold"         },
+    { DWRITE_FONT_WEIGHT_EXTRA_BOLD,   L"Extra Bold"   },
+    { DWRITE_FONT_WEIGHT_ULTRA_BOLD,   L"Ultra Bold"   },
+    { DWRITE_FONT_WEIGHT_BLACK,        L"Black"        },
+    { DWRITE_FONT_WEIGHT_HEAVY,        L"Heavy"        },
+    { DWRITE_FONT_WEIGHT_EXTRA_BLACK,  L"Extra Black"  },
+    { DWRITE_FONT_WEIGHT_ULTRA_BLACK,  L"Ultra Black"  }
 });
 
 
@@ -119,7 +119,7 @@ State::Settings::Settings()
     , textVerticalAlign(DWRITE_PARAGRAPH_ALIGNMENT_NEAR)
     , wordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP)
 {
-    StringCchCopy(this->font, _countof(this->font), _T("Arial"));
+    StringCchCopy(this->font, _countof(this->font), L"Arial");
     brushSettings[State::BrushType::Text].color = Color::Create(0xFFFFFFFF);
 }
 
@@ -135,56 +135,56 @@ void State::Settings::Load(const ::Settings * settings, const Settings * default
         defaults = this;
     }
 
-    this->cornerRadiusX = settings->GetFloat(_T("CornerRadiusX"), defaults->cornerRadiusX);
-    this->cornerRadiusY = settings->GetFloat(_T("CornerRadiusY"), defaults->cornerRadiusY);
-    settings->GetString(_T("Font"), buffer, _countof(buffer), defaults->font);
+    this->cornerRadiusX = settings->GetFloat(L"CornerRadiusX", defaults->cornerRadiusX);
+    this->cornerRadiusY = settings->GetFloat(L"CornerRadiusY", defaults->cornerRadiusY);
+    settings->GetString(L"Font", buffer, _countof(buffer), defaults->font);
     StringCchCopy(this->font, _countof(this->font), buffer);
-    this->fontSize = settings->GetFloat(_T("FontSize"), defaults->fontSize);
+    this->fontSize = settings->GetFloat(L"FontSize", defaults->fontSize);
 
-    settings->GetString(_T("FontStretch"), buffer, _countof(buffer), fontStretchMap.GetByA(defaults->fontStretch, _T("Normal")));
+    settings->GetString(L"FontStretch", buffer, _countof(buffer), fontStretchMap.GetByA(defaults->fontStretch, L"Normal"));
     this->fontStretch = ParseFontStretch(buffer);
 
-    settings->GetString(_T("FontStyle"), buffer, _countof(buffer), fontStyleMap.GetByA(defaults->fontStyle, _T("Normal")));
+    settings->GetString(L"FontStyle", buffer, _countof(buffer), fontStyleMap.GetByA(defaults->fontStyle, L"Normal"));
     this->fontStyle = ParseFontStyle(buffer);
 
-    settings->GetString(_T("FontWeight"), buffer, _countof(buffer), fontWeightMap.GetByA(defaults->fontWeight, _T("Regular")));
+    settings->GetString(L"FontWeight", buffer, _countof(buffer), fontWeightMap.GetByA(defaults->fontWeight, L"Regular"));
     this->fontWeight = ParseFontWeight(buffer);
 
-    this->outlineWidth = settings->GetFloat(_T("OutlineWidth"), defaults->outlineWidth);
+    this->outlineWidth = settings->GetFloat(L"OutlineWidth", defaults->outlineWidth);
 
-    settings->GetString(_T("ReadingDirection"), buffer, _countof(buffer), readingDirectionMap.GetByA(defaults->readingDirection, _T("LeftToRight")));
+    settings->GetString(L"ReadingDirection", buffer, _countof(buffer), readingDirectionMap.GetByA(defaults->readingDirection, L"LeftToRight"));
     this->readingDirection = ParseReadingDirection(buffer);
 
-    settings->GetString(_T("TextAlign"), buffer, _countof(buffer), textAlignmentMap.GetByA(defaults->textAlign, _T("Left")));
+    settings->GetString(L"TextAlign", buffer, _countof(buffer), textAlignmentMap.GetByA(defaults->textAlign, L"Left"));
     this->textAlign = ParseTextAlignment(buffer);
 
-    this->textOffsetBottom = settings->GetFloat(_T("TextOffsetBottom"), defaults->textOffsetBottom);
-    this->textOffsetLeft = settings->GetFloat(_T("TextOffsetLeft"), defaults->textOffsetLeft);
-    this->textOffsetRight = settings->GetFloat(_T("TextOffsetRight"), defaults->textOffsetRight);
-    this->textOffsetTop = settings->GetFloat(_T("TextOffsetTop"), defaults->textOffsetTop);
-    this->textRotation = settings->GetFloat(_T("TextRotation"), defaults->textRotation);
+    this->textOffsetBottom = settings->GetFloat(L"TextOffsetBottom", defaults->textOffsetBottom);
+    this->textOffsetLeft = settings->GetFloat(L"TextOffsetLeft", defaults->textOffsetLeft);
+    this->textOffsetRight = settings->GetFloat(L"TextOffsetRight", defaults->textOffsetRight);
+    this->textOffsetTop = settings->GetFloat(L"TextOffsetTop", defaults->textOffsetTop);
+    this->textRotation = settings->GetFloat(L"TextRotation", defaults->textRotation);
 
-    this->fontStrokeWidth = settings->GetFloat(_T("FontStrokeWidth"), defaults->fontStrokeWidth);
+    this->fontStrokeWidth = settings->GetFloat(L"FontStrokeWidth", defaults->fontStrokeWidth);
     
-    settings->GetString(_T("TextTrimmingGranularity"), buffer, _countof(buffer), trimmingGranularityMap.GetByA(defaults->textTrimmingGranularity, _T("Character")));
+    settings->GetString(L"TextTrimmingGranularity", buffer, _countof(buffer), trimmingGranularityMap.GetByA(defaults->textTrimmingGranularity, L"Character"));
     this->textTrimmingGranularity = ParseTrimmingGranularity(buffer);
     
-    settings->GetString(_T("TextVerticalAlign"), buffer, _countof(buffer), paragraphAlignmentMap.GetByA(defaults->textVerticalAlign, _T("Top")));
+    settings->GetString(L"TextVerticalAlign", buffer, _countof(buffer), paragraphAlignmentMap.GetByA(defaults->textVerticalAlign, L"Top"));
     this->textVerticalAlign = ParseParagraphAlignment(buffer);
 
-    settings->GetString(_T("WordWrapping"), buffer, _countof(buffer), wordWrappingMap.GetByA(defaults->wordWrapping, _T("NoWrap")));
+    settings->GetString(L"WordWrapping", buffer, _countof(buffer), wordWrappingMap.GetByA(defaults->wordWrapping, L"NoWrap"));
     this->wordWrapping = ParseWordWrapping(buffer);
 
     // Load brushes
     this->brushSettings[State::BrushType::Background].Load(settings, &defaults->brushSettings[State::BrushType::Background]);
     
-    ::Settings* outlineSettings = settings->CreateChild(_T("Outline"));
+    ::Settings* outlineSettings = settings->CreateChild(L"Outline");
     this->brushSettings[State::BrushType::Outline].Load(outlineSettings, &defaults->brushSettings[State::BrushType::Outline]);
 
-    ::Settings* textSettings = settings->CreateChild(_T("Font"));
+    ::Settings* textSettings = settings->CreateChild(L"Font");
     this->brushSettings[State::BrushType::Text].Load(textSettings, &defaults->brushSettings[State::BrushType::Text]);
 
-    ::Settings* textOutlineSettings = textSettings->CreateChild(_T("Stroke"));
+    ::Settings* textOutlineSettings = textSettings->CreateChild(L"Stroke");
     this->brushSettings[State::BrushType::TextStroke].Load(textOutlineSettings, &defaults->brushSettings[State::BrushType::TextStroke]);
     
     delete outlineSettings;

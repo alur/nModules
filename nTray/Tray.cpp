@@ -15,6 +15,7 @@
 #include "../Utilities/Math.h"
 #include "../Utilities/Process.h"
 
+#include <algorithm>
 #include <map>
 #include <Mmsystem.h>
 #include <shellapi.h>
@@ -55,9 +56,9 @@ Tray::Tray(LPCTSTR name)
 
   LoadSettings();
 
-  mInfoIcon = LoadIcon(NULL, IDI_INFORMATION);
-  mWarningIcon = LoadIcon(NULL, IDI_WARNING);
-  mErrorIcon = LoadIcon(NULL, IDI_ERROR);
+  mInfoIcon = LoadIcon(nullptr, IDI_INFORMATION);
+  mWarningIcon = LoadIcon(nullptr, IDI_WARNING);
+  mErrorIcon = LoadIcon(nullptr, IDI_ERROR);
 }
 
 
@@ -394,10 +395,10 @@ void Tray::EnqueueBalloon(TrayIcon *icon, LPCWSTR infoTitle, LPCWSTR info, DWORD
 /// </summary>
 void Tray::DismissBalloon(UINT message) {
   // Reset the timer.
-  SetTimer(mWindow->GetWindowHandle(), mBalloonTimer, mBalloonTime, NULL);
+  SetTimer(mWindow->GetWindowHandle(), mBalloonTimer, mBalloonTime, nullptr);
 
   mBalloon.Hide();
-  mActiveBalloonIcon->SendCallback(message, NULL, NULL);
+  mActiveBalloonIcon->SendCallback(message, 0, 0);
   mActiveBalloonIcon = nullptr;
 
   ShowNextBalloon();
@@ -410,7 +411,7 @@ void Tray::DismissBalloon(UINT message) {
 void Tray::ShowNextBalloon() {
   if (mActiveBalloonIcon != nullptr) {
     mBalloon.Hide();
-    mActiveBalloonIcon->SendCallback(NIN_BALLOONTIMEOUT, NULL, NULL);
+    mActiveBalloonIcon->SendCallback(NIN_BALLOONTIMEOUT, 0, 0);
     mActiveBalloonIcon = nullptr;
   }
 
@@ -453,21 +454,21 @@ void Tray::ShowNextBalloon() {
     iconSize.cy = GetSystemMetrics(SM_CYSMICON);
   }
 
-  HICON icon = NULL;
+  HICON icon = nullptr;
   if ((d.infoFlags & 0x3) == NIIF_INFO) {
     icon = mInfoIcon;
   } else if ((d.infoFlags & 0x3) == NIIF_WARNING) {
     icon = mWarningIcon;
   } else if ((d.infoFlags & 0x3) == NIIF_ERROR) {
     icon = mErrorIcon;
-  } else if ((d.infoFlags & NIIF_USER) == NIIF_USER && d.balloonIcon != NULL) {
+  } else if ((d.infoFlags & NIIF_USER) == NIIF_USER && d.balloonIcon != nullptr) {
     icon = d.balloonIcon;
   }
     
   if (mBalloonTimer == 0) {
     mBalloonTimer = mWindow->SetCallbackTimer(mBalloonTime, this);
     if ((d.infoFlags & NIIF_NOSOUND) != NIIF_NOSOUND && !mNoNotificationSounds) {
-      PlaySoundW(mNotificationSound, NULL, SND_ALIAS | SND_ASYNC | SND_SYSTEM | SND_NODEFAULT);
+      PlaySoundW(mNotificationSound, nullptr, SND_ALIAS | SND_ASYNC | SND_SYSTEM | SND_NODEFAULT);
     }
   }
 

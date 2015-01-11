@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  GUID.h
- *  The nModules Project
- *
- *  Utilities for dealing with GUIDs.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/GUID.h
+// The nModules Project
+//
+// Utilities for dealing with GUIDs.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 BOOL GUIDFromStringA(LPCSTR guidString, LPGUID guid);

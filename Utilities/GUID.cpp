@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  GUID.cpp
- *  The nModules Project
- *
- *  Utilities for dealing with GUIDs.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/GUID.cpp
+// The nModules Project
+//
+// Utilities for dealing with GUIDs.
+//-------------------------------------------------------------------------------------------------
 #include "Common.h"
 #include "GUID.h"
 
@@ -16,11 +15,11 @@
 /// <param name="guid">Out, the parsed GUID.</param>
 /// <returns>FALSE if the parsing failed.</param>
 BOOL GUIDFromStringA(LPCSTR guidString, LPGUID guid) {
-  typedef BOOL(WINAPI* PROCTYPE)(LPCSTR, LPGUID);
+  typedef BOOL(WINAPI *PROCTYPE)(LPCSTR, LPGUID);
   static PROCTYPE proc = nullptr;
 
   if (proc == nullptr) {
-    proc = (PROCTYPE)GetProcAddress(GetModuleHandle(_T("Shell32.dll")), (LPCSTR)703);
+    proc = (PROCTYPE)GetProcAddress(GetModuleHandle(L"Shell32.dll"), (LPCSTR)703);
   }
 
   if (proc) {
@@ -38,11 +37,11 @@ BOOL GUIDFromStringA(LPCSTR guidString, LPGUID guid) {
 /// <param name="guid">Out, the parsed GUID.</param>
 /// <returns>FALSE if the parsing failed.</param>
 BOOL GUIDFromStringW(LPCWSTR guidString, LPGUID guid) {
-  typedef BOOL(WINAPI* PROCTYPE)(LPCWSTR, LPGUID);
+  typedef BOOL(WINAPI *PROCTYPE)(LPCWSTR, LPGUID);
   static PROCTYPE proc = nullptr;
 
   if (proc == nullptr) {
-    proc = (PROCTYPE)GetProcAddress(GetModuleHandle(_T("Shell32.dll")), (LPCSTR)704);
+    proc = (PROCTYPE)GetProcAddress(GetModuleHandle(L"Shell32.dll"), (LPCSTR)704);
   }
 
   if (proc) {

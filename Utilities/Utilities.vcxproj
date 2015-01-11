@@ -100,6 +100,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClInclude Include="AlgorithmExtension.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="CommonD2D.h" />
     <ClInclude Include="DoubleNullStringList.hpp" />
@@ -118,7 +119,6 @@
     <ClInclude Include="StringUtils.h" />
     <ClInclude Include="UIDGenerator.hpp" />
     <ClInclude Include="Unordered1To1Map.hpp" />
-    <ClInclude Include="UnorderedMap.hpp" />
     <ClInclude Include="Versioning.h" />
   </ItemGroup>
   <ItemGroup>

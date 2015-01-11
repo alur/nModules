@@ -7,8 +7,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
-#include "../Utilities/Common.h"
-#include <d2d1.h>
+#include "../Utilities/CommonD2D.h"
 #include <dwrite.h>
 #include "Settings.hpp"
 #include <memory>
@@ -16,7 +15,7 @@
 class BrushSettings {
 public:
   BrushSettings();
-  BrushSettings(void init(BrushSettings &));
+  explicit BrushSettings(void init(BrushSettings&));
   explicit BrushSettings(const BrushSettings &source);
   ~BrushSettings();
 

@@ -9,9 +9,6 @@
 #include "StopWatch.hpp"
 
 
-/// <summary
-/// Constructor
-/// </summary>
 StopWatch::StopWatch() {
   QueryPerformanceFrequency((LARGE_INTEGER*)&mClockRate);
   QueryPerformanceCounter((LARGE_INTEGER*)&mLastClock);
@@ -19,9 +16,6 @@ StopWatch::StopWatch() {
 }
 
 
-/// <summary>
-/// Returns the number of seconds since this StopWatch was created, or Clock was called.
-/// </summary>
 float StopWatch::Clock() {
   __int64 currentClock;
   float timeSinceLastCall;
@@ -34,9 +28,6 @@ float StopWatch::Clock() {
 }
 
 
-/// <summary>
-/// Returns the number of seconds since this StopWatch was created, or Clock was called.
-/// </summary>
 float StopWatch::GetTime() const {
   __int64 currentClock;
   QueryPerformanceCounter((LARGE_INTEGER*)&currentClock);
@@ -44,9 +35,6 @@ float StopWatch::GetTime() const {
 }
 
 
-/// <summary>
-/// Returns the total number of seconds this clock has been alive.
-/// </summary>
 float StopWatch::GetTotalTime() const {
   __int64 currentClock;
   QueryPerformanceCounter((LARGE_INTEGER*)&currentClock);

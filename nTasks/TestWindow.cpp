@@ -72,12 +72,12 @@ void TestWindow::InitOverlay()
     mOverlayDescription = GetDlgItem(mDialogWindow, IDC_OVERLAY_DESC);
 
     //
-    mOverlayItems.push_back(OverlayItem(_T("None"), nullptr));
-    mOverlayItems.push_back(OverlayItem(_T("Alert"), LoadIcon(NULL, IDI_ASTERISK)));
-    mOverlayItems.push_back(OverlayItem(_T("Question"), LoadIcon(NULL, IDI_QUESTION)));
-    mOverlayItems.push_back(OverlayItem(_T("Error"), LoadIcon(NULL, IDI_ERROR)));
-    mOverlayItems.push_back(OverlayItem(_T("Warning"), LoadIcon(NULL, IDI_WARNING)));
-    mOverlayItems.push_back(OverlayItem(_T("Shield"), LoadIcon(NULL, IDI_SHIELD)));
+    mOverlayItems.push_back(OverlayItem(L"None", nullptr));
+    mOverlayItems.push_back(OverlayItem(L"Alert", LoadIcon(NULL, IDI_ASTERISK)));
+    mOverlayItems.push_back(OverlayItem(L"Question", LoadIcon(NULL, IDI_QUESTION)));
+    mOverlayItems.push_back(OverlayItem(L"Error", LoadIcon(NULL, IDI_ERROR)));
+    mOverlayItems.push_back(OverlayItem(L"Warning", LoadIcon(NULL, IDI_WARNING)));
+    mOverlayItems.push_back(OverlayItem(L"Shield", LoadIcon(NULL, IDI_SHIELD)));
 
     //
     mOverlayImages = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, (int)mOverlayItems.size(), 10);
@@ -317,9 +317,9 @@ static void ErrorHandler(LPCTSTR description, HRESULT error)
     TCHAR hrDescription[MAX_LINE_LENGTH];
 
     DescriptionFromHR(error, hrDescription, _countof(hrDescription));
-    StringCchPrintf(errorMessage, _countof(errorMessage), _T("Error creating test window. %s\n\n%s"), description, hrDescription);
+    StringCchPrintf(errorMessage, _countof(errorMessage), L"Error creating test window. %s\n\n%s", description, hrDescription);
 
-    MessageBox(nullptr, errorMessage, _T("nTask Error"), MB_OK | MB_ICONERROR);
+    MessageBox(nullptr, errorMessage, L"nTask Error", MB_OK | MB_ICONERROR);
 }
 
 
@@ -341,39 +341,39 @@ static void WindowWorker(HINSTANCE instance)
             {
                 TestWindow window(taskbarList, instance);
 
-                HWND parent = CreateWindowEx(WS_EX_APPWINDOW, _T("Static"), _T(""), WS_OVERLAPPEDWINDOW, 0, 0, 50, 50, nullptr, nullptr, instance, 0);
+                HWND parent = CreateWindowEx(WS_EX_APPWINDOW, L"Static", L"", WS_OVERLAPPEDWINDOW, 0, 0, 50, 50, nullptr, nullptr, instance, 0);
 
                 if (parent)
                 {
                     if (DialogBoxParam(instance, MAKEINTRESOURCE(IDD_TEST_WINDOW), parent, TestWindow::ExternDialogProc, (LPARAM)&window) == -1)
                     {
-                        ErrorHandler(_T("DialogBoxParam failed."), HRESULT_FROM_WIN32(GetLastError()));
+                        ErrorHandler(L"DialogBoxParam failed.", HRESULT_FROM_WIN32(GetLastError()));
                     }
 
                     DestroyWindow(parent);
                 }
                 else
                 {
-                    ErrorHandler(_T("CreateWindowEx failed."), HRESULT_FROM_WIN32(GetLastError()));
+                    ErrorHandler(L"CreateWindowEx failed.", HRESULT_FROM_WIN32(GetLastError()));
                 }
             }
             else
             {
-                ErrorHandler(_T("ITaskbarList::HrInit failed."), hr);
+                ErrorHandler(L"ITaskbarList::HrInit failed.", hr);
             }
 
             taskbarList->Release();
         }
         else
         {
-            ErrorHandler(_T("CoCreateInstance(IID_ITaskbarList4) failed."), hr);
+            ErrorHandler(L"CoCreateInstance(IID_ITaskbarList4) failed.", hr);
         }
 
         CoUninitialize();
     }
     else
     {
-        ErrorHandler(_T("Failed to get module handle."), hr);
+        ErrorHandler(L"Failed to get module handle.", hr);
     }
 }
 
@@ -423,6 +423,6 @@ EXPORT_STDCALL(void) CreateTestWindow(HWND, HINSTANCE, LPTSTR, int)
     }
     else
     {
-        MessageBox(nullptr, _T("Error creating test window. Failed to get module handle :/"), _T("nTask Error"), MB_OK | MB_ICONERROR);
+        MessageBox(nullptr, L"Error creating test window. Failed to get module handle :/", L"nTask Error", MB_OK | MB_ICONERROR);
     }
 }

@@ -12,7 +12,7 @@
 #include <strsafe.h>
 
 // The LSModule class
-LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
+LSModule gLSModule(TEXT(MODULE_NAME), TEXT(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
 const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, 0 };

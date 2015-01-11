@@ -16,7 +16,7 @@
 
 // The messages we want from the core
 static const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
-    LM_FULLSCREENDEACTIVATED, 0 };
+LM_FULLSCREENDEACTIVATED, 0 };
 
 // All current icon groups
 static std::unordered_map<std::wstring, TileGroup> sIconGroups;
@@ -26,7 +26,6 @@ LSModule gLSModule(MODULE_NAME, MODULE_AUTHOR, MakeVersion(MODULE_VERSION));
 
 // The next window in the clipboard viewer chain
 static HWND sNextClipboardViewer;
-
 
 /// <summary>
 /// Creates a new group with the specified name.
@@ -45,7 +44,6 @@ void CreateGroup(LPCWSTR groupName) {
   }
 }
 
-
 /// <summary>
 /// Reads through the .rc files and creates labels.
 /// </summary>
@@ -53,14 +51,12 @@ static void LoadSettings() {
   LiteStep::IterateOverLineTokens(L"*nIcon", CreateGroup);
 }
 
-
 /// <summary>
 /// Unloads everything created by .rc settings or at runtime.
 /// </summary>
 static void Unload() {
   sIconGroups.clear();
 }
-
 
 /// <summary>
 /// Called by the LiteStep core when this module is loaded.
@@ -79,7 +75,6 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
   return 0;
 }
 
-
 /// <summary>
 /// Called by the LiteStep core when this module is about to be unloaded.
 /// </summary>
@@ -89,7 +84,6 @@ EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */) {
   OleUninitialize();
 }
 
-
 /// <summary>
 /// Handles the main window's messages.
 /// </summary>
@@ -98,13 +92,15 @@ EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */) {
 /// <param name="wParam">wParam</param>
 /// <param name="lParam">lParam</param>
 LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
-  switch(message) {
+  switch (message) {
   case WM_CREATE:
-    SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
+    SendMessage(LiteStep::GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)window,
+      (LPARAM)gLSMessages);
     return 0;
 
   case WM_DESTROY:
-    SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window, (LPARAM)gLSMessages);
+    SendMessage(LiteStep::GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)window,
+      (LPARAM)gLSMessages);
     ChangeClipboardChain(window, sNextClipboardViewer);
     return 0;
 

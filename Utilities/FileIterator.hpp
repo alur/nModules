@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  FilterIterator.hpp
- *  The nModules Project
- *
- *  Allows you to iterate over all files matching a certain pattern.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/FilterIterator.hpp
+// The nModules Project
+//
+// Allows you to iterate over all files matching a certain pattern.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 class FileIterator {

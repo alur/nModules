@@ -11,6 +11,7 @@
 #include "../nShared/LSModule.hpp"
 #include "Popup.hpp"
 #include "../Utilities/Math.h"
+#include <algorithm>
 
 
 using std::min;

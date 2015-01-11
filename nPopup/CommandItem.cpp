@@ -14,8 +14,8 @@
 
 CommandItem::CommandItem(LPCTSTR title, LPCTSTR command, Drawable* parent)
     : PopupItem(parent, L"Item", PopupItem::Type::Command)
-    , title(_tcsdup(title))
-    , command(_tcsdup(command))
+    , title(_wcsdup(title))
+    , command(_wcsdup(command))
 {
     mWindow->Initialize(((Popup*)mParent)->mPopupSettings.mCommandWindowSettings, &((Popup*)mParent)->mPopupSettings.mCommandStateRender);
     mWindow->SetText(title);

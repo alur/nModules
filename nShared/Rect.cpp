@@ -6,18 +6,13 @@
 //-------------------------------------------------------------------------------------------------
 #include "Rect.hpp"
 
-
-Rect::Rect() {
-}
-
+Rect::Rect() {}
 
 Rect::Rect(Distance left, Distance top, Distance right, Distance bottom)
   : left(left)
   , top(top)
   , right(right)
-  , bottom(bottom) {
-}
-
+  , bottom(bottom) {}
 
 D2D1_RECT_F Rect::Evaluate(D2D1_SIZE_F parentSize /*, float dpi*/) {
   return D2D1::RectF(

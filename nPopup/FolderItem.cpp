@@ -18,7 +18,7 @@ nPopup::FolderItem::FolderItem(Drawable* parent, Popup* popup, LPCTSTR title)
     , mPopup(popup)
     , mPopupCreator(nullptr)
     , mCreationData(nullptr)
-    , mTitle(_tcsdup(title))
+    , mTitle(_wcsdup(title))
 {
     mWindow->Initialize(((Popup*)mParent)->mPopupSettings.mFolderWindowSettings, &((Popup*)mParent)->mPopupSettings.mFolderStateRender);
     mWindow->SetText(title);

@@ -16,6 +16,7 @@
 #include <Thumbcache.h>
 #include <CommonControls.h>
 #include "../Utilities/Math.h"
+#include <algorithm>
 #include <thread>
 
 
@@ -104,7 +105,7 @@ PCITEMID_CHILD Tile::GetItem() {
 
 
 bool Tile::IsInRect(D2D1_RECT_F rect) {
-  return Math::RectIntersectArea(rect, mWindow->GetDrawingRect()) > 0;
+  return RectIntersectArea(rect, mWindow->GetDrawingRect()) > 0;
 }
 
 

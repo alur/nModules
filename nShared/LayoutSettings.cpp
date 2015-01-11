@@ -43,24 +43,24 @@ void LayoutSettings::Load(Settings *settings, const LayoutSettings *defaults) {
     defaults = this;
   }
 
-  mColumnSpacing = settings->GetInt(_T("ColumnSpacing"), defaults->mColumnSpacing);
-  mPadding = settings->GetOffsetRect(_T("Padding"), &defaults->mPadding);
+  mColumnSpacing = settings->GetInt(L"ColumnSpacing", defaults->mColumnSpacing);
+  mPadding = settings->GetOffsetRect(L"Padding", &defaults->mPadding);
 
-  settings->GetString(_T("Start"), buffer, sizeof(buffer), _T("TopLeft"));
-  if (_tcsicmp(buffer, _T("TopRight")) == 0) {
+  settings->GetString(L"Start", buffer, sizeof(buffer), L"TopLeft");
+  if (_wcsicmp(buffer, L"TopRight") == 0) {
     mStartPosition = StartPosition::TopRight;
-  } else if (_tcsicmp(buffer, _T("BottomLeft")) == 0) {
+  } else if (_wcsicmp(buffer, L"BottomLeft") == 0) {
     mStartPosition = StartPosition::BottomLeft;
-  } else if (_tcsicmp(buffer, _T("BottomRight")) == 0) {
+  } else if (_wcsicmp(buffer, L"BottomRight") == 0) {
     mStartPosition = StartPosition::BottomRight;
   } else {
     mStartPosition = StartPosition::TopLeft;
   }
 
-  this->mRowSpacing = settings->GetInt(_T("RowSpacing"), defaults->mRowSpacing);
+  this->mRowSpacing = settings->GetInt(L"RowSpacing", defaults->mRowSpacing);
 
-  settings->GetString(_T("PrimaryDirection"), buffer, sizeof(buffer), _T("Horizontal"));
-  if (_tcsicmp(buffer, _T("Vertical")) == 0) {
+  settings->GetString(L"PrimaryDirection", buffer, sizeof(buffer), L"Horizontal");
+  if (_wcsicmp(buffer, L"Vertical") == 0) {
     mPrimaryDirection = Direction::Vertical;
   } else {
     mPrimaryDirection = Direction::Horizontal;

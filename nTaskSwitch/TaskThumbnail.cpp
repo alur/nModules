@@ -16,6 +16,7 @@
 #include "../Utilities/Math.h"
 #include <shellapi.h>
 #include "../nCoreCom/Core.h"
+#include <algorithm>
 
 
 extern HWND gDesktopWindow;
@@ -73,7 +74,7 @@ TaskThumbnail::TaskThumbnail(
     }
 
     //
-    double scale = Math::min(
+    double scale = std::min(
         (width - mThumbnailSettings.mThumbnailMargins.left - mThumbnailSettings.mThumbnailMargins.right)/(double)sourceSize.cx,
         (height - mThumbnailSettings.mThumbnailMargins.bottom - mThumbnailSettings.mThumbnailMargins.top)/(double)sourceSize.cy);
     sourceSize.cx = long(sourceSize.cx*scale);
@@ -228,7 +229,7 @@ void TaskThumbnail::UpdateIcon()
     if (mTargetWindow != gDesktopWindow)
     {
         mRequestedIcon = ICON_BIG;
-        SendMessageCallbackW(mTargetWindow, WM_GETICON, ICON_BIG, NULL, UpdateIconCallback, (ULONG_PTR)this);
+        SendMessageCallbackW(mTargetWindow, WM_GETICON, ICON_BIG, 0, UpdateIconCallback, (ULONG_PTR)this);
     }
     else
     {

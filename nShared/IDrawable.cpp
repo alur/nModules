@@ -25,7 +25,7 @@ IDrawable::IDrawable(LPCTSTR prefix)
     //mWindowClass = new WindowClass(mSettings);
     
     TCHAR parentPrefix[MAX_RCCOMMAND];
-    mSettings->GetString(_T("Parent"), parentPrefix, _countof(parentPrefix), _T(""));
+    mSettings->GetString(L"Parent", parentPrefix, _countof(parentPrefix), L"");
 
     auto isInt = [] (LPCWSTR s) -> bool
     {
@@ -36,14 +36,14 @@ IDrawable::IDrawable(LPCTSTR prefix)
                 return false;
             }
         }
-        while (*++s != _T('\0'));
+        while (*++s != L'\0');
 
         return true;
     };
 
-    if (*parentPrefix == _T('\0')
-        || _tcsicmp(parentPrefix, L"VirtualDesktop") == 0
-        || (_tcsnicmp(parentPrefix, L"Monitor", _countof(L"Monitor") - 1) == 0 && isInt(parentPrefix + _countof(L"Monitor") - 1))
+    if (*parentPrefix == L'\0'
+        || _wcsicmp(parentPrefix, L"VirtualDesktop") == 0
+        || (_wcsnicmp(parentPrefix, L"Monitor", _countof(L"Monitor") - 1) == 0 && isInt(parentPrefix + _countof(L"Monitor") - 1))
         )
     {
         mWindow = gLSModule.CreateDrawableWindow(mSettings, this);

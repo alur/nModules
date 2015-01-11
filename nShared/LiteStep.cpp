@@ -21,7 +21,7 @@ using std::function;
 bool LiteStep::GetPrefixedRCBool(LPCTSTR prefix, LPCTSTR keyName, bool defaultValue)
 {
     TCHAR prefixedKey[MAX_RCCOMMAND];
-    StringCchPrintf(prefixedKey, _countof(prefixedKey), _T("%s%s"), prefix, keyName);
+    StringCchPrintf(prefixedKey, _countof(prefixedKey), L"%s%s", prefix, keyName);
     return GetRCBoolDef(prefixedKey, defaultValue ? TRUE : FALSE) != FALSE;
 }
 
@@ -35,7 +35,7 @@ bool LiteStep::GetPrefixedRCBool(LPCTSTR prefix, LPCTSTR keyName, bool defaultVa
 double LiteStep::GetPrefixedRCDouble(LPCTSTR prefix, LPCTSTR keyName, double defaultValue)
 {
     TCHAR prefixedKey[MAX_RCCOMMAND];
-    StringCchPrintf(prefixedKey, _countof(prefixedKey), _T("%s%s"), prefix, keyName);
+    StringCchPrintf(prefixedKey, _countof(prefixedKey), L"%s%s", prefix, keyName);
     return GetRCDouble(prefixedKey, defaultValue);
 }
 
@@ -63,7 +63,7 @@ IColorVal* LiteStep::GetPrefixedRCColor(LPCTSTR prefix, LPCTSTR keyName, const I
 float LiteStep::GetPrefixedRCFloat(LPCTSTR prefix, LPCTSTR keyName, float defaultValue)
 {
     TCHAR prefixedKey[MAX_RCCOMMAND];
-    StringCchPrintf(prefixedKey, _countof(prefixedKey), _T("%s%s"), prefix, keyName);
+    StringCchPrintf(prefixedKey, _countof(prefixedKey), L"%s%s", prefix, keyName);
     return GetRCFloat(prefixedKey, defaultValue);
 }
 
@@ -77,7 +77,7 @@ float LiteStep::GetPrefixedRCFloat(LPCTSTR prefix, LPCTSTR keyName, float defaul
 int LiteStep::GetPrefixedRCInt(LPCTSTR prefix, LPCTSTR keyName, int defaultValue)
 {
     TCHAR prefixedKey[MAX_RCCOMMAND];
-    StringCchPrintf(prefixedKey, _countof(prefixedKey), _T("%s%s"), prefix, keyName);
+    StringCchPrintf(prefixedKey, _countof(prefixedKey), L"%s%s", prefix, keyName);
     return GetRCInt(prefixedKey, defaultValue);
 }
 
@@ -91,7 +91,7 @@ int LiteStep::GetPrefixedRCInt(LPCTSTR prefix, LPCTSTR keyName, int defaultValue
 __int64 LiteStep::GetPrefixedRCInt64(LPCTSTR prefix, LPCTSTR keyName, __int64 defaultValue)
 {
     TCHAR prefixedKey[MAX_RCCOMMAND];
-    StringCchPrintf(prefixedKey, _countof(prefixedKey), _T("%s%s"), prefix, keyName);
+    StringCchPrintf(prefixedKey, _countof(prefixedKey), L"%s%s", prefix, keyName);
     return GetRCInt64(prefixedKey, defaultValue);
 }
 
@@ -108,7 +108,7 @@ __int64 LiteStep::GetPrefixedRCInt64(LPCTSTR prefix, LPCTSTR keyName, __int64 de
 bool LiteStep::GetPrefixedRCLine(LPCTSTR prefix, LPCTSTR keyName, LPTSTR buffer, LPCTSTR defaultValue, size_t cchBuffer)
 {
     TCHAR prefixedKey[MAX_RCCOMMAND];
-    StringCchPrintf(prefixedKey, _countof(prefixedKey), _T("%s%s"), prefix, keyName);
+    StringCchPrintf(prefixedKey, _countof(prefixedKey), L"%s%s", prefix, keyName);
     return GetRCLine(prefixedKey, buffer, (UINT)cchBuffer, defaultValue) != FALSE;
 }
 
@@ -161,7 +161,7 @@ bool LiteStep::GetPrefixedRCString(LPCTSTR prefix, LPCTSTR keyName, LPTSTR buffe
     ASSERT(buffer != defaultValue);
 
     TCHAR prefixedKey[MAX_RCCOMMAND];
-    StringCchPrintf(prefixedKey, _countof(prefixedKey), _T("%s%s"), prefix, keyName);
+    StringCchPrintf(prefixedKey, _countof(prefixedKey), L"%s%s", prefix, keyName);
     return GetRCString(prefixedKey, buffer, defaultValue, (UINT)cchBuffer) != FALSE;
 }
 
@@ -174,7 +174,7 @@ bool LiteStep::GetPrefixedRCString(LPCTSTR prefix, LPCTSTR keyName, LPTSTR buffe
 void LiteStep::IterateOverLines(LPCTSTR keyName, function<void(LPCTSTR line)> callback)
 {
     TCHAR line[MAX_LINE_LENGTH];
-    LPCTSTR callbackLine = line + _tcslen(keyName) + 1;
+    LPCTSTR callbackLine = line + wcslen(keyName) + 1;
     LPVOID f = LCOpen(nullptr);
     while (LCReadNextConfig(f, keyName, line, _countof(line)))
     {
@@ -222,7 +222,7 @@ void LiteStep::IterateOverLineTokens(LPCTSTR keyName, function<void (LPCTSTR tok
 void LiteStep::IterateOverCommandLineTokens(LPCTSTR prefix, LPCTSTR keyName, function<void (LPCTSTR token)> callback)
 {
     TCHAR key[MAX_RCCOMMAND];
-    StringCchPrintf(key, _countof(key), _T("*%s%s"), prefix, keyName);
+    StringCchPrintf(key, _countof(key), L"*%s%s", prefix, keyName);
     IterateOverLines(key, [callback] (LPCTSTR line) -> void
     {
         IterateOverTokens(line, callback);
@@ -236,7 +236,7 @@ void LiteStep::IterateOverCommandLineTokens(LPCTSTR prefix, LPCTSTR keyName, fun
 /// <param name="boolString">The string to parse.</param>
 bool LiteStep::ParseBool(LPCTSTR boolString)
 {
-    return _tcsicmp(_T("off"), boolString) != 0 && _tcsicmp(_T("false"), boolString) != 0 && _tcsicmp(_T("no"), boolString) != 0;
+    return _wcsicmp(L"off", boolString) != 0 && _wcsicmp(L"false", boolString) != 0 && _wcsicmp(L"no", boolString) != 0;
 }
 
 
@@ -264,18 +264,18 @@ UINT LiteStep::ParseMonitor(LPCTSTR monitorString, UINT defaultValue)
         UINT value;
     } monitorMap[] =
     {
-        { _T("primary"),       0 },
-        { _T("secondary"),     1 },
-        { _T("tertiary"),      2 },
-        { _T("quaternary"),    3 },
-        { _T("quinary"),       4 },
-        { _T("senary"),        5 },
-        { _T("septenary"),     6 },
-        { _T("octonary"),      7 },
-        { _T("nonary"),        8 },
-        { _T("denary"),        9 },
-        { _T("duodenary"),    11 },
-        { _T("all"),  0xFFFFFFFF }
+        { L"primary",       0 },
+        { L"secondary",     1 },
+        { L"tertiary",      2 },
+        { L"quaternary",    3 },
+        { L"quinary",       4 },
+        { L"senary",        5 },
+        { L"septenary",     6 },
+        { L"octonary",      7 },
+        { L"nonary",        8 },
+        { L"denary",        9 },
+        { L"duodenary",    11 },
+        { L"all",  0xFFFFFFFF }
     };
 
     if (monitorString == nullptr)
@@ -286,7 +286,7 @@ UINT LiteStep::ParseMonitor(LPCTSTR monitorString, UINT defaultValue)
     // First check if the string is a named value
     for (auto item : monitorMap)
     {
-        if (_tcsicmp(item.name, monitorString) == 0)
+        if (_wcsicmp(item.name, monitorString) == 0)
         {
             return item.value;
         }
@@ -294,8 +294,8 @@ UINT LiteStep::ParseMonitor(LPCTSTR monitorString, UINT defaultValue)
 
     // Try to parse the string as an integer
     LPTSTR endPtr;
-    UINT monitor = _tcstoul(monitorString, &endPtr, 0);
-    if (*monitorString != _T('\0') && *endPtr == _T('\0'))
+    UINT monitor = wcstoul(monitorString, &endPtr, 0);
+    if (*monitorString != L'\0' && *endPtr == L'\0')
     {
         return monitor;
     }

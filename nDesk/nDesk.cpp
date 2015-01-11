@@ -28,7 +28,7 @@ DesktopPainter *g_pDesktopPainter;
 ClickHandler *g_pClickHandler;
 
 // The LSModule class
-LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
+LSModule gLSModule(TEXT(MODULE_NAME), TEXT(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 
 /// <summary>
@@ -39,7 +39,7 @@ EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* 
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.hInstance = instance;
-    wc.lpszClassName = _T("DesktopBackgroundClass");
+    wc.lpszClassName = L"DesktopBackgroundClass";
     wc.hIconSm = 0;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.style = CS_DBLCLKS;

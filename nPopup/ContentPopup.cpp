@@ -29,15 +29,15 @@ ContentPopup::ContentPopup(LPCTSTR path, bool dynamic, LPCTSTR title, LPCTSTR ba
     this->source = ContentSource::PATH;
 
     TCHAR processedPath[MAX_PATH], originalPath[MAX_PATH];
-    LPCTSTR splitter, end = _tcschr(path, L'\0');
+    LPCTSTR splitter, end = wcschr(path, L'\0');
     do
     {
-        splitter = _tcschr(path, L'|');
+        splitter = wcschr(path, L'|');
         StringCchCopyN(originalPath, MAX_PATH, path, (splitter != nullptr ? splitter : end) - path);
         PathCanonicalize(processedPath, originalPath);
         PathRemoveBackslash(processedPath);
 
-        this->paths.push_back(_tcsdup(processedPath));
+        this->paths.push_back(_wcsdup(processedPath));
         path = ++splitter;
     } while (splitter != (LPCTSTR)sizeof(TCHAR));
 }
@@ -101,7 +101,7 @@ void ContentPopup::AddPath(LPCTSTR path)
 
     PathCanonicalize(processedPath, path);
     PathRemoveBackslash(processedPath);
-    this->paths.push_back(_tcsdup(processedPath));
+    this->paths.push_back(_wcsdup(processedPath));
 
     if (this->loaded)
     {

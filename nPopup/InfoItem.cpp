@@ -14,7 +14,7 @@
 
 InfoItem::InfoItem(Drawable* parent, LPCTSTR title, LPCTSTR customIcon)
     : PopupItem(parent, L"InfoItem", PopupItem::Type::Info)
-    , title(_tcsdup(title))
+    , title(_wcsdup(title))
 {
     mWindow->Initialize(((Popup*)mParent)->mPopupSettings.mInfoWindowSettings, &((Popup*)mParent)->mPopupSettings.mInfoStateRender);
     mWindow->SetText(title);

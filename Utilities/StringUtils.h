@@ -18,14 +18,12 @@
 #include <unordered_set>
 #include <vector>
 
-
 namespace StringUtils {
   LPSTR PartialDup(LPCSTR str, size_t cch);
   LPWSTR PartialDup(LPCWSTR str, size_t cch);
   LPSTR ReallocOverwrite(LPSTR dest, LPCSTR str);
   LPWSTR ReallocOverwrite(LPWSTR dest, LPCWSTR str);
 }
-
 
 // <summary>
 // Hashing function for null-terminated strings.
@@ -60,7 +58,6 @@ struct StringHasher {
     return value;
   }
 };
-
 
 // <summary>
 // Case sensitive functions for StringKeyedContainers.
@@ -131,7 +128,6 @@ struct CaseSensitive {
   };
 };
 
-
 // <summary>
 // Case insensitive functions for StringKeyedContainers.
 // </summary>
@@ -201,7 +197,6 @@ struct CaseInsensitive {
   };
 };
 
-
 // <summary>
 // Standard maps using strings as keys.
 // </summary>
@@ -209,19 +204,18 @@ template <
   typename KeyType,
   typename Type,
   typename KeyOperators = CaseInsensitive,
-  typename Allocator = std::allocator<std::pair<std::add_const<KeyType>, Type>>
+  typename Allocator = std::allocator < std::pair<std::add_const<KeyType>, Type> >
 >
 struct StringKeyedMaps {
-  using Map = std::map<KeyType, Type, typename KeyOperators::Compare, Allocator>;
+  using Map = std::map < KeyType, Type, typename KeyOperators::Compare, Allocator > ;
   using ConstMap = const Map;
-  using MultiMap = std::multimap<KeyType, Type, typename KeyOperators::Compare, Allocator>;
+  using MultiMap = std::multimap < KeyType, Type, typename KeyOperators::Compare, Allocator > ;
   using ConstMultiMap = const MultiMap;
-  using UnorderedMap = std::unordered_map<KeyType, Type, typename KeyOperators::Hash, typename KeyOperators::Equal, Allocator>;
+  using UnorderedMap = std::unordered_map < KeyType, Type, typename KeyOperators::Hash, typename KeyOperators::Equal, Allocator > ;
   using ConstUnorderedMap = const UnorderedMap;
-  using UnorderedMultiMap = std::unordered_multimap<KeyType, Type, typename KeyOperators::Hash, typename KeyOperators::Equal, Allocator>;
+  using UnorderedMultiMap = std::unordered_multimap < KeyType, Type, typename KeyOperators::Hash, typename KeyOperators::Equal, Allocator > ;
   using ConstUnorderedMultiMap = const UnorderedMultiMap;
 };
-
 
 // <summary>
 // Standard sets using strings as keys.
@@ -229,15 +223,15 @@ struct StringKeyedMaps {
 template <
   typename Type,
   typename Operators = CaseInsensitive,
-  typename Allocator = std::allocator<std::pair<std::add_const<Type>, Type>>
+  typename Allocator = std::allocator < std::pair<std::add_const<Type>, Type> >
 >
 struct StringKeyedSets {
-  using Set = std::set<Type, typename Operators::Compare, Allocator>;
+  using Set = std::set < Type, typename Operators::Compare, Allocator > ;
   using ConstSet = const Set;
-  using MultiSet = std::multiset<Type, typename Operators::Compare, Allocator>;
+  using MultiSet = std::multiset < Type, typename Operators::Compare, Allocator > ;
   using ConstMultiSet = const MultiSet;
-  using UnorderedSet = std::unordered_set<Type, typename Operators::Hash, typename Operators::Equal, Allocator>;
+  using UnorderedSet = std::unordered_set < Type, typename Operators::Hash, typename Operators::Equal, Allocator > ;
   using ConstUnorderedSet = const UnorderedSet;
-  using UnorderedMultiSet = std::unordered_multiset<Type, typename Operators::Hash, typename Operators::Equal, Allocator>;
+  using UnorderedMultiSet = std::unordered_multiset < Type, typename Operators::Hash, typename Operators::Equal, Allocator > ;
   using ConstUnorderedMultiSet = const UnorderedMultiSet;
 };

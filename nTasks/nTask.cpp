@@ -20,7 +20,7 @@
 using std::map;
 
 // The LSModule class
-LSModule gLSModule(_T(MODULE_NAME), _T(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
+LSModule gLSModule(TEXT(MODULE_NAME), TEXT(MODULE_AUTHOR), MakeVersion(MODULE_VERSION));
 
 // The messages we want from the core
 const UINT gLSMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
@@ -60,7 +60,7 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
     WindowManager::Start();
      
     // Register a bang command for creating our test window
-    LiteStep::AddBangCommand(_T("!nTaskTestWindow"), [] (HWND, LPCTSTR) -> void
+    LiteStep::AddBangCommand(L"!nTaskTestWindow", [] (HWND, LPCTSTR) -> void
     {
         TestWindow::Create();
     });
@@ -74,7 +74,7 @@ EXPORT_CDECL(int) initModuleW(HWND parent, HINSTANCE instance, LPCWSTR /* path *
 /// </summary>
 void quitModule(HINSTANCE /* hDllInstance */)
 {
-    LiteStep::RemoveBangCommand(_T("!nTaskTestWindow"));
+    LiteStep::RemoveBangCommand(L"!nTaskTestWindow");
 
     TestWindow::DestroyAll();
     WindowManager::Stop();
@@ -208,7 +208,7 @@ void DestroyTaskbars()
 /// </summary>
 void LoadSettings()
 {
-    LiteStep::IterateOverLineTokens(_T("*nTaskbar"), CreateTaskbar);
+    LiteStep::IterateOverLineTokens(L"*nTaskbar", CreateTaskbar);
 }
 
 
@@ -227,6 +227,6 @@ void CreateTaskbar(LPCTSTR taskbarName)
     }
     else
     {
-        ErrorHandler::Error(ErrorHandler::Level::Critical, TEXT("Attempt to (re)create the already existing taskbar %s!"), taskbarName);
+        ErrorHandler::Error(ErrorHandler::Level::Critical, L"Attempt to (re)create the already existing taskbar %s!", taskbarName);
     }
 }

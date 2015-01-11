@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  FilterIteratorIterator.cpp
- *  The nModules Project
- *
- *  Helper class for FileIterator
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/FilterIteratorIterator.cpp
+// The nModules Project
+//
+// Helper class for FileIteratorn.
+//-------------------------------------------------------------------------------------------------
 #include "Common.h"
 #include "FileIterator.hpp"
 

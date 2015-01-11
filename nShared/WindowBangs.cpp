@@ -18,17 +18,17 @@ namespace WindowBangs
 
     static const BangItem BangMap[] =
     {
-        { _T("Hide"),                       Hide                       },
-        { _T("Show"),                       Show                       },
-        { _T("On"),                         On                         },
-        { _T("Off"),                        Off                        },
-        { _T("Move"),                       Move                       },
-        { _T("Size"),                       Size                       },
-        { _T("Position"),                   Position                   },
-        { _T("SetAlwaysOnTop"),             SetAlwaysOnTop             },
-        { _T("SetClickThrough"),            SetClickThrough            },
-        { _T("SetParent"),                  SetParent                  },
-        { _T("SetText"),                    SetText                    }
+        { L"Hide",                       Hide                       },
+        { L"Show",                       Show                       },
+        { L"On",                         On                         },
+        { L"Off",                        Off                        },
+        { L"Move",                       Move                       },
+        { L"Size",                       Size                       },
+        { L"Position",                   Position                   },
+        { L"SetAlwaysOnTop",             SetAlwaysOnTop             },
+        { L"SetClickThrough",            SetClickThrough            },
+        { L"SetParent",                  SetParent                  },
+        { L"SetText",                    SetText                    }
     };
 }
 
@@ -44,7 +44,7 @@ void WindowBangs::Register(LPCTSTR prefix, Window* (*drawableFinder)(LPCTSTR))
     TCHAR bangName[64];
     WindowBangs::drawableFinder = drawableFinder;
     for (BangItem item : BangMap) {
-        StringCchPrintf(bangName, _countof(bangName), _T("!%s%s"), prefix, item.name);
+        StringCchPrintf(bangName, _countof(bangName), L"!%s%s", prefix, item.name);
         LiteStep::AddBangCommand(bangName, item.command);
     }
 }
@@ -56,7 +56,7 @@ void WindowBangs::Register(LPCTSTR prefix, Window* (*drawableFinder)(LPCTSTR))
 void WindowBangs::UnRegister(LPCTSTR prefix) {
     TCHAR bangName[64];
     for (BangItem item : BangMap) {
-        StringCchPrintf(bangName, _countof(bangName), _T("!%s%s"), prefix, item.name);
+        StringCchPrintf(bangName, _countof(bangName), L"!%s%s", prefix, item.name);
         LiteStep::RemoveBangCommand(bangName);
     }
     WindowBangs::drawableFinder = nullptr;
@@ -117,7 +117,7 @@ void WindowBangs::Move(HWND, LPCTSTR args)
                 else
                 {
                     drawable->SetAnimation(x, y, drawable->GetDrawingSettings()->width,
-                        drawable->GetDrawingSettings()->height, _ttoi(durationstr),
+                        drawable->GetDrawingSettings()->height, _wtoi(durationstr),
                         numTokens == 4 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
                 }
             }
@@ -152,7 +152,7 @@ void WindowBangs::Size(HWND, LPCTSTR args)
                 else
                 {
                     drawable->SetAnimation(drawable->GetDrawingSettings()->x, 
-                        drawable->GetDrawingSettings()->y, width, height, _ttoi(durationstr),
+                        drawable->GetDrawingSettings()->y, width, height, _wtoi(durationstr),
                         numTokens == 4 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
                 }
             }
@@ -192,7 +192,7 @@ void WindowBangs::Position(HWND, LPCTSTR args) {
                 }
                 else
                 {
-                    drawable->SetAnimation(x, y, width, height, _ttoi(durationstr),
+                    drawable->SetAnimation(x, y, width, height, _wtoi(durationstr),
                         numTokens == 6 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
                 }
             }

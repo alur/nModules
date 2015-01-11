@@ -21,6 +21,7 @@
 #include "ErrorHandler.h"
 #include "../Utilities/StringUtils.h"
 #include "../Utilities/Math.h"
+#include <algorithm>
 
 
 using std::map;
@@ -152,9 +153,9 @@ Window::Window(HWND /* parent */, LPCTSTR windowClass, HINSTANCE instance, Setti
 
     // It is possible that we have a parent set. This will either be "VirtualDesktop", or "Monitor[0-9]+"
     TCHAR parent[MAX_RCCOMMAND];
-    mSettings->GetString(_T("Parent"), parent, _countof(parent), _T(""));
+    mSettings->GetString(L"Parent", parent, _countof(parent), L"");
     {
-        if (_tcsnicmp(parent, L"Monitor", _countof(L"Monitor") - 1) == 0)
+        if (_wcsnicmp(parent, L"Monitor", _countof(L"Monitor") - 1) == 0)
         {
         }
         else // VirtualDesktop
@@ -334,22 +335,20 @@ Window::PAINTER Window::AddPrePainter(IPainter* painter)
 /// <summary>
 /// Performs an animation step.
 /// </summary>
-void Window::Animate()
-{
-    float progress = Easing::Transform(CLAMP(0.0f, mAnimationClock.GetTime()/mAnimationDuration, 1.0f), mAnimationEasing);
+void Window::Animate() {
+  float progress = Easing::Transform(Clamp(0.0f, mAnimationClock.GetTime() / mAnimationDuration, 1.0f), mAnimationEasing);
 
-    if (progress >= 1.0f)
-    {
-        mAnimating = false;
-    }
+  if (progress >= 1.0f) {
+    mAnimating = false;
+  }
 
-    Rect step;
-    step.left = mAnimationStart.left + (mAnimationTarget.left - mAnimationStart.left)*progress;
-    step.top = mAnimationStart.top + (mAnimationTarget.top - mAnimationStart.top)*progress;
-    step.right = mAnimationStart.right + (mAnimationTarget.right - mAnimationStart.right)*progress;
-    step.bottom = mAnimationStart.bottom + (mAnimationTarget.bottom - mAnimationStart.bottom)*progress;
+  Rect step;
+  step.left = mAnimationStart.left + (mAnimationTarget.left - mAnimationStart.left)*progress;
+  step.top = mAnimationStart.top + (mAnimationTarget.top - mAnimationStart.top)*progress;
+  step.right = mAnimationStart.right + (mAnimationTarget.right - mAnimationStart.right)*progress;
+  step.bottom = mAnimationStart.bottom + (mAnimationTarget.bottom - mAnimationStart.bottom)*progress;
 
-    SetPosition(step.left, step.top, step.right - step.left, step.bottom - step.top);
+  SetPosition(step.left, step.top, step.right - step.left, step.bottom - step.top);
 }
 
 
@@ -941,7 +940,7 @@ void Window::Move(Distance x, Distance y)
 void Window::Paint(bool &inAnimation, D2D1_RECT_F *updateRect)
 {
     UpdateLock lock(this);
-    if (this->visible && Math::RectIntersectArea(updateRect, &this->drawingArea) > 0)
+    if (this->visible && RectIntersectArea(updateRect, &this->drawingArea) > 0)
     {
         mRenderTarget->PushAxisAlignedClip(this->drawingArea, D2D1_ANTIALIAS_MODE_ALIASED);
 

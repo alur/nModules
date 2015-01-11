@@ -20,7 +20,6 @@ public:
     mNextFreshID = start;
   }
 
-
   /// <summary>
   /// Generates a new ID. This ID won't be generated again until it has been released.
   /// </summary>
@@ -34,7 +33,6 @@ public:
     return ret;
   }
 
-
   /// <summary>
   /// Releases an ID, allowing it to be generated again.
   /// </summary>
@@ -42,7 +40,6 @@ public:
   void ReleaseID(TYPE id) {
     mReleasedIDs.push_back(id);
   }
-
 
 private:
   TYPE mNextFreshID;

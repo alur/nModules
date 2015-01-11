@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Version of the shared components.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 

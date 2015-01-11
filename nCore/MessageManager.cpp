@@ -14,14 +14,14 @@ static std::unordered_map<UINT, std::unordered_set<HWND>> sMessageMap;
 
 
 EXPORT_CDECL(void) RegisterForCoreMessages(HWND hwnd, const UINT messages[]) {
-  for (const UINT *message = messages; *message != NULL; ++message) {
+  for (const UINT *message = messages; *message != 0; ++message) {
     sMessageMap[*message].insert(hwnd);
   }
 }
 
 
 EXPORT_CDECL(void) UnregisterForCoreMessages(HWND hwnd, const UINT messages[]) {
-  for (const UINT *message = messages; *message != NULL; ++message) {
+  for (const UINT *message = messages; *message != 0; ++message) {
     sMessageMap[*message].erase(hwnd);
   }
 }

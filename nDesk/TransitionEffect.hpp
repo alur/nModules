@@ -9,7 +9,7 @@
 #ifndef TRANSITIONEFFECT_HPP
 #define TRANSITIONEFFECT_HPP
 
-#include <d2d1.h>
+#include "../Utilities/CommonD2D.h"
 
 class TransitionEffect {
 public:

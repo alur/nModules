@@ -8,8 +8,8 @@
 
 
 DoubleNullStringList::DoubleNullStringList()
-: mCchSize(2)
-, mStringList((LPWSTR)calloc(2, sizeof(wchar_t))) {}
+  : mCchSize(2)
+  , mStringList((LPWSTR)calloc(2, sizeof(wchar_t))) {}
 
 
 DoubleNullStringList::~DoubleNullStringList() {

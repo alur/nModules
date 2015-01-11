@@ -27,10 +27,10 @@ void WorkArea::ParseLine(MonitorInfo *mInfo, LPCTSTR pszLine)
     // Parse the input string
     if (LiteStep::LCTokenize(pszLine, szTokens, 5, nullptr) == 5)
     {
-        left = _ttoi(szLeft);
-        top = _ttoi(szTop);
-        right = _ttoi(szRight);
-        bottom = _ttoi(szBottom);
+        left = _wtoi(szLeft);
+        top = _wtoi(szTop);
+        right = _wtoi(szRight);
+        bottom = _wtoi(szBottom);
 
         UINT monitor = ParseMonitor(szMonitor, UINT(-2));
 

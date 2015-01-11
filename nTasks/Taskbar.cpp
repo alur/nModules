@@ -13,12 +13,14 @@
 #include "../Utilities/Math.h"
 #include "../nShared/DWMColorVal.hpp"
 
+#include <algorithm>
+
 
 /// <summary>
 /// Constructor
 /// </summary>
 Taskbar::Taskbar(LPCTSTR name) : Drawable(name) {
-  mThumbnail = new WindowThumbnail(_T("Thumbnail"), mSettings);
+  mThumbnail = new WindowThumbnail(L"Thumbnail", mSettings);
 
   LoadSettings();
 

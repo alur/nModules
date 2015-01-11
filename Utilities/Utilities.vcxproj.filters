@@ -16,11 +16,13 @@
     <ClInclude Include="FileIterator.hpp" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Unordered1To1Map.hpp" />
-    <ClInclude Include="UnorderedMap.hpp" />
-    <ClInclude Include="Hashing.h" />
     <ClInclude Include="DoubleNullStringList.hpp" />
     <ClInclude Include="CommonD2D.h" />
     <ClInclude Include="ShellHelper.h" />
+    <ClInclude Include="AlgorithmExtension.h" />
+    <ClInclude Include="Hashing.h">
+      <Filter>Hashing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StringUtils.cpp" />
@@ -33,9 +35,18 @@
     <ClCompile Include="FileIterator.cpp" />
     <ClCompile Include="FileIteratorIterator.cpp" />
     <ClCompile Include="Error.cpp" />
-    <ClCompile Include="CRC32.cpp" />
-    <ClCompile Include="CRC64.cpp" />
     <ClCompile Include="DoubleNullStringList.cpp" />
     <ClCompile Include="ShellHelper.cpp" />
+    <ClCompile Include="CRC64.cpp">
+      <Filter>Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="CRC32.cpp">
+      <Filter>Hashing</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Hashing">
+      <UniqueIdentifier>{9040150a-2adc-4844-a224-b66f50b5ec54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

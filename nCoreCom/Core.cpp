@@ -22,7 +22,6 @@ namespace nCore {
   DECL_FUNC_VAR(UnregisterForCoreMessages);
 }
 
-
 /// <summary>
 /// Initalizes communication with the core.
 /// </summary>
@@ -52,7 +51,7 @@ HRESULT nCore::Connect(VERSION minVersion) {
   }
   // If the minor version ==, the patch version must be >=
   if (GetMinorVersion(minVersion) == GetMinorVersion(coreVersion) &&
-      GetPatchVersion(minVersion) > GetPatchVersion(minVersion)) {
+    GetPatchVersion(minVersion) > GetPatchVersion(minVersion)) {
     return E_NCORECOM_PATCH_VERSION;
   }
 
@@ -68,7 +67,6 @@ HRESULT nCore::Connect(VERSION minVersion) {
   return hr;
 }
 
-
 /// <summary>
 /// Disconnects from the core.
 /// </summary>
@@ -78,7 +76,6 @@ void nCore::Disconnect() {
   sInitialized = false;
 }
 
-
 /// <summary>
 /// Returns true when the core is initalized.
 /// </summary>
@@ -86,7 +83,6 @@ void nCore::Disconnect() {
 bool nCore::Initialized() {
   return sInitialized;
 }
-
 
 /// <summary>
 /// Retrives the version of the loaded core.
@@ -96,12 +92,10 @@ VERSION nCore::GetCoreVersion() {
   return FUNC_VAR_NAME(GetCoreVersion)();
 }
 
-
 void nCore::RegisterForCoreMessages(HWND hwnd, const UINT messages[]) {
   ASSERT(nCore::Initialized());
   FUNC_VAR_NAME(RegisterForCoreMessages)(hwnd, messages);
 }
-
 
 void nCore::UnregisterForCoreMessages(HWND hwnd, const UINT messages[]) {
   ASSERT(nCore::Initialized());

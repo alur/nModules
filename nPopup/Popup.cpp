@@ -13,23 +13,24 @@
 #include "FolderItem.hpp"
 #include "../Utilities/Math.h"
 #include "../nCoreCom/Core.h"
+#include <algorithm>
 
 
 Popup::Popup(LPCTSTR title, LPCTSTR bang, LPCTSTR prefix)
     : Drawable(prefix)
-    , bang(bang != nullptr ? _tcsdup(bang) : nullptr)
+    , bang(bang != nullptr ? _wcsdup(bang) : nullptr)
     , openChild(nullptr)
     , owner(nullptr)
 {
-    this->itemSpacing = mSettings->GetInt(_T("ItemSpacing"), 2);
-    this->maxWidth = mSettings->GetInt(_T("MaxWidth"), 300);
-    this->noIcons = mSettings->GetBool(_T("NoIcons"), false);
-    this->expandLeft = mSettings->GetBool(_T("ExpandLeft"), false);
-    this->confineToMonitor = mSettings->GetBool(_T("ConfineToMonitor"), false);
-    this->confineToWorkArea = mSettings->GetBool(_T("ConfineToWorkArea"), false);
-    mChildOffsetX = mSettings->GetInt(_T("ChildOffsetX"), 0);
-    mChildOffsetY = mSettings->GetInt(_T("ChildOffsetY"), 0);
-    this->padding = mSettings->GetOffsetRect(_T("Padding"), 5, 5, 5, 5);
+    this->itemSpacing = mSettings->GetInt(L"ItemSpacing", 2);
+    this->maxWidth = mSettings->GetInt(L"MaxWidth", 300);
+    this->noIcons = mSettings->GetBool(L"NoIcons", false);
+    this->expandLeft = mSettings->GetBool(L"ExpandLeft", false);
+    this->confineToMonitor = mSettings->GetBool(L"ConfineToMonitor", false);
+    this->confineToWorkArea = mSettings->GetBool(L"ConfineToWorkArea", false);
+    mChildOffsetX = mSettings->GetInt(L"ChildOffsetX", 0);
+    mChildOffsetY = mSettings->GetInt(L"ChildOffsetY", 0);
+    this->padding = mSettings->GetOffsetRect(L"Padding", 5, 5, 5, 5);
 
     mPopupSettings.Load(mSettings);
 
@@ -189,7 +190,7 @@ void Popup::Show(int x, int y)
 void Popup::Size(LPRECT limits)
 {
     // Work out the desired item 
-    int itemWidth = mSettings->GetInt(_T("Width"), 200) - this->padding.left - this->padding.right;
+    int itemWidth = mSettings->GetInt(L"Width", 200) - this->padding.left - this->padding.right;
     int maxItemWidth = this->maxWidth - this->padding.left - this->padding.right;
     int height = this->padding.top;
     int width;

@@ -19,7 +19,7 @@ extern BOOL gActiveWindowTracking;
 /// Constructor
 /// </summary>
 TaskButton::TaskButton(Drawable* parent, HWND watchedWindow, ButtonSettings &btnSettings)
-    : Drawable(parent, _T("Button"))
+    : Drawable(parent, L"Button")
     , mButtonSettings(btnSettings)
 {
 

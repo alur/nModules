@@ -27,7 +27,7 @@ static State *FindState(LPCTSTR *args, int numArgs, Window *&window) {
                 return window->GetState(buffer);
             }
             else {
-                return window->GetState(_T(""));
+                return window->GetState(L"");
             }
         }
     }
@@ -45,7 +45,7 @@ static struct BangItem {
     LPCTSTR name;
     LiteStep::BANGCOMMANDPROC proc;
 } BangMap [] = {
-    BangItem(TEXT("SetCornerRadiusX"),           [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetCornerRadiusX",           [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -55,7 +55,7 @@ static struct BangItem {
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetCornerRadiusY"),           [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetCornerRadiusY",           [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -65,7 +65,7 @@ static struct BangItem {
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetOutlineWidth"),            [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetOutlineWidth",            [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -75,7 +75,7 @@ static struct BangItem {
             window->Repaint();
         }
     }),
-    /*BangItem(TEXT("SetFont"),                    [] (HWND, LPCTSTR args) -> void {
+    /*BangItem(L"SetFont",                    [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -84,7 +84,7 @@ static struct BangItem {
             //state->SetFont(arg);
         }
     }),
-    BangItem(TEXT("SetFontSize"),                [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetFontSize",                [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -93,7 +93,7 @@ static struct BangItem {
             //state->SetFontSize(strtof(arg, nullptr));
         }
     }),
-    BangItem(TEXT("SetFontStretch"),             [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetFontStretch",             [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -102,7 +102,7 @@ static struct BangItem {
             //state->SetFontStretch(StateSettings::ParseFontStretch(arg));
         }
     }),
-    BangItem(TEXT("SetFontStyle"),               [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetFontStyle",               [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -111,7 +111,7 @@ static struct BangItem {
             //state->SetFontStyle(StateSettings::ParseFontStyle(arg));
         }
     }),
-    BangItem(TEXT("SetFontWeight"),              [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetFontWeight",              [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -120,7 +120,7 @@ static struct BangItem {
             //state->SetFontWeight(StateSettings::ParseFontWeight(arg));
         }
     }),*/
-    BangItem(TEXT("SetReadingDirection"),        [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetReadingDirection",        [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -130,7 +130,7 @@ static struct BangItem {
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetTextAlign"),               [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetTextAlign",               [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -140,28 +140,28 @@ static struct BangItem {
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetTextOffset"),              [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetTextOffset",              [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 4, window);
         if (state) {
             TCHAR left[MAX_RCCOMMAND], top[MAX_RCCOMMAND], right[MAX_RCCOMMAND], bottom[MAX_RCCOMMAND];
             LPTSTR buffers[] = { left, top, right, bottom };
             LiteStep::CommandTokenize(args, buffers, _countof(buffers), nullptr);
-            state->SetTextOffsets(float(_ttof(left)), float(_ttof(top)), float(_ttof(right)), float(_ttof(bottom)));
+            state->SetTextOffsets(float(_wtof(left)), float(_wtof(top)), float(_wtof(right)), float(_wtof(bottom)));
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetTextRotation"),            [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetTextRotation",            [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
             TCHAR arg[MAX_RCCOMMAND];
             LiteStep::GetToken(args, arg, nullptr, 0);
-            state->SetTextRotation(float(_tcstof(arg, nullptr)));
+            state->SetTextRotation(float(wcstof(arg, nullptr)));
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetTextTrimmingGranularity"), [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetTextTrimmingGranularity", [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -171,7 +171,7 @@ static struct BangItem {
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetTextVerticalAlign"),       [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetTextVerticalAlign",       [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -181,7 +181,7 @@ static struct BangItem {
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetWordWrapping"),            [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetWordWrapping",            [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         State *state = FindState(&args, 1, window);
         if (state) {
@@ -201,7 +201,7 @@ void StateBangs::Register(LPCTSTR prefix, std::function<Window* (LPCTSTR)> windo
     TCHAR bangName[64];
     ::windowFinder = windowFinder;
     for (BangItem item : BangMap) {
-        StringCchPrintf(bangName, _countof(bangName), TEXT("!%s%s"), prefix, item.name);
+        StringCchPrintf(bangName, _countof(bangName), L"!%s%s", prefix, item.name);
         LiteStep::AddBangCommand(bangName, item.proc);
     }
 }
@@ -213,7 +213,7 @@ void StateBangs::Register(LPCTSTR prefix, std::function<Window* (LPCTSTR)> windo
 void StateBangs::UnRegister(LPCTSTR prefix) {
     TCHAR bangName[64];
     for (BangItem item : BangMap) {
-        StringCchPrintf(bangName, _countof(bangName), TEXT("!%s%s"), prefix, item.name);
+        StringCchPrintf(bangName, _countof(bangName), L"!%s%s", prefix, item.name);
         LiteStep::RemoveBangCommand(bangName);
     }
     ::windowFinder = nullptr;

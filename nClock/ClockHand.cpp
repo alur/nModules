@@ -87,15 +87,15 @@ bool ClockHand::UpdateDWMColor(ARGB newColor, ID2D1RenderTarget *renderTarget) {
 void ClockHand::Initialize(Settings *clockSettings, LPCTSTR prefix, float maxValue) {
   Settings *settings = clockSettings->CreateChild(prefix);
 
-  mSmoothMovement = settings->GetBool(_T("SmoothMovement"), false);
+  mSmoothMovement = settings->GetBool(L"SmoothMovement", false);
   mMaxValue = maxValue;
 
   mBrushSettings.Load(settings, &sBrushDefaults);
   mBrush.Load(&mBrushSettings);
 
-  float length = settings->GetFloat(_T("Length"), 50);
-  float thickness = settings->GetFloat(_T("Thickness"), 3);
-  float offset = settings->GetFloat(_T("Offset"), 0);
+  float length = settings->GetFloat(L"Length", 50);
+  float thickness = settings->GetFloat(L"Thickness", 3);
+  float offset = settings->GetFloat(L"Offset", 0);
 
   mHandRect.left = offset;
   mHandRect.top = -thickness / 2.0f;

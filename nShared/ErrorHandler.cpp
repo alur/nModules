@@ -13,7 +13,7 @@
 
 // The current global error level.
 static ErrorHandler::Level gErrorLevel = ErrorHandler::Level::Warning;
-static TCHAR gModuleName[64] = TEXT("");
+static TCHAR gModuleName[64] = L"";
 
 
 /// <summary>
@@ -53,19 +53,19 @@ void ErrorHandler::Error(Level level, LPCTSTR format, ...)
         switch (level)
         {
         case Level::Critical:
-            MessageBox(nullptr, message, TEXT("Critical"), MB_OK | MB_ICONERROR);
+            MessageBox(nullptr, message, L"Critical", MB_OK | MB_ICONERROR);
             break;
 
         case Level::Warning:
-            MessageBox(nullptr, message, TEXT("Warning"), MB_OK | MB_ICONWARNING);
+            MessageBox(nullptr, message, L"Warning", MB_OK | MB_ICONWARNING);
             break;
 
         case Level::Notice:
-            MessageBox(nullptr, message, TEXT("Notice"), MB_OK | MB_ICONINFORMATION);
+            MessageBox(nullptr, message, L"Notice", MB_OK | MB_ICONINFORMATION);
             break;
 
         case Level::Debug:
-            MessageBox(nullptr, message, TEXT("Debug"), MB_OK);
+            MessageBox(nullptr, message, L"Debug", MB_OK);
             break;
         }
     }
@@ -84,7 +84,7 @@ void ErrorHandler::ErrorHR(Level level, HRESULT hr, LPCTSTR format, ...)
 
     if (gErrorLevel >= level)
     {
-        *message = _T('\0');
+        *message = L'\0';
 
         if (format != nullptr)
         {
@@ -94,26 +94,26 @@ void ErrorHandler::ErrorHR(Level level, HRESULT hr, LPCTSTR format, ...)
             StringCchCat(message, _countof(message), L"\n\n");
         }
 
-        LPTSTR end = _tcschr(message, _T('\0'));
+        LPTSTR end = wcschr(message, L'\0');
 
         DescriptionFromHR(hr, end, _countof(message) - (end - message));
 
         switch (level)
         {
         case Level::Critical:
-            MessageBox(nullptr, message, TEXT("Critical"), MB_OK | MB_ICONERROR);
+            MessageBox(nullptr, message, L"Critical", MB_OK | MB_ICONERROR);
             break;
 
         case Level::Warning:
-            MessageBox(nullptr, message, TEXT("Warning"), MB_OK | MB_ICONWARNING);
+            MessageBox(nullptr, message, L"Warning", MB_OK | MB_ICONWARNING);
             break;
 
         case Level::Notice:
-            MessageBox(nullptr, message, TEXT("Notice"), MB_OK | MB_ICONINFORMATION);
+            MessageBox(nullptr, message, L"Notice", MB_OK | MB_ICONINFORMATION);
             break;
 
         case Level::Debug:
-            MessageBox(nullptr, message, TEXT("Debug"), MB_OK);
+            MessageBox(nullptr, message, L"Debug", MB_OK);
             break;
         }
     }

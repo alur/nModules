@@ -48,12 +48,12 @@ static Brush *FindBrush(LPCTSTR *args, int numArgs, Window *&window)
                     }
                     else // window brushowner
                     { 
-                        return owner->GetBrush(_T(""));
+                        return owner->GetBrush(L"");
                     }
                 }
                 else if (numTokens == numArgs + 2) // Window Brush
                 { 
-                    owner = window->GetBrushOwner(_T(""));
+                    owner = window->GetBrushOwner(L"");
                     if (owner)
                     {
                         return owner->GetBrush(buffer);
@@ -62,10 +62,10 @@ static Brush *FindBrush(LPCTSTR *args, int numArgs, Window *&window)
             }
             else // Window
             { 
-                IBrushOwner *owner = window->GetBrushOwner(_T(""));
+                IBrushOwner *owner = window->GetBrushOwner(L"");
                 if (owner)
                 {
-                    return owner->GetBrush(_T(""));
+                    return owner->GetBrush(L"");
                 }
             }
         }
@@ -87,7 +87,7 @@ static const struct BangItem
     LiteStep::BANGCOMMANDPROC proc;
 } BangMap [] =
 {
-    /*(BangItem(TEXT("SetBrushType"),            [] (HWND, LPCTSTR args) -> void
+    /*(BangItem(L"SetBrushType",            [] (HWND, LPCTSTR args) -> void
     {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
@@ -99,7 +99,7 @@ static const struct BangItem
             window->Repaint();
         }
     }),*/
-    BangItem(TEXT("SetColor"),                [] (HWND, LPCTSTR args) -> void
+    BangItem(L"SetColor",                [] (HWND, LPCTSTR args) -> void
     {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
@@ -116,7 +116,7 @@ static const struct BangItem
             }
         }
     }),
-    /*BangItem(TEXT("SetAlpha"),                [] (HWND, LPCTSTR args) -> void {
+    /*BangItem(L"SetAlpha",                [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -125,7 +125,7 @@ static const struct BangItem
             window->Repaint();
         }
     }), 
-    BangItem(TEXT("SetGradientColors"),       [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetGradientColors",       [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -134,7 +134,7 @@ static const struct BangItem
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetGradientStops"),        [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetGradientStops",        [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -143,7 +143,7 @@ static const struct BangItem
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetGradientStart"),        [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetGradientStart",        [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -152,7 +152,7 @@ static const struct BangItem
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetGradientEnd"),          [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetGradientEnd",          [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -161,7 +161,7 @@ static const struct BangItem
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetGradientCenter"),       [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetGradientCenter",       [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -170,7 +170,7 @@ static const struct BangItem
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetGradientRadius"),       [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetGradientRadius",       [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -179,7 +179,7 @@ static const struct BangItem
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetGradientOriginOffset"), [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetGradientOriginOffset", [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -188,7 +188,7 @@ static const struct BangItem
             window->Repaint();
         }
     }),*/
-    BangItem(TEXT("SetImage"),                [] (HWND, LPCTSTR args) -> void
+    BangItem(L"SetImage",                [] (HWND, LPCTSTR args) -> void
     {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
@@ -200,7 +200,7 @@ static const struct BangItem
             window->Repaint();
         }
     }),
-    /*BangItem(TEXT("SetImageRotation"),        [] (HWND, LPCTSTR args) -> void {
+    /*BangItem(L"SetImageRotation",        [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -210,7 +210,7 @@ static const struct BangItem
             window->Repaint();
         }
     }),*/
-    /*BangItem(TEXT("SetImageScalingMode"),     [] (HWND, LPCTSTR args) -> void {
+    /*BangItem(L"SetImageScalingMode",     [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -219,7 +219,7 @@ static const struct BangItem
             window->Repaint();
         }
     }),
-    BangItem(TEXT("SetTilingMode"),           [] (HWND, LPCTSTR args) -> void {
+    BangItem(L"SetTilingMode",           [] (HWND, LPCTSTR args) -> void {
         Window *window = nullptr;
         Brush *brush = FindBrush(&args, 1, window);
         if (brush) {
@@ -240,7 +240,7 @@ void BrushBangs::Register(LPCTSTR prefix, std::function<Window* (LPCTSTR)> windo
     ::windowFinder = windowFinder;
     for (BangItem item : BangMap)
     {
-        StringCchPrintf(bangName, _countof(bangName), TEXT("!%s%s"), prefix, item.name);
+        StringCchPrintf(bangName, _countof(bangName), L"!%s%s", prefix, item.name);
         LiteStep::AddBangCommand(bangName, item.proc);
     }
 }
@@ -254,7 +254,7 @@ void BrushBangs::UnRegister(LPCTSTR prefix)
     TCHAR bangName[64];
     for (BangItem item : BangMap)
     {
-        StringCchPrintf(bangName, _countof(bangName), TEXT("!%s%s"), prefix, item.name);
+        StringCchPrintf(bangName, _countof(bangName), L"!%s%s", prefix, item.name);
         LiteStep::RemoveBangCommand(bangName);
     }
     ::windowFinder = nullptr;

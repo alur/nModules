@@ -24,7 +24,7 @@ public:
         StateInitData()
         {
             priority = 0;
-            prefix = _T("");
+            prefix = L"";
             base = StateEnum::Base;
         }
 
@@ -155,7 +155,7 @@ public:
     {
         for (State &state : mStates)
         {
-            if (_tcsicmp(name, state.mName) == 0)
+          if (_wcsicmp(name, state.mName) == 0)
             {
                 return &state;
             }

@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  FilterIterator.cpp
- *  The nModules Project
- *
- *  Allows you to iterate over all files matching a certain pattern.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/FilterIterator.cpp
+// The nModules Project
+//
+// Allows you to iterate over all files matching a certain pattern.
+//-------------------------------------------------------------------------------------------------
 #include "Common.h"
 #include "FileIterator.hpp"
 

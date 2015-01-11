@@ -70,7 +70,7 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position)
                 y = this->position == BOTTOM ? position->bottom + this->distanceFromButton : position->top - height - this->distanceFromButton;
 
                 // Ensure that the entire preview is on the same monitor as the button.
-                x = CLAMP(monitor.rect.left, (long)x, monitor.rect.right - width);
+                x = Clamp(monitor.rect.left, (long)x, monitor.rect.right - width);
             }
             break;
 
@@ -86,7 +86,7 @@ void WindowThumbnail::Show(HWND hwnd, LPRECT position)
                 x = this->position == LEFT ? position->left - width - this->distanceFromButton : position->right + this->distanceFromButton;
 
                 // Ensure that the entire preview is on the same monitor as the button.
-                y = CLAMP(monitor.rect.top, (long)y, monitor.rect.bottom - height);
+                y = Clamp(monitor.rect.top, (long)y, monitor.rect.bottom - height);
             }
             break;
         }
@@ -170,20 +170,20 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/)
 
     TCHAR szBuf[32];
 
-    this->distanceFromButton = mSettings->GetInt(_T("DistanceFromButton"), 2);
-    this->maxHeight = mSettings->GetInt(_T("MaxHeight"), 300);
-    this->maxWidth = mSettings->GetInt(_T("MaxWidth"), 300);
-    this->offset = mSettings->GetOffsetRect(_T("Offset"), 5, 5, 5, 5);
-    mSettings->GetString(_T("Position"), szBuf, sizeof(szBuf), _T("Top")); 
-    if (_tcsicmp(szBuf, _T("Left")) == 0)
+    this->distanceFromButton = mSettings->GetInt(L"DistanceFromButton", 2);
+    this->maxHeight = mSettings->GetInt(L"MaxHeight", 300);
+    this->maxWidth = mSettings->GetInt(L"MaxWidth", 300);
+    this->offset = mSettings->GetOffsetRect(L"Offset", 5, 5, 5, 5);
+    mSettings->GetString(L"Position", szBuf, sizeof(szBuf), L"Top"); 
+    if (_wcsicmp(szBuf, L"Left") == 0)
     {
         this->position = LEFT;
     }
-    else if (_tcsicmp(szBuf, _T("Right")) == 0)
+    else if (_wcsicmp(szBuf, L"Right") == 0)
     {
         this->position = RIGHT;
     }
-    else if (_tcsicmp(szBuf, _T("Bottom")) == 0)
+    else if (_wcsicmp(szBuf, L"Bottom") == 0)
     {
         this->position = BOTTOM;
     }
@@ -191,10 +191,10 @@ void WindowThumbnail::LoadSettings(bool /*bIsRefresh*/)
     {
         this->position = TOP;
     }
-    mAnimate = mSettings->GetBool(_T("Animate"), false);
-    mAnimationDuration = mSettings->GetInt(_T("AnimationDuration"), 200);
-    this->sizeToButton = mSettings->GetBool(_T("SizeToButton"), true);
-    this->thumbnailOpacity = mSettings->GetInt(_T("ThumbnailOpacity"), 255);
+    mAnimate = mSettings->GetBool(L"Animate", false);
+    mAnimationDuration = mSettings->GetInt(L"AnimationDuration", 200);
+    this->sizeToButton = mSettings->GetBool(L"SizeToButton", true);
+    this->thumbnailOpacity = mSettings->GetInt(L"ThumbnailOpacity", 255);
 }
 
 
