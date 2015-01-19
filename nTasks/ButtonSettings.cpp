@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Contains all the settings used by button for a particular taskbar.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "ButtonSettings.hpp"
 #include "TaskButton.hpp"
@@ -47,31 +47,31 @@ static const StateRender<TaskButton::State>::InitData sInitData(
 /// Loads these button settings from the settings file.
 /// </summary>
 void ButtonSettings::Load(Settings *buttonSettings) {
-    mUseFlashing = buttonSettings->GetBool(L"UseFlashing", true);
-    mFlashInterval = buttonSettings->GetInt(L"FlashInterval", 500);
-    mNoIcons = buttonSettings->GetBool(L"NoIcons", false);
+  mUseFlashing = buttonSettings->GetBool(L"UseFlashing", true);
+  mFlashInterval = buttonSettings->GetInt(L"FlashInterval", 500);
+  mNoIcons = buttonSettings->GetBool(L"NoIcons", false);
 
-    //
-    Settings *iconSettings = buttonSettings->CreateChild(L"Icon");
-    float iconSize = iconSettings->GetFloat(L"Size", 32);
-    float iconX = iconSettings->GetFloat(L"X", 2);
-    float iconY = iconSettings->GetFloat(L"Y", 2);
-    mIconRect = D2D1::RectF(iconX, iconY, iconX + iconSize, iconY + iconSize);
+  //
+  Settings *iconSettings = buttonSettings->CreateChild(L"Icon");
+  float iconSize = iconSettings->GetFloat(L"Size", 32);
+  float iconX = iconSettings->GetFloat(L"X", 2);
+  float iconY = iconSettings->GetFloat(L"Y", 2);
+  mIconRect = D2D1::RectF(iconX, iconY, iconX + iconSize, iconY + iconSize);
 
-    //
-    float overlayIconSize = iconSettings->GetFloat(L"OverlaySize", 16);
-    float overlayIconOffsetX = iconSettings->GetFloat(L"OverlayOffsetX", 1);
-    float overlayIconOffsetY = iconSettings->GetFloat(L"OverlayOffsetY", 1);
-    mOverlayIconRect = D2D1::RectF(
-        iconX + iconSize - overlayIconSize + overlayIconOffsetX,
-        iconY + iconSize - overlayIconSize + overlayIconOffsetY,
-        iconX + iconSize + overlayIconOffsetX,
-        iconY + iconSize + overlayIconOffsetY);
+  //
+  float overlayIconSize = iconSettings->GetFloat(L"OverlaySize", 16);
+  float overlayIconOffsetX = iconSettings->GetFloat(L"OverlayOffsetX", 1);
+  float overlayIconOffsetY = iconSettings->GetFloat(L"OverlayOffsetY", 1);
+  mOverlayIconRect = D2D1::RectF(
+    iconX + iconSize - overlayIconSize + overlayIconOffsetX,
+    iconY + iconSize - overlayIconSize + overlayIconOffsetY,
+    iconX + iconSize + overlayIconOffsetX,
+    iconY + iconSize + overlayIconOffsetY);
 
-    mStateRender.Load(sInitData, buttonSettings);
+  mStateRender.Load(sInitData, buttonSettings);
 
-    //
-    mWindowSettings.Load(buttonSettings, nullptr);
+  //
+  mWindowSettings.Load(buttonSettings, nullptr);
 
-    delete iconSettings;
+  delete iconSettings;
 }

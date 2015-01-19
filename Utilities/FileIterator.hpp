@@ -25,7 +25,7 @@ public:
 
 public:
   explicit FileIterator(LPCTSTR path);
-  virtual ~FileIterator();
+  ~FileIterator();
 
 public:
   const WIN32_FIND_DATA &GetFileData() const;

@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Settings.hpp
- *  The nModules Project
- *
- *  Declaration of the Settings class.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nShared/Settings.hpp
+// The nModules Project
+//
+// Declaration of the Settings class.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 #include "LiteStep.h"
@@ -23,7 +22,7 @@ public:
   explicit Settings(LPCSettings settings);
 
 private:
-  explicit Settings(LPCTSTR prefix, LPCTSTR prefixTrail[]);
+  Settings(LPCTSTR prefix, LPCTSTR prefixTrail[]);
 
 public:
   LPSettings CreateChild(LPCTSTR prefix) const;
@@ -69,9 +68,6 @@ public:
   void IterateOverCommandLines(LPCTSTR key, std::function<void(LPCTSTR line)> callback) const;
   void IterateOverCommandTokens(LPCTSTR key, std::function<void(LPCTSTR token)> callback) const;
 
-  ///
-  ///
-  ///
   template <typename Type>
   struct EnumItem {
     EnumItem(Type value, LPCTSTR name) {
@@ -82,9 +78,6 @@ public:
     LPCTSTR name;
   };
 
-  /// <summary>
-  ///
-  /// </summary>
   template <typename Type>
   Type GetEnum(LPCTSTR key, std::initializer_list<EnumItem<Type>> map, Type defaultValue) {
     TCHAR settingValue[MAX_LINE_LENGTH];

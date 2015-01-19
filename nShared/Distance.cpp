@@ -10,32 +10,19 @@
 #include <stdlib.h>
 
 
-/// <summary>
-/// Constructor
-/// </summary>
 Distance::Distance() {}
 
 
-/// <summary>
-/// Constructor
-/// </summary>
 Distance::Distance(float pixels)
   : mPixels(pixels)
   , mPercent(0)
-  , mDips(0)
-{
-}
+  , mDips(0) {}
 
 
-/// <summary>
-/// Constructor
-/// </summary>
 Distance::Distance(float pixels, float percent /*, float dips */)
   : mPixels(pixels)
   , mPercent(percent)
-  , mDips(0)
-{
-}
+  , mDips(0) {}
 
 
 /// <summary>

@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  PointerIterator.hpp
- *  The nModules Project
- *
- *  Simplifies usage of iterators to pointer containers.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/PointerIterator.hpp
+// The nModules Project
+//
+// Simplifies usage of iterators to pointer containers.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 template <class IteratorType, class ItemType>

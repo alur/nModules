@@ -12,12 +12,14 @@
 
 #include <assert.h>
 
+
 /// <summary>
 /// Creates a new instance of the MonitorInfo class.
 /// </summary>
 MonitorInfo::MonitorInfo() {
   Update();
 }
+
 
 /// <summary>
 /// Returns the monitor which contains the biggest area of the specified window.
@@ -41,6 +43,7 @@ UINT MonitorInfo::MonitorFromHWND(HWND hWnd) const {
 
   return MonitorFromRECT(wndRect);
 }
+
 
 /// <summary>
 /// Returns the monitor which contains the biggest area of the specified window.
@@ -70,6 +73,7 @@ UINT MonitorInfo::MonitorFromRECT(RECT rect) const {
   return monitor;
 }
 
+
 /// <summary>
 /// Updates the list of monitors. Should be called when ...
 /// </summary>
@@ -91,6 +95,7 @@ void MonitorInfo::Update() {
   EnumDisplayMonitors(nullptr, nullptr, EnumMonitorsCallback, (LPARAM)this);
 }
 
+
 /// <summary>
 /// Gets the monitor with the given id.
 /// </summary>
@@ -100,12 +105,14 @@ const MonitorInfo::Monitor &MonitorInfo::GetMonitor(UINT id) const {
   return mMonitors[id];
 }
 
+
 /// <summary>
 /// Gets the virtual desktop.
 /// </summary>
 const MonitorInfo::Monitor &MonitorInfo::GetVirtualDesktop() const {
   return mVirtualDesktop;
 }
+
 
 /// <summary>
 /// Gets the number of monitors.
@@ -114,12 +121,14 @@ UINT MonitorInfo::GetMonitorCount() const {
   return UINT(mMonitors.size());
 }
 
+
 /// <summary>
 /// Returns a vector of monitors.
 /// </summary>
 const std::vector<MonitorInfo::Monitor> &MonitorInfo::GetMonitors() const {
   return mMonitors;
 }
+
 
 /// <summary>
 /// Callback for EnumDisplayMonitors. Adds a monitor to the list of monitors.

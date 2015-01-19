@@ -58,7 +58,7 @@ LSModule::LSModule(LPCTSTR moduleName, LPCTSTR author, VERSION version) {
 /// <param name="customMessageClass">Custom window class to use for the message handler.</param>
 /// <param name="customDrawableClass">Custom window class to use for the drawable window.</param>
 bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMessageClass,
-  PWNDCLASSEX customDrawableClass) {
+    PWNDCLASSEX customDrawableClass) {
   WNDCLASSEX wc;
   TCHAR className[MAX_PATH];
   HRESULT hr;
@@ -67,7 +67,8 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
   this->instance = instance;
 
   if (FAILED(hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE))) {
-    ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()), L"Failed to initialize COM.");
+    ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()),
+      L"Failed to initialize COM.");
     return 1;
   }
 
@@ -89,7 +90,8 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
   }
 
   if ((this->messageHandlerClass = RegisterClassEx(customMessageClass == NULL ? &wc : customMessageClass)) == 0) {
-    ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()), L"Failed to register the message handler class.");
+    ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()),
+      L"Failed to register the message handler class.");
     return false;
   }
 
@@ -99,14 +101,17 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
   wc.style |= CS_DBLCLKS;
 
   if ((this->drawableClass = RegisterClassEx(customDrawableClass == NULL ? &wc : customDrawableClass)) == 0) {
-    ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()), L"Failed to register the drawable window class.");
+    ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()),
+      L"Failed to register the drawable window class.");
     return false;
   }
 
   // Create the main window.
   if ((this->messageHandler = MessageHandler::CreateMessageWindowEx(WS_EX_TOOLWINDOW,
-    (LPCTSTR)this->messageHandlerClass, L"", this->parent ? WS_CHILD : WS_POPUP, 0, 0, 0, 0, this->parent, NULL, this->instance, this)) == NULL) {
-    ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()), L"Failed to register the LiteStep message window.");
+      (LPCTSTR)this->messageHandlerClass, L"", this->parent ? WS_CHILD : WS_POPUP, 0, 0, 0, 0,
+      this->parent, NULL, this->instance, this)) == NULL) {
+    ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()),
+      L"Failed to register the LiteStep message window.");
     return false;
   }
   SetWindowLongPtr(this->messageHandler, GWLP_USERDATA, MAGIC_DWORD);
@@ -177,9 +182,11 @@ Window *LSModule::CreateDrawableWindow(Settings *settings, MessageHandler *msgHa
     msgHandler);
 }
 
+
 HWND LSModule::GetMessageWindow() {
   return this->messageHandler;
 }
+
 
 HINSTANCE LSModule::GetInstance() {
   return this->instance;

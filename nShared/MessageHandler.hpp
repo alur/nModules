@@ -7,6 +7,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "../Utilities/Common.h"
+
 #define GWLP_MESSAGEHANDLER 0
 
 class MessageHandler {

@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Easing.cpp
- *  The nModules Project
- *
- *  Functions for calculating easings.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nShared/Easing.cpp
+// The nModules Project
+//
+// Functions for calculating easings.
+//-------------------------------------------------------------------------------------------------
 #include "Easing.h"
 
 #include "../Utilities/AlgorithmExtension.h"

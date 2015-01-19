@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Process.h
- *  The nModules Project
- *
- *  Utilities for dealing with processes.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/Process.h
+// The nModules Project
+//
+// Utilities for dealing with processes.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 /// <summary>

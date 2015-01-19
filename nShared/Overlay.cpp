@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  WindowOverlay.cpp
- *  The nModules Project
- *
- *  An overlay for a drawable window. An image or an icon.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nShared/Overlay.cpp
+// The nModules Project
+//
+// An overlay for a drawable window. An image or an icon.
+//-------------------------------------------------------------------------------------------------
 #include "Factories.h"
 #include "LiteStep.h"
 #include "Overlay.hpp"
@@ -15,6 +14,7 @@
 
 using namespace D2D1;
 
+
 Overlay::Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmapSource* source, int zOrder) {
   this->position = position;
   this->source = source;
@@ -24,10 +24,12 @@ Overlay::Overlay(D2D1_RECT_F position, D2D1_RECT_F parentPosition, IWICBitmapSou
   UpdatePosition(parentPosition);
 }
 
+
 Overlay::~Overlay() {
   DiscardDeviceResources();
   SAFERELEASE(this->source);
 }
+
 
 HRESULT Overlay::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
   IWICBitmapScaler* scaler = NULL;
@@ -87,10 +89,12 @@ HRESULT Overlay::ReCreateDeviceResources(ID2D1RenderTarget* renderTarget) {
   return hr;
 }
 
+
 void Overlay::DiscardDeviceResources() {
   SAFERELEASE(this->brush);
   this->renderTarget = nullptr;
 }
+
 
 void Overlay::UpdatePosition(D2D1_RECT_F parentPosition) {
   this->drawingPosition = this->position;
@@ -106,11 +110,13 @@ void Overlay::UpdatePosition(D2D1_RECT_F parentPosition) {
   }
 }
 
+
 void Overlay::Paint(ID2D1RenderTarget* renderTarget) {
   if (this->brush != NULL) {
     renderTarget->FillRectangle(this->drawingPosition, this->brush);
   }
 }
+
 
 void Overlay::SetSource(IWICBitmapSource* source) {
   SAFERELEASE(this->brush);
@@ -119,13 +125,16 @@ void Overlay::SetSource(IWICBitmapSource* source) {
   ReCreateDeviceResources(this->renderTarget);
 }
 
+
 ID2D1BitmapBrush *Overlay::GetBrush() {
   return brush;
 }
 
+
 int Overlay::GetZOrder() {
   return this->zOrder;
 }
+
 
 bool Overlay::UpdateDWMColor(ARGB, ID2D1RenderTarget*) {
   return false;

@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  StringUtils.h
- *  The nModules Project
- *
- *  Utilities for dealing with strings.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/StringUtils.h
+// The nModules Project
+//
+// Utilities for dealing with strings.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 #include "Common.h"
@@ -24,6 +23,7 @@ namespace StringUtils {
   LPSTR ReallocOverwrite(LPSTR dest, LPCSTR str);
   LPWSTR ReallocOverwrite(LPWSTR dest, LPCWSTR str);
 }
+
 
 // <summary>
 // Hashing function for null-terminated strings.
@@ -58,6 +58,7 @@ struct StringHasher {
     return value;
   }
 };
+
 
 // <summary>
 // Case sensitive functions for StringKeyedContainers.
@@ -128,6 +129,7 @@ struct CaseSensitive {
   };
 };
 
+
 // <summary>
 // Case insensitive functions for StringKeyedContainers.
 // </summary>
@@ -197,6 +199,7 @@ struct CaseInsensitive {
   };
 };
 
+
 // <summary>
 // Standard maps using strings as keys.
 // </summary>
@@ -216,6 +219,7 @@ struct StringKeyedMaps {
   using UnorderedMultiMap = std::unordered_multimap < KeyType, Type, typename KeyOperators::Hash, typename KeyOperators::Equal, Allocator > ;
   using ConstUnorderedMultiMap = const UnorderedMultiMap;
 };
+
 
 // <summary>
 // Standard sets using strings as keys.

@@ -1,15 +1,10 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Macros.h
- *  The nModules Project
- *
- *  Utility macros
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/Macros.h
+// The nModules Project
+//
+// Utility macros.
+//-------------------------------------------------------------------------------------------------
 #pragma once
-
-// Lets you skip to a certain part in the function if a CHECKHR fails
-//#define CHECKHR(var,exp) if (FAILED(var = (exp))) { goto chkeckhr_end; }
-//#define CHECKHR_END() chkeckhr_end:
 
 // Safe way to delete objects
 #define SAFEDELETE(obj) if (obj != nullptr) { delete obj; obj = nullptr; }

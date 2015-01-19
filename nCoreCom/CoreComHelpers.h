@@ -1,11 +1,10 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  CoreComHelpers.h
- *  The nModules Project
- *
- *  Helper functions for nCoreCom, essentially anything that should only be
- *  used by CoreCom routines.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nCoreCom/CoreComHelpers.h
+// The nModules Project
+//
+// Helper functions for nCoreCom, essentially anything that should only be used by CoreCom
+// routines.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 #include "../nShared/ResultCodes.h"

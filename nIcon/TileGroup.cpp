@@ -112,7 +112,7 @@ TileGroup::~TileGroup() {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 void TileGroup::LoadSettings() {
   // Icon settings
@@ -144,7 +144,7 @@ void TileGroup::LoadSettings() {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 void TileGroup::AddNameFilter(LPCWSTR name) {
   if (_wcsicmp(name, L".computer") == 0) {
@@ -172,7 +172,7 @@ void TileGroup::AddNameFilter(LPCWSTR name) {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 void TileGroup::SetFolder(LPWSTR folder) {
   PIDLIST_ABSOLUTE idList;
@@ -250,7 +250,7 @@ void TileGroup::AddIcon(PCITEMID_CHILD pidl) {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 void TileGroup::RemoveIcon(PCITEMID_CHILD pidl) {
   mTiles.remove_if([pidl, this] (Tile *tile) -> bool {
@@ -266,7 +266,7 @@ void TileGroup::RemoveIcon(PCITEMID_CHILD pidl) {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 void TileGroup::UpdateIcon(PCITEMID_CHILD pidl) {
   auto icon = FindIcon(pidl);
@@ -277,7 +277,7 @@ void TileGroup::UpdateIcon(PCITEMID_CHILD pidl) {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 void TileGroup::RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID) {
   auto icon = FindIcon(oldID);
@@ -288,7 +288,7 @@ void TileGroup::RenameIcon(PCITEMID_CHILD oldID, PCITEMID_CHILD newID) {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 int TileGroup::GetIconPosition(PCITEMID_CHILD /* pidl */) {
   if (!mEmptySpots.empty()) {
@@ -301,7 +301,7 @@ int TileGroup::GetIconPosition(PCITEMID_CHILD /* pidl */) {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 Tile *TileGroup::FindIcon(PCITEMID_CHILD pidl) const {
   for (auto tile : mTiles) {
@@ -356,7 +356,7 @@ HRESULT TileGroup::GetFolderPath(LPWSTR buf, UINT cchBuf) const {
     if (SUCCEEDED(hr)) {
       hr = mRootFolder->GetDisplayNameOf(curFolder, SHGDN_FORPARSING, &curFolderName);
     }
-        
+
     if (SUCCEEDED(hr)) {
       hr = StrRetToBufW(&curFolderName, curFolder, buf, cchBuf);
     }
@@ -516,7 +516,7 @@ void TileGroup::DoCopy(bool cut) {
   // Generate a double-null terminated list of files to copy.
   DoubleNullStringList files;
   WCHAR buffer[MAX_PATH];
-    
+
   ClearAllGhosting(!cut);
 
   for (Tile *tile : mTiles) {
@@ -607,7 +607,7 @@ void TileGroup::RenameSelectedFiles() {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 void TileGroup::ClearAllGhosting(bool repaint) {
   if (mClipBoardCutFiles) {
@@ -625,7 +625,7 @@ void TileGroup::ClearAllGhosting(bool repaint) {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 void TileGroup::StartRectangleSelection(D2D1_POINT_2U point) {
   mRectangleStart = point;
@@ -636,7 +636,7 @@ void TileGroup::StartRectangleSelection(D2D1_POINT_2U point) {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 void TileGroup::EndRectangleSelection(D2D1_POINT_2U point) {
   mInRectangleSelection = false;
@@ -665,7 +665,7 @@ void TileGroup::EndRectangleSelection(D2D1_POINT_2U point) {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 void TileGroup::MoveRectangleSelection(D2D1_POINT_2U point) {
   D2D1_RECT_F rect = D2D1::RectF(
@@ -779,7 +779,7 @@ LRESULT WINAPI TileGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
       return result;
     }
   }
-        
+
   if (mContextMenu2) {
     if (SUCCEEDED(mContextMenu2->HandleMenuMsg(message, wParam, lParam))) {
       return 0;
@@ -830,7 +830,7 @@ LRESULT WINAPI TileGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
     case VK_F2:
       RenameSelectedFiles();
       break;
-                    
+
     case VK_F5:
       UpdateAllIcons();
       break;
@@ -906,6 +906,6 @@ LRESULT WINAPI TileGroup::HandleMessage(HWND window, UINT message, WPARAM wParam
     break;
   }
 
-  mEventHandler->HandleMessage(window, message, wParam, lParam); 
+  mEventHandler->HandleMessage(window, message, wParam, lParam);
   return DefWindowProc(window, message, wParam, lParam);
 }

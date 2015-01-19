@@ -1,22 +1,21 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  UIDGenerator.hpp
- *  The nModules Project
- *
- *  Manages a set of unique ID's, letting you generate and release them.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/UIDGenerator.hpp
+// The nModules Project
+//
+// Manages a set of unique ID's, letting you generate and release them.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 #include <list>
 
-template <class TYPE>
+template <class Type>
 class UIDGenerator {
 public:
   /// <summary>
   /// Constructor.
   /// </summary>
   /// <param name="start">The ID to start at.</param>
-  explicit UIDGenerator(TYPE start = 0) {
+  explicit UIDGenerator(Type start = 0) {
     mNextFreshID = start;
   }
 
@@ -24,11 +23,11 @@ public:
   /// Generates a new ID. This ID won't be generated again until it has been released.
   /// </summary>
   /// <returns>The unique ID.</returns>
-  TYPE GetNewID() {
+  Type GetNewID() {
     if (mReleasedIDs.empty()) {
       return mNextFreshID++;
     }
-    TYPE ret = mReleasedIDs.front();
+    Type ret = mReleasedIDs.front();
     mReleasedIDs.pop_front();
     return ret;
   }
@@ -37,11 +36,11 @@ public:
   /// Releases an ID, allowing it to be generated again.
   /// </summary>
   /// <param name="id">The ID to release.</param>
-  void ReleaseID(TYPE id) {
+  void ReleaseID(Type id) {
     mReleasedIDs.push_back(id);
   }
 
 private:
-  TYPE mNextFreshID;
-  std::list<TYPE> mReleasedIDs;
+  Type mNextFreshID;
+  std::list<Type> mReleasedIDs;
 };

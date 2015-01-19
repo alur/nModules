@@ -5,8 +5,10 @@
  *  A class which can accept window messages.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#include "../Utilities/Common.h"
 #include "MessageHandler.hpp"
+
+#include "../Utilities/Common.h"
+
 
 /// <summary>
 /// Fixes up a WNDCLASSEX struct to be used as a message handler.
@@ -15,6 +17,7 @@ void MessageHandler::FixWindowClass(LPWNDCLASSEX ex) {
   ex->cbWndExtra += sizeof(MessageHandler*);
   ex->lpfnWndProc = &MessageHandler::WindowProcedureInit;
 }
+
 
 /// <summary>
 /// Wrapper for CreateWindowEx making sure that lParam is a MessageHandler*.
@@ -25,12 +28,14 @@ HWND MessageHandler::CreateMessageWindowEx(DWORD exStyle, LPCTSTR className, LPC
   return CreateWindowEx(exStyle, className, windowName, style, x, y, width, height, parent, menu, instance, messageHandler);
 }
 
+
 /// <summary>
 /// Wrapper since we can't point to a member function directly.
 /// </summary>
 LRESULT WINAPI MessageHandler::WindowProcedure(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
   return ((MessageHandler*)GetWindowLongPtr(window, 0))->HandleMessage(window, msg, wParam, lParam, nullptr);
 }
+
 
 /// <summary>
 /// Sets the windowproc and to MessageHandler::WindowProcedure and GWLP_MESSAGEHANDLER. This is done this

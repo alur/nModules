@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  StopWatch.cpp
- *  The nModules Project
- *
- *  Measures time between events.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/StopWatch.cpp
+// The nModules Project
+//
+// Measures time between events.
+//-------------------------------------------------------------------------------------------------
 #include "Common.h"
 #include "StopWatch.hpp"
 

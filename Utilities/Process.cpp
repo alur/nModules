@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Process.cpp
- *  The nModules Project
- *
- *  Utilities for dealing with processes.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/Process.cpp
+// The nModules Project
+//
+// Utilities for dealing with processes.
+//-------------------------------------------------------------------------------------------------
 #include "Common.h"
 #include "Process.h"
 

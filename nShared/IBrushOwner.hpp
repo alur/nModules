@@ -10,8 +10,7 @@
 #include "Brush.hpp"
 #include "IStateWindowData.hpp"
 
-class IBrushOwner
-{
+class IBrushOwner {
 public:
-    virtual Brush *GetBrush(LPCTSTR name) = 0;
+  virtual Brush *GetBrush(LPCTSTR name) = 0;
 };

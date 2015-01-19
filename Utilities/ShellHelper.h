@@ -16,5 +16,5 @@ namespace ShellHelper {
     MDT_Default = MDT_Effective_DPI
   };
 
-  HRESULT WINAPI GetDPIForMonitor(HMONITOR, MONITOR_DPI_TYPE, UINT *dpiX, UINT *dpiY);
+  HRESULT WINAPI GetDPIForMonitor(HMONITOR, MONITOR_DPI_TYPE, LPUINT dpiX, LPUINT dpiY);
 }

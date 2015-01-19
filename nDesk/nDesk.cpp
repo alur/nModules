@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Main .cpp file for the nDesk module.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "../nCoreCom/Core.h"
@@ -43,7 +43,7 @@ EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* 
     wc.hIconSm = 0;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.style = CS_DBLCLKS;
-    
+
     if (!gLSModule.ConnectToCore(MakeVersion(CORE_VERSION))) {
         return 1;
     }
@@ -51,7 +51,7 @@ EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* 
     // Initialize
     g_pClickHandler = new ClickHandler();
     g_pDesktopPainter = nullptr; // Initialized on WM_CREATE
-    
+
     if (!gLSModule.Initialize(nullptr, instance, &wc, nullptr)) {
         delete g_pClickHandler;
         return 1;
@@ -75,55 +75,6 @@ EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* 
     // Reset the work area for all monitors
     WorkArea::ResetWorkAreas(&nCore::FetchMonitorInfo());
     WorkArea::LoadSettings(&nCore::FetchMonitorInfo());
-
-    /*const CLSID CLSID_Test = {0xff609cc7, 0xd34d, 0x4049, {0xa1, 0xaa, 0x22, 0x93, 0x51, 0x7f, 0xfc, 0xc6}};
-    IExecuteCommand *iec;
-    IObjectWithSelection *iows;
-    IShellItem *ishi;
-    IShellItemArray *ishia;
-
-    HRESULT hr = CoCreateInstance(CLSID_Test, nullptr, CLSCTX_INPROC_SERVER, IID_IExecuteCommand, (LPVOID*)&iec);
-
-    if (SUCCEEDED(hr)) {
-        hr = iec->QueryInterface(IID_IObjectWithSelection, (LPVOID*)&iows);
-
-        hr = SHCreateItemFromParsingName(L"C:\\Users\\Erik\\Dropbox\\Wallpapers\\24545.jpg", nullptr, IID_IShellItem, (LPVOID*)&ishi);
-
-        hr = SHCreateShellItemArrayFromShellItem(ishi, IID_IShellItemArray, (LPVOID*)&ishia);
-
-        hr = iec->SetDirectory(L"C:\\Users\\Erik\\Dropbox\\Wallpapers");
-        hr = iows->SetSelection(ishia);
-
-        hr = iec->Execute();
-        
-        iec->Release();
-    }*/
-
-    // Used to generate the table for: http://portfolio.alurcard2.net/#!/wiki/Named%20Colors
-    
-    ////TRACE("[tr][th]Name[/th][th]Color[/th][th]#ARGB[/th][th]Alpha[/th][th]RGB[/th][th]HSL[/th][th]HSV[/th][/tr]");
-    //TRACE("|| Name || `_____ Color of the color _____` || #ARGB || Alpha || RGB || HSL || HSV ||");
-    //Color::KnownColor* knownColors = Color::GetKnownColors();
-    //for (int i = 0; knownColors[i].name != NULL; i++) {
-    //    AHSL ahsl = Color::ARGBToAHSL(knownColors[i].color);
-    //    AHSV ahsv = Color::ARGBToAHSV(knownColors[i].color);
-
-    //    /*TRACE("[tr][td]%s[/td][td][coloredblock=rgba(%u,%u,%u,%f) width=100%%][/td][td]#%08X[/td][td]%u[/td][td]%u, %u, %u[/td][td]%u, %u, %u[/td][td]%u, %u, %u[/td][/tr]",
-    //        knownColors[i].name, // Name
-    //        knownColors[i].color >> 16 & 0xFF, knownColors[i].color >> 8 & 0xFF, knownColors[i].color & 0xFF, (knownColors[i].color >> 24) / 255.0f,  // Block color
-    //        knownColors[i].color, knownColors[i].color >> 24, // #ARGB, Alpha
-    //        knownColors[i].color >> 16 & 0xFF, knownColors[i].color >> 8 & 0xFF, knownColors[i].color & 0xFF, // RGB
-    //        ahsl.hue, ahsl.saturation, ahsl.lightness, ahsv.hue, ahsv.saturation, ahsv.value // HSL, HSV
-    //        );*/
-
-    //    TRACE("|| `%s` || http://alurcard2.net/color.svg?color=%u,%u,%u,%.2f || #%08X || %u || %u, %u, %u || %u, %u, %u || %u, %u, %u ||",
-    //        knownColors[i].name, // Name
-    //        knownColors[i].color >> 16 & 0xFF, knownColors[i].color >> 8 & 0xFF, knownColors[i].color & 0xFF, (knownColors[i].color >> 24) / 255.0f,  // Block color
-    //        knownColors[i].color, knownColors[i].color >> 24, // #ARGB, Alpha
-    //        knownColors[i].color >> 16 & 0xFF, knownColors[i].color >> 8 & 0xFF, knownColors[i].color & 0xFF, // RGB
-    //        ahsl.hue, (UINT)ahsl.saturation, (UINT)ahsl.lightness, ahsv.hue, (UINT)ahsv.saturation, (UINT)ahsv.value // HSL, HSV
-    //        );
-    //}
 
     return 0;
 }
@@ -178,11 +129,11 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
             nDesk::Settings::Load();
         }
         return 0;
-    
+
     case WM_PAINT:
     case WM_ERASEBKGND:
         return g_pDesktopPainter->HandleMessage(window, message, wParam, lParam);
-    
+
     case WM_WINDOWPOSCHANGING:
         {
             // Keep the hWnd at the bottom of the window stack
@@ -200,14 +151,14 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 
     case NCORE_DISPLAYCHANGE:
         {
-            // TODO::Ensure 
+            // TODO::Ensure
             g_pDesktopPainter->Resize();
             nDesk::Settings::OnResolutionChange();
             WorkArea::LoadSettings(&nCore::FetchMonitorInfo());
             InvalidateRect(nullptr, nullptr, TRUE);
         }
         break;
-    
+
     case WM_SETTINGCHANGE:
         {
             if (wParam == SPI_SETDESKWALLPAPER) {

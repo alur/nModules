@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  StringUtils.cpp
- *  The nModules Project
- *
- *  Utilities for dealing with strings.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /Utilities/StringUtils.cpp
+// The nModules Project
+//
+// Utilities for dealing with strings.
+//-------------------------------------------------------------------------------------------------
 #include "Common.h"
 #include "StringUtils.h"
 

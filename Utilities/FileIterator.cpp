@@ -17,9 +17,6 @@ FileIterator::FileIterator(LPCTSTR path) {
 }
 
 
-/// <summary>
-/// Destructor
-/// </summary>
 FileIterator::~FileIterator() {
   if (mFindFileHandle != INVALID_HANDLE_VALUE) {
     FindClose(mFindFileHandle);

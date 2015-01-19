@@ -1,11 +1,3 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  LiteStep.h
- *  The nModules Project
- *
- *  Confines LSAPI routines to a namespace, and provides extra parsing
- *  functions.
- *  
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 //-------------------------------------------------------------------------------------------------
 // /nShared/LiteStep.h
 // The nModules Project

@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Settings.cpp
- *  The nModules Project
- *
- *  Manages RC settings with a certain prefix.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nShared/Settings.cpp
+// The nModules Project
+//
+// Manages RC settings with a certain prefix.
+//-------------------------------------------------------------------------------------------------
 #include "LiteStep.h"
 #include "Settings.hpp"
 #include "ErrorHandler.h"
@@ -15,6 +14,7 @@ using std::unique_ptr;
 using std::function;
 using namespace LiteStep;
 
+
 /// <summary>
 /// Initalizes a new Settings class.
 /// </summary>
@@ -23,6 +23,7 @@ Settings::Settings(LPCTSTR prefix) {
   StringCchCopy(mPrefix, _countof(mPrefix), prefix);
   mGroup = unique_ptr<Settings>(GreateGroup(nullptr));
 }
+
 
 /// <summary>
 /// Creates a deep copy of the specified group.
@@ -37,6 +38,7 @@ Settings::Settings(LPCSettings settings) {
   }
 }
 
+
 /// <summary>
 /// Initalizes a new Settings class, due to the precense of a Group setting in another class.
 /// </summary>
@@ -46,6 +48,7 @@ Settings::Settings(LPCTSTR prefix, LPCTSTR prefixTrail[]) {
   StringCchCopy(mPrefix, _countof(mPrefix), prefix);
   mGroup = unique_ptr<Settings>(GreateGroup(prefixTrail));
 }
+
 
 /// <summary>
 /// Creates a child of this Settings*. If you have a Settings with the prefix of Label, and you want
@@ -74,6 +77,7 @@ LPSettings Settings::CreateChild(LPCTSTR prefix) const {
   return head;
 }
 
+
 /// <summary>
 /// Appends the specified prefix to the end of the group list. Essentially, lets these
 /// settings fall back to that group as a default.
@@ -84,12 +88,14 @@ void Settings::AppendGroup(LPCSettings group) {
   tail->mGroup = unique_ptr<Settings>(new (std::nothrow) Settings(group));
 }
 
+
 /// <summary>
 /// Returns the fully qualified prefix used to read settings.
 /// </summary>
 LPCTSTR Settings::GetPrefix() const {
   return mPrefix;
 }
+
 
 /// <summary>
 /// Gets the value we should use for m_pGroup.
@@ -145,6 +151,7 @@ Settings* Settings::GreateGroup(LPCTSTR prefixTrail[]) {
   return new Settings(group, prefixTrail);
 }
 
+
 /// <summary>
 /// Gets a boolean from a prefixed RC value.
 /// </summary>
@@ -155,6 +162,7 @@ bool Settings::GetBool(LPCTSTR key, bool defaultValue) const {
   return GetPrefixedRCBool(mPrefix, key, mGroup != nullptr ? mGroup->GetBool(key, defaultValue) : defaultValue);
 }
 
+
 /// <summary>
 /// Set's a prefixed RC value to a particular boolean.
 /// </summary>
@@ -163,6 +171,7 @@ bool Settings::GetBool(LPCTSTR key, bool defaultValue) const {
 void Settings::SetBool(LPCTSTR key, bool value) const {
   SetString(key, value ? L"True" : L"False");
 }
+
 
 /// <summary>
 /// Gets a color from a prefixed RC value.
@@ -176,6 +185,7 @@ IColorVal* Settings::GetColor(LPCTSTR key, const IColorVal* defaultValue) const 
   return ParseColor(colorString, defaultValue);
 }
 
+
 /// <summary>
 /// Sets a prefixed RC value to a particular color.
 /// </summary>
@@ -187,6 +197,7 @@ void Settings::SetColor(LPCTSTR key, ARGB value) const {
   SetString(key, valueString);
 }
 
+
 /// <summary>
 /// Gets a double from a prefixed RC value.
 /// </summary>
@@ -196,6 +207,7 @@ void Settings::SetColor(LPCTSTR key, ARGB value) const {
 double Settings::GetDouble(LPCTSTR key, double defaultValue) const {
   return GetPrefixedRCDouble(mPrefix, key, mGroup != nullptr ? mGroup->GetDouble(key, defaultValue) : defaultValue);
 }
+
 
 /// <summary>
 /// Sets a prefixed RC value to a particular double.
@@ -208,6 +220,7 @@ void Settings::SetDouble(LPCTSTR key, double value) const {
   SetString(key, valueString);
 }
 
+
 /// <summary>
 /// Gets a float from a prefixed RC value.
 /// </summary>
@@ -217,6 +230,7 @@ void Settings::SetDouble(LPCTSTR key, double value) const {
 float Settings::GetFloat(LPCTSTR key, float defaultValue) const {
   return GetPrefixedRCFloat(mPrefix, key, mGroup != nullptr ? mGroup->GetFloat(key, defaultValue) : defaultValue);
 }
+
 
 /// <summary>
 /// Sets a prefixed RC value to a particular float.
@@ -229,6 +243,7 @@ void Settings::SetFloat(LPCTSTR key, float value) const {
   SetString(key, valueString);
 }
 
+
 /// <summary>
 /// Gets an integer from a prefixed RC value.
 /// </summary>
@@ -238,6 +253,7 @@ void Settings::SetFloat(LPCTSTR key, float value) const {
 int Settings::GetInt(LPCTSTR key, int defaultValue) const {
   return GetPrefixedRCInt(mPrefix, key, mGroup != nullptr ? mGroup->GetInt(key, defaultValue) : defaultValue);
 }
+
 
 /// <summary>
 /// Sets a prefixed RC value to a particular integer.
@@ -250,6 +266,7 @@ void Settings::SetInt(LPCTSTR key, int value) const {
   SetString(key, valueString);
 }
 
+
 /// <summary>
 /// Gets a 64-bit integer from a prefixed RC value.
 /// </summary>
@@ -259,6 +276,7 @@ void Settings::SetInt(LPCTSTR key, int value) const {
 __int64 Settings::GetInt64(LPCTSTR key, __int64 defaultValue) const {
   return GetPrefixedRCInt64(mPrefix, key, mGroup != nullptr ? mGroup->GetInt64(key, defaultValue) : defaultValue);
 }
+
 
 /// <summary>
 /// Sets a prefixed RC value to a particular integer.
@@ -271,6 +289,7 @@ void Settings::SetInt64(LPCTSTR key, __int64 value) const {
   SetString(key, valueString);
 }
 
+
 /// <summary>
 /// Get's a Monitor from a prefixed RC value.
 /// </summary>
@@ -280,6 +299,7 @@ void Settings::SetInt64(LPCTSTR key, __int64 value) const {
 UINT Settings::GetMonitor(LPCTSTR key, UINT defaultValue) const {
   return GetPrefixedRCMonitor(mPrefix, key, mGroup != nullptr ? mGroup->GetMonitor(key, defaultValue) : defaultValue);
 }
+
 
 /// <summary>
 /// Set's a prefixed RC value to a particular monitor.
@@ -292,6 +312,7 @@ void Settings::SetMonitor(LPCTSTR key, UINT value) const {
   SetString(key, valueString);
 }
 
+
 /// <summary>
 /// Get's a Distance from a prefixed RC value.
 /// </summary>
@@ -301,6 +322,7 @@ void Settings::SetMonitor(LPCTSTR key, UINT value) const {
 Distance Settings::GetDistance(LPCTSTR key, Distance defaultValue) const {
   return GetPrefixedRCDistance(mPrefix, key, mGroup != nullptr ? mGroup->GetDistance(key, defaultValue) : defaultValue);
 }
+
 
 /// <summary>
 /// Gets a line from a prefixed RC value.
@@ -319,6 +341,7 @@ bool Settings::GetLine(LPCTSTR key, LPTSTR buffer, UINT cchBuffer, LPCTSTR defau
   return GetPrefixedRCLine(mPrefix, key, buffer, defaultValue, cchBuffer);
 }
 
+
 /// <summary>
 /// Gets a string from a prefixed RC value.
 /// </summary>
@@ -336,6 +359,7 @@ bool Settings::GetString(LPCTSTR key, LPTSTR buffer, UINT cchBuffer, LPCTSTR def
   return GetPrefixedRCString(mPrefix, key, buffer, defaultValue, cchBuffer);
 }
 
+
 /// <summary>
 /// Sets a prefixed RC value to a particular string.
 /// </summary>
@@ -347,6 +371,7 @@ void Settings::SetString(LPCTSTR key, LPCTSTR value) const {
   LSSetVariable(keyName, value);
 }
 
+
 /// <summary>
 /// Reads an X, Y, Width, Height series of settings into a RECT.
 /// </summary>
@@ -355,6 +380,7 @@ void Settings::SetString(LPCTSTR key, LPCTSTR value) const {
 RECT Settings::GetRect(LPCTSTR key, LPCRECT defaultValue) const {
   return GetRect(key, defaultValue->left, defaultValue->top, defaultValue->right - defaultValue->left, defaultValue->bottom - defaultValue->top);
 }
+
 
 /// <summary>
 /// Reads an X, Y, Width, Height series of settings into a RECT.
@@ -380,6 +406,7 @@ RECT Settings::GetRect(LPCTSTR key, LONG defX, LONG defY, LONG defWidth, LONG de
   return rect;
 }
 
+
 /// <summary>
 /// Sets an X, Y, Width, Height series of settings from a RECT.
 /// </summary>
@@ -398,6 +425,7 @@ void Settings::SetRect(LPCTSTR key, LPCRECT value) const {
   SetInt(heightKey, value->bottom - value->top);
 }
 
+
 /// <summary>
 /// Reads a series of values into a RECT structure.
 /// </summary>
@@ -406,6 +434,7 @@ void Settings::SetRect(LPCTSTR key, LPCRECT value) const {
 RECT Settings::GetOffsetRect(LPCTSTR key, LPCRECT defaultValue) const {
   return GetOffsetRect(key, defaultValue->left, defaultValue->top, defaultValue->right, defaultValue->bottom);
 }
+
 
 /// <summary>
 /// Reads a series of values into a RECT structure.
@@ -431,6 +460,7 @@ RECT Settings::GetOffsetRect(LPCTSTR key, LONG defLeft, LONG defTop, LONG defRig
   return rect;
 }
 
+
 /// <summary>
 /// Sets a Left, Top, Right, Bottom series of settings from a RECT.
 /// </summary>
@@ -448,6 +478,7 @@ void Settings::SetOffsetRect(LPCTSTR key, LPCRECT value) const {
   SetInt(rightKey, value->right);
   SetInt(bottomKey, value->bottom);
 }
+
 
 /// <summary>
 /// Reads a series of values into a D2D1_RECT_F structure.
@@ -469,6 +500,7 @@ D2D1_RECT_F Settings::GetOffsetRectF(LPCTSTR key, const D2D1_RECT_F * defaultVal
 
   return rect;
 }
+
 
 /// <summary>
 /// Iterates over lines of the form *PrefixKey.

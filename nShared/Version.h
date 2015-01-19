@@ -1,10 +1,9 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Version.h
- *  The nModules Project
- *
- *  Version of the shared components.
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//-------------------------------------------------------------------------------------------------
+// /nShared/Version.h
+// The nModules Project
+//
+// Version of the shared components.
+//-------------------------------------------------------------------------------------------------
 #pragma once
 
 // The version of the shared components
