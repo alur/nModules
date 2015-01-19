@@ -5,6 +5,7 @@
 // Debugging functions. Taken from the LiteStep core.
 //-------------------------------------------------------------------------------------------------
 #include "Common.h"
+#include "Error.h"
 
 #include <strsafe.h>
 
@@ -69,6 +70,28 @@ void DbgTraceWindowMessage(LPCSTR prefix, UINT msg, WPARAM wParam, LPARAM lParam
       TRACE("[%s] WM_%.8X(%p, %p)", prefix, msg, wParam, lParam);
     }
   }
+}
+
+
+/// <summary>
+/// Sends a formatted (printf-style) message to the debug output window.
+/// Automatically inserts \n at the end of the string.
+/// </summary>
+void DbgTraceHr(LPCWSTR prefixFormat, HRESULT hr, ...) {
+  ASSERT(nullptr != prefixFormat);
+
+  va_list args;
+  WCHAR buffer[512];
+
+  va_start(args, prefixFormat);
+  StringCchVPrintfExW(buffer, 512, nullptr, nullptr, STRSAFE_NULL_ON_FAILURE, prefixFormat, args);
+  va_end(args);
+  OutputDebugStringW(buffer);
+
+  DescriptionFromHR(hr, buffer, 512);
+  OutputDebugStringW(buffer);
+
+  OutputDebugStringW(L"\n");
 }
 
 #endif /* _DEBUG */

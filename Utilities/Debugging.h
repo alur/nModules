@@ -45,6 +45,12 @@ void DbgTraceMessageW(LPCWSTR format, ...);
 #endif
 
 #if defined(_DEBUG)
+void DbgTraceHr(LPCWSTR prefixFormat, HRESULT hr, ...);
+#else
+#define DbgTraceHr
+#endif
+
+#if defined(_DEBUG)
 void    DbgTraceWindowMessage(LPCSTR prefix, UINT msg, WPARAM wParam, LPARAM lParam);
 #else
 #define DbgTraceWindowMessage(prefix, msg, wParam, lParam)
