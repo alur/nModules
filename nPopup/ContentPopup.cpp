@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  A popup which retrives its content from outside LiteStep's .rc files.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
@@ -130,7 +130,7 @@ void ContentPopup::LoadContent()
     case NETWORK:
         LoadShellFolder(FOLDERID_NetworkFolder);
         break;
-    
+
     case PATH:
         for (std::list<LPCTSTR>::const_iterator iter = paths.begin(); iter != paths.end(); ++iter)
         {
@@ -194,7 +194,7 @@ void ContentPopup::LoadPath(LPCTSTR path)
     rootFolder->ParseDisplayName(NULL, NULL, (LPTSTR)path, NULL, &idList, NULL);
     rootFolder->BindToObject(idList, NULL, IID_IShellFolder, reinterpret_cast<LPVOID*>(&targetFolder));
     rootFolder->Release();
-    
+
     LoadFromIDList(targetFolder, idList, false);
 
     if (idList != NULL)
@@ -228,7 +228,6 @@ void ContentPopup::LoadFromIDList(IShellFolder *targetFolder, PIDLIST_ABSOLUTE i
             CoTaskMemFree(idNext);
         }
         enumIDList->Release();
-    
 
         // Register for change notifications
         SHChangeNotifyEntry watchEntries[] = { idList, TRUE };
@@ -258,7 +257,7 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
     TCHAR quotedCommand[MAX_LINE_LENGTH];
     bool openable;
     HRESULT hr;
-    PopupItem* item; 
+    PopupItem* item;
     vector<PopupItem*>::const_iterator iter;
 
     if (SUCCEEDED(targetFolder->GetDisplayNameOf(itemID, SHGDN_NORMAL, &ret)))
@@ -268,12 +267,12 @@ void ContentPopup::LoadSingleItem(IShellFolder *targetFolder, PIDLIST_RELATIVE i
         {
             StrRetToStr(&ret, NULL, &command);
 
-            // 
+            //
             attributes = SFGAO_BROWSABLE | SFGAO_FOLDER;
             hr = targetFolder->GetAttributesOf(1, (LPCITEMIDLIST *)&itemID, &attributes);
             openable = SUCCEEDED(hr) && !dontExpandFolders && (((attributes & SFGAO_FOLDER) == SFGAO_FOLDER) || ((attributes & SFGAO_BROWSABLE) == SFGAO_BROWSABLE));
 
-            
+
             StopWatch watch;
             if (openable)
             {
@@ -380,5 +379,5 @@ LRESULT WINAPI ContentPopup::HandleMessage(HWND window, UINT message, WPARAM wPa
             return 0;
         }
     }
-    return Popup::HandleMessage(window, message, wParam, lParam, Window); 
+    return Popup::HandleMessage(window, message, wParam, lParam, Window);
 }

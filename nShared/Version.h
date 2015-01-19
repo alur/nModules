@@ -7,10 +7,10 @@
 #pragma once
 
 // The version of the shared components
-#define SHARED_VERSION 0, 6, 5, 0
+#define SHARED_VERSION 0, 7, 0, 0
 
 // The minimum core version required
-#define SHARED_CORE_VERSION 0, 6, 5, 0
+#define SHARED_CORE_VERSION 0, 7, 0, 0
 
 // String version of the SHARED_VERSION
-#define SHARED_VERSION_STR "0.6.5"
+#define SHARED_VERSION_STR "0.7"
