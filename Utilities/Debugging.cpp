@@ -6,6 +6,8 @@
 //-------------------------------------------------------------------------------------------------
 #include "Common.h"
 
+#include <strsafe.h>
+
 #ifdef _DEBUG
 
 
@@ -61,7 +63,7 @@ void DbgTraceWindowMessage(LPCSTR prefix, UINT msg, WPARAM wParam, LPARAM lParam
     TCHAR msgName[MAX_PATH] = { 0 };
 
     // GetClipboardFormatName retrieves the name of registered window messages too!
-    if (GetClipboardFormatName(msg, msgName, _countof(msgName)) > 0) {
+    if (GetClipboardFormatName(msg, msgName, MAX_PATH) > 0) {
       TRACE("[%s] WM_'%s'(%p, %p)", prefix, msgName, wParam, lParam);
     } else {
       TRACE("[%s] WM_%.8X(%p, %p)", prefix, msg, wParam, lParam);
