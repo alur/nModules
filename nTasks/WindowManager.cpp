@@ -4,7 +4,7 @@
 *
 *  Monitors all existing top-level windows. Forwards notifications to the
 *  taskbars.
-*   
+*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include "ButtonSettings.hpp"
@@ -37,10 +37,10 @@ extern LSModule gLSModule;
 const UINT gWMMessages[] = {
     // Standard HSHELL
     LM_WINDOWCREATED, LM_WINDOWACTIVATED, LM_WINDOWDESTROYED, LM_LANGUAGE,
-    LM_REDRAW, LM_GETMINRECT, LM_WINDOWREPLACED, LM_WINDOWREPLACING, LM_MONITORCHANGED, 
+    LM_REDRAW, LM_GETMINRECT, LM_WINDOWREPLACED, LM_WINDOWREPLACING, LM_MONITORCHANGED,
 
     // Progress bar
-    LM_TASK_SETPROGRESSSTATE, LM_TASK_SETPROGRESSVALUE, LM_TASK_MARKASACTIVE, 
+    LM_TASK_SETPROGRESSSTATE, LM_TASK_SETPROGRESSVALUE, LM_TASK_MARKASACTIVE,
 
     // MDI
     LM_TASK_REGISTERTAB, LM_TASK_UNREGISTERTAB, LM_TASK_SETACTIVETAB, LM_TASK_SETTABORDER, LM_TASK_SETTABPROPERTIES,
@@ -53,7 +53,7 @@ const UINT gWMMessages[] = {
 
     // Buttons
     LM_TASK_THUMBBARADDBUTTONS, LM_TASK_THUMBBARUPDATEBUTTONS, LM_TASK_THUMBBARSETIMAGELIST,
-    
+
     0 };
 
 namespace WindowManager
@@ -137,10 +137,12 @@ void WindowManager::AddWindow(HWND hWnd)
             TRACEW(L"AddWindow called with existing window!: %u %s", hWnd, title);
             return;
         }
-        
+
         // Get information about the window
         WindowInformation &wndInfo = windowMap[hWnd];
         wndInfo.uMonitor = nCore::FetchMonitorInfo().MonitorFromHWND(hWnd);
+        wndInfo.lastUpdateTime = GetTickCount64();
+        wndInfo.updateDuringMaintenance = false;
 
         // Add it to any taskbar that wants it
         for (TaskbarMap::value_type &taskbar : gTaskbars)
@@ -309,9 +311,14 @@ void WindowManager::UpdateWindow(HWND hWnd, LPARAM lParam)
     // Check that we are currently running
     ASSERT(isStarted);
 
-    WindowMap::const_iterator iter = windowMap.find(hWnd);
+    WindowMap::iterator iter = windowMap.find(hWnd);
     if (iter != windowMap.end())
     {
+        if (GetTickCount64() - iter->second.lastUpdateTime < 100) {
+            iter->second.updateDuringMaintenance = true;
+            return;
+        }
+
         // Update the text
         WCHAR title[MAX_LINE_LENGTH];
         GetWindowTextW(hWnd, title, _countof(title));
@@ -331,6 +338,9 @@ void WindowManager::UpdateWindow(HWND hWnd, LPARAM lParam)
                 button->Flash();
             }
         }
+
+        iter->second.lastUpdateTime = GetTickCount64();
+        iter->second.updateDuringMaintenance = false;
     }
     else if (IsTaskbarWindow(hWnd))
     {
@@ -346,7 +356,7 @@ void WindowManager::UpdateWindow(HWND hWnd, LPARAM lParam)
 /// <summary>
 /// Retrives the rectangle of the first taskbutton for the specified HWND.
 /// </summary>
-LRESULT WindowManager::GetMinRect(HWND hWnd, LPPOINTS lpPoints) 
+LRESULT WindowManager::GetMinRect(HWND hWnd, LPPOINTS lpPoints)
 {
     // Check that we are currently running
     ASSERT(isStarted);
@@ -388,7 +398,7 @@ void WindowManager::UpdateWindowMonitors()
         {
             MonitorChanged(mod.first, mod.second);
         }
-        
+
         // Clear update locks
         updateLocks.clear();
     }
@@ -479,7 +489,7 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         }
         return 0;
 
-        // 
+        //
     case WM_TIMER:
         {
             switch(wParam)
@@ -514,8 +524,8 @@ LRESULT WindowManager::ShellMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         {
         }
         return 0;
-        
-        // 
+
+        //
     case WM_ADDED_EXISTING:
         {
             // Relayout all taskbars.
@@ -739,7 +749,7 @@ void WindowManager::RunWindowMaintenance()
     {
         updateLocks[i++] = new Window::UpdateLock(taskbar.second.GetWindow());
     }
-    
+
     vector<HWND> removals;
     for (WindowMap::iterator iter = windowMap.begin(); iter != windowMap.end(); iter++)
     {
@@ -749,6 +759,10 @@ void WindowManager::RunWindowMaintenance()
         }
         else
         {
+            if (iter->second.updateDuringMaintenance)
+            {
+                UpdateWindow(iter->first, 0);
+            }
             for (TaskButton *button : iter->second.buttons)
             {
                 if (IsIconic(iter->first))

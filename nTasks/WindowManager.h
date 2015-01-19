@@ -3,7 +3,7 @@
 *  The nModules Project
 *
 *  Monitors all existing top-level windows.
-*  
+*
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
@@ -49,6 +49,12 @@ namespace WindowManager
 
         // If the progress is determinate, how far along we are
         USHORT progress;
+
+        // The tick count at the last time UpdateWindow was called.
+        ULONGLONG lastUpdateTime;
+
+        // True if this window should be updated during maintenance.
+        bool updateDuringMaintenance;
     };
 
     // Some helpful typedefs
