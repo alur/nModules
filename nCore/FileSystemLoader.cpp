@@ -156,6 +156,8 @@ static void LoadThumbnail(LoadThumbnailResponse &response, int iconSize, IShellF
 static void LoadFolderThread(LoadFolderRequest request, UINT64 requestId, volatile bool *abort, HWND hwnd) {
   LoadFolderResponse response;
 
+  CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
   IEnumIDList *enumIdList;
   if (SUCCEEDED(request.folder->EnumObjects(nullptr, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &enumIdList))) {
     PIDLIST_RELATIVE idNext;
@@ -195,6 +197,8 @@ static void LoadFolderThread(LoadFolderRequest request, UINT64 requestId, volati
   }
 
   request.folder->Release();
+
+  CoUninitialize();
 }
 
 
