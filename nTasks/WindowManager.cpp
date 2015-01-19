@@ -314,6 +314,10 @@ void WindowManager::UpdateWindow(HWND hWnd, LPARAM lParam)
     WindowMap::iterator iter = windowMap.find(hWnd);
     if (iter != windowMap.end())
     {
+        // There are a few (very few) windows which update 100s of times/second (the cygwin
+        // installer). We can't render that fast, and end up locking up the shell with our backlog
+        // of HSHELL_REDRAW messages. Therefore, if we get called too frequently, we just defer the
+        // update until the next maintenance cycle.
         if (GetTickCount64() - iter->second.lastUpdateTime < 100) {
             iter->second.updateDuringMaintenance = true;
             return;
