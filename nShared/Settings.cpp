@@ -517,3 +517,15 @@ void Settings::IterateOverCommandLines(LPCTSTR key, function<void(LPCTSTR line)>
     settings = settings->mGroup.get();
   }
 }
+
+
+/// <summary>
+/// Iterates over lines of the form *PrefixKey.
+/// </summary>
+/// <param name="key">Key of the lines to iterate over.</param>
+/// <param name="callback">Function to call for each token.</param>
+void Settings::IterateOverCommandTokens(LPCTSTR key, function<void(LPCTSTR token)> callback) const {
+  IterateOverCommandLines(key, [&callback] (LPCTSTR line) {
+    IterateOverTokens(line, callback);
+  });
+}

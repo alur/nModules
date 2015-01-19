@@ -138,9 +138,8 @@ void TileGroup::LoadSettings() {
     AddNameFilter(L".onedrive");
   }
 
-  /*mSettings->IterateOverCommandTokens(L"Hide", [this](LPCWSTR token) -> void {
-    AddNameFilter(token);
-  });*/
+  mSettings->IterateOverCommandTokens(
+    L"Hide", std::bind(&TileGroup::AddNameFilter, this, std::placeholders::_1));
 }
 
 
