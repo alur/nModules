@@ -67,9 +67,8 @@ bool LSModule::Initialize(HWND parent, HINSTANCE instance, PWNDCLASSEX customMes
   this->instance = instance;
 
   if (FAILED(hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE))) {
-    ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, HRESULT_FROM_WIN32(GetLastError()),
-      L"Failed to initialize COM.");
-    return 1;
+    ErrorHandler::ErrorHR(ErrorHandler::Level::Critical, hr, L"Failed to initialize COM.");
+    return false;
   }
 
   // Register the messageHandler window class
