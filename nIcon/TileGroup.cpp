@@ -135,6 +135,7 @@ void TileGroup::LoadSettings() {
     AddNameFilter(L".network");
     AddNameFilter(L".homegroup");
     AddNameFilter(L".user");
+    AddNameFilter(L".onedrive");
   }
 
   /*mSettings->IterateOverCommandTokens(L"Hide", [this](LPCWSTR token) -> void {
@@ -160,6 +161,11 @@ void TileGroup::AddNameFilter(LPCWSTR name) {
     mHiddenItems.emplace(L"::{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}");
   } else if (_wcsicmp(name, L".homegroup") == 0) {
     mHiddenItems.emplace(L"::{B4FB3F98-C1EA-428D-A78A-D1F5659CBA93}");
+  } else if (_wcsicmp(name, L".onedrive") == 0) {
+    LPWSTR path;
+    SHGetKnownFolderPath(FOLDERID_SkyDrive, 0, nullptr, &path);
+    mHiddenItems.emplace(path);
+    CoTaskMemFree(path);
   } else if (_wcsicmp(name, L".user") == 0) {
     LPWSTR path;
     SHGetKnownFolderPath(FOLDERID_Profile, 0, nullptr, &path);
