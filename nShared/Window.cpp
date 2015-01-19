@@ -702,7 +702,6 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
 
             if (GetUpdateRect(window, &updateRect, FALSE) != FALSE)
             {
-                ValidateRect(this->window, nullptr);
                 if (ReCreateDeviceResources() == S_OK)
                 {
                     D2D1_RECT_F d2dUpdateRect = D2D1::RectF(
@@ -720,6 +719,10 @@ LRESULT WINAPI Window::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARA
                     if (mRenderTarget->EndDraw() == D2DERR_RECREATE_TARGET)
                     {
                         DiscardDeviceResources();
+                    }
+                    else
+                    {
+                        ValidateRect(this->window, nullptr);
                     }
                 }
 
