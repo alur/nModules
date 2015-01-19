@@ -2,7 +2,7 @@ The nModules are a set of LiteStep modules designed for Windows Vista and beyond
 rendering. The nModules currently consist of 13 modules: nCalendar, nClock, nCore, nDesk, nIcon,
 nKey, nLabel, nMediaInfo, nPopup, nTask, nTaskSwitch, nTray, and nWallpaper.
 
-You can download the latest released version of the nModules, 0.6, from [Erik's NLM Archive]
+You can download the latest released version of the nModules, 0.7, from [Erik's NLM Archive]
 (http://lsmodules.alurcard2.net/).
 
 Screenshot of the current state: 
