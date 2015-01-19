@@ -221,14 +221,19 @@ void TileGroup::SetFolder(LPWSTR folder) {
 
 LPARAM TileGroup::FolderLoaded(UINT64 id, LoadFolderResponse *response) {
   Window::UpdateLock lock(mWindow);
-
   for (auto item : response->items) {
-    int iconPosition = GetIconPosition(item.id);
-    RECT pos = mLayoutSettings.RectFromID(iconPosition, mTileWidth, mTileHeight, int(mWindow->GetSize().width + 0.5f), int(mWindow->GetSize().height + 0.5f));
-    Tile *icon = new Tile(this, item.id, mWorkingFolder, mTileWidth, mTileHeight, mTileSettings, item.thumbnail);
-    icon->SetPosition(iconPosition, (int)pos.left, (int)pos.top);
-    mTiles.push_back(icon);
+    ItemLoaded(id, &item);
   }
+  return 0;
+}
+
+
+LPARAM TileGroup::ItemLoaded(UINT64 id, LoadItemResponse *item) {
+  int iconPosition = GetIconPosition(item->id);
+  RECT pos = mLayoutSettings.RectFromID(iconPosition, mTileWidth, mTileHeight, int(mWindow->GetSize().width + 0.5f), int(mWindow->GetSize().height + 0.5f));
+  Tile *icon = new Tile(this, item->id, mWorkingFolder, mTileWidth, mTileHeight, mTileSettings, item->thumbnail);
+  icon->SetPosition(iconPosition, (int)pos.left, (int)pos.top);
+  mTiles.push_back(icon);
 
   return 0;
 }
@@ -246,11 +251,11 @@ void TileGroup::AddIcon(PCITEMID_CHILD pidl) {
   GetDisplayNameOf(pidl, SHGDN_FORPARSING, buffer, _countof(buffer));
   if (mHiddenItems.find(buffer) != mHiddenItems.end()) return;
 
-  /*int iconPosition = GetIconPosition(pidl);
-  RECT pos = mLayoutSettings.RectFromID(iconPosition, mTileWidth, mTileHeight, int(mWindow->GetSize().width + 0.5f), int(mWindow->GetSize().height + 0.5f));
-  Tile *icon = new Tile(this, pidl, mWorkingFolder, mTileWidth, mTileHeight, mTileSettings);
-  icon->SetPosition(iconPosition, (int)pos.left, (int)pos.top);
-  mTiles.push_back(icon);*/
+  LoadItemRequest request;
+  request.folder = mWorkingFolder;
+  request.targetIconWidth = mTileSettings.mIconSize;
+  request.id = ILClone(pidl);
+  nCore::LoadFolderItem(request, this);
 }
 
 

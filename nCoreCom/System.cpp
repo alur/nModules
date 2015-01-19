@@ -13,6 +13,7 @@
 namespace nCore {
   DECL_FUNC_VAR(FetchMonitorInfo);
   DECL_FUNC_VAR(LoadFolder);
+  DECL_FUNC_VAR(LoadFolderItem);
 
   namespace System {
     DECL_FUNC_VAR(ParseText);
@@ -37,6 +38,7 @@ HRESULT nCore::System::_Init(HMODULE hCoreInstance) {
   INIT_FUNC(FetchMonitorInfo);
 
   INIT_FUNC(LoadFolder);
+  INIT_FUNC(LoadFolderItem);
 
   INIT_FUNC(ParseText);
   INIT_FUNC(RegisterDynamicTextFunction);
@@ -60,6 +62,7 @@ void nCore::System::_DeInit() {
   FUNC_VAR_NAME(FetchMonitorInfo) = nullptr;
 
   FUNC_VAR_NAME(LoadFolder) = nullptr;
+  FUNC_VAR_NAME(LoadFolderItem) = nullptr;
 
   FUNC_VAR_NAME(ParseText) = nullptr;
   FUNC_VAR_NAME(RegisterDynamicTextFunction) = nullptr;
@@ -138,4 +141,10 @@ MonitorInfo &nCore::FetchMonitorInfo() {
 UINT64 nCore::LoadFolder(LoadFolderRequest &request, FileSystemLoaderResponseHandler *handler) {
   ASSERT(nCore::Initialized());
   return FUNC_VAR_NAME(LoadFolder)(request, handler);
+}
+
+
+UINT64 nCore::LoadFolderItem(LoadItemRequest &request, FileSystemLoaderResponseHandler *handler) {
+  ASSERT(nCore::Initialized());
+  return FUNC_VAR_NAME(LoadFolderItem)(request, handler);
 }

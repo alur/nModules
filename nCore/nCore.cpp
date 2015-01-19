@@ -41,6 +41,7 @@ UINT_PTR timeTimer;
 // Service functions
 EXPORT_CDECL(Window*) FindRegisteredWindow(LPCWSTR prefix);
 extern void LoadCompleted(UINT64 id, LPVOID result);
+extern void LoadItemCompleted(UINT64 id, LPVOID result);
 extern void SendCoreMessage(UINT message, WPARAM, LPARAM);
 
 
@@ -110,6 +111,10 @@ static LRESULT WINAPI MainProc(HWND window, UINT message, WPARAM wParam, LPARAM 
 
   case NCORE_FILE_SYSTEM_LOAD_COMPLETE:
     LoadCompleted(UINT64(wParam), LPVOID(lParam));
+    return 0;
+
+  case NCORE_FILE_SYSTEM_ITEM_LOAD_COMPLETE:
+    LoadItemCompleted(UINT64(wParam), LPVOID(lParam));
     return 0;
   }
   return DefWindowProcW(window, message, wParam, lParam);

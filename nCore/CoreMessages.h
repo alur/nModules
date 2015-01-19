@@ -8,6 +8,7 @@
 
 // Internal nCore messages
 #define NCORE_FILE_SYSTEM_LOAD_COMPLETE             0x0500
+#define NCORE_FILE_SYSTEM_ITEM_LOAD_COMPLETE        0x0501
 
 // nCore -> Modules
 #define NCORE_DISPLAYCHANGE                         0x9000

@@ -153,6 +153,31 @@ static void LoadThumbnail(LoadThumbnailResponse &response, int iconSize, IShellF
 }
 
 
+static void LoadFolderItemThread(LoadItemRequest request, UINT64 requestId, volatile bool *abort, HWND hwnd) {
+  CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
+  LoadItemResponse item;
+  item.id = request.id;
+  LoadThumbnail(item.thumbnail, request.targetIconWidth, request.folder, (LPCITEMIDLIST*)&request.id);
+
+  if (!*abort) {
+    SendMessage(hwnd, NCORE_FILE_SYSTEM_ITEM_LOAD_COMPLETE, (WPARAM)requestId, (LPARAM)&item);
+  }
+  delete abort;
+
+  ILFree(item.id);
+  if (item.thumbnail.type == LoadThumbnailResponse::Type::HBITMAP) {
+    DeleteObject(item.thumbnail.thumbnail.bitmap);
+  } else if (item.thumbnail.type == LoadThumbnailResponse::Type::HICON) {
+    DestroyIcon(item.thumbnail.thumbnail.icon);
+  } else {
+    ASSERT(false);
+  }
+
+  CoUninitialize();
+}
+
+
 static void LoadFolderThread(LoadFolderRequest request, UINT64 requestId, volatile bool *abort, HWND hwnd) {
   LoadFolderResponse response;
 
@@ -222,6 +247,25 @@ EXPORT_CDECL(UINT64) LoadFolder(LoadFolderRequest &request, FileSystemLoaderResp
 
 
 /// <summary>
+/// Asynchronously loads a folder item.
+/// </summary>
+EXPORT_CDECL(UINT64) LoadFolderItem(LoadItemRequest &request, FileSystemLoaderResponseHandler *handler) {
+  UINT64 requestId = ++sNextRequestId;
+  auto requestData = sOutstandingRequests.emplace(
+    std::piecewise_construct,
+    std::forward_as_tuple(requestId),
+    std::forward_as_tuple(handler)).first;
+
+  request.folder->AddRef();
+
+  std::thread(LoadFolderItemThread, request, requestId, requestData->second.abort,
+    ghWndMsgHandler).detach();
+
+  return requestId;
+}
+
+
+/// <summary>
 /// Cancels an outstanding request.
 /// </summary>
 EXPORT_CDECL(void) CancelLoad(UINT64 id) {
@@ -239,5 +283,16 @@ void LoadCompleted(UINT64 id, LPVOID result) {
   auto request = sOutstandingRequests.find(id);
   if (request != sOutstandingRequests.end()) {
     request->second.handler->FolderLoaded(id, (LoadFolderResponse*)result);
+  }
+}
+
+
+/// <summary>
+/// Called by nCores window procedure when it receives a message from the thread.
+/// </summary>
+void LoadItemCompleted(UINT64 id, LPVOID result) {
+  auto request = sOutstandingRequests.find(id);
+  if (request != sOutstandingRequests.end()) {
+    request->second.handler->ItemLoaded(id, (LoadItemResponse*)result);
   }
 }

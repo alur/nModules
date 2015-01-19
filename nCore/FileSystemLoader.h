@@ -23,6 +23,16 @@ struct LoadFolderRequest {
   IShellFolder2 *folder;
 };
 
+struct LoadItemRequest {
+  // The desired icon size.
+  UINT targetIconWidth;
+  // The folder to load from.
+  IShellFolder2 *folder;
+  // The item to load.
+  PITEMID_CHILD id;
+};
+
+
 struct LoadThumbnailResponse {
   D2D1_SIZE_F size;
   union {

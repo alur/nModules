@@ -30,6 +30,7 @@ namespace nCore {
 
   // FileSystemLoader
   UINT64 LoadFolder(LoadFolderRequest&, FileSystemLoaderResponseHandler*);
+  UINT64 LoadFolderItem(LoadItemRequest&, FileSystemLoaderResponseHandler*);
 
   namespace System {
     // Dynamic Text Service

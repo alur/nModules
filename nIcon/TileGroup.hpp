@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  A group of icons. Essentially an *nIcon.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
@@ -37,7 +37,8 @@ public:
 
   // FileSystemLoaderResponseHandler
 public:
-  LPARAM FolderLoaded(UINT64, LoadFolderResponse*);
+  LPARAM FolderLoaded(UINT64, LoadFolderResponse*) override;
+  LPARAM ItemLoaded(UINT64, LoadItemResponse*) override;
 
 public:
   LRESULT WINAPI HandleMessage(HWND, UINT msg, WPARAM, LPARAM, LPVOID);
@@ -47,7 +48,7 @@ private:
 
 public:
   void SetFolder(LPWSTR path);
-    
+
   void SelectAll();
   void DeselectAll();
   void ContextMenu();

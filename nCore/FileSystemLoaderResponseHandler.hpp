@@ -13,4 +13,5 @@
 class FileSystemLoaderResponseHandler {
 public:
   virtual LPARAM FolderLoaded(UINT64, struct LoadFolderResponse*) = 0;
+  virtual LPARAM ItemLoaded(UINT64, struct LoadItemResponse*) = 0;
 };
