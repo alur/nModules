@@ -55,7 +55,7 @@ HRESULT Factories::GetD2DFactory(LPVOID *factory) {
 #endif
 
     HRESULT hr;
-    RETURNONFAIL(hr, D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory),
+    RETURNONFAIL(hr, D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory),
       &d2dFactoryOptions, reinterpret_cast<LPVOID*>(&sD2DFactory)));
   }
   *factory = sD2DFactory;
