@@ -156,13 +156,12 @@ LRESULT WINAPI TrayIcon::HandleMessage(HWND window, UINT message, WPARAM wParam,
 
     AllowSetForegroundWindow(mIconData.processId);
 
-    if (mIconData.version >= NOTIFYICON_VERSION_4) {
+    if (mIconData.version >= NOTIFYICON_VERSION) {
+      SendCallback(message, wParam, lParam);
       if (message == WM_RBUTTONUP) {
         SendCallback(WM_CONTEXTMENU, wParam, lParam);
       } else if (message == WM_LBUTTONUP) {
         SendCallback(NIN_SELECT, wParam, lParam);
-      } else {
-        SendCallback(message, wParam, lParam);
       }
     } else {
       SendCallback(message, wParam, lParam);
