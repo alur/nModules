@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Bangs for drawable windows.
- *   
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "LiteStep.h"
 #include "WindowBangs.h"
@@ -20,6 +20,7 @@ namespace WindowBangs
     {
         { L"Hide",                       Hide                       },
         { L"Show",                       Show                       },
+        { L"Toggle",                     Toggle                     },
         { L"On",                         On                         },
         { L"Off",                        Off                        },
         { L"Move",                       Move                       },
@@ -94,6 +95,23 @@ void WindowBangs::Show(HWND, LPCTSTR args)
 /// <summary>
 /// Shows the window.
 /// </summary>
+void WindowBangs::Toggle(HWND, LPCTSTR args) {
+  Window* drawable = drawableFinder(args);
+  if (drawable != nullptr) {
+    if (drawable->IsVisible())
+      drawable->Hide();
+    else
+      drawable->Show();
+    if (drawable->IsChild()) {
+      drawable->Repaint();
+    }
+  }
+}
+
+
+/// <summary>
+/// Shows the window.
+/// </summary>
 void WindowBangs::Move(HWND, LPCTSTR args)
 {
     TCHAR prefix[MAX_RCCOMMAND], xstr[MAX_RCCOMMAND], ystr[MAX_RCCOMMAND],
@@ -151,7 +169,7 @@ void WindowBangs::Size(HWND, LPCTSTR args)
                 }
                 else
                 {
-                    drawable->SetAnimation(drawable->GetDrawingSettings()->x, 
+                    drawable->SetAnimation(drawable->GetDrawingSettings()->x,
                         drawable->GetDrawingSettings()->y, width, height, _wtoi(durationstr),
                         numTokens == 4 ? Easing::Type::Linear : Easing::EasingFromString(easingstr));
                 }

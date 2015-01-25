@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Bangs for drawable windows.
- *   
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
@@ -18,9 +18,10 @@ namespace WindowBangs
     void On(HWND, LPCTSTR);
     void Off(HWND, LPCTSTR);
 
-    // 
+    //
     void Hide(HWND, LPCTSTR);
     void Show(HWND, LPCTSTR);
+    void Toggle(HWND, LPCTSTR);
     void Move(HWND, LPCTSTR);
     void Size(HWND, LPCTSTR);
     void Position(HWND, LPCTSTR);
