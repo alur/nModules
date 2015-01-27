@@ -1,0 +1,55 @@
+#pragma once
+
+#include "../nCoreApi/ISettingsReader.hpp"
+
+#include <vector>
+
+class SettingsReader : public ISettingsReader {
+public:
+  static HRESULT Create(LPCWSTR prefix, ISettingsReader **reader);
+
+private:
+  SettingsReader();
+
+  // ISettingsReader
+public:
+  HRESULT APICALL CreateChild(LPCWSTR, ISettingsReader**) const override;
+  void APICALL Destroy() override;
+
+  bool APICALL GetBool(LPCWSTR key, bool defaultValue) const override;
+  bool APICALL GetBool(LPCWSTR key, bool *value) const override;
+
+  double APICALL GetDouble(LPCWSTR key, double defaultValue) const override;
+  bool APICALL GetDouble(LPCWSTR key, double *value) const override;
+
+  float APICALL GetFloat(LPCWSTR key, float defaultValue) const override;
+  bool APICALL GetFloat(LPCWSTR key, float *value) const override;
+
+  int APICALL GetInt(LPCWSTR key, int defaultValue) const override;
+  bool APICALL GetInt(LPCWSTR key, int *value) const override;
+
+  __int64 APICALL GetInt64(LPCWSTR key, __int64 defaultValue) const override;
+  bool APICALL GetInt64(LPCWSTR key, __int64 *value) const override;
+
+  bool APICALL GetString(LPCWSTR key, LPWSTR value, size_t cchValue,
+    LPWSTR defaultValue) const override;
+
+  NLENGTH APICALL GetLength(LPCWSTR key, const NLENGTH &defaultValue) const override;
+  bool APICALL GetLength(LPCWSTR key, NLENGTH *value) const override;
+
+private:
+  class PrefixVal {
+  public:
+    operator const wchar_t*() const {
+      return mVal;
+    }
+    operator wchar_t*() {
+      return mVal;
+    }
+  private:
+    wchar_t mVal[MAX_PREFIX];
+  };
+
+private:
+  std::vector<PrefixVal> mPrefixes;
+};

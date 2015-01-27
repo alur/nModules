@@ -1,0 +1,35 @@
+#pragma once
+
+#include "Windows.h"
+
+// Creates a customer-defined HRESULT
+#define NHRESULT(severity, facility, code) \
+    (HRESULT)(((ULONG)severity << 31) | 0x20000000 | ((ULONG)facility << 16) | ((ULONG)code))
+
+// Facility codes, 11 bits
+#define FACILITY_UTILITIES 0
+#define FACILITY_API 1
+#define FACILITY_SHARED 2
+#define FACILITY_CORE 3
+#define FACILITY_DESK 4
+#define FACILITY_CLOCK 5
+#define FACILITY_CALENDAR 6
+#define FACILITY_ICON 7
+#define FACILITY_KEY 8
+#define FACILITY_LABEL 9
+#define FACILITY_MEDIA_INFO 10
+#define FACILITY_POPUP 11
+#define FACILITY_START_MENU 12
+#define FACILITY_TASK 13
+#define FACILITY_TASK_SWITCH 14
+#define FACILITY_TRAY 15
+#define FACILITY_VWM 16
+#define FACILITY_WALLPAPER 17
+
+// API
+#define E_API_CORE_NOT_FOUND                    NHRESULT(SEVERITY_ERROR, FACILITY_API, 0)
+#define E_API_FUNC_NOT_FOUND                    NHRESULT(SEVERITY_ERROR, FACILITY_API, 1)
+
+// Shared
+#define E_SHARED_REGISTER_WINDOW_CLASS_FAILED   NHRESULT(SEVERITY_ERROR, FACILITY_SHARED, 0)
+#define E_SHARED_CREATE_WINDOW_FAILED           NHRESULT(SEVERITY_ERROR, FACILITY_SHARED, 1)

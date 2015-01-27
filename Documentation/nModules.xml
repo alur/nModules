@@ -62,6 +62,7 @@
       <title>0.8</title>
       <date>Future</date>
       <changes>
+        <added>proper documentation.</added>
         <added>initial release of nCalendar.</added>
         <added>the Events JS object.</added>
       </changes>
@@ -69,9 +70,8 @@
 
     <version>
       <title>0.7</title>
-      <date>Future</date>
+      <date>January 19th, 2015</date>
       <changes>
-        <added>proper documentation.</added>
         <fixed>display of empty balloons.</fixed>
         <fixed>issue where !Shutdown did not work after a recycle.</fixed>
         <fixed>the HoverActive state wasn't triggered by hovering.</fixed>

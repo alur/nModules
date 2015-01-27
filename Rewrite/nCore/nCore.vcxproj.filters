@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="nCore.cpp" />
+    <ClCompile Include="Pane.cpp" />
+    <ClCompile Include="Displays.cpp" />
+    <ClCompile Include="Factories.cpp" />
+    <ClCompile Include="SettingsReader.cpp" />
+    <ClCompile Include="LiteStep.cpp" />
+    <ClCompile Include="StatePainter.cpp" />
+    <ClCompile Include="Parsers.cpp" />
+    <ClCompile Include="EventHandler.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Pane.hpp" />
+    <ClInclude Include="Displays.hpp" />
+    <ClInclude Include="Factories.h" />
+    <ClInclude Include="SettingsReader.hpp" />
+    <ClInclude Include="StatePainter.hpp" />
+    <ClInclude Include="Parsers.hpp" />
+    <ClInclude Include="EventHandler.hpp" />
+  </ItemGroup>
+</Project>

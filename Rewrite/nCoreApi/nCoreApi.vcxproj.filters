@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="Core.h" />
+    <ClInclude Include="IPane.hpp" />
+    <ClInclude Include="IMessageHandler.hpp" />
+    <ClInclude Include="IDisplays.hpp" />
+    <ClInclude Include="IPanePainter.hpp" />
+    <ClInclude Include="ISettingsReader.hpp" />
+    <ClInclude Include="IFileSystemWatcher.hpp" />
+    <ClInclude Include="IFileSystemEventHandler.hpp" />
+    <ClInclude Include="ApiDefs.h" />
+    <ClInclude Include="IStatePainter.hpp" />
+    <ClInclude Include="IEventHandler.hpp" />
+    <ClInclude Include="IEventProcessor.hpp" />
+    <ClInclude Include="Messages.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core.cpp" />
+  </ItemGroup>
+</Project>
