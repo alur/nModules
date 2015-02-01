@@ -8,10 +8,11 @@
 int RectArea(LPCRECT);
 
 /// <summary>
-/// Returns the rectangle representing the intersection of the two rectangles.
+/// Gets the rectangle representing the intersection of the two rectangles. Returns true iff the
+/// rectangles intersect.
 /// </summary>
-void RectIntersection(LPCRECT a, LPCRECT b, LPRECT out);
-void RectIntersection(const D2D1_RECT_F *a, const D2D1_RECT_F *b, D2D1_RECT_F *out);
+bool RectIntersection(LPCRECT a, LPCRECT b, LPRECT out);
+bool RectIntersection(const D2D1_RECT_F *a, const D2D1_RECT_F *b, D2D1_RECT_F *out);
 
 /// <summary>
 /// Returns whether or not the 2 rectangles overlap.

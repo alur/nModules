@@ -4,9 +4,13 @@
     <ClCompile Include="nTask.cpp" />
     <ClCompile Include="Taskbar.cpp" />
     <ClCompile Include="TaskButton.cpp" />
+    <ClCompile Include="TaskbarManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Taskbar.hpp" />
     <ClInclude Include="TaskButton.hpp" />
+    <ClInclude Include="TaskbarManager.hpp" />
+    <ClInclude Include="Messages.h" />
+    <ClInclude Include="TaskData.h" />
   </ItemGroup>
 </Project>

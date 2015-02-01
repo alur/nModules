@@ -1,8 +1,8 @@
-#pragma
+#pragma once
 
 #include "ApiDefs.h"
 
-#include "../nUtilities/Windows.h"
+#include "../nUtilities/d2d1.h"
 
 /// <summary>
 /// A monitor.
@@ -10,6 +10,8 @@
 struct Display {
   RECT rect;
   RECT workArea;
+  HMONITOR monitor;
+  D2D1_POINT_2F dpi;
   int width;
   int height;
   int workAreaWidth;
@@ -39,13 +41,13 @@ public:
   virtual UINT APICALL Count() const = 0;
 
   /// <summary>
+  /// Returns the virtual desktop, which covers all other displays.
+  /// </summary>
+  virtual const Display& APICALL GetDesktop() const = 0;
+
+  /// <summary>
   /// Returns the display with the given ID.
   /// </summary>
   /// <param name="id">The ID of the display to return.</param>
   virtual const Display& APICALL GetDisplay(UINT id) const = 0;
-
-  /// <summary>
-  /// Returns the virtual desktop, which covers all other displays.
-  /// </summary>
-  virtual const Display& APICALL GetDesktop() const = 0;
 };

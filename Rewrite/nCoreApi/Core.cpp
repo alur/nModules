@@ -1,4 +1,7 @@
+#include <assert.h>
+
 static void __cdecl UnitializedCoreFunc() {
+  assert(false);
   throw "Call to an uninitialized core function!";
 }
 
@@ -15,6 +18,7 @@ static const struct CoreProcItem {
   VERSION minVersion;
 } sCoreProcTable[] = {
   CORE_PROC_ITEM(CreateEventHandler,        MakeVersion(0, 9, 0, 0)),
+  CORE_PROC_ITEM(CreateLogger,              MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(CreatePane,                MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(CreateSettingsReader,      MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(CreateStatePainter,        MakeVersion(0, 9, 0, 0)),
@@ -22,32 +26,38 @@ static const struct CoreProcItem {
   CORE_PROC_ITEM(EnumRCLineTokens,          MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(FindPane,                  MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(GetCoreVersion,            MakeVersion(0, 9, 0, 0)),
+  CORE_PROC_ITEM(GetD2DFactory,             MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(GetDisplays,               MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(GetDWriteFactory,          MakeVersion(0, 9, 0, 0)),
-  CORE_PROC_ITEM(GetD2DFactory,             MakeVersion(0, 9, 0, 0)),
-  CORE_PROC_ITEM(GetWICFactory,             MakeVersion(0, 9, 0, 0))
+  CORE_PROC_ITEM(GetWICFactory,             MakeVersion(0, 9, 0, 0)),
+  CORE_PROC_ITEM(GetWindowIcon,             MakeVersion(0, 9, 0, 0)),
+  CORE_PROC_ITEM(IsTaskbarWindow,           MakeVersion(0, 9, 0, 0)),
+  CORE_PROC_ITEM(ParseLength,               MakeVersion(0, 9, 0, 0)),
+  CORE_PROC_ITEM(ParseMonitor,              MakeVersion(0, 9, 0, 0)),
+  CORE_PROC_ITEM(RegisterForMessages,       MakeVersion(0, 9, 0, 0)),
+  CORE_PROC_ITEM(UnregisterForMessages,     MakeVersion(0, 9, 0, 0))
 };
 
 static HINSTANCE sCoreInstance = nullptr;
+static HWND sCoreWindow = nullptr;
 
 
 HRESULT nCore::Connect(VERSION minVersion) {
   DWORD coreProcessId = 0, moduleProcessId = GetCurrentProcessId();
-  HWND coreWindow = nullptr;
 
   do {
     // Looks for LSnCore within the same process
-    coreWindow = FindWindowEx(nullptr, coreWindow, L"LSnModuleMsgHandler", L"nCore");
-    if (coreWindow != nullptr) {
-      GetWindowThreadProcessId(coreWindow, &coreProcessId);
+    sCoreWindow = FindWindowEx(nullptr, sCoreWindow, L"LSnModuleMsgHandler", L"nCore");
+    if (sCoreWindow != nullptr) {
+      GetWindowThreadProcessId(sCoreWindow, &coreProcessId);
     }
-  } while (coreWindow != nullptr && coreProcessId != moduleProcessId);
+  } while (sCoreWindow != nullptr && coreProcessId != moduleProcessId);
 
-  if (coreWindow == nullptr) {
+  if (sCoreWindow == nullptr) {
     return E_API_CORE_NOT_FOUND;
   }
 
-  sCoreInstance = (HINSTANCE)GetWindowLongPtr(coreWindow, GWLP_HINSTANCE);
+  sCoreInstance = (HINSTANCE)GetWindowLongPtr(sCoreWindow, GWLP_HINSTANCE);
   if (sCoreInstance == nullptr) {
     return E_FAIL;
   }
@@ -68,6 +78,7 @@ HRESULT nCore::Connect(VERSION minVersion) {
 
 void nCore::Disconnect() {
   sCoreInstance = nullptr;
+  sCoreWindow = nullptr;
   for (auto &item : sCoreProcTable) {
     *item.proc = UnitializedCoreFunc;
   }
@@ -76,4 +87,9 @@ void nCore::Disconnect() {
 
 HINSTANCE nCore::GetInstance() {
   return sCoreInstance;
+}
+
+
+HWND nCore::GetWindow() {
+  return sCoreWindow;
 }

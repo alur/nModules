@@ -3,15 +3,21 @@
 
 #include "../nCoreApi/Core.h"
 
-#include "../nShared/LsModule.hpp"
+#include "../nShared/LiteStep.h"
 
 #include "../nUtilities/lsapi.h"
 #include "../nUtilities/Macros.h"
 #include "../nUtilities/Windows.h"
 
 static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
-LsModule gLsModule(L"nDesk", MakeVersion(0, 9, 0, 0));
+static const wchar_t sName[] = L"nLabel";
+static const VERSION sVersion = MakeVersion(0, 9, 0, 0);
+static const VERSION sCoreVersion = MakeVersion(0, 9, 0, 0);
+
 static DesktopPane *sDesktopPane = nullptr;
+
+HWND gWindow = nullptr;
+ILogger *gLogger = nullptr;
 
 
 BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */) {
@@ -35,7 +41,7 @@ static LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, L
     return 0;
 
   case LM_GETREVID:
-    return gLsModule.HandleGetRevId(lParam);
+    return HandleGetRevId(sName, sVersion, lParam);
 
   case LM_REFRESH:
     ReloadWorkareas();
@@ -47,12 +53,13 @@ static LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, L
 
 
 EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE /* instance */, LPCWSTR /* path */) {
-  if (FAILED(nCore::Connect(MakeVersion(0, 9, 0, 0)))) {
-    gLsModule.DestroyMessageHandler();
+  if (FAILED(nCore::Connect(sCoreVersion))) {
     return 1;
   }
 
-  if (FAILED(gLsModule.CreateMessageHandler(nCore::GetInstance(), MessageHandler))) {
+  gLogger = nCore::CreateLogger(sName);
+
+  if (FAILED(CreateMessageHandler(nCore::GetInstance(), sName, MessageHandler, gWindow))) {
     return 1;
   }
 
@@ -66,6 +73,9 @@ EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE /* instance */, LPCWS
 EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */) {
   SAFEDELETE(sDesktopPane);
   ClearWorkareas();
+  gLogger->Destroy();
+  gLogger = nullptr;
   nCore::Disconnect();
-  gLsModule.DestroyMessageHandler();
+  DestroyWindow(gWindow);
+  gWindow = nullptr;
 }

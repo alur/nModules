@@ -1,0 +1,5 @@
+#pragma once
+
+#define NTASK_INITIALIZED 0x0400
+
+#define NTASK_TIMER_MAINTENANCE 1

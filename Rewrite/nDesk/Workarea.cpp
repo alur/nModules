@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+extern ILogger *gLogger;
+
 
 void LoadWorkareas() {
   nCore::EnumRCLines(L"*nDeskWorkArea", [] (LPCWSTR line, LPARAM) -> void {
@@ -13,26 +15,55 @@ void LoadWorkareas() {
     LPWSTR tokens[] = { monitorTok, leftTok, topTok, rightTok, bottomTok };
 
     if (LCTokenize(line, tokens, 5, nullptr) == 5) {
-      int left = std::max(0, _wtoi(leftTok)),
-          top = std::max(0, _wtoi(topTok)),
-          right = std::max(0, _wtoi(rightTok)),
-          bottom = std::max(0, _wtoi(bottomTok));
-      // TODO(Erik):ParseMonitor
-      UINT monitor = std::max(-1, _wtoi(monitorTok));
+      NLENGTH left(0, 0, 0), top(0, 0, 0), right(0, 0, 0), bottom(0, 0, 0);
+      UINT monitor = 0;
+
+      if (!nCore::ParseMonitor(monitorTok, &monitor)) {
+        gLogger->Warning(L"Invalid monitor %s in *nDeskWorkArea %s", monitorTok, line);
+        return;
+      }
+      if (!nCore::ParseLength(leftTok, &left)) {
+        gLogger->Warning(L"Invalid left padding %s in *nDeskWorkArea %s", leftTok, line);
+        return;
+      }
+      if (!nCore::ParseLength(topTok, &top)) {
+        gLogger->Warning(L"Invalid top padding %s in *nDeskWorkArea %s", topTok, line);
+        return;
+      }
+      if (!nCore::ParseLength(rightTok, &right)) {
+        gLogger->Warning(L"Invalid right padding %s in *nDeskWorkArea %s", rightTok, line);
+        return;
+      }
+      if (!nCore::ParseLength(bottomTok, &bottom)) {
+        gLogger->Warning(L"Invalid bottom padding %s in *nDeskWorkArea %s", bottomTok, line);
+        return;
+      }
 
       if (monitor == 0xFFFFFFFF) {
         for (UINT i = 0; i < nCore::GetDisplays()->Count(); ++i) {
-          RECT monitorRect = nCore::GetDisplays()->GetDisplay(i).rect;
-          RECT workArea = { monitorRect.left + left, monitorRect.top + top,
-            monitorRect.right - right, monitorRect.bottom - bottom };
+          const Display &display = nCore::GetDisplays()->GetDisplay(i);
+          RECT workArea = {
+            display.rect.left + (LONG)left.Evaluate((float)display.width, display.dpi.x),
+            display.rect.top + (LONG)top.Evaluate((float)display.height, display.dpi.y),
+            display.rect.right - (LONG)right.Evaluate((float)display.width, display.dpi.x),
+            display.rect.bottom - (LONG)bottom.Evaluate((float)display.height, display.dpi.y)
+          };
           SystemParametersInfoW(SPI_SETWORKAREA, 1, &workArea, 0);
         }
       } else if (monitor < nCore::GetDisplays()->Count()) {
-        RECT monitorRect = nCore::GetDisplays()->GetDisplay(monitor).rect;
-        RECT workArea = { monitorRect.left + left, monitorRect.top + top,
-          monitorRect.right - right, monitorRect.bottom - bottom };
+        const Display &display = nCore::GetDisplays()->GetDisplay(monitor);
+        RECT workArea = {
+          display.rect.left + (LONG)left.Evaluate((float)display.width, display.dpi.x),
+          display.rect.top + (LONG)top.Evaluate((float)display.height, display.dpi.y),
+          display.rect.right - (LONG)right.Evaluate((float)display.width, display.dpi.x),
+          display.rect.bottom - (LONG)bottom.Evaluate((float)display.height, display.dpi.y)
+        };
         SystemParametersInfoW(SPI_SETWORKAREA, 1, &workArea, 0);
+      } else {
+        gLogger->Warning(L"Invalid monitor %s in *nDeskWorkArea %s", monitorTok, line);
       }
+    } else {
+      gLogger->Warning(L"Malformatted workarea declaration %s", monitorTok, line);
     }
   }, 0);
   SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);

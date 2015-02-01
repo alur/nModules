@@ -9,19 +9,21 @@
 typedef class NLength {
 public:
   NLength();
-  NLength(float pixels, float percent, float dips);
+  NLength(float pixels, float fraction, float dips);
 
 public:
-  NLength operator-(const NLength&);
-  NLength operator+(const NLength&);
-  NLength operator*(float);
-  NLength operator/(float);
+  NLength operator-(const NLength&) const;
+  NLength operator+(const NLength&) const;
+  NLength operator*(float) const;
+  NLength operator/(float) const;
+  bool operator==(const NLength&) const;
+  bool operator!=(const NLength&) const;
 
 public:
-  float Evaluate(float parentLength, float dpi);
+  float Evaluate(float parentLength, float dpi) const;
 
 private:
   float mPixels;
-  float mPercent;
+  float mFraction;
   float mDips;
 } NLENGTH;

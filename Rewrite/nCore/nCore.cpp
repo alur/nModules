@@ -1,18 +1,22 @@
 #include "Displays.hpp"
 #include "Factories.h"
+#include "Messages.h"
 #include "Pane.hpp"
+#include "WindowMonitor.hpp"
 
-#include "../nShared/LsModule.hpp"
+#include "../nShared/LiteStep.h"
 
 #include "../nUtilities/lsapi.h"
 #include "../nUtilities/Macros.h"
 #include "../nUtilities/Windows.h"
 
 static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
+static const wchar_t sName[] = L"nCore";
 static const VERSION sVersion = MakeVersion(0, 9, 0, 0);
-LsModule gLsModule(L"nCore", MakeVersion(0, 9, 0, 0));
+
 Displays gDisplays;
 HINSTANCE gInstance = nullptr;
+HWND gWindow = nullptr;
 
 
 BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */) {
@@ -28,7 +32,7 @@ BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */)
 LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
   switch (message) {
   case LM_GETREVID:
-    return gLsModule.HandleGetRevId(lParam);
+    return HandleGetRevId(sName, sVersion, lParam);
 
   case LM_REFRESH:
     return 0;
@@ -50,6 +54,22 @@ LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM l
       gDisplays.Update();
     }
     return 0;
+
+  case WM_TIMER:
+    switch (wParam) {
+    case NCORE_TIMER_WINDOW_MAINTENANCE:
+      WindowMonitor::RunWindowMaintenance();
+      return 0;
+    }
+    return 0;
+
+  case LM_MONITORCHANGED:
+  case LM_REDRAW:
+  case LM_WINDOWCREATED:
+  case LM_WINDOWDESTROYED:
+  case LM_WINDOWREPLACED:
+  case LM_WINDOWREPLACING:
+    return WindowMonitor::HandleMessage(message, wParam, lParam);
   }
 
   return DefWindowProc(window, message, wParam, lParam);
@@ -92,17 +112,20 @@ static HRESULT RegisterMessageClass(HINSTANCE instance) {
 EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* path */) {
   gInstance = instance;
   RegisterMessageClass(instance);
-  gLsModule.CreateMessageHandler(instance, MessageHandler);
+  CreateMessageHandler(instance, sName, MessageHandler, gWindow);
   Pane::CreateWindowClasses(instance);
   Factories::Create();
+  WindowMonitor::Start();
   return 0;
 }
 
 
 EXPORT_CDECL(void) quitModule(HINSTANCE instance) {
+  WindowMonitor::Stop();
   Factories::Destroy();
   Pane::DestroyWindowClasses(instance);
-  gLsModule.DestroyMessageHandler();
+  DestroyWindow(gWindow);
+  gWindow = nullptr;
   UnregisterClass(L"LSnModuleMsgHandler", instance);
   gInstance = nullptr;
 }

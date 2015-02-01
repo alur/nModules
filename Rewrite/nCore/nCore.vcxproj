@@ -72,23 +72,23 @@
   <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Link>
-      <AdditionalDependencies>d2d1.lib;dwmapi.lib;dwrite.lib;lsapi.lib;ole32.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shcore.lib;d2d1.lib;dwmapi.lib;dwrite.lib;lsapi.lib;ole32.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Link>
-      <AdditionalDependencies>d2d1.lib;dwmapi.lib;dwrite.lib;lsapi.lib;ole32.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shcore.lib;d2d1.lib;dwmapi.lib;dwrite.lib;lsapi.lib;ole32.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
-      <AdditionalDependencies>d2d1.lib;dwmapi.lib;dwrite.lib;lsapi.lib;ole32.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shcore.lib;d2d1.lib;dwmapi.lib;dwrite.lib;lsapi.lib;ole32.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
-      <AdditionalDependencies>d2d1.lib;dwmapi.lib;dwrite.lib;lsapi.lib;ole32.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shcore.lib;d2d1.lib;dwmapi.lib;dwrite.lib;lsapi.lib;ole32.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile />
   </ItemDefinitionGroup>
@@ -97,20 +97,29 @@
     <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="Factories.cpp" />
     <ClCompile Include="LiteStep.cpp" />
+    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="MessageManager.cpp" />
     <ClCompile Include="nCore.cpp" />
     <ClCompile Include="Pane.cpp" />
+    <ClCompile Include="PaneMessageHandler.cpp" />
+    <ClCompile Include="PanePublicApi.cpp" />
     <ClCompile Include="Parsers.cpp" />
     <ClCompile Include="SettingsReader.cpp" />
     <ClCompile Include="StatePainter.cpp" />
+    <ClCompile Include="WindowMonitor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Api.h" />
     <ClInclude Include="Displays.hpp" />
     <ClInclude Include="EventHandler.hpp" />
     <ClInclude Include="Factories.h" />
+    <ClInclude Include="Logger.hpp" />
+    <ClInclude Include="MessageRegistrar.h" />
+    <ClInclude Include="Messages.h" />
     <ClInclude Include="Pane.hpp" />
-    <ClInclude Include="Parsers.hpp" />
     <ClInclude Include="SettingsReader.hpp" />
     <ClInclude Include="StatePainter.hpp" />
+    <ClInclude Include="WindowMonitor.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nShared\nShared.vcxproj">

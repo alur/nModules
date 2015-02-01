@@ -79,12 +79,14 @@
     <ClInclude Include="IEventProcessor.hpp" />
     <ClInclude Include="IFileSystemEventHandler.hpp" />
     <ClInclude Include="IFileSystemWatcher.hpp" />
+    <ClInclude Include="ILogger.hpp" />
     <ClInclude Include="IMessageHandler.hpp" />
     <ClInclude Include="IPane.hpp" />
     <ClInclude Include="IPanePainter.hpp" />
     <ClInclude Include="ISettingsReader.hpp" />
     <ClInclude Include="IStatePainter.hpp" />
     <ClInclude Include="Messages.h" />
+    <ClInclude Include="TaskWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp" />

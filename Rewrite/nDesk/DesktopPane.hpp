@@ -17,12 +17,16 @@ public:
 
   // IPanePainter
 public:
+  LPVOID APICALL AddPane(const IPane *pane) override;
   HRESULT APICALL CreateDeviceResources(ID2D1RenderTarget *renderTarget) override;
   void APICALL DiscardDeviceResources() override;
-  void APICALL Paint(ID2D1RenderTarget *renderTarget, D2D1_RECT_F *area, IPane *pane)
-    const override;
-  bool APICALL UpdateDWMColor(DWORD newColor, ID2D1RenderTarget *renderTarget) override;
-  void APICALL UpdatePosition(D2D1_RECT_F parentPosition) override;
+  bool APICALL DynamicColorChanged(ID2D1RenderTarget *renderTarget) override;
+  void APICALL Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area, const IPane *pane,
+    LPVOID painterData) const override;
+  void APICALL PositionChanged(const IPane *pane, LPVOID painterData,
+    D2D1_RECT_F position) override;
+  void APICALL RemovePane(const IPane *pane, LPVOID painterData) override;
+  void APICALL TextChanged(const IPane *pane, LPVOID painterData, LPCWSTR text) override;
 
 private:
   HRESULT CreateBitmapBrush(LPCWSTR file, ID2D1RenderTarget*, ID2D1BitmapBrush**, LPUINT widthOut,

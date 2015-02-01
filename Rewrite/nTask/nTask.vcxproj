@@ -93,6 +93,7 @@
   <ItemGroup>
     <ClCompile Include="nTask.cpp" />
     <ClCompile Include="Taskbar.cpp" />
+    <ClCompile Include="TaskbarManager.cpp" />
     <ClCompile Include="TaskButton.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -107,8 +108,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Messages.h" />
     <ClInclude Include="Taskbar.hpp" />
+    <ClInclude Include="TaskbarManager.hpp" />
     <ClInclude Include="TaskButton.hpp" />
+    <ClInclude Include="TaskData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

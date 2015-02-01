@@ -13,5 +13,6 @@
   <ItemGroup>
     <ClCompile Include="Version.cpp" />
     <ClCompile Include="NLength.cpp" />
+    <ClCompile Include="NRect.cpp" />
   </ItemGroup>
 </Project>

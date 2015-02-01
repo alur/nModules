@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IPanePainter.hpp"
+#include "ISettingsReader.hpp"
 
 #include <stdint.h>
 
@@ -20,7 +21,10 @@ public:
 /// </summary>
 struct StatePainterInitData {
   size_t cbSize;
-  LPCWSTR *stateNames;
-  BYTE *inheritance;
+  ISettingsReader *settingsReader;
+  struct State {
+    LPCWSTR name;
+    BYTE base;
+  } *states;
   BYTE numStates;
 };

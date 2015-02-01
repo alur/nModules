@@ -5,8 +5,13 @@
 
 typedef class NRect {
 public:
+  NRect();
+  NRect(const NLENGTH &left, const NLENGTH &top, const NLENGTH &right, const NLENGTH &bottom);
+
+public:
   NLENGTH left;
   NLENGTH top;
   NLENGTH right;
   NLENGTH bottom;
-} NRECT;
+} NRECT, *PNRECT;
+typedef const NRECT *LPCNRECT;

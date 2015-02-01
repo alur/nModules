@@ -71,12 +71,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
   <ItemGroup>
-    <ClInclude Include="LsModule.hpp" />
+    <ClInclude Include="AlgorithmExt.h" />
+    <ClInclude Include="LiteStep.h" />
     <ClInclude Include="Math.h" />
+    <ClInclude Include="ShellHelpers.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LsModule.cpp" />
+    <ClCompile Include="LiteStep.cpp" />
     <ClCompile Include="Math.cpp" />
+    <ClCompile Include="ShellHelpers.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

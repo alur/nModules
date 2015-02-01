@@ -2,6 +2,8 @@
 
 #include "../nShared/Math.h"
 
+#include <ShellScalingAPI.h>
+
 
 Displays::Displays() {
   Update();
@@ -89,12 +91,12 @@ void Displays::Update() {
 }
 
 
-BOOL CALLBACK Displays::EnumMonitorsCallback(HMONITOR hMonitor, HDC, LPRECT, LPARAM lParam) {
+BOOL CALLBACK Displays::EnumMonitorsCallback(HMONITOR monitor, HDC, LPRECT, LPARAM lParam) {
   Displays *self = (Displays*)lParam;
 
   MONITORINFOEX mi;
   mi.cbSize = sizeof(MONITORINFOEX);
-  GetMonitorInfo(hMonitor, &mi);
+  GetMonitorInfo(monitor, &mi);
 
   bool isPrimary = (mi.dwFlags & MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY;
   if (!isPrimary) {
@@ -109,6 +111,11 @@ BOOL CALLBACK Displays::EnumMonitorsCallback(HMONITOR hMonitor, HDC, LPRECT, LPA
   display.workArea = mi.rcWork;
   display.workAreaHeight = mi.rcWork.bottom - mi.rcWork.top;
   display.workAreaWidth = mi.rcWork.right - mi.rcWork.left;
+
+  display.monitor = monitor;
+  UINT dpiY, dpiX;
+  GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
+  display.dpi = D2D1::Point2F((float)dpiY, (float)dpiX);
 
   return TRUE;
 }

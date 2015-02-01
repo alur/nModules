@@ -1,4 +1,4 @@
-#include "Parsers.hpp"
+#include "Api.h"
 #include "SettingsReader.hpp"
 
 #include "../nUtilities/lsapi.h"
@@ -34,7 +34,6 @@ HRESULT SettingsReader::Create(LPCWSTR prefix, ISettingsReader **pReader) {
   while (GetPrefixedRCString(reader->mPrefixes.back(), L"Group", group, MAX_PREFIX, L"")) {
     reader->mPrefixes.emplace_back();
     StringCchCopy(reader->mPrefixes.back(), MAX_PREFIX, group);
-
     // TODO(Erik): Check for loops.
   }
 
@@ -48,8 +47,21 @@ SettingsReader::SettingsReader() {
 }
 
 
-HRESULT SettingsReader::CreateChild(LPCWSTR, ISettingsReader**) const {
-  return E_FAIL;
+HRESULT SettingsReader::CreateChild(LPCWSTR suffix, ISettingsReader **pReader) const {
+  SettingsReader *reader = new SettingsReader();
+  for (LPCWSTR prefix : mPrefixes) {
+    reader->mPrefixes.emplace_back();
+    StringCchPrintf(reader->mPrefixes.back(), MAX_PREFIX, L"%s%s", prefix, suffix);
+
+    wchar_t group[MAX_PREFIX];
+    while (GetPrefixedRCString(reader->mPrefixes.back(), L"Group", group, MAX_PREFIX, L"")) {
+      reader->mPrefixes.emplace_back();
+      StringCchCopy(reader->mPrefixes.back(), MAX_PREFIX, group);
+      // TODO(Erik): Check for loops.
+    }
+  }
+  *pReader = (ISettingsReader*)reader;
+  return S_OK;
 }
 
 

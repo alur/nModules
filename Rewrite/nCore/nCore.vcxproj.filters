@@ -2,22 +2,74 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="nCore.cpp" />
-    <ClCompile Include="Pane.cpp" />
     <ClCompile Include="Displays.cpp" />
     <ClCompile Include="Factories.cpp" />
-    <ClCompile Include="SettingsReader.cpp" />
     <ClCompile Include="LiteStep.cpp" />
-    <ClCompile Include="StatePainter.cpp" />
     <ClCompile Include="Parsers.cpp" />
-    <ClCompile Include="EventHandler.cpp" />
+    <ClCompile Include="PanePublicApi.cpp">
+      <Filter>Implementations\Pane</Filter>
+    </ClCompile>
+    <ClCompile Include="Pane.cpp">
+      <Filter>Implementations\Pane</Filter>
+    </ClCompile>
+    <ClCompile Include="PaneMessageHandler.cpp">
+      <Filter>Implementations\Pane</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowMonitor.cpp">
+      <Filter>Services</Filter>
+    </ClCompile>
+    <ClCompile Include="StatePainter.cpp">
+      <Filter>Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsReader.cpp">
+      <Filter>Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="EventHandler.cpp">
+      <Filter>Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageManager.cpp">
+      <Filter>Services</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Implementations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Pane.hpp" />
     <ClInclude Include="Displays.hpp" />
     <ClInclude Include="Factories.h" />
-    <ClInclude Include="SettingsReader.hpp" />
-    <ClInclude Include="StatePainter.hpp" />
-    <ClInclude Include="Parsers.hpp" />
-    <ClInclude Include="EventHandler.hpp" />
+    <ClInclude Include="Pane.hpp">
+      <Filter>Implementations\Pane</Filter>
+    </ClInclude>
+    <ClInclude Include="Messages.h" />
+    <ClInclude Include="Api.h" />
+    <ClInclude Include="WindowMonitor.hpp">
+      <Filter>Services</Filter>
+    </ClInclude>
+    <ClInclude Include="StatePainter.hpp">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsReader.hpp">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="EventHandler.hpp">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageRegistrar.h">
+      <Filter>Services</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.hpp">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Implementations">
+      <UniqueIdentifier>{c5b7a346-8158-4fbe-aafd-0b9c6bb80ca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services">
+      <UniqueIdentifier>{bf84c966-c649-4bc2-90e0-dc367437a44c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Implementations\Pane">
+      <UniqueIdentifier>{00cb5003-fdeb-4309-ba6d-83e5a3deab6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

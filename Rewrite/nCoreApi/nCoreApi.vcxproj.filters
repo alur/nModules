@@ -14,6 +14,8 @@
     <ClInclude Include="IEventHandler.hpp" />
     <ClInclude Include="IEventProcessor.hpp" />
     <ClInclude Include="Messages.h" />
+    <ClInclude Include="TaskWindow.h" />
+    <ClInclude Include="ILogger.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp" />

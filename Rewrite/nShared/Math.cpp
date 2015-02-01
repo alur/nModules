@@ -9,19 +9,21 @@ int RectArea(LPCRECT rect) {
 }
 
 
-void RectIntersection(LPCRECT a, LPCRECT b, LPRECT out) {
+bool RectIntersection(LPCRECT a, LPCRECT b, LPRECT out) {
   out->left = std::max(a->left, b->left);
   out->right = std::min(a->right, b->right);
   out->top = std::max(a->top, b->top);
   out->bottom = std::min(a->bottom, b->bottom);
+  return out->left < out->right && out->top < out->bottom;
 }
 
 
-void RectIntersection(const D2D1_RECT_F *a, const D2D1_RECT_F *b, D2D1_RECT_F *out) {
+bool RectIntersection(const D2D1_RECT_F *a, const D2D1_RECT_F *b, D2D1_RECT_F *out) {
   out->left = std::max(a->left, b->left);
   out->right = std::min(a->right, b->right);
   out->top = std::max(a->top, b->top);
   out->bottom = std::min(a->bottom, b->bottom);
+  return out->left < out->right && out->top < out->bottom;
 }
 
 

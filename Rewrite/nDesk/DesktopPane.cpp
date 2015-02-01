@@ -24,6 +24,7 @@ DesktopPane::DesktopPane()
   initData.flags = PaneInitData::DesktopWindow;
 
   mPane = nCore::CreatePane(&initData);
+  mPane->Show();
 }
 
 
@@ -57,6 +58,11 @@ LRESULT DesktopPane::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM 
 }
 
 
+LPVOID DesktopPane::AddPane(const IPane *pane) {
+  return nullptr;
+}
+
+
 HRESULT DesktopPane::CreateDeviceResources(ID2D1RenderTarget *renderTarget) {
   HRESULT hr = S_OK;
   IDesktopWallpaper *desktopWallpaper;
@@ -87,8 +93,10 @@ HRESULT DesktopPane::CreateDeviceResources(ID2D1RenderTarget *renderTarget) {
             hr = desktopWallpaper->GetWallpaper(id, &file);
             if (SUCCEEDED(hr)) {
               UINT width, height;
+              wchar_t expandedPath[MAX_PATH];
               ID2D1BitmapBrush *bitmapBrush;
-              hr = CreateBitmapBrush(file, renderTarget, &bitmapBrush, &width, &height);
+              ExpandEnvironmentStrings(file, expandedPath, MAX_PATH);
+              hr = CreateBitmapBrush(expandedPath, renderTarget, &bitmapBrush, &width, &height);
               if (SUCCEEDED(hr)) {
                 wallpaper.brush = (ID2D1Brush*)bitmapBrush;
                 D2D1::Matrix3x2F translation = D2D1::Matrix3x2F::Translation(
@@ -121,23 +129,31 @@ void DesktopPane::DiscardDeviceResources() {
 }
 
 
-void DesktopPane::Paint(ID2D1RenderTarget *renderTarget, D2D1_RECT_F *area, IPane*) const {
+bool DesktopPane::DynamicColorChanged(ID2D1RenderTarget*) {
+  return false;
+}
+
+
+void DesktopPane::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area, const IPane*,
+    LPVOID) const {
   for (const Wallpaper &wallpaper : mWallpapers) {
-    if (RectIntersects(&wallpaper.rect, area)) {
-      D2D1_RECT_F invalidatedArea;
-      RectIntersection(area, &wallpaper.rect, &invalidatedArea);
+    D2D1_RECT_F invalidatedArea;
+    if (RectIntersection(area, &wallpaper.rect, &invalidatedArea)) {
       renderTarget->FillRectangle(invalidatedArea, wallpaper.brush);
     }
   }
 }
 
 
-bool DesktopPane::UpdateDWMColor(DWORD, ID2D1RenderTarget*) {
-  return false;
+void DesktopPane::PositionChanged(const IPane*, LPVOID, D2D1_RECT_F) {
 }
 
 
-void DesktopPane::UpdatePosition(D2D1_RECT_F) {
+void DesktopPane::RemovePane(const IPane*, LPVOID) {
+}
+
+
+void DesktopPane::TextChanged(const IPane*, LPVOID, LPCWSTR) {
 }
 
 
