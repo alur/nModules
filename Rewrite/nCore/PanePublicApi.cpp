@@ -99,6 +99,7 @@ void Pane::SetText(LPCWSTR text) {
   } else {
     mText = _wcsdup(text);
   }
+  mPainter->TextChanged(this, mPainterData, mText);
 }
 
 

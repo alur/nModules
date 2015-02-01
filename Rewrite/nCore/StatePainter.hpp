@@ -1,12 +1,16 @@
 #pragma once
 
+//#include "StatePainterData.hpp"
+
 #include "../nCoreApi/IStatePainter.hpp"
+
+#include <dwrite.h>
 
 // TODO(Erik): Make this support rendering to different top-level windows.
 class StatePainter : public IStatePainter {
 private:
   struct PainterData {
-
+    IDWriteTextLayout *textLayout;
   };
 
 public:
@@ -31,6 +35,7 @@ public:
 
 private:
   ID2D1Brush *mBrush;
+  ID2D1Brush *mTextBrush;
   D2D_COLOR_F mColor;
   int mResourceRefCount;
 };

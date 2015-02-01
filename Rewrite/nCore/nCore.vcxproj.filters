@@ -18,9 +18,6 @@
     <ClCompile Include="WindowMonitor.cpp">
       <Filter>Services</Filter>
     </ClCompile>
-    <ClCompile Include="StatePainter.cpp">
-      <Filter>Implementations</Filter>
-    </ClCompile>
     <ClCompile Include="SettingsReader.cpp">
       <Filter>Implementations</Filter>
     </ClCompile>
@@ -32,6 +29,12 @@
     </ClCompile>
     <ClCompile Include="Logger.cpp">
       <Filter>Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="StatePainterData.cpp">
+      <Filter>Implementations\State</Filter>
+    </ClCompile>
+    <ClCompile Include="StatePainter.cpp">
+      <Filter>Implementations\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -45,9 +48,6 @@
     <ClInclude Include="WindowMonitor.hpp">
       <Filter>Services</Filter>
     </ClInclude>
-    <ClInclude Include="StatePainter.hpp">
-      <Filter>Implementations</Filter>
-    </ClInclude>
     <ClInclude Include="SettingsReader.hpp">
       <Filter>Implementations</Filter>
     </ClInclude>
@@ -60,6 +60,12 @@
     <ClInclude Include="Logger.hpp">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="StatePainterData.hpp">
+      <Filter>Implementations\State</Filter>
+    </ClInclude>
+    <ClInclude Include="StatePainter.hpp">
+      <Filter>Implementations\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Implementations">
@@ -70,6 +76,9 @@
     </Filter>
     <Filter Include="Implementations\Pane">
       <UniqueIdentifier>{00cb5003-fdeb-4309-ba6d-83e5a3deab6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Implementations\State">
+      <UniqueIdentifier>{c67b0794-f7fc-4f6c-9e6b-42500f5a40d9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

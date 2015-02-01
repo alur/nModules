@@ -1,3 +1,4 @@
+#include "Api.h"
 #include "StatePainter.hpp"
 
 #include "../nUtilities/Macros.h"
@@ -12,6 +13,7 @@ EXPORT_CDECL(IStatePainter*) CreateStatePainter(const StatePainterInitData *init
 
 StatePainter::StatePainter(const StatePainterInitData *initData)
     : mBrush(nullptr)
+    , mTextBrush(nullptr)
     , mResourceRefCount(0)
 {
   DWORD color = (DWORD)initData->settingsReader->GetInt64(L"Color", 0x55C0448F);
@@ -23,7 +25,9 @@ StatePainter::StatePainter(const StatePainterInitData *initData)
 
 
 LPVOID StatePainter::AddPane(const IPane*) {
-  return nullptr;
+  PainterData *data = new PainterData();
+  data->textLayout = nullptr;
+  return data;
 }
 
 
@@ -32,6 +36,8 @@ HRESULT StatePainter::CreateDeviceResources(ID2D1RenderTarget *renderTarget) {
     ID2D1SolidColorBrush *brush;
     renderTarget->CreateSolidColorBrush(mColor, &brush);
     mBrush = brush;
+    renderTarget->CreateSolidColorBrush(D2D1::ColorF(1.0, 1.0, 1.0), &brush);
+    mTextBrush = brush;
   }
   return S_OK;
 }
@@ -45,6 +51,7 @@ void StatePainter::Destroy() {
 void StatePainter::DiscardDeviceResources() {
   if (--mResourceRefCount == 0) {
     SAFERELEASE(mBrush);
+    SAFERELEASE(mTextBrush);
   }
   assert(mResourceRefCount >= 0);
 }
@@ -56,24 +63,40 @@ bool StatePainter::DynamicColorChanged(ID2D1RenderTarget*) {
 
 
 void StatePainter::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
-    const IPane *pane, LPVOID painterData) const {
+    const IPane *pane, LPVOID data) const {
   renderTarget->FillRectangle(area, mBrush);
 
   LPCWSTR text = pane->GetRenderingText();
   if (text && *text != L'\0') {
+    PainterData *paneData = (PainterData*)data;
+
+    // TODO(Erik): Hack!
+    IDWriteTextFormat *textFormat;
+
+    IDWriteFactory *factory = GetDWriteFactory();
+
+    HRESULT hr = factory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL,
+      DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 24.0f, L"en-US", &textFormat);
+
+    renderTarget->DrawTextW(text, lstrlenW(text), textFormat, area, mTextBrush);
+    textFormat->Release();
+    /*if (paneData->textLayout) {
+      paneData->textLayout->Draw(renderTarget, mTextRenderer, 0, 0);
+    }*/
   }
 
   pane->PaintChildren(renderTarget, area);
 }
 
 
-void StatePainter::PositionChanged(const IPane *pane, LPVOID painterData, D2D1_RECT_F position) {
+void StatePainter::PositionChanged(const IPane*, LPVOID, D2D1_RECT_F) {
 }
 
 
-void StatePainter::RemovePane(const IPane*, LPVOID) {
+void StatePainter::RemovePane(const IPane*, LPVOID data) {
+  delete (PainterData*)data;
 }
 
 
-void StatePainter::TextChanged(const IPane*, LPVOID, LPCWSTR) {
+void StatePainter::TextChanged(const IPane*, LPVOID data, LPCWSTR text) {
 }

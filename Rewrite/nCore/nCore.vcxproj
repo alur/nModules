@@ -106,6 +106,7 @@
     <ClCompile Include="Parsers.cpp" />
     <ClCompile Include="SettingsReader.cpp" />
     <ClCompile Include="StatePainter.cpp" />
+    <ClCompile Include="StatePainterData.cpp" />
     <ClCompile Include="WindowMonitor.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -119,6 +120,7 @@
     <ClInclude Include="Pane.hpp" />
     <ClInclude Include="SettingsReader.hpp" />
     <ClInclude Include="StatePainter.hpp" />
+    <ClInclude Include="StatePainterData.hpp" />
     <ClInclude Include="WindowMonitor.hpp" />
   </ItemGroup>
   <ItemGroup>

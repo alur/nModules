@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Implementation of the Taskbar class. Handles layout of the taskbar buttons.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "../nShared/LiteStep.h"
 #include <strsafe.h>
@@ -37,7 +37,7 @@ Taskbar::Taskbar(LPCTSTR name) : Drawable(name) {
   drawableDefaults.height = 36;
   drawableDefaults.registerWithCore = true;
   windowSettings.Load(mSettings, &drawableDefaults);
-    
+
   mWindow->Initialize(windowSettings, &mStateRender);
   mWindow->Show();
 }
@@ -152,7 +152,7 @@ void Taskbar::Repaint() {
 
 
 /// <summary>
-/// Repositions/Resizes all buttons.  
+/// Repositions/Resizes all buttons.
 /// </summary>
 void Taskbar::Relayout() {
   Window::UpdateLock lock(mWindow);
@@ -262,7 +262,7 @@ LRESULT WINAPI Taskbar::HandleMessage(HWND window, UINT message, WPARAM wParam, 
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 void Taskbar::ShowThumbnail(HWND hwnd, LPRECT position) {
   if (!mNoThumbnails) {
@@ -272,7 +272,7 @@ void Taskbar::ShowThumbnail(HWND hwnd, LPRECT position) {
 
 
 /// <summary>
-/// 
+///
 /// </summary>
 void Taskbar::HideThumbnail() {
   mThumbnail->Hide();
