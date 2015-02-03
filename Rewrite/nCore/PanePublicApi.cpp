@@ -1,7 +1,10 @@
+#include "Displays.hpp"
 #include "Pane.hpp"
 
 #include "../nUtilities/lsapi.h"
 #include "../nUtilities/Macros.h"
+
+extern Displays gDisplays;
 
 
 EXPORT_CDECL(IPane*) CreatePane(const PaneInitData *initData) {
@@ -25,6 +28,19 @@ void Pane::Destroy() {
   delete this;
 }
 
+
+float Pane::EvaluateLength(const NLENGTH &length, bool horizontal) const {
+  return length.Evaluate(horizontal ? mSize.width : mSize.height, horizontal ? mDpi.x : mDpi.y);
+}
+
+
+LPVOID Pane::GetPainterData() const {
+  return mPainterData;
+}
+
+const D2D1_RECT_F *Pane::GetRenderingPosition() const {
+  return &mRenderingPosition;
+}
 
 LPCWSTR Pane::GetRenderingText() const {
   return mText;
@@ -64,18 +80,36 @@ void Pane::Position(LPCNRECT position) {
   mSettings.position = *position;
 
   if (IsChildPane() && mParent) {
-    mRenderingPosition = D2D1::RectF(
-      EvaluateLength(mSettings.position.left, true) + mParent->mRenderingPosition.left,
-      EvaluateLength(mSettings.position.top, false) + mParent->mRenderingPosition.top,
-      EvaluateLength(mSettings.position.right, true) + mParent->mRenderingPosition.left,
-      EvaluateLength(mSettings.position.bottom, false) + mParent->mRenderingPosition.top);
+    D2D1_RECT_F newPosition = D2D1::RectF(
+      EvaluateLengthParent(mSettings.position.left, true) + mParent->mRenderingPosition.left,
+      EvaluateLengthParent(mSettings.position.top, false) + mParent->mRenderingPosition.top,
+      EvaluateLengthParent(mSettings.position.right, true) + mParent->mRenderingPosition.left,
+      EvaluateLengthParent(mSettings.position.bottom, false) + mParent->mRenderingPosition.top);
+
+    D2D1_SIZE_F newSize = D2D1::SizeF(
+      newPosition.right - newPosition.left,
+      newPosition.bottom - newPosition.top);
+
+    bool isMove = newPosition.left != mRenderingPosition.left
+      || newPosition.top != mRenderingPosition.top;
+    bool isSize = newSize.width != mSize.width || newSize.height != mSize.height;
+
+    if (!isMove && !isSize) {
+      return;
+    }
+
+    Repaint(false); // Invalidate where we used to be
+    mRenderingPosition = newPosition;
+    mSize = newSize;
+    mPainter->PositionChanged(this, mPainterData, mRenderingPosition, isMove, isSize);
+    Repaint(true); // And where we are now
   } else {
     //D2D1_RECT_U oldPosition = mWindowPosition;
     //SetWindowPos(mWindow, 0, int());
+    mSize = D2D1::SizeF(
+      mRenderingPosition.right - mRenderingPosition.left,
+      mRenderingPosition.bottom - mRenderingPosition.top);
   }
-  mSize = D2D1::SizeF(
-    mRenderingPosition.right - mRenderingPosition.left,
-    mRenderingPosition.bottom - mRenderingPosition.top);
 }
 
 
@@ -100,6 +134,7 @@ void Pane::SetText(LPCWSTR text) {
     mText = _wcsdup(text);
   }
   mPainter->TextChanged(this, mPainterData, mText);
+  Repaint(true);
 }
 
 

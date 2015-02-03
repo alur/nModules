@@ -85,17 +85,17 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
   if (mParent) {
     mDpi = mParent->mDpi;
     mRenderingPosition = D2D1::RectF(
-      EvaluateLength(mSettings.position.left, true) + mParent->mRenderingPosition.left,
-      EvaluateLength(mSettings.position.top, false) + mParent->mRenderingPosition.top,
-      EvaluateLength(mSettings.position.right, true) + mParent->mRenderingPosition.left,
-      EvaluateLength(mSettings.position.bottom, false) + mParent->mRenderingPosition.top);
+      EvaluateLengthParent(mSettings.position.left, true) + mParent->mRenderingPosition.left,
+      EvaluateLengthParent(mSettings.position.top, false) + mParent->mRenderingPosition.top,
+      EvaluateLengthParent(mSettings.position.right, true) + mParent->mRenderingPosition.left,
+      EvaluateLengthParent(mSettings.position.bottom, false) + mParent->mRenderingPosition.top);
   } else {
     mDpi = D2D1::Point2F(
       (float)gDisplays.GetDisplay(0).dpi.x,
       (float)gDisplays.GetDisplay(0).dpi.y);
     mRenderingPosition = D2D1::RectF(0, 0,
-      EvaluateLength(mSettings.position.right - mSettings.position.left, true),
-      EvaluateLength(mSettings.position.bottom - mSettings.position.top, false));
+      EvaluateLengthParent(mSettings.position.right - mSettings.position.left, true),
+      EvaluateLengthParent(mSettings.position.bottom - mSettings.position.top, false));
   }
   mSize = D2D1::SizeF(
     mRenderingPosition.right - mRenderingPosition.left,
@@ -124,8 +124,8 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
     }
 
     mWindow = CreateWindowEx(exStyle, windowClass, initData->name ? initData->name : L"", style,
-      (int)EvaluateLength(mSettings.position.left, true),
-      (int)EvaluateLength(mSettings.position.top, false),
+      (int)EvaluateLengthParent(mSettings.position.left, true),
+      (int)EvaluateLengthParent(mSettings.position.top, false),
       (int)mSize.width, (int)mSize.height, parentWindow, nullptr, gInstance, this);
     SetWindowLongPtr(mWindow, GWLP_USERDATA, MAGIC_DWORD);
     SetWindowPos(mWindow, insertAfter, 0, 0, 0, 0, windowPosFlags);
@@ -214,21 +214,21 @@ HRESULT Pane::ReCreateDeviceResources() {
 }
 
 
-float Pane::EvaluateLength(const NLENGTH &length, bool horizontal) const {
+bool Pane::IsChildPane() const {
+  return mParent != nullptr || *mSettings.parent != L'\0';
+}
+
+
+float Pane::EvaluateLengthParent(const NLENGTH &length, bool horizontal) const {
   float parentLength = 0;
   if (mParent) {
     parentLength = horizontal ? mParent->mSize.width : mParent->mSize.height;
-  } else if(!IsChildPane()) {
+  } else if (!IsChildPane()) {
     // TODO(Erik): This should be based on which monitor we belong to.
     parentLength = float(horizontal ?
       gDisplays.GetDisplay(0).width : gDisplays.GetDisplay(0).height);
   }
   return length.Evaluate(parentLength, horizontal ? mDpi.x : mDpi.y);
-}
-
-
-bool Pane::IsChildPane() const {
-  return mParent != nullptr || *mSettings.parent != L'\0';
 }
 
 

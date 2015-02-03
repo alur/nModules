@@ -72,25 +72,26 @@
   <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Link>
-      <AdditionalDependencies>lsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lsapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Link>
-      <AdditionalDependencies>lsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lsapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
-      <AdditionalDependencies>lsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lsapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
-      <AdditionalDependencies>lsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lsapi.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ButtonPainter.cpp" />
     <ClCompile Include="nTask.cpp" />
     <ClCompile Include="Taskbar.cpp" />
     <ClCompile Include="TaskbarManager.cpp" />
@@ -108,6 +109,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ButtonPainter.hpp" />
     <ClInclude Include="Messages.h" />
     <ClInclude Include="Taskbar.hpp" />
     <ClInclude Include="TaskbarManager.hpp" />

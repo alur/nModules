@@ -43,6 +43,14 @@ HRESULT StatePainter::CreateDeviceResources(ID2D1RenderTarget *renderTarget) {
 }
 
 
+void StatePainter::ActivateState(BYTE state, IPane *pane) {
+}
+
+
+void StatePainter::ClearState(BYTE state, IPane *pane) {
+}
+
+
 void StatePainter::Destroy() {
   delete this;
 }
@@ -64,8 +72,20 @@ bool StatePainter::DynamicColorChanged(ID2D1RenderTarget*) {
 
 void StatePainter::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
     const IPane *pane, LPVOID data) const {
-  renderTarget->FillRectangle(area, mBrush);
+  PaintBackground(renderTarget, area, pane, data);
+  PaintText(renderTarget, area, pane, data);
+  pane->PaintChildren(renderTarget, area);
+}
 
+
+void StatePainter::PaintBackground(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
+    const IPane *pane, LPVOID data) const {
+  renderTarget->FillRectangle(area, mBrush);
+}
+
+
+void StatePainter::PaintText(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
+    const IPane *pane, LPVOID data) const {
   LPCWSTR text = pane->GetRenderingText();
   if (text && *text != L'\0') {
     PainterData *paneData = (PainterData*)data;
@@ -81,15 +101,13 @@ void StatePainter::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *are
     renderTarget->DrawTextW(text, lstrlenW(text), textFormat, area, mTextBrush);
     textFormat->Release();
     /*if (paneData->textLayout) {
-      paneData->textLayout->Draw(renderTarget, mTextRenderer, 0, 0);
+    paneData->textLayout->Draw(renderTarget, mTextRenderer, 0, 0);
     }*/
   }
-
-  pane->PaintChildren(renderTarget, area);
 }
 
 
-void StatePainter::PositionChanged(const IPane*, LPVOID, D2D1_RECT_F) {
+void StatePainter::PositionChanged(const IPane*, LPVOID, D2D1_RECT_F, bool, bool) {
 }
 
 

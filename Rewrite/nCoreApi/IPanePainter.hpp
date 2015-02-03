@@ -45,11 +45,13 @@ public:
     const class IPane *pane, LPVOID painterData) const = 0;
 
   /// <summary>
-  ///
+  /// Called when the rendering position of the pane has changed.
   /// </summary>
-  /// <param name="position"></param>
+  /// <param name="position">The new position of the pane.</param>
+  /// <param name="isMove">True if the top left corner of the pane has moved.</param>
+  /// <param name="isSize">True if this size of the pane has changed.</param>
   virtual void APICALL PositionChanged(const class IPane *pane, LPVOID painterData,
-    D2D1_RECT_F position) = 0;
+    D2D1_RECT_F position, bool isMove, bool isSize) = 0;
 
   /// <summary>
   /// Called when the pane is no longer going to use this painter. The painter should free up any

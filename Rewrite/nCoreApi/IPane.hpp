@@ -43,6 +43,25 @@ public:
   virtual void APICALL Destroy() = 0;
 
   /// <summary>
+  /// Returns the current value of the given length.
+  /// </summary>
+  /// <param name="horizontal">
+  /// Set this to true if this is a horizontal length, false for vertical.
+  /// </param>
+  virtual float APICALL EvaluateLength(const NLENGTH &length, bool horizontal) const = 0;
+
+  /// <summary>
+  /// Returns the painter data for this pane.
+  /// </summary>
+  virtual LPVOID APICALL GetPainterData() const = 0;
+
+  /// <summary>
+  /// Retrieves the rendering position of the pane. This is the absolute position, in pixels, of
+  /// the pane relative to its parent window.
+  /// </summary>
+  virtual const D2D1_RECT_F *APICALL GetRenderingPosition() const = 0;
+
+  /// <summary>
   /// Retrieves the text that should be rendered for this pane. Note that this may not be the same
   /// as what was passed to SetText. Might be null.
   /// </summary>

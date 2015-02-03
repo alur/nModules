@@ -31,10 +31,13 @@
       <Filter>Implementations</Filter>
     </ClCompile>
     <ClCompile Include="StatePainterData.cpp">
-      <Filter>Implementations\State</Filter>
+      <Filter>Implementations\StatePainter</Filter>
     </ClCompile>
     <ClCompile Include="StatePainter.cpp">
-      <Filter>Implementations\State</Filter>
+      <Filter>Implementations\StatePainter</Filter>
+    </ClCompile>
+    <ClCompile Include="StatePainterState.cpp">
+      <Filter>Implementations\StatePainter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -61,10 +64,13 @@
       <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="StatePainterData.hpp">
-      <Filter>Implementations\State</Filter>
+      <Filter>Implementations\StatePainter</Filter>
     </ClInclude>
     <ClInclude Include="StatePainter.hpp">
-      <Filter>Implementations\State</Filter>
+      <Filter>Implementations\StatePainter</Filter>
+    </ClInclude>
+    <ClInclude Include="StatePainterState.hpp">
+      <Filter>Implementations\StatePainter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -77,7 +83,7 @@
     <Filter Include="Implementations\Pane">
       <UniqueIdentifier>{00cb5003-fdeb-4309-ba6d-83e5a3deab6d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Implementations\State">
+    <Filter Include="Implementations\StatePainter">
       <UniqueIdentifier>{c67b0794-f7fc-4f6c-9e6b-42500f5a40d9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

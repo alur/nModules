@@ -1,19 +1,12 @@
 #pragma once
 
-#include "../nCoreApi/IMessageHandler.hpp"
-#include "../nCoreApi/IPane.hpp"
 #include "../nCoreApi/IPanePainter.hpp"
+#include "../nCoreApi/IStatePainter.hpp"
 
-#include <vector>
-
-class DesktopPane : public IMessageHandler, public IPanePainter {
+class ButtonPainter : public IPanePainter {
 public:
-  DesktopPane();
-  ~DesktopPane();
-
-  // IMessageHandler
-public:
-  LRESULT APICALL HandleMessage(HWND, UINT message, WPARAM, LPARAM, NPARAM) override;
+  ButtonPainter(IStatePainter *statePainter);
+  ~ButtonPainter();
 
   // IPanePainter
 public:
@@ -28,18 +21,16 @@ public:
   void APICALL RemovePane(const IPane *pane, LPVOID painterData) override;
   void APICALL TextChanged(const IPane *pane, LPVOID painterData, LPCWSTR text) override;
 
-private:
-  HRESULT CreateBitmapBrush(LPCWSTR file, ID2D1RenderTarget*, ID2D1BitmapBrush**, LPUINT widthOut,
-    LPUINT heightOut);
+public:
+  void SetIcon(HICON icon);
 
 private:
-  struct Wallpaper {
-    D2D1_RECT_F rect;
-    ID2D1Brush *brush;
-  };
+  HRESULT BrushFromIcon(HICON icon, ID2D1RenderTarget *renderTarget, ID2D1BitmapBrush **brush);
 
 private:
-  std::vector<Wallpaper> mWallpapers;
-  IPane *mPane;
+  IStatePainter *mStatePainter;
+  D2D1_RECT_F mIconPaintingPosition;
+  ID2D1BitmapBrush *mIconBrush;
   ID2D1RenderTarget *mRenderTarget;
+  HICON mIcon;
 };

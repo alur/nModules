@@ -9,13 +9,17 @@ TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eve
   : mEventHandler(eventHandler)
   , mWindow(window)
 {
+  mPainter = new ButtonPainter(painter);
+
   PaneInitData initData;
   ZeroMemory(&initData, sizeof(PaneInitData));
   initData.cbSize = sizeof(PaneInitData);
   initData.messageHandler = this;
-  initData.painter = painter;
+  initData.painter = mPainter;
 
   mPane = parent->CreateChild(&initData);
+
+  mPainter->SetIcon(nCore::GetWindowIcon(window, 32));
 
   wchar_t windowText[256];
   GetWindowText(window, windowText, 256);
@@ -35,6 +39,13 @@ void TaskButton::Position(const NRECT &position) {
 
 void TaskButton::Show() {
   mPane->Show();
+}
+
+
+void TaskButton::Redraw() {
+  wchar_t windowText[256];
+  GetWindowText(mWindow, windowText, 256);
+  mPane->SetText(windowText);
 }
 
 

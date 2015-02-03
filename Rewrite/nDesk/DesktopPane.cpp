@@ -145,7 +145,7 @@ void DesktopPane::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area
 }
 
 
-void DesktopPane::PositionChanged(const IPane*, LPVOID, D2D1_RECT_F) {
+void DesktopPane::PositionChanged(const IPane*, LPVOID, D2D1_RECT_F, bool, bool) {
 }
 
 

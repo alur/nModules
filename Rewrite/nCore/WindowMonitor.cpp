@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <thread>
 #include <unordered_map>
 
 extern HWND gWindow;
@@ -21,6 +22,7 @@ static const UINT sWMMessages[] = {
 };
 
 static HICON sDefaultIcon;
+static std::thread sInitThread;
 
 
 struct WindowData {
@@ -153,14 +155,25 @@ void WindowMonitor::Start() {
   sDefaultIcon = LoadIcon(nullptr, IDI_APPLICATION);
   SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)gWindow, (LPARAM)sWMMessages);
   SetTimer(gWindow, NCORE_TIMER_WINDOW_MAINTENANCE, 250, nullptr);
+
+  sInitThread = std::thread([] () -> void {
+    EnumDesktopWindows(nullptr, [] (HWND window, LPARAM) -> BOOL {
+      if (IsTaskbarWindow(window)) {
+        PostMessage(gWindow, LM_WINDOWCREATED, (WPARAM)window, 0);
+      }
+      return TRUE;
+    }, 0);
+  });
 }
 
 
 void WindowMonitor::Stop() {
+  sInitThread.join();
   SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)gWindow, (LPARAM)sWMMessages);
   KillTimer(gWindow, NCORE_TIMER_WINDOW_MAINTENANCE);
   sWindowData.clear();
   DestroyIcon(sDefaultIcon);
+  sDefaultIcon = nullptr;
 }
 
 

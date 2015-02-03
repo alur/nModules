@@ -4,9 +4,19 @@
 
 #include "../nUtilities/lsapi.h"
 
+// TODO(Erik):Simplify this
 StatePainterInitData::State sButtonStates[] = {
-  { L"Hover", 0 }
+  { L"Minimized",               0x0000, 0 }, // 1
+  { L"Flashing",                0x0000, 0 }, // 2
+  { L"MinimizedFlashing",       0x0003, 2 }, // 3
+  { L"Active",                  0x0000, 0 }, // 4
+  { L"Hover",                   0x0000, 0 }, // 5
+  { L"MinimizedHover",          0x0011, 5 }, // 6
+  { L"ActiveHover",             0x0018, 4 }, // 7
+  { L"FlashingHover",           0x0012, 5 }, // 8
+  { L"MinimizedFlashingHover",  0x0013, 8 }  // 9
 };
+
 
 Taskbar::Taskbar(LPCWSTR prefix)
   : mPane(nullptr)
@@ -103,7 +113,11 @@ LRESULT Taskbar::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lPar
 TaskButton *Taskbar::AddTask(HWND window, bool isReplacement) {
   mPane->Lock();
 
-  mButtons.emplace_back(mPane, mButtonPainter, mButtonEventHandler, window);
+  if (isReplacement) {
+    mButtons.emplace(mReplacementPosition, mPane, mButtonPainter, mButtonEventHandler, window);
+  } else {
+    mButtons.emplace_back(mPane, mButtonPainter, mButtonEventHandler, window);
+  }
   mButtonMap[window] = --mButtons.end();
 
   TaskButton &button = mButtons.back();
@@ -118,8 +132,22 @@ TaskButton *Taskbar::AddTask(HWND window, bool isReplacement) {
 void Taskbar::RemoveTask(HWND window, bool isBeingReplaced) {
   auto iter = mButtonMap.find(window);
   if (iter != mButtonMap.end()) {
-    mButtons.erase(iter->second);
+    mPane->Lock();
+    if (isBeingReplaced) {
+      mReplacementPosition = mButtons.erase(iter->second);
+    } else {
+      mButtons.erase(iter->second);
+    }
     mButtonMap.erase(iter);
     Relayout();
+    mPane->Unlock();
+  }
+}
+
+
+void Taskbar::RedrawTask(HWND window) {
+  auto iter = mButtonMap.find(window);
+  if (iter != mButtonMap.end()) {
+    iter->second->Redraw();
   }
 }

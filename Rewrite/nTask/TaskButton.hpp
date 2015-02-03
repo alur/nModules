@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ButtonPainter.hpp"
+
 #include "../nCoreApi/IEventHandler.hpp"
 #include "../nCoreApi/IEventProcessor.hpp"
 #include "../nCoreApi/IPane.hpp"
@@ -16,6 +18,7 @@ public:
 
 public:
   void Position(const NRECT &position);
+  void Redraw();
   void Show();
 
   // IMessageHandler
@@ -29,5 +32,6 @@ public:
 private:
   const HWND mWindow;
   IEventHandler *mEventHandler;
+  ButtonPainter *mPainter;
   IPane *mPane;
 };

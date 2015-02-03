@@ -118,6 +118,10 @@ void TaskbarManager::RedrawWindow(HWND window, LPARAM lParam) {
   }
   task.lastUpdateTime = time;
   task.updateDuringMaintenance = false;
+
+  for (auto &taskbar : mTaskbars) {
+    taskbar.second.RedrawTask(window);
+  }
 }
 
 

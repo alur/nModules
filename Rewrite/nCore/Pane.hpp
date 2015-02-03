@@ -37,6 +37,9 @@ public:
 public:
   IPane* APICALL CreateChild(const PaneInitData*) override;
   void APICALL Destroy() override;
+  float APICALL EvaluateLength(const NLENGTH &length, bool horizontal) const override;
+  LPVOID APICALL GetPainterData() const override;
+  const D2D1_RECT_F *APICALL GetRenderingPosition() const override;
   LPCWSTR APICALL GetRenderingText() const override;
   HWND APICALL GetWindow() const override;
   void APICALL Hide() override;
@@ -52,8 +55,9 @@ private:
   void DiscardDeviceResources();
   HRESULT ReCreateDeviceResources();
 
-  float EvaluateLength(const NLENGTH &length, bool horizontal) const;
   inline bool IsChildPane() const;
+  // Evaluates a length in the context of the parent.
+  float EvaluateLengthParent(const NLENGTH &length, bool horizontal) const;
   void Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area) const;
   void Position(const RECT&);
 

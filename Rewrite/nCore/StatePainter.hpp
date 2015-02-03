@@ -1,6 +1,7 @@
 #pragma once
 
-//#include "StatePainterData.hpp"
+#include "StatePainterData.hpp"
+#include "StatePainterState.hpp"
 
 #include "../nCoreApi/IStatePainter.hpp"
 
@@ -25,13 +26,19 @@ public:
   void APICALL Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area, const IPane *pane,
     LPVOID painterData) const override;
   void APICALL PositionChanged(const IPane *pane, LPVOID painterData,
-    D2D1_RECT_F position) override;
+    D2D1_RECT_F position, bool isMove, bool isSize) override;
   void APICALL RemovePane(const IPane *pane, LPVOID painterData) override;
   void APICALL TextChanged(const IPane *pane, LPVOID painterData, LPCWSTR text) override;
 
   // IStatePainter
 public:
+  void APICALL ActivateState(BYTE state, IPane *pane) override;
+  void APICALL ClearState(BYTE state, IPane *pane) override;
   void APICALL Destroy() override;
+  void APICALL PaintBackground(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
+    const IPane *pane, LPVOID painterData) const override;
+  void APICALL PaintText(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
+    const IPane *pane, LPVOID painterData) const override;
 
 private:
   ID2D1Brush *mBrush;

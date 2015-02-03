@@ -20,6 +20,7 @@ public:
 
 public:
   TaskButton *AddTask(HWND, bool isReplacement);
+  void RedrawTask(HWND window);
   void RemoveTask(HWND window, bool isBeingReplaced);
 
   void Initialized();
@@ -38,6 +39,7 @@ private:
   IEventHandler *mButtonEventHandler;
   std::list<TaskButton> mButtons;
   std::unordered_map<HWND, std::list<TaskButton>::iterator> mButtonMap;
+  std::list<TaskButton>::const_iterator mReplacementPosition;
 
   // ButtonSettings
 };
