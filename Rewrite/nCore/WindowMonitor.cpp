@@ -89,7 +89,7 @@ static void CALLBACK GetIconCallback(HWND window, UINT message, ULONG_PTR data, 
       sWindowData[window].smallIcon = (HICON)result;
       PostMessage(gWindow, NCORE_WINDOW_ICON_CHANGED, (WPARAM)window, NULL);
     } else {
-      SendMessageCallback(window, WM_GETICON, ICON_SMALL2, NULL, GetIconCallback, ICON_SMALL);
+      SendMessageCallback(window, WM_GETICON, ICON_SMALL2, NULL, GetIconCallback, ICON_SMALL2);
     }
     break;
 
