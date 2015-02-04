@@ -26,3 +26,10 @@ void SendCoreMessage(UINT message, WPARAM wParam, LPARAM lParam) {
     SendMessage(window, message, wParam, lParam);
   }
 }
+
+
+void PostCoreMessage(UINT message, WPARAM wParam, LPARAM lParam) {
+  for (HWND window : sMessageMap[message]) {
+    PostMessage(window, message, wParam, lParam);
+  }
+}

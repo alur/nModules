@@ -98,7 +98,7 @@
     <ClCompile Include="Factories.cpp" />
     <ClCompile Include="LiteStep.cpp" />
     <ClCompile Include="Logger.cpp" />
-    <ClCompile Include="MessageManager.cpp" />
+    <ClCompile Include="MessageRegistrar.cpp" />
     <ClCompile Include="nCore.cpp" />
     <ClCompile Include="Pane.cpp" />
     <ClCompile Include="PaneMessageHandler.cpp" />

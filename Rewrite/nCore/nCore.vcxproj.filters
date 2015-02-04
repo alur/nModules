@@ -24,9 +24,6 @@
     <ClCompile Include="EventHandler.cpp">
       <Filter>Implementations</Filter>
     </ClCompile>
-    <ClCompile Include="MessageManager.cpp">
-      <Filter>Services</Filter>
-    </ClCompile>
     <ClCompile Include="Logger.cpp">
       <Filter>Implementations</Filter>
     </ClCompile>
@@ -38,6 +35,9 @@
     </ClCompile>
     <ClCompile Include="StatePainterState.cpp">
       <Filter>Implementations\StatePainter</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageRegistrar.cpp">
+      <Filter>Services</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

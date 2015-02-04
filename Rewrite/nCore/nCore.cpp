@@ -1,5 +1,6 @@
 #include "Displays.hpp"
 #include "Factories.h"
+#include "MessageRegistrar.h"
 #include "Messages.h"
 #include "Pane.hpp"
 #include "WindowMonitor.hpp"
@@ -70,6 +71,10 @@ LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM l
   case LM_WINDOWREPLACED:
   case LM_WINDOWREPLACING:
     return WindowMonitor::HandleMessage(message, wParam, lParam);
+  }
+
+  if (message >= NCORE_BROADCAST_LOW && message <= NCORE_BROADCAST_HIGH) {
+    SendCoreMessage(message, wParam, lParam);
   }
 
   return DefWindowProc(window, message, wParam, lParam);
