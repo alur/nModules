@@ -7,8 +7,9 @@
 #include <Wincodec.h>
 
 
-ButtonPainter::ButtonPainter(IStatePainter *statePainter)
+ButtonPainter::ButtonPainter(IStatePainter *statePainter, const NRECT &iconPosition)
   : mStatePainter(statePainter)
+  , mIconPosition(iconPosition)
   , mIconBrush(nullptr)
   , mIcon(nullptr)
   , mRenderTarget(nullptr)
@@ -29,9 +30,8 @@ HRESULT ButtonPainter::CreateDeviceResources(ID2D1RenderTarget *renderTarget) {
   mRenderTarget = renderTarget;
   HRESULT hr = mStatePainter->CreateDeviceResources(renderTarget);
   if (SUCCEEDED(hr) && mIcon) {
-    if (SUCCEEDED(BrushFromIcon(mIcon, renderTarget, &mIconBrush))) {
-      mIconBrush->SetTransform(D2D1::Matrix3x2F::Translation(
-        D2D1::SizeF(mIconPaintingPosition.left, mIconPaintingPosition.top)));
+    if (SUCCEEDED(BrushFromIcon(mIcon, renderTarget, &mIconSize, &mIconBrush))) {
+      mIconBrush->SetTransform(GetTransform());
     }
   }
   return hr;
@@ -62,11 +62,13 @@ void ButtonPainter::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *ar
 void ButtonPainter::PositionChanged(const IPane *pane, LPVOID painterData,
     D2D1_RECT_F position, bool isMove, bool isSize) {
   mStatePainter->PositionChanged(pane, painterData, position, isMove, isSize);
-  mIconPaintingPosition = D2D1::RectF(position.left, position.top, position.left + 36,
-    position.right + 36);
+  mIconPaintingPosition = D2D1::RectF(
+    pane->EvaluateLength(mIconPosition.left, true) + position.left,
+    pane->EvaluateLength(mIconPosition.top, true) + position.top,
+    pane->EvaluateLength(mIconPosition.right, true) + position.left,
+    pane->EvaluateLength(mIconPosition.bottom, true) + position.top);
   if (mIconBrush) {
-    mIconBrush->SetTransform(D2D1::Matrix3x2F::Translation(
-      D2D1::SizeF(mIconPaintingPosition.left, mIconPaintingPosition.top)));
+    mIconBrush->SetTransform(GetTransform());
   }
 }
 
@@ -79,9 +81,9 @@ void ButtonPainter::RemovePane(const IPane *pane, LPVOID painterData) {
 void ButtonPainter::SetIcon(HICON icon) {
   mIcon = icon;
   if (mRenderTarget && mIcon) {
-    if (SUCCEEDED(BrushFromIcon(mIcon, mRenderTarget, &mIconBrush))) {
-      mIconBrush->SetTransform(D2D1::Matrix3x2F::Translation(
-        D2D1::SizeF(mIconPaintingPosition.left, mIconPaintingPosition.top)));
+    SAFERELEASE(mIconBrush);
+    if (SUCCEEDED(BrushFromIcon(mIcon, mRenderTarget, &mIconSize, &mIconBrush))) {
+      mIconBrush->SetTransform(GetTransform());
     }
   }
 }
@@ -93,7 +95,7 @@ void ButtonPainter::TextChanged(const IPane *pane, LPVOID painterData, LPCWSTR t
 
 
 HRESULT ButtonPainter::BrushFromIcon(HICON icon, ID2D1RenderTarget *renderTarget,
-    ID2D1BitmapBrush **brush) {
+    D2D1_SIZE_U *size, ID2D1BitmapBrush **brush) {
   IWICImagingFactory *factory = nCore::GetWICFactory();
   IWICBitmap *wicBitmap;
   HRESULT hr = factory->CreateBitmapFromHICON(mIcon, &wicBitmap);
@@ -107,6 +109,7 @@ HRESULT ButtonPainter::BrushFromIcon(HICON icon, ID2D1RenderTarget *renderTarget
         ID2D1Bitmap *bitmap;
         hr = renderTarget->CreateBitmapFromWicBitmap(converter, &bitmap);
         if (SUCCEEDED(hr)) {
+          mIconSize = bitmap->GetPixelSize();
           hr = renderTarget->CreateBitmapBrush(bitmap, brush);
           bitmap->Release();
         }
@@ -116,4 +119,12 @@ HRESULT ButtonPainter::BrushFromIcon(HICON icon, ID2D1RenderTarget *renderTarget
     wicBitmap->Release();
   }
   return hr;
+}
+
+
+D2D1_MATRIX_3X2_F ButtonPainter::GetTransform() const {
+  return D2D1::Matrix3x2F::Scale(
+    (mIconPaintingPosition.right - mIconPaintingPosition.left) / (float)mIconSize.width,
+    (mIconPaintingPosition.bottom - mIconPaintingPosition.top) / (float)mIconSize.height)
+    * D2D1::Matrix3x2F::Translation(mIconPaintingPosition.left, mIconPaintingPosition.top);
 }

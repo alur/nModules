@@ -11,7 +11,9 @@ class TaskButton : public IMessageHandler, public IEventProcessor {
 public:
   enum Part {
     Text = 1,
-    Icon = 2
+    Icon = 2,
+    OverlayIcon = 4,
+    Progress = 8
   };
 
 public:
@@ -34,7 +36,7 @@ public:
 
   // IEventProcessor
 public:
-  bool APICALL ProcessEvent() override;
+  bool APICALL ProcessEvent(LPCWSTR action) override;
 
 private:
   const HWND mWindow;

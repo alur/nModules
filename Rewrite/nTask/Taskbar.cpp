@@ -17,6 +17,9 @@ StatePainterInitData::State sButtonStates[] = {
   { L"MinimizedFlashingHover",  0x0013, 8 }  // 9
 };
 
+/*DefaultSettings sButtonDefaults = {
+
+};*/
 
 Taskbar::Taskbar(LPCWSTR prefix)
   : mPane(nullptr)
@@ -101,11 +104,6 @@ void Taskbar::Relayout() {
 
 
 LRESULT Taskbar::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, NPARAM) {
-  switch (msg) {
-  case WM_LBUTTONUP:
-    LSExecute(nullptr, L"!about", SW_SHOWDEFAULT);
-    return 0;
-  }
   return mEventHandler->HandleMessage(window, msg, wParam, lParam, nullptr);
 };
 

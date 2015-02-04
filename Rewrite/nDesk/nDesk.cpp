@@ -44,7 +44,7 @@ static LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, L
     return HandleGetRevId(sName, sVersion, lParam);
 
   case LM_REFRESH:
-    ReloadWorkareas();
+    LoadWorkareas(true);
     return 0;
   }
 
@@ -64,7 +64,7 @@ EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE /* instance */, LPCWS
   }
 
   sDesktopPane = new DesktopPane();
-  LoadWorkareas();
+  LoadWorkareas(false);
 
   return 0;
 }

@@ -5,12 +5,19 @@
 #include "../nUtilities/lsapi.h"
 
 #include <algorithm>
+#include <vector>
 
 extern ILogger *gLogger;
 
 
-void LoadWorkareas() {
-  nCore::EnumRCLines(L"*nDeskWorkArea", [] (LPCWSTR line, LPARAM) -> void {
+void LoadWorkareas(bool isRefresh) {
+  std::vector<RECT> newWorkAreas(nCore::GetDisplays()->Count());
+  for (UINT i = 0; i < nCore::GetDisplays()->Count(); ++i) {
+    newWorkAreas[i] = nCore::GetDisplays()->GetDisplay(i).rect;
+  }
+
+  nCore::EnumRCLines(L"*nDeskWorkArea", [] (LPCWSTR line, LPARAM pNewWorkAreas) -> void {
+    LPRECT newWorkAreas = (LPRECT)pNewWorkAreas;
     wchar_t monitorTok[16], leftTok[16], topTok[16], rightTok[16], bottomTok[16];
     LPWSTR tokens[] = { monitorTok, leftTok, topTok, rightTok, bottomTok };
 
@@ -42,49 +49,52 @@ void LoadWorkareas() {
       if (monitor == 0xFFFFFFFF) {
         for (UINT i = 0; i < nCore::GetDisplays()->Count(); ++i) {
           const Display &display = nCore::GetDisplays()->GetDisplay(i);
-          RECT workArea = {
-            display.rect.left + (LONG)left.Evaluate((float)display.width, display.dpi.x),
-            display.rect.top + (LONG)top.Evaluate((float)display.height, display.dpi.y),
-            display.rect.right - (LONG)right.Evaluate((float)display.width, display.dpi.x),
-            display.rect.bottom - (LONG)bottom.Evaluate((float)display.height, display.dpi.y)
-          };
-          SystemParametersInfoW(SPI_SETWORKAREA, 1, &workArea, 0);
+          newWorkAreas[i] = display.rect;
+          newWorkAreas[i].left += (LONG)left.Evaluate((float)display.width, display.dpi.x);
+          newWorkAreas[i].top += (LONG)top.Evaluate((float)display.height, display.dpi.y);
+          newWorkAreas[i].right -= (LONG)right.Evaluate((float)display.width, display.dpi.x);
+          newWorkAreas[i].bottom -= (LONG)bottom.Evaluate((float)display.height, display.dpi.y);
         }
       } else if (monitor < nCore::GetDisplays()->Count()) {
         const Display &display = nCore::GetDisplays()->GetDisplay(monitor);
-        RECT workArea = {
-          display.rect.left + (LONG)left.Evaluate((float)display.width, display.dpi.x),
-          display.rect.top + (LONG)top.Evaluate((float)display.height, display.dpi.y),
-          display.rect.right - (LONG)right.Evaluate((float)display.width, display.dpi.x),
-          display.rect.bottom - (LONG)bottom.Evaluate((float)display.height, display.dpi.y)
-        };
-        SystemParametersInfoW(SPI_SETWORKAREA, 1, &workArea, 0);
+        newWorkAreas[monitor] = display.rect;
+        newWorkAreas[monitor].left += (LONG)left.Evaluate((float)display.width, display.dpi.x);
+        newWorkAreas[monitor].top += (LONG)top.Evaluate((float)display.height, display.dpi.y);
+        newWorkAreas[monitor].right -= (LONG)right.Evaluate((float)display.width, display.dpi.x);
+        newWorkAreas[monitor].bottom -= (LONG)bottom.Evaluate((float)display.height,
+          display.dpi.y);
       } else {
         gLogger->Warning(L"Invalid monitor %s in *nDeskWorkArea %s", monitorTok, line);
       }
     } else {
-      gLogger->Warning(L"Malformatted workarea declaration %s", monitorTok, line);
+      gLogger->Warning(L"Malformatted workarea declaration %s", line);
     }
-  }, 0);
-  SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
-}
+  }, (LPARAM)&newWorkAreas[0]);
 
 
-void ReloadWorkareas() {
+  bool changesMade = false;
   for (UINT i = 0; i < nCore::GetDisplays()->Count(); ++i) {
-    nCore::GetDisplays()->GetDisplay(i).rect;
-    SystemParametersInfoW(SPI_SETWORKAREA, 1,
-      const_cast<PRECT>(&nCore::GetDisplays()->GetDisplay(i).rect), 0);
+    if (!EqualRect(&nCore::GetDisplays()->GetDisplay(i).workArea, &newWorkAreas[i])) {
+      SystemParametersInfoW(SPI_SETWORKAREA, 1, const_cast<PRECT>(&newWorkAreas[i]), 0);
+      changesMade = true;
+    }
   }
-  LoadWorkareas();
+  if (changesMade) {
+    SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
+  }
 }
 
 
 void ClearWorkareas() {
+  bool changesMade = false;
   for (UINT i = 0; i < nCore::GetDisplays()->Count(); ++i) {
-    nCore::GetDisplays()->GetDisplay(i).rect;
-    SystemParametersInfoW(SPI_SETWORKAREA, 1,
-      const_cast<PRECT>(&nCore::GetDisplays()->GetDisplay(i).rect), 0);
+    const Display &display = nCore::GetDisplays()->GetDisplay(i);
+    if (!EqualRect(&display.rect, &display.workArea)) {
+      SystemParametersInfoW(SPI_SETWORKAREA, 1, const_cast<PRECT>(&display.rect), 0);
+      changesMade = true;
+    }
   }
-  SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
+  if (changesMade) {
+    SendNotifyMessageW(HWND_BROADCAST, WM_SETTINGCHANGE, SPI_SETWORKAREA, 0);
+  }
 }

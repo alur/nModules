@@ -5,8 +5,12 @@
 
 class ButtonPainter : public IPanePainter {
 public:
-  ButtonPainter(IStatePainter *statePainter);
+  ButtonPainter(IStatePainter *statePainter, const NRECT &iconPosition);
   ~ButtonPainter();
+
+public:
+  ButtonPainter(const ButtonPainter&) = delete;
+  ButtonPainter &operator=(const ButtonPainter&) = delete;
 
   // IPanePainter
 public:
@@ -25,12 +29,19 @@ public:
   void SetIcon(HICON icon);
 
 private:
-  HRESULT BrushFromIcon(HICON icon, ID2D1RenderTarget *renderTarget, ID2D1BitmapBrush **brush);
+  HRESULT BrushFromIcon(HICON icon, ID2D1RenderTarget *renderTarget, D2D1_SIZE_U *size,
+    ID2D1BitmapBrush **brush);
+
+  D2D1_MATRIX_3X2_F GetTransform() const;
 
 private:
   IStatePainter *mStatePainter;
-  D2D1_RECT_F mIconPaintingPosition;
   ID2D1BitmapBrush *mIconBrush;
   ID2D1RenderTarget *mRenderTarget;
+
+  D2D1_SIZE_U mIconSize;
+
   HICON mIcon;
+  const NRECT &mIconPosition;
+  D2D1_RECT_F mIconPaintingPosition;
 };

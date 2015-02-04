@@ -17,6 +17,11 @@ StatePainter::StatePainter(const StatePainterInitData *initData)
     , mResourceRefCount(0)
 {
   DWORD color = (DWORD)initData->settingsReader->GetInt64(L"Color", 0x55C0448F);
+  mTextPadding.left = initData->settingsReader->GetLength(L"TextOffsetLeft", NLENGTH(0, 0, 0));
+  mTextPadding.top = initData->settingsReader->GetLength(L"TextOffsetTop", NLENGTH(0, 0, 0));
+  mTextPadding.right = initData->settingsReader->GetLength(L"TextOffsetRight", NLENGTH(0, 0, 0));
+  mTextPadding.bottom = initData->settingsReader->GetLength(L"TextOffsetBottom", NLENGTH(0, 0, 0));
+
   mColor.a = (color >> 24) / 255.0f;
   mColor.r = (color >> 16 & 0xFF) / 255.0f;
   mColor.g = (color >> 8 & 0xFF) / 255.0f;
@@ -98,7 +103,7 @@ void StatePainter::PaintText(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F 
     HRESULT hr = factory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL,
       DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 24.0f, L"en-US", &textFormat);
 
-    renderTarget->DrawTextW(text, lstrlenW(text), textFormat, area, mTextBrush);
+    renderTarget->DrawTextW(text, lstrlenW(text), textFormat, paneData->textPosition, mTextBrush);
     textFormat->Release();
     /*if (paneData->textLayout) {
     paneData->textLayout->Draw(renderTarget, mTextRenderer, 0, 0);
@@ -107,7 +112,14 @@ void StatePainter::PaintText(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F 
 }
 
 
-void StatePainter::PositionChanged(const IPane*, LPVOID, D2D1_RECT_F, bool, bool) {
+void StatePainter::PositionChanged(const IPane *pane, LPVOID data, D2D1_RECT_F position, bool,
+    bool) {
+  PainterData *paneData = (PainterData*)data;
+  paneData->textPosition = position;
+  paneData->textPosition.left += pane->EvaluateLength(mTextPadding.left, true);
+  paneData->textPosition.top += pane->EvaluateLength(mTextPadding.top, false);
+  paneData->textPosition.right -= pane->EvaluateLength(mTextPadding.right, true);
+  paneData->textPosition.bottom -= pane->EvaluateLength(mTextPadding.bottom, false);
 }
 
 

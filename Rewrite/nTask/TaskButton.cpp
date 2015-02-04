@@ -10,9 +10,8 @@ TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eve
   : mEventHandler(eventHandler)
   , mWindow(window)
 {
-  mPainter = new ButtonPainter(painter);
-
-  mIconPosition = NRECT(NLENGTH(0, 0, 0), NLENGTH(0, 0, 0), NLENGTH(0, 0, 15), NLENGTH(0, 0, 15));
+  mIconPosition = NRECT(NLENGTH(0, 0, 0), NLENGTH(0, 0, 0), NLENGTH(0, 0, 32), NLENGTH(0, 0, 32));
+  mPainter = new ButtonPainter(painter, mIconPosition);
 
   PaneInitData initData;
   ZeroMemory(&initData, sizeof(PaneInitData));
@@ -91,6 +90,6 @@ LRESULT TaskButton::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM l
 };
 
 
-bool TaskButton::ProcessEvent() {
+bool TaskButton::ProcessEvent(LPCWSTR) {
   return false;
 }

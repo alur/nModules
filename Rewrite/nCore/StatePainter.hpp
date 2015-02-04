@@ -12,6 +12,7 @@ class StatePainter : public IStatePainter {
 private:
   struct PainterData {
     IDWriteTextLayout *textLayout;
+    D2D1_RECT_F textPosition;
   };
 
 public:
@@ -48,4 +49,6 @@ private:
   ID2D1Brush *mBrush;
   ID2D1Brush *mTextBrush;
   D2D_COLOR_F mColor;
+
+  NRECT mTextPadding;
 };

@@ -122,7 +122,7 @@ static void UpdateWindowData(HWND window) {
 }
 
 
-LRESULT WindowMonitor::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WindowMonitor::HandleMessage(UINT message, WPARAM wParam, LPARAM) {
   switch (message) {
   case LM_REDRAW:
     UpdateWindowData((HWND)wParam);
