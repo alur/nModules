@@ -3,6 +3,7 @@
 #include "../nCoreApi/Core.h"
 
 #include "../nUtilities/lsapi.h"
+#include "../nUtilities/Macros.h"
 
 
 TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eventHandler, HWND window)
@@ -10,6 +11,8 @@ TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eve
   , mWindow(window)
 {
   mPainter = new ButtonPainter(painter);
+
+  mIconPosition = NRECT(NLENGTH(0, 0, 0), NLENGTH(0, 0, 0), NLENGTH(0, 0, 15), NLENGTH(0, 0, 15));
 
   PaneInitData initData;
   ZeroMemory(&initData, sizeof(PaneInitData));
@@ -32,6 +35,11 @@ TaskButton::~TaskButton() {
 }
 
 
+void TaskButton::GetButtonScreenRect(D2D1_RECT_F *rect) {
+  mPane->GetScreenPosition(rect);
+}
+
+
 void TaskButton::Position(const NRECT &position) {
   mPane->Position(&position);
 }
@@ -42,10 +50,18 @@ void TaskButton::Show() {
 }
 
 
-void TaskButton::Redraw() {
-  wchar_t windowText[256];
-  GetWindowText(mWindow, windowText, 256);
-  mPane->SetText(windowText);
+void TaskButton::Redraw(DWORD parts) {
+  mPane->Lock();
+  if (CHECKFLAG(parts, Part::Icon)) {
+    mPainter->SetIcon(nCore::GetWindowIcon(mWindow, 32));
+    mPane->Repaint(&mIconPosition);
+  }
+  if (CHECKFLAG(parts, Part::Text)) {
+    wchar_t windowText[256];
+    GetWindowText(mWindow, windowText, 256);
+    mPane->SetText(windowText);
+  }
+  mPane->Unlock();
 }
 
 

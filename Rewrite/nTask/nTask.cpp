@@ -113,7 +113,7 @@ EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE /* instance */, LPCWS
 
 
 EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */) {
-  nCore::Disconnect();
   DestroyWindow(sWindow);
   sWindow = nullptr;
+  nCore::Disconnect();
 }

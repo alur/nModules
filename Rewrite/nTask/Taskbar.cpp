@@ -129,6 +129,17 @@ TaskButton *Taskbar::AddTask(HWND window, bool isReplacement) {
 }
 
 
+
+bool Taskbar::GetButtonScreenRect(HWND window, D2D1_RECT_F *rect) {
+  auto iter = mButtonMap.find(window);
+  if (iter == mButtonMap.end()) {
+    return false;
+  }
+  iter->second->GetButtonScreenRect(rect);
+  return true;
+}
+
+
 void Taskbar::RemoveTask(HWND window, bool isBeingReplaced) {
   auto iter = mButtonMap.find(window);
   if (iter != mButtonMap.end()) {
@@ -145,9 +156,9 @@ void Taskbar::RemoveTask(HWND window, bool isBeingReplaced) {
 }
 
 
-void Taskbar::RedrawTask(HWND window) {
+void Taskbar::RedrawTask(HWND window, DWORD parts) {
   auto iter = mButtonMap.find(window);
   if (iter != mButtonMap.end()) {
-    iter->second->Redraw();
+    iter->second->Redraw(parts);
   }
 }

@@ -32,7 +32,9 @@ public:
 private:
   void AddWindow(HWND window, bool isReplacement);
   void DestroyWindow(HWND window, bool isBeingReplaced);
+  LRESULT GetMinRect(HWND window, LPPOINTS points);
   void RedrawWindow(HWND window, LPARAM lParam);
+  void RedrawWindowIcon(HWND window);
 
 private:
   struct Task {

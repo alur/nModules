@@ -41,8 +41,11 @@ public:
     const IPane *pane, LPVOID painterData) const override;
 
 private:
+  int mResourceRefCount;
+
+  // TODO(Move these out of here)
+private:
   ID2D1Brush *mBrush;
   ID2D1Brush *mTextBrush;
   D2D_COLOR_F mColor;
-  int mResourceRefCount;
 };

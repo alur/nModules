@@ -2,18 +2,21 @@
 #include "TaskbarManager.hpp"
 
 #include "../nCoreApi/Core.h"
+#include "../nCoreApi/Messages.h"
 
 #include "../nUtilities/lsapi.h"
 
 #include <thread>
 
-static const UINT sMessages[] = { LM_GETMINRECT, LM_REDRAW, LM_WINDOWACTIVATED, LM_WINDOWCREATED,
+static const UINT sLSMessages[] = { LM_GETMINRECT, LM_REDRAW, LM_WINDOWACTIVATED, LM_WINDOWCREATED,
   LM_WINDOWDESTROYED, LM_WINDOWREPLACED, LM_WINDOWREPLACING, LM_MONITORCHANGED,
   LM_TASK_SETPROGRESSSTATE, LM_TASK_SETPROGRESSVALUE, LM_TASK_MARKASACTIVE, LM_TASK_REGISTERTAB,
   LM_TASK_UNREGISTERTAB, LM_TASK_SETACTIVETAB, LM_TASK_SETTABORDER, LM_TASK_SETTABPROPERTIES,
   LM_TASK_SETOVERLAYICON, LM_TASK_SETOVERLAYICONDESC, LM_TASK_SETTHUMBNAILTOOLTIP,
   LM_TASK_SETTHUMBNAILCLIP, LM_TASK_THUMBBARADDBUTTONS, LM_TASK_THUMBBARUPDATEBUTTONS,
   LM_TASK_THUMBBARSETIMAGELIST, 0 };
+
+static const UINT sCoreMessages[] = { NCORE_WINDOW_ICON_CHANGED, NCORE_DISPLAYS_CHANGED, 0 };
 
 // How often windows are allowed to be updated, in milliseconds.
 #define MAX_UPDATE_FREQUENCY 100
@@ -22,7 +25,8 @@ TaskbarManager::TaskbarManager(HWND messageWindow)
   : mMessageWindow(messageWindow)
   , mInitialized(false)
 {
-  SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)mMessageWindow, (LPARAM)sMessages);
+  SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)mMessageWindow, (LPARAM)sLSMessages);
+  nCore::RegisterForMessages(mMessageWindow, sCoreMessages);
   mInitThread = std::thread([messageWindow] () -> void {
     EnumDesktopWindows(nullptr, [] (HWND window, LPARAM messageWindow) -> BOOL {
       if (nCore::IsTaskbarWindow(window)) {
@@ -36,7 +40,8 @@ TaskbarManager::TaskbarManager(HWND messageWindow)
 
 
 TaskbarManager::~TaskbarManager() {
-  SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)mMessageWindow, (LPARAM)sMessages);
+  nCore::UnregisterForMessages(mMessageWindow, sCoreMessages);
+  SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)mMessageWindow, (LPARAM)sLSMessages);
   mInitThread.join();
 }
 
@@ -96,6 +101,21 @@ void TaskbarManager::DestroyWindow(HWND window, bool isBeingReplaced) {
 }
 
 
+LRESULT TaskbarManager::GetMinRect(HWND window, LPPOINTS points) {
+  D2D1_RECT_F rect = D2D1::RectF(0, 0, 20, 20);
+  for (auto &taskbar : mTaskbars) {
+    if (taskbar.second.GetButtonScreenRect(window, &rect)) {
+      break;
+    }
+  }
+  points[0].x = (short)rect.left;
+  points[0].y = (short)rect.top;
+  points[1].x = (short)rect.right;
+  points[1].y = (short)rect.bottom;
+  return 1;
+}
+
+
 void TaskbarManager::RedrawWindow(HWND window, LPARAM lParam) {
   if (mTasks.find(window) == mTasks.end()) {
     return;
@@ -120,7 +140,14 @@ void TaskbarManager::RedrawWindow(HWND window, LPARAM lParam) {
   task.updateDuringMaintenance = false;
 
   for (auto &taskbar : mTaskbars) {
-    taskbar.second.RedrawTask(window);
+    taskbar.second.RedrawTask(window, TaskButton::Text);
+  }
+}
+
+
+void TaskbarManager::RedrawWindowIcon(HWND window) {
+  for (auto &taskbar : mTaskbars) {
+    taskbar.second.RedrawTask(window, TaskButton::Icon);
   }
 }
 
@@ -129,7 +156,7 @@ LRESULT TaskbarManager::HandleMessage(HWND window, UINT message, WPARAM wParam, 
   switch (message) {
   case LM_GETMINRECT:
     // TODO(Erik): Handle this
-    return 0;
+    return GetMinRect((HWND)wParam, (LPPOINTS)lParam);
 
   case LM_REDRAW:
     RedrawWindow((HWND)wParam, lParam);
@@ -152,6 +179,13 @@ LRESULT TaskbarManager::HandleMessage(HWND window, UINT message, WPARAM wParam, 
 
   case LM_WINDOWREPLACING:
     DestroyWindow((HWND)wParam, true);
+    return 0;
+
+  case NCORE_DISPLAYS_CHANGED:
+    return 0;
+
+  case NCORE_WINDOW_ICON_CHANGED:
+    RedrawWindowIcon((HWND)wParam);
     return 0;
 
   case NTASK_INITIALIZED:
