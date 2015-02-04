@@ -38,12 +38,32 @@ LPVOID Pane::GetPainterData() const {
   return mPainterData;
 }
 
+
 const D2D1_RECT_F *Pane::GetRenderingPosition() const {
   return &mRenderingPosition;
 }
 
+
 LPCWSTR Pane::GetRenderingText() const {
   return mText;
+}
+
+
+bool Pane::GetScreenPosition(D2D1_RECT_F *rect) const {
+  const Pane *topMost = this;
+  for (; topMost && topMost->IsChildPane(); topMost = topMost->mParent);
+  if (topMost) {
+    RECT r;
+    if (GetWindowRect(topMost->mWindow, &r)) {
+      *rect = mRenderingPosition;
+      rect->left += (float)r.left;
+      rect->right += (float)r.left;
+      rect->top += (float)r.top;
+      rect->bottom += (float)r.top;
+      return true;
+    }
+  }
+  return false;
 }
 
 
@@ -118,7 +138,12 @@ void Pane::Repaint(LPCNRECT area) {
     if (area == nullptr) {
       Repaint(mRenderingPosition, true);
     } else {
-      Repaint(mRenderingPosition, true);
+      D2D1_RECT_F position = D2D1::RectF(
+        EvaluateLength(area->left, true) + mRenderingPosition.left,
+        EvaluateLength(area->top, false) + mRenderingPosition.top,
+        EvaluateLength(area->right, true) + mRenderingPosition.left,
+        EvaluateLength(area->bottom, false) + mRenderingPosition.top);
+      Repaint(position, true);
     }
   }
 }
@@ -152,6 +177,6 @@ void Pane::Show() {
 
 void Pane::Unlock() {
   if (--mUpdateLock == 0) {
-    UpdateWindow(mWindow);
+    RepaintInvalidated();
   }
 }

@@ -260,3 +260,14 @@ void Pane::Repaint(const D2D1_RECT_F &area, bool update) {
     }
   }
 }
+
+
+void Pane::RepaintInvalidated() const {
+  if (mUpdateLock == 0) {
+    if (!IsChildPane() && mWindow) {
+      UpdateWindow(mWindow);
+    } else if (mParent) {
+      mParent->RepaintInvalidated();
+    }
+  }
+}

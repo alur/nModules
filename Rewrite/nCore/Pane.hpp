@@ -41,6 +41,7 @@ public:
   LPVOID APICALL GetPainterData() const override;
   const D2D1_RECT_F *APICALL GetRenderingPosition() const override;
   LPCWSTR APICALL GetRenderingText() const override;
+  bool APICALL GetScreenPosition(D2D1_RECT_F *rect) const override;
   HWND APICALL GetWindow() const override;
   void APICALL Hide() override;
   void APICALL Lock() override;
@@ -63,6 +64,9 @@ private:
 
   // Invalidates the entire pane.
   void Repaint(bool update);
+
+  // Repaints the invalidated area of the window.
+  void RepaintInvalidated() const;
 
   // Invalidates the given area of the pane.
   void Repaint(const D2D1_RECT_F &area, bool update);

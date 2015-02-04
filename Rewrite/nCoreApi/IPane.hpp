@@ -68,6 +68,12 @@ public:
   virtual LPCWSTR APICALL GetRenderingText() const = 0;
 
   /// <summary>
+  /// Retrieves the position of the pane on the screen.
+  /// </summary>
+  /// <returns>False if the pane isn't on the screen.</returns>
+  virtual bool APICALL GetScreenPosition(D2D1_RECT_F *rect) const = 0;
+
+  /// <summary>
   /// Gets the current HWND of the window containing the pane. Note that this may change.
   /// </summary>
   virtual HWND APICALL GetWindow() const = 0;
