@@ -34,13 +34,27 @@ float Pane::EvaluateLength(const NLENGTH &length, bool horizontal) const {
 }
 
 
+D2D1_RECT_F Pane::EvaluateRect(const NRECT &rect) const {
+  return D2D1::RectF(
+    rect.left.Evaluate(mSize.width, mDpi.x),
+    rect.top.Evaluate(mSize.height, mDpi.y),
+    rect.right.Evaluate(mSize.width, mDpi.x),
+    rect.bottom.Evaluate(mSize.height, mDpi.y));
+}
+
+
 LPVOID Pane::GetPainterData() const {
   return mPainterData;
 }
 
 
-const D2D1_RECT_F *Pane::GetRenderingPosition() const {
-  return &mRenderingPosition;
+const D2D1_RECT_F &Pane::GetRenderingPosition() const {
+  return mRenderingPosition;
+}
+
+
+const D2D1_SIZE_F &Pane::GetRenderingSize() const {
+  return mSize;
 }
 
 
@@ -68,7 +82,9 @@ bool Pane::GetScreenPosition(D2D1_RECT_F *rect) const {
 
 
 HWND Pane::GetWindow() const {
-  return mWindow;
+  const Pane *pane = this;
+  for (; pane->mParent; pane = pane->mParent);
+  return pane->mWindow;
 }
 
 

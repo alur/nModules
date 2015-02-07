@@ -10,7 +10,7 @@
 extern ILogger *gLogger;
 
 
-void LoadWorkareas(bool isRefresh) {
+void LoadWorkareas() {
   std::vector<RECT> newWorkAreas(nCore::GetDisplays()->Count());
   for (UINT i = 0; i < nCore::GetDisplays()->Count(); ++i) {
     newWorkAreas[i] = nCore::GetDisplays()->GetDisplay(i).rect;

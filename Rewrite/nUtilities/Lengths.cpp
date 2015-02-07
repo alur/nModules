@@ -1,11 +1,11 @@
-#include "NLength.hpp"
+#include "Lengths.h"
 
 
 NLength::NLength() {}
 
 
 NLength::NLength(float pixels, float fraction, float dips)
-    : mPixels(pixels), mFraction(fraction), mDips(dips) {}
+  : mPixels(pixels), mFraction(fraction), mDips(dips) {}
 
 
 float NLength::Evaluate(float parentNLength, float dpi) const {
@@ -41,3 +41,11 @@ bool NLength::operator==(const NLength &other) const {
 bool NLength::operator!=(const NLength &other) const {
   return other.mDips != mDips || other.mFraction != mFraction || other.mPixels != mPixels;
 }
+
+
+
+NRect::NRect() {}
+
+
+NRect::NRect(const NLENGTH &left, const NLENGTH &top, const NLENGTH &right, const NLENGTH &bottom)
+  : left(left), top(top), right(right), bottom(bottom) {}

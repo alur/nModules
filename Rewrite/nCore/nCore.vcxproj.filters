@@ -33,11 +33,11 @@
     <ClCompile Include="StatePainter.cpp">
       <Filter>Implementations\StatePainter</Filter>
     </ClCompile>
-    <ClCompile Include="StatePainterState.cpp">
-      <Filter>Implementations\StatePainter</Filter>
-    </ClCompile>
     <ClCompile Include="MessageRegistrar.cpp">
       <Filter>Services</Filter>
+    </ClCompile>
+    <ClCompile Include="State.cpp">
+      <Filter>Implementations\StatePainter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -69,7 +69,7 @@
     <ClInclude Include="StatePainter.hpp">
       <Filter>Implementations\StatePainter</Filter>
     </ClInclude>
-    <ClInclude Include="StatePainterState.hpp">
+    <ClInclude Include="State.hpp">
       <Filter>Implementations\StatePainter</Filter>
     </ClInclude>
   </ItemGroup>

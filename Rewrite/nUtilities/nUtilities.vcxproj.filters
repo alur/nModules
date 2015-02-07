@@ -7,12 +7,10 @@
     <ClInclude Include="lsapi.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="hresults.h" />
-    <ClInclude Include="NLength.hpp" />
-    <ClInclude Include="NRect.hpp" />
+    <ClInclude Include="Lengths.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Version.cpp" />
-    <ClCompile Include="NLength.cpp" />
-    <ClCompile Include="NRect.cpp" />
+    <ClCompile Include="Lengths.cpp" />
   </ItemGroup>
 </Project>

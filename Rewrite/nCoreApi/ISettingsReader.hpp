@@ -2,7 +2,7 @@
 
 #include "ApiDefs.h"
 
-#include "../nUtilities/NLength.hpp"
+#include "../nUtilities/Lengths.h"
 #include "../nUtilities/Windows.h"
 
 /// <summary>
@@ -57,4 +57,30 @@ public:
 
   virtual NLENGTH APICALL GetLength(LPCWSTR key, const NLENGTH &defaultValue) const = 0;
   virtual bool APICALL GetLength(LPCWSTR key, NLENGTH *value) const = 0;
+
+  /// <summary>
+  /// Reads a rectangle specified by X Y Width and Height from the RC files. If one or more keys
+  /// aren't found the RC files, the values from defaultValue will be used.
+  /// </summary>
+  virtual NRECT APICALL GetXYWHRect(LPCWSTR key, const NRECT &defaultValue) const = 0;
+
+  /// <summary>
+  /// Reads a rectangle specified by X Y Width and Height from the RC files. If only someparts are
+  /// missing, those parts will be set to 0.
+  /// </summary>
+  /// <returns>True if any of the specified keys was found in the RC files.</returns>
+  virtual bool APICALL GetXYWHRect(LPCWSTR key, NRECT *value) const = 0;
+
+  /// <summary>
+  /// Reads a rectangle specified by Left, Top, Right, and Bottom from the RC files. If one or more
+  /// keys aren't found the RC files, the values from defaultValue will be used.
+  /// </summary>
+  virtual NRECT APICALL GetLTRBRect(LPCWSTR key, const NRECT &defaultValue) const = 0;
+
+  /// <summary>
+  /// Reads a rectangle specified by Left, Top, Right, and Bottom from the RC files. If only some
+  /// parts are missing, those parts will be set to 0.
+  /// </summary>
+  /// <returns>True if any of the specified keys was found in the RC files.</returns>
+  virtual bool APICALL GetLTRBRect(LPCWSTR key, NRECT *value) const = 0;
 };

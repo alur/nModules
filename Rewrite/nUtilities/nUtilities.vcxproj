@@ -74,16 +74,14 @@
   <ItemGroup>
     <ClInclude Include="d2d1.h" />
     <ClInclude Include="hresults.h" />
-    <ClInclude Include="NLength.hpp" />
+    <ClInclude Include="Lengths.h" />
     <ClInclude Include="lsapi.h" />
     <ClInclude Include="Macros.h" />
-    <ClInclude Include="NRect.hpp" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="Windows.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="NLength.cpp" />
-    <ClCompile Include="NRect.cpp" />
+    <ClCompile Include="Lengths.cpp" />
     <ClCompile Include="Version.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

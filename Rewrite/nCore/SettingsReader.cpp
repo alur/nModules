@@ -187,3 +187,41 @@ bool APICALL SettingsReader::GetLength(LPCWSTR key, NLENGTH *value) const {
 
   return false;
 }
+
+
+NRECT APICALL SettingsReader::GetXYWHRect(LPCWSTR key, const NRECT &defaultValue) const {
+  assert(false); // Not implemented
+  return NRECT();
+}
+
+
+bool APICALL SettingsReader::GetXYWHRect(LPCWSTR key, NRECT *value) const {
+  assert(false); // Not implemented
+  return false;
+}
+
+
+NRECT APICALL SettingsReader::GetLTRBRect(LPCWSTR key, const NRECT &defaultValue) const {
+  NRECT rect;
+  wchar_t buffer[MAX_PREFIX];
+
+  StringCchPrintf(buffer, MAX_PREFIX, L"%s%s", key, L"Left");
+  rect.left = GetLength(buffer, defaultValue.left);
+
+  StringCchPrintf(buffer, MAX_PREFIX, L"%s%s", key, L"Top");
+  rect.top = GetLength(buffer, defaultValue.top);
+
+  StringCchPrintf(buffer, MAX_PREFIX, L"%s%s", key, L"Right");
+  rect.right = GetLength(buffer, defaultValue.right);
+
+  StringCchPrintf(buffer, MAX_PREFIX, L"%s%s", key, L"Bottom");
+  rect.bottom = GetLength(buffer, defaultValue.bottom);
+
+  return rect;
+}
+
+
+bool APICALL SettingsReader::GetLTRBRect(LPCWSTR key, NRECT *value) const {
+  assert(false); // Not implemented
+  return false;
+}

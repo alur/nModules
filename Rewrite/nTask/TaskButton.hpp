@@ -30,6 +30,14 @@ public:
   void Redraw(DWORD sections);
   void Show();
 
+  // Button events
+private:
+  //
+  void SelectTask();
+  void OpenTaskProcess();
+  void ShowContextMenu();
+  void ToggleAlwaysOnTop();
+
   // IMessageHandler
 public:
   LRESULT APICALL HandleMessage(HWND, UINT message, WPARAM, LPARAM, NPARAM) override;
@@ -40,6 +48,7 @@ public:
 
 private:
   const HWND mWindow;
+  HMENU mMenu;
   IEventHandler *mEventHandler;
   ButtonPainter *mPainter;
   IPane *mPane;

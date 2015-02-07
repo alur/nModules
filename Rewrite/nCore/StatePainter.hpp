@@ -1,7 +1,7 @@
 #pragma once
 
 #include "StatePainterData.hpp"
-#include "StatePainterState.hpp"
+#include "State.hpp"
 
 #include "../nCoreApi/IStatePainter.hpp"
 
@@ -44,7 +44,7 @@ public:
 private:
   int mResourceRefCount;
 
-  // TODO(Move these out of here)
+  // TODO(Erik): Move these out of here
 private:
   ID2D1Brush *mBrush;
   ID2D1Brush *mTextBrush;

@@ -37,6 +37,12 @@ public:
   NLENGTH APICALL GetLength(LPCWSTR key, const NLENGTH &defaultValue) const override;
   bool APICALL GetLength(LPCWSTR key, NLENGTH *value) const override;
 
+  NRECT APICALL GetXYWHRect(LPCWSTR key, const NRECT &defaultValue) const override;
+  bool APICALL GetXYWHRect(LPCWSTR key, NRECT *value) const override;
+
+  NRECT APICALL GetLTRBRect(LPCWSTR key, const NRECT &defaultValue) const override;
+  bool APICALL GetLTRBRect(LPCWSTR key, NRECT *value) const override;
+
 private:
   class PrefixVal {
   public:

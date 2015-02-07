@@ -21,6 +21,9 @@ public:
   static HRESULT CreateWindowClasses(HINSTANCE);
   static void DestroyWindowClasses(HINSTANCE);
 
+  static void FullscreenActivated(HMONITOR, HWND);
+  static void FullscreenDeactivated(HMONITOR);
+
 public:
   Pane &operator=(Pane&) = delete;
   Pane(const Pane&) = delete;
@@ -38,8 +41,10 @@ public:
   IPane* APICALL CreateChild(const PaneInitData*) override;
   void APICALL Destroy() override;
   float APICALL EvaluateLength(const NLENGTH &length, bool horizontal) const override;
+  D2D1_RECT_F APICALL EvaluateRect(const NRECT &rect) const override;
   LPVOID APICALL GetPainterData() const override;
-  const D2D1_RECT_F *APICALL GetRenderingPosition() const override;
+  const D2D1_RECT_F &APICALL GetRenderingPosition() const override;
+  const D2D1_SIZE_F &APICALL GetRenderingSize() const override;
   LPCWSTR APICALL GetRenderingText() const override;
   bool APICALL GetScreenPosition(D2D1_RECT_F *rect) const override;
   HWND APICALL GetWindow() const override;
@@ -56,11 +61,14 @@ private:
   void DiscardDeviceResources();
   HRESULT ReCreateDeviceResources();
 
+  void OnFullscreenActivated(HMONITOR, HWND);
+  void OnFullscreenDeactivated(HMONITOR);
+
   inline bool IsChildPane() const;
   // Evaluates a length in the context of the parent.
   float EvaluateLengthParent(const NLENGTH &length, bool horizontal) const;
   void Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area) const;
-  void Position(const RECT&);
+  void ParentPositionChanged();
 
   // Invalidates the entire pane.
   void Repaint(bool update);
@@ -98,7 +106,13 @@ private:
   int mUpdateLock;
   bool mVisible;
   LPWSTR mText;
+  // A pointer retrieved from the painter, which is passed back when we paint. Allows the painter
+  // to store per-window data.
   LPVOID mPainterData;
+  // The name of the pane, if it's named.
+  wchar_t mName[MAX_PREFIX];
+
+  bool mCoveredByFullscreenWindow;
 
   // Set on all panes, but created & destroyed by the top-level.
 private:

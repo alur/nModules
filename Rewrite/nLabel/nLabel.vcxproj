@@ -91,6 +91,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Label.cpp" />
     <ClCompile Include="nLabel.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +104,9 @@
     <ProjectReference Include="..\nUtilities\nUtilities.vcxproj">
       <Project>{9a971a00-a016-4cc7-856d-939b5c1f895c}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Label.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

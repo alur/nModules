@@ -1,4 +1,4 @@
 #pragma once
 
-void LoadWorkareas(bool isRefresh);
+void LoadWorkareas();
 void ClearWorkareas();

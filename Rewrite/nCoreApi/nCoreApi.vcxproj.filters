@@ -2,22 +2,49 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="Core.h" />
-    <ClInclude Include="IPane.hpp" />
-    <ClInclude Include="IMessageHandler.hpp" />
-    <ClInclude Include="IDisplays.hpp" />
-    <ClInclude Include="IPanePainter.hpp" />
-    <ClInclude Include="ISettingsReader.hpp" />
-    <ClInclude Include="IFileSystemWatcher.hpp" />
-    <ClInclude Include="IFileSystemEventHandler.hpp" />
     <ClInclude Include="ApiDefs.h" />
-    <ClInclude Include="IStatePainter.hpp" />
-    <ClInclude Include="IEventHandler.hpp" />
-    <ClInclude Include="IEventProcessor.hpp" />
     <ClInclude Include="Messages.h" />
     <ClInclude Include="TaskWindow.h" />
-    <ClInclude Include="ILogger.hpp" />
+    <ClInclude Include="IStatePainter.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ISettingsReader.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IPanePainter.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IPane.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IMessageHandler.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ILogger.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IFileSystemWatcher.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IFileSystemEventHandler.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IEventProcessor.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IEventHandler.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IDisplays.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Interfaces">
+      <UniqueIdentifier>{ec3134e7-a1b8-41c7-9b47-18a71f9ffc66}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

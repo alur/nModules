@@ -70,7 +70,6 @@ LRESULT Pane::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam,
           mRenderTarget->PopAxisAlignedClip();
 
           HRESULT hr = mRenderTarget->EndDraw();
-
           if (hr == D2DERR_RECREATE_TARGET) {
             DiscardDeviceResources();
             InvalidateRect(mWindow, nullptr, FALSE);
@@ -88,7 +87,7 @@ LRESULT Pane::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam,
 
   case WM_WINDOWPOSCHANGING:
     {
-      if (mSettings.alwaysOnTop) {
+      if (mSettings.alwaysOnTop && !mCoveredByFullscreenWindow) {
         LPWINDOWPOS windowPos = LPWINDOWPOS(lParam);
         // TODO(Erik): Handle covered by fullscreen.
         windowPos->hwndInsertAfter = HWND_TOPMOST;

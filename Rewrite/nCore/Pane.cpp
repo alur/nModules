@@ -9,9 +9,35 @@
 
 #include <assert.h>
 #include <dwmapi.h>
+#include <strsafe.h>
+#include <unordered_set>
+#include <unordered_map>
 
 extern Displays gDisplays;
 extern HINSTANCE gInstance;
+
+// Top-level always on top panes.
+static std::unordered_set<Pane*> sAlwaysOnTopPanes;
+
+// The panes which are, or want to be, children of the pane with the given name.
+static std::unordered_map<std::wstring, std::unordered_set<Pane*>> sChildren;
+
+// All named panes.
+static std::unordered_map<std::wstring, Pane*> sNamedPanes;
+
+
+void Pane::FullscreenActivated(HMONITOR monitor, HWND fullscreenWindow) {
+  for (Pane *pane : sAlwaysOnTopPanes) {
+    pane->OnFullscreenActivated(monitor, fullscreenWindow);
+  }
+}
+
+
+void Pane::FullscreenDeactivated(HMONITOR monitor) {
+  for (Pane *pane : sAlwaysOnTopPanes) {
+    pane->OnFullscreenDeactivated(monitor);
+  }
+}
 
 
 HRESULT Pane::CreateWindowClasses(HINSTANCE instance) {
@@ -55,6 +81,11 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
   , mVisible(false)
   , mWindow(nullptr)
 {
+  mName[0] = L'\0';
+  if (initData->name) {
+    StringCchCopy(mName, MAX_PREFIX, initData->name);
+  }
+
   // Defaults
   mSettings.alwaysOnTop = false;
   mSettings.parent[0] = L'\0';
@@ -66,7 +97,9 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
   if (initData->settingsReader) {
     const ISettingsReader *reader = initData->settingsReader;
     mSettings.alwaysOnTop = reader->GetBool(L"AlwaysOnTop", mSettings.alwaysOnTop);
-    reader->GetString(L"Parent", mSettings.parent, MAX_PREFIX, L"");
+    if (!mParent) {
+      reader->GetString(L"Parent", mSettings.parent, MAX_PREFIX, L"");
+    }
     mSettings.position.top = reader->GetLength(L"Y", mSettings.position.top);
     mSettings.position.left = reader->GetLength(L"X", mSettings.position.left);
     mSettings.position.right = reader->GetLength(L"Width", mSettings.position.right)
@@ -80,6 +113,15 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
     mSettings.position.left = NLENGTH((float)GetSystemMetrics(SM_XVIRTUALSCREEN), 0, 0);
     mSettings.position.right = NLENGTH((float)GetSystemMetrics(SM_CXVIRTUALSCREEN), 0, 0);
     mSettings.position.bottom = NLENGTH((float)GetSystemMetrics(SM_CYVIRTUALSCREEN), 0, 0);
+  }
+
+  if (*mSettings.parent) {
+    sChildren[mSettings.parent].insert(this);
+    auto parent = sNamedPanes.find(mSettings.parent);
+    if (parent != sNamedPanes.end()) {
+      mParent = parent->second;
+      mParent->mChildren.insert(this);
+    }
   }
 
   if (mParent) {
@@ -117,8 +159,7 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
     } else {
       if (mSettings.alwaysOnTop) {
         insertAfter = HWND_TOPMOST;
-      } else {
-        windowPosFlags |= SWP_NOZORDER;
+        sAlwaysOnTopPanes.insert(this);
       }
       windowClass = L"LSnPane";
     }
@@ -140,10 +181,31 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
   if (mParent && mParent->mRenderTarget) {
     ReCreateDeviceResources();
   }
+
+  if (*mName) {
+    assert(sNamedPanes.count(mName) == 0);
+    sNamedPanes[mName] = this;
+
+    for (Pane *child : sChildren[mName]) {
+      mChildren.insert(child);
+      child->mParent = this;
+      child->ParentPositionChanged();
+      child->ReCreateDeviceResources();
+    }
+  }
 }
 
 
 Pane::~Pane() {
+  if (*mName) {
+    sNamedPanes.erase(mName);
+  }
+  if (mSettings.parent) {
+    sChildren[mSettings.parent].erase(this);
+  }
+  if (mSettings.alwaysOnTop) {
+    sAlwaysOnTopPanes.erase(this);
+  }
   DiscardDeviceResources();
   mPainter->RemovePane(this, mPainterData);
   if (mWindow) {
@@ -153,11 +215,16 @@ Pane::~Pane() {
     mParent->mChildren.erase(this);
     mParent->Repaint(mRenderingPosition, true);
   }
+  for (Pane *child : mChildren) {
+    child->mParent = nullptr;
+  }
 }
 
 
 void Pane::DiscardDeviceResources() {
-  mPainter->DiscardDeviceResources();
+  if (mRenderTarget) {
+    mPainter->DiscardDeviceResources();
+  }
   if (!mParent && mRenderTarget) {
     mRenderTarget->Release();
   }
@@ -194,15 +261,17 @@ HRESULT Pane::ReCreateDeviceResources() {
           hr = mPainter->CreateDeviceResources(mRenderTarget);
         }
       }
-    } else {
+    } else if (mParent->mRenderTarget) {
       mRenderTarget = mParent->mRenderTarget;
       hr = mPainter->CreateDeviceResources(mRenderTarget);
     }
-    for (Pane *child : mChildren) {
-      if (FAILED(hr)) {
-        break;
+    if (mRenderTarget) {
+      for (Pane *child : mChildren) {
+        if (FAILED(hr)) {
+          break;
+        }
+        hr = child->ReCreateDeviceResources();
       }
-      hr = child->ReCreateDeviceResources();
     }
   }
 
@@ -242,6 +311,31 @@ void Pane::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area) const
 }
 
 
+void Pane::ParentPositionChanged() {
+  D2D1_RECT_F newPosition = D2D1::RectF(
+    EvaluateLengthParent(mSettings.position.left, true) + mParent->mRenderingPosition.left,
+    EvaluateLengthParent(mSettings.position.top, false) + mParent->mRenderingPosition.top,
+    EvaluateLengthParent(mSettings.position.right, true) + mParent->mRenderingPosition.left,
+    EvaluateLengthParent(mSettings.position.bottom, false) + mParent->mRenderingPosition.top);
+
+  D2D1_SIZE_F newSize = D2D1::SizeF(
+    newPosition.right - newPosition.left,
+    newPosition.bottom - newPosition.top);
+
+  bool isMove = newPosition.left != mRenderingPosition.left
+    || newPosition.top != mRenderingPosition.top;
+  bool isSize = newSize.width != mSize.width || newSize.height != mSize.height;
+
+  if (!isMove && !isSize) {
+    return;
+  }
+
+  mRenderingPosition = newPosition;
+  mSize = newSize;
+  mPainter->PositionChanged(this, mPainterData, mRenderingPosition, isMove, isSize);
+}
+
+
 void Pane::Repaint(bool update) {
   Repaint(mRenderingPosition, update);
 }
@@ -269,5 +363,22 @@ void Pane::RepaintInvalidated() const {
     } else if (mParent) {
       mParent->RepaintInvalidated();
     }
+  }
+}
+
+
+void Pane::OnFullscreenActivated(HMONITOR monitor, HWND fullscreenWindow) {
+  if (MonitorFromWindow(mWindow, MONITOR_DEFAULTTONULL) == monitor) {
+    mCoveredByFullscreenWindow = true;
+    SetWindowPos(mWindow, fullscreenWindow, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE |
+      SWP_NOREDRAW);
+  }
+}
+
+
+void Pane::OnFullscreenDeactivated(HMONITOR monitor) {
+  if (MonitorFromWindow(mWindow, MONITOR_DEFAULTTONULL) == monitor) {
+    mCoveredByFullscreenWindow = false;
+    SetWindowPos(mWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
   }
 }

@@ -72,11 +72,14 @@
   <PropertyGroup />
   <ItemGroup>
     <ClInclude Include="AlgorithmExt.h" />
+    <ClInclude Include="Forwardable.hpp" />
+    <ClInclude Include="LayoutSettings.hpp" />
     <ClInclude Include="LiteStep.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="ShellHelpers.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="LayoutSettings.cpp" />
     <ClCompile Include="LiteStep.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="ShellHelpers.cpp" />

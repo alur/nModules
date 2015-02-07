@@ -11,7 +11,8 @@
 #include "../nUtilities/Macros.h"
 #include "../nUtilities/Windows.h"
 
-static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
+static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
+  LM_FULLSCREENDEACTIVATED, 0 };
 static const wchar_t sName[] = L"nCore";
 static const VERSION sVersion = MakeVersion(0, 9, 0, 0);
 
@@ -53,6 +54,7 @@ LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM l
   case WM_SETTINGCHANGE:
     if (wParam == SPI_SETWORKAREA) {
       gDisplays.Update();
+      SendCoreMessage(NCORE_DISPLAYS_CHANGED, 0, 0);
     }
     return 0;
 
@@ -62,6 +64,14 @@ LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM l
       WindowMonitor::RunWindowMaintenance();
       return 0;
     }
+    return 0;
+
+  case LM_FULLSCREENACTIVATED:
+    Pane::FullscreenActivated((HMONITOR)wParam, (HWND)lParam);
+    return 0;
+
+  case LM_FULLSCREENDEACTIVATED:
+    Pane::FullscreenDeactivated((HMONITOR)wParam);
     return 0;
 
   case LM_MONITORCHANGED:

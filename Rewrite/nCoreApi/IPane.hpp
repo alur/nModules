@@ -5,8 +5,8 @@
 #include "IPanePainter.hpp"
 #include "ISettingsReader.hpp"
 
-#include "../nUtilities/NRect.hpp"
-#include "../nUtilities/Windows.h"
+#include "../nUtilities/d2d1.h"
+#include "../nUtilities/Lengths.h"
 
 /// <summary>
 ///
@@ -51,6 +51,11 @@ public:
   virtual float APICALL EvaluateLength(const NLENGTH &length, bool horizontal) const = 0;
 
   /// <summary>
+  /// Returns the current value of the given rectangle.
+  /// </summary>
+  virtual D2D1_RECT_F APICALL EvaluateRect(const NRECT &rect) const = 0;
+
+  /// <summary>
   /// Returns the painter data for this pane.
   /// </summary>
   virtual LPVOID APICALL GetPainterData() const = 0;
@@ -59,7 +64,12 @@ public:
   /// Retrieves the rendering position of the pane. This is the absolute position, in pixels, of
   /// the pane relative to its parent window.
   /// </summary>
-  virtual const D2D1_RECT_F *APICALL GetRenderingPosition() const = 0;
+  virtual const D2D1_RECT_F &APICALL GetRenderingPosition() const = 0;
+
+  /// <summary>
+  /// Retrieves the size in pixels of the pane.
+  /// </summary>
+  virtual const D2D1_SIZE_F &APICALL GetRenderingSize() const = 0;
 
   /// <summary>
   /// Retrieves the text that should be rendered for this pane. Note that this may not be the same

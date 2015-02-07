@@ -2,6 +2,8 @@
 
 #include "TaskButton.hpp"
 
+#include "../nShared/LayoutSettings.hpp"
+
 #include "../nCoreApi/IEventHandler.hpp"
 #include "../nCoreApi/IPane.hpp"
 #include "../nCoreApi/IStatePainter.hpp"
@@ -28,6 +30,14 @@ public:
 
 private:
   void Relayout();
+
+  // Settings
+private:
+  LayoutSettings mLayoutSettings;
+  NLENGTH mButtonMaxWidth;
+  NLENGTH mButtonMaxHeight;
+  NLENGTH mButtonWidth;
+  NLENGTH mButtonHeight;
 
 private:
   IPane *mPane;

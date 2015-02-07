@@ -5,10 +5,13 @@
     <ClInclude Include="AlgorithmExt.h" />
     <ClInclude Include="LiteStep.h" />
     <ClInclude Include="ShellHelpers.h" />
+    <ClInclude Include="Forwardable.hpp" />
+    <ClInclude Include="LayoutSettings.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="LiteStep.cpp" />
     <ClCompile Include="ShellHelpers.cpp" />
+    <ClCompile Include="LayoutSettings.cpp" />
   </ItemGroup>
 </Project>
