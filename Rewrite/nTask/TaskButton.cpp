@@ -6,12 +6,12 @@
 #include "../nUtilities/Macros.h"
 
 #include <Shellapi.h>
-#include <thread>
 
 
 TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eventHandler, HWND window)
   : mEventHandler(eventHandler)
   , mMenu(nullptr)
+  , mMenuWindow(nullptr)
   , mWindow(window)
 {
   mIconPosition = NRECT(NLENGTH(0, 0, 0), NLENGTH(0, 0, 0), NLENGTH(0, 0, 32), NLENGTH(0, 0, 32));
@@ -41,6 +41,10 @@ TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eve
 
 
 TaskButton::~TaskButton() {
+  if (mMenuThread.joinable()) {
+    PostMessage(mMenuWindow, WM_CANCELMODE, 0, 0);
+    mMenuThread.join();
+  }
   mPane->Destroy();
 }
 
@@ -139,38 +143,45 @@ void TaskButton::OpenTaskProcess() {
 
 
 void TaskButton::ShowContextMenu() {
-  SetWindowPos(mWindow, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+  if (mMenuThread.joinable()) {
+    PostMessage(mMenuWindow, WM_CANCELMODE, 0, 0);
+    mMenuThread.join();
+  }
 
-  WINDOWPLACEMENT wp;
+  mMenuThread = std::thread([this] () {
+    SetWindowPos(mWindow, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 
-  ZeroMemory(&wp, sizeof(WINDOWPLACEMENT));
-  wp.length = sizeof(WINDOWPLACEMENT);
-  GetWindowPlacement(mWindow, &wp);
+    WINDOWPLACEMENT wp;
 
-  // Select which menu items are enabled
-  EnableMenuItem(mMenu, SC_RESTORE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWNORMAL ? MF_ENABLED : MF_GRAYED));
-  EnableMenuItem(mMenu, SC_MOVE, MF_BYCOMMAND | (wp.showCmd == SW_SHOWNORMAL ? MF_ENABLED : MF_GRAYED));
-  EnableMenuItem(mMenu, SC_SIZE, MF_BYCOMMAND | (wp.showCmd == SW_SHOWNORMAL ? MF_ENABLED : MF_GRAYED));
-  EnableMenuItem(mMenu, SC_MINIMIZE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWMINIMIZED ? MF_ENABLED : MF_GRAYED));
-  EnableMenuItem(mMenu, SC_MOVE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWMAXIMIZED ? MF_ENABLED : MF_GRAYED));
+    ZeroMemory(&wp, sizeof(WINDOWPLACEMENT));
+    wp.length = sizeof(WINDOWPLACEMENT);
+    GetWindowPlacement(mWindow, &wp);
 
-  // let application modify menu
-  PostMessage(mWindow, WM_INITMENU, (WPARAM)mMenu, 0);
-  PostMessage(mWindow, WM_INITMENUPOPUP, (WPARAM)mMenu, MAKELPARAM(0, TRUE));
+    // Select which menu items are enabled
+    EnableMenuItem(mMenu, SC_RESTORE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWNORMAL ? MF_ENABLED : MF_GRAYED));
+    EnableMenuItem(mMenu, SC_MOVE, MF_BYCOMMAND | (wp.showCmd == SW_SHOWNORMAL ? MF_ENABLED : MF_GRAYED));
+    EnableMenuItem(mMenu, SC_SIZE, MF_BYCOMMAND | (wp.showCmd == SW_SHOWNORMAL ? MF_ENABLED : MF_GRAYED));
+    EnableMenuItem(mMenu, SC_MINIMIZE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWMINIMIZED ? MF_ENABLED : MF_GRAYED));
+    EnableMenuItem(mMenu, SC_MOVE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWMAXIMIZED ? MF_ENABLED : MF_GRAYED));
 
-  POINT pt;
-  GetCursorPos(&pt);
+    // let application modify menu
+    PostMessage(mWindow, WM_INITMENU, (WPARAM)mMenu, 0);
+    PostMessage(mWindow, WM_INITMENUPOPUP, (WPARAM)mMenu, MAKELPARAM(0, TRUE));
 
-  std::thread([] (HMENU menu, HWND targetWindow, POINT pt) {
-    HWND window = CreateWindowEx(WS_EX_TOOLWINDOW, L"Static", L"", WS_POPUP, pt.x, pt.y, 1, 1,
+    POINT pt;
+    GetCursorPos(&pt);
+    mMenuWindow = CreateWindowEx(WS_EX_TOOLWINDOW, L"Static", L"", WS_POPUP, pt.x, pt.y, 1, 1,
       nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
-    ShowWindow(window, SW_SHOW);
-    int command = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0, window, NULL);
+    ShowWindow(mMenuWindow, SW_SHOW);
+
+    int command = TrackPopupMenu(mMenu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0,
+      mMenuWindow, NULL);
     if (command != 0) {
-      PostMessage(targetWindow, WM_SYSCOMMAND, (WPARAM)command, MAKELPARAM(pt.x, pt.y));
+      PostMessage(mWindow, WM_SYSCOMMAND, (WPARAM)command, MAKELPARAM(pt.x, pt.y));
     }
-    DestroyWindow(window);
-  }, mMenu, mWindow, pt).detach();
+    DestroyWindow(mMenuWindow);
+    mMenuWindow = nullptr;
+  });
 }
 
 

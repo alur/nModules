@@ -7,6 +7,8 @@
 #include "../nCoreApi/IPane.hpp"
 #include "../nCoreApi/IStatePainter.hpp"
 
+#include <thread>
+
 class TaskButton : public IMessageHandler, public IEventProcessor {
 public:
   enum Part {
@@ -48,10 +50,13 @@ public:
 
 private:
   const HWND mWindow;
-  HMENU mMenu;
   IEventHandler *mEventHandler;
   ButtonPainter *mPainter;
   IPane *mPane;
+
+  HMENU mMenu;
+  std::thread mMenuThread;
+  HWND mMenuWindow;
 
   // Things that should be under ButtonSettings.
 private:
