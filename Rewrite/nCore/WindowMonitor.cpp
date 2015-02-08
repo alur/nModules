@@ -51,7 +51,8 @@ EXPORT_CDECL(bool) IsTaskbarWindow(HWND window) {
   return CHECKFLAG(exStyle, WS_EX_APPWINDOW) ||
     GetParent(window) == nullptr &&
     GetWindow(window, GW_OWNER) == nullptr &&
-    !CHECKFLAG(exStyle, WS_EX_TOOLWINDOW);
+    !CHECKFLAG(exStyle, WS_EX_TOOLWINDOW) &&
+    GetWindowTextLength(window) != 0;
 }
 
 
@@ -179,7 +180,7 @@ void WindowMonitor::Stop() {
 
 void WindowMonitor::RunWindowMaintenance() {
   for (WindowMap::iterator iter = sWindowData.begin(); iter != sWindowData.end();) {
-    if (!IsWindow(iter->first)) {
+    if (!IsTaskbarWindow(iter->first)) {
       iter = sWindowData.erase(iter);
       continue;
     }
