@@ -2,6 +2,12 @@
 
 #include "../nCoreApi/Core.h"
 
+#include "../nUtilities/lsapi.h"
+
+StatePainterInitData::State sStates[] = {
+  { L"Hover",   0, 0 }, // 1
+  { L"Pressed", 0, 0 }, // 2
+};
 
 Label::Label(LPCWSTR name) {
   ISettingsReader *settingsReader;
@@ -12,9 +18,9 @@ Label::Label(LPCWSTR name) {
   StatePainterInitData painterInitData;
   ZeroMemory(&painterInitData, sizeof(StatePainterInitData));
   painterInitData.cbSize = sizeof(StatePainterInitData);
-  painterInitData.numStates = 0;
+  painterInitData.numStates = 2;
   painterInitData.settingsReader = settingsReader;
-  painterInitData.states = nullptr;
+  painterInitData.states = sStates;
   mPainter = nCore::CreateStatePainter(&painterInitData);
 
   PaneInitData paneInitData;
@@ -24,7 +30,13 @@ Label::Label(LPCWSTR name) {
   paneInitData.name = name;
   paneInitData.painter = mPainter;
   paneInitData.settingsReader = settingsReader;
+  paneInitData.flags = PaneInitData::DynamicText;
   mPane = nCore::CreatePane(&paneInitData);
+
+  wchar_t buffer[MAX_LINE_LENGTH];
+  if (settingsReader->GetString(L"Text", buffer, _countof(buffer), L"")) {
+    mPane->SetText(buffer);
+  }
 
   settingsReader->Destroy();
 

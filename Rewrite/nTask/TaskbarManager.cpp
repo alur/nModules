@@ -1,6 +1,8 @@
 #include "Messages.h"
 #include "TaskbarManager.hpp"
 
+#include "../nModuleBase/nModule.hpp"
+
 #include "../nCoreApi/Core.h"
 #include "../nCoreApi/Messages.h"
 
@@ -18,8 +20,11 @@ static const UINT sLSMessages[] = { LM_GETMINRECT, LM_REDRAW, LM_WINDOWACTIVATED
 
 static const UINT sCoreMessages[] = { NCORE_WINDOW_ICON_CHANGED, NCORE_DISPLAYS_CHANGED, 0 };
 
+extern NModule gModule;
+
 // How often windows are allowed to be updated, in milliseconds.
 #define MAX_UPDATE_FREQUENCY 100
+
 
 TaskbarManager::TaskbarManager(HWND messageWindow)
   : mMessageWindow(messageWindow)
@@ -60,7 +65,7 @@ void TaskbarManager::Create(LPCWSTR name) {
       taskbar.Initialized();
     }
   } else {
-    // TODO::Log
+    gModule.log->Warning(L"Failed to create taskbar %s, it already exists!");
   }
 }
 

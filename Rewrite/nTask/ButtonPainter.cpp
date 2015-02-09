@@ -60,7 +60,7 @@ void ButtonPainter::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *ar
 
 
 void ButtonPainter::PositionChanged(const IPane *pane, LPVOID painterData,
-    D2D1_RECT_F position, bool isMove, bool isSize) {
+    const D2D1_RECT_F &position, bool isMove, bool isSize) {
   mStatePainter->PositionChanged(pane, painterData, position, isMove, isSize);
   mIconPaintingPosition = D2D1::RectF(
     pane->EvaluateLength(mIconPosition.left, true) + position.left,

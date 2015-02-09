@@ -16,7 +16,8 @@ private:
   };
 
 public:
-  StatePainter(const StatePainterInitData *initData);
+  explicit StatePainter(const StatePainterInitData *initData);
+  ~StatePainter();
 
   // IPanePainter
 public:
@@ -27,7 +28,7 @@ public:
   void APICALL Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area, const IPane *pane,
     LPVOID painterData) const override;
   void APICALL PositionChanged(const IPane *pane, LPVOID painterData,
-    D2D1_RECT_F position, bool isMove, bool isSize) override;
+    const D2D1_RECT_F &position, bool isMove, bool isSize) override;
   void APICALL RemovePane(const IPane *pane, LPVOID painterData) override;
   void APICALL TextChanged(const IPane *pane, LPVOID painterData, LPCWSTR text) override;
 
@@ -43,6 +44,9 @@ public:
 
 private:
   int mResourceRefCount;
+
+  int mStateCount;
+  State *mStates;
 
   // TODO(Erik): Move these out of here
 private:

@@ -14,8 +14,21 @@ EXPORT_CDECL(IStatePainter*) CreateStatePainter(const StatePainterInitData *init
 StatePainter::StatePainter(const StatePainterInitData *initData)
     : mBrush(nullptr)
     , mTextBrush(nullptr)
+    , mStateCount(initData->numStates + 1)
     , mResourceRefCount(0)
 {
+  std::allocator<State> stateAllocator;
+  mStates = stateAllocator.allocate(mStateCount);
+  stateAllocator.construct(&mStates[0], initData->settingsReader, nullptr);
+  for (int i = 1; i < mStateCount; ++i) {
+    StatePainterInitData::State &state = initData->states[i - 1];
+    assert(state.base < i);
+    ISettingsReader *reader;
+    initData->settingsReader->CreateChild(state.name, &reader);
+    stateAllocator.construct(&mStates[i], initData->settingsReader, &mStates[state.base]);
+    reader->Destroy();
+  }
+
   DWORD color = (DWORD)initData->settingsReader->GetInt64(L"Color", 0x55C0448F);
   mTextPadding.left = initData->settingsReader->GetLength(L"TextOffsetLeft", NLENGTH(0, 0, 0));
   mTextPadding.top = initData->settingsReader->GetLength(L"TextOffsetTop", NLENGTH(0, 0, 0));
@@ -29,9 +42,19 @@ StatePainter::StatePainter(const StatePainterInitData *initData)
 }
 
 
-LPVOID StatePainter::AddPane(const IPane*) {
+StatePainter::~StatePainter() {
+  std::allocator<State> stateAllocator;
+  for (int i = 0; i < mStateCount; ++i) {
+    stateAllocator.destroy(&mStates[i]);
+  }
+  stateAllocator.deallocate(mStates, mStateCount);
+}
+
+
+LPVOID StatePainter::AddPane(const IPane *pane) {
   PainterData *data = new PainterData();
   data->textLayout = nullptr;
+  PositionChanged(pane, data, pane->GetRenderingPosition(), true, true);
   return data;
 }
 
@@ -112,8 +135,8 @@ void StatePainter::PaintText(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F 
 }
 
 
-void StatePainter::PositionChanged(const IPane *pane, LPVOID data, D2D1_RECT_F position, bool,
-    bool) {
+void StatePainter::PositionChanged(const IPane *pane, LPVOID data, const D2D1_RECT_F &position,
+    bool, bool) {
   PainterData *paneData = (PainterData*)data;
   paneData->textPosition = position;
   paneData->textPosition.left += pane->EvaluateLength(mTextPadding.left, true);

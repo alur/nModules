@@ -1,5 +1,3 @@
-#include "Label.hpp"
-
 #include "../nModuleBase/nModule.hpp"
 
 #include "../nShared/LiteStep.h"
@@ -8,24 +6,20 @@
 
 #include "../nUtilities/lsapi.h"
 #include "../nUtilities/Macros.h"
-#include "../nUtilities/Windows.h"
 
-#include <unordered_map>
+static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, LM_SYSTRAYINFOEVENT, 0 };
+//static TrayManager *sTrayManager = nullptr;
 
-NModule gModule(L"nLabel", MakeVersion(0, 9, 0, 0), MakeVersion(0, 9, 0, 0));
-std::unordered_map<std::wstring, Label> gLabels;
-
-static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
+NModule gModule(L"nTray", MakeVersion(0, 9, 0, 0), MakeVersion(0, 9, 0, 0));
 
 
-static void APICALL CreateLabel(LPCWSTR name, LPARAM) {
-  gLabels.emplace(
-    std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(name));
+static void APICALL CreateTray(LPCWSTR, LPARAM) {
+  //sTrayManager->Create(name);
 }
 
 
 static void LoadSettings() {
-  nCore::EnumRCLineTokens(L"*nLabel", CreateLabel, 0);
+  nCore::EnumRCLineTokens(L"*nTray", CreateTray, 0);
 }
 
 
@@ -36,7 +30,6 @@ int nModuleInit(NModule&) {
 
 
 void nModuleQuit(NModule&) {
-  gLabels.clear();
 }
 
 
@@ -44,19 +37,27 @@ LRESULT WINAPI MessageHandlerProc(HWND window, UINT message, WPARAM wParam, LPAR
   switch (message) {
   case WM_CREATE:
     SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
+    //sTrayManager = new TrayManager(window);
     return 0;
 
   case WM_DESTROY:
     SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
+    //delete sTrayManager;
+    //sTrayManager = nullptr;
     return 0;
 
   case LM_GETREVID:
     return HandleGetRevId(gModule.name, gModule.version, lParam);
 
   case LM_REFRESH:
-    gLabels.clear();
+    //sTrayManager->DestroyAll();
     LoadSettings();
     return 0;
+
+  case LM_SYSTRAY:
+  case LM_SYSTRAYINFOEVENT:
+    //return sTrayManager->HandleMessage(window, message, wParam, lParam);
+    break;
   }
 
   return DefWindowProc(window, message, wParam, lParam);

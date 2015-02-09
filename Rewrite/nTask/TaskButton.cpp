@@ -7,6 +7,8 @@
 
 #include <Shellapi.h>
 
+extern BOOL gActiveWindowTracking;
+
 
 TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eventHandler, HWND window)
   : mEventHandler(eventHandler)
@@ -104,22 +106,30 @@ bool TaskButton::ProcessEvent(LPCWSTR) {
 
 void TaskButton::SelectTask() {
   if (IsIconic(mWindow)) {
+    if (gActiveWindowTracking != FALSE) {
+      MoveMouseToWindow();
+    }
     BringWindowToTop(mWindow);
     PostMessage(mWindow, WM_SYSCOMMAND, SC_RESTORE, 0);
     SetForegroundWindow(mWindow);
-    /*if (gActiveWindowTracking != FALSE) {
-    MoveMouseToWindow();
-    }*/
   } else if (GetForegroundWindow() == mWindow) {
     PostMessage(mWindow, WM_SYSCOMMAND, SC_MINIMIZE, 0);
     //ActivateState(State::Minimized);
   } else {
+    if (gActiveWindowTracking != FALSE) {
+      MoveMouseToWindow();
+    }
     SetForegroundWindow(mWindow);
-    /*if (gActiveWindowTracking != FALSE) {
-    MoveMouseToWindow();
-    }*/
   }
   //((Taskbar*)mParent)->HideThumbnail();
+}
+
+
+void TaskButton::MoveMouseToWindow() {
+  WINDOWPLACEMENT placement;
+  RECT &rect = placement.rcNormalPosition;
+  GetWindowPlacement(mWindow, &placement);
+  SetCursorPos((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
 }
 
 
@@ -133,12 +143,8 @@ void TaskButton::OpenTaskProcess() {
     if (QueryFullProcessImageName(process, 0, processPath, &size)) {
       ShellExecute(nullptr, L"open", processPath, L"", L"", SW_SHOW);
     }
+    CloseHandle(process);
   }
-  if (process) {
-
-  }
-
-  CloseHandle(process);
 }
 
 
@@ -164,14 +170,14 @@ void TaskButton::ShowContextMenu() {
     EnableMenuItem(mMenu, SC_MINIMIZE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWMINIMIZED ? MF_ENABLED : MF_GRAYED));
     EnableMenuItem(mMenu, SC_MOVE, MF_BYCOMMAND | (wp.showCmd != SW_SHOWMAXIMIZED ? MF_ENABLED : MF_GRAYED));
 
-    // let application modify menu
+    // Let the application modify the menu
     PostMessage(mWindow, WM_INITMENU, (WPARAM)mMenu, 0);
     PostMessage(mWindow, WM_INITMENUPOPUP, (WPARAM)mMenu, MAKELPARAM(0, TRUE));
 
     POINT pt;
     GetCursorPos(&pt);
-    mMenuWindow = CreateWindowEx(WS_EX_TOOLWINDOW, L"Static", L"", WS_POPUP, pt.x, pt.y, 1, 1,
-      nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
+    mMenuWindow = CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, L"Static", L"", WS_POPUP, pt.x,
+      pt.y, 0, 0, nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
     ShowWindow(mMenuWindow, SW_SHOW);
 
     int command = TrackPopupMenu(mMenu, TPM_RETURNCMD | TPM_RIGHTBUTTON, pt.x, pt.y, 0,

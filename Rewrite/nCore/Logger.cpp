@@ -16,6 +16,7 @@ Logger::~Logger() {
   free(mName);
 }
 
+
 void Logger::Destroy() {
   delete this;
 }
@@ -25,7 +26,15 @@ void Logger::Debug(LPCWSTR, ...) {
 }
 
 
+void Logger::DebugHR(HRESULT, LPCWSTR, ...) {
+}
+
+
 void Logger::Info(LPCWSTR, ...) {
+}
+
+
+void Logger::InfoHR(HRESULT, LPCWSTR, ...) {
 }
 
 
@@ -33,5 +42,13 @@ void Logger::Warning(LPCWSTR, ...) {
 }
 
 
+void Logger::WarningHR(HRESULT, LPCWSTR, ...) {
+}
+
+
 void Logger::Error(LPCWSTR, ...) {
+}
+
+
+void Logger::ErrorHR(HRESULT, LPCWSTR, ...) {
 }

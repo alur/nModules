@@ -1,5 +1,7 @@
 #include "Workarea.h"
 
+#include "../nModuleBase/nModule.hpp"
+
 #include "../nCoreApi/Core.h"
 
 #include "../nUtilities/lsapi.h"
@@ -7,7 +9,7 @@
 #include <algorithm>
 #include <vector>
 
-extern ILogger *gLogger;
+extern NModule gModule;
 
 
 void LoadWorkareas() {
@@ -26,23 +28,23 @@ void LoadWorkareas() {
       UINT monitor = 0;
 
       if (!nCore::ParseMonitor(monitorTok, &monitor)) {
-        gLogger->Warning(L"Invalid monitor %s in *nDeskWorkArea %s", monitorTok, line);
+        gModule.log->Warning(L"Invalid monitor %s in *nDeskWorkArea %s", monitorTok, line);
         return;
       }
       if (!nCore::ParseLength(leftTok, &left)) {
-        gLogger->Warning(L"Invalid left padding %s in *nDeskWorkArea %s", leftTok, line);
+        gModule.log->Warning(L"Invalid left padding %s in *nDeskWorkArea %s", leftTok, line);
         return;
       }
       if (!nCore::ParseLength(topTok, &top)) {
-        gLogger->Warning(L"Invalid top padding %s in *nDeskWorkArea %s", topTok, line);
+        gModule.log->Warning(L"Invalid top padding %s in *nDeskWorkArea %s", topTok, line);
         return;
       }
       if (!nCore::ParseLength(rightTok, &right)) {
-        gLogger->Warning(L"Invalid right padding %s in *nDeskWorkArea %s", rightTok, line);
+        gModule.log->Warning(L"Invalid right padding %s in *nDeskWorkArea %s", rightTok, line);
         return;
       }
       if (!nCore::ParseLength(bottomTok, &bottom)) {
-        gLogger->Warning(L"Invalid bottom padding %s in *nDeskWorkArea %s", bottomTok, line);
+        gModule.log->Warning(L"Invalid bottom padding %s in *nDeskWorkArea %s", bottomTok, line);
         return;
       }
 
@@ -64,10 +66,10 @@ void LoadWorkareas() {
         newWorkAreas[monitor].bottom -= (LONG)bottom.Evaluate((float)display.height,
           display.dpi.y);
       } else {
-        gLogger->Warning(L"Invalid monitor %s in *nDeskWorkArea %s", monitorTok, line);
+        gModule.log->Warning(L"Invalid monitor %s in *nDeskWorkArea %s", monitorTok, line);
       }
     } else {
-      gLogger->Warning(L"Malformatted workarea declaration %s", line);
+      gModule.log->Warning(L"Malformatted workarea declaration %s", line);
     }
   }, (LPARAM)&newWorkAreas[0]);
 

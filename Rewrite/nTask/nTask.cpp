@@ -1,36 +1,24 @@
 #include "Messages.h"
 #include "TaskbarManager.hpp"
 
-#include "../nCoreApi/Core.h"
-#include "../nCoreApi/Messages.h"
+#include "../nModuleBase/nModule.hpp"
 
 #include "../nShared/LiteStep.h"
+
+#include "../nCoreApi/Core.h"
+#include "../nCoreApi/Messages.h"
 
 #include "../nUtilities/lsapi.h"
 #include "../nUtilities/Macros.h"
 #include "../nUtilities/Windows.h"
 
-#include <map>
-#include <string>
-#include <unordered_map>
+NModule gModule(L"nTask", MakeVersion(0, 9, 0, 0), MakeVersion(0, 9, 0, 0));
 
-static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
-static const wchar_t sName[] = L"nTask";
-static const VERSION sVersion = MakeVersion(0, 9, 0, 0);
-static const VERSION sCoreVersion = MakeVersion(0, 9, 0, 0);
+// Set to whether or not windows are activated by hovering over them. In this mode we should
+// automatically move the mouse cursor to the center of the window when activated.
+BOOL gActiveWindowTracking = FALSE;
 
 static TaskbarManager *sTaskbarManager = nullptr;
-static HWND sWindow = nullptr;
-
-
-BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */) {
-  if (reasonForCall == DLL_PROCESS_ATTACH) {
-#ifdef _DLL
-    DisableThreadLibraryCalls((HINSTANCE)module);
-#endif
-  }
-  return TRUE;
-}
 
 
 static void APICALL CreateTaskbar(LPCWSTR name, LPARAM) {
@@ -43,21 +31,25 @@ static void LoadSettings() {
 }
 
 
-static LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT WINAPI MessageHandlerProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
   switch (message) {
   case WM_CREATE:
-    SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
     sTaskbarManager = new TaskbarManager(window);
     return 0;
 
   case WM_DESTROY:
-    SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
     delete sTaskbarManager;
     sTaskbarManager = nullptr;
     return 0;
 
+  case WM_SETTINGCHANGE:
+    if (wParam == SPI_SETACTIVEWINDOWTRACKING) {
+      SystemParametersInfo(SPI_GETACTIVEWINDOWTRACKING, 0, &gActiveWindowTracking, 0);
+    }
+    return 0;
+
   case LM_GETREVID:
-    return HandleGetRevId(sName, sVersion, lParam);
+    return HandleGetRevId(gModule.name, gModule.version, lParam);
 
   case LM_REFRESH:
     sTaskbarManager->DestroyAll();
@@ -97,23 +89,12 @@ static LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, L
 }
 
 
-EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE /* instance */, LPCWSTR /* path */) {
-  if (FAILED(nCore::Connect(sCoreVersion))) {
-    return 1;
-  }
-
-  if (FAILED(CreateMessageHandler(nCore::GetInstance(), sName, MessageHandler, sWindow))) {
-    return 1;
-  }
-
+int nModuleInit(NModule&) {
   LoadSettings();
-
+  SystemParametersInfo(SPI_GETACTIVEWINDOWTRACKING, 0, &gActiveWindowTracking, 0);
   return 0;
 }
 
 
-EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */) {
-  DestroyWindow(sWindow);
-  sWindow = nullptr;
-  nCore::Disconnect();
+void nModuleQuit(NModule&) {
 }

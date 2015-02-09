@@ -101,6 +101,14 @@
     <ProjectReference Include="..\nCoreApi\nCoreApi.vcxproj">
       <Project>{dbbf5b43-ff47-437c-85e5-fb7c024aab61}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\nModuleBase\nModuleBase.vcxproj">
+      <Project>{64ccc365-fdb1-4018-be40-4566183b5000}</Project>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+    </ProjectReference>
     <ProjectReference Include="..\nShared\nShared.vcxproj">
       <Project>{1ef8ca33-6355-4206-b3cf-e500498aa67d}</Project>
     </ProjectReference>

@@ -111,6 +111,8 @@ private:
   LPVOID mPainterData;
   // The name of the pane, if it's named.
   wchar_t mName[MAX_PREFIX];
+  // If this pane supports dynamic text.
+  bool mDynamicText;
 
   bool mCoveredByFullscreenWindow;
 

@@ -24,6 +24,8 @@ struct PaneInitData {
   enum Flag : DWORD64 {
     // Set for the desktop window.
     DesktopWindow = 1,
+    // True if we should try to parse the text.
+    DynamicText = 2
   };
 };
 

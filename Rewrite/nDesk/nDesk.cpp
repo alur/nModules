@@ -1,41 +1,42 @@
 #include "DesktopPane.hpp"
 #include "Workarea.h"
 
-#include "../nCoreApi/Core.h"
-#include "../nCoreApi/Messages.h"
+#include "../nModuleBase/nModule.hpp"
 
 #include "../nShared/LiteStep.h"
+
+#include "../nCoreApi/Core.h"
+#include "../nCoreApi/Messages.h"
 
 #include "../nUtilities/lsapi.h"
 #include "../nUtilities/Macros.h"
 #include "../nUtilities/Windows.h"
 
+NModule gModule(L"nDesk", MakeVersion(0, 9, 0, 0), MakeVersion(0, 9, 0, 0));
+
 static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 static const UINT sCoreMessages[] = { NCORE_DISPLAYS_CHANGED, 0 };
-static const wchar_t sName[] = L"nLabel";
-static const VERSION sVersion = MakeVersion(0, 9, 0, 0);
-static const VERSION sCoreVersion = MakeVersion(0, 9, 0, 0);
 
 static DesktopPane *sDesktopPane = nullptr;
 
-HWND gWindow = nullptr;
-ILogger *gLogger = nullptr;
 
-
-BOOL APIENTRY DllMain(HANDLE module, DWORD reasonForCall, LPVOID /* reserved */) {
-  if (reasonForCall == DLL_PROCESS_ATTACH) {
-#ifdef _DLL
-    DisableThreadLibraryCalls((HINSTANCE)module);
-#endif
-  }
-  return TRUE;
+int nModuleInit(NModule&) {
+  sDesktopPane = new DesktopPane();
+  LoadWorkareas();
+  return 0;
 }
 
 
-static LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+void nModuleQuit(NModule&) {
+  SAFEDELETE(sDesktopPane);
+  ClearWorkareas();
+}
+
+
+LRESULT WINAPI MessageHandlerProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
   switch (message) {
   case LM_GETREVID:
-    return HandleGetRevId(sName, sVersion, lParam);
+    return HandleGetRevId(gModule.name, gModule.version, lParam);
 
   case LM_REFRESH:
     LoadWorkareas();
@@ -57,33 +58,4 @@ static LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, L
   }
 
   return DefWindowProc(window, message, wParam, lParam);
-}
-
-
-EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE /* instance */, LPCWSTR /* path */) {
-  if (FAILED(nCore::Connect(sCoreVersion))) {
-    return 1;
-  }
-
-  gLogger = nCore::CreateLogger(sName);
-
-  if (FAILED(CreateMessageHandler(nCore::GetInstance(), sName, MessageHandler, gWindow))) {
-    return 1;
-  }
-
-  sDesktopPane = new DesktopPane();
-  LoadWorkareas();
-
-  return 0;
-}
-
-
-EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */) {
-  SAFEDELETE(sDesktopPane);
-  ClearWorkareas();
-  gLogger->Destroy();
-  gLogger = nullptr;
-  DestroyWindow(gWindow);
-  gWindow = nullptr;
-  nCore::Disconnect();
 }

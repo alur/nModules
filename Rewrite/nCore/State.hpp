@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../nCoreApi/ISettingsReader.hpp"
+
+#include "../nUtilities/d2d1.h"
 #include "../nUtilities/lsapi.h"
 
 #include <dwrite.h>
@@ -7,7 +10,7 @@
 
 class State {
 public:
-  State();
+  State(ISettingsReader *settingsReader, State *base);
   ~State();
 
 private:
@@ -21,19 +24,22 @@ private:
     DWRITE_TRIMMING_GRANULARITY textTrimmingGranularity; // Default: Character
     DWRITE_PARAGRAPH_ALIGNMENT textVerticalAlign; // Default: Top
     DWRITE_WORD_WRAPPING wordWrapping; // Default: NoWrap
-    float cornerRadiusX; // Default: 0
-    float cornerRadiusY; // Default: 0
-    float fontSize; // Default: 12
-    float outlineWidth; // Default: 0
-    float textOffsetBottom; // Default: 0
-    float textOffsetLeft; // Default: 0
-    float textOffsetRight; // Default: 0
-    float textOffsetTop; // Default: 0
+    NLENGTH cornerRadiusX; // Default: 0
+    NLENGTH cornerRadiusY; // Default: 0
+    NLENGTH fontSize; // Default: 12
+    NLENGTH outlineWidth; // Default: 0
+    NRECT textPadding; // Default: 0 0 0 0
     float textRotation; // Default: 0
-    float fontStrokeWidth; // Default: 0
+    NLENGTH fontStrokeWidth; // Default: 0
   } mSettings;
 
-  State *mBase;
+private:
+  State *const mBase;
 
+  // The states which have this as their base state.
   std::vector<State*> mDependents;
+
+  // TODO(Erik): Move this
+private:
+  D2D1_COLOR_F mColor;
 };

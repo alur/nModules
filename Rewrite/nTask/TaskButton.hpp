@@ -18,6 +18,22 @@ public:
     Progress = 8
   };
 
+  enum class State : BYTE {
+    Minimized = 1,
+    Flashing = 2,
+    MinimizedFlashing = 3,
+    Active = 4,
+    Hover = 5,
+    MinimizedHober = 6,
+    ActiveHover = 7,
+    FlashingHover = 8,
+    MinimizedFlashingHover = 9
+  };
+
+  BYTE operator()(State &state) {
+    return (BYTE)state;
+  }
+
 public:
   TaskButton(IPane *pane, IStatePainter *painter, IEventHandler *eventHandler, HWND window);
   ~TaskButton();
@@ -31,10 +47,10 @@ public:
   void Position(const NRECT &position);
   void Redraw(DWORD sections);
   void Show();
+  void MoveMouseToWindow();
 
   // Button events
 private:
-  //
   void SelectTask();
   void OpenTaskProcess();
   void ShowContextMenu();

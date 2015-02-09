@@ -1,5 +1,7 @@
+#include "Error.h"
 #include "LiteStep.h"
 
+#include "../nUtilities/hresults.h"
 #include "../nUtilities/lsapi.h"
 
 #include <strsafe.h>
@@ -30,4 +32,24 @@ LRESULT HandleGetRevId(LPCWSTR name, VERSION version, LPARAM lParam) {
     }
   }
   return 0;
+}
+
+
+void HandleCoreConnectionError(LPCWSTR module, VERSION version, HRESULT hr) {
+  wchar_t title[128], message[4096];
+
+  switch (hr) {
+  default:
+    DescriptionFromHR(hr, message, _countof(message));
+    break;
+  case E_API_CORE_NOT_FOUND:
+    StringCchCopy(message, _countof(message), L"The core was not found. Is it loaded?");
+    break;
+  case E_API_FUNC_NOT_FOUND:
+    StringCchCopy(message, _countof(message), L"An expected nCore API was missing!");
+    break;
+  }
+  StringCchPrintf(title, _countof(title), L"%s: nCore connection failed", module);
+
+  MessageBox(nullptr, message, title, MB_OK | MB_ICONERROR);
 }

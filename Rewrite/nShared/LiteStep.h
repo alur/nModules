@@ -19,3 +19,9 @@ HRESULT CreateMessageHandler(HINSTANCE coreInstance, LPCWSTR name, WNDPROC wndPr
 /// <param name="version">The version of the module.</param>
 /// <param name="lParam">The LPARAM sent with LM_GETREVID.</param>
 LRESULT HandleGetRevId(LPCWSTR name, VERSION version, LPARAM lParam);
+
+/// <summary>
+/// Notifies the user that we failed to connect to nCore.
+/// </summary>
+/// <param name="hr">The HRESULT returned by nCore::Connect.</param>
+void HandleCoreConnectionError(LPCWSTR module, VERSION version, HRESULT hr);
