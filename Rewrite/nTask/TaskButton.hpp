@@ -1,9 +1,8 @@
 #pragma once
 
-#include "ButtonPainter.hpp"
-
 #include "../nCoreApi/IEventHandler.hpp"
 #include "../nCoreApi/IEventProcessor.hpp"
+#include "../nCoreApi/IImagePainter.hpp"
 #include "../nCoreApi/IPane.hpp"
 #include "../nCoreApi/IStatePainter.hpp"
 
@@ -67,7 +66,8 @@ public:
 private:
   const HWND mWindow;
   IEventHandler *mEventHandler;
-  ButtonPainter *mPainter;
+  IStatePainter *mStatePainter;
+  IImagePainter *mIconPainter;
   IPane *mPane;
 
   HMENU mMenu;

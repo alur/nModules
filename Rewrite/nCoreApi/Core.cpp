@@ -18,6 +18,7 @@ static const struct CoreProcItem {
   VERSION minVersion;
 } sCoreProcTable[] = {
   CORE_PROC_ITEM(CreateEventHandler,        MakeVersion(0, 9, 0, 0)),
+  CORE_PROC_ITEM(CreateImagePainter,        MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(CreateLogger,              MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(CreatePane,                MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(CreateSettingsReader,      MakeVersion(0, 9, 0, 0)),

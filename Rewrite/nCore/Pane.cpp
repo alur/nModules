@@ -72,8 +72,6 @@ void Pane::DestroyWindowClasses(HINSTANCE instance) {
 
 Pane::Pane(const PaneInitData *initData, Pane *parent)
   : mMessageHandler(initData->messageHandler)
-  , mPainter(initData->painter)
-  , mPainterData(nullptr)
   , mParent(parent)
   , mRenderTarget(nullptr)
   , mText(nullptr)
@@ -177,7 +175,13 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
     DwmExtendFrameIntoClientArea(mWindow, &margins);
   }
 
-  mPainterData = mPainter->AddPane(this);
+  mPainterData.resize(initData->numPainters);
+  mPainters.resize(initData->numPainters);
+  for (int i = 0; i < initData->numPainters; ++i) {
+    mPainters[i] = initData->painters[i];
+    mPainterData[i] = mPainters[i]->AddPane(this);
+  }
+
   if (mParent && mParent->mRenderTarget) {
     ReCreateDeviceResources();
   }
@@ -207,7 +211,9 @@ Pane::~Pane() {
     sAlwaysOnTopPanes.erase(this);
   }
   DiscardDeviceResources();
-  mPainter->RemovePane(this, mPainterData);
+  for (int i = 0; i < mPainters.size(); ++i) {
+    mPainters[i]->RemovePane(this, mPainterData[i]);
+  }
   if (mWindow) {
     DestroyWindow(mWindow);
   }
@@ -222,8 +228,8 @@ Pane::~Pane() {
 
 
 void Pane::DiscardDeviceResources() {
-  if (mRenderTarget) {
-    mPainter->DiscardDeviceResources();
+  for (IPanePainter *painter : mPainters) {
+    painter->DiscardDeviceResources();
   }
   if (!mParent && mRenderTarget) {
     mRenderTarget->Release();
@@ -258,12 +264,16 @@ HRESULT Pane::ReCreateDeviceResources() {
         factory->Release();
         if (SUCCEEDED(hr)) {
           mRenderTarget->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE);
-          hr = mPainter->CreateDeviceResources(mRenderTarget);
+          for (int i = 0; i < mPainters.size() && SUCCEEDED(hr); ++i) {
+            hr = mPainters[i]->CreateDeviceResources(mRenderTarget);
+          }
         }
       }
     } else if (mParent->mRenderTarget) {
       mRenderTarget = mParent->mRenderTarget;
-      hr = mPainter->CreateDeviceResources(mRenderTarget);
+      for (int i = 0; i < mPainters.size() && SUCCEEDED(hr); ++i) {
+        hr = mPainters[i]->CreateDeviceResources(mRenderTarget);
+      }
     }
     if (mRenderTarget) {
       for (Pane *child : mChildren) {
@@ -305,7 +315,9 @@ void Pane::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area) const
   D2D1_RECT_F invalidatedArea;
   if (mVisible && RectIntersection(area, &mRenderingPosition, &invalidatedArea)) {
     renderTarget->PushAxisAlignedClip(invalidatedArea, D2D1_ANTIALIAS_MODE_ALIASED);
-    mPainter->Paint(renderTarget, &invalidatedArea, (IPane*)this, mPainterData);
+    for (int i = 0; i < mPainters.size(); ++i) {
+      mPainters[i]->Paint(renderTarget, &invalidatedArea, (IPane*)this, mPainterData[i]);
+    }
     renderTarget->PopAxisAlignedClip();
   }
 }
@@ -332,7 +344,9 @@ void Pane::ParentPositionChanged() {
 
   mRenderingPosition = newPosition;
   mSize = newSize;
-  mPainter->PositionChanged(this, mPainterData, mRenderingPosition, isMove, isSize);
+  for (int i = 0; i < mPainters.size(); ++i) {
+    mPainters[i]->PositionChanged(this, mPainterData[i], mRenderingPosition, isMove, isSize);
+  }
 }
 
 

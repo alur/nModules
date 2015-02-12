@@ -39,6 +39,9 @@
     <ClCompile Include="State.cpp">
       <Filter>Implementations\StatePainter</Filter>
     </ClCompile>
+    <ClCompile Include="ImagePainter.cpp">
+      <Filter>Implementations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Displays.hpp" />
@@ -71,6 +74,9 @@
     </ClInclude>
     <ClInclude Include="State.hpp">
       <Filter>Implementations\StatePainter</Filter>
+    </ClInclude>
+    <ClInclude Include="ImagePainter.hpp">
+      <Filter>Implementations</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

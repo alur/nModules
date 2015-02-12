@@ -42,7 +42,7 @@ public:
   void APICALL Destroy() override;
   float APICALL EvaluateLength(const NLENGTH &length, bool horizontal) const override;
   D2D1_RECT_F APICALL EvaluateRect(const NRECT &rect) const override;
-  LPVOID APICALL GetPainterData() const override;
+  LPVOID APICALL GetPainterData(const IPanePainter *) const override;
   const D2D1_RECT_F &APICALL GetRenderingPosition() const override;
   const D2D1_SIZE_F &APICALL GetRenderingSize() const override;
   LPCWSTR APICALL GetRenderingText() const override;
@@ -95,7 +95,7 @@ private:
   // All panes.
 private:
   IMessageHandler *const mMessageHandler;
-  IPanePainter *const mPainter;
+  std::vector<IPanePainter*> mPainters;
   std::unordered_set<Pane*> mChildren;
   // The absolute position of this element within the window.
   D2D1_RECT_F mRenderingPosition;
@@ -108,7 +108,7 @@ private:
   LPWSTR mText;
   // A pointer retrieved from the painter, which is passed back when we paint. Allows the painter
   // to store per-window data.
-  LPVOID mPainterData;
+  std::vector<LPVOID> mPainterData;
   // The name of the pane, if it's named.
   wchar_t mName[MAX_PREFIX];
   // If this pane supports dynamic text.

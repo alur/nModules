@@ -3,6 +3,7 @@
 #include "IDisplays.hpp"
 #include "IEventHandler.hpp"
 #include "IEventProcessor.hpp"
+#include "IImagePainter.hpp"
 #include "ILogger.hpp"
 #include "IPane.hpp"
 #include "ISettingsReader.hpp"
@@ -28,6 +29,11 @@ namespace nCore {
   /// </summary>
   /// <param name="reader">The settings reader from which to get event actions.</param>
   CORE_API_PROC(IEventHandler*, CreateEventHandler, const ISettingsReader *reader);
+
+  /// <summary>
+  /// Creates an IImagePainter.
+  /// </summary>
+  CORE_API_PROC(IImagePainter*, CreateImagePainter);
 
   /// <summary>
   /// Creates a new logger.

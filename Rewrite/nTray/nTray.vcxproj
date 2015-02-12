@@ -92,6 +92,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="nTray.cpp" />
+    <ClCompile Include="Tray.cpp" />
+    <ClCompile Include="TrayIcon.cpp" />
+    <ClCompile Include="TrayManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nCoreApi\nCoreApi.vcxproj">
@@ -111,6 +114,13 @@
     <ProjectReference Include="..\nUtilities\nUtilities.vcxproj">
       <Project>{9a971a00-a016-4cc7-856d-939b5c1f895c}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IconData.h" />
+    <ClInclude Include="Messages.h" />
+    <ClInclude Include="Tray.hpp" />
+    <ClInclude Include="TrayIcon.hpp" />
+    <ClInclude Include="TrayManager.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

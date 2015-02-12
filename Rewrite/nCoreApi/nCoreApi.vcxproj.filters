@@ -38,6 +38,9 @@
     <ClInclude Include="IDisplays.hpp">
       <Filter>Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="IImagePainter.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp" />

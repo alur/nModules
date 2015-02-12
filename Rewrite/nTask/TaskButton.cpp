@@ -12,22 +12,26 @@ extern BOOL gActiveWindowTracking;
 
 TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eventHandler, HWND window)
   : mEventHandler(eventHandler)
+  , mIconPainter(nullptr)
   , mMenu(nullptr)
   , mMenuWindow(nullptr)
+  , mStatePainter(painter)
   , mWindow(window)
 {
   mIconPosition = NRECT(NLENGTH(0, 0, 0), NLENGTH(0, 0, 0), NLENGTH(0, 0, 32), NLENGTH(0, 0, 32));
-  mPainter = new ButtonPainter(painter, mIconPosition);
+  mIconPainter = nCore::CreateImagePainter();
+  mIconPainter->SetPosition(mIconPosition, nullptr);
+  mIconPainter->SetImage(nCore::GetWindowIcon(window, 32));
 
   PaneInitData initData;
   ZeroMemory(&initData, sizeof(PaneInitData));
   initData.cbSize = sizeof(PaneInitData);
   initData.messageHandler = this;
-  initData.painter = mPainter;
+  IPanePainter *painters[] = { mStatePainter, mIconPainter };
+  initData.painters = painters;
+  initData.numPainters = 2;
 
   mPane = parent->CreateChild(&initData);
-
-  mPainter->SetIcon(nCore::GetWindowIcon(window, 32));
 
   wchar_t windowText[256];
   GetWindowText(window, windowText, 256);
@@ -48,6 +52,7 @@ TaskButton::~TaskButton() {
     mMenuThread.join();
   }
   mPane->Destroy();
+  mIconPainter->Destroy();
 }
 
 
@@ -69,7 +74,7 @@ void TaskButton::Show() {
 void TaskButton::Redraw(DWORD parts) {
   mPane->Lock();
   if (CHECKFLAG(parts, Part::Icon)) {
-    mPainter->SetIcon(nCore::GetWindowIcon(mWindow, 32));
+    mIconPainter->SetImage(nCore::GetWindowIcon(mWindow, 32));
     mPane->Repaint(&mIconPosition);
   }
   if (CHECKFLAG(parts, Part::Text)) {

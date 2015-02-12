@@ -2,5 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="nTray.cpp" />
+    <ClCompile Include="TrayManager.cpp" />
+    <ClCompile Include="Tray.cpp" />
+    <ClCompile Include="TrayIcon.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TrayManager.hpp" />
+    <ClInclude Include="Messages.h" />
+    <ClInclude Include="Tray.hpp" />
+    <ClInclude Include="TrayIcon.hpp" />
+    <ClInclude Include="IconData.h" />
   </ItemGroup>
 </Project>

@@ -20,7 +20,9 @@ DesktopPane::DesktopPane()
   initData.cbSize = sizeof(PaneInitData);
   initData.name = nullptr;
   initData.messageHandler = (IMessageHandler*)this;
-  initData.painter = (IPanePainter*)this;
+  IPanePainter *painter = (IPanePainter*)this;
+  initData.painters = &painter;
+  initData.numPainters = 1;
   initData.flags = PaneInitData::DesktopWindow;
 
   mPane = nCore::CreatePane(&initData);

@@ -43,8 +43,13 @@ D2D1_RECT_F Pane::EvaluateRect(const NRECT &rect) const {
 }
 
 
-LPVOID Pane::GetPainterData() const {
-  return mPainterData;
+LPVOID APICALL Pane::GetPainterData(const IPanePainter *painter) const {
+  for (int i = 0; i < mPainters.size(); ++i) {
+    if (mPainters[i] == painter) {
+      return mPainterData[i];
+    }
+  }
+  return nullptr;
 }
 
 
@@ -137,7 +142,9 @@ void Pane::Position(LPCNRECT position) {
     Repaint(false); // Invalidate where we used to be
     mRenderingPosition = newPosition;
     mSize = newSize;
-    mPainter->PositionChanged(this, mPainterData, mRenderingPosition, isMove, isSize);
+    for (int i = 0; i < mPainters.size(); ++i) {
+      mPainters[i]->PositionChanged(this, mPainterData[i], mRenderingPosition, isMove, isSize);
+    }
     Repaint(true); // And where we are now
   } else {
     //D2D1_RECT_U oldPosition = mWindowPosition;
@@ -174,7 +181,9 @@ void Pane::SetText(LPCWSTR text) {
   } else {
     mText = _wcsdup(text);
   }
-  mPainter->TextChanged(this, mPainterData, mText);
+  for (int i = 0; i < mPainters.size(); ++i) {
+    mPainters[i]->TextChanged(this, mPainterData[i], mText);
+  }
   Repaint(true);
 }
 

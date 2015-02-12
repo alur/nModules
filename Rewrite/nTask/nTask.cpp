@@ -38,8 +38,7 @@ LRESULT WINAPI MessageHandlerProc(HWND window, UINT message, WPARAM wParam, LPAR
     return 0;
 
   case WM_DESTROY:
-    delete sTaskbarManager;
-    sTaskbarManager = nullptr;
+    SAFEDELETE(sTaskbarManager);
     return 0;
 
   case WM_SETTINGCHANGE:

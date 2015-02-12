@@ -79,6 +79,7 @@
     <ClInclude Include="IEventProcessor.hpp" />
     <ClInclude Include="IFileSystemEventHandler.hpp" />
     <ClInclude Include="IFileSystemWatcher.hpp" />
+    <ClInclude Include="IImagePainter.hpp" />
     <ClInclude Include="ILogger.hpp" />
     <ClInclude Include="IMessageHandler.hpp" />
     <ClInclude Include="IPane.hpp" />

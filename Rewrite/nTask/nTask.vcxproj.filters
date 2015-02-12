@@ -5,7 +5,6 @@
     <ClCompile Include="Taskbar.cpp" />
     <ClCompile Include="TaskButton.cpp" />
     <ClCompile Include="TaskbarManager.cpp" />
-    <ClCompile Include="ButtonPainter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Taskbar.hpp" />
@@ -13,6 +12,5 @@
     <ClInclude Include="TaskbarManager.hpp" />
     <ClInclude Include="Messages.h" />
     <ClInclude Include="TaskData.h" />
-    <ClInclude Include="ButtonPainter.hpp" />
   </ItemGroup>
 </Project>

@@ -91,7 +91,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ButtonPainter.cpp" />
     <ClCompile Include="nTask.cpp" />
     <ClCompile Include="Taskbar.cpp" />
     <ClCompile Include="TaskbarManager.cpp" />
@@ -117,7 +116,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ButtonPainter.hpp" />
     <ClInclude Include="Messages.h" />
     <ClInclude Include="Taskbar.hpp" />
     <ClInclude Include="TaskbarManager.hpp" />

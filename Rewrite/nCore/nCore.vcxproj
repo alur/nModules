@@ -96,6 +96,7 @@
     <ClCompile Include="Displays.cpp" />
     <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="Factories.cpp" />
+    <ClCompile Include="ImagePainter.cpp" />
     <ClCompile Include="LiteStep.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="MessageRegistrar.cpp" />
@@ -115,6 +116,7 @@
     <ClInclude Include="Displays.hpp" />
     <ClInclude Include="EventHandler.hpp" />
     <ClInclude Include="Factories.h" />
+    <ClInclude Include="ImagePainter.hpp" />
     <ClInclude Include="Logger.hpp" />
     <ClInclude Include="MessageRegistrar.h" />
     <ClInclude Include="Messages.h" />

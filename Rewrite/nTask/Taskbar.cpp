@@ -48,7 +48,9 @@ Taskbar::Taskbar(LPCWSTR prefix)
   initData.name = prefix;
   initData.settingsReader = reader;
   initData.messageHandler = (IMessageHandler*)this;
-  initData.painter = (IPanePainter*)mPainter;
+  IPanePainter *painter = (IPanePainter*)mPainter;
+  initData.painters = &painter;
+  initData.numPainters = 1;
 
   mPane = nCore::CreatePane(&initData);
 

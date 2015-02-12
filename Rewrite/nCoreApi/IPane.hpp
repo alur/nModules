@@ -16,7 +16,8 @@ struct PaneInitData {
   LPCWSTR name;
   DWORD64 flags;
   IMessageHandler *messageHandler;
-  class IPanePainter *painter;
+  class IPanePainter **painters;
+  size_t numPainters;
   // The settings reader to use. This may be null, if you would like the pane not to read
   // configuration settings.
   const ISettingsReader *settingsReader;
@@ -58,9 +59,10 @@ public:
   virtual D2D1_RECT_F APICALL EvaluateRect(const NRECT &rect) const = 0;
 
   /// <summary>
-  /// Returns the painter data for this pane.
+  /// Returns the painter data for this pane. Do not use this when painting, as it needs to search
+  /// for the proper painter.
   /// </summary>
-  virtual LPVOID APICALL GetPainterData() const = 0;
+  virtual LPVOID APICALL GetPainterData(const IPanePainter *) const = 0;
 
   /// <summary>
   /// Retrieves the rendering position of the pane. This is the absolute position, in pixels, of

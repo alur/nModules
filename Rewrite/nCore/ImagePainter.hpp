@@ -1,16 +1,11 @@
 #pragma once
 
-#include "../nCoreApi/IPanePainter.hpp"
-#include "../nCoreApi/IStatePainter.hpp"
+#include "../nCoreApi/IImagePainter.hpp"
 
-class ButtonPainter : public IPanePainter {
+class ImagePainter : public IImagePainter {
 public:
-  ButtonPainter(IStatePainter *statePainter, const NRECT &iconPosition);
-  ~ButtonPainter();
-
-public:
-  ButtonPainter(const ButtonPainter&) = delete;
-  ButtonPainter &operator=(const ButtonPainter&) = delete;
+  ImagePainter();
+  ~ImagePainter();
 
   // IPanePainter
 public:
@@ -25,23 +20,23 @@ public:
   void APICALL RemovePane(const IPane *pane, LPVOID painterData) override;
   void APICALL TextChanged(const IPane *pane, LPVOID painterData, LPCWSTR text) override;
 
+  // IImagePainter
 public:
-  void SetIcon(HICON icon);
+  void APICALL Destroy() override;
+  void APICALL SetPosition(NRECT position, const IPane *pane) override;
+  void APICALL SetImage(HICON icon) override;
+  void APICALL SetImage(HBITMAP bitmap) override;
 
 private:
-  HRESULT BrushFromIcon(HICON icon, ID2D1RenderTarget *renderTarget, D2D1_SIZE_U *size,
-    ID2D1BitmapBrush **brush);
-
+  void SetImage(IWICBitmapSource *image);
   D2D1_MATRIX_3X2_F GetTransform() const;
 
 private:
-  IStatePainter *mStatePainter;
-  ID2D1BitmapBrush *mIconBrush;
+  IWICBitmapSource *mImage;
+  ID2D1BitmapBrush *mBrush;
   ID2D1RenderTarget *mRenderTarget;
 
-  D2D1_SIZE_U mIconSize;
-
-  HICON mIcon;
-  const NRECT &mIconPosition;
-  D2D1_RECT_F mIconPaintingPosition;
+  D2D1_RECT_F mPaintingPosition;
+  D2D1_SIZE_U mImageSize;
+  NRECT mPosition;
 };
