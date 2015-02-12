@@ -32,8 +32,7 @@ Taskbar::Taskbar(LPCWSTR prefix)
 {
   mReplacementPosition = mButtons.end();
 
-  ISettingsReader *reader;
-  nCore::CreateSettingsReader(prefix, &reader);
+  ISettingsReader *reader = nCore::CreateSettingsReader(prefix);
   mEventHandler = nCore::CreateEventHandler(reader);
 
   StatePainterInitData spid;
@@ -54,8 +53,7 @@ Taskbar::Taskbar(LPCWSTR prefix)
 
   mPane = nCore::CreatePane(&initData);
 
-  ISettingsReader *buttonReader;
-  reader->CreateChild(L"Button", &buttonReader);
+  ISettingsReader *buttonReader = reader->CreateChild(L"Button");
   mButtonEventHandler = nCore::CreateEventHandler(buttonReader);
 
   StatePainterInitData buttonStatePainterInitData;

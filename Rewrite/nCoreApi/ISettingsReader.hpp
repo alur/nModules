@@ -21,8 +21,7 @@ public:
   /// settings in the order SecondaryTaskbarButton, MainTaskbarButton, GeneralButton.
   /// </summary>
   /// <param name="name">The name of the child.</param>
-  /// <param name="pReader">Pointer which will receieve the settings reader.</param>
-  virtual HRESULT APICALL CreateChild(LPCWSTR name, ISettingsReader **pReader) const = 0;
+  virtual ISettingsReader* APICALL CreateChild(LPCWSTR name) const = 0;
 
   /// <summary>
   /// Reads a boolean value from the RC files.

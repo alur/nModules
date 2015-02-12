@@ -23,8 +23,7 @@ StatePainter::StatePainter(const StatePainterInitData *initData)
   for (int i = 1; i < mStateCount; ++i) {
     StatePainterInitData::State &state = initData->states[i - 1];
     assert(state.base < i);
-    ISettingsReader *reader;
-    initData->settingsReader->CreateChild(state.name, &reader);
+    ISettingsReader *reader = initData->settingsReader->CreateChild(state.name);
     stateAllocator.construct(&mStates[i], initData->settingsReader, &mStates[state.base]);
     reader->Destroy();
   }

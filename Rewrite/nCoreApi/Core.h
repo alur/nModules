@@ -50,11 +50,10 @@ namespace nCore {
   CORE_API_PROC(IPane*, CreatePane, const PaneInitData *initData);
 
   /// <summary>
-  /// Creates a settings reader.
+  /// Creates a settings reader for the given prefix.
   /// </summary>
   /// <param name="prefix">The prefix to use when reading settings.</param>
-  /// <param name="reader">Out, receives a pointer to the settings reader on success.</param>
-  CORE_API_PROC(HRESULT, CreateSettingsReader, LPCWSTR prefix, ISettingsReader **reader);
+  CORE_API_PROC(ISettingsReader*, CreateSettingsReader, LPCWSTR prefix);
 
   /// <summary>
   /// Creates a new EventHandler. The caller must eventually call ->Destroy().

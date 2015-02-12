@@ -8,8 +8,8 @@
 #include <strsafe.h>
 
 
-EXPORT_CDECL(HRESULT) CreateSettingsReader(LPCWSTR prefix, ISettingsReader **reader) {
-  return SettingsReader::Create(prefix, reader);
+EXPORT_CDECL(ISettingsReader*) CreateSettingsReader(LPCWSTR prefix) {
+  return SettingsReader::Create(prefix);
 }
 
 
@@ -24,7 +24,7 @@ static bool GetPrefixedRCString(LPCWSTR prefix, LPCWSTR key, LPWSTR buffer, size
 }
 
 
-HRESULT SettingsReader::Create(LPCWSTR prefix, ISettingsReader **pReader) {
+ISettingsReader *SettingsReader::Create(LPCWSTR prefix) {
   SettingsReader *reader = new SettingsReader();
 
   reader->mPrefixes.emplace_back();
@@ -37,17 +37,14 @@ HRESULT SettingsReader::Create(LPCWSTR prefix, ISettingsReader **pReader) {
     // TODO(Erik): Check for loops.
   }
 
-  *pReader = (ISettingsReader*)reader;
-
-  return S_OK;
+  return reader;
 }
 
 
-SettingsReader::SettingsReader() {
-}
+SettingsReader::SettingsReader() {}
 
 
-HRESULT SettingsReader::CreateChild(LPCWSTR suffix, ISettingsReader **pReader) const {
+ISettingsReader *SettingsReader::CreateChild(LPCWSTR suffix) const {
   SettingsReader *reader = new SettingsReader();
   for (LPCWSTR prefix : mPrefixes) {
     reader->mPrefixes.emplace_back();
@@ -60,8 +57,7 @@ HRESULT SettingsReader::CreateChild(LPCWSTR suffix, ISettingsReader **pReader) c
       // TODO(Erik): Check for loops.
     }
   }
-  *pReader = (ISettingsReader*)reader;
-  return S_OK;
+  return reader;
 }
 
 

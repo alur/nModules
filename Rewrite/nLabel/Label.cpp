@@ -10,8 +10,7 @@ StatePainterInitData::State sStates[] = {
 };
 
 Label::Label(LPCWSTR name) {
-  ISettingsReader *settingsReader;
-  nCore::CreateSettingsReader(name, &settingsReader);
+  ISettingsReader *settingsReader = nCore::CreateSettingsReader(name);
 
   mEventHandler = nCore::CreateEventHandler(settingsReader);
 

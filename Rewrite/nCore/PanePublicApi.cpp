@@ -43,7 +43,7 @@ D2D1_RECT_F Pane::EvaluateRect(const NRECT &rect) const {
 }
 
 
-LPVOID APICALL Pane::GetPainterData(const IPanePainter *painter) const {
+LPVOID Pane::GetPainterData(const IPanePainter *painter) const {
   for (int i = 0; i < mPainters.size(); ++i) {
     if (mPainters[i] == painter) {
       return mPainterData[i];

@@ -6,14 +6,14 @@
 
 class SettingsReader : public ISettingsReader {
 public:
-  static HRESULT Create(LPCWSTR prefix, ISettingsReader **reader);
+  static ISettingsReader *Create(LPCWSTR prefix);
 
 private:
   SettingsReader();
 
   // ISettingsReader
 public:
-  HRESULT APICALL CreateChild(LPCWSTR, ISettingsReader**) const override;
+  ISettingsReader* APICALL CreateChild(LPCWSTR) const override;
   void APICALL Destroy() override;
 
   bool APICALL GetBool(LPCWSTR key, bool defaultValue) const override;

@@ -228,15 +228,17 @@ Pane::~Pane() {
 
 
 void Pane::DiscardDeviceResources() {
-  for (IPanePainter *painter : mPainters) {
-    painter->DiscardDeviceResources();
-  }
-  if (!mParent && mRenderTarget) {
-    mRenderTarget->Release();
-  }
-  mRenderTarget = nullptr;
-  for (Pane *child : mChildren) {
-    child->DiscardDeviceResources();
+  if (mRenderTarget) {
+    for (IPanePainter *painter : mPainters) {
+      painter->DiscardDeviceResources();
+    }
+    for (Pane *child : mChildren) {
+      child->DiscardDeviceResources();
+    }
+    if (!mParent && mRenderTarget) {
+      mRenderTarget->Release();
+    }
+    mRenderTarget = nullptr;
   }
 }
 

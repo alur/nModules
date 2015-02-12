@@ -13,6 +13,10 @@ public:
   State(ISettingsReader *settingsReader, State *base);
   ~State();
 
+public:
+  State(const State&) = delete;
+  State& operator=(State&) = delete;
+
 private:
   struct Settings {
     wchar_t font[MAX_PATH]; // Default: Arial

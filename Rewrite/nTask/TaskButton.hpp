@@ -65,8 +65,8 @@ public:
 
 private:
   const HWND mWindow;
-  IEventHandler *mEventHandler;
-  IStatePainter *mStatePainter;
+  IEventHandler * const mEventHandler;
+  IStatePainter * const mStatePainter;
   IImagePainter *mIconPainter;
   IPane *mPane;
 

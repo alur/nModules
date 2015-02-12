@@ -30,7 +30,6 @@ TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eve
   IPanePainter *painters[] = { mStatePainter, mIconPainter };
   initData.painters = painters;
   initData.numPainters = 2;
-
   mPane = parent->CreateChild(&initData);
 
   wchar_t windowText[256];

@@ -15,7 +15,7 @@ EXPORT_CDECL(IEventHandler*) CreateEventHandler(const ISettingsReader *reader);
 EXPORT_CDECL(IImagePainter*) CreateImagePainter();
 EXPORT_CDECL(ILogger*) CreateLogger(LPCWSTR name);
 EXPORT_CDECL(IPane*) CreatePane(const PaneInitData *initData);
-EXPORT_CDECL(HRESULT) CreateSettingsReader(LPCWSTR prefix, ISettingsReader **reader);
+EXPORT_CDECL(ISettingsReader*) CreateSettingsReader(LPCWSTR prefix);
 EXPORT_CDECL(IStatePainter*) CreateStatePainter(const StatePainterInitData *initData);
 EXPORT_CDECL(void) EnumRCLines(LPCWSTR key, void(APICALL *callback)(LPCWSTR line, LPARAM data),
   LPARAM data);

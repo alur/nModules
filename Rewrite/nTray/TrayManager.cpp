@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <shellapi.h>
+#include <strsafe.h>
 
 
 TrayManager::TrayManager() : mInitialized(false) {}
@@ -16,11 +17,34 @@ TrayManager::~TrayManager() {
 }
 
 
-void TrayManager::CreateTray(LPCWSTR name) {}
+void TrayManager::CreateTray(LPCWSTR name) {
+  mTrays.emplace(
+    std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(name));
+}
 
 
 void TrayManager::DestroyAllTrays() {
   mTrays.clear();
+}
+
+
+void TrayManager::UpdateIconData(IconData &data, LPLSNOTIFYICONDATA nid) {
+  if (CHECKFLAG(nid->uFlags, NIF_MESSAGE)) {
+    data.callbackMessage = nid->uCallbackMessage;
+    data.flags |= NIF_MESSAGE;
+  }
+  if (CHECKFLAG(nid->uFlags, NIF_ICON)) {
+    data.icon = nid->hIcon;
+    data.flags |= NIF_ICON;
+  }
+  if (CHECKFLAG(nid->uFlags, NIF_TIP)) {
+    StringCchCopy(data.tip, TRAY_MAX_TIP_LENGTH, nid->szTip);
+    data.flags |= NIF_TIP;
+  }
+  if (CHECKFLAG(data.flags, NIF_GUID) && CHECKFLAG(nid->uFlags, NIF_GUID)) {
+    data.guid = nid->guidItem;
+    data.flags |= NIF_GUID;
+  }
 }
 
 
@@ -31,36 +55,51 @@ void TrayManager::AddIcon(LPLSNOTIFYICONDATA nid) {
     icon.data.window = nid->hWnd;
     icon.data.id = nid->uID;
     GetWindowThreadProcessId(nid->hWnd, &icon.data.processId);
-    //UpdateIconData(icon.data, nid);
+    UpdateIconData(icon.data, nid);
 
     for (auto &tray : mTrays) {
-      /*TrayIcon *instance = tray.second.AddIcon(icon.data);
-      if (instance != nullptr) {
-        icon.instances[&tray.second] = instance;
-        instance->HandleModify(pNID);
-      }*/
+      if (tray.second.WantsIcon(icon.data)) {
+        std::list<TrayIcon>::iterator instance = tray.second.AddIcon(icon.data);
+        icon.instances.emplace_back(&tray.second, instance);
+        instance->Modify(nid);
+      }
     }
   }
 }
 
 
-void TrayManager::DeleteIcon(LPLSNOTIFYICONDATA iconData) {
-
+void TrayManager::DeleteIcon(LPLSNOTIFYICONDATA nid) {
+  auto icon = FindIcon(nid);
+  if (icon != mIcons.end()) {
+    for (auto instance : icon->instances) {
+      instance.first->RemoveIcon(instance.second);
+    }
+    mIcons.erase(icon);
+  }
 }
 
 
-void TrayManager::ModifyIcon(LPLSNOTIFYICONDATA iconData) {
-
+void TrayManager::ModifyIcon(LPLSNOTIFYICONDATA nid) {
+  auto icon = FindIcon(nid);
+  if (icon != mIcons.end()) {
+    UpdateIconData(icon->data, nid);
+    for (auto instance : icon->instances) {
+      instance.second->Modify(nid);
+    }
+  }
 }
 
 
-void TrayManager::SetFocus(LPLSNOTIFYICONDATA iconData) {
-
+void TrayManager::SetFocus(LPLSNOTIFYICONDATA) {
+  // TODO(Erik): Implement.
 }
 
 
-void TrayManager::SetVersion(LPLSNOTIFYICONDATA iconData) {
-
+void TrayManager::SetVersion(LPLSNOTIFYICONDATA nid) {
+  auto icon = FindIcon(nid);
+  if (icon != mIcons.end()) {
+    icon->data.version = nid->uVersion;
+  }
 }
 
 

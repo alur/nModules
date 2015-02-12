@@ -13,7 +13,7 @@ class TrayManager {
 private:
   struct NotifyIcon {
     IconData data;
-    std::list<std::pair<Tray*, TrayIcon*>> instances;
+    std::list<std::pair<Tray*, std::list<TrayIcon>::iterator>> instances;
   };
 
 public:
@@ -26,11 +26,13 @@ public:
   LRESULT HandleMessage(HWND, UINT, WPARAM, LPARAM);
 
 private:
-  void AddIcon(LPLSNOTIFYICONDATA iconData);
-  void DeleteIcon(LPLSNOTIFYICONDATA iconData);
-  void ModifyIcon(LPLSNOTIFYICONDATA iconData);
-  void SetFocus(LPLSNOTIFYICONDATA iconData);
-  void SetVersion(LPLSNOTIFYICONDATA iconData);
+  void UpdateIconData(IconData&, LPLSNOTIFYICONDATA);
+
+  void AddIcon(LPLSNOTIFYICONDATA nid);
+  void DeleteIcon(LPLSNOTIFYICONDATA nid);
+  void ModifyIcon(LPLSNOTIFYICONDATA nid);
+  void SetFocus(LPLSNOTIFYICONDATA nid);
+  void SetVersion(LPLSNOTIFYICONDATA nid);
 
   std::list<NotifyIcon>::iterator FindIcon(GUID);
   std::list<NotifyIcon>::iterator FindIcon(HWND, UINT);
