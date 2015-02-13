@@ -13,6 +13,10 @@ public:
   TrayIcon(IPane *parent, IStatePainter *painter, IconData &data);
   ~TrayIcon();
 
+public:
+  TrayIcon(TrayIcon&) = delete;
+  TrayIcon &operator=(TrayIcon&) = delete;
+
   // IMessageHandler
 public:
   LRESULT APICALL HandleMessage(HWND, UINT message, WPARAM, LPARAM, NPARAM) override;

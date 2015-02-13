@@ -18,13 +18,29 @@ TrayManager::~TrayManager() {
 
 
 void TrayManager::CreateTray(LPCWSTR name) {
-  mTrays.emplace(
+  auto ret = mTrays.emplace(
     std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(name));
+
+  if (ret.second) {
+    Tray &tray = ret.first->second;
+    for (NotifyIcon &icon : mIcons) {
+      if (tray.WantsIcon(icon.data)) {
+        std::list<TrayIcon>::iterator instance = tray.AddIcon(icon.data);
+        icon.instances.emplace_back(&tray, instance);
+      }
+    }
+    if (mInitialized) {
+      tray.Initialized();
+    }
+  }
 }
 
 
 void TrayManager::DestroyAllTrays() {
   mTrays.clear();
+  for (NotifyIcon &icon : mIcons) {
+    icon.instances.clear();
+  }
 }
 
 
@@ -202,6 +218,7 @@ LRESULT TrayManager::HandleMessage(HWND window, UINT message, WPARAM wParam, LPA
   case NTRAY_GOT_INITIAL_ICONS:
     mInitialized = true;
     for (auto &tray : mTrays) {
+      tray.second.Initialized();
     }
     return 0;
   }

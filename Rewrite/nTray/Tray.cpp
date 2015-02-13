@@ -5,7 +5,9 @@
 extern HWND gTrayNotifyWindow;
 
 
-Tray::Tray(LPCWSTR name) {
+Tray::Tray(LPCWSTR name)
+  : mLock(1)
+{
   ISettingsReader *reader = nCore::CreateSettingsReader(name);
 
   StatePainterInitData painterInitData;
@@ -41,7 +43,6 @@ Tray::Tray(LPCWSTR name) {
   iconReader->Destroy();
 
   reader->Destroy();
-  mPane->Show();
 }
 
 
@@ -52,6 +53,13 @@ Tray::~Tray() {
   mIconPainter->Destroy();
   mPane->Destroy();
   mPainter->Destroy();
+}
+
+
+void Tray::Initialized() {
+  --mLock;
+  Relayout();
+  mPane->Show();
 }
 
 
@@ -74,6 +82,10 @@ void Tray::RemoveIcon(std::list<TrayIcon>::iterator icon) {
 
 
 void Tray::Relayout() {
+  if (mLock != 0) {
+    return;
+  }
+
   mPane->Lock();
   float width = mPane->GetRenderingSize().width;
   float iconSize = mPane->EvaluateLength(NLENGTH(0, 0, 16), true);

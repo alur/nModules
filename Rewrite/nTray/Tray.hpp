@@ -23,6 +23,7 @@ public:
   std::list<TrayIcon>::iterator AddIcon(IconData&);
   void RemoveIcon(std::list<TrayIcon>::iterator);
   bool WantsIcon(IconData&);
+  void Initialized();
 
 private:
   void Relayout();
@@ -32,6 +33,7 @@ private:
 
   IPane *mPane;
   IStatePainter *mPainter;
+  int mLock;
 
 private:
   IStatePainter *mIconPainter;
