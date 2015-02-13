@@ -2,6 +2,8 @@
 
 #include "../nCoreApi/Core.h"
 
+#include "../nUtilities/Macros.h"
+
 #include <shellapi.h>
 //#include <strsafe.h>
 //#include <Windowsx.h>
@@ -44,7 +46,11 @@ bool TrayIcon::GetScreenRect(LPRECT rect) {
 }
 
 
-void TrayIcon::Modify(LPLSNOTIFYICONDATA) {
+void TrayIcon::Modify(LPLSNOTIFYICONDATA nid) {
+  if (CHECKFLAG(nid->uFlags, NIF_ICON)) {
+    mIconPainter->SetImage(nid->hIcon);
+    mPane->Repaint(nullptr);
+  }
 }
 
 

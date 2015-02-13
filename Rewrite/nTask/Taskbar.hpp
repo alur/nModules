@@ -25,6 +25,7 @@ public:
   bool GetButtonScreenRect(HWND window, D2D1_RECT_F*);
   void RedrawTask(HWND window, DWORD parts);
   void RemoveTask(HWND window, bool isBeingReplaced);
+  void SetOverlayIcon(HWND window, HICON icon);
 
   void Initialized();
 

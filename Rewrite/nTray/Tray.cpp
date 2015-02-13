@@ -2,6 +2,9 @@
 
 #include "../nCoreApi/Core.h"
 
+extern HWND gTrayNotifyWindow;
+
+
 Tray::Tray(LPCWSTR name) {
   ISettingsReader *reader = nCore::CreateSettingsReader(name);
 
@@ -96,5 +99,14 @@ bool Tray::WantsIcon(IconData &data) {
 
 
 LRESULT Tray::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, NPARAM) {
+  switch (message) {
+  case WM_MOUSEMOVE:
+    if (IsWindow(gTrayNotifyWindow)) {
+      D2D1_RECT_F r;
+      mPane->GetScreenPosition(&r);
+      MoveWindow(gTrayNotifyWindow, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
+    }
+    return 0;
+  }
   return DefWindowProc(window, message, wParam, lParam);
 }

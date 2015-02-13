@@ -143,7 +143,7 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
 
   if (!IsChildPane()) {
     DWORD style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP;
-    DWORD exStyle = WS_EX_TOOLWINDOW | WS_EX_COMPOSITED | WS_EX_NOACTIVATE;
+    DWORD exStyle = WS_EX_TOOLWINDOW | WS_EX_COMPOSITED;
     HWND parentWindow = nullptr;
     HWND insertAfter = HWND_BOTTOM;
     UINT windowPosFlags = SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED;

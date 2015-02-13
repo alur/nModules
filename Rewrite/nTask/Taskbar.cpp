@@ -232,7 +232,6 @@ TaskButton *Taskbar::AddTask(HWND window, bool isReplacement) {
 }
 
 
-
 bool Taskbar::GetButtonScreenRect(HWND window, D2D1_RECT_F *rect) {
   auto iter = mButtonMap.find(window);
   if (iter == mButtonMap.end()) {
@@ -263,5 +262,13 @@ void Taskbar::RedrawTask(HWND window, DWORD parts) {
   auto iter = mButtonMap.find(window);
   if (iter != mButtonMap.end()) {
     iter->second->Redraw(parts);
+  }
+}
+
+
+void Taskbar::SetOverlayIcon(HWND window, HICON icon) {
+  auto iter = mButtonMap.find(window);
+  if (iter != mButtonMap.end()) {
+    iter->second->SetOverlayIcon(icon);
   }
 }

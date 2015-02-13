@@ -43,10 +43,11 @@ public:
 
 public:
   void GetButtonScreenRect(D2D1_RECT_F *rect);
+  void MoveMouseToWindow();
   void Position(const NRECT &position);
   void Redraw(DWORD sections);
+  void SetOverlayIcon(HICON icon);
   void Show();
-  void MoveMouseToWindow();
 
   // Button events
 private:
@@ -68,6 +69,7 @@ private:
   IEventHandler * const mEventHandler;
   IStatePainter * const mStatePainter;
   IImagePainter *mIconPainter;
+  IImagePainter *mOverlayIconPainter;
   IPane *mPane;
 
   HMENU mMenu;
@@ -77,4 +79,5 @@ private:
   // Things that should be under ButtonSettings.
 private:
   NRECT mIconPosition;
+  NRECT mOverlayIconPosition;
 };

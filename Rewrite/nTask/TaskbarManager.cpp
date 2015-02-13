@@ -22,6 +22,9 @@ static const UINT sCoreMessages[] = { NCORE_WINDOW_ICON_CHANGED, NCORE_DISPLAYS_
 
 extern NModule gModule;
 
+HWND gActiveWindow;
+HWND gPreviouslyActiveWindow;
+
 // How often windows are allowed to be updated, in milliseconds.
 #define MAX_UPDATE_FREQUENCY 100
 
@@ -30,6 +33,8 @@ TaskbarManager::TaskbarManager(HWND messageWindow)
   : mMessageWindow(messageWindow)
   , mInitialized(false)
 {
+  gActiveWindow = GetActiveWindow();
+  gPreviouslyActiveWindow = gActiveWindow;
   SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)mMessageWindow, (LPARAM)sLSMessages);
   nCore::RegisterForMessages(mMessageWindow, sCoreMessages);
   mInitThread = std::thread([messageWindow] () -> void {
@@ -157,17 +162,29 @@ void TaskbarManager::RedrawWindowIcon(HWND window) {
 }
 
 
+void TaskbarManager::SetOverlayIcon(HWND window, HICON icon) {
+  for (auto &taskbar : mTaskbars) {
+    taskbar.second.SetOverlayIcon(window, icon);
+  }
+}
+
+
 LRESULT TaskbarManager::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
   switch (message) {
   case LM_GETMINRECT:
-    // TODO(Erik): Handle this
     return GetMinRect((HWND)wParam, (LPPOINTS)lParam);
+
+  case LM_TASK_SETOVERLAYICON:
+    SetOverlayIcon((HWND)wParam, (HICON)lParam);
+    return 0;
 
   case LM_REDRAW:
     RedrawWindow((HWND)wParam, lParam);
     return 0;
 
   case LM_WINDOWACTIVATED:
+    gPreviouslyActiveWindow = gActiveWindow;
+    gActiveWindow = (HWND)wParam;
     return 0;
 
   case LM_WINDOWCREATED:

@@ -35,6 +35,7 @@ private:
   LRESULT GetMinRect(HWND window, LPPOINTS points);
   void RedrawWindow(HWND window, LPARAM lParam);
   void RedrawWindowIcon(HWND window);
+  void SetOverlayIcon(HWND window, HICON icon);
 
 private:
   struct Task {

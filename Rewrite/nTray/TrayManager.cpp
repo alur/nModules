@@ -41,7 +41,7 @@ void TrayManager::UpdateIconData(IconData &data, LPLSNOTIFYICONDATA nid) {
     StringCchCopy(data.tip, TRAY_MAX_TIP_LENGTH, nid->szTip);
     data.flags |= NIF_TIP;
   }
-  if (CHECKFLAG(data.flags, NIF_GUID) && CHECKFLAG(nid->uFlags, NIF_GUID)) {
+  if (!CHECKFLAG(data.flags, NIF_GUID) && CHECKFLAG(nid->uFlags, NIF_GUID)) {
     data.guid = nid->guidItem;
     data.flags |= NIF_GUID;
   }

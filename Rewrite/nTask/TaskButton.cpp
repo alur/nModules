@@ -8,6 +8,8 @@
 #include <Shellapi.h>
 
 extern BOOL gActiveWindowTracking;
+extern HWND gActiveWindow;
+extern HWND gPreviouslyActiveWindow;
 
 
 TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eventHandler, HWND window)
@@ -15,6 +17,7 @@ TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eve
   , mIconPainter(nullptr)
   , mMenu(nullptr)
   , mMenuWindow(nullptr)
+  , mOverlayIconPainter(nullptr)
   , mStatePainter(painter)
   , mWindow(window)
 {
@@ -23,13 +26,18 @@ TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eve
   mIconPainter->SetPosition(mIconPosition, nullptr);
   mIconPainter->SetImage(nCore::GetWindowIcon(window, 32));
 
+  mOverlayIconPosition =
+    NRECT(NLENGTH(0, 0, 16), NLENGTH(0, 0, 16), NLENGTH(0, 0, 32), NLENGTH(0, 0, 32));
+  mOverlayIconPainter = nCore::CreateImagePainter();
+  mOverlayIconPainter->SetPosition(mOverlayIconPosition, nullptr);
+
   PaneInitData initData;
   ZeroMemory(&initData, sizeof(PaneInitData));
   initData.cbSize = sizeof(PaneInitData);
   initData.messageHandler = this;
-  IPanePainter *painters[] = { mStatePainter, mIconPainter };
+  IPanePainter *painters[] = { mStatePainter, mIconPainter, mOverlayIconPainter };
   initData.painters = painters;
-  initData.numPainters = 2;
+  initData.numPainters = 3;
   mPane = parent->CreateChild(&initData);
 
   wchar_t windowText[256];
@@ -52,6 +60,7 @@ TaskButton::~TaskButton() {
   }
   mPane->Destroy();
   mIconPainter->Destroy();
+  mOverlayIconPainter->Destroy();
 }
 
 
@@ -116,7 +125,7 @@ void TaskButton::SelectTask() {
     BringWindowToTop(mWindow);
     PostMessage(mWindow, WM_SYSCOMMAND, SC_RESTORE, 0);
     SetForegroundWindow(mWindow);
-  } else if (GetForegroundWindow() == mWindow) {
+  } else if (gPreviouslyActiveWindow == mWindow) {
     PostMessage(mWindow, WM_SYSCOMMAND, SC_MINIMIZE, 0);
     //ActivateState(State::Minimized);
   } else {
@@ -149,6 +158,12 @@ void TaskButton::OpenTaskProcess() {
     }
     CloseHandle(process);
   }
+}
+
+
+void TaskButton::SetOverlayIcon(HICON icon) {
+  mOverlayIconPainter->SetImage(icon);
+  mPane->Repaint(&mOverlayIconPosition);
 }
 
 
