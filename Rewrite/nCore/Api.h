@@ -22,6 +22,7 @@ EXPORT_CDECL(void) EnumRCLines(LPCWSTR key, void(APICALL *callback)(LPCWSTR line
 EXPORT_CDECL(void) EnumRCLineTokens(LPCWSTR key,
   void (APICALL *callback)(LPCWSTR token, LPARAM data), LPARAM data);
 EXPORT_CDECL(IPane*) FindPane(LPCWSTR name);
+EXPORT_CDECL(IPanePainter*) GetChildPainter();
 EXPORT_CDECL(VERSION) GetCoreVersion();
 EXPORT_CDECL(ID2D1Factory*) GetD2DFactory();
 EXPORT_CDECL(const IDisplays*) GetDisplays();

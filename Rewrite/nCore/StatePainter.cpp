@@ -98,10 +98,15 @@ bool StatePainter::DynamicColorChanged(ID2D1RenderTarget*) {
 
 
 void StatePainter::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
-    const IPane *pane, LPVOID data) const {
+    const IPane *pane, LPVOID data, UINT state) const {
   PaintBackground(renderTarget, area, pane, data);
   PaintText(renderTarget, area, pane, data);
-  pane->PaintChildren(renderTarget, area);
+}
+
+
+void StatePainter::PaintTransform(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
+    const class IPane *pane, LPVOID painterData, UINT, UINT newState, float) const {
+  Paint(renderTarget, area, pane, painterData, newState);
 }
 
 

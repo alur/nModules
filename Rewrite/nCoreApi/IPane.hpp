@@ -105,12 +105,6 @@ public:
   virtual void APICALL Lock() = 0;
 
   /// <summary>
-  /// Paints any child panes.
-  /// </summary>
-  /// <param name="area">The area to repaint.</param>
-  virtual void APICALL PaintChildren(ID2D1RenderTarget*, const D2D1_RECT_F *area) const = 0;
-
-  /// <summary>
   /// Repositions the pane.
   /// </summary>
   virtual void APICALL Position(LPCNRECT) = 0;

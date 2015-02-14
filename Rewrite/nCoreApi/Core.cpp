@@ -26,6 +26,7 @@ static const struct CoreProcItem {
   CORE_PROC_ITEM(EnumRCLines,               MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(EnumRCLineTokens,          MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(FindPane,                  MakeVersion(0, 9, 0, 0)),
+  CORE_PROC_ITEM(GetChildPainter,           MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(GetCoreVersion,            MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(GetD2DFactory,             MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(GetDisplays,               MakeVersion(0, 9, 0, 0)),

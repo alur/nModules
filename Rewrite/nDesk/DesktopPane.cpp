@@ -60,7 +60,7 @@ LRESULT DesktopPane::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM 
 }
 
 
-LPVOID DesktopPane::AddPane(const IPane *pane) {
+LPVOID DesktopPane::AddPane(const IPane*) {
   return nullptr;
 }
 
@@ -137,13 +137,19 @@ bool DesktopPane::DynamicColorChanged(ID2D1RenderTarget*) {
 
 
 void DesktopPane::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area, const IPane*,
-    LPVOID) const {
+    LPVOID, UINT) const {
   for (const Wallpaper &wallpaper : mWallpapers) {
     D2D1_RECT_F invalidatedArea;
     if (RectIntersection(area, &wallpaper.rect, &invalidatedArea)) {
       renderTarget->FillRectangle(invalidatedArea, wallpaper.brush);
     }
   }
+}
+
+
+void DesktopPane::PaintTransform(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
+    const class IPane *pane, LPVOID painterData, UINT, UINT newState, float) const {
+  Paint(renderTarget, area, pane, painterData, newState);
 }
 
 

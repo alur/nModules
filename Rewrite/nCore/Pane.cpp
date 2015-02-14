@@ -318,7 +318,7 @@ void Pane::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area) const
   if (mVisible && RectIntersection(area, &mRenderingPosition, &invalidatedArea)) {
     renderTarget->PushAxisAlignedClip(invalidatedArea, D2D1_ANTIALIAS_MODE_ALIASED);
     for (int i = 0; i < mPainters.size(); ++i) {
-      mPainters[i]->Paint(renderTarget, &invalidatedArea, (IPane*)this, mPainterData[i]);
+      mPainters[i]->Paint(renderTarget, &invalidatedArea, (IPane*)this, mPainterData[i], 0);
     }
     renderTarget->PopAxisAlignedClip();
   }

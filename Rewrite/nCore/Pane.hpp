@@ -50,12 +50,15 @@ public:
   HWND APICALL GetWindow() const override;
   void APICALL Hide() override;
   void APICALL Lock() override;
-  void APICALL PaintChildren(ID2D1RenderTarget*, const D2D1_RECT_F *area) const override;
   void APICALL Position(LPCNRECT) override;
   void APICALL Repaint(LPCNRECT) override;
   void APICALL SetText(LPCWSTR) override;
   void APICALL Show() override;
   void APICALL Unlock() override;
+
+  // Core only functions (PrivateApi)
+public:
+  void PaintChildren(ID2D1RenderTarget*, const D2D1_RECT_F*) const;
 
 private:
   void DiscardDeviceResources();

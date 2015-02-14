@@ -42,6 +42,12 @@
     <ClCompile Include="ImagePainter.cpp">
       <Filter>Implementations</Filter>
     </ClCompile>
+    <ClCompile Include="PanePrivateApi.cpp">
+      <Filter>Implementations\Pane</Filter>
+    </ClCompile>
+    <ClCompile Include="ChildPainter.cpp">
+      <Filter>Implementations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Displays.hpp" />
@@ -76,6 +82,9 @@
       <Filter>Implementations\StatePainter</Filter>
     </ClInclude>
     <ClInclude Include="ImagePainter.hpp">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildPainter.hpp">
       <Filter>Implementations</Filter>
     </ClInclude>
   </ItemGroup>

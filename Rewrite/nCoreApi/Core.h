@@ -89,6 +89,12 @@ namespace nCore {
   CORE_API_PROC(IPane*, FindPane, LPCWSTR name);
 
   /// <summary>
+  /// Returns a pointer to the child painter singleton. This painter simply paints the children of
+  /// a pane.
+  /// </summary>
+  CORE_API_PROC(IPanePainter*, GetChildPainter);
+
+  /// <summary>
   /// Returns the version of the core that is running.
   /// </summary>
   CORE_API_PROC(VERSION, GetCoreVersion);

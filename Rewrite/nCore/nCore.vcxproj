@@ -93,6 +93,7 @@
     <ClCompile />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ChildPainter.cpp" />
     <ClCompile Include="Displays.cpp" />
     <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="Factories.cpp" />
@@ -103,6 +104,7 @@
     <ClCompile Include="nCore.cpp" />
     <ClCompile Include="Pane.cpp" />
     <ClCompile Include="PaneMessageHandler.cpp" />
+    <ClCompile Include="PanePrivateApi.cpp" />
     <ClCompile Include="PanePublicApi.cpp" />
     <ClCompile Include="Parsers.cpp" />
     <ClCompile Include="SettingsReader.cpp" />
@@ -113,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Api.h" />
+    <ClInclude Include="ChildPainter.hpp" />
     <ClInclude Include="Displays.hpp" />
     <ClInclude Include="EventHandler.hpp" />
     <ClInclude Include="Factories.h" />

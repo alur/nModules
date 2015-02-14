@@ -27,9 +27,9 @@ Label::Label(LPCWSTR name) {
   paneInitData.cbSize = sizeof(PaneInitData);
   paneInitData.messageHandler = this;
   paneInitData.name = name;
-  IPanePainter *painter = (IPanePainter*)mPainter;
-  paneInitData.painters = &painter;
-  paneInitData.numPainters = 1;
+  IPanePainter *painters[] = { mPainter, nCore::GetChildPainter() };
+  paneInitData.painters = painters;
+  paneInitData.numPainters = _countof(painters);
   paneInitData.settingsReader = settingsReader;
   paneInitData.flags = PaneInitData::DynamicText;
   mPane = nCore::CreatePane(&paneInitData);

@@ -24,9 +24,9 @@ Tray::Tray(LPCWSTR name)
   paneInitData.flags = 0;
   paneInitData.messageHandler = this;
   paneInitData.name = name;
-  paneInitData.numPainters = 1;
-  IPanePainter *painter = mPainter;
-  paneInitData.painters = &painter;
+  IPanePainter *painters[] = { mPainter, nCore::GetChildPainter() };
+  paneInitData.numPainters = _countof(painters);
+  paneInitData.painters = painters;
   paneInitData.settingsReader = reader;
   mPane = nCore::CreatePane(&paneInitData);
 

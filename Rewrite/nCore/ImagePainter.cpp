@@ -65,11 +65,17 @@ bool ImagePainter::DynamicColorChanged(ID2D1RenderTarget*) {
 
 
 void ImagePainter::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
-    const IPane*, LPVOID) const {
+    const IPane*, LPVOID, UINT) const {
   D2D1_RECT_F intersection;
   if (mBrush != nullptr && RectIntersection(area, &mPaintingPosition, &intersection)) {
     renderTarget->FillRectangle(intersection, mBrush);
   }
+}
+
+
+void ImagePainter::PaintTransform(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
+    const class IPane *pane, LPVOID painterData, UINT, UINT newState, float) const {
+  Paint(renderTarget, area, pane, painterData, newState);
 }
 
 

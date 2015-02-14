@@ -37,12 +37,29 @@ public:
   virtual bool APICALL DynamicColorChanged(ID2D1RenderTarget *renderTarget) = 0;
 
   /// <summary>
-  ///
+  /// Paints the given area.
   /// </summary>
-  /// <param name="renderTarget"></param>
-  /// <param name="area"></param>
+  /// <param name="renderTarget">The pane's render target.</param>
+  /// <param name="area">The area to paint in.</param>
+  /// <param name="pane">The pane being painted.</param>
+  /// <param name="painterData">The pointer returned by AddPane.</param>
+  /// <param name="state">The current state of the pane.</param>
   virtual void APICALL Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
-    const class IPane *pane, LPVOID painterData) const = 0;
+    const class IPane *pane, LPVOID painterData, UINT state) const = 0;
+
+  /// <summary>
+  /// Paints the given area during a state transformation.
+  /// </summary>
+  /// <param name="renderTarget">The pane's render target.</param>
+  /// <param name="area">The area to paint in.</param>
+  /// <param name="pane">The pane being painted.</param>
+  /// <param name="painterData">The pointer returned by AddPane.</param>
+  /// <param name="oldState">The state we're transitioning from.</param>
+  /// <param name="newState">The state we're transitioning to.</param>
+  /// <param name="time">Transition progress, [0, 1].</param>
+  virtual void APICALL PaintTransform(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
+    const class IPane *pane, LPVOID painterData, UINT oldState, UINT newState,
+    float time) const = 0;
 
   /// <summary>
   /// Called when the rendering position of the pane has changed.
