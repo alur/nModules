@@ -94,6 +94,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BackgroundPainter.cpp" />
+    <ClCompile Include="BackgroundPainterState.cpp" />
     <ClCompile Include="ChildPainter.cpp" />
     <ClCompile Include="Displays.cpp" />
     <ClCompile Include="EventHandler.cpp" />
@@ -109,14 +110,15 @@
     <ClCompile Include="PanePublicApi.cpp" />
     <ClCompile Include="Parsers.cpp" />
     <ClCompile Include="SettingsReader.cpp" />
-    <ClCompile Include="StatePainterData.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="TextPainter.cpp" />
+    <ClCompile Include="TextPainterState.cpp" />
     <ClCompile Include="WindowMonitor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Api.h" />
     <ClInclude Include="BackgroundPainter.hpp" />
+    <ClInclude Include="BackgroundPainterState.hpp" />
     <ClInclude Include="ChildPainter.hpp" />
     <ClInclude Include="Displays.hpp" />
     <ClInclude Include="EventHandler.hpp" />
@@ -130,6 +132,7 @@
     <ClInclude Include="StatePainterData.hpp" />
     <ClInclude Include="State.hpp" />
     <ClInclude Include="TextPainter.hpp" />
+    <ClInclude Include="TextPainterState.hpp" />
     <ClInclude Include="WindowMonitor.hpp" />
   </ItemGroup>
   <ItemGroup>

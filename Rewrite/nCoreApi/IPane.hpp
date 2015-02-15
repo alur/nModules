@@ -30,7 +30,7 @@ struct PaneInitData {
   // configuration settings.
   const ISettingsReader *settingsReader;
   BYTE numStates;
-  StateDefinition *states;
+  const StateDefinition *states;
 
   enum Flag : DWORD64 {
     // Set for the desktop window.
@@ -45,6 +45,16 @@ struct PaneInitData {
 /// </summary>
 class IPane : public IMessageHandler, public IDiscardable {
 public:
+  /// <summary>
+  /// Activates the given state.
+  /// </summary>
+  virtual void APICALL ActivateState(BYTE state) = 0;
+
+  /// <summary>
+  /// Clears the given state.
+  /// </summary>
+  virtual void APICALL ClearState(BYTE state) = 0;
+
   /// <summary>
   /// Creates a child of this pane.
   /// </summary>

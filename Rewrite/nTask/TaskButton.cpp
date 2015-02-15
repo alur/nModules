@@ -10,6 +10,8 @@
 extern BOOL gActiveWindowTracking;
 extern HWND gActiveWindow;
 extern HWND gPreviouslyActiveWindow;
+extern StateDefinition gButtonStates[];
+extern BYTE gNumButtonStates;
 
 
 TaskButton::TaskButton(IPane *parent, IPainter *backgroundPainter, IPainter *textPainter,
@@ -38,6 +40,8 @@ TaskButton::TaskButton(IPane *parent, IPainter *backgroundPainter, IPainter *tex
   IPainter *painters[] = { backgroundPainter, textPainter, mIconPainter, mOverlayIconPainter };
   initData.painters = painters;
   initData.numPainters = _countof(painters);
+  initData.states = gButtonStates;
+  initData.numStates = gNumButtonStates;
   mPane = parent->CreateChild(&initData);
 
   wchar_t windowText[256];
@@ -96,6 +100,14 @@ void TaskButton::Redraw(DWORD parts) {
 
 LRESULT TaskButton::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, NPARAM) {
   switch (msg) {
+  case WM_MOUSEMOVE:
+    mPane->ActivateState(State::Hover);
+    return 0;
+
+  case WM_MOUSELEAVE:
+    mPane->ClearState(State::Hover);
+    return 0;
+
   case WM_LBUTTONUP:
     SelectTask();
     return 0;

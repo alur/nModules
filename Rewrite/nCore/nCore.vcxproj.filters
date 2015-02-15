@@ -27,9 +27,6 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Implementations</Filter>
     </ClCompile>
-    <ClCompile Include="StatePainterData.cpp">
-      <Filter>Implementations\StatePainter</Filter>
-    </ClCompile>
     <ClCompile Include="MessageRegistrar.cpp">
       <Filter>Services</Filter>
     </ClCompile>
@@ -50,6 +47,12 @@
     </ClCompile>
     <ClCompile Include="ChildPainter.cpp">
       <Filter>Implementations\Painters</Filter>
+    </ClCompile>
+    <ClCompile Include="TextPainterState.cpp">
+      <Filter>Implementations\Painters\TextPainter</Filter>
+    </ClCompile>
+    <ClCompile Include="BackgroundPainterState.cpp">
+      <Filter>Implementations\Painters\BackgroundPainter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,6 +95,12 @@
     </ClInclude>
     <ClInclude Include="ChildPainter.hpp">
       <Filter>Implementations\Painters</Filter>
+    </ClInclude>
+    <ClInclude Include="TextPainterState.hpp">
+      <Filter>Implementations\Painters\TextPainter</Filter>
+    </ClInclude>
+    <ClInclude Include="BackgroundPainterState.hpp">
+      <Filter>Implementations\Painters\BackgroundPainter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

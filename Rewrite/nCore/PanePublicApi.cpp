@@ -17,6 +17,29 @@ EXPORT_CDECL(IPane*) FindPane() {
 }
 
 
+void Pane::ActivateState(BYTE state) {
+  if (!mActiveStates[state]) {
+    mActiveStates[state] = true;
+    if (state > mCurrentState) {
+      mCurrentState = state;
+      Repaint(mRenderingPosition, true);
+    }
+  }
+}
+
+
+void Pane::ClearState(BYTE state) {
+  if (mActiveStates[state]) {
+    mActiveStates[state] = false;
+    if (mCurrentState == state) {
+      for (; state > 0 && !mActiveStates[state]; --state);
+      mCurrentState = state;
+      Repaint(mRenderingPosition, true);
+    }
+  }
+}
+
+
 IPane *Pane::CreateChild(const PaneInitData *initData) {
   Pane *pane = new Pane(initData, this);
   mChildren.insert(pane);

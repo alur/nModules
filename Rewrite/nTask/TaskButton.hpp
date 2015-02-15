@@ -16,7 +16,7 @@ public:
     Progress = 8
   };
 
-  enum class State : BYTE {
+  enum State : BYTE {
     Minimized = 1,
     Flashing = 2,
     MinimizedFlashing = 3,
@@ -27,10 +27,6 @@ public:
     FlashingHover = 8,
     MinimizedFlashingHover = 9
   };
-
-  BYTE operator()(State &state) {
-    return (BYTE)state;
-  }
 
 public:
   TaskButton(IPane *pane, IPainter *bcakgroundPainter, IPainter *textPainter,

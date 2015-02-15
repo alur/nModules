@@ -42,6 +42,8 @@ public:
 
   // IPane (PublicApi)
 public:
+  void APICALL ActivateState(BYTE state) override;
+  void APICALL ClearState(BYTE state) override;
   IPane* APICALL CreateChild(const PaneInitData*) override;
   float APICALL EvaluateLength(const NLENGTH &length, bool horizontal) const override;
   D2D1_RECT_F APICALL EvaluateRect(const NRECT &rect) const override;
@@ -121,6 +123,15 @@ private:
   bool mDynamicText;
 
   bool mCoveredByFullscreenWindow;
+
+  Pane *mActiveChild;
+  TRACKMOUSEEVENT mTrackMouseEvent;
+  bool mIsTrackingMouse;
+
+  // State stuff, all panes.
+private:
+  BYTE mCurrentState;
+  std::vector<bool> mActiveStates;
 
   // Set on all panes, but created & destroyed by the top-level.
 private:

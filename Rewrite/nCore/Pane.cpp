@@ -72,12 +72,16 @@ void Pane::DestroyWindowClasses(HINSTANCE instance) {
 
 Pane::Pane(const PaneInitData *initData, Pane *parent)
   : mMessageHandler(initData->messageHandler)
+  , mCurrentState(0)
+  , mActiveStates(initData->numStates + 1, false)
   , mParent(parent)
   , mRenderTarget(nullptr)
   , mText(nullptr)
   , mUpdateLock(0)
   , mVisible(false)
   , mWindow(nullptr)
+  , mActiveChild(nullptr)
+  , mIsTrackingMouse(false)
 {
   mName[0] = L'\0';
   if (initData->name) {
@@ -168,6 +172,12 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
       (int)mSize.width, (int)mSize.height, parentWindow, nullptr, gInstance, this);
     SetWindowLongPtr(mWindow, GWLP_USERDATA, MAGIC_DWORD);
     SetWindowPos(mWindow, insertAfter, 0, 0, 0, 0, windowPosFlags);
+
+    ZeroMemory(&mTrackMouseEvent, sizeof(TRACKMOUSEEVENT));
+    mTrackMouseEvent.cbSize = sizeof(TRACKMOUSEEVENT);
+    mTrackMouseEvent.hwndTrack = mWindow;
+    mTrackMouseEvent.dwFlags = TME_LEAVE;
+    mTrackMouseEvent.dwHoverTime = 200;
 
     MARGINS margins;
     ZeroMemory(&margins, sizeof(MARGINS));
@@ -318,7 +328,8 @@ void Pane::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area) const
   if (mVisible && RectIntersection(area, &mRenderingPosition, &invalidatedArea)) {
     renderTarget->PushAxisAlignedClip(invalidatedArea, D2D1_ANTIALIAS_MODE_ALIASED);
     for (int i = 0; i < mPainters.size(); ++i) {
-      mPainters[i]->Paint(renderTarget, &invalidatedArea, (IPane*)this, mPainterData[i], 0);
+      mPainters[i]->Paint(renderTarget, &invalidatedArea, (IPane*)this, mPainterData[i],
+        mCurrentState);
     }
     renderTarget->PopAxisAlignedClip();
   }

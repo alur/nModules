@@ -8,7 +8,7 @@
 #include <algorithm>
 
 // TODO(Erik):Simplify this
-const StateDefinition sButtonStates[] = {
+StateDefinition gButtonStates[] = {
   { L"Minimized",               0x0000, 0 }, // 1
   { L"Flashing",                0x0000, 0 }, // 2
   { L"MinimizedFlashing",       0x0003, 2 }, // 3
@@ -20,9 +20,12 @@ const StateDefinition sButtonStates[] = {
   { L"MinimizedFlashingHover",  0x0013, 8 }  // 9
 };
 
+BYTE gNumButtonStates = _countof(gButtonStates);
+
 /*DefaultSettings sButtonDefaults = {
 
 };*/
+
 
 Taskbar::Taskbar(LPCWSTR prefix)
   : mPane(nullptr)
@@ -52,10 +55,9 @@ Taskbar::Taskbar(LPCWSTR prefix)
 
   ISettingsReader *buttonReader = reader->CreateChild(L"Button");
   mButtonEventHandler = nCore::CreateEventHandler(buttonReader);
-  mButtonBackgroundPainter = nCore::CreateBackgroundPainter(buttonReader, sButtonStates,
-    _countof(sButtonStates));
-  mButtonTextPainter = nCore::CreateTextPainter(buttonReader, sButtonStates,
-    _countof(sButtonStates));
+  mButtonBackgroundPainter = nCore::CreateBackgroundPainter(buttonReader, gButtonStates,
+    gNumButtonStates);
+  mButtonTextPainter = nCore::CreateTextPainter(buttonReader, gButtonStates, gNumButtonStates);
 
   mButtonWidth = buttonReader->GetLength(L"Width", NLENGTH(0, 0, 150));
   mButtonHeight = buttonReader->GetLength(L"Height", NLENGTH(0, 0, 36));

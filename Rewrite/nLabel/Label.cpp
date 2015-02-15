@@ -27,6 +27,8 @@ Label::Label(LPCWSTR name) {
   paneInitData.numPainters = _countof(painters);
   paneInitData.settingsReader = reader;
   paneInitData.flags = PaneInitData::DynamicText;
+  paneInitData.states = sStates;
+  paneInitData.numStates = _countof(sStates);
   mPane = nCore::CreatePane(&paneInitData);
 
   wchar_t buffer[MAX_LINE_LENGTH];
@@ -49,5 +51,14 @@ Label::~Label() {
 
 
 LRESULT Label::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, NPARAM) {
+  switch (message) {
+  case WM_MOUSEMOVE:
+    mPane->ActivateState(1);
+    return 0;
+
+  case WM_MOUSELEAVE:
+    mPane->ClearState(1);
+    return 0;
+  }
   return mEventHandler->HandleMessage(window, message, wParam, lParam, nullptr);
 }

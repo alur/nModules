@@ -40,15 +40,39 @@ LRESULT Pane::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam,
       }
     }
 
+    if (msg == WM_MOUSEMOVE) {
+      if (!mIsTrackingMouse && mWindow) {
+        mIsTrackingMouse = true;
+        TrackMouseEvent(&mTrackMouseEvent);
+      }
+    }
+
+    if (handler != mActiveChild) {
+      if (mActiveChild) {
+        mActiveChild->HandleMessage(window, WM_MOUSELEAVE, 0, 0, 0);
+      } else {
+        mMessageHandler->HandleMessage(window, WM_MOUSEMOVE, wParam, lParam, 0);
+      }
+      mActiveChild = (Pane*)handler;
+    }
+
     // Just let our message handler deal with it.
     if (handler == nullptr) {
       handler = mMessageHandler;
     }
 
-    return handler->HandleMessage(window, msg, wParam, lParam, (NPARAM)this);
+    return handler->HandleMessage(window, msg, wParam, lParam, 0);
   }
 
   switch (msg) {
+  case WM_MOUSELEAVE:
+    mIsTrackingMouse = false;
+    if (mActiveChild) {
+      mActiveChild->HandleMessage(window, WM_MOUSELEAVE, 0, 0, 0);
+      mActiveChild = nullptr;
+    }
+    break;
+
   case WM_ERASEBKGND:
     return 1;
 

@@ -10,57 +10,48 @@ EXPORT_CDECL(IDiscardablePainter*) CreateBackgroundPainter(
 }
 
 
-BackgroundPainter::BackgroundPainter(const ISettingsReader *reader, const StateDefinition*,
+BackgroundPainter::BackgroundPainter(const ISettingsReader *reader, const StateDefinition *states,
   BYTE numStates)
-    : mBrush(nullptr)
-    , mStateCount(numStates + 1)
+    : mStateCount(numStates + 1)
     , mResourceRefCount(0) {
-  /*std::allocator<State> stateAllocator;
+  std::allocator<BackgroundPainterState> stateAllocator;
   mStates = stateAllocator.allocate(mStateCount);
-  stateAllocator.construct(&mStates[0], initData->settingsReader, nullptr);
+  stateAllocator.construct(&mStates[0], reader, nullptr);
   for (int i = 1; i < mStateCount; ++i) {
-    StatePainterInitData::State &state = initData->states[i - 1];
+    const StateDefinition &state = states[i - 1];
     assert(state.base < i);
-    ISettingsReader *reader = initData->settingsReader->CreateChild(state.name);
-    stateAllocator.construct(&mStates[i], initData->settingsReader, &mStates[state.base]);
-    reader->Discard();
+    ISettingsReader *stateReader = reader->CreateChild(state.name);
+    stateAllocator.construct(&mStates[i], stateReader, &mStates[state.base]);
+    stateReader->Discard();
   }
-
-  mTextPadding.left = initData->settingsReader->GetLength(L"TextOffsetLeft", NLENGTH(0, 0, 0));
-  mTextPadding.top = initData->settingsReader->GetLength(L"TextOffsetTop", NLENGTH(0, 0, 0));
-  mTextPadding.right = initData->settingsReader->GetLength(L"TextOffsetRight", NLENGTH(0, 0, 0));
-  mTextPadding.bottom = initData->settingsReader->GetLength(L"TextOffsetBottom", NLENGTH(0, 0, 0));
-  */
-
-  DWORD color = (DWORD)reader->GetInt64(L"Color", 0x55C0448F);
-  mColor.a = (color >> 24) / 255.0f;
-  mColor.r = (color >> 16 & 0xFF) / 255.0f;
-  mColor.g = (color >> 8 & 0xFF) / 255.0f;
-  mColor.b = (color & 0xFF) / 255.0f;
 }
 
 
 BackgroundPainter::~BackgroundPainter() {
-  /*std::allocator<State> stateAllocator;
+  std::allocator<BackgroundPainterState> stateAllocator;
   for (int i = 0; i < mStateCount; ++i) {
     stateAllocator.destroy(&mStates[i]);
   }
-  stateAllocator.deallocate(mStates, mStateCount);*/
+  stateAllocator.deallocate(mStates, mStateCount);
 }
 
 
 LPVOID BackgroundPainter::AddPane(const IPane *pane) {
-  return nullptr;
+  PerPaneData *data = new PerPaneData();
+  data->stateData.resize(mStateCount);
+  PositionChanged(pane, data, pane->GetRenderingPosition(), true, true);
+  return data;
 }
 
 
 HRESULT BackgroundPainter::CreateDeviceResources(ID2D1RenderTarget *renderTarget) {
+  HRESULT hr = S_OK;
   if (mResourceRefCount++ == 0) {
-    ID2D1SolidColorBrush *brush;
-    renderTarget->CreateSolidColorBrush(mColor, &brush);
-    mBrush = brush;
+    for (int i = 0; i < mStateCount && SUCCEEDED(hr); ++i) {
+      hr = mStates[i].CreateDeviceResources(renderTarget);
+    }
   }
-  return S_OK;
+  return hr;
 }
 
 
@@ -71,7 +62,9 @@ void BackgroundPainter::Discard() {
 
 void BackgroundPainter::DiscardDeviceResources() {
   if (--mResourceRefCount == 0) {
-    SAFERELEASE(mBrush);
+    for (int i = 0; i < mStateCount; ++i) {
+      mStates[i].DiscardDeviceResources();
+    }
   }
   assert(mResourceRefCount >= 0);
 }
@@ -84,7 +77,8 @@ bool BackgroundPainter::DynamicColorChanged(ID2D1RenderTarget*) {
 
 void BackgroundPainter::Paint(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
     const IPane *pane, LPVOID data, UINT state) const {
-  renderTarget->FillRectangle(area, mBrush);
+  PerPaneData *paneData = (PerPaneData*)data;
+  mStates[state].Paint(renderTarget, area, paneData->stateData[state], pane);
 }
 
 
@@ -94,8 +88,12 @@ void BackgroundPainter::PaintTransform(ID2D1RenderTarget *renderTarget, const D2
 }
 
 
-void BackgroundPainter::PositionChanged(const IPane*, LPVOID, const D2D1_RECT_F&,
-    bool, bool) {
+void BackgroundPainter::PositionChanged(const IPane *pane, LPVOID data,
+    const D2D1_RECT_F &position, bool isResize, bool isMove) {
+  PerPaneData *paneData = (PerPaneData*)data;
+  for (int i = 0; i < mStateCount; ++i) {
+    mStates[i].PositionChanged(pane, paneData->stateData[i], position, isResize, isMove);
+  }
 }
 
 

@@ -1,10 +1,20 @@
 #pragma once
 
+#include "BackgroundPainterState.hpp"
+
 #include "../nCoreApi/IDiscardablePainter.hpp"
 #include "../nCoreApi/IPane.hpp"
 
+#include <vector>
+
 // TODO(Erik): Make this support rendering to different top-level windows.
 class BackgroundPainter : public IDiscardablePainter {
+private:
+  struct PerPaneData {
+    D2D1_ROUNDED_RECT position;
+    std::vector<BackgroundPainterState::PerPaneData> stateData;
+  };
+
 public:
   explicit BackgroundPainter(const ISettingsReader*, const StateDefinition*, BYTE numStates);
   ~BackgroundPainter();
@@ -32,10 +42,5 @@ public:
 private:
   int mResourceRefCount;
   int mStateCount;
-  //State *mStates;
-
-  // TODO(Erik): Move these out of here
-private:
-  ID2D1Brush *mBrush;
-  D2D_COLOR_F mColor;
+  BackgroundPainterState *mStates;
 };
