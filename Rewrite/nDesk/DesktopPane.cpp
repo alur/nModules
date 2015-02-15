@@ -20,7 +20,7 @@ DesktopPane::DesktopPane()
   initData.cbSize = sizeof(PaneInitData);
   initData.name = nullptr;
   initData.messageHandler = (IMessageHandler*)this;
-  IPanePainter *painter = (IPanePainter*)this;
+  IPainter *painter = (IPainter*)this;
   initData.painters = &painter;
   initData.numPainters = 1;
   initData.flags = PaneInitData::DesktopWindow;
@@ -32,7 +32,7 @@ DesktopPane::DesktopPane()
 
 DesktopPane::~DesktopPane() {
   if (mPane != nullptr) {
-    mPane->Destroy();
+    mPane->Discard();
   }
 }
 

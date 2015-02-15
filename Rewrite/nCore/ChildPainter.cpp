@@ -3,7 +3,7 @@
 #include "Pane.hpp"
 
 
-EXPORT_CDECL(IPanePainter*) GetChildPainter() {
+EXPORT_CDECL(IPainter*) GetChildPainter() {
   static ChildPainter childPainter;
   return &childPainter;
 }

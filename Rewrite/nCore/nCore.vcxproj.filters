@@ -30,23 +30,26 @@
     <ClCompile Include="StatePainterData.cpp">
       <Filter>Implementations\StatePainter</Filter>
     </ClCompile>
-    <ClCompile Include="StatePainter.cpp">
-      <Filter>Implementations\StatePainter</Filter>
-    </ClCompile>
     <ClCompile Include="MessageRegistrar.cpp">
       <Filter>Services</Filter>
     </ClCompile>
     <ClCompile Include="State.cpp">
       <Filter>Implementations\StatePainter</Filter>
     </ClCompile>
-    <ClCompile Include="ImagePainter.cpp">
-      <Filter>Implementations</Filter>
-    </ClCompile>
     <ClCompile Include="PanePrivateApi.cpp">
       <Filter>Implementations\Pane</Filter>
     </ClCompile>
+    <ClCompile Include="BackgroundPainter.cpp">
+      <Filter>Implementations\Painters\BackgroundPainter</Filter>
+    </ClCompile>
+    <ClCompile Include="TextPainter.cpp">
+      <Filter>Implementations\Painters\TextPainter</Filter>
+    </ClCompile>
+    <ClCompile Include="ImagePainter.cpp">
+      <Filter>Implementations\Painters</Filter>
+    </ClCompile>
     <ClCompile Include="ChildPainter.cpp">
-      <Filter>Implementations</Filter>
+      <Filter>Implementations\Painters</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -75,17 +78,20 @@
     <ClInclude Include="StatePainterData.hpp">
       <Filter>Implementations\StatePainter</Filter>
     </ClInclude>
-    <ClInclude Include="StatePainter.hpp">
-      <Filter>Implementations\StatePainter</Filter>
-    </ClInclude>
     <ClInclude Include="State.hpp">
       <Filter>Implementations\StatePainter</Filter>
     </ClInclude>
+    <ClInclude Include="BackgroundPainter.hpp">
+      <Filter>Implementations\Painters\BackgroundPainter</Filter>
+    </ClInclude>
+    <ClInclude Include="TextPainter.hpp">
+      <Filter>Implementations\Painters\TextPainter</Filter>
+    </ClInclude>
     <ClInclude Include="ImagePainter.hpp">
-      <Filter>Implementations</Filter>
+      <Filter>Implementations\Painters</Filter>
     </ClInclude>
     <ClInclude Include="ChildPainter.hpp">
-      <Filter>Implementations</Filter>
+      <Filter>Implementations\Painters</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +106,15 @@
     </Filter>
     <Filter Include="Implementations\StatePainter">
       <UniqueIdentifier>{c67b0794-f7fc-4f6c-9e6b-42500f5a40d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Implementations\Painters">
+      <UniqueIdentifier>{53268efa-2098-485f-b208-0fadaf0e1963}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Implementations\Painters\BackgroundPainter">
+      <UniqueIdentifier>{8c246bc6-78d8-499f-b2c2-9b8a447aa90d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Implementations\Painters\TextPainter">
+      <UniqueIdentifier>{d8d73dd3-90b7-4c54-8e7a-26a88dbcf6bc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

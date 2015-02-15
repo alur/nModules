@@ -9,9 +9,8 @@
 //#include <Windowsx.h>
 
 
-TrayIcon::TrayIcon(IPane *parent, IStatePainter *painter, IconData &data)
+TrayIcon::TrayIcon(IPane *parent, IPainter *painter, IconData &data)
   : mData(data)
-  , mStatePainter(painter)
 {
   mIconPainter = nCore::CreateImagePainter();
   mIconPainter->SetImage(data.icon);
@@ -20,16 +19,16 @@ TrayIcon::TrayIcon(IPane *parent, IStatePainter *painter, IconData &data)
   ZeroMemory(&initData, sizeof(PaneInitData));
   initData.cbSize = sizeof(PaneInitData);
   initData.messageHandler = this;
-  IPanePainter *painters[] = { mStatePainter, mIconPainter };
+  IPainter *painters[] = { painter, mIconPainter };
   initData.painters = painters;
-  initData.numPainters = 2;
+  initData.numPainters = _countof(painters);
   mPane = parent->CreateChild(&initData);
 }
 
 
 TrayIcon::~TrayIcon() {
-  mPane->Destroy();
-  mIconPainter->Destroy();
+  mPane->Discard();
+  mIconPainter->Discard();
 }
 
 

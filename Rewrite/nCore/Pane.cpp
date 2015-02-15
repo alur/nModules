@@ -229,7 +229,7 @@ Pane::~Pane() {
 
 void Pane::DiscardDeviceResources() {
   if (mRenderTarget) {
-    for (IPanePainter *painter : mPainters) {
+    for (IPainter *painter : mPainters) {
       painter->DiscardDeviceResources();
     }
     for (Pane *child : mChildren) {

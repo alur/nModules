@@ -4,9 +4,9 @@
 
 #include "../nShared/LayoutSettings.hpp"
 
+#include "../nCoreApi/IDiscardablePainter.hpp"
 #include "../nCoreApi/IEventHandler.hpp"
 #include "../nCoreApi/IPane.hpp"
-#include "../nCoreApi/IStatePainter.hpp"
 
 #include <list>
 #include <unordered_map>
@@ -42,12 +42,13 @@ private:
 
 private:
   IPane *mPane;
-  IStatePainter *mPainter;
+  IDiscardablePainter *mBackgroundPainter;
   IEventHandler *mEventHandler;
   int mLock;
 
 private:
-  IStatePainter *mButtonPainter;
+  IDiscardablePainter *mButtonTextPainter;
+  IDiscardablePainter *mButtonBackgroundPainter;
   IEventHandler *mButtonEventHandler;
   std::list<TaskButton> mButtons;
   std::unordered_map<HWND, std::list<TaskButton>::iterator> mButtonMap;

@@ -4,13 +4,12 @@
 
 #include "../nCoreApi/IImagePainter.hpp"
 #include "../nCoreApi/IPane.hpp"
-#include "../nCoreApi/IStatePainter.hpp"
 
 #include "../nUtilities/lsapi.h"
 
 class TrayIcon : public IMessageHandler {
 public:
-  TrayIcon(IPane *parent, IStatePainter *painter, IconData &data);
+  TrayIcon(IPane *parent, IPainter *painter, IconData &data);
   ~TrayIcon();
 
 public:
@@ -32,6 +31,5 @@ private:
   IPane *mPane;
   IconData &mData;
 
-  IStatePainter * const mStatePainter;
   IImagePainter *mIconPainter;
 };

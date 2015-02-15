@@ -74,6 +74,8 @@
   <ItemGroup>
     <ClInclude Include="Core.h" />
     <ClInclude Include="ApiDefs.h" />
+    <ClInclude Include="IDiscardablePainter.hpp" />
+    <ClInclude Include="IDiscardable.hpp" />
     <ClInclude Include="IDisplays.hpp" />
     <ClInclude Include="IEventHandler.hpp" />
     <ClInclude Include="IEventProcessor.hpp" />
@@ -83,9 +85,8 @@
     <ClInclude Include="ILogger.hpp" />
     <ClInclude Include="IMessageHandler.hpp" />
     <ClInclude Include="IPane.hpp" />
-    <ClInclude Include="IPanePainter.hpp" />
+    <ClInclude Include="IPainter.hpp" />
     <ClInclude Include="ISettingsReader.hpp" />
-    <ClInclude Include="IStatePainter.hpp" />
     <ClInclude Include="Messages.h" />
     <ClInclude Include="TaskWindow.h" />
   </ItemGroup>

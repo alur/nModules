@@ -11,10 +11,13 @@ public:
 private:
   SettingsReader();
 
+  // IDiscardable
+public:
+  void APICALL Discard() override;
+
   // ISettingsReader
 public:
   ISettingsReader* APICALL CreateChild(LPCWSTR) const override;
-  void APICALL Destroy() override;
 
   bool APICALL GetBool(LPCWSTR key, bool defaultValue) const override;
   bool APICALL GetBool(LPCWSTR key, bool *value) const override;

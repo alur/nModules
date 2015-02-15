@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IDiscardablePainter.hpp"
 #include "IDisplays.hpp"
 #include "IEventHandler.hpp"
 #include "IEventProcessor.hpp"
@@ -7,7 +8,6 @@
 #include "ILogger.hpp"
 #include "IPane.hpp"
 #include "ISettingsReader.hpp"
-#include "IStatePainter.hpp"
 #include "TaskWindow.h"
 
 #include "../nUtilities/Version.h"
@@ -23,6 +23,12 @@ namespace nCore {
   /// </summary>
   /// <param name="minVersion">The minimum supported version of nCore.</param>
   HRESULT Connect(VERSION minVersion);
+
+  /// <summary>
+  /// Creates a background painter.
+  /// </summary>
+  CORE_API_PROC(IDiscardablePainter*, CreateBackgroundPainter, const ISettingsReader*,
+    const StateDefinition *states, BYTE numStates);
 
   /// <summary>
   /// Creates a new EventHandler. The caller must eventually call ->Destroy().
@@ -56,10 +62,10 @@ namespace nCore {
   CORE_API_PROC(ISettingsReader*, CreateSettingsReader, LPCWSTR prefix);
 
   /// <summary>
-  /// Creates a new EventHandler. The caller must eventually call ->Destroy().
+  /// Creates a text painter.
   /// </summary>
-  /// <param name="initData"></param>
-  CORE_API_PROC(IStatePainter*, CreateStatePainter, const StatePainterInitData *initData);
+  CORE_API_PROC(IDiscardablePainter*, CreateTextPainter, const ISettingsReader*,
+    const StateDefinition *states, BYTE numStates);
 
   /// <summary>
   /// Disconnects from the core.
@@ -92,7 +98,7 @@ namespace nCore {
   /// Returns a pointer to the child painter singleton. This painter simply paints the children of
   /// a pane.
   /// </summary>
-  CORE_API_PROC(IPanePainter*, GetChildPainter);
+  CORE_API_PROC(IPainter*, GetChildPainter);
 
   /// <summary>
   /// Returns the version of the core that is running.

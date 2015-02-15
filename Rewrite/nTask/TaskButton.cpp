@@ -12,13 +12,13 @@ extern HWND gActiveWindow;
 extern HWND gPreviouslyActiveWindow;
 
 
-TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eventHandler, HWND window)
+TaskButton::TaskButton(IPane *parent, IPainter *backgroundPainter, IPainter *textPainter,
+    IEventHandler *eventHandler, HWND window)
   : mEventHandler(eventHandler)
   , mIconPainter(nullptr)
   , mMenu(nullptr)
   , mMenuWindow(nullptr)
   , mOverlayIconPainter(nullptr)
-  , mStatePainter(painter)
   , mWindow(window)
 {
   mIconPosition = NRECT(NLENGTH(0, 0, 0), NLENGTH(0, 0, 0), NLENGTH(0, 0, 32), NLENGTH(0, 0, 32));
@@ -35,9 +35,9 @@ TaskButton::TaskButton(IPane *parent, IStatePainter *painter, IEventHandler *eve
   ZeroMemory(&initData, sizeof(PaneInitData));
   initData.cbSize = sizeof(PaneInitData);
   initData.messageHandler = this;
-  IPanePainter *painters[] = { mStatePainter, mIconPainter, mOverlayIconPainter };
+  IPainter *painters[] = { backgroundPainter, textPainter, mIconPainter, mOverlayIconPainter };
   initData.painters = painters;
-  initData.numPainters = 3;
+  initData.numPainters = _countof(painters);
   mPane = parent->CreateChild(&initData);
 
   wchar_t windowText[256];
@@ -58,9 +58,9 @@ TaskButton::~TaskButton() {
     PostMessage(mMenuWindow, WM_CANCELMODE, 0, 0);
     mMenuThread.join();
   }
-  mPane->Destroy();
-  mIconPainter->Destroy();
-  mOverlayIconPainter->Destroy();
+  mPane->Discard();
+  mIconPainter->Discard();
+  mOverlayIconPainter->Discard();
 }
 
 

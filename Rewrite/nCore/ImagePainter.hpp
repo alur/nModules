@@ -7,7 +7,11 @@ public:
   ImagePainter();
   ~ImagePainter();
 
-  // IPanePainter
+  // IDiscardable
+public:
+  void APICALL Discard() override;
+
+  // IPainter
 public:
   LPVOID APICALL AddPane(const IPane *pane) override;
   HRESULT APICALL CreateDeviceResources(ID2D1RenderTarget *renderTarget) override;
@@ -25,7 +29,6 @@ public:
 
   // IImagePainter
 public:
-  void APICALL Destroy() override;
   void APICALL SetPosition(NRECT position, const IPane *pane) override;
   void APICALL SetImage(HICON icon) override;
   void APICALL SetImage(HBITMAP bitmap) override;

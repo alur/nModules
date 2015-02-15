@@ -13,7 +13,7 @@ EventHandler::EventHandler(const ISettingsReader *settingsReader) {
 }
 
 
-void EventHandler::Destroy() {
+void EventHandler::Discard() {
   delete this;
 }
 

@@ -9,14 +9,7 @@ Tray::Tray(LPCWSTR name)
   : mLock(1)
 {
   ISettingsReader *reader = nCore::CreateSettingsReader(name);
-
-  StatePainterInitData painterInitData;
-  ZeroMemory(&painterInitData, sizeof(StatePainterInitData));
-  painterInitData.cbSize = sizeof(StatePainterInitData);
-  painterInitData.numStates = 0;
-  painterInitData.states = nullptr;
-  painterInitData.settingsReader = reader;
-  mPainter = nCore::CreateStatePainter(&painterInitData);
+  mPainter = nCore::CreateBackgroundPainter(reader, nullptr, 0);
 
   PaneInitData paneInitData;
   ZeroMemory(&paneInitData, sizeof(PaneInitData));
@@ -24,25 +17,17 @@ Tray::Tray(LPCWSTR name)
   paneInitData.flags = 0;
   paneInitData.messageHandler = this;
   paneInitData.name = name;
-  IPanePainter *painters[] = { mPainter, nCore::GetChildPainter() };
+  IPainter *painters[] = { mPainter, nCore::GetChildPainter() };
   paneInitData.numPainters = _countof(painters);
   paneInitData.painters = painters;
   paneInitData.settingsReader = reader;
   mPane = nCore::CreatePane(&paneInitData);
 
   ISettingsReader *iconReader = reader->CreateChild(L"Icon");
+  mIconPainter = nCore::CreateBackgroundPainter(iconReader, nullptr, 0);
+  iconReader->Discard();
 
-  StatePainterInitData buttonPainterInitData;
-  ZeroMemory(&buttonPainterInitData, sizeof(StatePainterInitData));
-  buttonPainterInitData.cbSize = sizeof(StatePainterInitData);
-  buttonPainterInitData.numStates = 0;
-  buttonPainterInitData.states = nullptr;
-  buttonPainterInitData.settingsReader = iconReader;
-  mIconPainter = nCore::CreateStatePainter(&buttonPainterInitData);
-
-  iconReader->Destroy();
-
-  reader->Destroy();
+  reader->Discard();
 }
 
 
@@ -50,9 +35,9 @@ Tray::~Tray() {
   mPane->Lock();
 
   mIcons.clear();
-  mIconPainter->Destroy();
-  mPane->Destroy();
-  mPainter->Destroy();
+  mIconPainter->Discard();
+  mPane->Discard();
+  mPainter->Discard();
 }
 
 
@@ -66,7 +51,7 @@ void Tray::Initialized() {
 std::list<TrayIcon>::iterator Tray::AddIcon(IconData &data) {
   mPane->Lock();
 
-  mIcons.emplace_back(mPane, mIconPainter, data);
+  mIcons.emplace_back(mPane, (IPainter*)mIconPainter, data);
   Relayout();
   mIcons.back().Show();
 

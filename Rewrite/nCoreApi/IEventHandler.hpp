@@ -1,17 +1,13 @@
 #pragma once
 
 #include "ApiDefs.h"
+#include "IDiscardable.hpp"
 #include "IEventProcessor.hpp"
 
 #include "../nUtilities/Windows.h"
 
-class IEventHandler {
+class IEventHandler : public IDiscardable {
 public:
-  /// <summary>
-  /// Destroys the event handler.
-  /// </summary>
-  virtual void APICALL Destroy() = 0;
-
   /// <summary>
   /// Handles a window message.
   /// </summary>

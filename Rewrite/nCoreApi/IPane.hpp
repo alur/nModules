@@ -1,26 +1,36 @@
 #pragma once
 
 #include "ApiDefs.h"
+#include "IDiscardable.hpp"
 #include "IMessageHandler.hpp"
-#include "IPanePainter.hpp"
+#include "IPainter.hpp"
 #include "ISettingsReader.hpp"
 
 #include "../nUtilities/d2d1.h"
 #include "../nUtilities/Lengths.h"
 
-/// <summary>
-///
-/// </summary>
+struct StateDefinition {
+  LPCWSTR name;
+  // Bitfield of depedencies. A state with dependencies set is automatically activated when all
+  // of its dependencies are active, and cleared when they are not.
+  ULONGLONG dependencies;
+  // The base for this state. If a setting isn't specified in this state, the one from the base
+  // state will be used instead.
+  BYTE base;
+};
+
 struct PaneInitData {
   size_t cbSize;
   LPCWSTR name;
   DWORD64 flags;
   IMessageHandler *messageHandler;
-  class IPanePainter **painters;
+  class IPainter **painters;
   size_t numPainters;
   // The settings reader to use. This may be null, if you would like the pane not to read
   // configuration settings.
   const ISettingsReader *settingsReader;
+  BYTE numStates;
+  StateDefinition *states;
 
   enum Flag : DWORD64 {
     // Set for the desktop window.
@@ -33,17 +43,12 @@ struct PaneInitData {
 /// <summary>
 /// A part of a window.
 /// </summary>
-class IPane : public IMessageHandler {
+class IPane : public IMessageHandler, public IDiscardable {
 public:
   /// <summary>
   /// Creates a child of this pane.
   /// </summary>
   virtual IPane *APICALL CreateChild(const PaneInitData*) = 0;
-
-  /// <summary>
-  /// Destroys the pane.
-  /// </summary>
-  virtual void APICALL Destroy() = 0;
 
   /// <summary>
   /// Returns the current value of the given length.
@@ -62,7 +67,7 @@ public:
   /// Returns the painter data for this pane. Do not use this when painting, as it needs to search
   /// for the proper painter.
   /// </summary>
-  virtual LPVOID APICALL GetPainterData(const IPanePainter *) const = 0;
+  virtual LPVOID APICALL GetPainterData(const IPainter*) const = 0;
 
   /// <summary>
   /// Retrieves the rendering position of the pane. This is the absolute position, in pixels, of

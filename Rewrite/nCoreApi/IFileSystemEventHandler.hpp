@@ -27,7 +27,4 @@ public:
     PITEMID_CHILD id;
     Thumbnail thumbnail;
   };
-
-public:
-  virtual void APICALL Destroy() = 0;
 };

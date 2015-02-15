@@ -4,7 +4,6 @@
 #include "TrayIcon.hpp"
 
 #include "../nCoreApi/IPane.hpp"
-#include "../nCoreApi/IStatePainter.hpp"
 
 #include "../nShared/LayoutSettings.hpp"
 
@@ -32,10 +31,10 @@ private:
   LayoutSettings mLayoutSettings;
 
   IPane *mPane;
-  IStatePainter *mPainter;
+  IDiscardablePainter *mPainter;
   int mLock;
 
 private:
-  IStatePainter *mIconPainter;
+  IDiscardablePainter *mIconPainter;
   std::list<TrayIcon> mIcons;
 };

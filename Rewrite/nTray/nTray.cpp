@@ -42,8 +42,8 @@ void nModuleQuit(NModule&) {
 LRESULT WINAPI MessageHandlerProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
   switch (message) {
   case WM_CREATE:
-    SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
     sTrayManager = new TrayManager();
+    SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
     return 0;
 
   case WM_DESTROY:

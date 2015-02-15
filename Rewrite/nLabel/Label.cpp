@@ -4,51 +4,47 @@
 
 #include "../nUtilities/lsapi.h"
 
-StatePainterInitData::State sStates[] = {
+const StateDefinition sStates[] = {
   { L"Hover",   0, 0 }, // 1
   { L"Pressed", 0, 0 }, // 2
 };
 
+
 Label::Label(LPCWSTR name) {
-  ISettingsReader *settingsReader = nCore::CreateSettingsReader(name);
+  ISettingsReader *reader = nCore::CreateSettingsReader(name);
 
-  mEventHandler = nCore::CreateEventHandler(settingsReader);
-
-  StatePainterInitData painterInitData;
-  ZeroMemory(&painterInitData, sizeof(StatePainterInitData));
-  painterInitData.cbSize = sizeof(StatePainterInitData);
-  painterInitData.numStates = 2;
-  painterInitData.settingsReader = settingsReader;
-  painterInitData.states = sStates;
-  mPainter = nCore::CreateStatePainter(&painterInitData);
+  mEventHandler = nCore::CreateEventHandler(reader);
+  mTextPainter = nCore::CreateTextPainter(reader, sStates, _countof(sStates));
+  mBackgroundPainter = nCore::CreateBackgroundPainter(reader, sStates, _countof(sStates));
 
   PaneInitData paneInitData;
   ZeroMemory(&paneInitData, sizeof(PaneInitData));
   paneInitData.cbSize = sizeof(PaneInitData);
   paneInitData.messageHandler = this;
   paneInitData.name = name;
-  IPanePainter *painters[] = { mPainter, nCore::GetChildPainter() };
+  IPainter *painters[] = { mBackgroundPainter, mTextPainter, nCore::GetChildPainter() };
   paneInitData.painters = painters;
   paneInitData.numPainters = _countof(painters);
-  paneInitData.settingsReader = settingsReader;
+  paneInitData.settingsReader = reader;
   paneInitData.flags = PaneInitData::DynamicText;
   mPane = nCore::CreatePane(&paneInitData);
 
   wchar_t buffer[MAX_LINE_LENGTH];
-  if (settingsReader->GetString(L"Text", buffer, _countof(buffer), L"")) {
+  if (reader->GetString(L"Text", buffer, _countof(buffer), L"")) {
     mPane->SetText(buffer);
   }
 
-  settingsReader->Destroy();
+  reader->Discard();
 
   mPane->Show();
 }
 
 
 Label::~Label() {
-  mPane->Destroy();
-  mPainter->Destroy();
-  mEventHandler->Destroy();
+  mPane->Discard();
+  mTextPainter->Discard();
+  mBackgroundPainter->Discard();
+  mEventHandler->Discard();
 }
 
 

@@ -6,9 +6,9 @@
 #include "../nUtilities/d2d1.h"
 
 /// <summary>
-///
+/// Paints panes.
 /// </summary>
-class IPanePainter {
+class IPainter {
 public:
   /// <summary>
   /// Called to initialize the painter for the given pane.

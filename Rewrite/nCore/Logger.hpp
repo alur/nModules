@@ -7,9 +7,12 @@ public:
   explicit Logger(LPCWSTR name);
   ~Logger();
 
+  // IDiscardable
+public:
+  void APICALL Discard() override;
+
   // ILogger
 public:
-  void APICALL Destroy();
   void APICALL Debug(LPCWSTR, ...) override;
   void APICALL DebugHR(HRESULT, LPCWSTR, ...) override;
   void APICALL Info(LPCWSTR, ...) override;

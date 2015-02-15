@@ -29,7 +29,7 @@ ImagePainter::~ImagePainter() {
 }
 
 
-void ImagePainter::Destroy() {
+void ImagePainter::Discard() {
   delete this;
 }
 

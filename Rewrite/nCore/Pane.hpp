@@ -32,6 +32,10 @@ public:
   Pane(const PaneInitData *initData, Pane *parent);
   ~Pane();
 
+  // IDiscardable
+public:
+  void APICALL Discard() override;
+
   // IMessageHandler;
 public:
   LRESULT APICALL HandleMessage(HWND, UINT, WPARAM, LPARAM, NPARAM) override;
@@ -39,10 +43,9 @@ public:
   // IPane (PublicApi)
 public:
   IPane* APICALL CreateChild(const PaneInitData*) override;
-  void APICALL Destroy() override;
   float APICALL EvaluateLength(const NLENGTH &length, bool horizontal) const override;
   D2D1_RECT_F APICALL EvaluateRect(const NRECT &rect) const override;
-  LPVOID APICALL GetPainterData(const IPanePainter *) const override;
+  LPVOID APICALL GetPainterData(const IPainter*) const override;
   const D2D1_RECT_F &APICALL GetRenderingPosition() const override;
   const D2D1_SIZE_F &APICALL GetRenderingSize() const override;
   LPCWSTR APICALL GetRenderingText() const override;
@@ -98,7 +101,7 @@ private:
   // All panes.
 private:
   IMessageHandler *const mMessageHandler;
-  std::vector<IPanePainter*> mPainters;
+  std::vector<IPainter*> mPainters;
   std::unordered_set<Pane*> mChildren;
   // The absolute position of this element within the window.
   D2D1_RECT_F mRenderingPosition;

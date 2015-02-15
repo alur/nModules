@@ -15,7 +15,7 @@ extern void nModuleQuit(NModule&);
 
 
 static void Cleanup() {
-  gModule.log->Destroy();
+  gModule.log->Discard();
   gModule.log = nullptr;
   DestroyWindow(gModule.window);
   gModule.window = nullptr;

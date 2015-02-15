@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../nCoreApi/IPanePainter.hpp"
+#include "../nCoreApi/IPainter.hpp"
 
-class ChildPainter : public IPanePainter {
-  // IPanePainter
+class ChildPainter : public IPainter {
+  // IPainter
 public:
   LPVOID APICALL AddPane(const IPane *pane) override;
   HRESULT APICALL CreateDeviceResources(ID2D1RenderTarget *renderTarget) override;

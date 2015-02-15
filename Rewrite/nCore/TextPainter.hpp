@@ -1,23 +1,20 @@
 #pragma once
 
-#include "StatePainterData.hpp"
-#include "State.hpp"
+#include "../nCoreApi/IDiscardablePainter.hpp"
 
-#include "../nCoreApi/IStatePainter.hpp"
-
-#include <dwrite.h>
-
-// TODO(Erik): Make this support rendering to different top-level windows.
-class StatePainter : public IStatePainter {
+class TextPainter : public IDiscardablePainter {
 private:
-  struct PainterData {
-    IDWriteTextLayout *textLayout;
+  struct PerPaneData {
     D2D1_RECT_F textPosition;
   };
 
 public:
-  explicit StatePainter(const StatePainterInitData *initData);
-  ~StatePainter();
+  explicit TextPainter(const ISettingsReader*, const StateDefinition*, BYTE numStates);
+  ~TextPainter();
+
+  // IDiscardable
+public:
+  void APICALL Discard() override;
 
   // IPanePainter
 public:
@@ -35,27 +32,13 @@ public:
   void APICALL RemovePane(const IPane *pane, LPVOID painterData) override;
   void APICALL TextChanged(const IPane *pane, LPVOID painterData, LPCWSTR text) override;
 
-  // IStatePainter
-public:
-  void APICALL ActivateState(BYTE state, IPane *pane) override;
-  void APICALL ClearState(BYTE state, IPane *pane) override;
-  void APICALL Destroy() override;
-  void APICALL PaintBackground(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
-    const IPane *pane, LPVOID painterData) const override;
-  void APICALL PaintText(ID2D1RenderTarget *renderTarget, const D2D1_RECT_F *area,
-    const IPane *pane, LPVOID painterData) const override;
-
 private:
   int mResourceRefCount;
-
   int mStateCount;
-  State *mStates;
+  //State *mStates;
 
   // TODO(Erik): Move these out of here
 private:
   ID2D1Brush *mBrush;
-  ID2D1Brush *mTextBrush;
-  D2D_COLOR_F mColor;
-
   NRECT mTextPadding;
 };

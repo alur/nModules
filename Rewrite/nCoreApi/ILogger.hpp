@@ -1,12 +1,12 @@
 #pragma once
 
 #include "ApiDefs.h"
+#include "IDiscardable.hpp"
 
 #include "../nUtilities/Windows.h"
 
-class ILogger {
+class ILogger : public IDiscardable {
 public:
-  virtual void Destroy() = 0;
   virtual void APICALL Debug(LPCWSTR, ...) = 0;
   virtual void APICALL Info(LPCWSTR, ...) = 0;
   virtual void APICALL Warning(LPCWSTR, ...) = 0;

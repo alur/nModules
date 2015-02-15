@@ -4,7 +4,6 @@
 #include "../nCoreApi/IEventProcessor.hpp"
 #include "../nCoreApi/IImagePainter.hpp"
 #include "../nCoreApi/IPane.hpp"
-#include "../nCoreApi/IStatePainter.hpp"
 
 #include <thread>
 
@@ -34,7 +33,8 @@ public:
   }
 
 public:
-  TaskButton(IPane *pane, IStatePainter *painter, IEventHandler *eventHandler, HWND window);
+  TaskButton(IPane *pane, IPainter *bcakgroundPainter, IPainter *textPainter,
+    IEventHandler *eventHandler, HWND window);
   ~TaskButton();
 
 public:
@@ -67,7 +67,6 @@ public:
 private:
   const HWND mWindow;
   IEventHandler * const mEventHandler;
-  IStatePainter * const mStatePainter;
   IImagePainter *mIconPainter;
   IImagePainter *mOverlayIconPainter;
   IPane *mPane;

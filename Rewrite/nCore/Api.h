@@ -4,25 +4,27 @@
 #include "../nCoreApi/IEventHandler.hpp"
 #include "../nCoreApi/IImagePainter.hpp"
 #include "../nCoreApi/ILogger.hpp"
-#include "../nCoreApi/IStatePainter.hpp"
 #include "../nCoreApi/ApiDefs.h"
 
 #include "../nUtilities/d2d1.h"
 #include "../nUtilities/Macros.h"
 #include "../nUtilities/Version.h"
 
+EXPORT_CDECL(IDiscardablePainter*) CreateBackgroundPainter(const ISettingsReader *reader,
+  const StateDefinition *states, BYTE numStates);
 EXPORT_CDECL(IEventHandler*) CreateEventHandler(const ISettingsReader *reader);
 EXPORT_CDECL(IImagePainter*) CreateImagePainter();
 EXPORT_CDECL(ILogger*) CreateLogger(LPCWSTR name);
 EXPORT_CDECL(IPane*) CreatePane(const PaneInitData *initData);
 EXPORT_CDECL(ISettingsReader*) CreateSettingsReader(LPCWSTR prefix);
-EXPORT_CDECL(IStatePainter*) CreateStatePainter(const StatePainterInitData *initData);
+EXPORT_CDECL(IDiscardablePainter*) CreateTextPainter(const ISettingsReader *reader,
+  const StateDefinition *states, BYTE numStates);
 EXPORT_CDECL(void) EnumRCLines(LPCWSTR key, void(APICALL *callback)(LPCWSTR line, LPARAM data),
   LPARAM data);
 EXPORT_CDECL(void) EnumRCLineTokens(LPCWSTR key,
   void (APICALL *callback)(LPCWSTR token, LPARAM data), LPARAM data);
 EXPORT_CDECL(IPane*) FindPane(LPCWSTR name);
-EXPORT_CDECL(IPanePainter*) GetChildPainter();
+EXPORT_CDECL(IPainter*) GetChildPainter();
 EXPORT_CDECL(VERSION) GetCoreVersion();
 EXPORT_CDECL(ID2D1Factory*) GetD2DFactory();
 EXPORT_CDECL(const IDisplays*) GetDisplays();

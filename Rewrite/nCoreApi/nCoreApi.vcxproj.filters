@@ -5,13 +5,7 @@
     <ClInclude Include="ApiDefs.h" />
     <ClInclude Include="Messages.h" />
     <ClInclude Include="TaskWindow.h" />
-    <ClInclude Include="IStatePainter.hpp">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="ISettingsReader.hpp">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IPanePainter.hpp">
       <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="IPane.hpp">
@@ -39,6 +33,15 @@
       <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="IImagePainter.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IDiscardable.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IDiscardablePainter.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IPainter.hpp">
       <Filter>Interfaces</Filter>
     </ClInclude>
   </ItemGroup>

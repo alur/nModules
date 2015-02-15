@@ -17,12 +17,13 @@ static const struct CoreProcItem {
   LPCSTR name;
   VERSION minVersion;
 } sCoreProcTable[] = {
+  CORE_PROC_ITEM(CreateBackgroundPainter,   MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(CreateEventHandler,        MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(CreateImagePainter,        MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(CreateLogger,              MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(CreatePane,                MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(CreateSettingsReader,      MakeVersion(0, 9, 0, 0)),
-  CORE_PROC_ITEM(CreateStatePainter,        MakeVersion(0, 9, 0, 0)),
+  CORE_PROC_ITEM(CreateTextPainter,         MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(EnumRCLines,               MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(EnumRCLineTokens,          MakeVersion(0, 9, 0, 0)),
   CORE_PROC_ITEM(FindPane,                  MakeVersion(0, 9, 0, 0)),

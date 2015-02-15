@@ -8,7 +8,7 @@
 #include <algorithm>
 
 // TODO(Erik):Simplify this
-StatePainterInitData::State sButtonStates[] = {
+const StateDefinition sButtonStates[] = {
   { L"Minimized",               0x0000, 0 }, // 1
   { L"Flashing",                0x0000, 0 }, // 2
   { L"MinimizedFlashing",       0x0003, 2 }, // 3
@@ -26,7 +26,9 @@ StatePainterInitData::State sButtonStates[] = {
 
 Taskbar::Taskbar(LPCWSTR prefix)
   : mPane(nullptr)
-  , mPainter(nullptr)
+  , mBackgroundPainter(nullptr)
+  , mButtonTextPainter(nullptr)
+  , mButtonBackgroundPainter(nullptr)
   , mEventHandler(nullptr)
   , mLock(1)
 {
@@ -34,12 +36,7 @@ Taskbar::Taskbar(LPCWSTR prefix)
 
   ISettingsReader *reader = nCore::CreateSettingsReader(prefix);
   mEventHandler = nCore::CreateEventHandler(reader);
-
-  StatePainterInitData spid;
-  spid.cbSize = sizeof(StatePainterInitData);
-  spid.numStates = 0;
-  spid.settingsReader = reader;
-  mPainter = nCore::CreateStatePainter(&spid);
+  mBackgroundPainter = nCore::CreateBackgroundPainter(reader, nullptr, 0);
 
   PaneInitData initData;
   ZeroMemory(&initData, sizeof(PaneInitData));
@@ -47,7 +44,7 @@ Taskbar::Taskbar(LPCWSTR prefix)
   initData.name = prefix;
   initData.settingsReader = reader;
   initData.messageHandler = (IMessageHandler*)this;
-  IPanePainter *painters[] = { mPainter, nCore::GetChildPainter() };
+  IPainter *painters[] = { mBackgroundPainter, nCore::GetChildPainter() };
   initData.painters = painters;
   initData.numPainters = _countof(painters);
 
@@ -55,25 +52,21 @@ Taskbar::Taskbar(LPCWSTR prefix)
 
   ISettingsReader *buttonReader = reader->CreateChild(L"Button");
   mButtonEventHandler = nCore::CreateEventHandler(buttonReader);
-
-  StatePainterInitData buttonStatePainterInitData;
-  ZeroMemory(&buttonStatePainterInitData, sizeof(StatePainterInitData));
-  buttonStatePainterInitData.cbSize = sizeof(StatePainterInitData);
-  buttonStatePainterInitData.numStates = _countof(sButtonStates);
-  buttonStatePainterInitData.states = sButtonStates;
-  buttonStatePainterInitData.settingsReader = buttonReader;
-  mButtonPainter = nCore::CreateStatePainter(&buttonStatePainterInitData);
+  mButtonBackgroundPainter = nCore::CreateBackgroundPainter(buttonReader, sButtonStates,
+    _countof(sButtonStates));
+  mButtonTextPainter = nCore::CreateTextPainter(buttonReader, sButtonStates,
+    _countof(sButtonStates));
 
   mButtonWidth = buttonReader->GetLength(L"Width", NLENGTH(0, 0, 150));
   mButtonHeight = buttonReader->GetLength(L"Height", NLENGTH(0, 0, 36));
   mButtonMaxWidth = buttonReader->GetLength(L"MaxWidth", mButtonWidth);
   mButtonMaxHeight = buttonReader->GetLength(L"MaxHeight", mButtonHeight);
 
-  buttonReader->Destroy();
+  buttonReader->Discard();
 
   mLayoutSettings.Load(reader);
 
-  reader->Destroy();
+  reader->Discard();
 }
 
 
@@ -81,12 +74,13 @@ Taskbar::~Taskbar() {
   mPane->Lock(); // Never paint again.
 
   mButtons.clear();
-  mButtonPainter->Destroy();
-  mButtonEventHandler->Destroy();
+  mButtonBackgroundPainter->Discard();
+  mButtonTextPainter->Discard();
+  mButtonEventHandler->Discard();
 
-  mPane->Destroy();
-  mPainter->Destroy();
-  mEventHandler->Destroy();
+  mPane->Discard();
+  mBackgroundPainter->Discard();
+  mEventHandler->Discard();
 }
 
 
@@ -217,9 +211,11 @@ TaskButton *Taskbar::AddTask(HWND window, bool isReplacement) {
   mPane->Lock();
 
   if (isReplacement) {
-    mButtons.emplace(mReplacementPosition, mPane, mButtonPainter, mButtonEventHandler, window);
+    mButtons.emplace(mReplacementPosition, mPane, (IPainter*)mButtonBackgroundPainter,
+      (IPainter*)mButtonTextPainter, mButtonEventHandler, window);
   } else {
-    mButtons.emplace_back(mPane, mButtonPainter, mButtonEventHandler, window);
+    mButtons.emplace_back(mPane, (IPainter*)mButtonBackgroundPainter,
+      (IPainter*)mButtonTextPainter, mButtonEventHandler, window);
   }
   mButtonMap[window] = --mButtons.end();
 

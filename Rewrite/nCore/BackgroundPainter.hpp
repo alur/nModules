@@ -1,19 +1,17 @@
 #pragma once
 
-#include "../nCoreApi/IMessageHandler.hpp"
+#include "../nCoreApi/IDiscardablePainter.hpp"
 #include "../nCoreApi/IPane.hpp"
-#include "../nCoreApi/IPainter.hpp"
 
-#include <vector>
-
-class DesktopPane : public IMessageHandler, public IPainter {
+// TODO(Erik): Make this support rendering to different top-level windows.
+class BackgroundPainter : public IDiscardablePainter {
 public:
-  DesktopPane();
-  ~DesktopPane();
+  explicit BackgroundPainter(const ISettingsReader*, const StateDefinition*, BYTE numStates);
+  ~BackgroundPainter();
 
-  // IMessageHandler
+  // IDiscardable
 public:
-  LRESULT APICALL HandleMessage(HWND, UINT message, WPARAM, LPARAM, NPARAM) override;
+  void APICALL Discard() override;
 
   // IPainter
 public:
@@ -32,17 +30,12 @@ public:
   void APICALL TextChanged(const IPane *pane, LPVOID painterData, LPCWSTR text) override;
 
 private:
-  HRESULT CreateBitmapBrush(LPCWSTR file, ID2D1RenderTarget*, ID2D1BitmapBrush**, LPUINT widthOut,
-    LPUINT heightOut);
+  int mResourceRefCount;
+  int mStateCount;
+  //State *mStates;
 
+  // TODO(Erik): Move these out of here
 private:
-  struct Wallpaper {
-    D2D1_RECT_F rect;
-    ID2D1Brush *brush;
-  };
-
-private:
-  std::vector<Wallpaper> mWallpapers;
-  IPane *mPane;
-  ID2D1RenderTarget *mRenderTarget;
+  ID2D1Brush *mBrush;
+  D2D_COLOR_F mColor;
 };

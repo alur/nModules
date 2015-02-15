@@ -18,6 +18,7 @@ NModule gModule(L"nTask", MakeVersion(0, 9, 0, 0), MakeVersion(0, 9, 0, 0));
 // automatically move the mouse cursor to the center of the window when activated.
 BOOL gActiveWindowTracking = FALSE;
 
+static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
 static TaskbarManager *sTaskbarManager = nullptr;
 
 
@@ -35,9 +36,11 @@ LRESULT WINAPI MessageHandlerProc(HWND window, UINT message, WPARAM wParam, LPAR
   switch (message) {
   case WM_CREATE:
     sTaskbarManager = new TaskbarManager(window);
+    SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
     return 0;
 
   case WM_DESTROY:
+    SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
     SAFEDELETE(sTaskbarManager);
     return 0;
 

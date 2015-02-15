@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ApiDefs.h"
+#include "IDiscardable.hpp"
 
 #include "../nUtilities/Lengths.h"
 #include "../nUtilities/Windows.h"
@@ -8,13 +9,8 @@
 /// <summary>
 /// Reads settings from the LiteStep RC files, using a prefix.
 /// </summary>
-class ISettingsReader {
+class ISettingsReader : public IDiscardable {
 public:
-  /// <summary>
-  /// Destroys the SettingsReader.
-  /// </summary>
-  virtual void APICALL Destroy() = 0;
-
   /// <summary>
   /// Creates a child of this settings reader. If the parent reads settings in the order
   /// SecondaryTaskbar, MainTaskbar, General, the result of CreateChild(Button, ...) will read

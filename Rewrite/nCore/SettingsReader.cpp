@@ -61,7 +61,7 @@ ISettingsReader *SettingsReader::CreateChild(LPCWSTR suffix) const {
 }
 
 
-void SettingsReader::Destroy() {
+void SettingsReader::Discard() {
   delete this;
 }
 

@@ -1,8 +1,8 @@
 #pragma once
 
+#include "../nCoreApi/IDiscardablePainter.hpp"
 #include "../nCoreApi/IEventHandler.hpp"
 #include "../nCoreApi/IPane.hpp"
-#include "../nCoreApi/IStatePainter.hpp"
 
 class Label : public IMessageHandler {
 public:
@@ -15,6 +15,7 @@ public:
 
 private:
   IPane *mPane;
-  IStatePainter *mPainter;
+  IDiscardablePainter *mTextPainter;
+  IDiscardablePainter *mBackgroundPainter;
   IEventHandler *mEventHandler;
 };

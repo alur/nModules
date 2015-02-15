@@ -17,7 +17,7 @@ Logger::~Logger() {
 }
 
 
-void Logger::Destroy() {
+void Logger::Discard() {
   delete this;
 }
 

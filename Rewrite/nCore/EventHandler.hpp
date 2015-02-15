@@ -12,11 +12,11 @@ public:
   EventHandler(const EventHandler&) = delete;
   EventHandler &operator=(const EventHandler&) = delete;
 
-  // IMessageHandler
+  // IDiscardable
 public:
-  LRESULT APICALL HandleMessage(HWND, UINT message, WPARAM, LPARAM, IEventProcessor*) override;
+  void APICALL Discard() override;
 
   // IEventHandler
 public:
-  void APICALL Destroy() override;
+  LRESULT APICALL HandleMessage(HWND, UINT message, WPARAM, LPARAM, IEventProcessor*) override;
 };
