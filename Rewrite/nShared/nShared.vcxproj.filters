@@ -8,6 +8,9 @@
     <ClInclude Include="Forwardable.hpp" />
     <ClInclude Include="LayoutSettings.hpp" />
     <ClInclude Include="Error.h" />
+    <ClInclude Include="Optional.hpp" />
+    <ClInclude Include="FallbackOptional.hpp" />
+    <ClInclude Include="StringMap.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math.cpp" />
@@ -15,5 +18,6 @@
     <ClCompile Include="ShellHelpers.cpp" />
     <ClCompile Include="LayoutSettings.cpp" />
     <ClCompile Include="Error.cpp" />
+    <ClCompile Include="StringMap.cpp" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@
 #include "../nUtilities/d2d1.h"
 
 #include <unordered_set>
+#include <vector>
 
 class Pane : public IPane {
 private:
@@ -132,6 +133,10 @@ private:
 private:
   BYTE mCurrentState;
   std::vector<bool> mActiveStates;
+  // State -> States which depend on this to be activated.
+  std::vector<std::vector<BYTE>> mStateDependents;
+  // State -> States which need to be activated for this to activate.
+  std::vector<std::vector<BYTE>> mStateDependencies;
 
   // Set on all panes, but created & destroyed by the top-level.
 private:

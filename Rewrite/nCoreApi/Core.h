@@ -8,6 +8,7 @@
 #include "ILogger.hpp"
 #include "IPane.hpp"
 #include "ISettingsReader.hpp"
+#include "IStringMap.hpp"
 #include "TaskWindow.h"
 
 #include "../nUtilities/Version.h"
@@ -59,7 +60,9 @@ namespace nCore {
   /// Creates a settings reader for the given prefix.
   /// </summary>
   /// <param name="prefix">The prefix to use when reading settings.</param>
-  CORE_API_PROC(ISettingsReader*, CreateSettingsReader, LPCWSTR prefix);
+  /// <param name="defaults">Default values to use, may be null.</param>
+  CORE_API_PROC(ISettingsReader*, CreateSettingsReader, LPCWSTR prefix,
+    const IStringMap *defaults);
 
   /// <summary>
   /// Creates a text painter.

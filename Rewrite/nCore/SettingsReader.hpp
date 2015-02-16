@@ -6,10 +6,13 @@
 
 class SettingsReader : public ISettingsReader {
 public:
-  static ISettingsReader *Create(LPCWSTR prefix);
+  static ISettingsReader *Create(LPCWSTR prefix, const IStringMap *defaults);
+
+public:
+  SettingsReader &operator=(SettingsReader&) = delete;
 
 private:
-  SettingsReader();
+  SettingsReader(const IStringMap *defaults);
 
   // IDiscardable
 public:
@@ -47,6 +50,9 @@ public:
   bool APICALL GetLTRBRect(LPCWSTR key, NRECT *value) const override;
 
 private:
+  bool GetFromDefaults(LPCWSTR key, LPWSTR value, size_t cchValue) const;
+
+private:
   class PrefixVal {
   public:
     operator const wchar_t*() const {
@@ -61,4 +67,6 @@ private:
 
 private:
   std::vector<PrefixVal> mPrefixes;
+  const IStringMap* const mDefaults;
+  PrefixVal mDefaultsPrefix;
 };

@@ -1,14 +1,20 @@
 #include "Tray.hpp"
 
+#include "../nShared/StringMap.hpp"
+
 #include "../nCoreApi/Core.h"
 
 extern HWND gTrayNotifyWindow;
+
+static const StringMap sDefaults({
+  { L"IconColor", L"0x00000000" }
+});
 
 
 Tray::Tray(LPCWSTR name)
   : mLock(1)
 {
-  ISettingsReader *reader = nCore::CreateSettingsReader(name);
+  ISettingsReader *reader = nCore::CreateSettingsReader(name, &sDefaults);
   mPainter = nCore::CreateBackgroundPainter(reader, nullptr, 0);
 
   PaneInitData paneInitData;

@@ -72,12 +72,15 @@
   <PropertyGroup />
   <ItemGroup>
     <ClInclude Include="AlgorithmExt.h" />
+    <ClInclude Include="FallbackOptional.hpp" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Forwardable.hpp" />
     <ClInclude Include="LayoutSettings.hpp" />
     <ClInclude Include="LiteStep.h" />
     <ClInclude Include="Math.h" />
+    <ClInclude Include="Optional.hpp" />
     <ClInclude Include="ShellHelpers.h" />
+    <ClInclude Include="StringMap.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Error.cpp" />
@@ -85,6 +88,7 @@
     <ClCompile Include="LiteStep.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="ShellHelpers.cpp" />
+    <ClCompile Include="StringMap.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

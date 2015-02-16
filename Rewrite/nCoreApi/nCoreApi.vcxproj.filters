@@ -44,6 +44,9 @@
     <ClInclude Include="IPainter.hpp">
       <Filter>Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="IStringMap.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp" />

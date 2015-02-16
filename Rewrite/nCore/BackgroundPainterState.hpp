@@ -3,6 +3,8 @@
 #include "../nCoreApi/IPane.hpp"
 #include "../nCoreApi/ISettingsReader.hpp"
 
+#include "../nShared/FallbackOptional.hpp"
+
 #include "../nUtilities/d2d1.h"
 #include "../nUtilities/lsapi.h"
 
@@ -30,11 +32,10 @@ public:
   BackgroundPainterState& operator=(BackgroundPainterState&) = delete;
 
 private:
-  struct Settings {
-    NLENGTH cornerRadiusX; // Default: 0
-    NLENGTH cornerRadiusY; // Default: 0
-    NLENGTH outlineWidth; // Default: 0
-  } mSettings;
+  FallbackOptional<NLENGTH> mCornerRadiusX;
+  FallbackOptional<NLENGTH> mCornerRadiusY;
+  FallbackOptional<NLENGTH> mOutlineWidth;
+  FallbackOptional<D2D1_COLOR_F> mColor;
 
 private:
   BackgroundPainterState *const mBase;
@@ -45,5 +46,4 @@ private:
   // TODO(Erik): Move this
 private:
   ID2D1Brush *mBrush;
-  D2D1_COLOR_F mColor;
 };

@@ -185,6 +185,9 @@ LRESULT TaskbarManager::HandleMessage(HWND window, UINT message, WPARAM wParam, 
   case LM_WINDOWACTIVATED:
     gPreviouslyActiveWindow = gActiveWindow;
     gActiveWindow = (HWND)wParam;
+    for (auto &taskbar : mTaskbars) {
+      taskbar.second.ActiveWindowChanged(gPreviouslyActiveWindow, gActiveWindow);
+    }
     return 0;
 
   case LM_WINDOWCREATED:

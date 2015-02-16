@@ -5,6 +5,12 @@
 #include "../nCoreApi/IPane.hpp"
 
 class Label : public IMessageHandler {
+private:
+  enum State : BYTE {
+    Hover = 1,
+    Pressed = 2
+  };
+
 public:
   explicit Label(LPCWSTR name);
   ~Label();
@@ -18,4 +24,5 @@ private:
   IDiscardablePainter *mTextPainter;
   IDiscardablePainter *mBackgroundPainter;
   IEventHandler *mEventHandler;
+  int mButtonsPressed;
 };

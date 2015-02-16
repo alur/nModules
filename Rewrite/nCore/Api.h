@@ -1,10 +1,11 @@
 #pragma once
 
+#include "../nCoreApi/ApiDefs.h"
 #include "../nCoreApi/IDisplays.hpp"
 #include "../nCoreApi/IEventHandler.hpp"
 #include "../nCoreApi/IImagePainter.hpp"
 #include "../nCoreApi/ILogger.hpp"
-#include "../nCoreApi/ApiDefs.h"
+#include "../nCoreApi/IStringMAp.hpp"
 
 #include "../nUtilities/d2d1.h"
 #include "../nUtilities/Macros.h"
@@ -16,7 +17,7 @@ EXPORT_CDECL(IEventHandler*) CreateEventHandler(const ISettingsReader *reader);
 EXPORT_CDECL(IImagePainter*) CreateImagePainter();
 EXPORT_CDECL(ILogger*) CreateLogger(LPCWSTR name);
 EXPORT_CDECL(IPane*) CreatePane(const PaneInitData *initData);
-EXPORT_CDECL(ISettingsReader*) CreateSettingsReader(LPCWSTR prefix);
+EXPORT_CDECL(ISettingsReader*) CreateSettingsReader(LPCWSTR prefix, const IStringMap *defaults);
 EXPORT_CDECL(IDiscardablePainter*) CreateTextPainter(const ISettingsReader *reader,
   const StateDefinition *states, BYTE numStates);
 EXPORT_CDECL(void) EnumRCLines(LPCWSTR key, void(APICALL *callback)(LPCWSTR line, LPARAM data),

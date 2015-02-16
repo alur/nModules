@@ -38,6 +38,8 @@ public:
   TaskButton &operator=(const TaskButton&) = delete;
 
 public:
+  void ActivateState(State state);
+  void ClearState(State state);
   void GetButtonScreenRect(D2D1_RECT_F *rect);
   void MoveMouseToWindow();
   void Position(const NRECT &position);

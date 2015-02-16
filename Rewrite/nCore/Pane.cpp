@@ -82,10 +82,22 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
   , mWindow(nullptr)
   , mActiveChild(nullptr)
   , mIsTrackingMouse(false)
+  , mStateDependencies(initData->numStates + 1)
+  , mStateDependents(initData->numStates + 1)
 {
   mName[0] = L'\0';
   if (initData->name) {
     StringCchCopy(mName, MAX_PREFIX, initData->name);
+  }
+
+  for (int i = 0; i < initData->numStates; ++i) {
+    ULONGLONG dependencies = initData->states[i].dependencies;
+    for (int j = 1; dependencies; ++j, dependencies >>= 1) {
+      if (dependencies & 1) {
+        mStateDependencies[i+1].push_back((BYTE)j);
+        mStateDependents[j].push_back((BYTE)i+1);
+      }
+    }
   }
 
   // Defaults

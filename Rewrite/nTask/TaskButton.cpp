@@ -44,6 +44,10 @@ TaskButton::TaskButton(IPane *parent, IPainter *backgroundPainter, IPainter *tex
   initData.numStates = gNumButtonStates;
   mPane = parent->CreateChild(&initData);
 
+  if (window == gActiveWindow) {
+    mPane->ActivateState(State::Active);
+  }
+
   wchar_t windowText[256];
   GetWindowText(window, windowText, 256);
   mPane->SetText(windowText);
@@ -65,6 +69,16 @@ TaskButton::~TaskButton() {
   mPane->Discard();
   mIconPainter->Discard();
   mOverlayIconPainter->Discard();
+}
+
+
+void TaskButton::ActivateState(State state) {
+  mPane->ActivateState(state);
+}
+
+
+void TaskButton::ClearState(State state) {
+  mPane->ClearState(state);
 }
 
 

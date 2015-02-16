@@ -8,13 +8,13 @@
 #include <strsafe.h>
 
 
-EXPORT_CDECL(ISettingsReader*) CreateSettingsReader(LPCWSTR prefix) {
-  return SettingsReader::Create(prefix);
+EXPORT_CDECL(ISettingsReader*) CreateSettingsReader(LPCWSTR prefix, const IStringMap *defaults) {
+  return SettingsReader::Create(prefix, defaults);
 }
 
 
 static bool GetPrefixedRCString(LPCWSTR prefix, LPCWSTR key, LPWSTR buffer, size_t cchBuffer,
-  LPCWSTR defaultVal) {
+    LPCWSTR defaultVal) {
   // This is bad, since the first thing GetRCString does is to set *buffer = '\0'
   assert(buffer != defaultVal);
 
@@ -24,8 +24,8 @@ static bool GetPrefixedRCString(LPCWSTR prefix, LPCWSTR key, LPWSTR buffer, size
 }
 
 
-ISettingsReader *SettingsReader::Create(LPCWSTR prefix) {
-  SettingsReader *reader = new SettingsReader();
+ISettingsReader *SettingsReader::Create(LPCWSTR prefix, const IStringMap *defaults) {
+  SettingsReader *reader = new SettingsReader(defaults);
 
   reader->mPrefixes.emplace_back();
   StringCchCopy(reader->mPrefixes.back(), MAX_PREFIX, prefix);
@@ -41,11 +41,13 @@ ISettingsReader *SettingsReader::Create(LPCWSTR prefix) {
 }
 
 
-SettingsReader::SettingsReader() {}
+SettingsReader::SettingsReader(const IStringMap *defaults) : mDefaults(defaults) {
+  *mDefaultsPrefix = L'\0';
+}
 
 
 ISettingsReader *SettingsReader::CreateChild(LPCWSTR suffix) const {
-  SettingsReader *reader = new SettingsReader();
+  SettingsReader *reader = new SettingsReader(mDefaults);
   for (LPCWSTR prefix : mPrefixes) {
     reader->mPrefixes.emplace_back();
     StringCchPrintf(reader->mPrefixes.back(), MAX_PREFIX, L"%s%s", prefix, suffix);
@@ -56,6 +58,9 @@ ISettingsReader *SettingsReader::CreateChild(LPCWSTR suffix) const {
       StringCchCopy(reader->mPrefixes.back(), MAX_PREFIX, group);
       // TODO(Erik): Check for loops.
     }
+  }
+  if (mDefaults) {
+    StringCchPrintf(reader->mDefaultsPrefix, MAX_PREFIX, L"%s%s", mDefaultsPrefix, suffix);
   }
   return reader;
 }
@@ -157,10 +162,11 @@ bool SettingsReader::GetInt64(LPCWSTR key, __int64 *value) const {
 }
 
 
-bool SettingsReader::GetString(LPCWSTR key, LPWSTR value, size_t cchValue,
-    LPWSTR defaultValue) const {
-  for (LPCWSTR prefix : mPrefixes) {
-    if (GetPrefixedRCString(prefix, key, value, cchValue, defaultValue)) {
+bool SettingsReader::GetFromDefaults(LPCWSTR key, LPWSTR value, size_t cchValue) const {
+  if (mDefaults) {
+    wchar_t prefixedKey[MAX_PREFIX];
+    StringCchPrintf(prefixedKey, MAX_PREFIX, L"%s%s", mDefaultsPrefix, key);
+    if (mDefaults->Get(prefixedKey, value, cchValue)) {
       return true;
     }
   }
@@ -168,13 +174,27 @@ bool SettingsReader::GetString(LPCWSTR key, LPWSTR value, size_t cchValue,
 }
 
 
-NLENGTH APICALL SettingsReader::GetLength(LPCWSTR key, const NLENGTH &defaultValue) const {
+bool SettingsReader::GetString(LPCWSTR key, LPWSTR value, size_t cchValue,
+    LPWSTR defaultValue) const {
+  for (LPCWSTR prefix : mPrefixes) {
+    if (GetPrefixedRCString(prefix, key, value, cchValue, defaultValue)) {
+      return true;
+    }
+  }
+  if (GetFromDefaults(key, value, cchValue)) {
+    return true;
+  }
+  return false;
+}
+
+
+NLENGTH SettingsReader::GetLength(LPCWSTR key, const NLENGTH &defaultValue) const {
   NLENGTH val;
   return GetLength(key, &val) ? val : defaultValue;
 }
 
 
-bool APICALL SettingsReader::GetLength(LPCWSTR key, NLENGTH *value) const {
+bool SettingsReader::GetLength(LPCWSTR key, NLENGTH *value) const {
   wchar_t buffer[MAX_LINE_LENGTH];
 
   if (GetString(key, buffer, MAX_LINE_LENGTH, L"")) {
@@ -185,19 +205,19 @@ bool APICALL SettingsReader::GetLength(LPCWSTR key, NLENGTH *value) const {
 }
 
 
-NRECT APICALL SettingsReader::GetXYWHRect(LPCWSTR key, const NRECT &defaultValue) const {
+NRECT SettingsReader::GetXYWHRect(LPCWSTR key, const NRECT &defaultValue) const {
   assert(false); // Not implemented
   return NRECT();
 }
 
 
-bool APICALL SettingsReader::GetXYWHRect(LPCWSTR key, NRECT *value) const {
+bool SettingsReader::GetXYWHRect(LPCWSTR key, NRECT *value) const {
   assert(false); // Not implemented
   return false;
 }
 
 
-NRECT APICALL SettingsReader::GetLTRBRect(LPCWSTR key, const NRECT &defaultValue) const {
+NRECT SettingsReader::GetLTRBRect(LPCWSTR key, const NRECT &defaultValue) const {
   NRECT rect;
   wchar_t buffer[MAX_PREFIX];
 
@@ -217,7 +237,7 @@ NRECT APICALL SettingsReader::GetLTRBRect(LPCWSTR key, const NRECT &defaultValue
 }
 
 
-bool APICALL SettingsReader::GetLTRBRect(LPCWSTR key, NRECT *value) const {
+bool SettingsReader::GetLTRBRect(LPCWSTR key, NRECT *value) const {
   assert(false); // Not implemented
   return false;
 }

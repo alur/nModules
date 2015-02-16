@@ -1,5 +1,7 @@
 #include "Taskbar.hpp"
 
+#include "../nShared/StringMap.hpp"
+
 #include "../nCoreApi/Core.h"
 
 #include "../nUtilities/lsapi.h"
@@ -22,9 +24,9 @@ StateDefinition gButtonStates[] = {
 
 BYTE gNumButtonStates = _countof(gButtonStates);
 
-/*DefaultSettings sButtonDefaults = {
-
-};*/
+static const StringMap sDefaults({
+  {L"Width", L"100%"}
+});
 
 
 Taskbar::Taskbar(LPCWSTR prefix)
@@ -37,7 +39,7 @@ Taskbar::Taskbar(LPCWSTR prefix)
 {
   mReplacementPosition = mButtons.end();
 
-  ISettingsReader *reader = nCore::CreateSettingsReader(prefix);
+  ISettingsReader *reader = nCore::CreateSettingsReader(prefix, &sDefaults);
   mEventHandler = nCore::CreateEventHandler(reader);
   mBackgroundPainter = nCore::CreateBackgroundPainter(reader, nullptr, 0);
 
@@ -207,6 +209,23 @@ void Taskbar::Relayout() {
 LRESULT Taskbar::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, NPARAM) {
   return mEventHandler->HandleMessage(window, msg, wParam, lParam, nullptr);
 };
+
+
+void Taskbar::ActiveWindowChanged(HWND oldWindow, HWND newWindow) {
+  mPane->Lock();
+
+  auto iter = mButtonMap.find(oldWindow);
+  if (iter != mButtonMap.end()) {
+    iter->second->ClearState(TaskButton::State::Active);
+  }
+  
+  iter = mButtonMap.find(newWindow);
+  if (iter != mButtonMap.end()) {
+    iter->second->ActivateState(TaskButton::State::Active);
+  }
+
+  mPane->Unlock();
+}
 
 
 TaskButton *Taskbar::AddTask(HWND window, bool isReplacement) {

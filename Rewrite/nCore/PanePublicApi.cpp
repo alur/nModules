@@ -20,9 +20,21 @@ EXPORT_CDECL(IPane*) FindPane() {
 void Pane::ActivateState(BYTE state) {
   if (!mActiveStates[state]) {
     mActiveStates[state] = true;
+    for (BYTE dependent : mStateDependents[state]) {
+      bool activate = true;
+      for (BYTE dependency : mStateDependencies[dependent]) {
+        if (!mActiveStates[dependency]) {
+          activate = false;
+          break;
+        }
+      }
+      if (activate) {
+        ActivateState(dependent);
+      }
+    }
     if (state > mCurrentState) {
       mCurrentState = state;
-      Repaint(mRenderingPosition, true);
+      Repaint(true);
     }
   }
 }
@@ -34,7 +46,10 @@ void Pane::ClearState(BYTE state) {
     if (mCurrentState == state) {
       for (; state > 0 && !mActiveStates[state]; --state);
       mCurrentState = state;
-      Repaint(mRenderingPosition, true);
+      Repaint(true);
+    }
+    for (BYTE dependent : mStateDependents[state]) {
+      ClearState(dependent);
     }
   }
 }

@@ -13,7 +13,7 @@ public:
   }
 
   bool IsSet() {
-    return mIsSet ? mValue : mForwardedValue;
+    return mIsSet;
   }
 
 private:

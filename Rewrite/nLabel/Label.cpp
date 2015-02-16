@@ -10,8 +10,8 @@ const StateDefinition sStates[] = {
 };
 
 
-Label::Label(LPCWSTR name) {
-  ISettingsReader *reader = nCore::CreateSettingsReader(name);
+Label::Label(LPCWSTR name) : mButtonsPressed(0) {
+  ISettingsReader *reader = nCore::CreateSettingsReader(name, nullptr);
 
   mEventHandler = nCore::CreateEventHandler(reader);
   mTextPainter = nCore::CreateTextPainter(reader, sStates, _countof(sStates));
@@ -53,12 +53,31 @@ Label::~Label() {
 LRESULT Label::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, NPARAM) {
   switch (message) {
   case WM_MOUSEMOVE:
-    mPane->ActivateState(1);
-    return 0;
+    mPane->ActivateState(State::Hover);
+    break;
 
   case WM_MOUSELEAVE:
-    mPane->ClearState(1);
-    return 0;
+    mButtonsPressed = 0;
+    mPane->ClearState(State::Hover);
+    mPane->ClearState(State::Pressed);
+    break;
+
+  case WM_LBUTTONDOWN:
+  case WM_RBUTTONDOWN:
+  case WM_MBUTTONDOWN:
+  case WM_XBUTTONDOWN:
+    ++mButtonsPressed;
+    mPane->ActivateState(State::Pressed);
+    break;
+
+  case WM_LBUTTONUP:
+  case WM_RBUTTONUP:
+  case WM_MBUTTONUP:
+  case WM_XBUTTONUP:
+    if (--mButtonsPressed <= 0) {
+      mPane->ClearState(State::Pressed);
+    }
+    break;
   }
   return mEventHandler->HandleMessage(window, message, wParam, lParam, nullptr);
 }

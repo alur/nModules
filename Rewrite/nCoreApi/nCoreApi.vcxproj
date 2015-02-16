@@ -87,6 +87,7 @@
     <ClInclude Include="IPane.hpp" />
     <ClInclude Include="IPainter.hpp" />
     <ClInclude Include="ISettingsReader.hpp" />
+    <ClInclude Include="IStringMap.hpp" />
     <ClInclude Include="Messages.h" />
     <ClInclude Include="TaskWindow.h" />
   </ItemGroup>

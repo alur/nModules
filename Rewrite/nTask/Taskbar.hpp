@@ -21,6 +21,7 @@ public:
   LRESULT APICALL HandleMessage(HWND, UINT message, WPARAM, LPARAM, NPARAM) override;
 
 public:
+  void ActiveWindowChanged(HWND oldWindow, HWND newWindow);
   TaskButton *AddTask(HWND, bool isReplacement);
   bool GetButtonScreenRect(HWND window, D2D1_RECT_F*);
   void RedrawTask(HWND window, DWORD parts);
