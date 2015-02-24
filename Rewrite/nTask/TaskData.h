@@ -9,4 +9,5 @@ struct TaskData {
   TBPFLAG progressState;
   USHORT progress;
   bool flashing;
+  HICON overlayIcon;
 };

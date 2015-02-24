@@ -102,6 +102,7 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
 
   // Defaults
   mSettings.alwaysOnTop = false;
+  mSettings.clickThrough = false;
   mSettings.parent[0] = L'\0';
   mSettings.position.top = NLENGTH(0, 0, 0);
   mSettings.position.left = NLENGTH(0, 0, 0);
@@ -111,6 +112,7 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
   if (initData->settingsReader) {
     const ISettingsReader *reader = initData->settingsReader;
     mSettings.alwaysOnTop = reader->GetBool(L"AlwaysOnTop", mSettings.alwaysOnTop);
+    mSettings.clickThrough = reader->GetBool(L"ClickThrough", mSettings.clickThrough);
     if (!mParent) {
       reader->GetString(L"Parent", mSettings.parent, MAX_PREFIX, L"");
     }

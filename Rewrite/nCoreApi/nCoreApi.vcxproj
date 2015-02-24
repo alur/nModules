@@ -74,6 +74,7 @@
   <ItemGroup>
     <ClInclude Include="Core.h" />
     <ClInclude Include="ApiDefs.h" />
+    <ClInclude Include="IDataProvider.hpp" />
     <ClInclude Include="IDiscardablePainter.hpp" />
     <ClInclude Include="IDiscardable.hpp" />
     <ClInclude Include="IDisplays.hpp" />

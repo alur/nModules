@@ -231,6 +231,15 @@ void Pane::Show() {
 }
 
 
+void Pane::ToggleState(BYTE state) {
+  if (mActiveStates[state]) {
+    ClearState(state);
+  } else {
+    ActivateState(state);
+  }
+}
+
+
 void Pane::Unlock() {
   if (--mUpdateLock == 0) {
     RepaintInvalidated();

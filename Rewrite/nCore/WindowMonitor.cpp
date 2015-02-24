@@ -1,7 +1,7 @@
 #include "Api.h"
 #include "Displays.hpp"
 #include "Messages.h"
-#include "WindowMonitor.hpp"
+#include "WindowMonitor.h"
 
 #include "../nUtilities/lsapi.h"
 #include "../nUtilities/Macros.h"
@@ -158,7 +158,7 @@ void WindowMonitor::Start() {
   SetTimer(gWindow, NCORE_TIMER_WINDOW_MAINTENANCE, 250, nullptr);
 
   sInitThread = std::thread([] () -> void {
-    EnumDesktopWindows(nullptr, [] (HWND window, LPARAM) -> BOOL {
+    EnumDesktopWindows(nullptr, (WNDENUMPROC) [] (HWND window, LPARAM) -> BOOL {
       if (IsTaskbarWindow(window)) {
         PostMessage(gWindow, LM_WINDOWCREATED, (WPARAM)window, 0);
       }

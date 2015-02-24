@@ -97,7 +97,9 @@ void BackgroundPainter::PositionChanged(const IPane *pane, LPVOID data,
 }
 
 
-void BackgroundPainter::RemovePane(const IPane*, LPVOID data) {}
+void BackgroundPainter::RemovePane(const IPane*, LPVOID data) {
+  delete (PerPaneData*)data;
+}
 
 
-void BackgroundPainter::TextChanged(const IPane*, LPVOID data, LPCWSTR text) {}
+void BackgroundPainter::TextChanged(const IPane*, LPVOID, LPCWSTR) {}

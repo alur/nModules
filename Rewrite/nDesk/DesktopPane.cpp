@@ -7,6 +7,7 @@
 #include "../nUtilities/lsapi.h"
 #include "../nUtilities/Macros.h"
 
+#include <algorithm>
 #include <ShlObj.h>
 #include <wincodec.h>
 
@@ -67,11 +68,15 @@ LPVOID DesktopPane::AddPane(const IPane*) {
 
 HRESULT DesktopPane::CreateDeviceResources(ID2D1RenderTarget *renderTarget) {
   HRESULT hr = S_OK;
+  mRenderTarget = renderTarget;
   IDesktopWallpaper *desktopWallpaper;
   hr = LSCoCreateInstance(CLSID_DesktopWallpaper, nullptr, CLSCTX_ALL, IID_IDesktopWallpaper,
     (void**)&desktopWallpaper);
   if (SUCCEEDED(hr)) {
     const Display &desktop = nCore::GetDisplays()->GetDesktop();
+
+    DESKTOP_WALLPAPER_POSITION position;
+    desktopWallpaper->GetPosition(&position);
 
     UINT numMonitors;
     hr = desktopWallpaper->GetMonitorDevicePathCount(&numMonitors);
@@ -100,13 +105,48 @@ HRESULT DesktopPane::CreateDeviceResources(ID2D1RenderTarget *renderTarget) {
               ExpandEnvironmentStrings(file, expandedPath, MAX_PATH);
               hr = CreateBitmapBrush(expandedPath, renderTarget, &bitmapBrush, &width, &height);
               if (SUCCEEDED(hr)) {
+                D2D1_SIZE_F translation = D2D1::SizeF(wallpaper.rect.left, wallpaper.rect.top);
+                D2D1_SIZE_F scale = D2D1::SizeF(1, 1);
+
+                switch (position) {
+                default:
+                case DWPOS_FILL:
+                  scale.height = scale.width = std::max(
+                    float(rect.right - rect.left) / width,
+                    float(rect.bottom - rect.top) / height);
+                  translation.width += (rect.right - rect.left - width * scale.width) / 2.0f;
+                  translation.height += (rect.bottom - rect.top - height * scale.height) / 2.0f;
+                  break;
+
+                case DWPOS_FIT:
+                  scale.height = scale.width = std::min(
+                    float(rect.right - rect.left) / width,
+                    float(rect.bottom - rect.top) / height);
+                  translation.width += (rect.right - rect.left - width * scale.width) / 2.0f;
+                  translation.height += (rect.bottom - rect.top - height * scale.height) / 2.0f;
+                  break;
+
+                case DWPOS_STRETCH:
+                  scale = D2D1::SizeF(
+                    float(rect.right - rect.left) / width,
+                    float(rect.bottom - rect.top) / height);
+                  break;
+
+                case DWPOS_CENTER:
+                  translation.width += (rect.right - rect.left - width) / 2.0f;
+                  translation.height += (rect.bottom - rect.top - height) / 2.0f;
+                  break;
+
+                case DWPOS_SPAN:
+                  break;
+
+                case DWPOS_TILE:
+                  break;
+                }
+
+                bitmapBrush->SetTransform(
+                  D2D1::Matrix3x2F::Scale(scale) * D2D1::Matrix3x2F::Translation(translation));
                 wallpaper.brush = (ID2D1Brush*)bitmapBrush;
-                D2D1::Matrix3x2F translation = D2D1::Matrix3x2F::Translation(
-                  (float)wallpaper.rect.left, (float)wallpaper.rect.top);
-                D2D1::Matrix3x2F scale = D2D1::Matrix3x2F::Scale(
-                  float(float(rect.bottom - rect.top) / height),
-                  float(float(rect.right - rect.left) / width));
-                bitmapBrush->SetTransform(scale * translation);
               }
               CoTaskMemFree(file);
             }
@@ -128,6 +168,7 @@ void DesktopPane::DiscardDeviceResources() {
   for (Wallpaper &wallpaper : mWallpapers) {
     SAFERELEASE(wallpaper.brush);
   }
+  mRenderTarget = nullptr;
 }
 
 
@@ -162,6 +203,17 @@ void DesktopPane::RemovePane(const IPane*, LPVOID) {
 
 
 void DesktopPane::TextChanged(const IPane*, LPVOID, LPCWSTR) {
+}
+
+
+void DesktopPane::UpdateWallpapers() {
+  // TODO(Erik):
+  if (mRenderTarget) {
+    ID2D1RenderTarget *renderTarget = mRenderTarget;
+    DiscardDeviceResources();
+    CreateDeviceResources(renderTarget);
+    mPane->Repaint(nullptr);
+  }
 }
 
 

@@ -13,4 +13,7 @@
     <ClInclude Include="TrayIcon.hpp" />
     <ClInclude Include="IconData.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nTray.rc" />
+  </ItemGroup>
 </Project>

@@ -1,10 +1,13 @@
 #include "Api.h"
 #include "SettingsReader.hpp"
 
+#include "../nShared/String.h"
+
 #include "../nUtilities/lsapi.h"
 #include "../nUtilities/Macros.h"
 
 #include <assert.h>
+#include <functional>
 #include <strsafe.h>
 
 
@@ -19,7 +22,7 @@ static bool GetPrefixedRCString(LPCWSTR prefix, LPCWSTR key, LPWSTR buffer, size
   assert(buffer != defaultVal);
 
   wchar_t prefixedKey[MAX_PREFIX];
-  StringCchPrintf(prefixedKey, MAX_PREFIX, L"%s%s", prefix, key);
+  ConcatenateStrings(prefixedKey, _countof(prefixedKey), prefix, key);
   return GetRCString(prefixedKey, buffer, defaultVal, (UINT)cchBuffer) != FALSE;
 }
 
@@ -50,7 +53,7 @@ ISettingsReader *SettingsReader::CreateChild(LPCWSTR suffix) const {
   SettingsReader *reader = new SettingsReader(mDefaults);
   for (LPCWSTR prefix : mPrefixes) {
     reader->mPrefixes.emplace_back();
-    StringCchPrintf(reader->mPrefixes.back(), MAX_PREFIX, L"%s%s", prefix, suffix);
+    ConcatenateStrings(reader->mPrefixes.back(), MAX_PREFIX, prefix, suffix);
 
     wchar_t group[MAX_PREFIX];
     while (GetPrefixedRCString(reader->mPrefixes.back(), L"Group", group, MAX_PREFIX, L"")) {
@@ -60,7 +63,7 @@ ISettingsReader *SettingsReader::CreateChild(LPCWSTR suffix) const {
     }
   }
   if (mDefaults) {
-    StringCchPrintf(reader->mDefaultsPrefix, MAX_PREFIX, L"%s%s", mDefaultsPrefix, suffix);
+    ConcatenateStrings(reader->mDefaultsPrefix, MAX_PREFIX, mDefaultsPrefix, suffix);
   }
   return reader;
 }
@@ -68,6 +71,16 @@ ISettingsReader *SettingsReader::CreateChild(LPCWSTR suffix) const {
 
 void SettingsReader::Discard() {
   delete this;
+}
+
+
+void SettingsReader::EnumLines(LPCWSTR key, void (APICALL *callback)(LPCWSTR line, LPARAM lParam),
+    LPARAM lParam) const {
+  wchar_t prefixedKey[MAX_PREFIX];
+  for (LPCWSTR prefix : mPrefixes) {
+    ConcatenateStrings(prefixedKey, _countof(prefixedKey), prefix, key);
+    EnumRCLines(prefixedKey, callback, lParam);
+  }
 }
 
 
@@ -165,7 +178,7 @@ bool SettingsReader::GetInt64(LPCWSTR key, __int64 *value) const {
 bool SettingsReader::GetFromDefaults(LPCWSTR key, LPWSTR value, size_t cchValue) const {
   if (mDefaults) {
     wchar_t prefixedKey[MAX_PREFIX];
-    StringCchPrintf(prefixedKey, MAX_PREFIX, L"%s%s", mDefaultsPrefix, key);
+    ConcatenateStrings(prefixedKey, MAX_PREFIX, mDefaultsPrefix, key);
     if (mDefaults->Get(prefixedKey, value, cchValue)) {
       return true;
     }
@@ -205,13 +218,13 @@ bool SettingsReader::GetLength(LPCWSTR key, NLENGTH *value) const {
 }
 
 
-NRECT SettingsReader::GetXYWHRect(LPCWSTR key, const NRECT &defaultValue) const {
+NRECT SettingsReader::GetXYWHRect(LPCWSTR, const NRECT&) const {
   assert(false); // Not implemented
   return NRECT();
 }
 
 
-bool SettingsReader::GetXYWHRect(LPCWSTR key, NRECT *value) const {
+bool SettingsReader::GetXYWHRect(LPCWSTR, NRECT*) const {
   assert(false); // Not implemented
   return false;
 }
@@ -221,23 +234,23 @@ NRECT SettingsReader::GetLTRBRect(LPCWSTR key, const NRECT &defaultValue) const 
   NRECT rect;
   wchar_t buffer[MAX_PREFIX];
 
-  StringCchPrintf(buffer, MAX_PREFIX, L"%s%s", key, L"Left");
+  ConcatenateStrings(buffer, MAX_PREFIX, key, L"Left");
   rect.left = GetLength(buffer, defaultValue.left);
 
-  StringCchPrintf(buffer, MAX_PREFIX, L"%s%s", key, L"Top");
+  ConcatenateStrings(buffer, MAX_PREFIX, key, L"Top");
   rect.top = GetLength(buffer, defaultValue.top);
 
-  StringCchPrintf(buffer, MAX_PREFIX, L"%s%s", key, L"Right");
+  ConcatenateStrings(buffer, MAX_PREFIX, key, L"Right");
   rect.right = GetLength(buffer, defaultValue.right);
 
-  StringCchPrintf(buffer, MAX_PREFIX, L"%s%s", key, L"Bottom");
+  ConcatenateStrings(buffer, MAX_PREFIX, key, L"Bottom");
   rect.bottom = GetLength(buffer, defaultValue.bottom);
 
   return rect;
 }
 
 
-bool SettingsReader::GetLTRBRect(LPCWSTR key, NRECT *value) const {
+bool SettingsReader::GetLTRBRect(LPCWSTR, NRECT*) const {
   assert(false); // Not implemented
   return false;
 }

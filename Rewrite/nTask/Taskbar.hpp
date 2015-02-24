@@ -22,11 +22,10 @@ public:
 
 public:
   void ActiveWindowChanged(HWND oldWindow, HWND newWindow);
-  TaskButton *AddTask(HWND, bool isReplacement);
+  TaskButton *AddTask(HWND, TaskData&, bool isReplacement);
   bool GetButtonScreenRect(HWND window, D2D1_RECT_F*);
-  void RedrawTask(HWND window, DWORD parts);
+  void RedrawTask(HWND window, DWORD parts, bool flash);
   void RemoveTask(HWND window, bool isBeingReplaced);
-  void SetOverlayIcon(HWND window, HICON icon);
 
   void Initialized();
 

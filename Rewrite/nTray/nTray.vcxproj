@@ -122,6 +122,9 @@
     <ClInclude Include="TrayIcon.hpp" />
     <ClInclude Include="TrayManager.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nTray.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

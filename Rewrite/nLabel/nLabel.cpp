@@ -12,7 +12,7 @@
 
 #include <unordered_map>
 
-NModule gModule(L"nLabel", MakeVersion(0, 9, 0, 0), MakeVersion(0, 9, 0, 0));
+NModule gModule(L"nLabel", MakeVersion(1, 0, 0, 0), MakeVersion(1, 0, 0, 0));
 std::unordered_map<std::wstring, Label> gLabels;
 
 static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
@@ -29,24 +29,15 @@ static void LoadSettings() {
 }
 
 
-int nModuleInit(NModule&) {
-  LoadSettings();
-  return 0;
-}
-
-
-void nModuleQuit(NModule&) {
-  gLabels.clear();
-}
-
-
 LRESULT WINAPI MessageHandlerProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
   switch (message) {
   case WM_CREATE:
     SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
+    LoadSettings();
     return 0;
 
   case WM_DESTROY:
+    gLabels.clear();
     SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
     return 0;
 

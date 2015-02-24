@@ -1,0 +1,5 @@
+#define MODULE_NAME "nLabel"
+#define MODULE_VERSION_STR "0.9"
+#define MODULE_VERSION 0, 9, 0, 0
+
+#include "../nModuleBase/nModule.rc"

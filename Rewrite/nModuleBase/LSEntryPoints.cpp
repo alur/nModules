@@ -10,8 +10,6 @@
 // All modules are expected to provide these globals.
 extern NModule gModule;
 extern LRESULT WINAPI MessageHandlerProc(HWND, UINT, WPARAM, LPARAM);
-extern int nModuleInit(NModule&);
-extern void nModuleQuit(NModule&);
 
 
 static void Cleanup() {
@@ -25,7 +23,6 @@ static void Cleanup() {
 
 
 EXPORT_CDECL(void) quitModule(HINSTANCE /* instance */) {
-  nModuleQuit(gModule);
   Cleanup();
 }
 
@@ -48,9 +45,5 @@ EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* 
     return 1;
   }
 
-  int result = nModuleInit(gModule);
-  if (result != 0) {
-    Cleanup();
-  }
-  return result;
+  return 0;
 }

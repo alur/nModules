@@ -8,4 +8,8 @@
 // nCore internal messages [0x0500-0x2000)
 
 // Timers
-#define NCORE_TIMER_WINDOW_MAINTENANCE 1
+enum {
+  NCORE_TIMER_WINDOW_MAINTENANCE = 1,
+
+  NCORE_LEASEABLE_TIMERS_START // Keep at the end
+};

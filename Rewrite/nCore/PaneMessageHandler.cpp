@@ -31,11 +31,12 @@ LRESULT Pane::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam,
 
     if (handler == nullptr) {
       for (Pane *child : mChildren) {
-        // TODO(Erik): ClickThrough
-        D2D1_RECT_F pos = child->mRenderingPosition;
-        if (xPos >= pos.left && xPos <= pos.right && yPos >= pos.top && yPos <= pos.bottom) {
-          handler = child;
-          break;
+        if (child->mVisible && !child->mSettings.clickThrough) { // TODO(Erik): ClickThrough
+          D2D1_RECT_F pos = child->mRenderingPosition;
+          if (xPos >= pos.left && xPos <= pos.right && yPos >= pos.top && yPos <= pos.bottom) {
+            handler = child;
+            break;
+          }
         }
       }
     }

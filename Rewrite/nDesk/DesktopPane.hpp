@@ -11,6 +11,9 @@ public:
   DesktopPane();
   ~DesktopPane();
 
+public:
+  void UpdateWallpapers();
+
   // IMessageHandler
 public:
   LRESULT APICALL HandleMessage(HWND, UINT message, WPARAM, LPARAM, NPARAM) override;

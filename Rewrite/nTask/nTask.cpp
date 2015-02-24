@@ -12,7 +12,7 @@
 #include "../nUtilities/Macros.h"
 #include "../nUtilities/Windows.h"
 
-NModule gModule(L"nTask", MakeVersion(0, 9, 0, 0), MakeVersion(0, 9, 0, 0));
+NModule gModule(L"nTask", MakeVersion(1, 0, 0, 0), MakeVersion(1, 0, 0, 0));
 
 // Set to whether or not windows are activated by hovering over them. In this mode we should
 // automatically move the mouse cursor to the center of the window when activated.
@@ -35,13 +35,15 @@ static void LoadSettings() {
 LRESULT WINAPI MessageHandlerProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
   switch (message) {
   case WM_CREATE:
+    SystemParametersInfo(SPI_GETACTIVEWINDOWTRACKING, 0, &gActiveWindowTracking, 0);
     sTaskbarManager = new TaskbarManager(window);
     SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
+    LoadSettings();
     return 0;
 
   case WM_DESTROY:
-    SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
     SAFEDELETE(sTaskbarManager);
+    SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
     return 0;
 
   case WM_SETTINGCHANGE:
@@ -88,15 +90,4 @@ LRESULT WINAPI MessageHandlerProc(HWND window, UINT message, WPARAM wParam, LPAR
   }
 
   return DefWindowProc(window, message, wParam, lParam);
-}
-
-
-int nModuleInit(NModule&) {
-  LoadSettings();
-  SystemParametersInfo(SPI_GETACTIVEWINDOWTRACKING, 0, &gActiveWindowTracking, 0);
-  return 0;
-}
-
-
-void nModuleQuit(NModule&) {
 }

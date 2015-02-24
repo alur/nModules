@@ -141,6 +141,11 @@ public:
   virtual void APICALL Show() = 0;
 
   /// <summary>
+  /// Toggles the given state.
+  /// </summary>
+  virtual void APICALL ToggleState(BYTE state) = 0;
+
+  /// <summary>
   /// Reverts a Lock() call. Updates the window contents if neccesary.
   /// </summary>
   virtual void APICALL Unlock() = 0;

@@ -117,10 +117,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Messages.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Taskbar.hpp" />
     <ClInclude Include="TaskbarManager.hpp" />
     <ClInclude Include="TaskButton.hpp" />
     <ClInclude Include="TaskData.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nTask.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

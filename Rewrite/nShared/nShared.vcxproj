@@ -80,7 +80,9 @@
     <ClInclude Include="Math.h" />
     <ClInclude Include="Optional.hpp" />
     <ClInclude Include="ShellHelpers.h" />
+    <ClInclude Include="String.h" />
     <ClInclude Include="StringMap.hpp" />
+    <ClInclude Include="UIDGenerator.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Error.cpp" />

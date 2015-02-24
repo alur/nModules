@@ -19,4 +19,7 @@ public:
   // IEventHandler
 public:
   LRESULT APICALL HandleMessage(HWND, UINT message, WPARAM, LPARAM, IEventProcessor*) override;
+
+private:
+  void APICALL AddEventAction(LPCWSTR line);
 };

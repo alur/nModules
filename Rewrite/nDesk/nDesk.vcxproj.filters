@@ -9,4 +9,7 @@
     <ClInclude Include="DesktopPane.hpp" />
     <ClInclude Include="Workarea.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nDesk.rc" />
+  </ItemGroup>
 </Project>

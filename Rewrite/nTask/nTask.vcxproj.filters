@@ -12,5 +12,9 @@
     <ClInclude Include="TaskbarManager.hpp" />
     <ClInclude Include="Messages.h" />
     <ClInclude Include="TaskData.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nTask.rc" />
   </ItemGroup>
 </Project>

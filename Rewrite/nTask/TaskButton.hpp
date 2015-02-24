@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TaskData.h"
+
 #include "../nCoreApi/IEventHandler.hpp"
 #include "../nCoreApi/IEventProcessor.hpp"
 #include "../nCoreApi/IImagePainter.hpp"
@@ -30,7 +32,7 @@ public:
 
 public:
   TaskButton(IPane *pane, IPainter *bcakgroundPainter, IPainter *textPainter,
-    IEventHandler *eventHandler, HWND window);
+    IEventHandler *eventHandler, HWND window, TaskData &taskData);
   ~TaskButton();
 
 public:
@@ -40,11 +42,11 @@ public:
 public:
   void ActivateState(State state);
   void ClearState(State state);
+  void Flash();
   void GetButtonScreenRect(D2D1_RECT_F *rect);
   void MoveMouseToWindow();
   void Position(const NRECT &position);
   void Redraw(DWORD sections);
-  void SetOverlayIcon(HICON icon);
   void Show();
 
   // Button events
@@ -64,6 +66,7 @@ public:
 
 private:
   const HWND mWindow;
+  TaskData &mTaskData;
   IEventHandler * const mEventHandler;
   IImagePainter *mIconPainter;
   IImagePainter *mOverlayIconPainter;
@@ -72,6 +75,8 @@ private:
   HMENU mMenu;
   std::thread mMenuThread;
   HWND mMenuWindow;
+
+  UINT_PTR mFlashInterval;
 
   // Things that should be under ButtonSettings.
 private:

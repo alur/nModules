@@ -107,7 +107,8 @@ LRESULT Tray::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     if (IsWindow(gTrayNotifyWindow)) {
       D2D1_RECT_F r;
       mPane->GetScreenPosition(&r);
-      MoveWindow(gTrayNotifyWindow, r.left, r.top, r.right - r.left, r.bottom - r.top, FALSE);
+      MoveWindow(gTrayNotifyWindow, int(r.left + 0.5f), int(r.top + 0.5f),
+        int(r.right - r.left + 0.5f), int(r.bottom - r.top + 0.5f), FALSE);
     }
     return 0;
   }

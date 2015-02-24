@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IDataProvider.hpp"
 #include "IDiscardablePainter.hpp"
 #include "IDisplays.hpp"
 #include "IEventHandler.hpp"
@@ -19,6 +20,11 @@
 #endif
 
 namespace nCore {
+  /// <summary>
+  /// Clears a timer.
+  /// </summary>
+  CORE_API_PROC(void, ClearInterval, UINT_PTR timer);
+
   /// <summary>
   /// Connects to the core.
   /// </summary>
@@ -69,6 +75,11 @@ namespace nCore {
   /// </summary>
   CORE_API_PROC(IDiscardablePainter*, CreateTextPainter, const ISettingsReader*,
     const StateDefinition *states, BYTE numStates);
+
+  /// <summary>
+  /// Notifies the core that some number of data sources have changed.
+  /// </summary>
+  //void DataChanged(int num, LPCWSTR name, ...);
 
   /// <summary>
   /// Disconnects from the core.
@@ -170,9 +181,24 @@ namespace nCore {
   CORE_API_PROC(bool, ParseMonitor, LPCWSTR string, LPUINT out);
 
   /// <summary>
+  /// Registers a data provider.
+  /// </summary>
+  CORE_API_PROC(bool, RegisterDataProvider, LPCWSTR name, IDataProvider *provider);
+
+  /// <summary>
   /// Registers a window as a handler for the specified messages.
   /// </summary>
   CORE_API_PROC(void, RegisterForMessages, HWND window, const UINT messages[]);
+
+  /// <summary>
+  /// Sets a timer.
+  /// </summary>
+  CORE_API_PROC(UINT_PTR, SetInterval, UINT delay, IMessageHandler *handler);
+
+  /// <summary>
+  /// Unregisters a data provider.
+  /// </summary>
+  CORE_API_PROC(void, UnregisterDataProvider, LPCWSTR name);
 
   /// <summary>
   /// Unregisters a window as a handler for the specified messages.

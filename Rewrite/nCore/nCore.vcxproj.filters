@@ -54,6 +54,9 @@
     <ClCompile Include="BackgroundPainterState.cpp">
       <Filter>Implementations\Painters\BackgroundPainter</Filter>
     </ClCompile>
+    <ClCompile Include="Timers.cpp">
+      <Filter>Services</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Displays.hpp" />
@@ -63,9 +66,6 @@
     </ClInclude>
     <ClInclude Include="Messages.h" />
     <ClInclude Include="Api.h" />
-    <ClInclude Include="WindowMonitor.hpp">
-      <Filter>Services</Filter>
-    </ClInclude>
     <ClInclude Include="SettingsReader.hpp">
       <Filter>Implementations</Filter>
     </ClInclude>
@@ -102,6 +102,12 @@
     <ClInclude Include="BackgroundPainterState.hpp">
       <Filter>Implementations\Painters\BackgroundPainter</Filter>
     </ClInclude>
+    <ClInclude Include="Timers.h">
+      <Filter>Services</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowMonitor.h">
+      <Filter>Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Implementations">
@@ -125,5 +131,8 @@
     <Filter Include="Implementations\Painters\TextPainter">
       <UniqueIdentifier>{d8d73dd3-90b7-4c54-8e7a-26a88dbcf6bc}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nCore.rc" />
   </ItemGroup>
 </Project>

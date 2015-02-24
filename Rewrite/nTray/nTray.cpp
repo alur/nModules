@@ -13,7 +13,7 @@
 static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, LM_SYSTRAYINFOEVENT, 0 };
 static TrayManager *sTrayManager = nullptr;
 
-NModule gModule(L"nTray", MakeVersion(0, 9, 0, 0), MakeVersion(0, 9, 0, 0));
+NModule gModule(L"nTray", MakeVersion(1, 0, 0, 0), MakeVersion(1, 0, 0, 0));
 HWND gTrayNotifyWindow;
 
 
@@ -27,23 +27,14 @@ static void LoadSettings() {
 }
 
 
-int nModuleInit(NModule&) {
-  LoadSettings();
-  gTrayNotifyWindow = (HWND)SendMessage(GetLitestepWnd(), LM_SYSTRAYREADY, 0, 0);
-  PostMessage(gModule.window, NTRAY_GOT_INITIAL_ICONS, 0, 0);
-  return 0;
-}
-
-
-void nModuleQuit(NModule&) {
-}
-
-
 LRESULT WINAPI MessageHandlerProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
   switch (message) {
   case WM_CREATE:
     sTrayManager = new TrayManager();
     SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, WPARAM(window), LPARAM(sLsMessages));
+    LoadSettings();
+    gTrayNotifyWindow = (HWND)SendMessage(GetLitestepWnd(), LM_SYSTRAYREADY, 0, 0);
+    PostMessage(window, NTRAY_GOT_INITIAL_ICONS, 0, 0);
     return 0;
 
   case WM_DESTROY:

@@ -96,6 +96,7 @@
     <ClCompile Include="BackgroundPainter.cpp" />
     <ClCompile Include="BackgroundPainterState.cpp" />
     <ClCompile Include="ChildPainter.cpp" />
+    <ClCompile Include="DataManager.cpp" />
     <ClCompile Include="Displays.cpp" />
     <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="Factories.cpp" />
@@ -113,6 +114,7 @@
     <ClCompile Include="State.cpp" />
     <ClCompile Include="TextPainter.cpp" />
     <ClCompile Include="TextPainterState.cpp" />
+    <ClCompile Include="Timers.cpp" />
     <ClCompile Include="WindowMonitor.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -133,7 +135,8 @@
     <ClInclude Include="State.hpp" />
     <ClInclude Include="TextPainter.hpp" />
     <ClInclude Include="TextPainterState.hpp" />
-    <ClInclude Include="WindowMonitor.hpp" />
+    <ClInclude Include="Timers.h" />
+    <ClInclude Include="WindowMonitor.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nShared\nShared.vcxproj">
@@ -142,6 +145,9 @@
     <ProjectReference Include="..\nUtilities\nUtilities.vcxproj">
       <Project>{9a971a00-a016-4cc7-856d-939b5c1f895c}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nCore.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -15,12 +15,14 @@ extern BYTE gNumButtonStates;
 
 
 TaskButton::TaskButton(IPane *parent, IPainter *backgroundPainter, IPainter *textPainter,
-    IEventHandler *eventHandler, HWND window)
+    IEventHandler *eventHandler, HWND window, TaskData &taskData)
   : mEventHandler(eventHandler)
   , mIconPainter(nullptr)
   , mMenu(nullptr)
   , mMenuWindow(nullptr)
   , mOverlayIconPainter(nullptr)
+  , mTaskData(taskData)
+  , mFlashInterval(0)
   , mWindow(window)
 {
   mIconPosition = NRECT(NLENGTH(0, 0, 0), NLENGTH(0, 0, 0), NLENGTH(0, 0, 32), NLENGTH(0, 0, 32));
@@ -44,8 +46,11 @@ TaskButton::TaskButton(IPane *parent, IPainter *backgroundPainter, IPainter *tex
   initData.numStates = gNumButtonStates;
   mPane = parent->CreateChild(&initData);
 
+  if (IsIconic(window)) {
+    ActivateState(State::Minimized);
+  }
   if (window == gActiveWindow) {
-    mPane->ActivateState(State::Active);
+    ActivateState(State::Active);
   }
 
   wchar_t windowText[256];
@@ -66,6 +71,9 @@ TaskButton::~TaskButton() {
     PostMessage(mMenuWindow, WM_CANCELMODE, 0, 0);
     mMenuThread.join();
   }
+  if (mFlashInterval) {
+    nCore::ClearInterval(mFlashInterval);
+  }
   mPane->Discard();
   mIconPainter->Discard();
   mOverlayIconPainter->Discard();
@@ -74,6 +82,14 @@ TaskButton::~TaskButton() {
 
 void TaskButton::ActivateState(State state) {
   mPane->ActivateState(state);
+  if (state == State::Active) {
+    if (mFlashInterval) {
+      nCore::ClearInterval(mFlashInterval);
+      mFlashInterval = 0;
+      ClearState(State::Flashing);
+    }
+    ClearState(State::Minimized);
+  }
 }
 
 
@@ -82,7 +98,21 @@ void TaskButton::ClearState(State state) {
 }
 
 
+void TaskButton::Flash() {
+  if (!mFlashInterval) {
+    ActivateState(State::Flashing);
+    mFlashInterval = nCore::SetInterval(500, this);
+  }
+}
+
+
 void TaskButton::GetButtonScreenRect(D2D1_RECT_F *rect) {
+  WINDOWPLACEMENT wp;
+  GetWindowPlacement(mWindow, &wp);
+  if (wp.showCmd == SW_SHOWMINIMIZED || wp.showCmd == SW_SHOWMINNOACTIVE) {
+    // The window is being minimized.
+    ActivateState(State::Minimized);
+  }
   mPane->GetScreenPosition(rect);
 }
 
@@ -99,14 +129,18 @@ void TaskButton::Show() {
 
 void TaskButton::Redraw(DWORD parts) {
   mPane->Lock();
-  if (CHECKFLAG(parts, Part::Icon)) {
-    mIconPainter->SetImage(nCore::GetWindowIcon(mWindow, 32));
-    mPane->Repaint(&mIconPosition);
-  }
   if (CHECKFLAG(parts, Part::Text)) {
     wchar_t windowText[256];
     GetWindowText(mWindow, windowText, 256);
     mPane->SetText(windowText);
+  }
+  if (CHECKFLAG(parts, Part::Icon)) {
+    mIconPainter->SetImage(nCore::GetWindowIcon(mWindow, 32));
+    mPane->Repaint(&mIconPosition);
+  }
+  if (CHECKFLAG(parts, Part::OverlayIcon)) {
+    mOverlayIconPainter->SetImage(mTaskData.overlayIcon);
+    mPane->Repaint(&mOverlayIconPosition);
   }
   mPane->Unlock();
 }
@@ -115,11 +149,17 @@ void TaskButton::Redraw(DWORD parts) {
 LRESULT TaskButton::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam, NPARAM) {
   switch (msg) {
   case WM_MOUSEMOVE:
-    mPane->ActivateState(State::Hover);
+    ActivateState(State::Hover);
     return 0;
 
   case WM_MOUSELEAVE:
-    mPane->ClearState(State::Hover);
+    ClearState(State::Hover);
+    return 0;
+
+  case WM_TIMER:
+    if (wParam == mFlashInterval) {
+      mPane->ToggleState(State::Flashing);
+    }
     return 0;
 
   case WM_LBUTTONUP:
@@ -153,7 +193,7 @@ void TaskButton::SelectTask() {
     SetForegroundWindow(mWindow);
   } else if (gPreviouslyActiveWindow == mWindow) {
     PostMessage(mWindow, WM_SYSCOMMAND, SC_MINIMIZE, 0);
-    //ActivateState(State::Minimized);
+    ActivateState(State::Minimized);
   } else {
     if (gActiveWindowTracking != FALSE) {
       MoveMouseToWindow();
@@ -184,12 +224,6 @@ void TaskButton::OpenTaskProcess() {
     }
     CloseHandle(process);
   }
-}
-
-
-void TaskButton::SetOverlayIcon(HICON icon) {
-  mOverlayIconPainter->SetImage(icon);
-  mPane->Repaint(&mOverlayIconPosition);
 }
 
 

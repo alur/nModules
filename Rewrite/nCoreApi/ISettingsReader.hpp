@@ -20,6 +20,12 @@ public:
   virtual ISettingsReader* APICALL CreateChild(LPCWSTR name) const = 0;
 
   /// <summary>
+  /// Enumerates all lines with the given key.
+  /// </summary>
+  virtual void APICALL EnumLines(LPCWSTR key, void (APICALL *callback)(LPCWSTR line, LPARAM),
+    LPARAM) const = 0;
+
+  /// <summary>
   /// Reads a boolean value from the RC files.
   /// </summary>
   /// <returns>The boolean value</returns>

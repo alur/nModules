@@ -11,6 +11,8 @@
     <ClInclude Include="Optional.hpp" />
     <ClInclude Include="FallbackOptional.hpp" />
     <ClInclude Include="StringMap.hpp" />
+    <ClInclude Include="UIDGenerator.hpp" />
+    <ClInclude Include="String.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math.cpp" />

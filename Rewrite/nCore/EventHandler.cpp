@@ -1,4 +1,6 @@
+#include "Api.h"
 #include "EventHandler.hpp"
+
 
 #include "../nUtilities/Macros.h"
 
@@ -9,7 +11,10 @@ EXPORT_CDECL(IEventHandler*) CreateEventHandler(const ISettingsReader *settingsR
 
 
 EventHandler::EventHandler(const ISettingsReader *settingsReader) {
+  settingsReader->EnumLines(L"*On", [] (LPCWSTR line, LPARAM lParam) -> void {
+    EventHandler *self = (EventHandler*)lParam;
 
+  }, (LPARAM)this);
 }
 
 

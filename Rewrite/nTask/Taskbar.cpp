@@ -25,7 +25,8 @@ StateDefinition gButtonStates[] = {
 BYTE gNumButtonStates = _countof(gButtonStates);
 
 static const StringMap sDefaults({
-  {L"Width", L"100%"}
+  { L"ButtonFlashingColor", L"0xAAFF0000" },
+  { L"Width", L"100%" },
 });
 
 
@@ -218,7 +219,7 @@ void Taskbar::ActiveWindowChanged(HWND oldWindow, HWND newWindow) {
   if (iter != mButtonMap.end()) {
     iter->second->ClearState(TaskButton::State::Active);
   }
-  
+
   iter = mButtonMap.find(newWindow);
   if (iter != mButtonMap.end()) {
     iter->second->ActivateState(TaskButton::State::Active);
@@ -228,15 +229,15 @@ void Taskbar::ActiveWindowChanged(HWND oldWindow, HWND newWindow) {
 }
 
 
-TaskButton *Taskbar::AddTask(HWND window, bool isReplacement) {
+TaskButton *Taskbar::AddTask(HWND window, TaskData &taskData, bool isReplacement) {
   mPane->Lock();
 
   if (isReplacement) {
     mButtons.emplace(mReplacementPosition, mPane, (IPainter*)mButtonBackgroundPainter,
-      (IPainter*)mButtonTextPainter, mButtonEventHandler, window);
+      (IPainter*)mButtonTextPainter, mButtonEventHandler, window, taskData);
   } else {
     mButtons.emplace_back(mPane, (IPainter*)mButtonBackgroundPainter,
-      (IPainter*)mButtonTextPainter, mButtonEventHandler, window);
+      (IPainter*)mButtonTextPainter, mButtonEventHandler, window, taskData);
   }
   mButtonMap[window] = --mButtons.end();
 
@@ -275,17 +276,12 @@ void Taskbar::RemoveTask(HWND window, bool isBeingReplaced) {
 }
 
 
-void Taskbar::RedrawTask(HWND window, DWORD parts) {
+void Taskbar::RedrawTask(HWND window, DWORD parts, bool flash) {
   auto iter = mButtonMap.find(window);
   if (iter != mButtonMap.end()) {
     iter->second->Redraw(parts);
-  }
-}
-
-
-void Taskbar::SetOverlayIcon(HWND window, HICON icon) {
-  auto iter = mButtonMap.find(window);
-  if (iter != mButtonMap.end()) {
-    iter->second->SetOverlayIcon(icon);
+    if (flash) {
+      iter->second->Flash();
+    }
   }
 }

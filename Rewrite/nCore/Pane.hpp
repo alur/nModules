@@ -14,6 +14,7 @@ private:
     NRECT position;
     wchar_t parent[MAX_PREFIX];
     bool alwaysOnTop;
+    bool clickThrough;
     // The monitor to use for computing relative sizes. Top-level pane only.
     UINT monitor;
   } mSettings;
@@ -37,7 +38,7 @@ public:
 public:
   void APICALL Discard() override;
 
-  // IMessageHandler;
+  // IMessageHandler
 public:
   LRESULT APICALL HandleMessage(HWND, UINT, WPARAM, LPARAM, NPARAM) override;
 
@@ -60,6 +61,7 @@ public:
   void APICALL Repaint(LPCNRECT) override;
   void APICALL SetText(LPCWSTR) override;
   void APICALL Show() override;
+  void APICALL ToggleState(BYTE state) override;
   void APICALL Unlock() override;
 
   // Core only functions (PrivateApi)

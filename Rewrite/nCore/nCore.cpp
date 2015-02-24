@@ -2,8 +2,9 @@
 #include "Factories.h"
 #include "MessageRegistrar.h"
 #include "Messages.h"
+#include "Timers.h"
 #include "Pane.hpp"
-#include "WindowMonitor.hpp"
+#include "WindowMonitor.h"
 
 #include "../nShared/LiteStep.h"
 
@@ -64,6 +65,7 @@ LRESULT WINAPI MessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM l
       WindowMonitor::RunWindowMaintenance();
       return 0;
     }
+    Timers::Handle(wParam, lParam);
     return 0;
 
   case LM_FULLSCREENACTIVATED:

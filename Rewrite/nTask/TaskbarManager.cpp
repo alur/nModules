@@ -38,7 +38,7 @@ TaskbarManager::TaskbarManager(HWND messageWindow)
   SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)mMessageWindow, (LPARAM)sLSMessages);
   nCore::RegisterForMessages(mMessageWindow, sCoreMessages);
   mInitThread = std::thread([messageWindow] () -> void {
-    EnumDesktopWindows(nullptr, [] (HWND window, LPARAM messageWindow) -> BOOL {
+    EnumDesktopWindows(nullptr, (WNDENUMPROC) [] (HWND window, LPARAM messageWindow) -> BOOL {
       if (nCore::IsTaskbarWindow(window)) {
         PostMessage((HWND)messageWindow, LM_WINDOWCREATED, (WPARAM)window, 0);
       }
@@ -64,7 +64,7 @@ void TaskbarManager::Create(LPCWSTR name) {
   if (result.second) {
     Taskbar &taskbar = result.first->second;
     for (auto task : mTasks) {
-      taskbar.AddTask(task.first, false);
+      taskbar.AddTask(task.first, task.second.data, false);
     }
     if (mInitialized) {
       taskbar.Initialized();
@@ -94,7 +94,7 @@ void TaskbarManager::AddWindow(HWND window, bool isReplacement) {
   task.updateDuringMaintenance = false;
 
   for (auto &taskbar : mTaskbars) {
-    taskbar.second.AddTask(window, isReplacement);
+    taskbar.second.AddTask(window, task.data, isReplacement);
   }
 }
 
@@ -150,21 +150,26 @@ void TaskbarManager::RedrawWindow(HWND window, LPARAM lParam) {
   task.updateDuringMaintenance = false;
 
   for (auto &taskbar : mTaskbars) {
-    taskbar.second.RedrawTask(window, TaskButton::Text);
+    taskbar.second.RedrawTask(window, TaskButton::Text, lParam == HSHELL_HIGHBIT);
   }
 }
 
 
 void TaskbarManager::RedrawWindowIcon(HWND window) {
   for (auto &taskbar : mTaskbars) {
-    taskbar.second.RedrawTask(window, TaskButton::Icon);
+    taskbar.second.RedrawTask(window, TaskButton::Icon, false);
   }
 }
 
 
 void TaskbarManager::SetOverlayIcon(HWND window, HICON icon) {
+  if (mTasks.find(window) == mTasks.end()) {
+    return;
+  }
+  mTasks[window].data.overlayIcon = icon;
+
   for (auto &taskbar : mTaskbars) {
-    taskbar.second.SetOverlayIcon(window, icon);
+    taskbar.second.RedrawTask(window, TaskButton::OverlayIcon, false);
   }
 }
 
