@@ -43,31 +43,6 @@ typedef std::unordered_map<HWND, WindowData> WindowMap;
 static WindowMap sWindowData;
 
 
-EXPORT_CDECL(bool) IsTaskbarWindow(HWND window) {
-  if (!IsWindow(window) || !IsWindowVisible(window)) {
-    return false;
-  }
-  LONG_PTR exStyle = GetWindowLongPtr(window, GWL_EXSTYLE);
-  return CHECKFLAG(exStyle, WS_EX_APPWINDOW) ||
-    GetParent(window) == nullptr &&
-    GetWindow(window, GW_OWNER) == nullptr &&
-    !CHECKFLAG(exStyle, WS_EX_TOOLWINDOW) &&
-    GetWindowTextLength(window) != 0;
-}
-
-
-EXPORT_CDECL(HICON) GetWindowIcon(HWND window, UINT32 size) {
-  WindowMap::iterator iter = sWindowData.find(window);
-  if (iter == sWindowData.end()) {
-    return nullptr;
-  }
-  if (size > 20 && iter->second.largeIcon != nullptr) {
-    return iter->second.largeIcon;
-  }
-  return iter->second.smallIcon;
-}
-
-
 static void CALLBACK GetIconCallback(HWND window, UINT message, ULONG_PTR data, LRESULT result) {
   assert(message == WM_GETICON);
 
@@ -192,4 +167,32 @@ void WindowMonitor::RunWindowMaintenance() {
 
     ++iter;
   }
+}
+
+
+EXPORT_CDECL(bool) IsTaskbarWindow(HWND window) {
+  if (!IsWindow(window) || !IsWindowVisible(window)) {
+    return false;
+  }
+  LONG_PTR exStyle = GetWindowLongPtr(window, GWL_EXSTYLE);
+  return CHECKFLAG(exStyle, WS_EX_APPWINDOW) ||
+    GetParent(window) == nullptr &&
+    GetWindow(window, GW_OWNER) == nullptr &&
+    !CHECKFLAG(exStyle, WS_EX_TOOLWINDOW) &&
+    GetWindowTextLength(window) != 0;
+}
+
+
+EXPORT_CDECL(HICON) GetWindowIcon(HWND window, UINT32 size) {
+  WindowMap::iterator iter = sWindowData.find(window);
+  if (iter == sWindowData.end()) {
+    if (IsTaskbarWindow(window)) {
+      UpdateWindowData(window);
+    }
+    return nullptr;
+  }
+  if (size > 20 && iter->second.largeIcon != nullptr) {
+    return iter->second.largeIcon;
+  }
+  return iter->second.smallIcon;
 }

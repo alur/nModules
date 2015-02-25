@@ -128,6 +128,9 @@ LRESULT TaskbarManager::GetMinRect(HWND window, LPPOINTS points) {
 
 void TaskbarManager::RedrawWindow(HWND window, LPARAM lParam) {
   if (mTasks.find(window) == mTasks.end()) {
+    if (nCore::IsTaskbarWindow(window)) {
+      AddWindow(window, false);
+    }
     return;
   }
 
@@ -192,6 +195,9 @@ LRESULT TaskbarManager::HandleMessage(HWND window, UINT message, WPARAM wParam, 
     gActiveWindow = (HWND)wParam;
     for (auto &taskbar : mTaskbars) {
       taskbar.second.ActiveWindowChanged(gPreviouslyActiveWindow, gActiveWindow);
+    }
+    if (nCore::IsTaskbarWindow((HWND)wParam)) {
+      AddWindow((HWND)wParam, false); // Steam...
     }
     return 0;
 
