@@ -3,7 +3,7 @@
  *  The nModules Project
  *
  *  Main .cpp file for the nPopup module.
- *  
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include "CommandItem.hpp"
 #include "ContainerItem.hpp"
@@ -158,12 +158,16 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
 /// <summary>
 /// Called when a popup bang is executed.
 /// </summary>
-void __cdecl HandlePopupBang(HWND /* owner */, LPCTSTR bang, LPCTSTR /* args */)
-{
+void __cdecl HandlePopupBang(HWND /* owner */, LPCTSTR bang, LPCTSTR args) {
   Popup *popup = std::get(gRootPopups, bang, (Popup*)nullptr);
-  if (popup != nullptr)
-  {
-    popup->Show();
+  if (popup != nullptr) {
+    TCHAR x[16], y[16];
+    LPTSTR tokens[] = { x, y };
+    if (LiteStep::LCTokenize(args, tokens, 2, nullptr) == 2) {
+      popup->Show(_wtoi(x), _wtoi(y));
+    } else {
+      popup->Show();
+    }
   }
 }
 
@@ -241,7 +245,7 @@ bool LoadPopup(LPVOID f, PopupLevel level, Popup * & out, LPCTSTR parentPrefix)
 {
     TCHAR line[MAX_LINE_LENGTH], title[MAX_LINE_LENGTH], command[MAX_LINE_LENGTH], icon[MAX_LINE_LENGTH], prefix[MAX_LINE_LENGTH];
     ContentPopup::ContentSource source;
-    
+
     while (LiteStep::LCReadNextConfig(f, L"*Popup", line, _countof(line)))
     {
         PopupLineType type = ProcessPopupLine(line, source, title, _countof(title), command, _countof(command), icon, _countof(icon), prefix, _countof(prefix));
@@ -384,7 +388,7 @@ PopupLineType ProcessPopupLine(LPCTSTR line, ContentPopup::ContentSource & sourc
     LPCTSTR linePointer = line;
 
     LiteStep::GetToken(linePointer, nullptr, &linePointer, FALSE); // Drop *Popup
-    
+
     // The first token will be ~Folder, ~New, !Separator, !Info, !Container, .icon=, or a title.
     LiteStep::GetToken(linePointer, token, &linePointer, FALSE);
     if (_wcsicmp(token, L"~New") == 0)
@@ -468,7 +472,7 @@ PopupLineType ProcessPopupLine(LPCTSTR line, ContentPopup::ContentSource & sourc
             {
                 type = PopupLineType::Folder;
             }
-            else if (_wcsicmp(token, L"!PopupAdminTools") == 0) 
+            else if (_wcsicmp(token, L"!PopupAdminTools") == 0)
             {
                 source = ContentPopup::ContentSource::ADMIN_TOOLS;
                 type = PopupLineType::Content;
