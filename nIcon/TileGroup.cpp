@@ -162,14 +162,16 @@ void TileGroup::AddNameFilter(LPCWSTR name) {
     mHiddenItems.emplace(L"::{B4FB3F98-C1EA-428D-A78A-D1F5659CBA93}");
   } else if (_wcsicmp(name, L".onedrive") == 0) {
     LPWSTR path;
-    SHGetKnownFolderPath(FOLDERID_SkyDrive, 0, nullptr, &path);
-    mHiddenItems.emplace(path);
-    CoTaskMemFree(path);
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_SkyDrive, 0, nullptr, &path))) {
+      mHiddenItems.emplace(path);
+      CoTaskMemFree(path);
+    }
   } else if (_wcsicmp(name, L".user") == 0) {
     LPWSTR path;
-    SHGetKnownFolderPath(FOLDERID_Profile, 0, nullptr, &path);
-    mHiddenItems.emplace(path);
-    CoTaskMemFree(path);
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Profile, 0, nullptr, &path))) {
+      mHiddenItems.emplace(path);
+      CoTaskMemFree(path);
+    }
   } else {
     mHiddenItems.emplace(name);
   }
