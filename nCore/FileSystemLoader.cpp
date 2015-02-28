@@ -73,8 +73,9 @@ static HRESULT LoadIconUsingExtractImage(LoadThumbnailResponse &response, int ic
     WCHAR location[MAX_PATH];
     SIZE size = { iconSize, iconSize };
     DWORD flags = 0;
+    DWORD priority = IEIT_PRIORITY_NORMAL;
 
-    hr = extractImage->GetLocation(location, _countof(location), nullptr, &size, 0, &flags);
+    hr = extractImage->GetLocation(location, _countof(location), &priority, &size, 0, &flags);
 
     if (SUCCEEDED(hr)) {
       hr = extractImage->Extract(&response.thumbnail.bitmap);
