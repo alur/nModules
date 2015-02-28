@@ -149,6 +149,13 @@ LRESULT WINAPI LSMessageHandler(HWND window, UINT message, WPARAM wParam, LPARAM
         return 0;
 
     case LM_REFRESH:
+        for (auto & popup : gRootPopups)
+        {
+            LiteStep::RemoveBangCommand(popup.second->GetBang());
+            delete popup.second;
+        }
+        LiteStep::RemoveBangCommand(L"!PopupDynamicFolder");
+        LoadPopups();
         return 0;
     }
     return DefWindowProc(window, message, wParam, lParam);
