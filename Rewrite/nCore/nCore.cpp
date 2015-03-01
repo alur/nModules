@@ -15,7 +15,7 @@
 static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
   LM_FULLSCREENDEACTIVATED, 0 };
 static const wchar_t sName[] = L"nCore";
-static const VERSION sVersion = MakeVersion(0, 9, 0, 0);
+static const VERSION sVersion = MakeVersion(1, 0, 0, 0);
 
 Displays gDisplays;
 HINSTANCE gInstance = nullptr;

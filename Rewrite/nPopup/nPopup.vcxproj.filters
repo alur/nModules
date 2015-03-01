@@ -1,2 +1,38 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" />
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="nPopup.cpp" />
+    <ClCompile Include="Popup.cpp">
+      <Filter>Popups</Filter>
+    </ClCompile>
+    <ClCompile Include="ContentPopup.cpp">
+      <Filter>Popups</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Popup.hpp">
+      <Filter>Popups</Filter>
+    </ClInclude>
+    <ClInclude Include="PopupLevel.h" />
+    <ClInclude Include="PopupLineType.h" />
+    <ClInclude Include="nPopup.h" />
+    <ClInclude Include="ContentPopup.hpp">
+      <Filter>Popups</Filter>
+    </ClInclude>
+    <ClInclude Include="PopupItem.hpp">
+      <Filter>Items</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nPopup.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Popups">
+      <UniqueIdentifier>{43c23f87-6d63-4dff-a7c9-018966b45fc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Items">
+      <UniqueIdentifier>{e1ce1d8a-f0f6-438f-9242-c3b766bb57b8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

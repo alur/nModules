@@ -244,6 +244,9 @@ Pane::~Pane() {
   if (mParent) {
     mParent->mChildren.erase(this);
     mParent->Repaint(mRenderingPosition, true);
+    if (mParent->mActiveChild == this) {
+      mParent->mActiveChild = nullptr;
+    }
   }
   for (Pane *child : mChildren) {
     child->mParent = nullptr;

@@ -191,7 +191,7 @@ void AddPopup(Popup *popup)
 
 
 /// <summary>
-/// Reads through the .rc files and creates Taskbars.
+/// Reads through the .rc files and creates Popups.
 /// </summary>
 void LoadPopups()
 {
