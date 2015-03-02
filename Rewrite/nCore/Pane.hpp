@@ -57,6 +57,7 @@ public:
   HWND APICALL GetWindow() const override;
   void APICALL Hide() override;
   void APICALL Lock() override;
+  void APICALL Move(const NPOINT&) override;
   void APICALL Position(LPCNRECT) override;
   void APICALL Repaint(LPCNRECT) override;
   void APICALL SetText(LPCWSTR) override;

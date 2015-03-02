@@ -26,6 +26,10 @@ DesktopPane::DesktopPane()
   initData.numPainters = 1;
   initData.flags = PaneInitData::DesktopWindow;
 
+  ISettingsReader *reader = nCore::CreateSettingsReader(L"nDesk", nullptr);
+  mEventHandler = nCore::CreateEventHandler(reader);
+  reader->Discard();
+
   mPane = nCore::CreatePane(&initData);
   mPane->Show();
 }
@@ -35,6 +39,7 @@ DesktopPane::~DesktopPane() {
   if (mPane != nullptr) {
     mPane->Discard();
   }
+  mEventHandler->Discard();
 }
 
 
@@ -57,7 +62,7 @@ LRESULT DesktopPane::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM 
     return 0;
   }
 
-  return DefWindowProc(window, msg, wParam, lParam);
+  return mEventHandler->HandleMessage(window, msg, wParam, lParam, nullptr);
 }
 
 

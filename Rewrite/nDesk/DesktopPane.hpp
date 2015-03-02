@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../nCoreApi/IEventHandler.hpp"
 #include "../nCoreApi/IMessageHandler.hpp"
 #include "../nCoreApi/IPane.hpp"
 #include "../nCoreApi/IPainter.hpp"
@@ -46,6 +47,7 @@ private:
 
 private:
   std::vector<Wallpaper> mWallpapers;
+  IEventHandler *mEventHandler;
   IPane *mPane;
   ID2D1RenderTarget *mRenderTarget;
 };

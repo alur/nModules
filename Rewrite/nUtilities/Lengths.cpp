@@ -13,6 +13,22 @@ float NLength::Evaluate(float parentNLength, float dpi) const {
 }
 
 
+NLength &NLength::operator-=(const NLength &other) {
+  mDips -= other.mDips;
+  mFraction -= other.mFraction;
+  mPixels -= other.mPixels;
+  return *this;
+}
+
+
+NLength &NLength::operator+=(const NLength &other) {
+  mDips += other.mDips;
+  mFraction += other.mFraction;
+  mPixels += other.mPixels;
+  return *this;
+}
+
+
 NLength NLength::operator-(const NLength &other) const {
   return NLength(mPixels - other.mPixels, mFraction - other.mFraction, mDips - other.mDips);
 }
@@ -43,9 +59,20 @@ bool NLength::operator!=(const NLength &other) const {
 }
 
 
-
 NRect::NRect() {}
 
 
 NRect::NRect(const NLENGTH &left, const NLENGTH &top, const NLENGTH &right, const NLENGTH &bottom)
   : left(left), top(top), right(right), bottom(bottom) {}
+
+
+NSize::NSize() {}
+
+
+NSize::NSize(const NLENGTH &width, const NLENGTH &height) : width(width), height(height) {};
+
+
+NPoint::NPoint() {}
+
+
+NPoint::NPoint(const NLENGTH &x, const NLENGTH &y) : x(x), y(y) {}

@@ -148,10 +148,41 @@ void Pane::Lock() {
 }
 
 
+void Pane::Move(const NPOINT &point) {
+  mSettings.position.bottom -= mSettings.position.top - point.y;
+  mSettings.position.top = point.y;
+  mSettings.position.right -= mSettings.position.left - point.x;
+  mSettings.position.left = point.x;
+
+  if (!IsChildPane()) {
+    MoveWindow(mWindow, (int)EvaluateLengthParent(mSettings.position.left, true),
+      (int)EvaluateLengthParent(mSettings.position.top, false), (int)mSize.width,
+      (int)mSize.height, FALSE);
+  } else if (mParent) {
+    Repaint(false); // Invalidate where we used to be
+    mRenderingPosition = D2D1::RectF(
+      EvaluateLengthParent(mSettings.position.left, true) + mParent->mRenderingPosition.left,
+      EvaluateLengthParent(mSettings.position.top, false) + mParent->mRenderingPosition.top,
+      EvaluateLengthParent(mSettings.position.right, true) + mParent->mRenderingPosition.left,
+      EvaluateLengthParent(mSettings.position.bottom, false) + mParent->mRenderingPosition.top);
+    for (int i = 0; i < mPainters.size(); ++i) {
+      mPainters[i]->PositionChanged(this, mPainterData[i], mRenderingPosition, true, false);
+    }
+    Repaint(true); // And where we are now
+  }
+}
+
+
 void Pane::Position(LPCNRECT position) {
   mSettings.position = *position;
 
-  if (IsChildPane() && mParent) {
+  if (!IsChildPane()) {
+    //D2D1_RECT_U oldPosition = mWindowPosition;
+    mSize = D2D1::SizeF(
+      mRenderingPosition.right - mRenderingPosition.left,
+      mRenderingPosition.bottom - mRenderingPosition.top);
+
+  } else if (mParent) {
     D2D1_RECT_F newPosition = D2D1::RectF(
       EvaluateLengthParent(mSettings.position.left, true) + mParent->mRenderingPosition.left,
       EvaluateLengthParent(mSettings.position.top, false) + mParent->mRenderingPosition.top,
@@ -177,12 +208,6 @@ void Pane::Position(LPCNRECT position) {
       mPainters[i]->PositionChanged(this, mPainterData[i], mRenderingPosition, isMove, isSize);
     }
     Repaint(true); // And where we are now
-  } else {
-    //D2D1_RECT_U oldPosition = mWindowPosition;
-    //SetWindowPos(mWindow, 0, int());
-    mSize = D2D1::SizeF(
-      mRenderingPosition.right - mRenderingPosition.left,
-      mRenderingPosition.bottom - mRenderingPosition.top);
   }
 }
 

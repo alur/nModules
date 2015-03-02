@@ -5,6 +5,7 @@
 
 #include "../nShared/AlgorithmExt.h"
 #include "../nShared/LiteStep.h"
+#include "../nShared/String.h"
 
 #include "../nUtilities/lsapi.h"
 
@@ -14,7 +15,7 @@
 NModule gModule(L"nLabel", MakeVersion(1, 0, 0, 0), MakeVersion(1, 0, 0, 0));
 
 static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, 0 };
-static std::unordered_map<std::wstring, Popup*> gPopups;
+static StringKeyedMaps<std::wstring, Popup*>::UnorderedMap gPopups;
 
 
 void __cdecl HandlePopupBang(HWND /* owner */, LPCWSTR bang, LPCWSTR args) {
@@ -36,12 +37,13 @@ static void DestroyPopups() {
     RemoveBangCommand(popup.first.c_str());
     delete popup.second;
   }
+  gPopups.clear();
 }
 
 
 static void LoadPopups() {
   // Pre-defined popups
-  /*AddPopup(L"!PopupAdminTools", new Popup(ContentPopup::ContentSource::ADMIN_TOOLS, L"Admin Tools", L"nPopup"));
+  /*AddPopup(L"!PopupAdminTools", new ContentPopup(ContentPopup::ContentSource::ADMIN_TOOLS, L"Admin Tools", L"nPopup"));
   AddPopup(L"!PopupControlPanel", new ContentPopup(ContentPopup::ContentSource::CONTROL_PANEL, L"Control Panel", L"nPopup"));
   AddPopup(new ContentPopup(ContentPopup::ContentSource::MY_COMPUTER, L"My Computer", L"!PopupMyComputer", L"nPopup"));
   AddPopup(new ContentPopup(ContentPopup::ContentSource::NETWORK, L"Network", L"!PopupNetwork", L"nPopup"));
@@ -87,10 +89,11 @@ static bool LoadPopup(LPVOID f, PopupLevel level, Popup *&popup, LPWSTR bang, si
         return true;
       }
     } else switch (type) {
-    case PopupLineType::Folder:
-      //Popup *folder = new FolderPopup(title, nullptr, prefix[0] == L'\0' ? parentPrefix : prefix);
-      //LoadPopup(f, PopupLevel::Folder, folder, prefix[0] == L'\0' ? parentPrefix : prefix);
-      //popup->AddItem(new nPopup::FolderItem(popup, title, popup, icon));
+    case PopupLineType::Folder: {
+        //Popup *folder = new Popup(title, *prefix ? parentPrefix : prefix);
+        //LoadPopup(f, PopupLevel::Folder, folder, nullptr, 0, *prefix ? parentPrefix : prefix);
+        //popup->AddItem(new nPopup::FolderItem(popup, title, popup, icon));
+      }
       break;
 
     case PopupLineType::EndFolder:

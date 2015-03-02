@@ -22,6 +22,8 @@ public:
 public:
   ISettingsReader* APICALL CreateChild(LPCWSTR) const override;
 
+  void APICALL EnumCommandLines(LPCWSTR key, void (APICALL *callback)(LPCWSTR line, LPARAM),
+    LPARAM) const override;
   void APICALL EnumLines(LPCWSTR key, void (APICALL *callback)(LPCWSTR line, LPARAM),
     LPARAM) const override;
 

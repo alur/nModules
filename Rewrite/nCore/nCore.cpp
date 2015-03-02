@@ -1,4 +1,5 @@
 #include "Displays.hpp"
+#include "Logger.hpp"
 #include "Factories.h"
 #include "MessageRegistrar.h"
 #include "Messages.h"
@@ -18,6 +19,7 @@ static const wchar_t sName[] = L"nCore";
 static const VERSION sVersion = MakeVersion(1, 0, 0, 0);
 
 Displays gDisplays;
+Logger *gLogger = nullptr;
 HINSTANCE gInstance = nullptr;
 HWND gWindow = nullptr;
 
@@ -127,6 +129,7 @@ static HRESULT RegisterMessageClass(HINSTANCE instance) {
 
 
 EXPORT_CDECL(int) initModuleW(HWND /* parent */, HINSTANCE instance, LPCWSTR /* path */) {
+  gLogger = new Logger(sName);
   gInstance = instance;
   RegisterMessageClass(instance);
   CreateMessageHandler(instance, sName, MessageHandler, gWindow);
@@ -145,6 +148,8 @@ EXPORT_CDECL(void) quitModule(HINSTANCE instance) {
   gWindow = nullptr;
   UnregisterClass(L"LSnModuleMsgHandler", instance);
   gInstance = nullptr;
+  delete gLogger;
+  gLogger = nullptr;
 }
 
 

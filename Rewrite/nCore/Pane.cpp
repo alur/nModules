@@ -387,14 +387,14 @@ void Pane::Repaint(bool update) {
 
 void Pane::Repaint(const D2D1_RECT_F &area, bool update) {
   if (mVisible) {
-    if (IsChildPane() && mParent) {
-      mParent->Repaint(area, update && mUpdateLock == 0);
-    } else {
+    if (!IsChildPane()) {
       RECT r = { (LONG)area.left, (LONG)area.top, (LONG)area.right, (LONG)area.bottom };
       InvalidateRect(mWindow, &r, FALSE);
       if (update && mUpdateLock == 0) {
         UpdateWindow(mWindow);
       }
+    } else if (mParent) {
+      mParent->Repaint(area, update && mUpdateLock == 0);
     }
   }
 }

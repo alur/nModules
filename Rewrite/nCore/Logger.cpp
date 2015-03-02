@@ -9,11 +9,11 @@ EXPORT_CDECL(ILogger*) CreateLogger(LPCWSTR name) {
   return new Logger(name);
 }
 
-Logger::Logger(LPCWSTR name) : mName(_wcsdup(name)) {}
+
+Logger::Logger(LPCWSTR name) : mName(name) {}
 
 
 Logger::~Logger() {
-  free(mName);
 }
 
 

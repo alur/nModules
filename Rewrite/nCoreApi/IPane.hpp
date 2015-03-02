@@ -118,6 +118,11 @@ public:
   /// Lock().
   /// </summary>
   virtual void APICALL Lock() = 0;
+  
+  /// <summary>
+  /// Moves the top-left corner of the pane to the given position.
+  /// </summary>
+  virtual void APICALL Move(const NPOINT&) = 0;
 
   /// <summary>
   /// Repositions the pane.

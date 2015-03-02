@@ -23,6 +23,8 @@ Popup::Popup(LPCWSTR title, LPCWSTR prefix) {
   paneInitData.numPainters = _countof(painters);
   mPane = nCore::CreatePane(&paneInitData);
 
+  mPane->SetText(title);
+
   reader->Discard();
 }
 
@@ -35,15 +37,28 @@ Popup::~Popup() {
 
 
 void Popup::Show() {
-  mPane->Show();
+  POINT pt;
+  GetCursorPos(&pt);
+  Show(pt.x, pt.y);
 }
 
 
 void Popup::Show(int x, int y) {
+  mPane->Move(NPOINT(NLENGTH(x, 0, 0), NLENGTH(y, 0, 0)));
   mPane->Show();
+  SetWindowPos(mPane->GetWindow(), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+  SetFocus(mPane->GetWindow());
+  SetActiveWindow(mPane->GetWindow());
 }
 
 
 LRESULT Popup::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam, NPARAM) {
+  switch(message) {
+    case WM_ACTIVATE:
+      if (LOWORD(wParam) == WA_INACTIVE) {
+        mPane->Hide();
+      }
+      return 0;
+  }
   return DefWindowProc(window, message, wParam, lParam);
 }

@@ -74,6 +74,17 @@ void SettingsReader::Discard() {
 }
 
 
+void SettingsReader::EnumCommandLines(LPCWSTR key,
+    void (APICALL *callback)(LPCWSTR line, LPARAM lParam), LPARAM lParam) const {
+  wchar_t prefixedKey[MAX_PREFIX];
+  prefixedKey[0] = '*';
+  for (LPCWSTR prefix : mPrefixes) {
+    ConcatenateStrings(prefixedKey + 1, _countof(prefixedKey) - 1, prefix, key);
+    EnumRCLines(prefixedKey, callback, lParam);
+  }
+}
+
+
 void SettingsReader::EnumLines(LPCWSTR key, void (APICALL *callback)(LPCWSTR line, LPARAM lParam),
     LPARAM lParam) const {
   wchar_t prefixedKey[MAX_PREFIX];

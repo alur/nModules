@@ -2,6 +2,8 @@
 
 #include "../nCoreApi/ILogger.hpp"
 
+#include <string>
+
 class Logger : public ILogger {
 public:
   explicit Logger(LPCWSTR name);
@@ -23,5 +25,5 @@ public:
   void APICALL ErrorHR(HRESULT, LPCWSTR, ...) override;
 
 private:
-  LPWSTR mName;
+  std::wstring mName;
 };

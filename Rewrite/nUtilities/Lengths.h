@@ -12,6 +12,8 @@ public:
   NLength(float pixels, float fraction, float dips);
 
 public:
+  NLength &operator-=(const NLength&);
+  NLength &operator+=(const NLength&);
   NLength operator-(const NLength&) const;
   NLength operator+(const NLength&) const;
   NLength operator*(float) const;
@@ -29,7 +31,7 @@ private:
 } NLENGTH;
 
 
-typedef class NRect {
+typedef struct NRect {
 public:
   NRect();
   NRect(const NLENGTH &left, const NLENGTH &top, const NLENGTH &right, const NLENGTH &bottom);
@@ -43,8 +45,23 @@ public:
 typedef const NRECT *LPCNRECT;
 
 
-typedef class NSize {
+typedef struct NSize {
+public:
+  NSize();
+  NSize(const NLENGTH &width, const NLENGTH &height);
+
 public:
   NLENGTH width;
   NLENGTH height;
 } NSIZE;
+
+
+typedef struct NPoint {
+public:
+  NPoint();
+  NPoint(const NLENGTH &x, const NLENGTH &y);
+
+public:
+  NLENGTH x;
+  NLENGTH y;
+} NPOINT;

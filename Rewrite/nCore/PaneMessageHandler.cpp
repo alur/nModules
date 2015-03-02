@@ -1,5 +1,7 @@
 #include "Pane.hpp"
 
+#include "../nCoreApi/Messages.h"
+
 #include "../nUtilities/Windows.h"
 
 #include <assert.h>
@@ -41,11 +43,10 @@ LRESULT Pane::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam,
       }
     }
 
-    if (msg == WM_MOUSEMOVE) {
-      if (!mIsTrackingMouse && mWindow) {
-        mIsTrackingMouse = true;
-        TrackMouseEvent(&mTrackMouseEvent);
-      }
+    if (msg == WM_MOUSEMOVE && !mIsTrackingMouse && mWindow) {
+      mIsTrackingMouse = true;
+      TrackMouseEvent(&mTrackMouseEvent);
+      mMessageHandler->HandleMessage(window, NCORE_WM_MOUSEENTER, wParam, lParam, 0);
     }
 
     if (handler != mActiveChild) {
@@ -55,6 +56,9 @@ LRESULT Pane::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam,
         mMessageHandler->HandleMessage(window, WM_MOUSEMOVE, wParam, lParam, 0);
       }
       mActiveChild = (Pane*)handler;
+      if (handler) {
+        handler->HandleMessage(window, NCORE_WM_MOUSEENTER, wParam, lParam, 0);
+      }
     }
 
     // Just let our message handler deal with it.

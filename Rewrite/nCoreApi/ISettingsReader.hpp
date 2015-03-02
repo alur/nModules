@@ -20,6 +20,12 @@ public:
   virtual ISettingsReader* APICALL CreateChild(LPCWSTR name) const = 0;
 
   /// <summary>
+  /// Enumerates all command lines with the given key.
+  /// </summary>
+  virtual void APICALL EnumCommandLines(LPCWSTR key,
+    void (APICALL *callback)(LPCWSTR line, LPARAM), LPARAM) const = 0;
+
+  /// <summary>
   /// Enumerates all lines with the given key.
   /// </summary>
   virtual void APICALL EnumLines(LPCWSTR key, void (APICALL *callback)(LPCWSTR line, LPARAM),
