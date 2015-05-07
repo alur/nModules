@@ -52,7 +52,9 @@ Tray::Tray(LPCTSTR name)
   windowSettings.Load(mSettings, &sWindowDefaults);
 
   mWindow->Initialize(windowSettings, &mStateRender);
-  mWindow->Show();
+  if (!mWindow->GetDrawingSettings()->hidden) {
+    mWindow->Show();
+  }
 
   LoadSettings();
 
