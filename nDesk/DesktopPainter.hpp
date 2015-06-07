@@ -118,4 +118,8 @@ private:
     // If on, every window will be repainted when the wallpaper is changed instead of just the
     // desktop background. Fixes issues with other modules (xModules).
     bool m_bInvalidateAllOnUpdate;
+
+    //Event to check if Desktop Wallpaper has been changed
+    HANDLE hWallpaperEvent;
+    HKEY   hWallpaperKey;
 };
