@@ -8,9 +8,8 @@
 #include "../nCoreApi/Core.h"
 #include "../nCoreApi/Messages.h"
 
-#include "../nUtilities/lsapi.h"
-#include "../nUtilities/Macros.h"
-#include "../nUtilities/Windows.h"
+#include "../Headers/lsapi.h"
+#include "../Headers/Macros.h"
 
 NModule gModule(L"nDesk", MakeVersion(1, 0, 0, 0), MakeVersion(1, 0, 0, 0));
 
@@ -34,6 +33,7 @@ LRESULT WINAPI MessageHandlerProc(HWND window, UINT message, WPARAM wParam, LPAR
     return 0;
 
   case NCORE_DISPLAYS_CHANGED:
+    sDesktopPane->UpdateWallpapers();
     LoadWorkareas();
     return 0;
 

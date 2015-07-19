@@ -5,7 +5,7 @@
 #include "../nCoreApi/IImagePainter.hpp"
 #include "../nCoreApi/IPane.hpp"
 
-#include "../nUtilities/lsapi.h"
+#include "../Headers/lsapi.h"
 
 class TrayIcon : public IMessageHandler {
 public:

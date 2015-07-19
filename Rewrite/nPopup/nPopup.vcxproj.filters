@@ -8,6 +8,16 @@
     <ClCompile Include="ContentPopup.cpp">
       <Filter>Popups</Filter>
     </ClCompile>
+    <ClCompile Include="CommandItem.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="PopupItem.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="PopupData.cpp" />
+    <ClCompile Include="InfoItem.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -21,6 +31,13 @@
       <Filter>Popups</Filter>
     </ClInclude>
     <ClInclude Include="PopupItem.hpp">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandItem.hpp">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="PopupData.hpp" />
+    <ClInclude Include="InfoItem.hpp">
       <Filter>Items</Filter>
     </ClInclude>
   </ItemGroup>

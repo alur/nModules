@@ -2,7 +2,7 @@
 
 #include "../nCoreApi/Messages.h"
 
-#include "../nUtilities/Windows.h"
+#include "../Headers/Windows.h"
 
 #include <assert.h>
 #include <windowsx.h>
@@ -87,7 +87,9 @@ LRESULT Pane::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam,
   case WM_PAINT:
     {
       RECT updateRect;
-      if (GetUpdateRect(window, &updateRect, FALSE) != FALSE) {
+      // The mVisible check is here because we continiously receieve WM_PAINT message for hidden
+      // windows. Needs to be investigated.
+      if (mVisible && GetUpdateRect(window, &updateRect, FALSE) != FALSE) {
         if (ReCreateDeviceResources() == S_OK) {
           D2D1_RECT_F d2dUpdateRect = D2D1::RectF((FLOAT)updateRect.left, (FLOAT)updateRect.top,
             (FLOAT)updateRect.right, (FLOAT)updateRect.bottom);

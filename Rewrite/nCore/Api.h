@@ -7,10 +7,10 @@
 #include "../nCoreApi/IImagePainter.hpp"
 #include "../nCoreApi/ILogger.hpp"
 #include "../nCoreApi/IStringMAp.hpp"
+#include "../nCoreApi/Version.h"
 
-#include "../nUtilities/d2d1.h"
-#include "../nUtilities/Macros.h"
-#include "../nUtilities/Version.h"
+#include "../Headers/d2d1.h"
+#include "../Headers/Macros.h"
 
 EXPORT_CDECL(void) ClearInterval(UINT_PTR timer);
 EXPORT_CDECL(IDiscardablePainter*) CreateBackgroundPainter(const ISettingsReader *reader,

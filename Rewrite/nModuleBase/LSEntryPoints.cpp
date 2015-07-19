@@ -4,8 +4,8 @@
 
 #include "../nCoreApi/Core.h"
 
-#include "../nUtilities/Macros.h"
-#include "../nUtilities/Windows.h"
+#include "../Headers/Macros.h"
+#include "../Headers/Windows.h"
 
 // All modules are expected to provide these globals.
 extern NModule gModule;

@@ -18,17 +18,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\nCoreApi\nCoreApi.vcxproj">
-      <Project>{dbbf5b43-ff47-437c-85e5-fb7c024aab61}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\nShared\nShared.vcxproj">
-      <Project>{1ef8ca33-6355-4206-b3cf-e500498aa67d}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\nUtilities\nUtilities.vcxproj">
-      <Project>{9a971a00-a016-4cc7-856d-939b5c1f895c}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{17049036-883C-4374-B17D-5C4E59BC1196}</ProjectGuid>
     <RootNamespace>nWallpaper</RootNamespace>

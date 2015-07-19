@@ -2,8 +2,8 @@
 
 #include "../nCoreApi/ISettingsReader.hpp"
 
-#include "../nUtilities/d2d1.h"
-#include "../nUtilities/lsapi.h"
+#include "../Headers/d2d1.h"
+#include "../Headers/lsapi.h"
 
 #include <dwrite.h>
 #include <vector>

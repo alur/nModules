@@ -7,8 +7,8 @@
 
 #include "../nCoreApi/Messages.h"
 
-#include "../nUtilities/lsapi.h"
-#include "../nUtilities/Macros.h"
+#include "../Headers/lsapi.h"
+#include "../Headers/Macros.h"
 
 extern Logger *gLogger;
 
@@ -73,6 +73,11 @@ DWORD EventHandler::ParseEventLine(LPCWSTR line, LPWSTR action, size_t cchAction
   if (GetToken(line, token, &line, FALSE) == FALSE) {
     return 0;
   }
+
+  if (line == nullptr) {
+    return 0;
+  }
+
   mods = ModsFromString(token);
 
   StringCchCopy(action, cchAction, line);

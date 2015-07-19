@@ -8,9 +8,8 @@
 #include "../nCoreApi/Core.h"
 #include "../nCoreApi/Messages.h"
 
-#include "../nUtilities/lsapi.h"
-#include "../nUtilities/Macros.h"
-#include "../nUtilities/Windows.h"
+#include "../Headers/lsapi.h"
+#include "../Headers/Macros.h"
 
 NModule gModule(L"nTask", MakeVersion(1, 0, 0, 0), MakeVersion(1, 0, 0, 0));
 
@@ -86,6 +85,7 @@ LRESULT WINAPI MessageHandlerProc(HWND window, UINT message, WPARAM wParam, LPAR
   case NCORE_DISPLAYS_CHANGED:
   case NCORE_WINDOW_ICON_CHANGED:
   case NTASK_INITIALIZED:
+  case WM_TIMER:
     return sTaskbarManager->HandleMessage(window, message, wParam, lParam);
   }
 

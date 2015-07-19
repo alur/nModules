@@ -47,9 +47,16 @@
     <ClInclude Include="IStringMap.hpp">
       <Filter>Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="Lengths.h" />
+    <ClInclude Include="Version.h" />
+    <ClInclude Include="IDataProvider.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp" />
+    <ClCompile Include="Lengths.cpp" />
+    <ClCompile Include="Version.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

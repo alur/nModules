@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../nUtilities/Windows.h"
+#include "../Headers/Windows.h"
 
 #include <ShObjIdl.h>
 
@@ -9,5 +9,6 @@ struct TaskData {
   TBPFLAG progressState;
   USHORT progress;
   bool flashing;
+  bool minimized;
   HICON overlayIcon;
 };

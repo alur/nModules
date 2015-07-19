@@ -9,9 +9,9 @@
 
 #include "../nShared/LiteStep.h"
 
-#include "../nUtilities/lsapi.h"
-#include "../nUtilities/Macros.h"
-#include "../nUtilities/Windows.h"
+#include "../Headers/lsapi.h"
+#include "../Headers/Macros.h"
+#include "../Headers/Windows.h"
 
 static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, LM_FULLSCREENACTIVATED,
   LM_FULLSCREENDEACTIVATED, 0 };

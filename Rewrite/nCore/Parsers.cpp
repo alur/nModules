@@ -47,18 +47,18 @@ EXPORT_CDECL(bool) ParseMonitor(LPCWSTR string, LPUINT out) {
     LPCTSTR name;
     UINT value;
   } monitorMap[] =  {
-    { L"primary",      0 },
-    { L"secondary",    1 },
-    { L"tertiary",     2 },
-    { L"quaternary",   3 },
-    { L"quinary",      4 },
-    { L"senary",       5 },
-    { L"septenary",    6 },
-    { L"octonary",     7 },
-    { L"nonary",       8 },
-    { L"denary",       9 },
-    { L"duodenary",   11 },
-    { L"all", 0xFFFFFFFF }
+    { L"primary",       0 },
+    { L"secondary",     1 },
+    { L"tertiary",      2 },
+    { L"quaternary",    3 },
+    { L"quinary",       4 },
+    { L"senary",        5 },
+    { L"septenary",     6 },
+    { L"octonary",      7 },
+    { L"nonary",        8 },
+    { L"denary",        9 },
+    { L"duodenary",    11 },
+    { L"all", MONITOR_ALL }
   };
 
   if (string == nullptr || out == nullptr) {

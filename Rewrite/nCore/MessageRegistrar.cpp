@@ -1,5 +1,5 @@
-#include "../nUtilities/Macros.h"
-#include "../nUtilities/Windows.h"
+#include "../Headers/Macros.h"
+#include "../Headers/Windows.h"
 
 #include <unordered_map>
 #include <unordered_set>

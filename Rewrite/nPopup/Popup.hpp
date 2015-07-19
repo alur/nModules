@@ -5,7 +5,9 @@
 #include "../nCoreApi/IDiscardablePainter.hpp"
 #include "../nCoreApi/IPane.hpp"
 
-#include "../nUtilities/Windows.h"
+#include "../Headers/Windows.h"
+
+#include <vector>
 
 class Popup : public IMessageHandler {
 public:
@@ -25,4 +27,6 @@ public:
   IPane *mPane;
   IDiscardablePainter *mTitlePainter;
   IDiscardablePainter *mBackgroundPainter;
+
+  std::vector<PopupItem*> mItems;
 };

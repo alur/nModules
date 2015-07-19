@@ -2,7 +2,7 @@
 
 #include "../nCoreApi/Core.h"
 
-#include "../nUtilities/lsapi.h"
+#include "../Headers/lsapi.h"
 
 const StateDefinition sStates[] = {
   { L"Hover",   0, 0 }, // 1

@@ -7,8 +7,8 @@
 
 #include "../nCoreApi/Core.h"
 
-#include "../nUtilities/lsapi.h"
-#include "../nUtilities/Macros.h"
+#include "../Headers/lsapi.h"
+#include "../Headers/Macros.h"
 
 static const UINT sLsMessages[] = { LM_GETREVID, LM_REFRESH, LM_SYSTRAY, LM_SYSTRAYINFOEVENT, 0 };
 static TrayManager *sTrayManager = nullptr;

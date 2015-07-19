@@ -11,9 +11,9 @@
 #include "ISettingsReader.hpp"
 #include "IStringMap.hpp"
 #include "TaskWindow.h"
+#include "Version.h"
 
-#include "../nUtilities/Version.h"
-#include "../nUtilities/Windows.h"
+#include "../Headers/Windows.h"
 
 #ifndef CORE_API_PROC
 #define CORE_API_PROC(x, y, ...) extern x (__cdecl *y)(__VA_ARGS__)

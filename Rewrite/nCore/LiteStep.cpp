@@ -1,5 +1,5 @@
-#include "../nUtilities/lsapi.h"
-#include "../nUtilities/Macros.h"
+#include "../Headers/lsapi.h"
+#include "../Headers/Macros.h"
 
 #include <functional>
 

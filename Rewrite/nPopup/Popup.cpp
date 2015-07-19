@@ -25,11 +25,17 @@ Popup::Popup(LPCWSTR title, LPCWSTR prefix) {
 
   mPane->SetText(title);
 
+  reader->GetBool(L"ConfineToMonitor", false);
+  reader->GetBool(L"ConfineToWorkArea", false);
+
   reader->Discard();
 }
 
 
 Popup::~Popup() {
+  for (PopupItem *item : mItems) {
+    delete item;
+  }
   mPane->Discard();
   mTitlePainter->Discard();
   mBackgroundPainter->Discard();
@@ -46,6 +52,11 @@ void Popup::Show() {
 void Popup::Show(int x, int y) {
   mPane->Move(NPOINT(NLENGTH(x, 0, 0), NLENGTH(y, 0, 0)));
   mPane->Show();
+
+  for (PopupItem *item : mItems) {
+
+  }
+
   SetWindowPos(mPane->GetWindow(), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
   SetFocus(mPane->GetWindow());
   SetActiveWindow(mPane->GetWindow());

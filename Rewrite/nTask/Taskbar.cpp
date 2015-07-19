@@ -4,7 +4,7 @@
 
 #include "../nCoreApi/Core.h"
 
-#include "../nUtilities/lsapi.h"
+#include "../Headers/lsapi.h"
 
 #include <assert.h>
 #include <algorithm>
@@ -36,6 +36,7 @@ Taskbar::Taskbar(LPCWSTR prefix)
   , mButtonTextPainter(nullptr)
   , mButtonBackgroundPainter(nullptr)
   , mEventHandler(nullptr)
+  , mLayoutOnUnlock(false)
   , mLock(1)
 {
   mReplacementPosition = mButtons.end();
@@ -53,8 +54,9 @@ Taskbar::Taskbar(LPCWSTR prefix)
   IPainter *painters[] = { mBackgroundPainter, nCore::GetChildPainter() };
   initData.painters = painters;
   initData.numPainters = _countof(painters);
-
   mPane = nCore::CreatePane(&initData);
+
+  mMonitor = reader->GetMonitor(L"Monitor", MONITOR_ALL);
 
   ISettingsReader *buttonReader = reader->CreateChild(L"Button");
   mButtonEventHandler = nCore::CreateEventHandler(buttonReader);
@@ -77,7 +79,8 @@ Taskbar::Taskbar(LPCWSTR prefix)
 
 Taskbar::~Taskbar() {
   mPane->Lock(); // Never paint again.
-
+  
+  mButtonMap.clear();
   mButtons.clear();
   mButtonBackgroundPainter->Discard();
   mButtonTextPainter->Discard();
@@ -100,8 +103,10 @@ void Taskbar::Initialized() {
 // and rerun this whenever the taskbar is resized.
 void Taskbar::Relayout() {
   if (mLock != 0 || mButtons.size() == 0) {
+    mLayoutOnUnlock = true;
     return;
   }
+  mLayoutOnUnlock = false;
 
   mPane->Lock();
 
@@ -229,15 +234,20 @@ void Taskbar::ActiveWindowChanged(HWND oldWindow, HWND newWindow) {
 }
 
 
-TaskButton *Taskbar::AddTask(HWND window, TaskData &taskData, bool isReplacement) {
+void Taskbar::AddTask(HWND window, TaskData &taskData, bool isReplacement) {
+  if (mMonitor != MONITOR_ALL && taskData.monitor != mMonitor || mButtonMap.count(window) != 0) {
+    return;
+  }
+
   mPane->Lock();
 
   if (isReplacement) {
-    mButtons.emplace(mReplacementPosition, mPane, (IPainter*)mButtonBackgroundPainter,
-      (IPainter*)mButtonTextPainter, mButtonEventHandler, window, taskData);
+    mButtons.emplace(mReplacementPosition, mPane, mButtonBackgroundPainter, mButtonTextPainter,
+      mButtonEventHandler, window, taskData);
+    mReplacementPosition = mButtons.end();
   } else {
-    mButtons.emplace_back(mPane, (IPainter*)mButtonBackgroundPainter,
-      (IPainter*)mButtonTextPainter, mButtonEventHandler, window, taskData);
+    mButtons.emplace_back(mPane, mButtonBackgroundPainter, mButtonTextPainter, mButtonEventHandler,
+      window, taskData);
   }
   mButtonMap[window] = --mButtons.end();
 
@@ -246,7 +256,6 @@ TaskButton *Taskbar::AddTask(HWND window, TaskData &taskData, bool isReplacement
   button.Show();
 
   mPane->Unlock();
-  return &button;
 }
 
 
@@ -260,6 +269,21 @@ bool Taskbar::GetButtonScreenRect(HWND window, D2D1_RECT_F *rect) {
 }
 
 
+void Taskbar::Lock() {
+  ++mLock;
+  mPane->Lock();
+}
+
+
+void Taskbar::MonitorChanged(HWND window, TaskData &taskData) {
+  if (taskData.monitor == mMonitor) {
+    AddTask(window, taskData, false);
+  } else if (mMonitor != MONITOR_ALL) {
+    RemoveTask(window, false);
+  }
+}
+
+
 void Taskbar::RemoveTask(HWND window, bool isBeingReplaced) {
   auto iter = mButtonMap.find(window);
   if (iter != mButtonMap.end()) {
@@ -267,6 +291,7 @@ void Taskbar::RemoveTask(HWND window, bool isBeingReplaced) {
     if (isBeingReplaced) {
       mReplacementPosition = mButtons.erase(iter->second);
     } else {
+      mReplacementPosition = mButtons.end();
       mButtons.erase(iter->second);
     }
     mButtonMap.erase(iter);
@@ -283,5 +308,21 @@ void Taskbar::RedrawTask(HWND window, DWORD parts, bool flash) {
     if (flash) {
       iter->second->Flash();
     }
+  }
+}
+
+
+void Taskbar::Unlock() {
+  if (--mLock == 0 && mLayoutOnUnlock) {
+    Relayout();
+  }
+  mPane->Unlock();
+}
+
+
+void Taskbar::UpdateButtonState(HWND window) {
+  auto iter = mButtonMap.find(window);
+  if (iter != mButtonMap.end()) {
+    iter->second->UpdateState();
   }
 }

@@ -2,7 +2,7 @@
 
 #include "ApiDefs.h"
 
-#include "../nUtilities/Windows.h"
+#include "../Headers/Windows.h"
 
 #include <stdint.h>
 
@@ -19,22 +19,23 @@ public:
   /// <summary>
   /// Get the boolean value, called for types where
   /// </summary>
-  virtual HRESULT APICALL Get(bool *dest) = 0;
+  virtual HRESULT APICALL Get(bool *dest, uint8_t argc, DataType *argt, void *argv) = 0;
 
   /// <summary>
   /// Called for Float types.
   /// </summary>
-  virtual HRESULT APICALL Get(float *dest) = 0;
+  virtual HRESULT APICALL Get(float *dest, uint8_t argc, DataType *argt, void *argv) = 0;
 
   /// <summary>
   /// Called for Float types.
   /// </summary>
-  virtual HRESULT APICALL Get(int *dest) = 0;
+  virtual HRESULT APICALL Get(int *dest, uint8_t argc, DataType *argt, void *argv) = 0;
 
   /// <summary>
   /// Called for String types.
   /// </summary>
-  virtual HRESULT APICALL Get(wchar_t *dest, size_t cchDest) = 0;
+  virtual HRESULT APICALL Get(wchar_t *dest, size_t cchDest,
+    uint8_t argc, DataType *argt, void *argv) = 0;
 
   /// <summary>
   /// Gets the return type of a call with the given parameters. If the argument types are not

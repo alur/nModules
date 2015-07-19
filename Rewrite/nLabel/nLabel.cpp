@@ -6,9 +6,8 @@
 
 #include "../nCoreApi/Core.h"
 
-#include "../nUtilities/lsapi.h"
-#include "../nUtilities/Macros.h"
-#include "../nUtilities/Windows.h"
+#include "../Headers/lsapi.h"
+#include "../Headers/Macros.h"
 
 #include <unordered_map>
 

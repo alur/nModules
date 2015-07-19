@@ -57,6 +57,7 @@
     <ClCompile Include="Timers.cpp">
       <Filter>Services</Filter>
     </ClCompile>
+    <ClCompile Include="DataManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Displays.hpp" />

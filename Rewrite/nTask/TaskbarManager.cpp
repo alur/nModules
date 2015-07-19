@@ -6,9 +6,10 @@
 #include "../nCoreApi/Core.h"
 #include "../nCoreApi/Messages.h"
 
-#include "../nUtilities/lsapi.h"
+#include "../Headers/lsapi.h"
 
 #include <thread>
+#include <VersionHelpers.h>
 
 static const UINT sLSMessages[] = { LM_GETMINRECT, LM_REDRAW, LM_WINDOWACTIVATED, LM_WINDOWCREATED,
   LM_WINDOWDESTROYED, LM_WINDOWREPLACED, LM_WINDOWREPLACING, LM_MONITORCHANGED,
@@ -28,11 +29,15 @@ HWND gPreviouslyActiveWindow;
 // How often windows are allowed to be updated, in milliseconds.
 #define MAX_UPDATE_FREQUENCY 100
 
+// How often to perform window maintenance.
+#define MAINTENANCE_FREQUENCY 250
+
 
 TaskbarManager::TaskbarManager(HWND messageWindow)
   : mMessageWindow(messageWindow)
   , mInitialized(false)
 {
+  mUpdateMonitorDuringMaintanance = !IsWindows8OrGreater();
   gActiveWindow = GetActiveWindow();
   gPreviouslyActiveWindow = gActiveWindow;
   SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)mMessageWindow, (LPARAM)sLSMessages);
@@ -46,10 +51,12 @@ TaskbarManager::TaskbarManager(HWND messageWindow)
     }, (LPARAM)messageWindow);
     PostMessage(messageWindow, NTASK_INITIALIZED, 0, 0);
   });
+  SetTimer(messageWindow, NTASK_TIMER_MAINTENANCE, MAINTENANCE_FREQUENCY, nullptr);
 }
 
 
 TaskbarManager::~TaskbarManager() {
+  KillTimer(mMessageWindow, NTASK_TIMER_MAINTENANCE);
   nCore::UnregisterForMessages(mMessageWindow, sCoreMessages);
   SendMessage(GetLitestepWnd(), LM_UNREGISTERMESSAGE, (WPARAM)mMessageWindow, (LPARAM)sLSMessages);
   mInitThread.join();
@@ -90,6 +97,7 @@ void TaskbarManager::AddWindow(HWND window, bool isReplacement) {
   task.data.progress = 0;
   task.data.progressState = TBPF_NOPROGRESS;
   task.data.flashing = false;
+  task.data.minimized = IsIconic(window) != FALSE;
   task.lastUpdateTime = GetTickCount64();
   task.updateDuringMaintenance = false;
 
@@ -123,6 +131,22 @@ LRESULT TaskbarManager::GetMinRect(HWND window, LPPOINTS points) {
   points[1].x = (short)rect.right;
   points[1].y = (short)rect.bottom;
   return 1;
+}
+
+
+void TaskbarManager::MonitorChanged(HWND window, UINT newMonitor) {
+  if (mTasks.find(window) == mTasks.end()) {
+    if (nCore::IsTaskbarWindow(window)) {
+      AddWindow(window, false);
+    }
+    return;
+  }
+
+  Task &task = mTasks[window];
+  task.data.monitor = newMonitor;
+  for (auto &taskbar : mTaskbars) {
+    taskbar.second.MonitorChanged(window, task.data);
+  }
 }
 
 
@@ -177,10 +201,55 @@ void TaskbarManager::SetOverlayIcon(HWND window, HICON icon) {
 }
 
 
+void TaskbarManager::WindowMaintenance() {
+  for (auto &taskbar : mTaskbars) {
+    taskbar.second.Lock();
+  }
+
+  // Remove invalid windows
+  for (auto iter = mTasks.begin(); iter != mTasks.end(); ) {
+    if (!IsWindow(iter->first)) {
+      for (auto &taskbar : mTaskbars) {
+        taskbar.second.RemoveTask(iter->first, false);
+      }
+      iter = mTasks.erase(iter);
+      continue;
+    }
+
+    if (mUpdateMonitorDuringMaintanance) {
+      UINT monitor = nCore::GetDisplays()->DisplayFromHWND(iter->first);
+      if (monitor != iter->second.data.monitor) {
+        MonitorChanged(iter->first, monitor);
+      }
+    }
+
+    if (iter->second.updateDuringMaintenance) {
+      RedrawWindow(iter->first, 0);
+    }
+
+    if ((IsIconic(iter->first) != FALSE) != iter->second.data.minimized) {
+      iter->second.data.minimized = !iter->second.data.minimized;
+      for (auto &taskbar : mTaskbars) {
+        taskbar.second.UpdateButtonState(iter->first);
+      }
+    }
+    ++iter;
+  }
+
+  for (auto &taskbar : mTaskbars) {
+    taskbar.second.Unlock();
+  }
+}
+
+
 LRESULT TaskbarManager::HandleMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
   switch (message) {
   case LM_GETMINRECT:
     return GetMinRect((HWND)wParam, (LPPOINTS)lParam);
+
+  case LM_MONITORCHANGED:
+    MonitorChanged((HWND)wParam, nCore::GetDisplays()->DisplayFromHWND((HWND)wParam));
+    return 0;
 
   case LM_TASK_SETOVERLAYICON:
     SetOverlayIcon((HWND)wParam, (HICON)lParam);
@@ -228,6 +297,14 @@ LRESULT TaskbarManager::HandleMessage(HWND window, UINT message, WPARAM wParam, 
     mInitialized = true;
     for (auto &taskbar : mTaskbars) {
       taskbar.second.Initialized();
+    }
+    return 0;
+
+  case WM_TIMER:
+    switch (wParam) {
+    case NTASK_TIMER_MAINTENANCE:
+      WindowMaintenance();
+      break;
     }
     return 0;
   }

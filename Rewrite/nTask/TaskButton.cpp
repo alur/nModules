@@ -2,8 +2,8 @@
 
 #include "../nCoreApi/Core.h"
 
-#include "../nUtilities/lsapi.h"
-#include "../nUtilities/Macros.h"
+#include "../Headers/lsapi.h"
+#include "../Headers/Macros.h"
 
 #include <Shellapi.h>
 
@@ -46,7 +46,7 @@ TaskButton::TaskButton(IPane *parent, IPainter *backgroundPainter, IPainter *tex
   initData.numStates = gNumButtonStates;
   mPane = parent->CreateChild(&initData);
 
-  if (IsIconic(window)) {
+  if (taskData.minimized) {
     ActivateState(State::Minimized);
   }
   if (window == gActiveWindow) {
@@ -89,12 +89,17 @@ void TaskButton::ActivateState(State state) {
       ClearState(State::Flashing);
     }
     ClearState(State::Minimized);
+  } else if (state == State::Minimized) {
+    mTaskData.minimized = true;
   }
 }
 
 
 void TaskButton::ClearState(State state) {
   mPane->ClearState(state);
+  if (state == State::Minimized) {
+    mTaskData.minimized = false;
+  }
 }
 
 
@@ -275,5 +280,14 @@ void TaskButton::ToggleAlwaysOnTop() {
     SetWindowPos(mWindow, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
   } else {
     SetWindowPos(mWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+  }
+}
+
+
+void TaskButton::UpdateState() {
+  if (mTaskData.minimized) {
+    ActivateState(State::Minimized);
+  } else {
+    ClearState(State::Minimized);
   }
 }

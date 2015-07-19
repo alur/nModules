@@ -2,9 +2,9 @@
 
 #include "ApiDefs.h"
 #include "IDiscardable.hpp"
+#include "Lengths.h"
 
-#include "../nUtilities/Lengths.h"
-#include "../nUtilities/Windows.h"
+#include "../Headers/Windows.h"
 
 /// <summary>
 /// Reads settings from the LiteStep RC files, using a prefix.
@@ -64,6 +64,9 @@ public:
 
   virtual NLENGTH APICALL GetLength(LPCWSTR key, const NLENGTH &defaultValue) const = 0;
   virtual bool APICALL GetLength(LPCWSTR key, NLENGTH *value) const = 0;
+
+  virtual UINT APICALL GetMonitor(LPCWSTR key, const UINT defaultValue) const = 0;
+  virtual bool APICALL GetMonitor(LPCWSTR key, const LPUINT value) const = 0;
 
   /// <summary>
   /// Reads a rectangle specified by X Y Width and Height from the RC files. If one or more keys

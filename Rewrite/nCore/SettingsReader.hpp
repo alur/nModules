@@ -54,6 +54,9 @@ public:
   NRECT APICALL GetLTRBRect(LPCWSTR key, const NRECT &defaultValue) const override;
   bool APICALL GetLTRBRect(LPCWSTR key, NRECT *value) const override;
 
+  UINT APICALL GetMonitor(LPCWSTR key, const UINT defaultValue) const override;
+  bool APICALL GetMonitor(LPCWSTR key, const LPUINT value) const override;
+
 private:
   bool GetFromDefaults(LPCWSTR key, LPWSTR value, size_t cchValue) const;
 

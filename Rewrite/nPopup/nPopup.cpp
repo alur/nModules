@@ -7,7 +7,7 @@
 #include "../nShared/LiteStep.h"
 #include "../nShared/String.h"
 
-#include "../nUtilities/lsapi.h"
+#include "../Headers/lsapi.h"
 
 #include <strsafe.h>
 #include <unordered_map>

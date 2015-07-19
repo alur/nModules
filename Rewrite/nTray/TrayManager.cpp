@@ -1,7 +1,7 @@
 #include "Messages.h"
 #include "TrayManager.hpp"
 
-#include "../nUtilities/Macros.h"
+#include "../Headers/Macros.h"
 
 #include <assert.h>
 #include <shellapi.h>

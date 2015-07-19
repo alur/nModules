@@ -91,14 +91,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CommandItem.cpp" />
     <ClCompile Include="ContentPopup.cpp" />
+    <ClCompile Include="InfoItem.cpp" />
     <ClCompile Include="nPopup.cpp" />
     <ClCompile Include="Popup.cpp" />
+    <ClCompile Include="PopupData.cpp" />
+    <ClCompile Include="PopupItem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommandItem.hpp" />
     <ClInclude Include="ContentPopup.hpp" />
+    <ClInclude Include="InfoItem.hpp" />
     <ClInclude Include="nPopup.h" />
     <ClInclude Include="Popup.hpp" />
+    <ClInclude Include="PopupData.hpp" />
     <ClInclude Include="PopupItem.hpp" />
     <ClInclude Include="PopupLevel.h" />
     <ClInclude Include="PopupLineType.h" />
@@ -121,9 +128,6 @@
     </ProjectReference>
     <ProjectReference Include="..\nShared\nShared.vcxproj">
       <Project>{1ef8ca33-6355-4206-b3cf-e500498aa67d}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\nUtilities\nUtilities.vcxproj">
-      <Project>{9a971a00-a016-4cc7-856d-939b5c1f895c}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

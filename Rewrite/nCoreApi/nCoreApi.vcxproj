@@ -89,16 +89,15 @@
     <ClInclude Include="IPainter.hpp" />
     <ClInclude Include="ISettingsReader.hpp" />
     <ClInclude Include="IStringMap.hpp" />
+    <ClInclude Include="Lengths.h" />
     <ClInclude Include="Messages.h" />
     <ClInclude Include="TaskWindow.h" />
+    <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\nUtilities\nUtilities.vcxproj">
-      <Project>{9a971a00-a016-4cc7-856d-939b5c1f895c}</Project>
-    </ProjectReference>
+    <ClCompile Include="Lengths.cpp" />
+    <ClCompile Include="Version.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

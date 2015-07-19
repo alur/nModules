@@ -1,8 +1,8 @@
 #include "Displays.hpp"
 #include "Pane.hpp"
 
-#include "../nUtilities/lsapi.h"
-#include "../nUtilities/Macros.h"
+#include "../Headers/lsapi.h"
+#include "../Headers/Macros.h"
 
 extern Displays gDisplays;
 

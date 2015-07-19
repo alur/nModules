@@ -3,7 +3,7 @@
 #include "ApiDefs.h"
 #include "IPane.hpp"
 
-#include "../nUtilities/d2d1.h"
+#include "../Headers/d2d1.h"
 
 /// <summary>
 /// Paints panes.

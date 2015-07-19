@@ -22,10 +22,14 @@ public:
 
 public:
   void ActiveWindowChanged(HWND oldWindow, HWND newWindow);
-  TaskButton *AddTask(HWND, TaskData&, bool isReplacement);
+  void AddTask(HWND, TaskData&, bool isReplacement);
   bool GetButtonScreenRect(HWND window, D2D1_RECT_F*);
+  void Lock();
+  void MonitorChanged(HWND, TaskData&);
   void RedrawTask(HWND window, DWORD parts, bool flash);
   void RemoveTask(HWND window, bool isBeingReplaced);
+  void Unlock();
+  void UpdateButtonState(HWND window);
 
   void Initialized();
 
@@ -39,12 +43,14 @@ private:
   NLENGTH mButtonMaxHeight;
   NLENGTH mButtonWidth;
   NLENGTH mButtonHeight;
+  UINT mMonitor;
 
 private:
   IPane *mPane;
   IDiscardablePainter *mBackgroundPainter;
   IEventHandler *mEventHandler;
   int mLock;
+  bool mLayoutOnUnlock;
 
 private:
   IDiscardablePainter *mButtonTextPainter;

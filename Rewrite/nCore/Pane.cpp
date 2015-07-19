@@ -4,8 +4,8 @@
 
 #include "../nShared/Math.h"
 
-#include "../nUtilities/lsapi.h"
-#include "../nUtilities/Macros.h"
+#include "../Headers/lsapi.h"
+#include "../Headers/Macros.h"
 
 #include <assert.h>
 #include <dwmapi.h>
@@ -186,6 +186,7 @@ Pane::Pane(const PaneInitData *initData, Pane *parent)
       (int)mSize.width, (int)mSize.height, parentWindow, nullptr, gInstance, this);
     SetWindowLongPtr(mWindow, GWLP_USERDATA, MAGIC_DWORD);
     SetWindowPos(mWindow, insertAfter, 0, 0, 0, 0, windowPosFlags);
+    ShowWindow(mWindow, SW_HIDE);
 
     ZeroMemory(&mTrackMouseEvent, sizeof(TRACKMOUSEEVENT));
     mTrackMouseEvent.cbSize = sizeof(TRACKMOUSEEVENT);

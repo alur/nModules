@@ -5,9 +5,9 @@
 #include "IMessageHandler.hpp"
 #include "IPainter.hpp"
 #include "ISettingsReader.hpp"
+#include "Lengths.h"
 
-#include "../nUtilities/d2d1.h"
-#include "../nUtilities/Lengths.h"
+#include "../Headers/d2d1.h"
 
 struct StateDefinition {
   LPCWSTR name;
@@ -118,7 +118,7 @@ public:
   /// Lock().
   /// </summary>
   virtual void APICALL Lock() = 0;
-  
+
   /// <summary>
   /// Moves the top-left corner of the pane to the given position.
   /// </summary>

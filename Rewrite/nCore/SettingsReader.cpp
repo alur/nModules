@@ -3,8 +3,8 @@
 
 #include "../nShared/String.h"
 
-#include "../nUtilities/lsapi.h"
-#include "../nUtilities/Macros.h"
+#include "../Headers/lsapi.h"
+#include "../Headers/Macros.h"
 
 #include <assert.h>
 #include <functional>
@@ -223,6 +223,23 @@ bool SettingsReader::GetLength(LPCWSTR key, NLENGTH *value) const {
 
   if (GetString(key, buffer, MAX_LINE_LENGTH, L"")) {
     return ParseLength(buffer, value);
+  }
+
+  return false;
+}
+
+
+UINT SettingsReader::GetMonitor(LPCWSTR key, const UINT defaultValue) const {
+  UINT val;
+  return GetMonitor(key, &val) ? val : defaultValue;
+}
+
+
+bool SettingsReader::GetMonitor(LPCWSTR key, const LPUINT value) const {
+  wchar_t buffer[MAX_LINE_LENGTH];
+
+  if (GetString(key, buffer, MAX_LINE_LENGTH, L"")) {
+    return ParseMonitor(buffer, value);
   }
 
   return false;

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../nUtilities/Windows.h"
+#include "../Headers/Windows.h"
 
 #include <Shobjidl.h>
 
 /// <summary>
-/// 
+///
 /// </summary>
 struct TaskWindow {
   UINT monitor;

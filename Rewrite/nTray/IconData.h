@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../nUtilities/lsapi.h"
+#include "../Headers/lsapi.h"
 
 struct IconData {
   IconData() : guid(GUID_NULL), window(nullptr), icon(nullptr), id(0), version(0),

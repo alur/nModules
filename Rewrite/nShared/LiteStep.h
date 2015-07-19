@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../nUtilities/Version.h"
-#include "../nUtilities/Windows.h"
+#include "../nCoreApi/Version.h"
+
+#include "../Headers/Windows.h"
 
 /// <summary>
 /// Creates a message handler for an nModule.

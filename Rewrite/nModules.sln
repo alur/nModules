@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nDesk", "nDesk\nDesk.vcxpro
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{356D83DF-9894-45E8-8308-9384DF1B54DD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nUtilities", "nUtilities\nUtilities.vcxproj", "{9A971A00-A016-4CC7-856D-939B5C1F895C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Headers", "Headers\Headers.vcxproj", "{9A971A00-A016-4CC7-856D-939B5C1F895C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{9C71B613-75C3-4413-8781-D6192351B49F}"
 EndProject

@@ -3,7 +3,7 @@
 #include "ApiDefs.h"
 #include "IDiscardable.hpp"
 
-#include "../nUtilities/Windows.h"
+#include "../Headers/Windows.h"
 
 class ILogger : public IDiscardable {
 public:

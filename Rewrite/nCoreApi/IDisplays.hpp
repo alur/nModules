@@ -2,7 +2,7 @@
 
 #include "ApiDefs.h"
 
-#include "../nUtilities/d2d1.h"
+#include "../Headers/d2d1.h"
 
 /// <summary>
 /// A monitor.

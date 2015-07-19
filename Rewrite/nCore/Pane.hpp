@@ -2,7 +2,7 @@
 
 #include "../nCoreApi/IPane.hpp"
 
-#include "../nUtilities/d2d1.h"
+#include "../Headers/d2d1.h"
 
 #include <unordered_set>
 #include <vector>

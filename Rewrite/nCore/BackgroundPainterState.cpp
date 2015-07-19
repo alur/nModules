@@ -1,6 +1,6 @@
 #include "BackgroundPainterState.hpp"
 
-#include "../nUtilities/Macros.h"
+#include "../Headers/Macros.h"
 
 
 void GetLength(const ISettingsReader *reader, LPCWSTR key, FallbackOptional<NLENGTH> &out) {

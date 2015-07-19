@@ -1,8 +1,7 @@
 #pragma once
 
 #include "../nCoreApi/ISettingsReader.hpp"
-
-#include "../nUtilities/Lengths.h"
+#include "../nCoreApi/Lengths.h"
 
 class LayoutSettings {
 public:

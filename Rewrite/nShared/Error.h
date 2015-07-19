@@ -6,7 +6,7 @@
 //-------------------------------------------------------------------------------------------------
 #pragma once
 
-#include "../nUtilities/Windows.h"
+#include "../Headers/Windows.h"
 
 inline HRESULT HrGetLastError() {
   return HRESULT_FROM_WIN32(GetLastError());

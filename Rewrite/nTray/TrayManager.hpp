@@ -4,7 +4,7 @@
 #include "Tray.hpp"
 #include "TrayIcon.hpp"
 
-#include "../nUtilities/lsapi.h"
+#include "../Headers/lsapi.h"
 
 #include <list>
 #include <map>

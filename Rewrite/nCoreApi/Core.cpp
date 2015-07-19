@@ -9,7 +9,7 @@ static void __cdecl UnitializedCoreFunc() {
   x (__cdecl *y)(__VA_ARGS__) = (x (__cdecl*)(__VA_ARGS__))UnitializedCoreFunc
 #include "Core.h"
 
-#include "../nUtilities/hresults.h"
+#include "../Headers/hresults.h"
 
 #define CORE_PROC_ITEM(name, version) { (void**)&nCore::name, #name, version }
 static const struct CoreProcItem {
@@ -39,10 +39,10 @@ static const struct CoreProcItem {
   CORE_PROC_ITEM(IsTaskbarWindow,           MakeVersion(1, 0, 0, 0)),
   CORE_PROC_ITEM(ParseLength,               MakeVersion(1, 0, 0, 0)),
   CORE_PROC_ITEM(ParseMonitor,              MakeVersion(1, 0, 0, 0)),
-  //CORE_PROC_ITEM(RegisterDataProvider,      MakeVersion(1, 0, 0, 0)),
+  CORE_PROC_ITEM(RegisterDataProvider,      MakeVersion(1, 0, 0, 0)),
   CORE_PROC_ITEM(RegisterForMessages,       MakeVersion(1, 0, 0, 0)),
   CORE_PROC_ITEM(SetInterval,               MakeVersion(1, 0, 0, 0)),
-  //CORE_PROC_ITEM(UnregisterDataProvider,    MakeVersion(1, 0, 0, 0)),
+  CORE_PROC_ITEM(UnregisterDataProvider,    MakeVersion(1, 0, 0, 0)),
   CORE_PROC_ITEM(UnregisterForMessages,     MakeVersion(1, 0, 0, 0))
 };
 

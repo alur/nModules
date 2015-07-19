@@ -1,7 +1,7 @@
 #include "Factories.h"
 
-#include "../nUtilities/d2d1.h"
-#include "../nUtilities/Macros.h"
+#include "../Headers/d2d1.h"
+#include "../Headers/Macros.h"
 
 #include <dwrite.h>
 #include <wincodec.h>

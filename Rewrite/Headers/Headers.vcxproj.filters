@@ -5,12 +5,6 @@
     <ClInclude Include="Windows.h" />
     <ClInclude Include="d2d1.h" />
     <ClInclude Include="lsapi.h" />
-    <ClInclude Include="Version.h" />
     <ClInclude Include="hresults.h" />
-    <ClInclude Include="Lengths.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Version.cpp" />
-    <ClCompile Include="Lengths.cpp" />
   </ItemGroup>
 </Project>

@@ -3,8 +3,8 @@
 #include "Messages.h"
 #include "WindowMonitor.h"
 
-#include "../nUtilities/lsapi.h"
-#include "../nUtilities/Macros.h"
+#include "../Headers/lsapi.h"
+#include "../Headers/Macros.h"
 
 #include <algorithm>
 #include <assert.h>

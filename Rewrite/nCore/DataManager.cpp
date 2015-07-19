@@ -12,6 +12,7 @@ EXPORT_CDECL(void) DataChanged(int num, LPCWSTR name, ...) {
 
 
 EXPORT_CDECL(bool) RegisterDataProvider(LPCWSTR name, IDataProvider *provider) {
+  sDataProviders.emplace(name, provider);
   return true;
 }
 

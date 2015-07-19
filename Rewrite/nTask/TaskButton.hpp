@@ -48,6 +48,7 @@ public:
   void Position(const NRECT &position);
   void Redraw(DWORD sections);
   void Show();
+  void UpdateState();
 
   // Button events
 private:

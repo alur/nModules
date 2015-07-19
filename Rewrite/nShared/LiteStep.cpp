@@ -1,8 +1,8 @@
 #include "Error.h"
 #include "LiteStep.h"
 
-#include "../nUtilities/hresults.h"
-#include "../nUtilities/lsapi.h"
+#include "../Headers/hresults.h"
+#include "../Headers/lsapi.h"
 
 #include <strsafe.h>
 

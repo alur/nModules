@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../nCoreApi/ILogger.hpp"
+#include "../nCoreApi/Version.h"
 
-#include "../nUtilities/Version.h"
-#include "../nUtilities/Windows.h"
+#include "../Headers/Windows.h"
 
 class NModule {
 public:

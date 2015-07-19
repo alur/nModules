@@ -2,7 +2,7 @@
 
 #include "ApiDefs.h"
 
-#include "../nUtilities/Windows.h"
+#include "../Headers/Windows.h"
 
 typedef LONG_PTR NPARAM;
 

@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9A971A00-A016-4CC7-856D-939B5C1F895C}</ProjectGuid>
     <RootNamespace>Utilities</RootNamespace>
-    <ProjectName>nUtilities</ProjectName>
+    <ProjectName>Headers</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -74,15 +74,9 @@
   <ItemGroup>
     <ClInclude Include="d2d1.h" />
     <ClInclude Include="hresults.h" />
-    <ClInclude Include="Lengths.h" />
     <ClInclude Include="lsapi.h" />
     <ClInclude Include="Macros.h" />
-    <ClInclude Include="Version.h" />
     <ClInclude Include="Windows.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Lengths.cpp" />
-    <ClCompile Include="Version.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

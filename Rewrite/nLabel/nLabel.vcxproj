@@ -109,9 +109,6 @@
     <ProjectReference Include="..\nShared\nShared.vcxproj">
       <Project>{1ef8ca33-6355-4206-b3cf-e500498aa67d}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\nUtilities\nUtilities.vcxproj">
-      <Project>{9a971a00-a016-4cc7-856d-939b5c1f895c}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Label.hpp" />
