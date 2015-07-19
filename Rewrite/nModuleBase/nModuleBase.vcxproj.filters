@@ -10,6 +10,6 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="nModule.rc" />
+    <None Include="nModule.rc" />
   </ItemGroup>
 </Project>

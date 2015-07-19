@@ -18,7 +18,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AssemblyDebug>true</AssemblyDebug>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>kernel32.lib;msvcrtd.lib;msvcprtd.lib;user32.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;msvcrtd.lib;msvcprtd.lib;user32.lib;vcruntimed.lib;ucrtd.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\libs\$(PlatformArchitecture)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -45,7 +45,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>kernel32.lib;msvcrt.lib;msvcprt.lib;user32.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;msvcrt.lib;msvcprt.lib;user32.lib;vcruntime.lib;ucrt.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\libs\$(PlatformArchitecture)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
