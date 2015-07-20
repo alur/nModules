@@ -287,14 +287,18 @@ void Taskbar::MonitorChanged(HWND window, TaskData &taskData) {
 void Taskbar::RemoveTask(HWND window, bool isBeingReplaced) {
   auto iter = mButtonMap.find(window);
   if (iter != mButtonMap.end()) {
+    // Destroying the actual button may trigger message processing, which may attempt to delete
+    // the task once again (WindowMaintenance + LM_WINDOWDESTROYED). Therefore, it must be erased
+    // from the mButtonMap before being erased from mButtons.
+    auto buttonsIter = iter->second;
+    mButtonMap.erase(iter);
     mPane->Lock();
     if (isBeingReplaced) {
-      mReplacementPosition = mButtons.erase(iter->second);
+      mReplacementPosition = mButtons.erase(buttonsIter);
     } else {
       mReplacementPosition = mButtons.end();
-      mButtons.erase(iter->second);
+      mButtons.erase(buttonsIter);
     }
-    mButtonMap.erase(iter);
     Relayout();
     mPane->Unlock();
   }
