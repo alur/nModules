@@ -42,7 +42,7 @@ TaskbarManager::TaskbarManager(HWND messageWindow)
   gPreviouslyActiveWindow = gActiveWindow;
   SendMessage(GetLitestepWnd(), LM_REGISTERMESSAGE, (WPARAM)mMessageWindow, (LPARAM)sLSMessages);
   nCore::RegisterForMessages(mMessageWindow, sCoreMessages);
-  mInitThread = std::thread([messageWindow] () -> void {
+  mInitThread = std::thread([] (HWND messageWindow) -> void {
     EnumDesktopWindows(nullptr, (WNDENUMPROC) [] (HWND window, LPARAM messageWindow) -> BOOL {
       if (nCore::IsTaskbarWindow(window)) {
         PostMessage((HWND)messageWindow, LM_WINDOWCREATED, (WPARAM)window, 0);
@@ -50,7 +50,7 @@ TaskbarManager::TaskbarManager(HWND messageWindow)
       return TRUE;
     }, (LPARAM)messageWindow);
     PostMessage(messageWindow, NTASK_INITIALIZED, 0, 0);
-  });
+  }, messageWindow);
   SetTimer(messageWindow, NTASK_TIMER_MAINTENANCE, MAINTENANCE_FREQUENCY, nullptr);
 }
 
@@ -111,11 +111,11 @@ void TaskbarManager::DestroyWindow(HWND window, bool isBeingReplaced) {
   if (mTasks.find(window) == mTasks.end()) {
     return;
   }
+  mTasks.erase(window);
 
   for (auto &taskbar : mTaskbars) {
     taskbar.second.RemoveTask(window, isBeingReplaced);
   }
-  mTasks.erase(window);
 }
 
 
