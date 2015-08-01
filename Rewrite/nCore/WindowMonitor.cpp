@@ -170,16 +170,27 @@ void WindowMonitor::RunWindowMaintenance() {
 }
 
 
+static inline bool IsCoreWindow(HWND window) {
+  wchar_t className[512];
+  if (GetClassName(window, className, _countof(className)) == 0) {
+    return false;
+  }
+  return wcscmp(L"Windows.UI.Core.CoreWindow", className) == 0 ||
+      wcscmp(L"ApplicationFrameWindow", className) == 0;
+}
+
+
 EXPORT_CDECL(bool) IsTaskbarWindow(HWND window) {
   if (!IsWindow(window) || !IsWindowVisible(window)) {
     return false;
   }
   LONG_PTR exStyle = GetWindowLongPtr(window, GWL_EXSTYLE);
   return CHECKFLAG(exStyle, WS_EX_APPWINDOW) ||
-    GetParent(window) == nullptr &&
-    GetWindow(window, GW_OWNER) == nullptr &&
-    !CHECKFLAG(exStyle, WS_EX_TOOLWINDOW) &&
-    GetWindowTextLength(window) != 0;
+      GetParent(window) == nullptr &&
+      GetWindow(window, GW_OWNER) == nullptr &&
+      !CHECKFLAG(exStyle, WS_EX_TOOLWINDOW) &&
+      GetWindowTextLength(window) != 0 &&
+      !IsCoreWindow(window); // TODO(Erik): How does explorer do this?
 }
 
 
