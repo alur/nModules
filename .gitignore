@@ -7,3 +7,6 @@ bin
 *.dat
 /Documentation/*.chm
 /tools/builds
+*.opendb
+*.VC.db
+*/.vs/*
