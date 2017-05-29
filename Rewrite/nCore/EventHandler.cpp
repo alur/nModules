@@ -150,14 +150,14 @@ LRESULT EventHandler::HandleMessage(HWND window, UINT msg, WPARAM wParam, LPARAM
 /// </summary>
 WORD EventHandler::ModsFromString(LPWSTR str) {
   static StringKeyedMaps<LPCWSTR, WORD>::ConstUnorderedMap stringToMod({
-    { L"ctrl", MK_CONTROL },
-    { L"mouseleft", MK_LBUTTON },
-    { L"mousemiddle", MK_MBUTTON },
-    { L"mouseright", MK_RBUTTON },
-    { L"shift", MK_SHIFT },
-    { L"mousex1", MK_XBUTTON1 },
-    { L"mousex2", MK_XBUTTON2 },
-    { L"alt", MK_XBUTTON2 << 1 }
+    { L"ctrl", WORD(MK_CONTROL) },
+    { L"mouseleft", WORD(MK_LBUTTON) },
+    { L"mousemiddle", WORD(MK_MBUTTON) },
+    { L"mouseright", WORD(MK_RBUTTON) },
+    { L"shift", WORD(MK_SHIFT) },
+    { L"mousex1", WORD(MK_XBUTTON1) },
+    { L"mousex2", WORD(MK_XBUTTON2) },
+    { L"alt", WORD(MK_XBUTTON2 << 1) }
   });
 
   WORD mods = 0x0000;
