@@ -11,8 +11,7 @@ HRESULT CreateMessageHandler(HINSTANCE coreInstance, LPCWSTR name, WNDPROC wndPr
   window = CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_NOREDIRECTIONBITMAP, L"LSnModuleMsgHandler",
     name, WS_POPUP, 0, 0, 0, 0, nullptr, nullptr, coreInstance, wndProc);
   if (window == nullptr) {
-    HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
-    return hr;
+    return HrGetLastError();
   }
 
   SetWindowLongPtr(window, GWLP_USERDATA, MAGIC_DWORD);
