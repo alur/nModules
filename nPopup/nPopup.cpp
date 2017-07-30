@@ -448,20 +448,26 @@ PopupLineType ProcessPopupLine(LPCTSTR line, ContentPopup::ContentSource & sourc
                 *title = L'\0';
             }
             return PopupLineType::Info;
-        }
-        else
-        {
-            StringCchCopy(title, cchTitle, token);
+		}
+		else
+		{
+			// Store a copy to here, if this turns out to be a command
+			LPCTSTR commandPointer = linePointer;
+
+			// Check if the title was omited for !New
+			if (_wcsicmp(token, L"!New") != 0)
+			{
+				StringCchCopy(title, cchTitle, token);
+
+				// This would be an empty command, or something, might as well mark it invalid.
+				if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) == FALSE)
+				{
+					return PopupLineType::Invalid;
+				}
+			}
+			else
+				*title = L'\0';
             // The token after the title is either !New, Folder, or a command.
-
-            // Store a copy to here, if this turns out to be a command
-            LPCTSTR commandPointer = linePointer;
-
-            // This would be an empty command, or something, might as well mark it invalid.
-            if (LiteStep::GetToken(linePointer, token, &linePointer, FALSE) == FALSE)
-            {
-                return PopupLineType::Invalid;
-            }
 
             //
             PopupLineType type;
