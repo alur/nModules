@@ -65,6 +65,11 @@ DesktopPainter::DesktopPainter(HWND hWnd) : Window(hWnd, L"nDesk", g_pClickHandl
 
   nCore::System::RegisterWindow(L"nDesk", this);
   UpdateWallpaper(true);
+
+  //Create the notification for wallpaper change
+  hWallpaperEvent = CreateEvent(NULL, false, false, NULL);
+  RegOpenKeyEx(HKEY_CURRENT_USER, L"Control Panel\\Desktop", 0, KEY_NOTIFY, &hWallpaperKey);
+  RegNotifyChangeKeyValue(hWallpaperKey, FALSE, REG_NOTIFY_CHANGE_LAST_SET, hWallpaperEvent, TRUE);
 }
 
 /// <summary>
@@ -78,6 +83,12 @@ DesktopPainter::~DesktopPainter() {
   if (m_TransitionEffect) {
     delete m_TransitionEffect;
   }
+
+  //Close the wallpaper event
+  CloseHandle(hWallpaperEvent);
+
+  //Close the wallpaper registry key
+  RegCloseKey(hWallpaperKey);
 }
 
 /// <summary>
@@ -328,6 +339,20 @@ void DesktopPainter::PaintComposite() {
 /// Handles certain window messages.
 /// </summary>
 LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+
+	//Check if the wallpaper registry has been changed
+	if (WaitForSingleObject(hWallpaperEvent, 0) == WAIT_OBJECT_0)
+	{
+		//Fetch the new wallpaper
+		UpdateWallpaper();
+
+		//Force window to redraw
+		this->Repaint();
+
+		//RegNotifyChangeKeyValue() expires after the event has changed state
+		RegNotifyChangeKeyValue(hWallpaperKey, FALSE, REG_NOTIFY_CHANGE_LAST_SET, hWallpaperEvent, TRUE);
+	}
+
   switch (uMsg) {
   case WM_ERASEBKGND:
     return 1;
@@ -335,6 +360,7 @@ LRESULT DesktopPainter::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
   case WM_PAINT:
     {
       if (!mDontRenderWallpaper) {
+
         UpdateLock lock(this);
 
         bool inAnimation = false;
