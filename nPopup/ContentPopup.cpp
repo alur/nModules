@@ -117,7 +117,7 @@ void ContentPopup::LoadContent()
     {
     case ADMIN_TOOLS:
         LoadShellFolder(FOLDERID_AdminTools);
-		LoadShellFolder(FOLDERID_CommonAdminTools);
+        LoadShellFolder(FOLDERID_CommonAdminTools);
         break;
 
     case CONTROL_PANEL:
